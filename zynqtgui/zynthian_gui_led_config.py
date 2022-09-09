@@ -117,34 +117,76 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
                 # This is global (i.e. for all screens)
                 if self.zyngui.leftSidebarActive:
-                    partClip = self.zyngui.sketchpad.song.getClipByPart(channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, i-1)
-
-                    if channel is not None and partClip.enabled:
-                        if channel.channelAudioType == "synth":
+                    # If slots synths bar is active, light up filled cells otherwise turn off led
+                    if channel is not None and channel.channelAudioType == "synth":
+                        if channel.chainedSounds[i - 1] > -1 and \
+                                channel.checkIfLayerExists(channel.chainedSounds[i - 1]):
                             self.button_color_map[i] = {
                                 'color': self.led_color_red,
                                 'blink': True
                             }
-                        elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
+                        else:
+                            self.button_color_map[i] = {
+                                'color': self.led_color_blue,
+                                'blink': False
+                            }
+
+                        continue
+
+                    # If slots samples bar is active, light up filled cells otherwise turn off led
+                    if channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
+                        if channel.samples[i - 1].path is not None:
                             self.button_color_map[i] = {
                                 'color': self.led_color_yellow,
                                 'blink': True
                             }
-                        elif channel.channelAudioType == "sample-loop":
+                        else:
+                            self.button_color_map[i] = {
+                                'color': self.led_color_blue,
+                                'blink': False
+                            }
+
+                        continue
+
+                    # If channel is in loop mode, light slot having a clip green, otherwise turn off
+                    if channel is not None and channel.channelAudioType == "sample-loop":
+                        clip = channel.getClipsModelByPart(i-1).getClip(self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex)
+
+                        if clip is not None and clip.path is not None and len(clip.path) > 0:
                             self.button_color_map[i] = {
                                 'color': self.led_color_green,
                                 'blink': True
                             }
-                        elif channel.channelAudioType == "external":
+                        else:
                             self.button_color_map[i] = {
-                                'color': self.led_color_purple,
-                                'blink': True
+                                'color': self.led_color_blue,
+                                'blink': False
                             }
-                    else:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_blue,
-                            'blink': False
-                        }
+
+                        continue
+
+                    # If sound combinator is active, light up filled cells with green color otherwise display blue color
+                    if self.zyngui.soundCombinatorActive:
+                        if channel is not None and \
+                                (i - 1) == channel.selectedSlotRow:
+                            # Set active color to selected sound row when combinator is open
+                            self.button_color_map[i] = {
+                                'color': self.led_color_active,
+                                'blink': False
+                            }
+                        else:
+                            self.button_color_map[i] = {
+                                'color': self.led_color_light,
+                                'blink': False
+                            }
+
+                        continue
+
+                    # If none of the above conditions were true, light up button with blue color
+                    self.button_color_map[i] = {
+                        'color': self.led_color_light,
+                        'blink': False
+                    }
 
                     continue
 
@@ -164,76 +206,34 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
                     continue
 
-                # If slots synths bar is active, light up filled cells otherwise turn off led
-                if channel is not None and channel.channelAudioType == "synth":
-                    if channel.chainedSounds[i-1] > -1 and \
-                            channel.checkIfLayerExists(channel.chainedSounds[i-1]):
+                partClip = self.zyngui.sketchpad.song.getClipByPart(channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, i - 1)
+
+                if channel is not None and partClip.enabled:
+                    if channel.channelAudioType == "synth":
                         self.button_color_map[i] = {
                             'color': self.led_color_red,
                             'blink': False
                         }
-                    else:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_blue,
-                            'blink': False
-                        }
-
-                    continue
-
-                # If slots samples bar is active, light up filled cells otherwise turn off led
-                if channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                    if channel.samples[i-1].path is not None:
+                    elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
                         self.button_color_map[i] = {
                             'color': self.led_color_yellow,
                             'blink': False
                         }
-                    else:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_blue,
-                            'blink': False
-                        }
-
-                    continue
-
-                # light up "1" Button green if clip has a wav otherwise turn off led
-                if channel is not None and channel.channelAudioType == "sample-loop":
-                    clip = channel.clipsModel.getClip(0)
-
-                    if i-1 == 0 and clip.path is not None and len(clip.path) > 0:
+                    elif channel.channelAudioType == "sample-loop":
                         self.button_color_map[i] = {
                             'color': self.led_color_green,
                             'blink': False
                         }
-                    else:
+                    elif channel.channelAudioType == "external":
                         self.button_color_map[i] = {
-                            'color': self.led_color_blue,
+                            'color': self.led_color_purple,
                             'blink': False
                         }
-
-                    continue
-
-                # If sound combinator is active, light up filled cells with green color otherwise display blue color
-                if self.zyngui.soundCombinatorActive:
-                    if channel is not None and \
-                            (i-1) == channel.selectedSlotRow:
-                        # Set active color to selected sound row when combinator is open
-                        self.button_color_map[i] = {
-                            'color': self.led_color_active,
-                            'blink': False
-                        }
-                    else:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_light,
-                            'blink': False
-                        }
-
-                    continue
-
-                # If none of the above conditions were true, light up button with blue color
-                self.button_color_map[i] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
+                else:
+                    self.button_color_map[i] = {
+                        'color': self.led_color_blue,
+                        'blink': False
+                    }
 
             # 7 : FX Button
             if channel is not None and channel.channelAudioType == "synth":

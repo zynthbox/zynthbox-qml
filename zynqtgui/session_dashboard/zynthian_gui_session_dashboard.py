@@ -108,11 +108,11 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def set_selected_channel_complete(self):
         self.zyngui.fixed_layers.fill_list()
 
-        # Do make a call to switch sound (and eventually update bank and preset screens) when
-        # library page is open. Otherwise sound change is already reactive to selectedChannel and calling
+        # Do make a call to switch sound (and eventually update bank and preset screens) when any page other than
+        # sketchpad is open. Otherwise sound change is already reactive to selectedChannel and calling
         # change_o_channel_sound causes UI stutters as showing bank and preset screen is a bit time consuming.
         if self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen_id() in ["layers_for_channel", "bank", "preset"]:
+                self.zyngui.get_current_screen_id() != "sketchpad":
             QMetaObject.invokeMethod(self, "change_to_channel_sound", Qt.QueuedConnection)
 
     ### Property name

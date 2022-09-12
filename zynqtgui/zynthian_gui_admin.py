@@ -911,10 +911,12 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
                 process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=True)
 
-                cache = apt.cache.Cache()
-                cache.open()
-                cache["zynthbox-update-script"].mark_install()
-                cache.commit()
+                #cache = apt.cache.Cache()
+                #cache.open()
+                #cache["zynthbox-update-script"].mark_install()
+                #cache.commit()
+
+                process_upgrade_updater = run(["apt-get", "install", "-y", "zynthbox-update-script"], capture_output=False, text=True, check=True)
 
                 process_check_for_updates = run(["/usr/bin/zynthbox-update-script", "check_for_updates"], capture_output=False, text=True, check=False)
 

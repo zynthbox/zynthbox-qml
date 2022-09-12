@@ -58,7 +58,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackAHold), 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackAHold / zynthian.status_information.rangedB), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -122,7 +122,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackBHold), 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackBHold / zynthian.status_information.rangedB), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor

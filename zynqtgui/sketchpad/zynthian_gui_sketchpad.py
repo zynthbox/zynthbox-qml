@@ -120,7 +120,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.clips_to_record = []
         self.__display_scene_buttons = False
         self.__recording_source = "internal"
-        self.__recording_channel = "1"
+        self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
 

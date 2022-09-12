@@ -273,6 +273,7 @@ QQC2.Popup {
                 }
 
                 RowLayout {
+                    visible: false // Hide target channels for now
                     Layout.fillWidth: false
 
                     QQC2.Label {
@@ -463,51 +464,69 @@ QQC2.Popup {
                             horizontalCenter: parent.horizontalCenter
                         }
 
-                        Extras.Gauge {
-                            Layout.fillHeight: true
+                        ColumnLayout {
+                            Extras.Gauge {
+                                Layout.fillHeight: true
 
-                            minimumValue: -100
-                            maximumValue: 20
-                            value: visible
-                                   ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                      ? ZL.AudioLevels.channels[root.selectedChannel.id]
-                                      : ZL.AudioLevels.captureA
-                                   : -100
+                                minimumValue: -100
+                                maximumValue: 20
+                                value: visible
+                                       ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                          ? ZL.AudioLevels.channels[root.selectedChannel.id]
+                                          : ZL.AudioLevels.captureA
+                                       : -100
 
-                            font.pointSize: 8
+                                font.pointSize: 8
 
-                            style: GaugeStyle {
-                                valueBar: Rectangle {
-                                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                    implicitWidth: 6
+                                style: GaugeStyle {
+                                    valueBar: Rectangle {
+                                        color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                        implicitWidth: 6
+                                    }
+                                    minorTickmark: null
+                                    tickmark: null
+                                    tickmarkLabel: null
                                 }
-                                minorTickmark: null
-                                tickmark: null
-                                tickmarkLabel: null
+                            }
+
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                horizontalAlignment: "AlignRight"
+                                text: qsTr("L")
                             }
                         }
 
-                        Extras.Gauge {
-                            Layout.fillHeight: true
+                        ColumnLayout {
+                            Extras.Gauge {
+                                Layout.fillHeight: true
 
-                            minimumValue: -100
-                            maximumValue: 20
-                            value: visible
-                                    ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                       ? ZL.AudioLevels.channels[root.selectedChannel.id]
-                                       : ZL.AudioLevels.captureB
-                                    : -100
+                                minimumValue: -100
+                                maximumValue: 20
+                                value: visible
+                                        ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                           ? ZL.AudioLevels.channels[root.selectedChannel.id]
+                                           : ZL.AudioLevels.captureB
+                                        : -100
 
-                            font.pointSize: 8
+                                font.pointSize: 8
 
-                            style: GaugeStyle {
-                                valueBar: Rectangle {
-                                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                    implicitWidth: 6
+                                style: GaugeStyle {
+                                    valueBar: Rectangle {
+                                        color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                        implicitWidth: 6
+                                    }
+                                    minorTickmark: null
+                                    tickmark: null
+                                    tickmarkLabel: null
                                 }
-                                minorTickmark: null
-                                tickmark: null
-                                tickmarkLabel: null
+                            }
+
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                horizontalAlignment: "AlignRight"
+                                text: qsTr("R")
                             }
                         }
                     }

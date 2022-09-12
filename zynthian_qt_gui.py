@@ -679,6 +679,10 @@ class zynthian_gui(QObject):
 
         self.show_screens_queue_timer.start()
 
+    def clear_show_screen_queue(self):
+        self.show_screens_queue_timer.stop()
+        self.show_screens_queue.clear()
+
     '''
     Show screen queue timer timeout when invoked will process the screens from the queue and will call processEvents
     after showing every screen to process any queued qt events. This will cause the UI to keep updating and not cause

@@ -268,6 +268,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.activate_index(i)
 
 	def activate_midichan_layer(self, midi_chan):
+		self.zyngui.clear_show_screen_queue()
 		self.zyngui.screens['bank'].set_show_top_sounds(False)
 		if midi_chan in self.layer_midi_map:
 			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))

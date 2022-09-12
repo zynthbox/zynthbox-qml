@@ -476,6 +476,7 @@ class zynthian_gui(QObject):
         self.__global_popup_opened__ = False
         self.__is__modal__screens__caching__complete__ = False
         self.__is__screens__caching__complete__ = False
+        self.__passive_notification = ""
 
         # When true, 1-5 buttons selects channel 6-10
         self.channels_mod_active = False
@@ -3628,7 +3629,6 @@ class zynthian_gui(QObject):
         root.send_event(close_message, event_mask=mask)
         display.flush()
 
-
     def get_active_midi_channel(self):
         if self.curlayer == None:
             return lib_zyncoder.get_midi_active_chan()
@@ -4342,6 +4342,22 @@ class zynthian_gui(QObject):
     knobTouchUpdateInProgress = Property(bool, get_knob_touch_update_in_progress, set_knob_touch_update_in_progress,
                                          notify=knob_touch_update_in_progress_changed)
     ### END Property knobTouchUpdateInProgress
+
+    ### Property passiveNotification
+    def get_passiveNotification(self):
+        return self.__passive_notification
+
+    def set_passiveNotification(self, msg):
+        self.__passive_notification = msg
+
+        # Show notification if message is not empty
+        if msg != "":
+            self.passiveNotificationChanged.emit()
+
+    passiveNotificationChanged = Signal()
+
+    passiveNotification = Property(str, get_passiveNotification, set_passiveNotification, notify=passiveNotificationChanged)
+    ### END Property passiveNotification
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

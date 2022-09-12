@@ -707,6 +707,9 @@ Kirigami.AbstractApplicationWindow {
         onDisplayRecordingPopup: recordingPopup.open()
         onOpenLeftSidebar: slotSelectionDrawer.open()
         onCloseLeftSidebar: slotSelectionDrawer.close()
+        onPassiveNotificationChanged: {
+            applicationWindow().showPassiveNotification(zynthian.passiveNotification, 1500)
+        }
     }
 
     Connections {

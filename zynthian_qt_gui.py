@@ -1671,6 +1671,11 @@ class zynthian_gui(QObject):
         if modal_screen_scanged:
             self.current_modal_screen_id_changed.emit()
 
+        # Update curlayer when page changes if not updated when changing layers
+        if not self.session_dashboard.curlayer_updated_on_channel_change:
+            self.layers_for_channel.do_activate_midich_layer()
+            self.session_dashboard.curlayer_updated_on_channel_change = True
+
     def show_active_screen(self):
         self.show_screen()
 
@@ -1711,6 +1716,11 @@ class zynthian_gui(QObject):
 
         self.current_modal_screen_id_changed.emit()
         self.current_screen_id_changed.emit()
+
+        # Update curlayer when page changes if not updated when changing layers
+        if not self.session_dashboard.curlayer_updated_on_channel_change:
+            self.layers_for_channel.do_activate_midich_layer()
+            self.session_dashboard.curlayer_updated_on_channel_change = True
 
     def close_modal(self):
         self.cancel_modal_timer()

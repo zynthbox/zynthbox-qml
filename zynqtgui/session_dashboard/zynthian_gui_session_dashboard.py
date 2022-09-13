@@ -59,6 +59,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__visible_channels_end__ = 5
         self.__last_selected_sketchpad__ = None
         self.__selected_channel__ = 0
+        self.curlayer_updated_on_channel_change = False
 
         if not self.restore():
             def cb():
@@ -113,7 +114,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         # change_o_channel_sound causes UI stutters as showing bank and preset screen is a bit time consuming.
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen_id() != "sketchpad":
+            self.curlayer_updated_on_channel_change = True
             QMetaObject.invokeMethod(self, "change_to_channel_sound", Qt.QueuedConnection)
+        else:
+            self.curlayer_updated_on_channel_change = False
 
     ### Property name
     def get_name(self):

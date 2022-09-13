@@ -236,7 +236,13 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     }
 
             # 7 : FX Button
-            if channel is not None and channel.channelAudioType == "synth":
+            if self.zyngui.active_screen == "main":
+                # If main page is open, color it blue
+                self.button_color_map[7] = {
+                    'color': self.led_color_blue,
+                    'blink': False
+                }
+            elif channel is not None and channel.channelAudioType == "synth":
                 if self.zyngui.leftSidebarActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_red,

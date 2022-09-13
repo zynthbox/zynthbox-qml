@@ -1523,13 +1523,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 if self.recordingChannel == "1":
                     self.__last_recording_type__ = "External (Mono Left)"
-                    recording_ports = [("system:capture_1", "system:capture_1")]
+                    recording_ports = [["system:capture_1"]]
                 elif self.recordingChannel == "2":
                     self.__last_recording_type__ = "External (Mono Right)"
-                    recording_ports = [("system:capture_2", "system:capture_2")]
+                    recording_ports = [["system:capture_2"]]
                 else:
                     self.__last_recording_type__ = "External (Stereo)"
-                    recording_ports = [("system:capture_1", "system:capture_2")]
+                    recording_ports = [["system:capture_1", "system:capture_2"]]
 
             logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
 

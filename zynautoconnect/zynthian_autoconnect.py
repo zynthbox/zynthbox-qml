@@ -494,7 +494,7 @@ def audio_autoconnect(force=False):
 	#   the SamplerSynth output for that channel to system playback, otherwise connect
 	#   to the effects
 
-	# Connect SamplerSynth's global efected to either the global effects, or to system out, depending on whether or not there are any global effects
+	# Connect SamplerSynth's global effected to either the global effects, or to system out, depending on whether or not there are any global effects
 	hasGlobalEffects = False
 	if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
@@ -504,9 +504,9 @@ def audio_autoconnect(force=False):
 				if len(engineInPorts) == 1:
 					engineInPorts[1] = engineInPorts[0];
 				for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), engineInPorts):
+					hasGlobalEffects = True
 					try:
 						jclient.connect(port[0], port[1])
-						hasGlobalEffects = True
 					except: pass
 			except Exception as e:
 				logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
@@ -518,14 +518,20 @@ def audio_autoconnect(force=False):
 		# Since there are effects, we don't want to send the output to playback directly, so disconnect those
 		for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
 			try:
+				logging.info(f"Disconnecting global effected port from {port[1]}")
 				jclient.disconnect(port[0], port[1])
-			except: pass
+			except Exception as e:
+				#logging.info(f"Could not disconnect the global effected channel from playback: {e}")
+				pass
 	else:
 		# If there are no global effects, connect the effected global ports directly to system playback
 		for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
 			try:
+				logging.info(f"Connecting global effected port to {port[1]}")
 				jclient.connect(port[0], port[1])
-			except: pass
+			except Exception as e:
+				#logging.info(f"Could not disconnect the global effected channel from playback: {e}")
+				pass
 
 	# Connect global FX ports to system playback
 	try:
@@ -555,67 +561,77 @@ def audio_autoconnect(force=False):
 			channel = song.channelsModel.getChannel(channelId)
 			if channel is not None:
 				channelPorts = jclient.get_ports(f"SamplerSynth-channel_{channelId + 1}:", is_audio=True, is_output=True)
-				# Firstly, attempt to connect the channel to any effects attached to the channel
-				channelHasEffects = False
-				if len(channel.chainedSounds) > 0:
-					for chainedSound in channel.chainedSounds:
-						if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
-							layer = zynthian_gui_config.zyngui.screens['layer'].layer_midi_map[chainedSound]
-							effectsLayers = zynthian_gui_config.zyngui.screens['layer'].get_fxchain_layers(layer)
-							if effectsLayers != None and len(effectsLayers) > 0:
-								# As there are effects, connect the channel's outputs to their inputs
-								for sl in effectsLayers:
-									if sl.engine.type == "Audio Effect":
-										try:
-											engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
-											if len(engineInPorts) == 1:
-												engineInPorts.append(engineInPorts[0]);
-											for port in zip(channelPorts, engineInPorts):
-												channelHasEffects = True
-												try:
-													jclient.connect(port[0], port[1])
-												except: pass
-										except Exception as e:
-											logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-											# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
-											# Logic below the return statement will be eventually evaluated when called again after the timeout
-											force_next_autoconnect = True;
-											release_lock()
-											return
-								pass
-				# If channel wants to route through global FX, connect its outputs to the global effects if there are any
-				hasGlobalEffects = False
-				if channel.routeThroughGlobalFX and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
-					for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-						try:
-							engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
-							# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
-							if len(engineInPorts) == 1:
-								engineInPorts[1] = engineInPorts[0];
-							for port in zip(channelPorts, engineInPorts):
-								try:
-									jclient.connect(port[0], port[1])
+				# Only connect the sampelersynth client for the channel to the outputs if this is a sample based channel, otherwise disconnect SamplerSynth
+				if channel.channelAudioType.startswith("sample-"):
+					# Firstly, attempt to connect the channel to any effects attached to the channel
+					channelHasEffects = False
+					if len(channel.chainedSounds) > 0:
+						for chainedSound in channel.chainedSounds:
+							if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
+								layer = zynthian_gui_config.zyngui.screens['layer'].layer_midi_map[chainedSound]
+								effectsLayers = zynthian_gui_config.zyngui.screens['layer'].get_fxchain_layers(layer)
+								if effectsLayers != None and len(effectsLayers) > 0:
+									# As there are effects, connect the channel's outputs to their inputs
+									for sl in effectsLayers:
+										if sl.engine.type == "Audio Effect":
+											try:
+												engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
+												if len(engineInPorts) == 1:
+													engineInPorts.append(engineInPorts[0]);
+												for port in zip(channelPorts, engineInPorts):
+													channelHasEffects = True
+													try:
+														jclient.connect(port[0], port[1])
+													except: pass
+											except Exception as e:
+												logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+												# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+												# Logic below the return statement will be eventually evaluated when called again after the timeout
+												force_next_autoconnect = True;
+												release_lock()
+												return
+									pass
+					# If channel wants to route through global FX, connect its outputs to the global effects if there are any
+					hasGlobalEffects = False
+					if channel.routeThroughGlobalFX and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
+						for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+							try:
+								engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
+								# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
+								if len(engineInPorts) == 1:
+									engineInPorts[1] = engineInPorts[0];
+								for port in zip(channelPorts, engineInPorts):
 									hasGlobalEffects = True
-								except: pass
-						except Exception as e:
-							logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-							# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
-							# Logic below the return statement will be eventually evaluated when called again after the timeout
-							force_next_autoconnect = True;
-							release_lock()
-							return
-				# If there are still no effects attached to this channel after taking global into account, connect its outputs to system playback
-				if channelHasEffects or hasGlobalEffects:
-					for port in zip(channelPorts, playback_ports):
-						try:
-							jclient.disconnect(port[0], port[1])
-						except: pass
-				# If there were no global effects or channel effects, make sure that the channel is connected to system playback
+									try:
+										jclient.connect(port[0], port[1])
+									except: pass
+							except Exception as e:
+								logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+								# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+								# Logic below the return statement will be eventually evaluated when called again after the timeout
+								force_next_autoconnect = True;
+								release_lock()
+								return
+					# If there are still no effects attached to this channel after taking global into account, connect its outputs to system playback
+					if channelHasEffects or hasGlobalEffects:
+						for port in zip(channelPorts, playback_ports):
+							try:
+								jclient.disconnect(port[0], port[1])
+							except: pass
+					# If there were no global effects or channel effects, make sure that the channel is connected to system playback
+					else:
+						for port in zip(channelPorts, playback_ports):
+							try:
+								jclient.connect(port[0], port[1])
+							except: pass
 				else:
-					for port in zip(channelPorts, playback_ports):
+					for port in channelPorts:
 						try:
-							jclient.connect(port[0], port[1])
-						except: pass
+							portConnections = jclient.get_all_connections(port)
+							for otherPort in portConnections:
+								jclient.disconnect(port, otherPort)
+						except Exception as e:
+							logging.error(f"OUCH! {e}")
 	###
 
 	#Get layers list from UI
@@ -673,7 +689,7 @@ def audio_autoconnect(force=False):
 						except:
 							pass
 				else:
-					logger.error(" => Disconnecting from {} : {}".format(ao,jrange))
+					logger.info(" => Disconnecting from {} : {}".format(ao,jrange))
 					for j in jrange:
 						try:
 							jclient.disconnect(ports[j%np],input_ports[ao][j%nip])
@@ -719,6 +735,7 @@ def audio_autoconnect(force=False):
 								# Disconnect synth engine from playback port
 								for port in zip(synth_engine_output_ports, playback_ports):
 									try:
+										logging.info(f"Disconnecting {port[0]} from {port[1]} in favour of global effects")
 										jclient.disconnect(port[0], port[1])
 									except:
 										pass
@@ -733,6 +750,7 @@ def audio_autoconnect(force=False):
 								# Connect synth engine to global fx ports
 								for port in zip(synth_engine_output_ports, fx_engine_input_ports):
 									try:
+										logging.info(f"Connecting {port[0]} to global effect {port[1]}")
 										jclient.connect(port[0], port[1])
 									except:
 										pass
@@ -819,37 +837,43 @@ def audio_autoconnect(force=False):
 				except:
 					pass
 
-		# Connect to AudioLevels client
-		audiolevels_out = jclient.get_ports("AudioLevels-SystemPlayback:", is_input=True, is_audio=True)
-		audiolevels_connected_ports_1 = jclient.get_all_connections("AudioLevels-SystemPlayback:left_in")
-		audiolevels_connected_ports_2 = jclient.get_all_connections("AudioLevels-SystemPlayback:right_in")
-		# Disconnect ports (that is, any that aren't connected to the system playback ports)
-		for connected_port in audiolevels_connected_ports_1:
-			if connected_port in sysout_conports_1:
-				try:
-					jclient.disconnect(connected_port, audiolevels_out[0])
-				except:
-					pass
-		for connected_port in audiolevels_connected_ports_2:
-			if connected_port in sysout_conports_2:
-				try:
-					jclient.disconnect(connected_port, audiolevels_out[1])
-				except:
-					pass
-		# Connect anything that is connected to the system playback ports to the audiolevels client, except for the global uneffected
-		# SamplerSynth port (which is used for system sound type stuff that shouldn't go in recordings and the like)
-		for port_to_connect in sysout_conports_1:
-			if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
-				try:
-					jclient.connect(port_to_connect, audiolevels_out[0])
-				except:
-					pass
-		for port_to_connect in sysout_conports_2:
-			if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
-				try:
-					jclient.connect(port_to_connect, audiolevels_out[1])
-				except:
-				    pass
+	# Connect to AudioLevels client
+	audiolevels_out = jclient.get_ports("AudioLevels-SystemPlayback:", is_input=True, is_audio=True)
+	audiolevels_connected_ports_1 = jclient.get_all_connections("AudioLevels-SystemPlayback:left_in")
+	audiolevels_connected_ports_2 = jclient.get_all_connections("AudioLevels-SystemPlayback:right_in")
+	sysout_conports_1 = jclient.get_all_connections("system:playback_1")
+	sysout_conports_2 = jclient.get_all_connections("system:playback_2")
+	# Disconnect ports (that is, any that aren't connected to the system playback ports)
+	for connected_port in audiolevels_connected_ports_1:
+		if connected_port not in sysout_conports_1:
+			try:
+				logging.info(f"Disconnecting port {connected_port} from audiolevels")
+				jclient.disconnect(connected_port, audiolevels_out[0])
+			except:
+				pass
+	for connected_port in audiolevels_connected_ports_2:
+		if connected_port not in sysout_conports_2:
+			try:
+				logging.info(f"Disconnecting port {connected_port} from audiolevels")
+				jclient.disconnect(connected_port, audiolevels_out[1])
+			except:
+				pass
+	# Connect anything that is connected to the system playback ports to the audiolevels client, except for the global uneffected
+	# SamplerSynth port (which is used for system sound type stuff that shouldn't go in recordings and the like)
+	for port_to_connect in sysout_conports_1:
+		if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
+			try:
+				logging.info(f"Connecting port {port_to_connect} to audiolevels")
+				jclient.connect(port_to_connect, audiolevels_out[0])
+			except:
+				pass
+	for port_to_connect in sysout_conports_2:
+		if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
+			try:
+				logging.info(f"Connecting port {port_to_connect} to audiolevels")
+				jclient.connect(port_to_connect, audiolevels_out[1])
+			except:
+			    pass
 
 	#Get System Capture ports => jack output ports!!
 	capture_ports = get_audio_capture_ports()

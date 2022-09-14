@@ -395,7 +395,7 @@ class sketchpad_channel(QObject):
             try:
                 for port in zip([f"SamplerSynth-channel_{self.id + 1}:left_out", f"SamplerSynth-channel_{self.id + 1}:right_out"], [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
                     try:
-                        if channelHasEffects:
+                        if channelHasEffects or self.get_channel_audio_type().startswith("sample-") is False:
                             p = Popen(("jack_disconnect", port[1], port[0]))
                             p.wait()
                         else:
@@ -425,6 +425,7 @@ class sketchpad_channel(QObject):
                 synth_ports.append(port_names)
 
             self.set_channelSynthPorts(synth_ports)
+            self.zyngui.zynautoconnect(True)
 
         worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
         worker_thread.start()
@@ -909,6 +910,7 @@ class sketchpad_channel(QObject):
                     self.onClipEnabledChanged(track, part)
             if not force_set:
                 self.__song__.schedule_save()
+            self.update_jack_port()
 
     channel_audio_type_changed = Signal()
 

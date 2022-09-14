@@ -59,41 +59,6 @@ Rectangle {
         var returnVal = false
 
         switch (cuia) {
-            case "CHANNEL_1":
-            case "CHANNEL_6":
-                clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-                clip.enabled = !clip.enabled
-                returnVal = true
-                break
-
-            case "CHANNEL_2":
-            case "CHANNEL_7":
-                clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-                clip.enabled = !clip.enabled
-                returnVal = true
-                break
-
-            case "CHANNEL_3":
-            case "CHANNEL_8":
-                clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-                clip.enabled = !clip.enabled
-                returnVal = true
-                break
-
-            case "CHANNEL_4":
-            case "CHANNEL_9":
-                clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-                clip.enabled = !clip.enabled
-                returnVal = true
-                break
-
-            case "CHANNEL_5":
-            case "CHANNEL_10":
-                clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-                clip.enabled = !clip.enabled
-                returnVal = true
-                break
-
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
                 returnVal = true

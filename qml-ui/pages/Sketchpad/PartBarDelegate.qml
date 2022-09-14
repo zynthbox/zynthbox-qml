@@ -111,6 +111,7 @@ ColumnLayout {
                     } else {
                         partDelegate.clip.enabled = !partDelegate.clip.enabled;
                         root.channel.selectedPart = index;
+                        root.channel.selectedSlotRow = index;
 
                         root.selectedPartClip = partDelegate.clip
                         root.selectedPartPattern = partDelegate.pattern
@@ -121,6 +122,7 @@ ColumnLayout {
                 onPressAndHold: {
                     partDelegate.clip.enabled = true;
                     root.channel.selectedPart = index;
+                    root.channel.selectedSlotRow = index;
 
                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
                     bottomStack.bottomBar.controlObj = root.channel.sceneClip;

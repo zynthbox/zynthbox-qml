@@ -482,7 +482,7 @@ Rectangle {
 
                                     WaveFormItem {
                                         property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
-                                                                    ? root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+                                                                    ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                                                                     : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
                                         anchors.fill: parent

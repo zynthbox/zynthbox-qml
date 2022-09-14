@@ -96,6 +96,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
             bottomStack.slotsBar.partButton.checked = true
             clip = selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             clip.enabled = !clip.enabled
+            selectedChannel.selectedSlotRow = 0;
 
             returnVal = true
             break
@@ -105,6 +106,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
             bottomStack.slotsBar.partButton.checked = true
             clip = selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             clip.enabled = !clip.enabled
+            selectedChannel.selectedSlotRow = 1;
 
             returnVal = true
             break
@@ -114,6 +116,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
             bottomStack.slotsBar.partButton.checked = true
             clip = selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             clip.enabled = !clip.enabled
+            selectedChannel.selectedSlotRow = 2;
 
             returnVal = true
             break
@@ -123,6 +126,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
             bottomStack.slotsBar.partButton.checked = true
             clip = selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             clip.enabled = !clip.enabled
+            selectedChannel.selectedSlotRow = 3;
 
             returnVal = true
             break
@@ -132,6 +136,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
             bottomStack.slotsBar.partButton.checked = true
             clip = selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             clip.enabled = !clip.enabled
+            selectedChannel.selectedSlotRow = 4;
 
             returnVal = true
             break

@@ -1219,7 +1219,7 @@ class sketchpad_channel(QObject):
         if self.channelAudioType in ["sample-trig", "sample-slice"]:
             return self.samples[self.selectedSlotRow]
         else:
-            return self.sceneClip
+            return self.getClipsModelByPart(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedTrackIndex)
 
     @Slot(None, result=str)
     def getChannelSoundSnapshotJson(self):

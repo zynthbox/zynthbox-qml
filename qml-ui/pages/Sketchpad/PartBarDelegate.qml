@@ -103,6 +103,13 @@ ColumnLayout {
                     text: root.visible ? partDelegate.clip.path.split("/").pop() : ""
                 }
             }
+            Rectangle {
+                anchors.fill: parent
+                color: root.channel.id === zynthian.session_dashboard.selectedChannel &&
+                       partDelegate.partIndex === root.channel.selectedSlotRow
+                        ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+                        : "transparent"
+            }
             MouseArea {
                 anchors.fill: parent
                 onClicked: {

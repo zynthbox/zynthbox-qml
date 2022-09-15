@@ -460,138 +460,148 @@ Rectangle {
                             }
 
                             RowLayout {
+                                id: waveformContainer
+
+                                property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
+                                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+                                                            : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                                 spacing: Kirigami.Units.gridUnit / 2
 
                                 // Take 3/5 th of available width
-                                Rectangle {
-                                    property bool showWaveform: root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                                root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                                root.selectedChannel.channelAudioType === "sample-loop"
-
+                                ColumnLayout {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                                    color: "#222222"
-                                    border.width: 1
-                                    border.color: "#ff999999"
-                                    radius: 4
-                                    opacity: showWaveform ? 1 : 0
 
-                                    WaveFormItem {
-                                        property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
-                                                                    ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-                                                                    : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
-
-                                        anchors.fill: parent
-                                        color: Kirigami.Theme.textColor
-                                        source: clip ? clip.path : ""
-
-                                        visible: clip && clip.path && clip.path.length > 0
-
-                                        // Mask for wave part before start
-                                        Rectangle {
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                                left: parent.left
-                                                right: startLoopLine.left
-                                            }
-                                            color: "#99000000"
-                                        }
-
-                                        // Mask for wave part after
-                                        Rectangle {
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                                left: endLoopLine.right
-                                                right: parent.right
-                                            }
-                                            color: "#99000000"
-                                        }
-
-                                        // Start loop line
-                                        Rectangle {
-                                            id: startLoopLine
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                            }
-                                            color: Kirigami.Theme.positiveTextColor
-                                            opacity: 0.6
-                                            width: Kirigami.Units.smallSpacing
-                                            x: (parent.clip.startPosition / parent.clip.duration) * parent.width
-                                        }
-
-                                        // End loop line
-                                        Rectangle {
-                                            id: endLoopLine
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                            }
-                                            color: Kirigami.Theme.neutralTextColor
-                                            opacity: 0.6
-                                            width: Kirigami.Units.smallSpacing
-                                            x: ((((60/zynthian.sketchpad.song.bpm) * parent.clip.length) / parent.clip.duration) * parent.width) + ((parent.clip.startPosition / parent.clip.duration) * parent.width)
-                                        }
-
-                                        // Progress line
-                                        Rectangle {
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                            }
-                                            visible: root.visible && parent.clip.isPlaying
-                                            color: Kirigami.Theme.highlightColor
-                                            width: Kirigami.Units.smallSpacing
-                                            x: visible ? parent.clip.progress/parent.clip.duration * parent.width : 0
-                                        }
-
-                                        // SamplerSynth progress dots
-                                        Repeater {
-                                            property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(parent.clip.cppObjId) : null;
-                                            model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
-                                                ? cppClipObject.playbackPositions
-                                                : 0
-                                            delegate: Item {
-                                                Rectangle {
-                                                    anchors.centerIn: parent
-                                                    rotation: 45
-                                                    color: Kirigami.Theme.highlightColor
-                                                    width: Kirigami.Units.largeSpacing
-                                                    height:  Kirigami.Units.largeSpacing
-                                                    scale: 0.5 + model.positionGain
-                                                }
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                x: Math.floor(model.positionProgress * parent.width)
-                                            }
-                                        }
+                                    QQC2.Label {
+                                        Layout.fillWidth: false
+                                        Layout.fillHeight: false
+                                        font.pointSize: 9
+                                        text: waveformContainer.clip.path.split("/").pop()
                                     }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            if (root.selectedChannel.channelAudioType === "sample-loop") {
-                                                var clip = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+                                    Rectangle {
+                                        property bool showWaveform: root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                                    root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                                    root.selectedChannel.channelAudioType === "sample-loop"
 
-                                                if (clip && clip.path && clip.path.length > 0) {
-                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                    bottomStack.bottomBar.controlObj = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex);
-                                                    bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                    bottomStack.bottomBar.waveEditorAction.trigger();
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        color: "#222222"
+                                        border.width: 1
+                                        border.color: "#ff999999"
+                                        radius: 4
+                                        opacity: showWaveform ? 1 : 0
+
+                                        WaveFormItem {
+                                            anchors.fill: parent
+                                            color: Kirigami.Theme.textColor
+                                            source: waveformContainer.clip ? waveformContainer.clip.path : ""
+
+                                            visible: waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0
+
+                                            // Mask for wave part before start
+                                            Rectangle {
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                    left: parent.left
+                                                    right: startLoopLine.left
                                                 }
-                                            } else {
-                                                var clip = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                                                color: "#99000000"
+                                            }
 
-                                                if (clip && clip.path && clip.path.length > 0) {
-                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
-                                                    bottomStack.bottomBar.controlObj = root.selectedChannel;
-                                                    bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                    bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                            // Mask for wave part after
+                                            Rectangle {
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                    left: endLoopLine.right
+                                                    right: parent.right
+                                                }
+                                                color: "#99000000"
+                                            }
+
+                                            // Start loop line
+                                            Rectangle {
+                                                id: startLoopLine
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                color: Kirigami.Theme.positiveTextColor
+                                                opacity: 0.6
+                                                width: Kirigami.Units.smallSpacing
+                                                x: (waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width
+                                            }
+
+                                            // End loop line
+                                            Rectangle {
+                                                id: endLoopLine
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                color: Kirigami.Theme.neutralTextColor
+                                                opacity: 0.6
+                                                width: Kirigami.Units.smallSpacing
+                                                x: ((((60/zynthian.sketchpad.song.bpm) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width)
+                                            }
+
+                                            // Progress line
+                                            Rectangle {
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                visible: root.visible && waveformContainer.clip.isPlaying
+                                                color: Kirigami.Theme.highlightColor
+                                                width: Kirigami.Units.smallSpacing
+                                                x: visible ? waveformContainer.clip.progress/waveformContainer.clip.duration * parent.width : 0
+                                            }
+
+                                            // SamplerSynth progress dots
+                                            Repeater {
+                                                property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
+                                                model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
+                                                    ? cppClipObject.playbackPositions
+                                                    : 0
+                                                delegate: Item {
+                                                    Rectangle {
+                                                        anchors.centerIn: parent
+                                                        rotation: 45
+                                                        color: Kirigami.Theme.highlightColor
+                                                        width: Kirigami.Units.largeSpacing
+                                                        height:  Kirigami.Units.largeSpacing
+                                                        scale: 0.5 + model.positionGain
+                                                    }
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    x: Math.floor(model.positionProgress * parent.width)
+                                                }
+                                            }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                    if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                        bottomStack.bottomBar.controlObj = waveformContainer.clip;
+                                                        bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                        bottomStack.bottomBar.waveEditorAction.trigger();
+                                                    }
+                                                } else {
+                                                    if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
+                                                        bottomStack.bottomBar.controlObj = root.selectedChannel;
+                                                        bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                        bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                                    }
                                                 }
                                             }
                                         }
@@ -599,7 +609,9 @@ Rectangle {
                                 }
 
                                 // Take remaining available width
-                                Rectangle {
+                                ColumnLayout {
+                                    id: patternContainer
+
                                     property bool showPattern: root.selectedChannel.channelAudioType === "synth" ||
                                                                root.selectedChannel.channelAudioType === "external" ||
                                                                root.selectedChannel.channelAudioType === "sample-trig" ||
@@ -607,55 +619,68 @@ Rectangle {
 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                                    opacity: patternContainer.showPattern ? 1 : 0
 
-                                    border.width: 1
-                                    border.color: "#ff999999"
-                                    radius: 4
-                                    color: "#222222"
-                                    clip: true
-                                    opacity: showPattern ? 1 : 0
+                                    QQC2.Label {
+                                        Layout.fillWidth: false
+                                        Layout.fillHeight: false
+                                        font.pointSize: 9
+                                        text: root.pattern.objectName
+                                    }
 
-                                    Image {
-                                        id: patternVisualiser
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
 
-                                        visible: root.selectedChannel &&
-                                                 root.selectedChannel.connectedPattern >= 0
+                                        border.width: 1
+                                        border.color: "#ff999999"
+                                        radius: 4
+                                        color: "#222222"
+                                        clip: true
 
-                                        anchors {
-                                            fill: parent
-                                            centerIn: parent
-                                            topMargin: 3
-                                            leftMargin: 3
-                                            rightMargin: 3
-                                            bottomMargin: 2
-                                        }
-                                        smooth: false
-                                        source: root.pattern ? root.pattern.thumbnailUrl : ""
-                                        Rectangle { // Progress
+                                        Image {
+                                            id: patternVisualiser
+
+                                            visible: root.selectedChannel &&
+                                                     root.selectedChannel.connectedPattern >= 0
+
                                             anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
+                                                fill: parent
+                                                centerIn: parent
+                                                topMargin: 3
+                                                leftMargin: 3
+                                                rightMargin: 3
+                                                bottomMargin: 2
                                             }
-                                            visible: root.visible &&
-                                                     root.sequence &&
-                                                     root.sequence.isPlaying &&
-                                                     root.pattern &&
-                                                     root.pattern.enabled
-                                            color: Kirigami.Theme.highlightColor
-                                            width: widthFactor // this way the progress rect is the same width as a step
-                                            property double widthFactor: visible && root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
-                                            x: visible && root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
-                                        }
-                                        MouseArea {
-                                            anchors.fill:parent
-                                            onClicked: {
-                                                var screenBack = zynthian.current_screen_id;
-                                                zynthian.current_modal_screen_id = "playgrid";
-                                                zynthian.forced_screen_back = "sketchpad";
-                                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
-                                                sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                                            smooth: false
+                                            source: root.pattern ? root.pattern.thumbnailUrl : ""
+                                            Rectangle { // Progress
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                visible: root.visible &&
+                                                         root.sequence &&
+                                                         root.sequence.isPlaying &&
+                                                         root.pattern &&
+                                                         root.pattern.enabled
+                                                color: Kirigami.Theme.highlightColor
+                                                width: widthFactor // this way the progress rect is the same width as a step
+                                                property double widthFactor: visible && root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
+                                                x: visible && root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
+                                            }
+                                            MouseArea {
+                                                anchors.fill:parent
+                                                onClicked: {
+                                                    var screenBack = zynthian.current_screen_id;
+                                                    zynthian.current_modal_screen_id = "playgrid";
+                                                    zynthian.forced_screen_back = "sketchpad";
+                                                    ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
+                                                    sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                                                }
                                             }
                                         }
                                     }

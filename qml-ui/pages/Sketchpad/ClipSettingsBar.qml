@@ -43,10 +43,10 @@ GridLayout {
     property QtObject bottomBar: null
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
                                     ? bottomBar.controlObj // selected bottomBar object is clip/pattern
-                                    : bottomBar.controlObj && bottomBar.controlObj.samples && bottomBar.controlObj.selectedSlotRow // selected bottomBar object is not clip/pattern and hence it is a channel
+                                    : bottomBar.controlObj && bottomBar.controlObj.hasOwnProperty("samples") && bottomBar.controlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
                                         ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow]
                                         : null
-
+        
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":

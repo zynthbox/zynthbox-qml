@@ -97,6 +97,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 			self.zyngui.screens['snapshot'].save_last_state_snapshot()
+			self.zyngui.sketchpad.set_selector()
 
 	@Slot(int)
 	def selectNextPreset(self, midi_chan):
@@ -107,6 +108,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 			self.zyngui.screens['snapshot'].save_last_state_snapshot()
+			self.zyngui.sketchpad.set_selector()
 
 	@Slot(int, int)
 	def selectPreset(self, midi_chan, preset_index):

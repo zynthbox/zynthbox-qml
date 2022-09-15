@@ -174,32 +174,40 @@ def midi_autoconnect(force=False):
 	engines_in={}
 	engines_out=[]
 	engines_fb=[]
-	for k, zyngine in zyngine_list.items():
-		if not zyngine.jackname or zyngine.nickname=="MD":
-			continue
+	try:
+		for k, zyngine in zyngine_list.items():
+			if not zyngine.jackname or zyngine.nickname=="MD":
+				continue
 
-		if zyngine.type in ("MIDI Synth", "MIDI Tool", "Special"):
-			port_name = get_fixed_midi_port_name(zyngine.jackname)
-			#logger.debug("Zyngine Port Name: {}".format(port_name))
+			if zyngine.type in ("MIDI Synth", "MIDI Tool", "Special"):
+				port_name = get_fixed_midi_port_name(zyngine.jackname)
+				#logger.debug("Zyngine Port Name: {}".format(port_name))
 
-			ports = jclient.get_ports(port_name, is_input=True, is_midi=True, is_physical=False)
-			try:
-				#logger.debug("Engine {}:{} found".format(zyngine.jackname,ports[0].short_name))
-				engines_in[zyngine.jackname]=ports[0]
-			except:
-				#logger.warning("Engine {} is not present".format(zyngine.jackname))
-				pass
+				ports = jclient.get_ports(port_name, is_input=True, is_midi=True, is_physical=False)
+				try:
+					#logger.debug("Engine {}:{} found".format(zyngine.jackname,ports[0].short_name))
+					engines_in[zyngine.jackname]=ports[0]
+				except:
+					#logger.warning("Engine {} is not present".format(zyngine.jackname))
+					pass
 
-			ports = jclient.get_ports(port_name, is_output=True, is_midi=True, is_physical=False)
-			try:
-				#logger.debug("Engine {}:{} found".format(zyngine.jackname,ports[0].short_name))
-				if zyngine.type=="MIDI Synth":
-					engines_fb.append(ports[0])
-				else:
-					engines_out.append(ports[0])
-			except:
-				#logger.warning("Engine {} is not present".format(zyngine.jackname))
-				pass
+				ports = jclient.get_ports(port_name, is_output=True, is_midi=True, is_physical=False)
+				try:
+					#logger.debug("Engine {}:{} found".format(zyngine.jackname,ports[0].short_name))
+					if zyngine.type=="MIDI Synth":
+						engines_fb.append(ports[0])
+					else:
+						engines_out.append(ports[0])
+				except:
+					#logger.warning("Engine {} is not present".format(zyngine.jackname))
+					pass
+	except Exception as e:
+		logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+		# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+		# Logic below the return statement will be eventually evaluated when called again after the timeout
+		force_next_autoconnect = True;
+		release_lock()
+		return
 
 	#logger.debug("Synth Engine Input Ports: {}".format(engines_in))
 	#logger.debug("Synth Engine Output Ports: {}".format(engines_out))

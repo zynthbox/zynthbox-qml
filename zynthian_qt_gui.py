@@ -445,6 +445,7 @@ class zynthian_gui(QObject):
         super(zynthian_gui, self).__init__(parent)
 
         self.__current_task_message = ""
+        self.__show_current_task_message = True
         self.currentTaskMessage = f"Starting Zynthbox QML"
 
         self.zynmidi = None
@@ -3965,6 +3966,7 @@ class zynthian_gui(QObject):
 
         # Emit long task ended only if all task has ended
         if self.__long_task_count__ == 0:
+            self.showCurrentTaskMessage = True
             self.currentTaskMessage = ""
             self.longTaskEnded.emit()
             self.run_set_selectors()
@@ -4293,7 +4295,7 @@ class zynthian_gui(QObject):
         return self.__current_task_message
 
     def set_currentTaskMessage(self, value):
-        if value != self.__current_task_message:
+        if value != self.__current_task_message and self.showCurrentTaskMessage:
             self.__current_task_message = value
             self.currentTaskMessageChanged.emit()
             QGuiApplication.instance().processEvents()
@@ -4305,6 +4307,20 @@ class zynthian_gui(QObject):
 
     currentTaskMessage = Property(str, get_currentTaskMessage, set_currentTaskMessage, notify=currentTaskMessageChanged)
     ### END Property currentTaskMessage
+
+    ### Property showCurrentTaskMessage
+    def get_showCurrentTaskMessage(self):
+        return self.__show_current_task_message
+
+    def set_showCurrentTaskMessage(self, value):
+        if value != self.__show_current_task_message:
+            self.__show_current_task_message = value
+            self.showCurrentTaskMessageChanged.emit()
+
+    showCurrentTaskMessageChanged = Signal()
+
+    showCurrentTaskMessage = Property(bool, get_showCurrentTaskMessage, set_showCurrentTaskMessage, notify=showCurrentTaskMessageChanged)
+    ### END Property showCurrentTaskMessage
 
     ### Property isModalScreensCachingComplete
     def get_isModalScreensCachingComplete(self):

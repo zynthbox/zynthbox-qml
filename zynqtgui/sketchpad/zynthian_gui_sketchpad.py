@@ -1263,6 +1263,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
         self.zyngui.currentTaskMessage = "Saving sketchpad"
+        self.zyngui.showCurrentTaskMessage = False
         self.zyngui.do_long_task(task)
 
     @Slot(str)
@@ -1310,6 +1311,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
+        self.zyngui.currentTaskMessage = f"Saving Sketchpad : {name}"
+        self.zyngui.showCurrentTaskMessage = False
         self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
@@ -1322,6 +1325,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
         self.zyngui.currentTaskMessage = "Saving a copy of the sketchpad"
+        self.zyngui.showCurrentTaskMessage = False
         self.zyngui.do_long_task(task)
 
     @Slot(str, bool)

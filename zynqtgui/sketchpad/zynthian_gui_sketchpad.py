@@ -283,17 +283,17 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def set_layer_volume_actual(self, volume):
         selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
         try:
-            synth_name = selected_channel.getLayerNameByMidiChannel(selected_channel.selectedSlotRow).split('>')[0]
+            synth_name = selected_channel.getLayerNameByMidiChannel(selected_channel.chainedSounds[selected_channel.selectedSlotRow]).split('>')[0]
         except:
             synth_name = ""
 
         try:
             if ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
                         selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
+                volume_control_obj = self.zyngui.fixed_layers.volume_controls[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
             elif self.zyngui.sound_combinator_active and \
                     selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
+                volume_control_obj = self.zyngui.fixed_layers.volume_controls[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
             else:
                 volume_control_obj = None
         except:

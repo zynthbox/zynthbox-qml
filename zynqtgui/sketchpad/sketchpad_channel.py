@@ -155,7 +155,6 @@ class sketchpad_channel(QObject):
     def chained_sounds_changed_handler(self):
         self.__song__.updateAutoconnectedSounds()
         self.occupiedSlotsChanged.emit()
-        self.update_jack_port()
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()
@@ -811,21 +810,26 @@ class sketchpad_channel(QObject):
 
             zyngui.end_long_task()
 
-        self.zyngui.currentTaskMessage = f"Removing chained sound at channel `{chan}` from channel `{self.name}`"
+        self.zyngui.currentTaskMessage = f"Removing chained sound at slot `{self.selectedSlotRow + 1}` from channel `{self.name}`"
         zyngui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
+        update_jack_ports = True
+
         # Stop all playing notes
         for old_chan in self.__chained_sounds__:
             if old_chan > -1:
                 self.zyngui.raw_all_notes_off_chan(old_chan)
 
-        self.__chained_sounds__ = [-1, -1, -1, -1, -1]
+        chained_sounds = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):
-            if sound not in self.__chained_sounds__:
-                self.__chained_sounds__[i] = sound
+            if sound not in chained_sounds:
+                chained_sounds[i] = sound
 
-        self.__song__.schedule_save()
+        if chained_sounds == self.__chained_sounds__:
+            update_jack_ports = False
+
+        self.__chained_sounds__ = chained_sounds
 
         try: #can be called before creation
             self.zyngui.screens['layers_for_channel'].fill_list()
@@ -837,8 +841,11 @@ class sketchpad_channel(QObject):
         except:
             pass
 
-        self.update_sound_snapshot_json()
+        if update_jack_ports:
+            self.update_jack_port()
 
+        self.update_sound_snapshot_json()
+        self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
 
     chained_sounds_changed = Signal()

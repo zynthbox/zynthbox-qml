@@ -424,7 +424,8 @@ class sketchpad_channel(QObject):
                 synth_ports.append(port_names)
 
             self.set_channelSynthPorts(synth_ports)
-            self.zyngui.zynautoconnect(True)
+            # self.zyngui.zynautoconnect(True)
+            self.__song__.updateAutoconnectedSounds()
 
         worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
         worker_thread.start()

@@ -33,6 +33,8 @@ from datetime import datetime
 # Zynthian specific modules
 from pathlib import Path
 
+from PySide2.QtGui import QGuiApplication
+
 from zynqtgui import zynthian_gui_selector
 
 # Qt modules
@@ -155,6 +157,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             logging.debug(f"### Setting selected channel : channel({channel})")
             self.__selected_channel__ = channel
             self.selected_channel_changed.emit()
+
+            self.zyngui.fixed_layers.fill_list()
+            QGuiApplication.instance().processEvents()
 
             # Set is_set_selector_running way before set_selector is called so that
             # knob values are discarded. set_selector will be called by change_to_channel_sound

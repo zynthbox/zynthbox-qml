@@ -111,6 +111,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
+        font.pointSize: 10
         text: qsTr("%1").arg(root.selectedChannel.name)
         
         MouseArea {
@@ -129,57 +130,60 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
+        font.pointSize: 10
         text: qsTr("Slot %1 %2")
-        .arg(root.selectedChannel.selectedSlotRow + 1)
-        .arg(layerIndex >= 0
-        ? layerCount > 0
-        ? "(+" + (layerCount-1) + ")"
-        : 0
-        : "")
+                .arg(root.selectedChannel.selectedSlotRow + 1)
+                .arg(layerIndex >= 0
+                        ? layerCount > 0
+                            ? "(+" + (layerCount-1) + ")"
+                            : 0
+                        : "")
     }
     QQC2.Label {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        font.pointSize: 10
         text: visible
-        ? infoBar.selectedSoundSlotExists
-        ? qsTr("Preset (%2/%3): %1")
-        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
-        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
-        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
-        : qsTr("Preset: --")
-        : ""
+                ? infoBar.selectedSoundSlotExists
+                    ? qsTr("Preset (%2/%3): %1")
+                        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
+                        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
+                        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
+                    : qsTr("Preset: --")
+                : ""
     }
     QQC2.Label {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        font.pointSize: 10
         text: visible
-        ? infoBar.selectedSoundSlotExists
-        ? qsTr("Bank: %1")
-        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
-        : qsTr("Bank: --")
-        : ""
+                ? infoBar.selectedSoundSlotExists
+                    ? qsTr("Bank: %1").arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
+                    : qsTr("Bank: --")
+                : ""
     }
     QQC2.Label {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        font.pointSize: 10
         text: visible
-        ? infoBar.selectedSoundSlotExists
-        ? qsTr("Synth: %1")
-        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
-        : qsTr("Synth: --")
-        : ""
+                ? infoBar.selectedSoundSlotExists
+                    ? qsTr("Synth: %1").arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
+                    : qsTr("Synth: --")
+                : ""
     }
     QQC2.Label {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "sample-loop"
+        font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
     }
@@ -189,7 +193,8 @@ RowLayout {
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
         visible: infoBar.clip && (infoBar.clip.clipChannel.channelAudioType === "sample-trig" ||
-        infoBar.clip.clipChannel.channelAudioType === "sample-slice")
+                 infoBar.clip.clipChannel.channelAudioType === "sample-slice")
+        font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynthian.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
     }
@@ -217,13 +222,15 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
+        font.pointSize: 10
+        visible: false
         Binding {
             target: parent
             property: "text"
             delayed: true
             value: qsTr("%1 %2")
-            .arg("T" + (zynthian.session_dashboard.selectedChannel+1))
-            .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
+                    .arg("T" + (zynthian.session_dashboard.selectedChannel+1))
+                    .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
         }
     }
 } 

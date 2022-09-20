@@ -542,16 +542,12 @@ Zynthian.ScreenPage {
             anchors.bottomMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.smallSpacing
 
-            Rectangle {
+            InfoBar {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                color: Kirigami.Theme.backgroundColor
-
-                InfoBar {
-                    width: parent.width - Kirigami.Units.gridUnit
-                    anchors.centerIn: parent
-                }
+                Layout.leftMargin: Kirigami.Units.gridUnit * 0.5
+                Layout.rightMargin: Kirigami.Units.gridUnit * 0.5
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
             }
 
             RowLayout {

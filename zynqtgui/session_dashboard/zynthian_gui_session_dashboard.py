@@ -62,6 +62,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__last_selected_sketchpad__ = None
         self.__selected_channel__ = 0
         self.curlayer_updated_on_channel_change = False
+        self.selected_channel_change_in_progress = False
 
         if not self.restore():
             def cb():
@@ -121,6 +122,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         else:
             self.curlayer_updated_on_channel_change = False
 
+        self.zyngui.sketchpad.set_selector()
+        self.selected_channel_change_in_progress = False
+
     ### Property name
     def get_name(self):
         if self.__name__ is not None:
@@ -158,14 +162,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             self.__selected_channel__ = channel
             self.selected_channel_changed.emit()
 
-            self.zyngui.fixed_layers.fill_list()
-            QGuiApplication.instance().processEvents()
-
-            # Set is_set_selector_running way before set_selector is called so that
-            # knob values are discarded. set_selector will be called by change_to_channel_sound
-            # after 1000ms when active midi channel is switched
-            # self.zyngui.sketchpad.set_set_selector_active()
-            self.zyngui.sketchpad.set_selector() #(True, False, False, False)
+            # Set selected_channel_change_in_progress way before set_selector is called so that knob values are discarded
+            self.selected_channel_change_in_progress = True
 
             # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when channel changes
             # fill_list and emitting selected_channel_changed event is a bit on the heavier side and hence should go

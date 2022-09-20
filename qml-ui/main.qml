@@ -500,7 +500,21 @@ Kirigami.AbstractApplicationWindow {
             Layout.fillWidth: true
         }
 
+        QQC2.Button {
+            Layout.preferredWidth: Kirigami.Units.gridUnit*4
+            Layout.preferredHeight: Kirigami.Units.gridUnit*2
+            onClicked: {
+                applicationWindow().openRecordingPopup()
+            }
 
+            Kirigami.Icon {
+                width: Kirigami.Units.gridUnit
+                height: width
+                anchors.centerIn: parent
+                source: "media-record-symbolic"
+                color: zynthian.sketchpad.isRecording ? "#fff44336" : "white"
+            }
+        }        
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
@@ -518,21 +532,6 @@ Kirigami.AbstractApplicationWindow {
                 anchors.centerIn: parent
                 source: zynthian.sketchpad.isMetronomeRunning ? "media-playback-stop" : "media-playback-start"
                 color: "white"
-            }
-        }
-        QQC2.Button {
-            Layout.preferredWidth: Kirigami.Units.gridUnit*4
-            Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            onClicked: {
-                applicationWindow().openRecordingPopup()
-            }
-
-            Kirigami.Icon {
-                width: Kirigami.Units.gridUnit
-                height: width
-                anchors.centerIn: parent
-                source: "media-record-symbolic"
-                color: zynthian.sketchpad.isRecording ? "#fff44336" : "white"
             }
         }
 

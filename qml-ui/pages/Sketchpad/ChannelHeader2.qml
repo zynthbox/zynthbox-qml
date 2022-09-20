@@ -46,6 +46,7 @@ QQC2.AbstractButton {
     property color color: Kirigami.Theme.backgroundColor
     property bool highlighted: false
     property bool highlightOnFocus: true
+    property color highlightColor: Kirigami.Theme.highlightColor
 
     property bool synthDetailsVisible: true
 
@@ -170,7 +171,7 @@ QQC2.AbstractButton {
 
     background: Rectangle {
         border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
-        border.color: Kirigami.Theme.highlightColor
+        border.color: root.highlightColor
 
         color: Kirigami.Theme.backgroundColor
     }

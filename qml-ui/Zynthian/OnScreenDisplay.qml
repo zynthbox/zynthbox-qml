@@ -40,7 +40,7 @@ QQC2.Popup {
     y: Kirigami.Units.largeSpacing
     Timer {
         id: hideTimer
-        running: false; repeat: false; interval: 3000;
+        running: false; repeat: false; interval: 1500;
         onTriggered: {
             if (component.opened) {
                 component.close();

@@ -36,6 +36,14 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
     """
     A Helper class that sets correct led color per button as per current state
 
+    To set a led color to a button :
+    self.button_color_map[0] = {
+        'color': <One of the self.led_color_*>,
+        'blink': <True or False> # Setting to True will make the led blink as per the blinkMode
+        'blinkMode': <'toggleOnBeat'(default) or 'onOffOnBeat'> # toggleOnBeat will toggle on/off state on every beat
+                                                                # onOffOnBeat will blink the button color on=off on every beat
+    }
+
     Button id map :
     0 : Menu
     1 : 1
@@ -401,13 +409,20 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
             # Save button
             if self.zyngui.sketchpad.clickChannelEnabled:
-                self.button_color_map[16] = {
-                    'color': self.led_color_blue,
-                    'blink': True
-                }
+                if self.zyngui.sketchpad.isMetronomeRunning:
+                    self.button_color_map[16] = {
+                        'color': self.led_color_blue,
+                        'blink': True,
+                        'blinkMode': 'onOffOnBeat'
+                    }
+                else:
+                    self.button_color_map[16] = {
+                        'color': self.led_color_blue,
+                        'blink': False
+                    }
             else:
                 self.button_color_map[16] = {
-                    'color': self.led_color_blue,
+                    'color': self.led_color_off,
                     'blink': False
                 }
 

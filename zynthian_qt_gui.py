@@ -487,6 +487,7 @@ class zynthian_gui(QObject):
         self.wsleds_num = 25
         self.wsleds = None
         self.wsleds_blink_count = 0
+        self.wsleds_start_blink_complete = False # Determines if a blink is already complete for a tick and needs reset for blinkMode onOffOnBeat
 
         # This Timer will be used to blink the leds in sync to BPM when metronome is not running.
         # When metronome is running, we will be using the metronome callback to blink LED as it is more accurate.
@@ -663,6 +664,9 @@ class zynthian_gui(QObject):
 
     def increment_blink_count(self):
         self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
+
+        if self.wsleds_blink_count % 2 == 0:
+            self.wsleds_start_blink_complete = False
 
     ### SHOW SCREEN QUEUE
     '''
@@ -1306,7 +1310,21 @@ class zynthian_gui(QObject):
 
                 for button_id, button in self.led_config.button_color_map.items():
                     if button["blink"]:
-                        self.wsled_blink(button_id, button["color"])
+                        if "blinkMode" in button:
+                            if button["blinkMode"] == "toggleOnBeat":
+                                self.wsled_blink(button_id, button["color"])
+                            elif button["blinkMode"] == "onOffOnBeat":
+                                if not self.wsleds_start_blink_complete:
+                                    self.wsleds.setPixelColor(button_id, self.led_config.led_color_off)
+                                    self.wsleds.show()
+                                    time.sleep(0.1)
+                                    self.wsleds.setPixelColor(button_id, button["color"])
+                                    self.wsleds.show()
+                                    self.wsleds_start_blink_complete = True
+                                else:
+                                    self.wsleds.setPixelColor(button_id, button["color"])
+                        else:
+                            self.wsled_blink(button_id, button["color"])
                     else:
                         self.wsleds.setPixelColor(button_id, button["color"])
             except:
@@ -3296,7 +3314,7 @@ class zynthian_gui(QObject):
             #self.refresh_status()
             if self.wsleds:
                 self.update_wsleds()
-            time.sleep(0.1)
+            time.sleep(0.05)
         self.end_wsleds()
 
     # ------------------------------------------------------------------

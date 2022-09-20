@@ -804,20 +804,19 @@ class zynthian_gui(QObject):
                     controller.value != delay:
                 controller.set_value(delay, True)
 
-                if not self.globalPopupOpened:
-                    self.osd.updateOsd(
-                        parameterName="global_delay",
-                        description=f"Global Delay FX",
-                        start=0,
-                        stop=100,
-                        step=1,
-                        defaultValue=10,
-                        currentValue=delay_percent,
-                        setValueFunction=self.set_delay_actual,
-                        showValueLabel=True,
-                        showResetToDefault=True,
-                        showVisualZero=True
-                    )
+                self.osd.updateOsd(
+                    parameterName="global_delay",
+                    description=f"Global Delay FX",
+                    start=0,
+                    stop=100,
+                    step=1,
+                    defaultValue=10,
+                    currentValue=delay_percent,
+                    setValueFunction=self.set_delay_actual,
+                    showValueLabel=True,
+                    showResetToDefault=True,
+                    showVisualZero=True
+                )
 
                 self.set_selector()
 
@@ -840,20 +839,19 @@ class zynthian_gui(QObject):
                     controller.value != reverb:
                 controller.set_value(reverb, True)
 
-                if not self.globalPopupOpened:
-                    self.osd.updateOsd(
-                        parameterName="global_reverb",
-                        description=f"Global Reverb FX",
-                        start=0,
-                        stop=100,
-                        step=1,
-                        defaultValue=10,
-                        currentValue=reverb_percent,
-                        setValueFunction=self.set_reverb_actual,
-                        showValueLabel=True,
-                        showResetToDefault=True,
-                        showVisualZero=True
-                    )
+                self.osd.updateOsd(
+                    parameterName="global_reverb",
+                    description=f"Global Reverb FX",
+                    start=0,
+                    stop=100,
+                    step=1,
+                    defaultValue=10,
+                    currentValue=reverb_percent,
+                    setValueFunction=self.set_reverb_actual,
+                    showValueLabel=True,
+                    showResetToDefault=True,
+                    showVisualZero=True
+                )
 
                 self.set_selector()
 

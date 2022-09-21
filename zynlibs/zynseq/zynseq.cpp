@@ -1518,7 +1518,7 @@ void setSequencesInBank(uint8_t bank, uint8_t sequences)
     g_bMutex = false;
 }
 
-size_t getSequencesInBank(uint32_t bank)
+uint32_t getSequencesInBank(uint32_t bank)
 {
     return g_seqMan.getSequencesInBank(bank);
 }
@@ -1642,7 +1642,7 @@ void removeSequence(uint8_t bank, uint8_t sequence)
 
 // ** Track management **
 
-size_t getPatternsInTrack(uint8_t bank, uint8_t sequence, uint32_t track)
+uint32_t getPatternsInTrack(uint8_t bank, uint8_t sequence, uint32_t track)
 {
     Track* pTrack = g_seqMan.getSequence(bank, sequence)->getTrack(track);
     if(!pTrack)

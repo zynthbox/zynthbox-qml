@@ -492,7 +492,7 @@ void togglePlayState(uint8_t bank, uint8_t sequence);
 *   @param  bank Index of bank
 *   @param  sequence Index of sequence
 */
-size_t getTracksInSequence(uint8_t bank, uint8_t sequence);
+uint32_t getTracksInSequence(uint8_t bank, uint8_t sequence);
 
 /** @brief  Stops all sequences
 */

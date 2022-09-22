@@ -1315,7 +1315,7 @@ class zynthian_gui(QObject):
                                 if not self.wsleds_start_blink_complete:
                                     self.wsleds.setPixelColor(button_id, self.led_config.led_color_off)
                                     self.wsleds.show()
-                                    time.sleep(0.1)
+                                    time.sleep(0.05)
                                     self.wsleds.setPixelColor(button_id, button["color"])
                                     self.wsleds.show()
                                     self.wsleds_start_blink_complete = True

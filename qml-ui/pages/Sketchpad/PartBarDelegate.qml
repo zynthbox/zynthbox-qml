@@ -16,6 +16,7 @@ ColumnLayout {
     property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
+    property QtObject selectedComponent
     property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
 
     signal clicked()
@@ -103,13 +104,6 @@ ColumnLayout {
                     text: root.visible ? partDelegate.clip.path.split("/").pop() : ""
                 }
             }
-            Rectangle {
-                anchors.fill: parent
-                color: root.channel.id === zynthian.session_dashboard.selectedChannel &&
-                       partDelegate.partIndex === root.channel.selectedSlotRow
-                        ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
-                        : "transparent"
-            }
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
@@ -122,6 +116,7 @@ ColumnLayout {
 
                         root.selectedPartClip = partDelegate.clip
                         root.selectedPartPattern = partDelegate.pattern
+                        root.selectedComponent = partDelegate
                     }
 
                     root.clicked()

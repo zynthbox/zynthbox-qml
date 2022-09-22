@@ -47,6 +47,7 @@ Rectangle {
     property QtObject selectedPartChannel
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
+    property QtObject selectedComponent
 
     property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
 
@@ -132,6 +133,7 @@ Rectangle {
                                     root.selectedPartChannel = partBarDelegate.channel
                                     root.selectedPartClip = partBarDelegate.selectedPartClip
                                     root.selectedPartPattern = partBarDelegate.selectedPartPattern
+                                    root.selectedComponent = partBarDelegate.selectedComponent
                                     root.clicked()
                                 }
                             }

@@ -221,7 +221,7 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: copySourceObj === channel.sceneClip ? "#2196f3" : root.backgroundColor
+        color: root.backgroundColor
 
         border.width: 1
         border.color: root.highlightColor

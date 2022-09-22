@@ -50,9 +50,6 @@ Kirigami.AbstractApplicationWindow {
     }
     readonly property Item playGrids: playGridsRepeater
 
-    // Used by PartBarDelegate to determine the lastSelectedObj in sketchpad
-    property alias dashboardLayer: dashboardLayer
-    
     property bool headerVisible: true
     property var channels: [
         zynthian.sketchpad.song.channelsModel.getChannel(0),

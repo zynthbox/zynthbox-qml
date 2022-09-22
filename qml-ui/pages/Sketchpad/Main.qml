@@ -677,16 +677,9 @@ Zynthian.ScreenPage {
                                     anchors.fill: parent
                                     color: Kirigami.Theme.backgroundColor
                                     highlightOnFocus: false
-                                    highlighted: root.lastSelectedObj.className === "sketchpad_track" &&
-                                                 root.lastSelectedObj.trackIndex === index
-                                                    ? true
-                                                    : root.displayTrackButtons
-                                                        ? root.song.scenesModel.selectedTrackIndex === index
-                                                        : ""
-                                    highlightColor: root.lastSelectedObj.className === "sketchpad_track" &&
-                                                    root.lastSelectedObj.trackIndex === index
-                                                        ? "white"
-                                                        : Kirigami.Theme.highlightColor
+                                    highlighted: root.displayTrackButtons
+                                                    ? root.song.scenesModel.selectedTrackIndex === index
+                                                    : ""
 
                                     text: root.displayTrackButtons
                                             ? qsTr("T%1").arg(index+1)
@@ -695,7 +688,6 @@ Zynthian.ScreenPage {
 
                                     onPressed: {
                                         if (root.displayTrackButtons) {
-                                            root.resetBottomBar(false)
                                             root.lastSelectedObj = {
                                                 className: "sketchpad_track",
                                                 trackIndex: index
@@ -718,12 +710,7 @@ Zynthian.ScreenPage {
                                     anchors.fill: parent
 
                                     highlightOnFocus: false
-                                    highlighted: root.lastSelectedObj === sketchHeaderDelegate.sketch
-                                                    ? true
-                                                    : sketchHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
-                                    highlightColor: root.lastSelectedObj === sketchHeaderDelegate.sketch
-                                                        ? "white"
-                                                        : Kirigami.Theme.highlightColor
+                                    highlighted: sketchHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
 
                                     text: sketchHeaderDelegate.sketch.name
                                     textSize: 10
@@ -832,12 +819,7 @@ Zynthian.ScreenPage {
                                     }
 
                                     highlightOnFocus: false
-                                    highlighted: root.lastSelectedObj === channelHeaderDelegate.channel
-                                                    ? true
-                                                    : index === zynthian.session_dashboard.selectedChannel // If song mode is not active, highlight if current cell is selected channel
-                                    highlightColor: root.lastSelectedObj === channelHeaderDelegate.channel
-                                                        ? "white"
-                                                        : Kirigami.Theme.highlightColor
+                                    highlighted: index === zynthian.session_dashboard.selectedChannel // If song mode is not active, highlight if current cell is selected channel
 
                                     onPressed: {
                                         // If song mode is not active, clicking on cells should activate that channel
@@ -950,10 +932,6 @@ Zynthian.ScreenPage {
 
                                     highlightOnFocus: false
                                     highlighted: {
-                                        if (root.lastSelectedObj === segmentHeader.segment) {
-                                            return true
-                                        }
-
                                         // If song mode is active and arrow keys are visible, do not highlight arrow key cells
                                         if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
                                             return false
@@ -964,9 +942,6 @@ Zynthian.ScreenPage {
                                         // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
                                         return segmentHeader.thisSegmentIndex === root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
                                     }
-                                    highlightColor: root.lastSelectedObj === segmentHeader.segment
-                                                        ? "white"
-                                                        : Kirigami.Theme.highlightColor
 
                                     onPressed: {
                                         if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
@@ -1012,7 +987,7 @@ Zynthian.ScreenPage {
 
                                     backgroundColor: "#000000"
                                     onHighlightedChanged: {
-//                                        Qt.callLater(function () {
+                                        Qt.callLater(function () {
                                             //console.log("Clip : (" + channel.sceneClip.row+", "+channel.sceneClip.col+")", "Selected Channel :"+ zynthian.session_dashboard.selectedChannel)
 
                                             // Switch to highlighted clip only if previous selected bottombar object was a clip/pattern
@@ -1025,15 +1000,8 @@ Zynthian.ScreenPage {
 //                                                    bottomBar.controlObj = channel.sceneClip;
 //                                                }
 //                                            }
-//                                        });
+                                        });
                                     }
-                                    highlighted: root.lastSelectedObj === channel.sceneClip
-                                                    ? true
-                                                    : channel.sceneClip.row === zynthian.session_dashboard.selectedChannel &&
-                                                      channel.sceneClip.col === zynthian.sketchpad.song.scenesModel.selectedTrackIndex // bottomBar.controlObj === channel.sceneClip
-                                    highlightColor: root.lastSelectedObj === channel.sceneClip
-                                                        ? "white"
-                                                        : Kirigami.Theme.highlightColor
 
                                     Connections {
                                         target: channel.sceneClip
@@ -1115,7 +1083,7 @@ Zynthian.ScreenPage {
                                             zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
                                         }
 
-                                       Qt.callLater(function() {
+                                        Qt.callLater(function() {
                                             root.resetBottomBar(toggleBottomBar)
                                             // zynthian.session_dashboard.disableNextSoundSwitchTimer();
 
@@ -1126,7 +1094,7 @@ Zynthian.ScreenPage {
                                                 bottomBar.controlType = BottomBar.ControlType.Clip;
                                                 bottomBar.controlObj = channel.sceneClip;
                                             }
-                                       })
+                                        })
                                     }
                                     onPressAndHold: {
                                         bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;

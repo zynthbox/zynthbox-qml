@@ -41,10 +41,10 @@ QQC2.AbstractButton {
     property bool isPlaying
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property bool highlighted: false
-    property color highlightColor: Kirigami.Theme.highlightColor
-    property color _highlightColor: highlighted
-                                       ? root.highlightColor
+    property bool highlighted: channel.sceneClip.row === zynthian.session_dashboard.selectedChannel &&
+                               channel.sceneClip.col === zynthian.sketchpad.song.scenesModel.selectedTrackIndex // bottomBar.controlObj === channel.sceneClip
+    property color highlightColor: highlighted
+                                       ? Kirigami.Theme.highlightColor
                                        : "transparent"
     property bool isInScene: channel.selectedPartNames
                                 ? channel.selectedPartNames.join("").length > 0
@@ -224,7 +224,11 @@ QQC2.AbstractButton {
         color: copySourceObj === channel.sceneClip ? "#2196f3" : root.backgroundColor
 
         border.width: 1
-        border.color: root._highlightColor
+        border.color: root.highlightColor
+                        ? root.highlightColor
+                        : root.highlighted
+                            ? Kirigami.Theme.highlightColor
+                            : "transparent"
 
         Rectangle {
             id: progressRect

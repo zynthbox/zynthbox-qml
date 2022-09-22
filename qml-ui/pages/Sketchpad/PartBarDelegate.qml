@@ -30,31 +30,20 @@ ColumnLayout {
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
             property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
-            property bool isSelected: false
 
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: "#000000"
             border{
-                color: partDelegate.isSelected
-                        ? "white"
-                        : Kirigami.Theme.highlightColor
+                color: Kirigami.Theme.highlightColor
                 width: root.songMode
                         ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
                             ? 1
                             : 0
-                        : partDelegate.isSelected || (partDelegate.clip && partDelegate.clip.inCurrentScene)
+                        : partDelegate.clip && partDelegate.clip.inCurrentScene
                             ? 1
                             : 0
             }
-            Binding {
-                target: partDelegate
-                property: "isSelected"
-                delayed: true
-                value: applicationWindow().dashboardLayer.pageCache["sketchpad"].lastSelectedObj.className === "sketchpad_part" &&
-                       applicationWindow().dashboardLayer.pageCache["sketchpad"].lastSelectedObj.partClip === clip
-            }
-
             WaveFormItem {
                 anchors.fill: parent
                 color: Kirigami.Theme.textColor
@@ -114,13 +103,13 @@ ColumnLayout {
                     text: root.visible ? partDelegate.clip.path.split("/").pop() : ""
                 }
             }
-//            Rectangle {
-//                anchors.fill: parent
-//                color: root.channel.id === zynthian.session_dashboard.selectedChannel &&
-//                       partDelegate.partIndex === root.channel.selectedSlotRow
-//                        ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
-//                        : "transparent"
-//            }
+            Rectangle {
+                anchors.fill: parent
+                color: root.channel.id === zynthian.session_dashboard.selectedChannel &&
+                       partDelegate.partIndex === root.channel.selectedSlotRow
+                        ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+                        : "transparent"
+            }
             MouseArea {
                 anchors.fill: parent
                 onClicked: {

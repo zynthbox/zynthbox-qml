@@ -26,6 +26,7 @@ function startMetronomeAndPlayback() {
 function stopMetronomeAndPlayback() {
     if (zynthian.sketchpad.song.sketchesModel.songMode) {
         zynthian.sketchpad.stopAllPlayback();
+        zynthian.callable_ui_action("ALL_NOTES_OFF")
         ZynQuick.SegmentHandler.stopPlayback();
         zynthian.sketchpad.resetMetronome();
     } else {
@@ -63,6 +64,7 @@ function stopMetronomeAndPlayback() {
         }
 
         zynthian.sketchpad.stopAllPlayback();
+        zynthian.callable_ui_action("ALL_NOTES_OFF")
         zynthian.playgrid.stopMetronomeRequest();
         zynthian.song_arranger.stop();
         zynthian.sketchpad.resetMetronome();

@@ -1243,13 +1243,16 @@ Zynthian.ScreenPage {
 
                                 // Check if source and destination are same
                                 if (root.copySourceObj.className === "sketchpad_clip" &&
-                                    root.copySourceObj.value !== root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex)) {
+                                    root.copySourceObj.value !== root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex) &&
+                                    root.lastSelectedObj.className === "sketchpad_clip") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_channel" &&
-                                           root.copySourceObj.value.id !== zynthian.session_dashboard.selectedChannel) {
+                                           root.copySourceObj.value.id !== zynthian.session_dashboard.selectedChannel &&
+                                           root.lastSelectedObj.className === "sketchpad_channel") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_track" &&
-                                           root.copySourceObj.value !== root.song.scenesModel.selectedTrackIndex) {
+                                           root.copySourceObj.value !== root.song.scenesModel.selectedTrackIndex &&
+                                           root.lastSelectedObj.className === "sketchpad_track") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_part" &&
                                            root.copySourceObj.value !== root.lastSelectedObj.value &&
@@ -1276,11 +1279,11 @@ Zynthian.ScreenPage {
                                                                ? qsTr("Channel")
                                                                : root.copySourceObj.className === "sketchpad_track"
                                                                    ? qsTr("Track")
-                                                                   : root.lastSelectedObj.className === "sketchpad_part"
+                                                                   : root.copySourceObj.className === "sketchpad_part"
                                                                      ? qsTr("Part")
-                                                                     : root.lastSelectedObj.className === "sketchpad_segment"
+                                                                     : root.copySourceObj.className === "sketchpad_segment"
                                                                        ? qsTr("Segment")
-                                                                       : root.lastSelectedObj.className === "sketchpad_sketch"
+                                                                       : root.copySourceObj.className === "sketchpad_sketch"
                                                                          ? qsTr("Sketch")
                                                                          : ""
                                                        : "")

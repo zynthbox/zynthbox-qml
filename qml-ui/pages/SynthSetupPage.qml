@@ -292,8 +292,11 @@ Zynthian.ScreenPage {
                                     property: "text"
                                     delayed: true
                                     value: mainLabel.visible
-                                        ? (model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "")
+                                        ? (model.metadata ? (index + 1) + " - " + model.display : "")
                                         : ""
+//                                    value: mainLabel.visible
+//                                        ? (model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "")
+//                                        : ""
                                 }
                                 elide: Text.ElideRight
                             }

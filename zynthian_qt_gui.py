@@ -2216,7 +2216,8 @@ class zynthian_gui(QObject):
             pass
 
         elif cuia == "SCREEN_LAYER":
-            self.show_screen("layers_for_channel")
+            # self.show_screen("layers_for_channel")
+            self.show_screen("preset")
 
         elif cuia == "SCREEN_LAYER_FX":
             self.show_screen("layer_effects")

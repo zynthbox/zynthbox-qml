@@ -91,8 +91,18 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(int)
 	def selectPrevPreset(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
+			prev_volume = None
+			try:
+				prev_volume = self.zyngui.layers_for_channel.volume_controls[midi_chan].value
+			except: pass
+
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(max(0, layer.preset_index - 1), True)
+
+			try:
+				self.zyngui.layers_for_channel.volume_controls[midi_chan].value = prev_volume
+			except: pass
+
 			logging.debug(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
@@ -102,8 +112,20 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(int)
 	def selectNextPreset(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
+			prev_volume = None
+			try:
+				prev_volume = self.zyngui.layers_for_channel.volume_controls[midi_chan].value
+			except:
+				pass
+
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(min(layer.preset_index + 1, len(layer.preset_list) -1), True)
+
+			try:
+				self.zyngui.layers_for_channel.volume_controls[midi_chan].value = prev_volume
+			except:
+				pass
+
 			logging.debug(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
@@ -113,10 +135,22 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(int, int)
 	def selectPreset(self, midi_chan, preset_index):
 		if midi_chan in self.layer_midi_map:
+			prev_volume = None
+			try:
+				prev_volume = self.zyngui.layers_for_channel.volume_controls[midi_chan].value
+			except:
+				pass
+
 			layer = self.layer_midi_map[midi_chan]
 
 			if 0 <= preset_index < len(layer.preset_list):
 				layer.set_preset(preset_index, True)
+
+				try:
+					self.zyngui.layers_for_channel.volume_controls[midi_chan].value = prev_volume
+				except:
+					pass
+
 				logging.debug(layer.preset_index)
 				self.zyngui.screens['control'].show()
 				self.fill_list()

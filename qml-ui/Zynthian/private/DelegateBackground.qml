@@ -36,18 +36,22 @@ Rectangle {
     readonly property real topPadding: Kirigami.Units.largeSpacing
     readonly property real bottomPadding: Kirigami.Units.largeSpacing
 
+//    color: !delegate.ListView.isCurrentItem && !delegate.pressed
+//        ? "transparent"
+//        : ((delegate.ListView.view.activeFocus && !delegate.pressed || !delegate.ListView.view.activeFocus && delegate.pressed)
+//                ? Kirigami.Theme.highlightColor
+//                : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4))
 
-    color: !delegate.ListView.isCurrentItem && !delegate.pressed
-        ? "transparent"
-        : ((delegate.ListView.view.activeFocus && !delegate.pressed || !delegate.ListView.view.activeFocus && delegate.pressed)
-                ? Kirigami.Theme.highlightColor
-                : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4))
+//    Behavior on color {
+//        ColorAnimation {
+//            duration: Kirigami.Units.shortDuration
+//            easing.type: Easing.InOutQuad
+//        }
+//    }
 
-    Behavior on color {
-        ColorAnimation {
-            duration: Kirigami.Units.shortDuration
-            easing.type: Easing.InOutQuad
-        }
-    }
+    color: "transparent"
+    border.width: delegate.ListView.isCurrentItem ? 1 : 0
+    border.color: Qt.rgba(255, 255, 255, 0.8)
+    radius: 4
 }
 

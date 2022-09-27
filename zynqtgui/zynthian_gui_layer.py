@@ -100,6 +100,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(max(0, layer.preset_index - 1), True)
+			self.zyngui.fixed_layers.update_mixers()
 
 			if prev_volume is not None:
 				try:
@@ -129,6 +130,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(min(layer.preset_index + 1, len(layer.preset_list) -1), True)
+			self.zyngui.fixed_layers.update_mixers()
 
 			if prev_volume is not None:
 				try:
@@ -160,6 +162,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			if 0 <= preset_index < len(layer.preset_list):
 				layer.set_preset(preset_index, True)
+				self.zyngui.fixed_layers.update_mixers()
 
 				if prev_volume is not None:
 					try:

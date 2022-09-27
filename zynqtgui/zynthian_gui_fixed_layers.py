@@ -138,7 +138,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__mixer_timer = QTimer()
         self.__mixer_timer.setInterval(250)
         self.__mixer_timer.setSingleShot(True)
-        self.__mixer_timer.timeout.connect(self.__update_mixers)
+        self.__mixer_timer.timeout.connect(self.update_mixers)
 
         # Load engine config
         try:
@@ -221,7 +221,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__mixer_timer.start()
         super().fill_list()
 
-    def __update_mixers(self):
+    def update_mixers(self):
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]

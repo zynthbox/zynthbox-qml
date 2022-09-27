@@ -218,7 +218,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_segment(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         if self.__big_knob_mode__ == "segment" and self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
@@ -228,7 +228,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_channel(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         if self.__big_knob_mode__ == "channel" and self.zyngui.session_dashboard.get_selected_channel() != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
@@ -238,7 +238,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_preset(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
@@ -250,7 +250,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.set_preset_actual(preset_index)
 
     def set_preset_actual(self, preset_index):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
@@ -306,13 +306,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         self.set_layer_volume_actual(self.__zselector[1].value / 1000)
 
     def set_layer_volume_actual(self, volume):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
@@ -335,6 +335,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
         if volume_control_obj is not None and \
            volume_control_obj.value != volume:
+            logging.debug(f"### zyncoder_update_layer_volume check : {volume_control_obj.value}, {volume}")
             volume_control_obj.value = volume
             logging.debug(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
             self.set_selector()
@@ -355,14 +356,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_channel_volume(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         volume = np.interp(self.__zselector[1].value, (0, 60), (-40, 20))
         self.set_channel_volume_actual(volume)
 
     def set_channel_volume_actual(self, volume):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
@@ -386,7 +387,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
@@ -404,7 +405,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
@@ -421,7 +422,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.set_selector()
 
     def update_channel_pan_actual(self, pan):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
@@ -434,14 +435,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.zyngui.osd.updateOsd("channel_pan", f"Channel {selected_channel_obj.id + 1}: Pan", 1, -1, 0.1, 0, selected_channel_obj.pan, self.set_selected_channel_pan, startLabel="L", stopLabel="R", showValueLabel=False, visualZero=0)
 
     def set_selected_channel_pan(self, pan):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         self.update_channel_pan_actual(min(max(-1, round(pan, 2)), 1))
 
     @Slot(None)
     def zyncoder_update_channel_pan(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         pan = round(np.interp(self.__zselector[2].value, (0, 1000), (-1.0, 1.0)), 2)
@@ -449,7 +450,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
@@ -472,7 +473,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.set_selector()
 
     def zyncoder_read(self):
-        if self.zyngui.knobTouchUpdateInProgress or self.zyngui.session_dashboard.selected_channel_change_in_progress:
+        if self.zyngui.knobTouchUpdateInProgress or self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
         if self.is_set_selector_running:
             # Set selector in progress. Not setting value with encoder

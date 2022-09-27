@@ -502,7 +502,7 @@ def audio_autoconnect(force=False):
 	#   the SamplerSynth output for that channel to system playback, otherwise connect
 	#   to the effects
 
-	# Connect SamplerSynth's global effected to either the global effects, or to system out, depending on whether or not there are any global effects
+	# Connect the global effects passthrough wet output to the global effects
 	hasGlobalEffects = False
 	if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
@@ -511,35 +511,46 @@ def audio_autoconnect(force=False):
 				# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
 				if len(engineInPorts) == 1:
 					engineInPorts[1] = engineInPorts[0];
-				for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), engineInPorts):
+				for port in zip(jclient.get_ports("GlobalFXPassthrough:wetOut", is_audio=True, is_output=True), engineInPorts):
 					hasGlobalEffects = True
 					try:
 						jclient.connect(port[0], port[1])
 					except: pass
 			except Exception as e:
-				logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+				logging.error(f"Failed to connect global fx passthrough to one of the effect engines. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
 				# Logic below the return statement will be eventually evaluated when called again after the timeout
 				force_next_autoconnect = True;
 				release_lock()
 				return
-	if hasGlobalEffects:
-		# Since there are effects, we don't want to send the output to playback directly, so disconnect those
-		for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
+	# Connect the global effects passthrough dry output to system out
+	try:
+		for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), playback_ports):
 			try:
-				logging.info(f"Disconnecting global effected port from {port[1]}")
-				jclient.disconnect(port[0], port[1])
-			except Exception as e:
-				#logging.info(f"Could not disconnect the global effected channel from playback: {e}")
-				pass
-	else:
-		# If there are no global effects, connect the effected global ports directly to system playback
-		for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
-			try:
-				logging.info(f"Connecting global effected port to {port[1]}")
 				jclient.connect(port[0], port[1])
-			except Exception as e:
-				#logging.info(f"Could not disconnect the global effected channel from playback: {e}")
-				pass
+			except: pass
+	except Exception as e:
+		logging.error(f"Failed to connect global fx passthrough to system playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+		# Logic below the return statement will be eventually evaluated when called again after the timeout
+		force_next_autoconnect = True;
+		release_lock()
+		return
+
+	globalFxPassthroughInput = jclient.get_ports("GlobalFXPassthrough:input", is_audio=True, is_input=True)
+	logging.error(f"Global FX Inputs are {globalFxPassthroughInput}")
+	
+	# Connect SamplerSynth's global effected to the global effects passthrough
+	for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), globalFxPassthroughInput):
+		try:
+			jclient.connect(port[0], port[1])
+		except: pass
+	# Disconnect global effected port from system playback
+	for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
+		try:
+			#logging.info(f"Disconnecting global effected port from {port[1]}")
+			jclient.disconnect(port[0], port[1])
+		except Exception as e:
+			#logging.info(f"Could not disconnect the global effected channel from playback: {e}")
+			pass
 
 	# Connect global FX ports to system playback
 	try:
@@ -599,39 +610,30 @@ def audio_autoconnect(force=False):
 												release_lock()
 												return
 									pass
-					# If channel wants to route through global FX, connect its outputs to the global effects if there are any
-					hasGlobalEffects = False
-					if channel.routeThroughGlobalFX and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
-						for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-							try:
-								engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
-								# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
-								if len(engineInPorts) == 1:
-									engineInPorts[1] = engineInPorts[0];
-								for port in zip(channelPorts, engineInPorts):
-									hasGlobalEffects = True
+					# If the channel wants to route through global FX, connect its outputs to the global effects
+					if not channelHasEffects:
+						try:
+							if channel.routeThroughGlobalFX:
+								for port in zip(channelPorts, playback_ports):
+									try:
+										jclient.disconnect(port[0], port[1])
+									except: pass
+								for port in zip(channelPorts, globalFxPassthroughInput):
 									try:
 										jclient.connect(port[0], port[1])
 									except: pass
-							except Exception as e:
-								logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-								# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
-								# Logic below the return statement will be eventually evaluated when called again after the timeout
-								force_next_autoconnect = True;
-								release_lock()
-								return
-					# If there are still no effects attached to this channel after taking global into account, connect its outputs to system playback
-					if channelHasEffects or hasGlobalEffects:
-						for port in zip(channelPorts, playback_ports):
-							try:
-								jclient.disconnect(port[0], port[1])
-							except: pass
-					# If there were no global effects or channel effects, make sure that the channel is connected to system playback
-					else:
-						for port in zip(channelPorts, playback_ports):
-							try:
-								jclient.connect(port[0], port[1])
-							except: pass
+							else:
+								for port in zip(channelPorts, playback_ports):
+									try:
+										jclient.connect(port[0], port[1])
+									except: pass
+						except Exception as e:
+							logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+							# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+							# Logic below the return statement will be eventually evaluated when called again after the timeout
+							force_next_autoconnect = True;
+							release_lock()
+							return
 				else:
 					for port in channelPorts:
 						try:
@@ -748,20 +750,13 @@ def audio_autoconnect(force=False):
 									except:
 										pass
 
-							for fx_engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-								fx_engine_input_ports = jclient.get_ports(fx_engine.jackname, is_input=True, is_audio=True)
-
-								# Handle case when fx_engine has less than 2 channels
-								if len(fx_engine_input_ports) < 2:
-									fx_engine_input_ports[1] = fx_engine_input_ports[0]
-
-								# Connect synth engine to global fx ports
-								for port in zip(synth_engine_output_ports, fx_engine_input_ports):
-									try:
-										logging.info(f"Connecting {port[0]} to global effect {port[1]}")
-										jclient.connect(port[0], port[1])
-									except:
-										pass
+							# Connect synth engine to global fx passthrough ports
+							for port in zip(synth_engine_output_ports, globalFxPassthroughInput):
+								try:
+									logging.info(f"Connecting {port[0]} to global effect {port[1]}")
+									jclient.connect(port[0], port[1])
+								except:
+									pass
 						else:
 							# Channel does not want to route through Global FX. Break out of loop carry on with next midi channel
 							break

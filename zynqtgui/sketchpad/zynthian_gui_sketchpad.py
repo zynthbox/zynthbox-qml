@@ -265,8 +265,24 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
 
             if channel.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
+                prev_volume = None
+                try:
+                    prev_volume = self.zyngui.fixed_layers.volume_controls[selected_channel].value
+                    logging.debug(f"### Volume Previous : {prev_volume}")
+                except Exception as e:
+                    logging.debug(f"Error resetting volume : {str(e)}")
+
                 logging.debug(f"Selecting preset : {preset_index}")
                 layer.set_preset(preset_index, True)
+
+                if prev_volume is not None:
+                    try:
+                        logging.debug(f"### Volume after preset change : {self.zyngui.fixed_layers.volume_controls[selected_channel].value}")
+                        self.zyngui.fixed_layers.volume_controls[selected_channel].value = prev_volume
+                        logging.debug(f"### Volume after reset : {self.zyngui.fixed_layers.volume_controls[selected_channel].value}")
+                    except Exception as e:
+                        logging.debug(f"Error resetting volume : {str(e)}")
+
                 channel.chainedSoundsInfoChanged.emit()
                 self.set_selector()
                 self.zyngui.fixed_layers.fill_list()

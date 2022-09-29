@@ -348,6 +348,7 @@ Zynthian.BasePlayGrid {
                 } else {
                     _private.updateChannel();
                 }
+                Qt.callLater(_private.updateUniqueCurrentRowNotes)
             }
         }
 

@@ -74,7 +74,6 @@ from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
-from zynqtgui.sketchpad.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
 sys.path.insert(1, "./zynqtgui")
@@ -161,6 +160,8 @@ from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_g
 from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
 
 from zynqtgui.zynthian_osd import zynthian_osd
+
+from zynqtgui.sketchpad.libzl import libzl
 
 from pathlib import Path
 
@@ -661,6 +662,9 @@ class zynthian_gui(QObject):
                 #"/zynthian/zynthian-ui/zynlibs/zynseq/build/libzynseq.so"
             #)
             #self.libseq.init(True)
+
+        # Initialise libzl (which requires things found in zyncoder, specifically the zynthian midi router)
+        libzl.init()
 
     def increment_blink_count(self):
         self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
@@ -4667,7 +4671,6 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"Error updating libzl Settings.xml : {str(e)}")
 
-    libzl.init()
     ###
 
     app = QGuiApplication(sys.argv)

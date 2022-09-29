@@ -1959,9 +1959,9 @@ Zynthian.BasePlayGrid {
 
                 Zynthian.PlayGridButton {
                     text: _private.sequence && _private.sequence.soloPatternObject
-                        ? "Pattern:\nSOLO\n" + _private.sceneName + "-" + (_private.sequence.soloPatternObject.channelIndex + 1) + _private.sequence.soloPatternObject.partName
+                        ? "Pattern:\nCh" + "-" + (_private.sequence.soloPatternObject.channelIndex + 1) + "-P" + _private.sequence.soloPatternObject.partName + "\nSOLO"
                         : _private.activePatternModel
-                            ? "Pattern:\n" + (_private.associatedChannel ? _private.associatedChannel.name : "(none)") + "\n" + _private.sceneName + "-" + (_private.activePatternModel.channelIndex + 1) + _private.activePatternModel.partName
+                            ? "Pattern:\nCh" + (_private.activePatternModel.channelIndex + 1) + "-P" + _private.activePatternModel.partName + "\n" + (_private.associatedChannel ? _private.associatedChannel.name : "(none)")
                             : "";
                     onClicked: {
                         component.showPatternsMenu();

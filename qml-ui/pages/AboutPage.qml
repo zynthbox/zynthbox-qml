@@ -37,14 +37,9 @@ Zynthian.ScreenPage {
 
     screenId: "about"
 
-    RowLayout {
-        anchors.fill: parent
-        Image {
-            Layout.alignment: Qt.AlignCenter
-            source: "../../img/logo.png"
-        }
+    Component {
+        id: aboutDetailsComponent
         Kirigami.FormLayout {
-            Layout.fillWidth: true
             Layout.alignment: Qt.AlignCenter
             QQC2.Label {
                 Kirigami.FormData.label: "Zynthbox OS:"
@@ -79,6 +74,22 @@ Zynthian.ScreenPage {
                 text: zynthian.network.getHostname()
             }
         }
-
+    }
+    contentItem: RowLayout {
+        Image {
+            Layout.alignment: Qt.AlignCenter
+            source: "../../img/logo.png"
+        }
+        Loader {
+            id: aboutDetailsLoader
+            Layout.fillWidth: true
+            asynchronous: true
+            sourceComponent: aboutDetailsComponent
+            QQC2.BusyIndicator {
+                anchors.centerIn: parent
+                visible: parent.status !== Loader.Ready
+                running: visible
+            }
+        }
     }
 }

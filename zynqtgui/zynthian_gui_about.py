@@ -45,11 +45,13 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 class zynthian_gui_about(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_about, self).__init__(parent)
-        self.cache = apt.cache.Cache()
-        self.cache.open()
+        self.cache = None
 
     def get_version_from_apt(self, package):
         try:
+            if self.cache is None:
+                self.cache = apt.cache.Cache()
+                self.cache.open()
             return self.cache[package].installed.version
         except Exception as e:
             logging.error(f"Error getting version from apt : {e}")

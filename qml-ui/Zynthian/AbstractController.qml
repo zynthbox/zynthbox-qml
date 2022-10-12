@@ -80,16 +80,18 @@ Card {
         }
     }
 
-
     contentItem: ColumnLayout {
-        Kirigami.Heading {
+        QQC2.Label {
             id: heading
             visible: text.length > 0
             text: root.controller.ctrl ? root.controller.ctrl.title : ""
             Layout.fillWidth: true
+            Layout.minimumHeight: font.pixelSize
+            Layout.maximumHeight: font.pixelSize
             horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            level: 2
+            verticalAlignment: Text.AlignVCenter
+            fontSizeMode: Text.Fit
+            font.pixelSize: root.height / 6
         }
         QQC2.Control {
             id: contentItem

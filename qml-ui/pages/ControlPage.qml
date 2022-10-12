@@ -339,6 +339,7 @@ Zynthian.ScreenPage {
 //        }
         RowLayout {
             id: defaultPageRoot
+            objectName: "defaultPage"
 
             property QQC2.StackView stack
 

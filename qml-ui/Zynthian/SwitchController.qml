@@ -53,7 +53,11 @@ AbstractController {
         QQC2.Switch {
             id: switchControl
             z: -1
-            anchors.centerIn: parent
+            anchors {
+                top: parent.top
+                topMargin: Kirigami.Units.largeSpacing
+                horizontalCenter: parent.horizontalCenter
+            }
             width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
             height: Kirigami.Units.gridUnit * 3
             checked: root.controller.ctrl && root.controller.ctrl.value !== root.controller.ctrl.value0
@@ -65,16 +69,17 @@ AbstractController {
                 property: "color"
                 value: switchControl.checked ? Kirigami.Theme.highlightColor : switchControl.palette.midlight
             }*/
-
-            Kirigami.Heading {
-                id: valueLabel
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.bottom
-                    //bottomMargin: Kirigami.Units.gridUnit * 2
-                }
-                text: root.controller.ctrl ? root.controller.ctrl.value_print : ""
+        }
+        Kirigami.Heading {
+            id: valueLabel
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom
+                bottomMargin: Kirigami.Units.smallSpacing
+                //bottomMargin: Kirigami.Units.gridUnit * 2
             }
+            level: 2
+            text: root.controller.ctrl ? root.controller.ctrl.value_print : ""
         }
     }
 }

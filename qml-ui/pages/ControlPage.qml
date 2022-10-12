@@ -33,6 +33,9 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
+
+    property int selectedPage: 0
+
     title: zynthian.control.selector_path_element
 
     screenId: "control"
@@ -171,166 +174,221 @@ Zynthian.ScreenPage {
 
     Component {
         id: defaultPage
+//        RowLayout {
+//            id: defaultPage
+//            objectName: "defaultPage"
+//            onVisibleChanged: {
+//                if (visible) {
+//                    // FIXME: why needed?
+//                    zynthian.control.activate_index(zynthian.control.current_index)
+//                }
+//            }
+
+//            function topLevelFocusItem(item) {
+//                if (!item) {
+//                    return null;
+//                }
+//                while (item.parent) {
+//                    switch (item) {
+//                    case mainView:
+//                    case control1:
+//                    case control2:
+//                    case control3:
+//                    case control4:
+//                        return item;
+//                    default:
+//                        break;
+//                    }
+//                    item = item.parent;
+//                }
+//                return mainView;
+//            }
+//            property var cuiaCallback: function(cuia) {
+//                if (!Window.activeFocusItem) {
+//                    return false;
+//                }
+//                let focusItem = topLevelFocusItem(Window.activeFocusItem);
+//                switch (cuia) {
+//                    case "SELECT_UP":
+//                        switch (focusItem) {
+//                        case control1:
+//                            return true;
+//                        case control2:
+//                            control1.item.forceActiveFocus();
+//                            return true;
+//                        case control3:
+//                            return true;
+//                        case control4:
+//                            control3.item.forceActiveFocus();
+//                            return true;
+//                        default:
+//                            return false;
+//                        }
+//                    case "SELECT_DOWN":
+//                        switch (focusItem) {
+//                        case control1:
+//                            control2.item.forceActiveFocus();
+//                            return true;
+//                        case control2:
+//                            return true;
+//                        case control3:
+//                            control4.item.forceActiveFocus();
+//                            return true;
+//                        case control4:
+//                            return true;
+//                        default:
+//                            return false;
+//                        }
+//                    case "NAVIGATE_LEFT":
+//                        switch (focusItem) {
+//                        case control1:
+//                        case control2:
+//                            return true;
+//                        case mainView:
+//                            control1.item.forceActiveFocus();
+//                            return true;
+//                        case control3:
+//                        case control4:
+//                            mainView.forceActiveFocus();
+//                            return true;
+//                        default:
+//                            return false;
+//                        }
+//                    case "NAVIGATE_RIGHT":
+//                        switch (focusItem) {
+//                        case control1:
+//                        case control2:
+//                            mainView.forceActiveFocus();
+//                            return true;
+//                        case mainView:
+//                            control3.item.forceActiveFocus();
+//                            return true;
+//                        case control3:
+//                        case control4:
+//                            return true;
+//                        default:
+//                            return false;
+//                        }
+//                    case "INCREASE":
+//                        if (Window.activeFocusItem && Window.activeFocusItem.increase) {
+//                            Window.activeFocusItem.increase();
+//                        } else if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
+//                            Window.activeFocusItem.toggle()
+//                        }
+//                        return true;
+//                    case "DECREASE":
+//                        if (Window.activeFocusItem && Window.activeFocusItem.decrease) {
+//                            Window.activeFocusItem.decrease();
+//                        } else if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
+//                            Window.activeFocusItem.toggle()
+//                        }
+//                        return true;
+//                    case "SWITCH_SELECT_SHORT":
+//                    case "SWITCH_SELECT_BOLD":
+//                    case "SWITCH_SELECT_LONG":
+//                        if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
+//                            Window.activeFocusItem.toggle();
+//                            return true;
+//                        } else {
+//                            return true;
+//                        }
+//                    default:
+//                        return false;
+//                    }
+//            }
+//            ColumnLayout {
+//                Layout.maximumWidth: Math.floor(root.width / 4)
+//                Layout.minimumWidth: Layout.maximumWidth
+//                Layout.fillHeight: true
+//                Zynthian.ControllerLoader {
+//                    id: control1
+//                    Layout.preferredHeight: 1
+//                    // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
+//                    controller.index: 0
+//                }
+//                Zynthian.ControllerLoader {
+//                    id: control2
+//                    Layout.preferredHeight: 1
+//                    controller.index: 1
+//                }
+//            }
+//            Zynthian.SelectorView {
+//                id: mainView
+//                screenId: root.screenId
+//                Layout.fillWidth: true
+//                Layout.fillHeight: true
+//                onCurrentScreenIdRequested: root.currentScreenIdRequested(root.screenId)
+//                onItemActivated: root.itemActivated(root.screenId, index)
+//                highlighted: defaultPage.topLevelFocusItem(Window.activeFocusItem) === mainView
+//            }
+//            ColumnLayout {
+//                Layout.maximumWidth: Math.floor(root.width / 4)
+//                Layout.minimumWidth: Layout.maximumWidth
+//                Layout.fillHeight: true
+//                Zynthian.ControllerLoader {
+//                    id: control3
+//                    Layout.preferredHeight: 1
+//                    controller.index: 2
+//                }
+//                Zynthian.ControllerLoader {
+//                    id: control4
+//                    Layout.preferredHeight: 1
+//                    controller.index: 3
+//                }
+//            }
+//        }
         RowLayout {
-            id: defaultPage
-            objectName: "defaultPage"
-            onVisibleChanged: {
-                if (visible) {
-                    // FIXME: why needed?
-                    zynthian.control.activate_index(zynthian.control.current_index)
+            id: defaultPageRoot
+
+            property QQC2.StackView stack
+
+            Rectangle {
+                Layout.fillWidth: false
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                color: Kirigami.Theme.backgroundColor
+
+                ListView {
+                    anchors.fill: parent
+                    model: Math.floor(zynthian.control.all_controls.length / 12)
+                    clip: true
+                    delegate: Kirigami.BasicListItem {
+                        label: qsTr("Page %1").arg(index+1)
+                        highlighted: root.selectedPage === index
+                        onClicked: {
+                            root.selectedPage = index
+                        }
+                    }
                 }
             }
 
-            function topLevelFocusItem(item) {
-                if (!item) {
-                    return null;
-                }
-                while (item.parent) {
-                    switch (item) {
-                    case mainView:
-                    case control1:
-                    case control2:
-                    case control3:
-                    case control4:
-                        return item;
-                    default:
-                        break;
+            Repeater {
+                model: 4
+                delegate: ColumnLayout {
+                    property int columnIndex: index
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    Repeater {
+                        model: 3
+                        delegate: Item {
+                            id: controlDelegate
+
+                            property int allControlsIndex: root.selectedPage*12 + columnIndex*3 + index
+                            property var control: zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            Zynthian.ControllerLoader {
+                                anchors.fill: parent
+                                controller {
+                                    category: controlDelegate.control["control_screen"]
+                                    index: controlDelegate.control["index"]
+                                }
+                            }
+                        }
                     }
-                    item = item.parent;
-                }
-                return mainView;
-            }
-            property var cuiaCallback: function(cuia) {
-                if (!Window.activeFocusItem) {
-                    return false;
-                }
-                let focusItem = topLevelFocusItem(Window.activeFocusItem);
-                switch (cuia) {
-                    case "SELECT_UP":
-                        switch (focusItem) {
-                        case control1:
-                            return true;
-                        case control2:
-                            control1.item.forceActiveFocus();
-                            return true;
-                        case control3:
-                            return true;
-                        case control4:
-                            control3.item.forceActiveFocus();
-                            return true;
-                        default:
-                            return false;
-                        }
-                    case "SELECT_DOWN":
-                        switch (focusItem) {
-                        case control1:
-                            control2.item.forceActiveFocus();
-                            return true;
-                        case control2:
-                            return true;
-                        case control3:
-                            control4.item.forceActiveFocus();
-                            return true;
-                        case control4:
-                            return true;
-                        default:
-                            return false;
-                        }
-                    case "NAVIGATE_LEFT":
-                        switch (focusItem) {
-                        case control1:
-                        case control2:
-                            return true;
-                        case mainView:
-                            control1.item.forceActiveFocus();
-                            return true;
-                        case control3:
-                        case control4:
-                            mainView.forceActiveFocus();
-                            return true;
-                        default:
-                            return false;
-                        }
-                    case "NAVIGATE_RIGHT":
-                        switch (focusItem) {
-                        case control1:
-                        case control2:
-                            mainView.forceActiveFocus();
-                            return true;
-                        case mainView:
-                            control3.item.forceActiveFocus();
-                            return true;
-                        case control3:
-                        case control4:
-                            return true;
-                        default:
-                            return false;
-                        }
-                    case "INCREASE":
-                        if (Window.activeFocusItem && Window.activeFocusItem.increase) {
-                            Window.activeFocusItem.increase();
-                        } else if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
-                            Window.activeFocusItem.toggle()
-                        }
-                        return true;
-                    case "DECREASE":
-                        if (Window.activeFocusItem && Window.activeFocusItem.decrease) {
-                            Window.activeFocusItem.decrease();
-                        } else if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
-                            Window.activeFocusItem.toggle()
-                        }
-                        return true;
-                    case "SWITCH_SELECT_SHORT":
-                    case "SWITCH_SELECT_BOLD":
-                    case "SWITCH_SELECT_LONG":
-                        if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
-                            Window.activeFocusItem.toggle();
-                            return true;
-                        } else {
-                            return true;
-                        }
-                    default:
-                        return false;
-                    }
-            }
-            ColumnLayout {
-                Layout.maximumWidth: Math.floor(root.width / 4)
-                Layout.minimumWidth: Layout.maximumWidth
-                Layout.fillHeight: true
-                Zynthian.ControllerLoader {
-                    id: control1
-                    Layout.preferredHeight: 1
-                    // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
-                    controller.index: 0
-                }
-                Zynthian.ControllerLoader {
-                    id: control2
-                    Layout.preferredHeight: 1
-                    controller.index: 1
-                }
-            }
-            Zynthian.SelectorView {
-                id: mainView
-                screenId: root.screenId
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                onCurrentScreenIdRequested: root.currentScreenIdRequested(root.screenId)
-                onItemActivated: root.itemActivated(root.screenId, index)
-                highlighted: defaultPage.topLevelFocusItem(Window.activeFocusItem) === mainView
-            }
-            ColumnLayout {
-                Layout.maximumWidth: Math.floor(root.width / 4)
-                Layout.minimumWidth: Layout.maximumWidth
-                Layout.fillHeight: true
-                Zynthian.ControllerLoader {
-                    id: control3
-                    Layout.preferredHeight: 1
-                    controller.index: 2
-                }
-                Zynthian.ControllerLoader {
-                    id: control4
-                    Layout.preferredHeight: 1
-                    controller.index: 3
                 }
             }
         }

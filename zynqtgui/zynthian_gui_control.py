@@ -135,6 +135,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__single_effect_engine = None
 		self.__custom_controller_mode = False
 		self._active_custom_controller = None
+		self.__all_controls = []
 
 		# xyselect mode vars
 		self.xyselect_mode=False
@@ -267,6 +268,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def fill_list(self):
 		self.list_data = []
+		self.__all_controls = []
 
 		if not self.zyngui.curlayer:
 			logging.info("Can't fill control screen list for None layer!")
@@ -294,6 +296,13 @@ class zynthian_gui_control(zynthian_gui_selector):
 				self.list_data.append((None,None,"> {}".format(layer.engine.name.split("/")[-1])))
 			for cscr in layer.get_ctrl_screens():
 				self.list_data.append((cscr,i,cscr,layer,j))
+
+				for index, ctrl in enumerate(layer.get_ctrl_screens()[cscr]):
+					self.__all_controls.append({
+						"engine": layer.engine.name.split("/")[-1],
+						"control_screen": cscr,
+						"index": index
+					})
 				i += 1
 				j += 1
 		if self.__single_effect_engine == None:
@@ -303,6 +312,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
 			self.index = 1
 		super().fill_list()
+		self.all_controls_changed.emit()
 
 
 	def set_selector(self, zs_hiden=True):
@@ -845,7 +855,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.select_path_element = "EDIT"
 		super().set_select_path()
 
-
+	def get_all_controls(self):
+		return self.__all_controls
 
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()
@@ -854,6 +865,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	single_effect_engine_changed = Signal()
 	custom_controller_mode_changed = Signal()
 	active_custom_controller_changed = Signal()
+	all_controls_changed = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
 	custom_control_page = Property(str, get_custom_control_page, set_custom_control_page, notify = custom_control_page_changed)
@@ -861,5 +873,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 	control_pages_model = Property(QObject, get_control_pages_model, constant = True)
 	single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
 	active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
+	all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
 
 #------------------------------------------------------------------------------

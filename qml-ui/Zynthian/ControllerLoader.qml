@@ -37,7 +37,12 @@ Loader {
 
     Layout.fillWidth: true
     Layout.fillHeight: true
-    active: controller.ctrl !== null && controller.ctrl.visible
+    Binding {
+        target: root
+        property: "active"
+        value: controller.ctrl ? controller.ctrl.visible : false
+        delayed: true
+    }
 
     readonly property string valueType: {
         //FIXME: Ugly heuristics
@@ -54,18 +59,17 @@ Loader {
         return root.controller.ctrl.value_type;
     }
 
-    onValueTypeChanged: {
-        if (valueType === "bool") {
-            root.setSource(Qt.resolvedUrl("./SwitchController.qml"), {"controller": root.controller});
-        } else {
-            root.setSource(Qt.resolvedUrl("./DialController.qml"), {"controller": root.controller});
+    sourceComponent: root.valueType === "bool" ? switchController : dialController;
+    Component {
+        id: switchController
+        SwitchController {
+            controller: root.controller;
         }
     }
-    Component.onCompleted: { //FIXME
-        if (valueType === "bool") {
-            root.setSource(Qt.resolvedUrl("./SwitchController.qml"), {"controller": root.controller});
-        } else {
-            root.setSource(Qt.resolvedUrl("./DialController.qml"), {"controller": root.controller});
+    Component {
+        id: dialController
+        DialController {
+            controller: root.controller;
         }
     }
 }

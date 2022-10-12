@@ -55,11 +55,13 @@ Card {
         }
     }
     Component.onCompleted: {
-        controller.ctrl.visible = root.visible
-        if (root.encoderIndex < 0) {
-            root.encoderIndex = controller.ctrl.encoder_index;
-        } else {
-            controller.ctrl.encoder_index = root.encoderIndex
+        if (controller.ctrl) {
+            controller.ctrl.visible = root.visible
+            if (root.encoderIndex < 0) {
+                root.encoderIndex = controller.ctrl.encoder_index;
+            } else {
+                controller.ctrl.encoder_index = root.encoderIndex
+            }
         }
     }
 

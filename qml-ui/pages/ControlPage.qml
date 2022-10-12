@@ -161,11 +161,11 @@ Zynthian.ScreenPage {
         }
     }
 
-    onFocusChanged: {
-        if (focus) {
-            mainView.forceActiveFocus()
-        }
-    }
+    //onFocusChanged: {
+        //if (focus) {
+            //mainView.forceActiveFocus()
+        //}
+    //}
 
     bottomPadding: Kirigami.Units.gridUnit
     contentItem: Zynthian.Stack {
@@ -376,7 +376,13 @@ Zynthian.ScreenPage {
                             id: controlDelegate
 
                             property int allControlsIndex: root.selectedPage*12 + columnIndex*3 + index
-                            property var control: zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
+                            property var control: null
+                            Binding {
+                                target: controlDelegate
+                                property: "control"
+                                value: zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
+                                delayed: true
+                            }
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true

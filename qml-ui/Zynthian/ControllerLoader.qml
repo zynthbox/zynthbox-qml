@@ -30,19 +30,13 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import "private"
 
-Loader {
+Item {
     id: root
 
     readonly property ControllerGroup controller: ControllerGroup {}
 
     Layout.fillWidth: true
     Layout.fillHeight: true
-    Binding {
-        target: root
-        property: "active"
-        value: controller.ctrl ? controller.ctrl.visible : false
-        delayed: true
-    }
 
     readonly property string valueType: {
         //FIXME: Ugly heuristics
@@ -59,17 +53,16 @@ Loader {
         return root.controller.ctrl.value_type;
     }
 
-    sourceComponent: root.valueType === "bool" ? switchController : dialController;
-    Component {
-        id: switchController
-        SwitchController {
-            controller: root.controller;
-        }
+    // Just a stand-in to point invisible controllers at
+    readonly property ControllerGroup noController: ControllerGroup {}
+    SwitchController {
+        visible: root.valueType === "bool"
+        anchors.fill: parent
+        controller: visible ? root.controller : root.noController;
     }
-    Component {
-        id: dialController
-        DialController {
-            controller: root.controller;
-        }
+    DialController {
+        visible: root.valueType !== "bool"
+        anchors.fill: parent
+        controller: visible ? root.controller : root.noController;
     }
 }

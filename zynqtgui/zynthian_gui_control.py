@@ -139,6 +139,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__all_controls = []
 		self.__selected_page = 0
 		self.__selected_column = 0
+		self.selected_column_controller = zynthian_controller(None, 'edit_page_big_knob', 'edit_page_big_knob', {'midi_cc': 0, 'value': 50, 'value_min': 0, 'value_max': 100})
+		self.selected_column_gui_controller = zynthian_gui_controller(3, self.selected_column_controller, self)
 
 		self.__set_selector_timer = QTimer()
 		self.__set_selector_timer.setInterval(100)
@@ -336,19 +338,26 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.mode=='select': super().set_selector()
 
 		try:
-			logging.debug(f"set_selector() : {self.all_controls[0]}")
+			start_index = self.selectedPage*12 + self.selectedColumn*3
 
-			controller0 = self.controller_by_category(self.all_controls[0]["control_screen"], self.all_controls[0]["index"])
+			controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
 			controller0.index = 0
 			controller0.setup_zyncoder()
 
-			controller1 = self.controller_by_category(self.all_controls[1]["control_screen"], self.all_controls[1]["index"])
+			controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
 			controller1.index = 1
 			controller1.setup_zyncoder()
 
-			controller2 = self.controller_by_category(self.all_controls[2]["control_screen"], self.all_controls[2]["index"])
+			controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
 			controller2.index = 2
 			controller2.setup_zyncoder()
+
+			self.selected_column_gui_controller.value = 50
+
+			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
+				self.selected_column_gui_controller.show()
+			else:
+				self.selected_column_gui_controller.hide()
 		except:
 			pass
 
@@ -716,7 +725,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 	@Slot()
 	def zyncoder_set_knob1_value(self):
 		try:
-			controller = self.controller_by_category(self.all_controls[0]["control_screen"], self.all_controls[0]["index"])
+			start_index = self.selectedPage*12 + self.selectedColumn*3
+			controller = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
 			if controller.index in [0, 1, 2, 3]:
 				controller.read_zyncoder()
 		except:
@@ -725,7 +735,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 	@Slot()
 	def zyncoder_set_knob2_value(self):
 		try:
-			controller = self.controller_by_category(self.all_controls[1]["control_screen"], self.all_controls[1]["index"])
+			start_index = self.selectedPage*12 + self.selectedColumn*3
+			controller = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
 			if controller.index in [0, 1, 2, 3]:
 				controller.read_zyncoder()
 		except:
@@ -734,9 +745,41 @@ class zynthian_gui_control(zynthian_gui_selector):
 	@Slot()
 	def zyncoder_set_knob3_value(self):
 		try:
-			controller = self.controller_by_category(self.all_controls[2]["control_screen"], self.all_controls[2]["index"])
+			start_index = self.selectedPage*12 + self.selectedColumn*3
+			controller = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
 			if controller.index in [0, 1, 2, 3]:
 				controller.read_zyncoder()
+		except:
+			pass
+
+	@Slot()
+	def zyncoder_set_big_knob_value(self):
+		try:
+			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
+				self.selected_column_gui_controller.read_zyncoder()
+
+				if self.selected_column_gui_controller.value > 50:
+					total_pages = len(self.all_controls) / 12
+
+					if self.selectedColumn < 3:
+						self.selectedColumn += 1
+					else:
+						if self.selectedPage < total_pages-1:
+							self.selectedColumn = 0
+							self.selectedPage = max(0, min(total_pages - 1, self.selectedPage + 1))
+				elif self.selected_column_gui_controller.value < 50:
+					total_pages = len(self.all_controls) / 12
+
+					if self.selectedColumn > 0:
+						self.selectedColumn -= 1
+					else:
+						if self.selectedPage > 0:
+							self.selectedColumn = 3
+							self.selectedPage = max(0, min(total_pages - 1, self.selectedPage - 1))
+						else:
+							self.selectedColumn = 0
+
+				self.selected_column_gui_controller.value = 50
 		except:
 			pass
 
@@ -750,6 +793,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 				QMetaObject.invokeMethod(self, "zyncoder_set_knob1_value", Qt.QueuedConnection)
 				QMetaObject.invokeMethod(self, "zyncoder_set_knob2_value", Qt.QueuedConnection)
 				QMetaObject.invokeMethod(self, "zyncoder_set_knob3_value", Qt.QueuedConnection)
+				QMetaObject.invokeMethod(self, "zyncoder_set_big_knob_value", Qt.QueuedConnection)
 			else:
 				# for i, zctrl in enumerate(self.zcontrollers):
 				# 	#print('Read Control ' + str(self.zgui_controllers[i].title))
@@ -931,6 +975,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.__selected_page != page:
 			self.__selected_page = page
 			self.selectedPageChanged.emit()
+			self.set_selector()
 
 	def get_selectedColumn(self):
 		return self.__selected_column
@@ -939,6 +984,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.__selected_column != column:
 			self.__selected_column = column
 			self.selectedColumnChanged.emit()
+			self.set_selector()
 
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()

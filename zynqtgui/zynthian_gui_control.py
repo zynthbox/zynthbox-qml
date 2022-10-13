@@ -137,6 +137,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__custom_controller_mode = False
 		self._active_custom_controller = None
 		self.__all_controls = []
+		self.__selected_page = 0
+		self.__selected_column = 0
 
 		self.__set_selector_timer = QTimer()
 		self.__set_selector_timer.setInterval(100)
@@ -922,6 +924,22 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def get_all_controls(self):
 		return self.__all_controls
 
+	def get_selectedPage(self):
+		return self.__selected_page
+
+	def set_selectedPage(self, page):
+		if self.__selected_page != page:
+			self.__selected_page = page
+			self.selectedPageChanged.emit()
+
+	def get_selectedColumn(self):
+		return self.__selected_column
+
+	def set_selectedColumn(self, column):
+		if self.__selected_column != column:
+			self.__selected_column = column
+			self.selectedColumnChanged.emit()
+
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()
 	custom_control_page_changed = Signal()
@@ -930,6 +948,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 	custom_controller_mode_changed = Signal()
 	active_custom_controller_changed = Signal()
 	all_controls_changed = Signal()
+	selectedPageChanged = Signal()
+	selectedColumnChanged = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
 	custom_control_page = Property(str, get_custom_control_page, set_custom_control_page, notify = custom_control_page_changed)
@@ -938,5 +958,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
 	active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
 	all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
+	selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedPageChanged)
+	selectedColumn = Property(int, get_selectedColumn, set_selectedColumn, notify=selectedColumnChanged)
 
 #------------------------------------------------------------------------------

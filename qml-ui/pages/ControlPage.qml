@@ -33,9 +33,6 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-
-    property int selectedPage: 0
-
     title: zynthian.control.selector_path_element
 
     screenId: "control"
@@ -355,9 +352,9 @@ Zynthian.ScreenPage {
                     clip: true
                     delegate: Kirigami.BasicListItem {
                         label: qsTr("Page %1").arg(index+1)
-                        highlighted: root.selectedPage === index
+                        highlighted: zynthian.control.selectedPage === index
                         onClicked: {
-                            root.selectedPage = index
+                            zynthian.control.selectedPage = index
                         }
                     }
                 }
@@ -365,33 +362,45 @@ Zynthian.ScreenPage {
 
             Repeater {
                 model: 4
-                delegate: ColumnLayout {
+                delegate: Rectangle {
+                    id: columnDelegate
+
                     property int columnIndex: index
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    Repeater {
-                        model: 3
-                        delegate: Item {
-                            id: controlDelegate
+                    color: "transparent"
+                    border.color: "#88ffffff"
+                    border.width: zynthian.control.selectedColumn === index ? 2 : 0
 
-                            property int allControlsIndex: root.selectedPage*12 + columnIndex*3 + index
-                            property var control: null
-                            Binding {
-                                target: controlDelegate
-                                property: "control"
-                                value: zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
-                                delayed: true
-                            }
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 8
 
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
+                        Repeater {
+                            model: 3
+                            delegate: Item {
+                                id: controlDelegate
 
-                            Zynthian.ControllerLoader {
-                                anchors.fill: parent
-                                controller {
-                                    category: controlDelegate.control["control_screen"]
-                                    index: controlDelegate.control["index"]
+                                property int allControlsIndex: zynthian.control.selectedPage*12 + columnDelegate.columnIndex*3 + index
+                                property var control: null
+                                Binding {
+                                    target: controlDelegate
+                                    property: "control"
+                                    value: zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
+                                    delayed: true
+                                }
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                Zynthian.ControllerLoader {
+                                    anchors.fill: parent
+                                    controller {
+                                        category: controlDelegate.control["control_screen"]
+                                        index: controlDelegate.control["index"]
+                                    }
                                 }
                             }
                         }

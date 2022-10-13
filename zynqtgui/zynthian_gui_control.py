@@ -40,7 +40,8 @@ from . import zynthian_gui_controller
 from . import zynthian_gui_selector
 
 # Qt modules
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, QByteArray
+from PySide2.QtCore import QMetaObject, QTimer, Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, \
+	QByteArray
 import time
 #------------------------------------------------------------------------------
 # Zynthian Instrument Controller GUI Class
@@ -137,6 +138,11 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self._active_custom_controller = None
 		self.__all_controls = []
 
+		self.__set_selector_timer = QTimer()
+		self.__set_selector_timer.setInterval(100)
+		self.__set_selector_timer.setSingleShot(True)
+		self.__set_selector_timer.timeout.connect(self.set_selector_actual)
+
 		# xyselect mode vars
 		self.xyselect_mode=False
 		self.x_zctrl=None
@@ -205,6 +211,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 		return self._active_custom_controller
 
 	def set_active_custom_controller(self, controller):
+		# If there is no custom control page, do not update values of selected controller with Big knob
+		if self.custom_control_page == "":
+			return
+
 		if self._active_custom_controller == controller:
 			return
 		if self._active_custom_controller:
@@ -301,7 +311,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 					self.__all_controls.append({
 						"engine": layer.engine.name.split("/")[-1],
 						"control_screen": cscr,
-						"index": index
+						"index": index,
+						"control": ctrl
 					})
 				i += 1
 				j += 1
@@ -316,7 +327,28 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
 	def set_selector(self, zs_hiden=True):
-		if self.mode=='select': super().set_selector(zs_hiden)
+		self.__set_selector_timer.start()
+
+	@Slot()
+	def set_selector_actual(self):
+		if self.mode=='select': super().set_selector()
+
+		try:
+			logging.debug(f"set_selector() : {self.all_controls[0]}")
+
+			controller0 = self.controller_by_category(self.all_controls[0]["control_screen"], self.all_controls[0]["index"])
+			controller0.index = 0
+			controller0.setup_zyncoder()
+
+			controller1 = self.controller_by_category(self.all_controls[1]["control_screen"], self.all_controls[1]["index"])
+			controller1.index = 1
+			controller1.setup_zyncoder()
+
+			controller2 = self.controller_by_category(self.all_controls[2]["control_screen"], self.all_controls[2]["index"])
+			controller2.index = 2
+			controller2.setup_zyncoder()
+		except:
+			pass
 
 	def get_controllers_count(self):
 		return len(self.zgui_controllers)
@@ -679,28 +711,60 @@ class zynthian_gui_control(zynthian_gui_selector):
 		for gctrl in self.zgui_custom_controllers:
 			gctrl.ctrl_value = gctrl.zctrl.value
 
+	@Slot()
+	def zyncoder_set_knob1_value(self):
+		try:
+			controller = self.controller_by_category(self.all_controls[0]["control_screen"], self.all_controls[0]["index"])
+			if controller.index in [0, 1, 2, 3]:
+				controller.read_zyncoder()
+		except:
+			pass
+
+	@Slot()
+	def zyncoder_set_knob2_value(self):
+		try:
+			controller = self.controller_by_category(self.all_controls[1]["control_screen"], self.all_controls[1]["index"])
+			if controller.index in [0, 1, 2, 3]:
+				controller.read_zyncoder()
+		except:
+			pass
+
+	@Slot()
+	def zyncoder_set_knob3_value(self):
+		try:
+			controller = self.controller_by_category(self.all_controls[2]["control_screen"], self.all_controls[2]["index"])
+			if controller.index in [0, 1, 2, 3]:
+				controller.read_zyncoder()
+		except:
+			pass
+
 	def zyncoder_read(self, zcnums=None):
+		if not self.zyngui.isBootingComplete:
+			return
+
 		#Read Controller
 		if self.controllers_lock and self.mode=='control' and self.zcontrollers:
-			if self._active_custom_controller:
-				self._active_custom_controller.read_zyncoder()
-			elif self.__custom_control_page == "":
-				for i, zctrl in enumerate(self.zcontrollers):
-					#print('Read Control ' + str(self.zgui_controllers[i].title))
-
-					if not zcnums or i in zcnums:
-						if i >= len(self.zgui_controllers):
-							continue
-						res=self.zgui_controllers[i].read_zyncoder()
-
-						if res and self.zyngui.midi_learn_mode:
-							logging.debug("MIDI-learn ZController {}".format(i))
-							self.zyngui.midi_learn_mode = False
-							self.midi_learn(i)
-
-						if res and self.xyselect_mode:
-							self.zyncoder_read_xyselect(zctrl, i)
+			if self.__custom_control_page == "":
+				QMetaObject.invokeMethod(self, "zyncoder_set_knob1_value", Qt.QueuedConnection)
+				QMetaObject.invokeMethod(self, "zyncoder_set_knob2_value", Qt.QueuedConnection)
+				QMetaObject.invokeMethod(self, "zyncoder_set_knob3_value", Qt.QueuedConnection)
 			else:
+				# for i, zctrl in enumerate(self.zcontrollers):
+				# 	#print('Read Control ' + str(self.zgui_controllers[i].title))
+				#
+				# 	if not zcnums or i in zcnums:
+				# 		if i >= len(self.zgui_controllers):
+				# 			continue
+				# 		res=self.zgui_controllers[i].read_zyncoder()
+				#
+				# 		if res and self.zyngui.midi_learn_mode:
+				# 			logging.debug("MIDI-learn ZController {}".format(i))
+				# 			self.zyngui.midi_learn_mode = False
+				# 			self.midi_learn(i)
+				#
+				# 		if res and self.xyselect_mode:
+				# 			self.zyncoder_read_xyselect(zctrl, i)
+
 				for ctrl in self.zgui_custom_controllers_map.values():
 					if ctrl.index <= zynthian_gui_config.select_ctrl:
 						ctrl.read_zyncoder()

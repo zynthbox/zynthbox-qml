@@ -359,10 +359,11 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
 				self.selected_column_gui_controller.show()
+				self.selected_column_gui_controller.setup_zyncoder()
 			else:
 				self.selected_column_gui_controller.hide()
-		except:
-			pass
+		except Exception as e:
+			logging.error(f"Failed to set selector, with error {e}")
 
 	def get_controllers_count(self):
 		return len(self.zgui_controllers)

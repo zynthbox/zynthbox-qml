@@ -34,10 +34,13 @@ import Zynthian 1.0 as Zynthian
 RowLayout {
     property QQC2.StackView stack
 
+    spacing: 0
+
     Rectangle {
         Layout.fillWidth: false
         Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+        Layout.rightMargin: Kirigami.Units.smallSpacing
         color: Kirigami.Theme.backgroundColor
 
         ListView {
@@ -85,7 +88,7 @@ RowLayout {
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 8
+                spacing: 0
 
                 Repeater {
                     model: 3

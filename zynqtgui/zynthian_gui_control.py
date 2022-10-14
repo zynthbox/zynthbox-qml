@@ -349,17 +349,23 @@ class zynthian_gui_control(zynthian_gui_selector):
 			controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
 			controller0.show()
 			controller0.encoder_index = 0
-			#controller0.setup_zyncoder()
+			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+			# always reset knob values when encoder_index is already set
+			controller0.setup_zyncoder()
 
 			controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
 			controller1.show()
 			controller1.encoder_index = 1
-			#controller1.setup_zyncoder()
+			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+			# always reset knob values when encoder_index is already set
+			controller1.setup_zyncoder()
 
 			controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
 			controller2.show()
 			controller2.encoder_index = 2
-			#controller2.setup_zyncoder()
+			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+			# always reset knob values when encoder_index is already set
+			controller2.setup_zyncoder()
 
 			self.selected_column_gui_controller.value = 50
 

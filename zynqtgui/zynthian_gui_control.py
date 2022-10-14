@@ -269,6 +269,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.sync_selectors_visibility()
 		self.set_mode_control()
 
+		self.selectedPage = 0
+		self.selectedColumn = 0
+		self.set_selector_actual()
+
 
 	def hide(self):
 		super().hide()
@@ -337,6 +341,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def set_selector_actual(self):
 		if self.mode=='select': super().set_selector()
 
+		# Use small knobs to control selected columns controllers
+		# Use big knob to control selectedColumn and selectedPage
 		try:
 			start_index = self.selectedPage*12 + self.selectedColumn*3
 
@@ -793,6 +799,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		#Read Controller
 		if self.controllers_lock and self.mode=='control' and self.zcontrollers:
+			# If there is no custom page, use small knobs to set values of selected columns controllers
+			# If there is a custom page selected, use big knob to set active controller's value
 			if self.__custom_control_page == "":
 				QMetaObject.invokeMethod(self, "zyncoder_set_knob1_value", Qt.QueuedConnection)
 				QMetaObject.invokeMethod(self, "zyncoder_set_knob2_value", Qt.QueuedConnection)
@@ -976,19 +984,19 @@ class zynthian_gui_control(zynthian_gui_selector):
 		return self.__selected_page
 
 	def set_selectedPage(self, page):
-		if self.__selected_page != page:
-			self.__selected_page = page
+		if self.__selected_page != int(page):
+			self.__selected_page = int(page)
 			self.selectedPageChanged.emit()
-			self.set_selector()
+			self.set_selector_actual()
 
 	def get_selectedColumn(self):
 		return self.__selected_column
 
 	def set_selectedColumn(self, column):
-		if self.__selected_column != column:
-			self.__selected_column = column
+		if self.__selected_column != int(column):
+			self.__selected_column = int(column)
 			self.selectedColumnChanged.emit()
-			self.set_selector()
+			self.set_selector_actual()
 
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()

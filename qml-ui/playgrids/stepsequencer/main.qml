@@ -1841,7 +1841,7 @@ Zynthian.BasePlayGrid {
                     implicitHeight: Kirigami.Units.gridUnit * 40
                     Kirigami.Heading {
                         Layout.fillWidth: true
-                        text: qsTr("Select Active Parts For Channel %1").arg(partPicker.associatedChannel.name)
+                        text: qsTr("Select Active Parts For Channel %1").arg(partPicker.associatedChannel ? partPicker.associatedChannel.name : "")
                     }
                     ColumnLayout {
                         Layout.fillHeight: true

@@ -352,7 +352,22 @@ Zynthian.ScreenPage {
                     clip: true
                     delegate: Kirigami.BasicListItem {
                         label: qsTr("Page %1").arg(index+1)
-                        highlighted: zynthian.control.selectedPage === index
+                        background: Rectangle {
+                            color: "transparent"
+                            border.color: "#88ffffff"
+                            border.width: zynthian.control.selectedPage === index ? 2 : 0
+                            radius: 2
+
+                            Kirigami.Separator {
+                                height: 1
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
+                            }
+                        }
+
                         onClicked: {
                             zynthian.control.selectedPage = index
                         }

@@ -34,7 +34,7 @@ import Zynthian 1.0 as Zynthian
 RowLayout {
     property QQC2.StackView stack
 
-    spacing: 0
+    spacing: 4
 
     Rectangle {
         Layout.fillWidth: false
@@ -88,7 +88,8 @@ RowLayout {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: 0
+                anchors.margins: 4
+                spacing: 4
 
                 Repeater {
                     model: 3

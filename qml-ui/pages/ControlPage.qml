@@ -348,7 +348,7 @@ Zynthian.ScreenPage {
 
                 ListView {
                     anchors.fill: parent
-                    model: Math.floor(zynthian.control.all_controls.length / 12)
+                    model: Math.max(1, Math.floor(zynthian.control.all_controls.length / 12))
                     clip: true
                     delegate: Kirigami.BasicListItem {
                         label: qsTr("Page %1").arg(index+1)

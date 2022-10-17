@@ -773,10 +773,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 		try:
 			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
 				self.selected_column_gui_controller.read_zyncoder()
+				total_pages = math.ceil(len(self.__all_controls) / 12)
 
 				if self.selected_column_gui_controller.value > 50:
-					total_pages = len(self.all_controls) / 12
-
 					if self.selectedColumn < 3:
 						self.selectedColumn += 1
 					else:
@@ -784,8 +783,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 							self.selectedColumn = 0
 							self.selectedPage = max(0, min(total_pages - 1, self.selectedPage + 1))
 				elif self.selected_column_gui_controller.value < 50:
-					total_pages = len(self.all_controls) / 12
-
 					if self.selectedColumn > 0:
 						self.selectedColumn -= 1
 					else:

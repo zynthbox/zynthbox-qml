@@ -70,6 +70,8 @@ RowLayout {
             anchors.fill: parent
             model: Math.ceil(zynthian.control.all_controls.length / 12)
             clip: true
+            currentIndex: zynthian.control.selectedPage
+            highlightFollowsCurrentItem: true
             delegate: Kirigami.BasicListItem {
                 label: qsTr("Page %1").arg(index+1)
                 background: Rectangle {

@@ -33,6 +33,45 @@ import Zynthian 1.0 as Zynthian
 
 RowLayout {
     property QQC2.StackView stack
+    property var cuiaCallback: function(cuia) {
+        var total_pages = Math.ceil(zynthian.control.all_controls.length / 12)
+
+        switch (cuia) {
+            case "SELECT_UP":
+                zynthian.control.selectedPage = Math.max(0, zynthian.control.selectedPage - 1)
+                return true
+            case "SELECT_DOWN":
+                zynthian.control.selectedPage = Math.min(total_pages - 1, zynthian.control.selectedPage + 1)
+                return true
+            case "NAVIGATE_LEFT":
+                if (zynthian.control.selectedColumn > 0) {
+                    zynthian.control.selectedColumn -= 1
+                } else {
+                    if (zynthian.control.selectedPage > 0) {
+                        zynthian.control.selectedColumn = 3
+                        zynthian.control.selectedPage = Math.max(0, Math.min(total_pages - 1, zynthian.control.selectedPage - 1))
+                    }
+                    else {
+                        zynthian.control.selectedColumn = 0
+                    }
+                }
+
+                return true
+            case "NAVIGATE_RIGHT":
+                if (zynthian.control.selectedColumn < 3) {
+                    zynthian.control.selectedColumn += 1
+                } else {
+                    if (zynthian.control.selectedPage < total_pages-1) {
+                        zynthian.control.selectedColumn = 0
+                        zynthian.control.selectedPage = Math.max(0, Math.min(total_pages - 1, zynthian.control.selectedPage + 1))
+                    }
+                }
+
+                return true
+        }
+
+        return false;
+    }
 
     spacing: 4
 

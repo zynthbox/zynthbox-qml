@@ -38,35 +38,19 @@ RowLayout {
 
         switch (cuia) {
             case "SELECT_UP":
-                zynthian.control.selectedPage = Math.max(0, zynthian.control.selectedPage - 1)
+                zynthian.control.selectPrevPage()
                 return true
+
             case "SELECT_DOWN":
-                zynthian.control.selectedPage = Math.min(total_pages - 1, zynthian.control.selectedPage + 1)
+                zynthian.control.selectNextPage()
                 return true
+
             case "NAVIGATE_LEFT":
-                if (zynthian.control.selectedColumn > 0) {
-                    zynthian.control.selectedColumn -= 1
-                } else {
-                    if (zynthian.control.selectedPage > 0) {
-                        zynthian.control.selectedColumn = 3
-                        zynthian.control.selectedPage = Math.max(0, Math.min(total_pages - 1, zynthian.control.selectedPage - 1))
-                    }
-                    else {
-                        zynthian.control.selectedColumn = 0
-                    }
-                }
-
+                zynthian.control.selectPrevColumn()
                 return true
-            case "NAVIGATE_RIGHT":
-                if (zynthian.control.selectedColumn < 3) {
-                    zynthian.control.selectedColumn += 1
-                } else {
-                    if (zynthian.control.selectedPage < total_pages-1) {
-                        zynthian.control.selectedColumn = 0
-                        zynthian.control.selectedPage = Math.max(0, Math.min(total_pages - 1, zynthian.control.selectedPage + 1))
-                    }
-                }
 
+            case "NAVIGATE_RIGHT":
+                zynthian.control.selectNextColumn()
                 return true
         }
 
@@ -106,6 +90,7 @@ RowLayout {
 
                 onClicked: {
                     zynthian.control.selectedPage = index
+                    zynthian.control.selectedColumn = 0
                 }
             }
         }

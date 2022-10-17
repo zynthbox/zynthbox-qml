@@ -739,6 +739,51 @@ class zynthian_gui_control(zynthian_gui_selector):
 			gctrl.ctrl_value = gctrl.zctrl.value
 
 	@Slot()
+	def selectNextColumn(self):
+		total_pages = math.ceil(len(self.__all_controls) / 12)
+
+		if self.selectedColumn < 3:
+			# Allow selecting next column only if next column has at least one control
+			try:
+				next_col_index = self.selectedPage * 12 + (self.selectedColumn + 1) * 3
+				if self.__all_controls[next_col_index] is not None or \
+						self.__all_controls[next_col_index + 1] is not None or \
+						self.__all_controls[next_col_index + 2] is not None:
+					self.selectedColumn += 1
+			except:
+				pass
+		else:
+			if self.selectedPage < total_pages - 1:
+				self.selectedColumn = 0
+				self.selectedPage = max(0, min(total_pages - 1, self.selectedPage + 1))
+
+	@Slot()
+	def selectPrevColumn(self):
+		total_pages = math.ceil(len(self.__all_controls) / 12)
+
+		if self.selectedColumn > 0:
+			self.selectedColumn -= 1
+		else:
+			if self.selectedPage > 0:
+				self.selectedColumn = 3
+				self.selectedPage = max(0, min(total_pages - 1, self.selectedPage - 1))
+			else:
+				self.selectedColumn = 0
+
+	@Slot()
+	def selectNextPage(self):
+		total_pages = math.ceil(len(self.__all_controls) / 12)
+
+		self.selectedPage = min(total_pages - 1, self.selectedPage + 1)
+		self.selectedColumn = 0
+
+	@Slot()
+	def selectPrevPage(self):
+		total_pages = math.ceil(len(self.__all_controls) / 12)
+
+		self.selectedPage = max(0, self.selectedPage - 1)
+
+	@Slot()
 	def zyncoder_set_knob1_value(self):
 		try:
 			start_index = self.selectedPage*12 + self.selectedColumn*3
@@ -773,24 +818,11 @@ class zynthian_gui_control(zynthian_gui_selector):
 		try:
 			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
 				self.selected_column_gui_controller.read_zyncoder()
-				total_pages = math.ceil(len(self.__all_controls) / 12)
 
 				if self.selected_column_gui_controller.value > 50:
-					if self.selectedColumn < 3:
-						self.selectedColumn += 1
-					else:
-						if self.selectedPage < total_pages-1:
-							self.selectedColumn = 0
-							self.selectedPage = max(0, min(total_pages - 1, self.selectedPage + 1))
+					self.selectNextColumn()
 				elif self.selected_column_gui_controller.value < 50:
-					if self.selectedColumn > 0:
-						self.selectedColumn -= 1
-					else:
-						if self.selectedPage > 0:
-							self.selectedColumn = 3
-							self.selectedPage = max(0, min(total_pages - 1, self.selectedPage - 1))
-						else:
-							self.selectedColumn = 0
+					self.selectPrevColumn()
 
 				self.selected_column_gui_controller.value = 50
 		except:

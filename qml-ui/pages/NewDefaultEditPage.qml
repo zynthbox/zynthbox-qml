@@ -72,27 +72,34 @@ RowLayout {
             clip: true
             currentIndex: zynthian.control.selectedPage
             highlightFollowsCurrentItem: true
-            delegate: Kirigami.BasicListItem {
-                label: qsTr("Page %1").arg(index+1)
-                background: Rectangle {
-                    color: "transparent"
-                    border.color: "#88ffffff"
-                    border.width: zynthian.control.selectedPage === index ? 2 : 0
-                    radius: 2
+            delegate: Rectangle {
+                width: ListView.view.width
+                height: ListView.view.height / 6
+                color: "transparent"
+                border.color: "#88ffffff"
+                border.width: zynthian.control.selectedPage === index ? 2 : 0
+                radius: 2
 
-                    Kirigami.Separator {
-                        height: 1
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            bottom: parent.bottom
-                        }
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: qsTr("Page %1").arg(index+1)
+                }
+
+                Kirigami.Separator {
+                    height: 1
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
                     }
                 }
 
-                onClicked: {
-                    zynthian.control.selectedPage = index
-                    zynthian.control.selectedColumn = 0
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        zynthian.control.selectedPage = index
+                        zynthian.control.selectedColumn = 0
+                    }
                 }
             }
         }

@@ -67,11 +67,23 @@ RowLayout {
         color: Kirigami.Theme.backgroundColor
 
         ListView {
+            id: pageSelectorListview
             anchors.fill: parent
             model: Math.ceil(zynthian.control.all_controls.length / 12)
             clip: true
             currentIndex: zynthian.control.selectedPage
             highlightFollowsCurrentItem: true
+            QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                width: Kirigami.Units.gridUnit * 0.3
+                policy: QQC2.ScrollBar.AlwaysOn
+                active: true
+                contentItem: Rectangle {
+                    radius: width/2
+                    color: Kirigami.Theme.textColor
+                    opacity: 0.3
+                }
+            }
+
             delegate: Rectangle {
                 width: ListView.view.width
                 height: ListView.view.height / 6

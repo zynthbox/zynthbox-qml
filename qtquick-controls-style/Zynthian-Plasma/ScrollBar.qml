@@ -57,7 +57,7 @@ T.ScrollBar {
             disappearTimer.restart();
         }
 
-        if (handleGraphics.handleState) {
+        if (handleGraphics != null && handleGraphics.handleState) {
             handleGraphics.handleState = Math.min(1, handleGraphics.handleState + 0.1)
         }
     }

@@ -67,7 +67,7 @@ def xrun_counter_timer_timeout():
 	global xrun_count
 
 	if xrun_count > 0:
-		logging.warning(f"Got {xrun_count} XRUNS in last 10 seconds")
+		logging.debug(f"Got {xrun_count} XRUNS in last 10 seconds")
 		xrun_count = 0
 
 

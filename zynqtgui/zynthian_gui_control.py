@@ -140,6 +140,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__all_controls = []
 		self.__selected_column = 0
 		self.bigknob_multiplier = 1 if self.isZ2V3 else 10
+		self.controller0 = None
+		self.controller1 = None
+		self.controller2 = None
 		self.selected_column_controller = None
 		self.selected_column_gui_controller = None
 
@@ -348,35 +351,50 @@ class zynthian_gui_control(zynthian_gui_selector):
 		try:
 			start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
 
-			logging.debug(f"SmallKnob1 : Using control at index {start_index}")
-			controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
-			controller0.show()
-			controller0.encoder_index = 0
-			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
-			# always reset knob values when encoder_index is already set
-			controller0.setup_zyncoder()
+			if 0 <= start_index < len(self.all_controls):
+				logging.debug(f"SmallKnob1 : Using control at index {start_index}. Showing")
+				self.controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
+				self.controller0.show()
+				self.controller0.encoder_index = 0
+				# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+				# always reset knob values when encoder_index is already set
+				self.controller0.setup_zyncoder()
+			else:
+				if self.controller0 is not None:
+					logging.debug(f"SmallKnob1 : control not found at index {start_index}. Hiding")
+					self.controller0.hide()
 		except Exception as e:
 			logging.error(f"Failed to set selector for SmallKnob1, with error {e}")
 
 		try:
-			logging.debug(f"SmallKnob2 : Using control at index {start_index + 1}")
-			controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
-			controller1.show()
-			controller1.encoder_index = 1
-			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
-			# always reset knob values when encoder_index is already set
-			controller1.setup_zyncoder()
+			if 0 <= (start_index + 1) < len(self.all_controls):
+				logging.debug(f"SmallKnob2 : Using control at index {start_index + 1}. Showing")
+				self.controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
+				self.controller1.show()
+				self.controller1.encoder_index = 1
+				# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+				# always reset knob values when encoder_index is already set
+				self.controller1.setup_zyncoder()
+			else:
+				if self.controller1 is not None:
+					logging.debug(f"SmallKnob2 : control not found at index {start_index + 1}. Hiding")
+					self.controller1.hide()
 		except Exception as e:
 			logging.error(f"Failed to set selector for SmallKnob2, with error {e}")
 
 		try:
-			logging.debug(f"SmallKnob3 : Using control at index {start_index + 2}")
-			controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
-			controller2.show()
-			controller2.encoder_index = 2
-			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
-			# always reset knob values when encoder_index is already set
-			controller2.setup_zyncoder()
+			if 0 <= (start_index + 2) < len(self.all_controls):
+				logging.debug(f"SmallKnob3 : Using control at index {start_index + 2}. Showing")
+				self.controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
+				self.controller2.show()
+				self.controller2.encoder_index = 2
+				# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+				# always reset knob values when encoder_index is already set
+				self.controller2.setup_zyncoder()
+			else:
+				if self.controller2 is not None:
+					logging.debug(f"SmallKnob3 : control not found at index {start_index + 2}. Hiding")
+					self.controller2.hide()
 		except Exception as e:
 			logging.error(f"Failed to set selector for SmallKnob3, with error {e}")
 

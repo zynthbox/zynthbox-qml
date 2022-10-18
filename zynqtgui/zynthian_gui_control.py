@@ -115,6 +115,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def __init__(self, selcap='Controllers', parent = None):
 		super(zynthian_gui_control, self).__init__(selcap, parent)
 
+		self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
 		self.mode=None
 
 		self.ctrl_screens={}
@@ -137,10 +138,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__custom_controller_mode = False
 		self._active_custom_controller = None
 		self.__all_controls = []
-		self.__selected_page = 0
 		self.__selected_column = 0
-		self.selected_column_controller = zynthian_controller(None, 'edit_page_big_knob', 'edit_page_big_knob', {'midi_cc': 0, 'value': 50, 'value_min': 0, 'value_max': 100})
-		self.selected_column_gui_controller = zynthian_gui_controller(3, self.selected_column_controller, self)
+		self.bigknob_multiplier = 1 if self.isZ2V3 else 10
+		self.selected_column_controller = None
+		self.selected_column_gui_controller = None
 
 		self.__set_selector_timer = QTimer()
 		self.__set_selector_timer.setInterval(100)
@@ -270,7 +271,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.set_mode_control()
 
 		self.selectedPage = 0
-		self.selectedColumn = 0
 		self.set_selector_actual()
 
 
@@ -341,33 +341,53 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def set_selector_actual(self):
 		if self.mode=='select': super().set_selector()
 
-		# Use small knobs to control selected columns controllers
-		# Use big knob to control selectedColumn and selectedPage
-		try:
-			start_index = self.selectedPage*12 + self.selectedColumn*3
+		logging.debug(f"Edit Page set_selector")
 
+		# Use small knobs to control selected columns controllers
+		# Use big knob to control selectedColumn
+		try:
+			start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
+
+			logging.debug(f"SmallKnob1 : Using control at index {start_index}")
 			controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
 			controller0.show()
 			controller0.encoder_index = 0
 			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
 			# always reset knob values when encoder_index is already set
 			controller0.setup_zyncoder()
+		except Exception as e:
+			logging.error(f"Failed to set selector for SmallKnob1, with error {e}")
 
+		try:
+			logging.debug(f"SmallKnob2 : Using control at index {start_index + 1}")
 			controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
 			controller1.show()
 			controller1.encoder_index = 1
 			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
 			# always reset knob values when encoder_index is already set
 			controller1.setup_zyncoder()
+		except Exception as e:
+			logging.error(f"Failed to set selector for SmallKnob2, with error {e}")
 
+		try:
+			logging.debug(f"SmallKnob3 : Using control at index {start_index + 2}")
 			controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
 			controller2.show()
 			controller2.encoder_index = 2
 			# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
 			# always reset knob values when encoder_index is already set
 			controller2.setup_zyncoder()
+		except Exception as e:
+			logging.error(f"Failed to set selector for SmallKnob3, with error {e}")
 
-			self.selected_column_gui_controller.value = 50
+		try:
+			if self.selected_column_gui_controller is None:
+				self.selected_column_controller = zynthian_controller(None, 'edit_page_big_knob', 'edit_page_big_knob', {'midi_cc': 0, 'value': self.selectedColumn * self.bigknob_multiplier, 'value_min': 0, 'value_max': self.totalColumns * self.bigknob_multiplier})
+				self.selected_column_gui_controller = zynthian_gui_controller(3, self.selected_column_controller, self)
+
+			logging.debug(f"BigKnob : Setting value to {self.selectedColumn * self.bigknob_multiplier}")
+			self.selected_column_controller.set_options({'symbol': 'edit_page_big_knob', 'name': 'edit_page_big_knob', 'short_name': 'edit_page_big_knob', 'midi_cc': 0, 'value': self.selectedColumn * self.bigknob_multiplier, 'value_min': 0, 'value_max': self.totalColumns * self.bigknob_multiplier})
+			self.selected_column_gui_controller.config(self.selected_column_controller)
 
 			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
 				self.selected_column_gui_controller.show()
@@ -375,7 +395,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 			else:
 				self.selected_column_gui_controller.hide()
 		except Exception as e:
-			logging.error(f"Failed to set selector, with error {e}")
+			logging.error(f"Failed to set selector for BigKnob, with error {e}")
 
 	def get_controllers_count(self):
 		return len(self.zgui_controllers)
@@ -740,53 +760,24 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	@Slot()
 	def selectNextColumn(self):
-		total_pages = math.ceil(len(self.__all_controls) / 12)
-
-		if self.selectedColumn < 3:
-			# Allow selecting next column only if next column has at least one control
-			try:
-				next_col_index = self.selectedPage * 12 + (self.selectedColumn + 1) * 3
-				if self.__all_controls[next_col_index] is not None or \
-						self.__all_controls[next_col_index + 1] is not None or \
-						self.__all_controls[next_col_index + 2] is not None:
-					self.selectedColumn += 1
-			except:
-				pass
-		else:
-			if self.selectedPage < total_pages - 1:
-				self.selectedColumn = 0
-				self.selectedPage = max(0, min(total_pages - 1, self.selectedPage + 1))
+		self.selectedColumn = min(self.totalColumns - 1, self.selectedColumn + 1)
 
 	@Slot()
 	def selectPrevColumn(self):
-		total_pages = math.ceil(len(self.__all_controls) / 12)
-
-		if self.selectedColumn > 0:
-			self.selectedColumn -= 1
-		else:
-			if self.selectedPage > 0:
-				self.selectedColumn = 3
-				self.selectedPage = max(0, min(total_pages - 1, self.selectedPage - 1))
-			else:
-				self.selectedColumn = 0
+		self.selectedColumn = max(0, self.selectedColumn - 1)
 
 	@Slot()
 	def selectNextPage(self):
-		total_pages = math.ceil(len(self.__all_controls) / 12)
-
-		self.selectedPage = min(total_pages - 1, self.selectedPage + 1)
-		self.selectedColumn = 0
+		self.selectedPage = min(self.totalPages - 1, self.selectedPage + 1)
 
 	@Slot()
 	def selectPrevPage(self):
-		total_pages = math.ceil(len(self.__all_controls) / 12)
-
 		self.selectedPage = max(0, self.selectedPage - 1)
 
 	@Slot()
 	def zyncoder_set_knob1_value(self):
 		try:
-			start_index = self.selectedPage*12 + self.selectedColumn*3
+			start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
 			controller = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
 			if controller.index in [0, 1, 2, 3]:
 				controller.read_zyncoder()
@@ -796,7 +787,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	@Slot()
 	def zyncoder_set_knob2_value(self):
 		try:
-			start_index = self.selectedPage*12 + self.selectedColumn*3
+			start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
 			controller = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
 			if controller.index in [0, 1, 2, 3]:
 				controller.read_zyncoder()
@@ -806,7 +797,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	@Slot()
 	def zyncoder_set_knob3_value(self):
 		try:
-			start_index = self.selectedPage*12 + self.selectedColumn*3
+			start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
 			controller = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
 			if controller.index in [0, 1, 2, 3]:
 				controller.read_zyncoder()
@@ -819,12 +810,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
 				self.selected_column_gui_controller.read_zyncoder()
 
-				if self.selected_column_gui_controller.value > 50:
-					self.selectNextColumn()
-				elif self.selected_column_gui_controller.value < 50:
-					self.selectPrevColumn()
-
-				self.selected_column_gui_controller.value = 50
+				if (self.selected_column_gui_controller.value // self.bigknob_multiplier) != self.selectedColumn:
+					self.selectedColumn = self.selected_column_gui_controller.value // self.bigknob_multiplier
 		except:
 			pass
 
@@ -1016,12 +1003,14 @@ class zynthian_gui_control(zynthian_gui_selector):
 		return self.__all_controls
 
 	def get_selectedPage(self):
-		return self.__selected_page
+		return math.floor((self.selectedColumn * 3) / 12)
 
 	def set_selectedPage(self, page):
-		if self.__selected_page != int(page):
-			self.__selected_page = int(page)
-			self.selectedPageChanged.emit()
+		column = math.floor((page * 12) / 3)
+
+		if self.__selected_column != column:
+			self.__selected_column = column
+			self.selectedColumnChanged.emit()
 			self.set_selector_actual()
 
 	def get_selectedColumn(self):
@@ -1033,6 +1022,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.selectedColumnChanged.emit()
 			self.set_selector_actual()
 
+	def get_totalPages(self):
+		return math.ceil(len(self.__all_controls) / 12)
+
+	def get_totalColumns(self):
+		return math.ceil(len(self.__all_controls) / 3)
+
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()
 	custom_control_page_changed = Signal()
@@ -1041,7 +1036,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 	custom_controller_mode_changed = Signal()
 	active_custom_controller_changed = Signal()
 	all_controls_changed = Signal()
-	selectedPageChanged = Signal()
 	selectedColumnChanged = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
@@ -1051,7 +1045,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 	single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
 	active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
 	all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
-	selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedPageChanged)
+
+	selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedColumnChanged)
 	selectedColumn = Property(int, get_selectedColumn, set_selectedColumn, notify=selectedColumnChanged)
+	totalPages = Property(int, get_totalPages, notify=selectedColumnChanged)
+	totalColumns = Property(int, get_totalColumns, notify=selectedColumnChanged)
 
 #------------------------------------------------------------------------------

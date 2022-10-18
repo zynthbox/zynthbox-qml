@@ -34,8 +34,6 @@ import Zynthian 1.0 as Zynthian
 RowLayout {
     property QQC2.StackView stack
     property var cuiaCallback: function(cuia) {
-        var total_pages = Math.ceil(zynthian.control.all_controls.length / 12)
-
         switch (cuia) {
             case "SELECT_UP":
                 zynthian.control.selectPrevPage()
@@ -69,7 +67,7 @@ RowLayout {
         ListView {
             id: pageSelectorListview
             anchors.fill: parent
-            model: Math.ceil(zynthian.control.all_controls.length / 12)
+            model: zynthian.control.totalPages
             clip: true
             currentIndex: zynthian.control.selectedPage
             highlightFollowsCurrentItem: true
@@ -110,7 +108,6 @@ RowLayout {
                     anchors.fill: parent
                     onClicked: {
                         zynthian.control.selectedPage = index
-                        zynthian.control.selectedColumn = 0
                     }
                 }
             }
@@ -129,7 +126,7 @@ RowLayout {
 
             color: "transparent"
             border.color: "#88ffffff"
-            border.width: zynthian.control.selectedColumn === index ? 2 : 0
+            border.width: (zynthian.control.selectedColumn % 4) === index ? 2 : 0
 
             ColumnLayout {
                 anchors.fill: parent
@@ -141,7 +138,7 @@ RowLayout {
                     delegate: Item {
                         id: controlDelegate
 
-                        property int allControlsIndex: zynthian.control.selectedPage*12 + columnDelegate.columnIndex*3 + index
+                        property int allControlsIndex: zynthian.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
                         property var control: null
                         Binding {
                             target: controlDelegate

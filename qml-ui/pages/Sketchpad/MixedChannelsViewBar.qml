@@ -219,10 +219,10 @@ Rectangle {
 
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: "Trig"
-                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
+                                            text: "Loop"
+                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
                                             onClicked: {
-                                                root.selectedChannel.channelAudioType = "sample-trig"
+                                                root.selectedChannel.channelAudioType = "sample-loop"
                                             }
                                         }
                                         QQC2.Button {
@@ -235,10 +235,10 @@ Rectangle {
                                         }
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: "Loop"
-                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
+                                            text: "Trig"
+                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
                                             onClicked: {
-                                                root.selectedChannel.channelAudioType = "sample-loop"
+                                                root.selectedChannel.channelAudioType = "sample-trig"
                                             }
                                         }
                                     }

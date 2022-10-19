@@ -1132,24 +1132,17 @@ Zynthian.ScreenPage {
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
-                                        var toggleBottomBar = false
                                         root.lastSelectedObj = {
                                             className: channel.sceneClip.className,
                                             value: channel.sceneClip,
                                             component: clipCell
                                         }
 
-                                        if (zynthian.session_dashboard.selectedChannel === channel.id) {
-                                            toggleBottomBar = true
-                                        } else {
-                                            zynthian.session_dashboard.selectedChannel = channel.id;
-                                            zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
-                                        }
+                                        zynthian.session_dashboard.selectedChannel = channel.id;
+                                        zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
+                                        bottomStack.slotsBar.partButton.checked = true
 
                                         Qt.callLater(function() {
-                                            root.resetBottomBar(toggleBottomBar)
-                                            // zynthian.session_dashboard.disableNextSoundSwitchTimer();
-
                                             if (channel.connectedPattern >= 0) {
                                                 bottomBar.controlType = BottomBar.ControlType.Pattern;
                                                 bottomBar.controlObj = channel.sceneClip;

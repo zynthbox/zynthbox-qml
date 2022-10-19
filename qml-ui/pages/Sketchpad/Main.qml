@@ -122,10 +122,12 @@ Zynthian.ScreenPage {
             text: qsTr("Mixer")
             checked: bottomStack.slotsBar.mixerButton.checked
             onTriggered: {
-                if (bottomStack.slotsBar.mixerButton.checked) {
-                    bottomStack.slotsBar.channelButton.checked = true
-                } else {
-                    bottomStack.slotsBar.mixerButton.checked = true
+                if (!root.songMode) {
+                    if (bottomStack.slotsBar.mixerButton.checked) {
+                        bottomStack.slotsBar.channelButton.checked = true
+                    } else {
+                        bottomStack.slotsBar.mixerButton.checked = true
+                    }
                 }
             }
         },

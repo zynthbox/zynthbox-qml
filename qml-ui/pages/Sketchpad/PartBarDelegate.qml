@@ -126,18 +126,20 @@ ColumnLayout {
                     root.channel.selectedPart = index;
                     root.channel.selectedSlotRow = index;
 
-                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                    bottomStack.bottomBar.controlObj = root.channel.sceneClip;
-                    bottomStack.slotsBar.bottomBarButton.checked = true;
+                    if (!root.songMode) {
+                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                        bottomStack.bottomBar.controlObj = root.channel.sceneClip;
+                        bottomStack.slotsBar.bottomBarButton.checked = true;
 
-                    if (root.channel.channelAudioType === "sample-loop") {
-                        if (partDelegate.clipHasWav) {
-                            bottomStack.bottomBar.waveEditorAction.trigger();
+                        if (root.channel.channelAudioType === "sample-loop") {
+                            if (partDelegate.clipHasWav) {
+                                bottomStack.bottomBar.waveEditorAction.trigger();
+                            } else {
+                                bottomStack.bottomBar.recordingAction.trigger();
+                            }
                         } else {
-                            bottomStack.bottomBar.recordingAction.trigger();
+                            bottomStack.bottomBar.patternAction.trigger();
                         }
-                    } else {
-                        bottomStack.bottomBar.patternAction.trigger();
                     }
                 }
             }

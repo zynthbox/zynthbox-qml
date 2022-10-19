@@ -282,8 +282,12 @@ Rectangle {
                         visible: false
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 0
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 0
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }
@@ -298,8 +302,12 @@ Rectangle {
                         text: qsTr("Mixer")
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 1
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 1
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }
@@ -314,8 +322,12 @@ Rectangle {
                         text: qsTr("Sound Combinator")
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 5
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 5
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }
@@ -332,8 +344,12 @@ Rectangle {
                         text: qsTr("Channel")
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 3
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 3
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }
@@ -362,8 +378,12 @@ Rectangle {
                         text: qsTr("Synths")
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 2
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 2
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }
@@ -377,8 +397,12 @@ Rectangle {
                         text: qsTr("Samples")
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 2
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 2
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }
@@ -392,8 +416,12 @@ Rectangle {
                         text: qsTr("FX")
                         onCheckedChanged: {
                             if (checked) {
-                                bottomStack.currentIndex = 2
-                                updateLedVariablesTimer.restart()
+                                if (!root.songMode) {
+                                    bottomStack.currentIndex = 2
+                                    updateLedVariablesTimer.restart()
+                                } else {
+                                    partButton.checked = true
+                                }
                             }
                         }
                     }

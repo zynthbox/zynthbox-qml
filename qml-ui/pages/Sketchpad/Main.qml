@@ -604,12 +604,14 @@ Zynthian.ScreenPage {
                     TableHeader {
                         id: songCell
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
+                        Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
+                        Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
 
                         highlightOnFocus: false
                         highlighted: !root.songMode && root.displayTrackButtons
-                        text: root.song.name
-                        subText: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
+                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         onPressed: {
                             root.displayTrackButtons = !root.displayTrackButtons
                             zynthian.sketchpad.song.sketchesModel.songMode = false
@@ -620,8 +622,9 @@ Zynthian.ScreenPage {
                     TableHeader {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.minimumHeight: Kirigami.Units.gridUnit * 3
+                        Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
+                        Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
+                        Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
 
                         text: qsTr("Song Mode")
                         highlightOnFocus: false

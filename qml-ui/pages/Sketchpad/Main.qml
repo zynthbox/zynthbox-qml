@@ -132,8 +132,9 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: qsTr("Sounds")
+            text: "" //qsTr("Sounds")
             onTriggered: zynthian.show_modal("sound_categories")
+            enabled: false
         },
 
         Kirigami.Action {

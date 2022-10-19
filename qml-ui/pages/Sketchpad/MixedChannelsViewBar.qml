@@ -471,6 +471,10 @@ Rectangle {
                             RowLayout {
                                 id: waveformContainer
 
+                                property bool showWaveform: root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                            root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                            root.selectedChannel.channelAudioType === "sample-loop"
+
                                 property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
                                                             ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                                                             : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
@@ -490,21 +494,18 @@ Rectangle {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
                                         font.pointSize: 9
-                                        text: waveformContainer.clip.path.split("/").pop()
+                                        opacity: waveformContainer.showWaveform ? 1 : 0
+                                        text: qsTr("Wave : %1").arg(waveformContainer.clip.path.split("/").pop())
                                     }
 
                                     Rectangle {
-                                        property bool showWaveform: root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                                    root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                                    root.selectedChannel.channelAudioType === "sample-loop"
-
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         color: "#222222"
                                         border.width: 1
                                         border.color: "#ff999999"
                                         radius: 4
-                                        opacity: showWaveform ? 1 : 0
+                                        opacity: waveformContainer.showWaveform ? 1 : 0
 
                                         WaveFormItem {
                                             anchors.fill: parent
@@ -635,7 +636,7 @@ Rectangle {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
                                         font.pointSize: 9
-                                        text: root.pattern.objectName
+                                        text: qsTr("Pattern : %1").arg(root.pattern.objectName)
                                     }
 
                                     Rectangle {

@@ -362,6 +362,7 @@ Rectangle {
 
                                     delegate: Rectangle {
                                         property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop" ||
+                                                                   root.selectedChannel.channelAudioType === "sample-slice" ||
                                                                    root.selectedChannel.channelAudioType === "external"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
@@ -444,9 +445,16 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                    if (root.selectedChannel.channelAudioType === "sample-loop" ||
+                                                        root.selectedChannel.channelAudioType === "external"
+                                                    ) {
                                                         // If channel type is sample-loop or external, then it has only 1 slot visible
                                                         // and the respective selectedSlotRow is already selected. Hence directly handle item click
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                                                        // If channel type is sample-slice, then it has only 1 slot visible and it is always slot 0
+                                                        // Hence set selectedSlotRow to 0 and call handle item click
+                                                        root.selectedChannel.selectedSlotRow  = 0
                                                         bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                                                     } else {
                                                         // For any other channel modes, set selectedSlotRow first if not already set

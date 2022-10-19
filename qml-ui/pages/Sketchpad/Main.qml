@@ -588,14 +588,6 @@ Zynthian.ScreenPage {
             anchors.bottomMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.smallSpacing
 
-            InfoBar {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.leftMargin: Kirigami.Units.gridUnit * 0.5
-                Layout.rightMargin: Kirigami.Units.gridUnit * 0.5
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-            }
-
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
@@ -1437,6 +1429,14 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }
+            }
+
+            InfoBar {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.leftMargin: Kirigami.Units.gridUnit * 0.5
+                Layout.rightMargin: Kirigami.Units.gridUnit * 0.5
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
             }
         }
     }

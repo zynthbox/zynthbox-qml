@@ -806,7 +806,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
-                text: qsTr("Pick recording for slot")
+                text: qsTr("Pick recording")
 
                 onClicked: {
                     samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir
@@ -819,7 +819,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
-                text: qsTr("Pick sample for slot")
+                text: qsTr("Pick sample")
 
                 onClicked: {
                     samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
@@ -832,7 +832,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
-                text: qsTr("Pick sample-bank for channel")
+                text: qsTr("Pick sample-bank")
 
                 onClicked: {
                     bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
@@ -846,6 +846,7 @@ Rectangle {
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
                 text: qsTr("Download Samples")
+                visible: false // Hide for now
                 onClicked: {
                     zynthian.current_modal_screen_id = "sample_downloader"
                     samplePickerPopup.close()

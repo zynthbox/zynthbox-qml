@@ -536,7 +536,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 try:
                     preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
-                    max_value = (len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) - 1) * 1000
+                    max_value = len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) * 1000
                 except:
                     pass
 
@@ -579,7 +579,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'sketchpad_segment', 'name': 'sketchpad_segment', 'short_name': 'sketchpad_segment', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': (self.song.sketchesModel.selectedSketch.segmentsModel.count - 1) * self.big_knob_channel_multiplier, 'value': selected_segment, 'step': 1})
+                     'value_min': 0, 'value_max': self.song.sketchesModel.selectedSketch.segmentsModel.count * self.big_knob_channel_multiplier, 'value': selected_segment, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 
@@ -607,7 +607,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'sketchpad_channel', 'name': 'sketchpad_channel', 'short_name': 'sketchpad_channel', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': 9*self.big_knob_channel_multiplier, 'value': selected_channel, 'step': 1})
+                     'value_min': 0, 'value_max': 10 * self.big_knob_channel_multiplier, 'value': selected_channel, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 

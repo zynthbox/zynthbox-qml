@@ -350,7 +350,7 @@ Rectangle {
                                                 root.selectedChannel.channelAudioType === "sample-slice"
                                                     ? root.selectedChannel.samples
                                                     : root.selectedChannel.channelAudioType === "sample-loop"
-                                                        ? root.selectedChannel.getAllPartClips()
+                                                        ? [root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex), null, null, null, null]
                                                         : root.selectedChannel.channelAudioType === "external"
                                                             ? [qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""), null, null, null, null]
                                                             : []
@@ -361,7 +361,8 @@ Rectangle {
                                     id: synthRepeater
 
                                     delegate: Rectangle {
-                                        property bool highlighted: root.selectedChannel.channelAudioType === "external"
+                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop" ||
+                                                                   root.selectedChannel.channelAudioType === "external"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
 
@@ -392,9 +393,10 @@ Rectangle {
                                             border.width: 1
                                             radius: 4
 
-                                            // For slice and external modes only first slot is visible.
+                                            // For loop, slice and external modes only first slot is visible.
                                             // For other modes all slots are visible
-                                            enabled: root.selectedChannel.channelAudioType === "sample-slice" ||
+                                            enabled: root.selectedChannel.channelAudioType === "sample-loop" ||
+                                                     root.selectedChannel.channelAudioType === "sample-slice" ||
                                                      root.selectedChannel.channelAudioType === "external"
                                                         ? index === 0
                                                         : true
@@ -442,10 +444,17 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    if (index !== root.selectedChannel.selectedSlotRow) {
-                                                        root.selectedChannel.selectedSlotRow = index
-                                                    } else {
+                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                        // If channel type is sample-loop or external, then it has only 1 slot visible
+                                                        // and the respective selectedSlotRow is already selected. Hence directly handle item click
                                                         bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    } else {
+                                                        // For any other channel modes, set selectedSlotRow first if not already set
+                                                        if (index !== root.selectedChannel.selectedSlotRow) {
+                                                            root.selectedChannel.selectedSlotRow = index
+                                                        } else {
+                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                        }
                                                     }
                                                 }
                                             }

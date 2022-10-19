@@ -598,20 +598,23 @@ Rectangle {
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
-                                                if (root.selectedChannel.channelAudioType === "sample-loop") {
-                                                    if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                        bottomStack.bottomBar.controlObj = waveformContainer.clip;
-                                                        bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                        bottomStack.bottomBar.waveEditorAction.trigger();
-                                                    }
-                                                } else {
-                                                    if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
-                                                        bottomStack.bottomBar.controlObj = root.selectedChannel;
-                                                        bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                        bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                                                    }
+                                                if (waveformContainer.showWaveform) {
+                                                    /*if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                            bottomStack.bottomBar.controlObj = waveformContainer.clip;
+                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                            bottomStack.bottomBar.waveEditorAction.trigger();
+                                                        }
+                                                    } else {
+                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
+                                                            bottomStack.bottomBar.controlObj = root.selectedChannel;
+                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                            bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                                        }
+                                                    }*/
+                                                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                                                 }
                                             }
                                         }
@@ -684,12 +687,14 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill:parent
                                                 onClicked: {
-                                                    var screenBack = zynthian.current_screen_id;
-                                                    zynthian.current_modal_screen_id = "playgrid";
-                                                    zynthian.forced_screen_back = "sketchpad";
-                                                    ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
-                                                    sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                                                    if (patternContainer.showPattern) {
+                                                        var screenBack = zynthian.current_screen_id;
+                                                        zynthian.current_modal_screen_id = "playgrid";
+                                                        zynthian.forced_screen_back = "sketchpad";
+                                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
+                                                        sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                                                    }
                                                 }
                                             }
                                         }

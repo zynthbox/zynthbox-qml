@@ -139,7 +139,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self._active_custom_controller = None
 		self.__all_controls = []
 		self.__selected_column = 0
-		self.bigknob_multiplier = 1 if self.isZ2V3 else 10
+		self.bigknob_multiplier = 1 if self.isZ2V3 else 100
 		self.controller0 = None
 		self.controller1 = None
 		self.controller2 = None

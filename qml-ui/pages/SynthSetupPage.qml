@@ -253,6 +253,10 @@ Zynthian.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+
+                Component.onCompleted: {
+                    layersView.background.highlighted = Qt.binding(function() { return zynthian.current_screen_id === screenId })
+                }
                 delegate: Zynthian.SelectorDelegate {
                     id: delegate
                     screenId: layersView.screenId
@@ -447,6 +451,9 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                    Component.onCompleted: {
+                        bankView.background.highlighted = Qt.binding(function() { return zynthian.current_screen_id === screenId })
+                    }
                     delegate: Zynthian.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
@@ -574,6 +581,9 @@ Zynthian.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                Component.onCompleted: {
+                    presetView.background.highlighted = Qt.binding(function() { return zynthian.current_screen_id === screenId })
+                }
             }
         }
 

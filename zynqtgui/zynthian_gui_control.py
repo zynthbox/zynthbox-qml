@@ -346,74 +346,99 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		logging.debug(f"Edit Page set_selector")
 
-		# Use small knobs to control selected columns controllers
-		# Use big knob to control selectedColumn
-		try:
-			start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-
-			if 0 <= start_index < len(self.all_controls):
-				logging.debug(f"SmallKnob1 : Using control at index {start_index}. Showing")
-				self.controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
-				self.controller0.show()
-				self.controller0.encoder_index = 0
-				# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
-				# always reset knob values when encoder_index is already set
-				self.controller0.setup_zyncoder()
-			else:
+		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+			try:
 				if self.controller0 is not None:
-					logging.debug(f"SmallKnob1 : control not found at index {start_index}. Hiding")
 					self.controller0.hide()
-		except Exception as e:
-			logging.error(f"Failed to set selector for SmallKnob1, with error {e}")
+			except:
+				pass
 
-		try:
-			if 0 <= (start_index + 1) < len(self.all_controls):
-				logging.debug(f"SmallKnob2 : Using control at index {start_index + 1}. Showing")
-				self.controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
-				self.controller1.show()
-				self.controller1.encoder_index = 1
-				# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
-				# always reset knob values when encoder_index is already set
-				self.controller1.setup_zyncoder()
-			else:
+			try:
 				if self.controller1 is not None:
-					logging.debug(f"SmallKnob2 : control not found at index {start_index + 1}. Hiding")
 					self.controller1.hide()
-		except Exception as e:
-			logging.error(f"Failed to set selector for SmallKnob2, with error {e}")
+			except:
+				pass
 
-		try:
-			if 0 <= (start_index + 2) < len(self.all_controls):
-				logging.debug(f"SmallKnob3 : Using control at index {start_index + 2}. Showing")
-				self.controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
-				self.controller2.show()
-				self.controller2.encoder_index = 2
-				# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
-				# always reset knob values when encoder_index is already set
-				self.controller2.setup_zyncoder()
-			else:
+			try:
 				if self.controller2 is not None:
-					logging.debug(f"SmallKnob3 : control not found at index {start_index + 2}. Hiding")
 					self.controller2.hide()
-		except Exception as e:
-			logging.error(f"Failed to set selector for SmallKnob3, with error {e}")
+			except:
+				pass
 
-		try:
-			if self.selected_column_gui_controller is None:
-				self.selected_column_controller = zynthian_controller(None, 'edit_page_big_knob', 'edit_page_big_knob', {'midi_cc': 0, 'value': self.selectedColumn * self.bigknob_multiplier, 'value_min': 0, 'value_max': self.totalColumns * self.bigknob_multiplier})
-				self.selected_column_gui_controller = zynthian_gui_controller(3, self.selected_column_controller, self)
+			try:
+				if self.selected_column_gui_controller is not None:
+					self.selected_column_gui_controller.hide()
+			except:
+				pass
+		else:
+			# Use small knobs to control selected columns controllers
+			# Use big knob to control selectedColumn
+			try:
+				start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
 
-			logging.debug(f"BigKnob : Setting value to {self.selectedColumn * self.bigknob_multiplier}")
-			self.selected_column_controller.set_options({'symbol': 'edit_page_big_knob', 'name': 'edit_page_big_knob', 'short_name': 'edit_page_big_knob', 'midi_cc': 0, 'value': self.selectedColumn * self.bigknob_multiplier, 'value_min': 0, 'value_max': self.totalColumns * self.bigknob_multiplier})
-			self.selected_column_gui_controller.config(self.selected_column_controller)
+				if 0 <= start_index < len(self.all_controls):
+					logging.debug(f"SmallKnob1 : Using control at index {start_index}. Showing")
+					self.controller0 = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
+					self.controller0.show()
+					self.controller0.encoder_index = 0
+					# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+					# always reset knob values when encoder_index is already set
+					self.controller0.setup_zyncoder()
+				else:
+					if self.controller0 is not None:
+						logging.debug(f"SmallKnob1 : control not found at index {start_index}. Hiding")
+						self.controller0.hide()
+			except Exception as e:
+				logging.error(f"Failed to set selector for SmallKnob1, with error {e}")
 
-			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
-				self.selected_column_gui_controller.show()
-				self.selected_column_gui_controller.setup_zyncoder()
-			else:
-				self.selected_column_gui_controller.hide()
-		except Exception as e:
-			logging.error(f"Failed to set selector for BigKnob, with error {e}")
+			try:
+				if 0 <= (start_index + 1) < len(self.all_controls):
+					logging.debug(f"SmallKnob2 : Using control at index {start_index + 1}. Showing")
+					self.controller1 = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
+					self.controller1.show()
+					self.controller1.encoder_index = 1
+					# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+					# always reset knob values when encoder_index is already set
+					self.controller1.setup_zyncoder()
+				else:
+					if self.controller1 is not None:
+						logging.debug(f"SmallKnob2 : control not found at index {start_index + 1}. Hiding")
+						self.controller1.hide()
+			except Exception as e:
+				logging.error(f"Failed to set selector for SmallKnob2, with error {e}")
+
+			try:
+				if 0 <= (start_index + 2) < len(self.all_controls):
+					logging.debug(f"SmallKnob3 : Using control at index {start_index + 2}. Showing")
+					self.controller2 = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
+					self.controller2.show()
+					self.controller2.encoder_index = 2
+					# Force call setup_zyncoder to always resets knob values to selected as encoder_index setter does not
+					# always reset knob values when encoder_index is already set
+					self.controller2.setup_zyncoder()
+				else:
+					if self.controller2 is not None:
+						logging.debug(f"SmallKnob3 : control not found at index {start_index + 2}. Hiding")
+						self.controller2.hide()
+			except Exception as e:
+				logging.error(f"Failed to set selector for SmallKnob3, with error {e}")
+
+			try:
+				if self.selected_column_gui_controller is None:
+					self.selected_column_controller = zynthian_controller(None, 'edit_page_big_knob', 'edit_page_big_knob', {'midi_cc': 0, 'value': self.selectedColumn * self.bigknob_multiplier, 'value_min': 0, 'value_max': self.totalColumns * self.bigknob_multiplier})
+					self.selected_column_gui_controller = zynthian_gui_controller(3, self.selected_column_controller, self)
+
+				logging.debug(f"BigKnob : Setting value to {self.selectedColumn * self.bigknob_multiplier}")
+				self.selected_column_controller.set_options({'symbol': 'edit_page_big_knob', 'name': 'edit_page_big_knob', 'short_name': 'edit_page_big_knob', 'midi_cc': 0, 'value': self.selectedColumn * self.bigknob_multiplier, 'value_min': 0, 'value_max': self.totalColumns * self.bigknob_multiplier})
+				self.selected_column_gui_controller.config(self.selected_column_controller)
+
+				if self.custom_control_page == "":
+					self.selected_column_gui_controller.show()
+					self.selected_column_gui_controller.setup_zyncoder()
+				else:
+					self.selected_column_gui_controller.hide()
+			except Exception as e:
+				logging.error(f"Failed to set selector for BigKnob, with error {e}")
 
 	def get_controllers_count(self):
 		return len(self.zgui_controllers)
@@ -835,6 +860,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def zyncoder_read(self, zcnums=None):
 		if not self.zyngui.isBootingComplete:
+			return
+
+		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
 			return
 
 		#Read Controller

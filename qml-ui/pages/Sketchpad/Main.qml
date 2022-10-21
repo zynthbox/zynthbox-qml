@@ -922,6 +922,25 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
+                                Connections {
+                                    target: root
+                                    onSongModeChanged: {
+                                        if (root.songMode && index === 0) {
+                                            root.lastSelectedObj = {
+                                                className: segmentHeader.segment.className,
+                                                value: segmentHeader.segment,
+                                                component: segmentHeader
+                                            }
+                                        } else if (!root.songMode && index === 0) {
+                                            root.lastSelectedObj = {
+                                                className: channel.sceneClip.className,
+                                                value: channel.sceneClip,
+                                                component: clipCell
+                                            }
+                                        }
+                                    }
+                                }
+
                                 TableHeader {
                                     anchors.fill: parent
                                     visible: !root.songMode && root.displaySceneButtons

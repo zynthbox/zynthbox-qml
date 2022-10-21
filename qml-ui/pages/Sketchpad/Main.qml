@@ -557,10 +557,16 @@ Zynthian.ScreenPage {
                         ? zynthian.slotsBarPartActive
                         : root.lastSelectedObj != null
                             ? ["sketchpad_segment", "sketchpad_sketch"].indexOf(root.lastSelectedObj.className) >= 0
-                              ? root.songMode
-                              : ["sketchpad_channel", "sketchpad_clip"].indexOf(root.lastSelectedObj.className) >= 0
-                                ? !root.songMode
-                                : false
+                                ? root.songMode
+                                : root.lastSelectedObj.className === "sketchpad_channel"
+                                    ? !root.songMode && !root.displayTrackButtons
+                                    : root.lastSelectedObj.className === "sketchpad_clip"
+                                        ? !root.songMode && !root.displaySceneButtons
+                                        : root.lastSelectedObj.className === "sketchpad_scene"
+                                            ? !root.songMode && root.displaySceneButtons
+                                            : root.lastSelectedObj.className === "sketchpad_track"
+                                                ? !root.songMode && root.displayTrackButtons
+                                                : false
                             : false
 
             width: root.lastSelectedObj && root.lastSelectedObj.component ? root.lastSelectedObj.component.width + 8 : 0
@@ -942,6 +948,7 @@ Zynthian.ScreenPage {
                                 }
 
                                 TableHeader {
+                                    id: sceneHeader
                                     anchors.fill: parent
                                     visible: !root.songMode && root.displaySceneButtons
                                     text: String.fromCharCode(65+index).toUpperCase()
@@ -952,6 +959,12 @@ Zynthian.ScreenPage {
                                         if (root.songMode) {
                                             root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.copyClipsFromScene(index)
                                         } else {
+//                                            root.lastSelectedObj = {
+//                                                className: "sketchpad_scene",
+//                                                value: index,
+//                                                component: sceneHeader
+//                                            }
+
                                             Zynthian.CommonUtils.switchToScene(index);
                                         }
                                     }

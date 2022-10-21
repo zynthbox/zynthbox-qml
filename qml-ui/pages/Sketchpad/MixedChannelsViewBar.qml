@@ -465,6 +465,14 @@ Rectangle {
                                                         }
                                                     }
                                                 }
+                                                onPressAndHold: {
+                                                    if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[index])) {
+                                                        zynthian.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
+                                                        zynthian.control.single_effect_engine = null;
+                                                        zynthian.current_screen_id = "control";
+                                                        zynthian.forced_screen_back = "sketchpad"
+                                                    }
+                                                }
                                             }
                                         }
                                     }

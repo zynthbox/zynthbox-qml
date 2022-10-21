@@ -26,9 +26,9 @@ QQC2.Dialog {
     height: Kirigami.Units.gridUnit * 8
     onVisibleChanged : {
         cancelSaveButton.forceActiveFocus();
-        if (visible) {
-            delayKeyboardTimer.restart()
-        }
+//        if (visible) {
+//            delayKeyboardTimer.restart()
+//        }
     }
     Timer {
         id: delayKeyboardTimer

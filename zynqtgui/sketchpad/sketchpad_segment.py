@@ -35,7 +35,7 @@ class sketchpad_segment(QObject):
 
         self.__song = song
         self.__sketch = sketch
-        self.__bar_length = 0
+        self.__bar_length = 1
         self.__beat_length = 0
         self.__clips = []
 

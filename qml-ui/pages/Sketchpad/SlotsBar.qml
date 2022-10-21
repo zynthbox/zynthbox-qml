@@ -55,21 +55,6 @@ Rectangle {
     //         Find a proper solution and see if selectedChannel can be used for all cases instead of this
     property QtObject selectedSlotRowItem
 
-    onSongModeChanged: {
-        if (root.songMode) {
-            partButton.checked = true
-        } else {
-            channelButton.checked = true
-        }
-    }
-    onDisplaySceneButtonsChanged: {
-        if (root.displaySceneButtons) {
-            partButton.checked = true
-        } else {
-            channelButton.checked = true
-        }
-    }
-
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
@@ -332,14 +317,13 @@ Rectangle {
                         }
                     }
 
-                    //// INVISIBLE BUTTONS
+                    //// END INVISIBLE BUTTONS
 
                     QQC2.Button {
                         id: channelButton
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        checked: true
                         enabled: !root.songMode && !root.displaySceneButtons
                         text: qsTr("Channel")
                         onCheckedChanged: {

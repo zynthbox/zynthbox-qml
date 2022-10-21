@@ -616,6 +616,7 @@ Zynthian.ScreenPage {
                         onPressed: {
                             root.displayTrackButtons = !root.displayTrackButtons
                             zynthian.sketchpad.song.sketchesModel.songMode = false
+                            bottomStack.slotsBar.channelButton.checked = true
                             zynthian.sketchpad.displaySceneButtons = false
                         }
                     }
@@ -635,6 +636,13 @@ Zynthian.ScreenPage {
                                 applicationWindow().showPassiveNotification("Cannot switch song mode when timer is running", 1500)
                             } else {
                                 zynthian.sketchpad.song.sketchesModel.songMode = !zynthian.sketchpad.song.sketchesModel.songMode
+
+                                if (root.songMode) {
+                                    bottomStack.slotsBar.partButton.checked = true
+                                } else {
+                                    bottomStack.slotsBar.channelButton.checked = true
+                                }
+
                                 root.displayTrackButtons = false
                                 zynthian.sketchpad.displaySceneButtons = false
                             }
@@ -653,8 +661,10 @@ Zynthian.ScreenPage {
                         onPressed: {
                             if (zynthian.sketchpad.displaySceneButtons) {
                                 zynthian.sketchpad.displaySceneButtons = false
+                                bottomStack.slotsBar.channelButton.checked = true
                             } else {
                                 zynthian.sketchpad.displaySceneButtons = true
+                                bottomStack.slotsBar.partButton.checked = true
                                 zynthian.sketchpad.song.sketchesModel.songMode = false
                                 root.displayTrackButtons = false
                             }

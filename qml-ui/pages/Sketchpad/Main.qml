@@ -555,7 +555,13 @@ Zynthian.ScreenPage {
 
             visible: root.lastSelectedObj && root.lastSelectedObj.className === "sketchpad_part"
                         ? zynthian.slotsBarPartActive
-                        : root.lastSelectedObj
+                        : root.lastSelectedObj != null
+                            ? ["sketchpad_segment", "sketchpad_sketch"].indexOf(root.lastSelectedObj.className) >= 0
+                              ? root.songMode
+                              : ["sketchpad_channel", "sketchpad_clip"].indexOf(root.lastSelectedObj.className) >= 0
+                                ? !root.songMode
+                                : false
+                            : false
 
             width: root.lastSelectedObj && root.lastSelectedObj.component ? root.lastSelectedObj.component.width + 8 : 0
             height: root.lastSelectedObj && root.lastSelectedObj.component ? root.lastSelectedObj.component.height + 8 : 0

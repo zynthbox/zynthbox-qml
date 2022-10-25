@@ -724,7 +724,11 @@ Kirigami.AbstractApplicationWindow {
 
     Connections {
         target: ZynQuick.PlayGridManager
-        onTaskMessage: zynthian.playgrid.setCurrentTaskMessage(message);
+        onTaskMessage: {
+            Qt.callLater(function() {
+                zynthian.playgrid.setCurrentTaskMessage(message);
+            })
+        }
     }
     Repeater {
         id: playGridsRepeater

@@ -664,23 +664,21 @@ don't want to have to dig too far...
     // and fetched from PlayGridManager by asking for the sequence by name ("T1" for example), and then
     // calling getByPart(channelIndex, partIndex) to fetch the specific pattern
     Repeater {
-        model: zynthian.sketchpad.song.channelsModel
+        id: channelsRepeater
         delegate: Repeater {
             id: baseChannelDelegate
             property QtObject theChannel: channel
             property int channelIndex: index
-            model: theChannel.parts
             delegate: Repeater {
                 id: channelPartDelegate
                 property int partIndex: index
                 property QtObject part: modelData
-                model: channelPartDelegate.part
                 delegate: Item {
                     id: channelPartSceneDelegate
                     property QtObject sceneClip: model.clip
                     property int sceneIndex: model.index
                     property string connectedSequenceName: "T" + (model.index + 1)
-                    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
+                    property QtObject sequence: null
                     property int sequenceIndex: model.index;
                     property QtObject pattern: sequence && sequence.count > 0 ? channelPartSceneDelegate.sequence.getByPart(baseChannelDelegate.channelIndex, channelPartDelegate.partIndex) : null;
                     property int patternIndex: sequence ? sequence.indexOf(pattern) : -1;
@@ -701,8 +699,29 @@ don't want to have to dig too far...
                             channelPartSceneDelegate.pattern.zlScene = channelPartSceneDelegate.sceneClip;
                         }
                     }
+
+                    Binding {
+                        target: channelPartSceneDelegate
+                        property: "sequence"
+                        value: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
+                        delayed: true
+                    }
+                }
+
+                Binding {
+                    target: channelPartDelegate
+                    property: "model"
+                    value: channelPartDelegate.part
+                    delayed: true
                 }
             }
+        }
+
+        Binding {
+            target: channelsRepeater
+            property: "model"
+            value: zynthian.sketchpad.song.channelsModel
+            delayed: true
         }
     }
 }

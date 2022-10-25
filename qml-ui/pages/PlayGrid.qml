@@ -669,10 +669,12 @@ don't want to have to dig too far...
             id: baseChannelDelegate
             property QtObject theChannel: channel
             property int channelIndex: index
+            model: baseChannelDelegate.theChannel.parts
             delegate: Repeater {
                 id: channelPartDelegate
                 property int partIndex: index
                 property QtObject part: modelData
+                model: channelPartDelegate.part
                 delegate: Item {
                     id: channelPartSceneDelegate
                     property QtObject sceneClip: model.clip
@@ -707,21 +709,14 @@ don't want to have to dig too far...
                         delayed: true
                     }
                 }
-
-                Binding {
-                    target: channelPartDelegate
-                    property: "model"
-                    value: channelPartDelegate.part
-                    delayed: true
-                }
             }
         }
+    }
 
-        Binding {
-            target: channelsRepeater
-            property: "model"
-            value: zynthian.sketchpad.song.channelsModel
-            delayed: true
-        }
+    Binding {
+        target: channelsRepeater
+        property: "model"
+        value: zynthian.sketchpad.song.channelsModel
+        delayed: true
     }
 }

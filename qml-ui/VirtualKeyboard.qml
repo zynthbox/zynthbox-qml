@@ -30,14 +30,30 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 Item {
+    id: root
+
+    // Property to store reference to the selected textfield when VK opens.
+    // This is to make sure we always have the reference to original textfield that was focused
+    // as when VK opens, focus is moved to a temporary textfield
+    property QtObject focusedTextField: null
+
     visible: Qt.inputMethod.visible
 
     Connections {
         target: Qt.inputMethod
         onVisibleChanged: {
             Qt.callLater(function() {
-                if (active && applicationWindow().activeFocusItem.selectAll) {
-                    applicationWindow().activeFocusItem.selectAll()
+                if (visible && root.focusedTextField == null) {
+                    // If VK is visible, store reference of original focus textfield on
+                    // which VK will operate
+                    root.focusedTextField = applicationWindow().activeFocusItem
+                    textfield.text = root.focusedTextField.text ? root.focusedTextField.text : ""
+                    textfield.forceActiveFocus()
+                    textField.selectAll()
+                } else if (!visible) {
+                    // If VK is not visible, delete reference of last focused textfield
+                    root.focusedTextField = null
+                    applicationWindow().forceActiveFocus()
                 }
             })
         }
@@ -51,6 +67,7 @@ Item {
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
                 Qt.inputMethod.hide();
+                applicationWindow().forceActiveFocus()
                 result = true;
                 break;
             default:
@@ -63,21 +80,32 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: "#cc222222"
+        color: "#ee222222"
 
-        QQC2.TextField {
-            anchors.centerIn: parent
-            width: parent.width * 0.4
-            height: Kirigami.Units.gridUnit * 2
-            horizontalAlignment: "AlignHCenter"
-            verticalAlignment: "AlignVCenter"
-            text: applicationWindow().activeFocusItem.text ? applicationWindow().activeFocusItem.text : ""
-        }
-
+        // Hide VK when clicked outside textfield
         MouseArea {
             anchors.fill: parent
             onClicked: {
                 Qt.inputMethod.hide()
+                applicationWindow().forceActiveFocus()
+            }
+        }
+
+        QQC2.TextField {
+            id: textfield
+
+            anchors.centerIn: parent
+            width: parent.width * 0.4
+            height: Kirigami.Units.gridUnit * 3
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            selectByMouse: true
+            onAccepted: {
+                // When temporary textfield is accepted, set text property of original focused textfield to
+                // this one and hide VK
+                root.focusedTextField.text = textfield.text
+                Qt.inputMethod.hide()
+                applicationWindow().forceActiveFocus()
             }
         }
     }

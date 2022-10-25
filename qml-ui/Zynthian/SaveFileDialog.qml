@@ -21,14 +21,11 @@ QQC2.Dialog {
     modal: true
     z: 999999999
     x: Math.round(parent.width/2 - width/2)
-    y: Qt.inputMethod.visible ? Math.round(parent.height/5) : Math.round(parent.height/2 - height/2)
+    y: Math.round(parent.height/2 - height/2)
     width: Kirigami.Units.gridUnit * 15
     height: Kirigami.Units.gridUnit * 8
     onVisibleChanged : {
         cancelSaveButton.forceActiveFocus();
-//        if (visible) {
-//            delayKeyboardTimer.restart()
-//        }
     }
     Timer {
         id: delayKeyboardTimer

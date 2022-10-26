@@ -615,22 +615,30 @@ Rectangle {
                                             anchors.fill: parent
                                             onClicked: {
                                                 if (waveformContainer.showWaveform) {
-                                                    /*if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                }
+                                            }
+                                            onPressAndHold: {
+                                                if (waveformContainer.showWaveform) {
+                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
                                                             bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
                                                             bottomStack.bottomBar.controlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                            bottomStack.bottomBar.waveEditorAction.trigger();
+                                                            Qt.callLater(function() {
+                                                                bottomStack.bottomBar.waveEditorAction.trigger();
+                                                            })
                                                         }
                                                     } else {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
                                                             bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
                                                             bottomStack.bottomBar.controlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                            bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                                            Qt.callLater(function() {
+                                                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                                            })
                                                         }
-                                                    }*/
-                                                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    }
                                                 }
                                             }
                                         }

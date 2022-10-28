@@ -134,7 +134,7 @@ Zynthian.Stack {
         //}
 
         Component.onCompleted: {
-            zynthian.currentTaskMessage = "Loading looper page"
+            zynthian.currentTaskMessage = "Loading sketchpad page"
         }
     }
 }

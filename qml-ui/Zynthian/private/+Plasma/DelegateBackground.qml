@@ -33,6 +33,9 @@ PlasmaCore.FrameSvgItem {
     property QQC2.ItemDelegate delegate
     visible: delegate.ListView.isCurrentItem || delegate.pressed
     imagePath: "widgets/viewitem"
-    prefix: (delegate.highlighted && !delegate.pressed || !delegate.highlighted && delegate.pressed) ? "selected+hover" : "hover"
+    
+    // Always add hover prefix as it should not show filled background for selected items
+    // Always show white outline for hover/selected item.
+    prefix: "hover"
 }
 

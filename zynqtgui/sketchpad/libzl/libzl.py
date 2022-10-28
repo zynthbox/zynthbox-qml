@@ -147,6 +147,9 @@ def getSyncTimerInstance():
     if libzl:
         return libzl.SyncTimer_instance()
 
+def reloadZynthianConfiguration():
+    if libzl:
+        libzl.reloadZynthianConfiguration()
 
 def registerTimerCallback(callback):
     if libzl:

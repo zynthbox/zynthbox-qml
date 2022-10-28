@@ -1384,6 +1384,7 @@ class zynthian_gui(QObject):
             self.init_midi()
             self.init_midi_services()
             self.zynautoconnect()
+            libzl.reloadZynthianConfiguration()
 
     """
     Initialize Global FX Engines

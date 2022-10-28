@@ -237,8 +237,11 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def show(self):
 		super().show()
-		self.click_listbox()
-		logging.error("SHOWING {}".format(time.time() * 1000))
+
+		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+			self.click_listbox()
+
+		# logging.error("SHOWING {}".format(time.time() * 1000))
 		if self.zyngui.curlayer:
 			path = "/root/.local/share/zynthian/engineeditpages/"
 			entries = []
@@ -269,13 +272,14 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.__control_pages_model.set_entries(entries)
 		else:
 			self.__control_pages_model.set_entries([])
-		logging.error("SHOWed {}".format(time.time() * 1000))
-		self.sync_selectors_visibility()
-		self.set_mode_control()
 
-		self.selectedPage = 0
-		self.set_selector_actual()
+		# logging.error("SHOWed {}".format(time.time() * 1000))
 
+		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+			self.sync_selectors_visibility()
+			self.set_mode_control()
+			self.selectedPage = 0
+			self.set_selector_actual()
 
 	def hide(self):
 		super().hide()

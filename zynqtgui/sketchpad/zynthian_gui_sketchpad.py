@@ -124,8 +124,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
 
-        self.big_knob_channel_multiplier = 1 if self.isZ2V3 else 10
-
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
         self.master_audio_level_timer.setInterval(50)
@@ -221,9 +219,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        if self.__big_knob_mode__ == "segment" and self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
-            logging.debug(f"Setting segment from zyncoder {round(self.__zselector[0].value/self.big_knob_channel_multiplier)}")
-            self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_channel_multiplier)
+        if self.__big_knob_mode__ == "segment" and self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex != int(self.__zselector[0].value):
+            logging.debug(f"Setting segment from zyncoder {int(self.__zselector[0].value)}")
+            self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = int(self.__zselector[0].value)
             self.set_selector()
 
     @Slot(None)
@@ -231,9 +229,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        if self.__big_knob_mode__ == "channel" and self.zyngui.session_dashboard.get_selected_channel() != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
-            logging.debug(f"Setting channel from zyncoder {round(self.__zselector[0].value/self.big_knob_channel_multiplier)}")
-            self.zyngui.session_dashboard.set_selected_channel(round(self.__zselector[0].value/self.big_knob_channel_multiplier))
+        if self.__big_knob_mode__ == "channel" and self.zyngui.session_dashboard.get_selected_channel() != int(self.__zselector[0].value):
+            logging.debug(f"Setting channel from zyncoder {int(self.__zselector[0].value)}")
+            self.zyngui.session_dashboard.set_selected_channel(int(self.__zselector[0].value))
             self.set_selector()
 
     @Slot(None)
@@ -560,12 +558,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.__big_knob_mode__ = "segment"
 
                 try:
-                    selected_segment = self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex * self.big_knob_channel_multiplier
+                    selected_segment = self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
                 except:
                     selected_segment = 0
 
                 logging.debug(
-                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment // self.big_knob_channel_multiplier})")
+                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment})")
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_segment', 'sketchpad_segment',
@@ -579,7 +577,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'sketchpad_segment', 'name': 'sketchpad_segment', 'short_name': 'sketchpad_segment', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': self.song.sketchesModel.selectedSketch.segmentsModel.count * self.big_knob_channel_multiplier, 'value': selected_segment, 'step': 1})
+                     'value_min': 0, 'value_max': self.song.sketchesModel.selectedSketch.segmentsModel.count, 'value': selected_segment, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 
@@ -591,11 +589,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.__big_knob_mode__ = "channel"
 
                 try:
-                    selected_channel = self.zyngui.session_dashboard.get_selected_channel() * self.big_knob_channel_multiplier
+                    selected_channel = self.zyngui.session_dashboard.get_selected_channel()
                 except:
                     selected_channel = 0
 
-                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_channel({selected_channel // self.big_knob_channel_multiplier})")
+                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_channel({selected_channel})")
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_channel', 'sketchpad_channel',
@@ -607,7 +605,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'sketchpad_channel', 'name': 'sketchpad_channel', 'short_name': 'sketchpad_channel', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': 10 * self.big_knob_channel_multiplier, 'value': selected_channel, 'step': 1})
+                     'value_min': 0, 'value_max': 10, 'value': selected_channel, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 

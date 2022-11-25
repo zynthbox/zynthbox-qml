@@ -31,9 +31,21 @@ import org.kde.kirigami 2.6 as Kirigami
 
 ColumnLayout {
     id: component
-    anchors {
-        fill: parent
+    objectName: "clipPickerFile"
+
+    property bool isRecording: zynthian.main.isRecording
+    function startRecording() {
+        // If the current module is an alsa thing, don't use jack to record it and instead record using alsa
+        if (zynthian.main.currentModuleRecordAlsa === true) {
+            zynthian.main.start_recording_alsa();
+        } else {
+            zynthian.main.start_recording();
+        }
     }
+    function stopRecording() {
+        zynthian.main.stop_recording();
+    }
+
     Kirigami.Heading {
         Layout.fillWidth: true
         text: qsTr("Save Recordings To A File");

@@ -1073,7 +1073,11 @@ Kirigami.AbstractApplicationWindow {
                     implicitWidth: 1
                     text: qsTr("RECORDING DESTINATION")
                     onClicked: {
-                        clipPickerMenu.visible = !clipPickerMenu.visible;
+                        if (clipPickerMenu.visible) {
+                            clipPickerMenu.hide();
+                        } else {
+                            clipPickerMenu.show();
+                        }
                     }
                     Rectangle {
                         anchors {
@@ -1092,12 +1096,12 @@ Kirigami.AbstractApplicationWindow {
                     Layout.fillHeight: true
                     implicitWidth: 1
                     enabled: true
-                    text: zynthian.main.isRecording ? qsTr("STOP RECORDING") : qsTr("START RECORDING")
+                    text: clipPickerView.isRecording ? qsTr("STOP RECORDING") : qsTr("START RECORDING")
                     onClicked: {
-                        if (zynthian.main.isRecording) {
-                            zynthian.main.stop_recording();
+                        if (clipPickerView.isRecording) {
+                            clipPickerView.stopRecording();
                         } else {
-                            zynthian.main.start_recording();
+                            clipPickerView.startRecording();
                         }
                     }
                 }
@@ -1119,36 +1123,65 @@ Kirigami.AbstractApplicationWindow {
     Window {
         id: clipPickerMenu
         visible: false;
-        width: screen.width / 2
-        height: screen.height / 2
-        x: screen.width - width
-        y: screen.height - height
+        width: root.width
+        height: root.height - root.footer.height
+        x: 0
+        y: 0
         flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         color: Kirigami.Theme.backgroundColor
-        Zynthian.TabbedControlView {
+        RowLayout {
             anchors {
-                fill: parent;
-                margins: Kirigami.Units.smallSpacing;
+                fill: parent
+                margins: Kirigami.Units.smallSpacing
             }
-            visibleFocusRects: false
-            minimumTabsCount: 2
-
-            property QQC2.StackView stack
-
-            tabActions: [
-                Zynthian.TabbedControlViewAction {
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     text: qsTr("File")
-                    page: Qt.resolvedUrl("ExternalRecordingDestinationFile.qml")
-                    preload: true
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Clip")
-                    page: Qt.resolvedUrl("ExternalRecordingDestinationClip.qml")
-                    preload: true
+                    onClicked: clipPickerView.currentItem = clipPickerComponentFile
+                    checked: clipPickerView.currentItem.objectName === "clipPickerFile"
                 }
-            ]
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: qsTr("Sample Slot")
+                    onClicked: clipPickerView.currentItem = clipPickerComponentClip
+                    checked: clipPickerView.currentItem.objectName === "clipPickerClip"
+                }
+            }
+            Item {
+                id: clipPickerView
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+
+                property bool isRecording: currentItem ? currentItem.isRecording : false
+                function startRecording() {
+                    currentItem.startRecording();
+                }
+                function stopRecording() {
+                    currentItem.stopRecording();
+                }
+
+                property Item currentItem: clipPickerComponentFile
+                ExternalRecordingDestinationFile {
+                    id: clipPickerComponentFile
+                    visible: clipPickerMenu.visible && clipPickerView.currentItem.objectName === objectName
+                    anchors.fill: parent
+                }
+                ExternalRecordingDestinationClip {
+                    id: clipPickerComponentClip
+                    visible:  clipPickerMenu.visible && clipPickerView.currentItem.objectName === objectName
+                    anchors.fill: parent
+                }
+            }
         }
     }
 

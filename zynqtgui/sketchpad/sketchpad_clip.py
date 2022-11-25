@@ -85,6 +85,10 @@ class sketchpad_clip(QObject):
         self.__enabled__ = False
         self.channel = None
 
+        self.__autoStopTimer__ = QTimer()
+        self.__autoStopTimer__.setSingleShot(True)
+        self.__autoStopTimer__.timeout.connect(self.stop_audio)
+
         try:
             # Check if a dir named <somerandomname>.<channel_id> exists.
             # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
@@ -642,6 +646,7 @@ class sketchpad_clip(QObject):
     #                   should_copy should be set to False when restoring to avoid copying the same clip under
     #                   a different name. Otherwise when path is set from UI, it makes sure to always create a new file
     #                   when first selecting a wav for a clip.
+    @Slot(str,bool)
     def set_path(self, path, should_copy=True):
         selected_path = Path(path)
         new_filename = ""
@@ -965,13 +970,24 @@ class sketchpad_clip(QObject):
         else:
             return self.__song__.sketchpad_folder
 
+    # Only use this to do things like previewing the audio. Use play and stop above to control the playback properly
+    @Slot(bool)
     def play_audio(self, loop=True):
         if self.audioSource is not None:
             self.audioSource.play(loop)
+            self.__autoStopTimer__.setInterval(self.duration * 1000)
+            self.__autoStopTimer__.start()
+            self.__is_playing__ = True
+            self.__is_playing_changed__.emit()
 
+    # Only use this to do things like previewing the audio. Use play and stop above to control the playback properly
+    @Slot(None)
     def stop_audio(self):
         if self.audioSource is not None:
+            self.__autoStopTimer__.stop()
             self.audioSource.stop()
+            self.__is_playing__ = False
+            self.__is_playing_changed__.emit()
 
     @Slot(None)
     def saveMetadata(self):

@@ -144,7 +144,7 @@ QQC2.Popup {
                     _private.recordingProgress = 0;
                     // Set the filenames for each channel (never mind whether they're being recorded or not, it doesn't hurt)
                     var date = new Date();
-                    var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + date.getFullYear() + date.getMonth() + date.getDate() + "-" + date.getHours() + date.getMinutes();
+                    var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
                     ZL.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-");
                     baseRecordingLocation = baseRecordingLocation + "/channel-";
                     for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {

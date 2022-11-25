@@ -42,7 +42,6 @@ import os
 from pathlib import Path
 from subprocess import Popen
 
-
 # ------------------------------------------------------------------------------
 # Zynthian App Selection GUI Class
 # ------------------------------------------------------------------------------
@@ -58,6 +57,10 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.__most_recent_recording_file__ = ""
         self.__recording_file__ = ""
         # Possible values : modules(all zynthian modules + appimages), appimages(only appimages), sessions(sketchpad folders), sessions-versions(sketchpad files inside sketchpad folders), templates, discover
+        self.__current_module_name__ = ""
+        self.__current_module_recordalsa__ = False
+        self.__current_module_recordingports_left__ = ""
+        self.__current_module_recordingports_right__ = ""
         self.__visible_category__ = "modules"
         self.__selected_sketchpad_folder__ = None
         self.recorder_process = None
@@ -137,10 +140,25 @@ class zynthian_gui_main(zynthian_gui_selector):
                         metadata = JSONDecoder().decode(f.read())
                         if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
                             continue
+                        autoFilled = False
+                        if not "RecordingPortsLeft" in metadata:
+                            metadata["RecordingPortsLeft"] = ""
+                            autoFilled = True
+                        if not "RecordingPortsRight" in metadata:
+                            metadata["RecordingPortsRight"] = ""
+                            autoFilled = True
+                        # TODO Just some heuristics so we end up with stuff in these for some of our stuff without having to update... We can get rid of these a bit later on
+                        if autoFilled:
+                            if metadata["Name"] == "Norns":
+                                metadata["RecordingPortsLeft"] = "SuperCollider:out_1"
+                                metadata["RecordingPortsRight"] = "SuperCollider:out_2"
+                        recordAlsa = False
+                        if "RecordAlsa" in metadata:
+                            recordAlsa = metadata["RecordAlsa"].lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
                         self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
                         # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
                         # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
-                        self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"]})
+                        self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"], "recording_ports_left" : metadata["RecordingPortsLeft"], "recording_ports_right" : metadata["RecordingPortsRight"], "record_alsa" : recordAlsa})
                     except Exception as e:
                         logging.error(e)
 
@@ -161,6 +179,11 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.song_recordings_dir = self.zyngui.screens["sketchpad"].song.sketchpad_folder + "wav"
             self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
+            self.__current_module_name__ = self.list_data[i][2]
+            self.__current_module_recordalsa__ = self.list_metadata[i]["record_alsa"]
+            self.__current_module_recordingports_left__ = self.list_metadata[i]["recording_ports_left"]
+            self.__current_module_recordingports_right__ = self.list_metadata[i]["recording_ports_right"]
+            self.currentModuleChanged.emit
             Popen([self.list_data[i][1]])
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
@@ -176,6 +199,19 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.last_action()
 
     @Slot(None)
+    def start_recording_alsa(self):
+        if (self.__is_recording__ == False):
+            Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
+            self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
+
+            audioDeviceName = self.zyngui.audio_settings.zynthian_mixer.zynapi_get_device_name()
+            self.recorder_process = Popen(("/usr/bin/arecord", "-f", "dat", "-D", f"hw:{audioDeviceName}", self.__recording_file__))
+            logging.info("Started recording using arecord into the file " + self.__recording_file__)
+            self.__is_recording__ = True
+            self.is_recording_changed.emit()
+
+    @Slot(None)
     def start_recording(self):
         if (self.__is_recording__ == False):
             Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
@@ -187,18 +223,25 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.__is_recording__ = True
             self.is_recording_changed.emit()
 
-    @Slot(None)
-    def stop_recording(self):
+    @Slot(str)
+    def stop_recording_and_move(self, destination):
         if (self.recorder_process is not None):
             self.recorder_process.terminate()
             self.recorder_process = None
             self.__is_recording__ = False
             self.is_recording_changed.emit()
-            self.__most_recent_recording_file__ = self.__recording_file__
+            if (destination != self.__recording_file__):
+                # Move the file from its temporary destination to its new home if the destination is somewhere other than where the file already lives
+                os.rename(self.__recording_file__, destination)
+            self.__most_recent_recording_file__ = destination
             self.most_recent_recording_file_changed.emit()
             self.__recording_file__ = ""
             self.recording_file_changed.emit();
         pass
+
+    @Slot(None)
+    def stop_recording(self):
+        self.stop_recording_and_move(self.__recording_file__)
 
     @Signal
     def is_recording_changed(self):
@@ -446,4 +489,32 @@ class zynthian_gui_main(zynthian_gui_selector):
     visibleCategory = Property(str, get_visibleCategory, set_visibleCategory, notify=visibleCategoryChanged)
     ### END Property visibleCategory
 
+    currentModuleChanged = Signal()
+    ### Property currentModuleName
+    def get_currentModuleName(self):
+        return self.__current_module_name__
+
+    currentModuleName = Property(str, get_currentModuleName, notify=currentModuleChanged)
+    ### END Property currentModuleName
+
+    ### Property currentModuleRecordAlsa
+    def get_currentModuleRecordAlsa(self):
+        return self.__current_module_recordalsa__
+
+    currentModuleRecordAlsa = Property(str, get_currentModuleRecordAlsa, notify=currentModuleChanged)
+    ### END Property currentModuleRecordingPortsLeft
+
+    ### Property currentModuleRecordingPortsLeft
+    def get_currentModuleRecordingPortsLeft(self):
+        return self.__current_module_recordingports_left__
+
+    currentModuleRecordingPortsLeft = Property(str, get_currentModuleRecordingPortsLeft, notify=currentModuleChanged)
+    ### END Property currentModuleRecordingPortsLeft
+
+    ### Property currentModuleRecordingPortsRight
+    def get_currentModuleRecordingPortsRight(self):
+        return self.__current_module_recordingports_right__
+
+    currentModuleRecordingPortsRight = Property(str, get_currentModuleRecordingPortsRight, notify=currentModuleChanged)
+    ### END Property currentModuleRecordingPortsRight
 # ------------------------------------------------------------------------------

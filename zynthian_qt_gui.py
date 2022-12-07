@@ -3567,6 +3567,7 @@ class zynthian_gui(QObject):
     # Autoconnect
     # ------------------------------------------------------------------
 
+    @Slot()
     def zynautoconnect(self, force=False):
         if force:
             zynautoconnect.midi_autoconnect(True)
@@ -3720,12 +3721,12 @@ class zynthian_gui(QObject):
             if self.isModalScreensCachingComplete and self.isScreensCachingComplete:
                 logging.debug("QML Caching complete. Calling stop_splash")
                 stop_splash_timer.stop()
+                self.isBootingComplete = True
 
                 extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
+                blank_video_path = Path('/usr/share/zynthbox-bootsplash/blank.mp4')
 
-                process = None
-                if extro_path.exists():
-                    process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
+                process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path), str(blank_video_path)))
 
                 with open("/tmp/mplayer-splash-control", "w") as f:
                     f.write("quit\n")
@@ -3734,13 +3735,12 @@ class zynthian_gui(QObject):
                 if process is not None:
                     process.wait()
 
-                self.isBootingComplete = True
                 self.displayMainWindow.emit()
                 boot_end = timer()
 
                 logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
-                self.zynautoconnect()
+                QMetaObject.invokeMethod(self, "zynautoconnect", Qt.QueuedConnection)
             else:
                 logging.debug("QML Caching not yet complete. Rescheduling stop_splash call")
 

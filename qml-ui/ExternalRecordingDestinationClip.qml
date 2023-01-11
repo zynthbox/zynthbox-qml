@@ -214,110 +214,11 @@ ColumnLayout {
                     }
                 }
             }
-            Item {
+            Zynthian.SampleVisualiser {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                clip: true
-                Rectangle {
-                    anchors.fill: parent
-                    color: "#222222"
-                    border.width: 1
-                    border.color: "#ff999999"
-                    radius: 4
-                }
-                WaveFormItem {
-                    anchors.fill: parent
-                    color: Kirigami.Theme.textColor
-                    Binding {
-                        target: parent
-                        property: "source"
-                        value: component.selectedSample ? component.selectedSample.path : ""
-                        when: parent.visible
-                        delayed: true
-                    }
-
-                    visible: component.visible && component.selectedSample && component.selectedSample.path && component.selectedSample.path.length > 0
-
-                    // Mask for wave part before start
-                    Rectangle {
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                            left: parent.left
-                            right: startLoopLine.left
-                        }
-                        color: "#99000000"
-                    }
-
-                    // Mask for wave part after
-                    Rectangle {
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                            left: endLoopLine.right
-                            right: parent.right
-                        }
-                        color: "#99000000"
-                    }
-
-                    // Start loop line
-                    Rectangle {
-                        id: startLoopLine
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-                        color: Kirigami.Theme.positiveTextColor
-                        opacity: 0.6
-                        width: Kirigami.Units.smallSpacing
-                        x: component.selectedSample ? (component.selectedSample.startPosition / component.selectedSample.duration) * parent.width : 0
-                    }
-
-                    // End loop line
-                    Rectangle {
-                        id: endLoopLine
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-                        color: Kirigami.Theme.neutralTextColor
-                        opacity: 0.6
-                        width: Kirigami.Units.smallSpacing
-                        x: component.selectedSample ? ((((60/zynthian.sketchpad.song.bpm) * component.selectedSample.length) / component.selectedSample.duration) * parent.width) + ((component.selectedSample.startPosition / component.selectedSample.duration) * parent.width) : 0
-                    }
-
-                    // Progress line
-                    Rectangle {
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                        }
-                        visible: root.visible && component.selectedSample.isPlaying
-                        color: Kirigami.Theme.highlightColor
-                        width: Kirigami.Units.smallSpacing
-                        x: visible ? component.selectedSample.progress/component.selectedSample.duration * parent.width : 0
-                    }
-
-                    // SamplerSynth progress dots
-                    Repeater {
-                        property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(component.selectedSample.cppObjId) : null;
-                        model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
-                            ? cppClipObject.playbackPositions
-                            : 0
-                        delegate: Item {
-                            Rectangle {
-                                anchors.centerIn: parent
-                                rotation: 45
-                                color: Kirigami.Theme.highlightColor
-                                width: Kirigami.Units.largeSpacing
-                                height:  Kirigami.Units.largeSpacing
-                                scale: 0.5 + model.positionGain
-                            }
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Math.floor(model.positionProgress * parent.width)
-                        }
-                    }
-                }
+                sample: component.selectedSample
+                channelAudioType: root.selectedChannel.channelAudioType
             }
         }
     }

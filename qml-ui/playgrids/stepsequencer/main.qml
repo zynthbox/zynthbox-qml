@@ -603,6 +603,7 @@ Zynthian.BasePlayGrid {
                 // drum pad & sequencer
                 Rectangle {
                     id:drumPad
+                    property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
                     Layout.fillWidth: true; 
                     Layout.minimumHeight: parent.height / 5; 
                     Layout.maximumHeight: parent.height / 5;
@@ -768,10 +769,31 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                    Item {
+                        id: drumpadLoopVisualiser
+                        anchors.fill:parent
+                        anchors.margins: 5
+                        visible: parent.visible && drumPad.channelIsLoopType
+                        property QtObject channel: null
+                        Binding {
+                            target: drumpadLoopVisualiser
+                            property: "channel"
+                            value: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+                            when: drumpadLoopVisualiser.visible
+                            delayed: true
+                        }
+                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex) : null
+                        Zynthian.SampleVisualiser {
+                            anchors.fill: parent
+                            sample: parent.visible ? drumpadLoopVisualiser.sample : null
+                            channelAudioType: drumpadLoopVisualiser.channel === null ? "" : drumpadLoopVisualiser.channel.channelAudioType
+                        }
+                    }
                     RowLayout {
                         anchors.fill:parent
                         anchors.margins: 5
                         spacing: 0
+                        visible: !drumPad.channelIsLoopType
                         Repeater {
                             id:drumPadRepeater
                             model: _private.activeBarModelWidth
@@ -1132,56 +1154,56 @@ Zynthian.BasePlayGrid {
                             RowLayout {
                                 anchors.fill: parent
 
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Zynthian.PlayGridButton {
-                                        text: "TRIG"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
-                                        onClicked: {
-                                            if (checked) {
-                                                _private.associatedChannel.channelAudioType = "external";
-                                            } else {
-                                                _private.associatedChannel.channelAudioType = "sample-trig";
-                                            }
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "SYNTH"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
-                                        onClicked: {
-                                            if (checked) {
-                                                _private.associatedChannel.channelAudioType = "external";
-                                            } else {
-                                                _private.associatedChannel.channelAudioType = "synth";
-                                            }
-                                        }
-                                    }
-                                }
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Zynthian.PlayGridButton {
-                                        text: "SLICE"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
-                                        onClicked: {
-                                            if (checked) {
-                                                _private.associatedChannel.channelAudioType = "external";
-                                            } else {
-                                                _private.associatedChannel.channelAudioType = "sample-slice";
-                                            }
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "LOOP"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
-                                        onClicked: {
-                                            if (checked) {
-                                                _private.associatedChannel.channelAudioType = "external";
-                                            } else {
-                                                _private.associatedChannel.channelAudioType = "sample-loop";
-                                            }
-                                        }
-                                    }
-                                }
+//                                 ColumnLayout {
+//                                     Layout.fillHeight: true
+//                                     Zynthian.PlayGridButton {
+//                                         text: "TRIG"
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
+//                                         onClicked: {
+//                                             if (checked) {
+//                                                 _private.associatedChannel.channelAudioType = "external";
+//                                             } else {
+//                                                 _private.associatedChannel.channelAudioType = "sample-trig";
+//                                             }
+//                                         }
+//                                     }
+//                                     Zynthian.PlayGridButton {
+//                                         text: "SYNTH"
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
+//                                         onClicked: {
+//                                             if (checked) {
+//                                                 _private.associatedChannel.channelAudioType = "external";
+//                                             } else {
+//                                                 _private.associatedChannel.channelAudioType = "synth";
+//                                             }
+//                                         }
+//                                     }
+//                                 }
+//                                 ColumnLayout {
+//                                     Layout.fillHeight: true
+//                                     Zynthian.PlayGridButton {
+//                                         text: "SLICE"
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+//                                         onClicked: {
+//                                             if (checked) {
+//                                                 _private.associatedChannel.channelAudioType = "external";
+//                                             } else {
+//                                                 _private.associatedChannel.channelAudioType = "sample-slice";
+//                                             }
+//                                         }
+//                                     }
+//                                     Zynthian.PlayGridButton {
+//                                         text: "LOOP"
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+//                                         onClicked: {
+//                                             if (checked) {
+//                                                 _private.associatedChannel.channelAudioType = "external";
+//                                             } else {
+//                                                 _private.associatedChannel.channelAudioType = "sample-loop";
+//                                             }
+//                                         }
+//                                     }
+//                                 }
 
                                 ColumnLayout {
                                     Zynthian.PlayGridButton {
@@ -1306,10 +1328,17 @@ Zynthian.BasePlayGrid {
                         }
 
                         RowLayout {
+                            id: patternBarsLayout
                             Layout.preferredWidth: parent.width / 2
                             Layout.fillHeight: true
+                            property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+                            Item {
+                                visible: padSettings.visible && patternBarsLayout.channelIsLoopType
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
                             Repeater {
-                                model: _private.bars
+                                model: patternBarsLayout.channelIsLoopType ? 0 : _private.bars
                                 delegate: BarStep {
                                     availableBars: _private.availableBars
                                     activeBar: _private.activeBar
@@ -1496,37 +1525,6 @@ Zynthian.BasePlayGrid {
                                             Layout.minimumWidth: (parent.width / 8) * 3;
                                             Layout.maximumWidth: (parent.width / 8) * 3;
 
-                                            RowLayout {
-                                                Layout.fillWidth: true
-                                                Layout.preferredHeight: patternsMenuItem.height / 2
-                                                Image {
-                                                    Layout.fillHeight: true
-                                                    Layout.fillWidth: true
-                                                    source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
-                                                    Rectangle {
-                                                        anchors {
-                                                            top: parent.top
-                                                            bottom: parent.bottom
-                                                        }
-                                                        visible: parent.visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
-                                                        color: Kirigami.Theme.highlightColor
-                                                        width: Math.max(1, Math.floor(widthFactor))
-                                                        property double widthFactor: visible && patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
-                                                        x: visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
-                                                    }
-                                                    Kirigami.Heading {
-                                                        anchors {
-                                                            fill: parent
-                                                            margins: Kirigami.Units.smallSpacing
-                                                        }
-                                                        horizontalAlignment: Text.AlignRight
-                                                        verticalAlignment: Text.AlignBottom
-                                                        level: 4
-                                                        text: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.name + (patternsMenuItem.thisPattern.unsavedChanges === true ? " *" : "") : ""
-                                                    }
-                                                }
-                                            }
-
                                             Zynthian.PlayGridButton {
                                                 id: soundButton
                                                 Layout.fillWidth: true
@@ -1534,6 +1532,31 @@ Zynthian.BasePlayGrid {
                                                 enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedChannel && patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
                                                 opacity: enabled ? 1 : 0.7
                                                 property string soundName
+                                                background: Rectangle {
+                                                    id: patternPopupSampleVisualiser
+                                                    radius: 2
+                                                    border {
+                                                        width: 1
+                                                        color: soundButton.borderColor
+                                                    }
+                                                    color: soundButton.backgroundColor
+                                                    property bool sampleVisible: parent.visible && (patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination || patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination)
+                                                    property QtObject channel: null
+                                                    Binding {
+                                                        target: patternPopupSampleVisualiser
+                                                        property: "channel"
+                                                        value: patternsMenuItem.associatedChannel
+                                                        when: patternPopupSampleVisualiser.sampleVisible
+                                                        delayed: true
+                                                    }
+                                                    property QtObject sample: channel && channel.samples ? channel.samples[_private.activePattern] : null
+                                                    Zynthian.SampleVisualiser {
+                                                        anchors.fill: parent
+                                                        opacity: 0.2
+                                                        sample: parent.visible ? patternPopupSampleVisualiser.sample : null
+                                                        channelAudioType: patternPopupSampleVisualiser.channel === null ? "" : patternPopupSampleVisualiser.channel.channelAudioType
+                                                    }
+                                                }
                                                 Component.onCompleted: {
                                                     updateSoundNameTimer.restart();
                                                 }
@@ -1606,6 +1629,58 @@ Zynthian.BasePlayGrid {
                                                     channelsViewDrawer.open();
                                                 }
                                             }
+
+                                            RowLayout {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: patternsMenuItem.height / 2
+                                                Item {
+                                                    id: patternPopupLoopVisualiser
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    visible: parent.visible && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+                                                    property QtObject channel: null
+                                                    Binding {
+                                                        target: patternPopupLoopVisualiser
+                                                        property: "channel"
+                                                        value: patternsMenuItem.associatedChannel
+                                                        when: patternPopupLoopVisualiser.visible
+                                                        delayed: true
+                                                    }
+                                                    property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex) : null
+                                                    Zynthian.SampleVisualiser {
+                                                        anchors.fill: parent
+                                                        sample: parent.visible ?  patternPopupLoopVisualiser.sample : null
+                                                        channelAudioType: patternPopupLoopVisualiser.channel === null ? "" : patternPopupLoopVisualiser.channel.channelAudioType
+                                                    }
+                                                }
+                                                Image {
+                                                    Layout.fillHeight: true
+                                                    Layout.fillWidth: true
+                                                    visible: parent.visible && patternsMenuItem.thisPattern.noteDestination !== ZynQuick.PatternModel.SampleLoopedDestination
+                                                    source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
+                                                    Rectangle {
+                                                        anchors {
+                                                            top: parent.top
+                                                            bottom: parent.bottom
+                                                        }
+                                                        visible: parent.visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
+                                                        color: Kirigami.Theme.highlightColor
+                                                        width: Math.max(1, Math.floor(widthFactor))
+                                                        property double widthFactor: visible && patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
+                                                        x: visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
+                                                    }
+                                                    Kirigami.Heading {
+                                                        anchors {
+                                                            fill: parent
+                                                            margins: Kirigami.Units.smallSpacing
+                                                        }
+                                                        horizontalAlignment: Text.AlignRight
+                                                        verticalAlignment: Text.AlignBottom
+                                                        level: 4
+                                                        text: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.name + (patternsMenuItem.thisPattern.unsavedChanges === true ? " *" : "") : ""
+                                                    }
+                                                }
+                                            }
                                         }
                                         //ColumnLayout {
                                             //Layout.fillHeight: true
@@ -1626,60 +1701,60 @@ Zynthian.BasePlayGrid {
                                                 //}
                                             //}
                                         //}
-                                        ColumnLayout {
-                                            Layout.fillHeight: true
-                                            Zynthian.PlayGridButton {
-                                                text: "TRIG"
-                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
-                                                onClicked: {
-                                                    if (checked) {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "external";
-                                                    } else {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "sample-trig";
-                                                    }
-                                                }
-                                            }
-                                            Zynthian.PlayGridButton {
-                                                text: "SYNTH"
-                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
-                                                onClicked: {
-                                                    if (checked) {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "external";
-                                                    } else {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "synth";
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        ColumnLayout {
-                                            Layout.fillHeight: true
-                                            Zynthian.PlayGridButton {
-                                                text: "SLICE"
-                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
-                                                onClicked: {
-                                                    if (checked) {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "external";
-                                                    } else {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "sample-slice";
-                                                    }
-                                                }
-                                            }
-                                            Zynthian.PlayGridButton {
-                                                text: "LOOP"
-                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
-                                                onClicked: {
-                                                    if (checked) {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "external";
-                                                    } else {
-                                                        patternsMenuItem.associatedChannel.channelAudioType = "sample-loop";
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        //ColumnLayout {
+                                            //Layout.fillHeight: true
+                                            //Zynthian.PlayGridButton {
+                                                //text: "TRIG"
+                                                //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
+                                                //onClicked: {
+                                                    //if (checked) {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                    //} else {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "sample-trig";
+                                                    //}
+                                                //}
+                                            //}
+                                            //Zynthian.PlayGridButton {
+                                                //text: "SYNTH"
+                                                //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
+                                                //onClicked: {
+                                                    //if (checked) {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                    //} else {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "synth";
+                                                    //}
+                                                //}
+                                            //}
+                                        //}
+                                        //ColumnLayout {
+                                            //Layout.fillHeight: true
+                                            //Zynthian.PlayGridButton {
+                                                //text: "SLICE"
+                                                //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
+                                                //onClicked: {
+                                                    //if (checked) {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                    //} else {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "sample-slice";
+                                                    //}
+                                                //}
+                                            //}
+                                            //Zynthian.PlayGridButton {
+                                                //text: "LOOP"
+                                                //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
+                                                //onClicked: {
+                                                    //if (checked) {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                    //} else {
+                                                        //patternsMenuItem.associatedChannel.channelAudioType = "sample-loop";
+                                                    //}
+                                                //}
+                                            //}
+                                        //}
                                         Zynthian.PlayGridButton {
                                             text: "copy\n"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex

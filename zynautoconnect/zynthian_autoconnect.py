@@ -535,6 +535,44 @@ def audio_autoconnect(force=False):
 		release_lock()
 		return
 
+	### Bluetooth ports connection
+	bluealsa_ports = jclient.get_ports("bluealsa", is_audio=True, is_input=True)
+
+	# Connect to bluealsa ports only if bluealsa ports are available
+	if len(bluealsa_ports) > 0:
+		# Connect GlobalFXPassthrough dry ports to bluealsa (if available)
+		try:
+			for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), bluealsa_ports):
+				try:
+					jclient.connect(port[0], port[1])
+				except: pass
+		except Exception as e:
+			logging.error(f"Failed to connect global fx passthrough to bluealsa playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+			# Logic below the return statement will be eventually evaluated when called again after the timeout
+			force_next_autoconnect = True
+			release_lock()
+			return
+
+		# Connect Global effects output to bluealsa (if available)
+		if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
+			for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+				try:
+					engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True)
+					# Some engines only take mono output, but we want them to receive both our left and right outputs, so connect l and r both to that one output
+					if len(engineOutPorts) == 1:
+						engineOutPorts[1] = engineOutPorts[0]
+					for port in zip(engineOutPorts, bluealsa_ports):
+						try:
+							jclient.connect(port[0], port[1])
+						except: pass
+				except Exception as e:
+					logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+					# Logic below the return statement will be eventually evaluated when called again after the timeout
+					force_next_autoconnect = True
+					release_lock()
+					return
+	### END Bluetooth ports connection
+
 	globalFxPassthroughInput = jclient.get_ports("GlobalFXPassthrough:input", is_audio=True, is_input=True)
 	logging.error(f"Global FX Inputs are {globalFxPassthroughInput}")
 	

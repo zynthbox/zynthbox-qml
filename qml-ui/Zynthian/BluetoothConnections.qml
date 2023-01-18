@@ -50,6 +50,20 @@ Item {
         property QtObject manager: BluezQt.Manager
         property QtObject usableAdapter: _private.manager.usableAdapter
     }
+    Connections {
+        target: _private.manager
+        onInitFinished: {
+            // If we've got any devices connected at startup, let's make sure we also connect it to our ports
+            var devices = _private.manager.devices;
+            for (var i = 0; i < devices.length; ++i) {
+                var device = devices[i];
+                if (device.connected) {
+                    zynthian.bluetooth_config.connectBluetoothPorts();
+                    break;
+                }
+            }
+        }
+    }
     onVisibleChanged: {
         if (component.visible && _private.usableAdapter !== null && deviceList.count === 0) {
             _private.usableAdapter.startDiscovery();
@@ -86,7 +100,9 @@ Item {
                 Connections {
                     target: btDeviceDelegate.device
                     onConnectedChanged: {
-                        zynthian.bluetooth_config.connectBluetoothPorts()
+                        if (btDeviceDelegate.device.connected) {
+                            zynthian.bluetooth_config.connectBluetoothPorts();
+                        }
                     }
                 }
                 property QtObject pendingCall: null

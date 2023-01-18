@@ -69,4 +69,6 @@ class zynthian_gui_bluetooth_config(zynthian_qt_gui_base.ZynGui):
 
         self.zita_j2a_process = Popen(("zita-j2a", "-j", "bluealsa", "-d", "bluealsa", "-p", "1024", "-n", "3", "-c", "2", "-L"))
 
+        # Connect to bluealsa ports after a short timeout to allow zita-j2a to set up jack ports before
+        # attempting to connect otherwise it will end up failing to connect to the ports
         QTimer.singleShot(3000, post_startup_task)

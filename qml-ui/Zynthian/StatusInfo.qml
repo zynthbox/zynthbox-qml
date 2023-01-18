@@ -443,35 +443,22 @@ MouseArea {
                     Layout.preferredWidth: 1
                     contentItem: ColumnLayout {
                         Layout.alignment: Qt.AlignVCenter
-                        QQC2.Button {
-                            icon.name: bluetoothSetup.connectedDevice === null ? "network-bluetooth" : "network-bluetooth-activated"
-                            text: bluetoothSetup.connectedDevice === null ? qsTr("(not connected)") : bluetoothSetup.connectedDevice.name
-                            display: QQC2.AbstractButton.TextUnderIcon
-                            Layout.alignment: Qt.AlignVCenter
+                        QQC2.Label {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            enabled: zynthian.btAudioEnabled
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            wrapMode: Text.Wrap
+                            text: bluetoothSetup.connectedDevice === null ? qsTr("Not\nConnected") : qsTr("Connected to\n%1").arg(bluetoothSetup.connectedDevice.name)
+                        }
+                        QQC2.Button {
+                            icon.name: bluetoothSetup.connectedDevice === null ? "network-bluetooth" : "network-bluetooth-activated"
+                            text: qsTr("Setup")
+                            display: QQC2.AbstractButton.TextBesideIcon
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.fillWidth: true
                             onClicked: {
                                 bluetoothSetup.show();
-                            }
-                        }
-                        RowLayout {
-                            Layout.fillWidth: true
-                            Item {
-                                Layout.fillWidth: true
-                            }
-                            QQC2.Switch {
-                                Layout.alignment: Qt.AlignVCenter
-                                implicitWidth: Kirigami.Units.gridUnit * 3
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                checked: zynthian.btAudioEnabled
-                                onToggled: {
-                                    zynthian.btAudioEnabled = checked
-                                }
-                            }
-                            Item {
-                                Layout.fillWidth: true
                             }
                         }
                         QQC2.Label {

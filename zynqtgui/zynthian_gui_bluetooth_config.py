@@ -46,6 +46,15 @@ class zynthian_gui_bluetooth_config(zynthian_qt_gui_base.ZynGui):
 
     @Slot()
     def connectBluetoothPorts(self):
+        """
+        This method will start zita-j2a process which will create a jack to alsa bridge.
+        The jack to alsa bridge will create 2 jack input ports named `bluealsa:playback_1` and `bluealsa:playback_2`
+
+        Connecting the output ports to these 2 ports will forward output to the connected bluetooth device
+
+        Please note that running zita-j2a process without connecting to a bluetooth device will result in a failure.
+        Hence, make sure to run this method after connecting to a device
+        """
         @Slot()
         def post_startup_task():
             # If zita-j2a bridge is running do run autoconnect to connect to bluetooth ports

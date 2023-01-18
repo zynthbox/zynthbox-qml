@@ -95,7 +95,7 @@ Item {
             Kirigami.Heading {
                 Layout.fillWidth: true
                 elide: Text.ElideRight
-                text: "Pick A Bluetooth Device"
+                text: qsTr("Pick A Bluetooth Device")
             }
         }
         ListView {
@@ -132,20 +132,15 @@ Item {
                         deviceList.currentIndex = model.index
                     }
                 }
-                Rectangle {
-                    anchors.fill: parent
-                    color: "transparent"
-                    border.width: btDeviceDelegate.ListView.isCurrentItem ? 1 : 0
-                    border.color: Qt.rgba(255, 255, 255, 0.8)
-                    radius: 4
-                }
                 RowLayout {
-                    anchors.fill: parent;
+                    anchors {
+                        fill: parent;
+                        margins: 2;
+                    }
                     Kirigami.Icon {
-                        Layout.minimumWidth: Kirigami.Units.gridUnit * 2
-                        Layout.maximumWidth: Kirigami.Units.gridUnit * 2
-                        Layout.minimumHeight: Kirigami.Units.gridUnit * 2
-                        Layout.maximumHeight: Kirigami.Units.gridUnit * 2
+                        Layout.fillHeight: true
+                        Layout.minimumWidth: height
+                        Layout.maximumWidth: height
                         source: model.Icon
                         Kirigami.Icon {
                             anchors {
@@ -170,33 +165,54 @@ Item {
                             font.pointSize: 6
                         }
                     }
-                    QQC2.Button {
-                        visible: btDeviceDelegate.ListView.isCurrentItem
-                        enabled: btDeviceDelegate.pendingCall === null
-                        text: model.Connected ? "Disconnect" : "Connect"
-                        onClicked: {
-                            if (_private.usableAdapter.discovering) {
-                                _private.usableAdapter.stopDiscovery();
-                            }
-                            if (btDeviceDelegate.device.connected) {
-                                btDeviceDelegate.pendingCall = btDeviceDelegate.device.disconnectFromDevice();
-                            } else {
-                                btDeviceDelegate.pendingCall = btDeviceDelegate.device.connectToDevice();
-                            }
+                }
+                QQC2.Button {
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+                        margins: 2
+                    }
+                    visible: btDeviceDelegate.ListView.isCurrentItem
+                    enabled: btDeviceDelegate.pendingCall === null
+                    text: btDeviceDelegate.pendingCall === null
+                        ? (model.Connected ? qsTr("Disconnect") : qsTr("Connect"))
+                        : qsTr("Working...")
+                    onClicked: {
+                        if (_private.usableAdapter.discovering) {
+                            _private.usableAdapter.stopDiscovery();
                         }
-                        QQC2.BusyIndicator {
-                            anchors.fill: parent;
-                            visible: btDeviceDelegate.pendingCall !== null
-                            running: visible
+                        if (btDeviceDelegate.device.connected) {
+                            btDeviceDelegate.pendingCall = btDeviceDelegate.device.disconnectFromDevice();
+                        } else {
+                            btDeviceDelegate.pendingCall = btDeviceDelegate.device.connectToDevice();
                         }
                     }
+                    QQC2.BusyIndicator {
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                            right: parent.left
+                            rightMargin: Kirigami.Units.smallSpacing
+                        }
+                        width: height
+                        visible: btDeviceDelegate.pendingCall !== null
+                        running: visible
+                    }
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: 1
+                    border.color: btDeviceDelegate.ListView.isCurrentItem ? Qt.rgba(255, 255, 255, 0.8) : "transparent"
+                    radius: 4
                 }
             }
         }
         RowLayout {
             Layout.fillWidth: true
             QQC2.Button {
-                text: _private.usableAdapter && _private.usableAdapter.discovering ? "Stop Scan" : "Start Scan"
+                text: _private.usableAdapter && _private.usableAdapter.discovering ? qsTr("Stop Scan") : qsTr("Start Scan")
                 enabled: _private.manager.bluetoothOperational
                 Timer {
                     id: btScanTimeout

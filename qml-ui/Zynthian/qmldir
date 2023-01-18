@@ -4,6 +4,7 @@ AbstractController 1.0 AbstractController.qml
 ActionBar 1.0 ActionBar.qml
 ADSRControlView 1.0 ADSRControlView.qml
 BasePlayGrid 1.0 BasePlayGrid.qml
+BluetoothConnections 1.0 BluetoothConnections.qml
 Breadcrumb 1.0 Breadcrumb.qml
 BreadcrumbButton 1.0 BreadcrumbButton.qml
 Card 1.0 Card.qml

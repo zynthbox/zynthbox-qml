@@ -333,170 +333,234 @@ MouseArea {
         exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
         modal: true
         onClosed: zynthian.globalPopupOpened = false
-        contentItem: GridLayout {
-            columns: 3
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                contentItem: SketchpadDial {
-                    id: bpmDial
-                    text: qsTr("BPM")
-                    controlObj: zynthian.sketchpad.song
-                    controlProperty: "bpm"
-
-                    dial {
-                        stepSize: 1
-                        from: 50
-                        to: 200
-                    }
-
-                    onPressed: registerTap();
-                    property int bpm: 0
-                    property var timestamps: []
-                    function registerTap() {
-                        var newStamp = Date.now();
-                        if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
-                            // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
-                            bpmDial.timestamps = [];
-                            bpm = 0;
-                        }
-                        bpmDial.timestamps.push(newStamp);
-                        if (bpmDial.timestamps.length > 1) {
-                            var differences = [];
-                            for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
-                                differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
-                            }
-                            var sum = 0;
-                            for (var i = 0; i < differences.length; ++i) {
-                                sum += differences[i];
-                            }
-                            var average = sum / differences.length;
-                            bpmDial.bpm = 60000 / average;
-                            zynthian.sketchpad.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
-                        }
-                    }
-                }
-            }
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                contentItem: ColumnLayout {
-                    SketchpadMultiSwitch {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+        contentItem: Item {
+            GridLayout {
+                anchors.fill: parent;
+                columns: 3
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: SketchpadDial {
+                        id: bpmDial
+                        text: qsTr("BPM")
                         controlObj: zynthian.sketchpad.song
-                        controlProperty: "selectedScaleIndex"
-                        from: 0
-                        to: 11
-                        text: zynthian.sketchpad.song.selectedScale
-                    }
-                    QQC2.Label {
-                        text: qsTr("Scale")
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
-            }
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                contentItem: SketchpadDial {
-                    id: volumeDial
-                    text: qsTr("Volume")
-                    controlObj: zynthian.master_alsa_mixer
-                    controlProperty: "volume"
-                    valueString: qsTr("%1%").arg(dial.value)
+                        controlProperty: "bpm"
 
-                    dial {
-                        stepSize: 1
-                        from: 0
-                        to: 100
-                    }
-                }
-            }
+                        dial {
+                            stepSize: 1
+                            from: 50
+                            to: 200
+                        }
 
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                contentItem: SketchpadDial {
-                    text: qsTr("Delay")
-                    controlObj: zynthian
-                    controlProperty: "delayKnobValue"
-                    valueString: qsTr("%1%").arg(dial.value)
-
-                    dial {
-                        stepSize: 1
-                        from: 0
-                        to: 100
-                    }
-                }
-            }
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                contentItem: Item {}
-            }
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                contentItem: SketchpadDial {
-                    text: qsTr("Reverb")
-                    controlObj: zynthian
-                    controlProperty: "reverbKnobValue"
-                    valueString: qsTr("%1%").arg(dial.value)
-
-                    dial {
-                        stepSize: 1
-                        from: 0
-                        to: 100
-                    }
-                }
-            }
-
-            Card {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                contentItem: RowLayout {
-                    Layout.alignment: Qt.AlignLeft
-                    QQC2.Label {
-                        text: qsTr("Click")
-                    }
-
-                    QQC2.Switch {
-                        Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 3
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.sketchpad.clickChannelEnabled
-                        onToggled: {
-                            zynthian.sketchpad.clickChannelEnabled = checked
+                        onPressed: registerTap();
+                        property int bpm: 0
+                        property var timestamps: []
+                        function registerTap() {
+                            var newStamp = Date.now();
+                            if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
+                                // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
+                                bpmDial.timestamps = [];
+                                bpm = 0;
+                            }
+                            bpmDial.timestamps.push(newStamp);
+                            if (bpmDial.timestamps.length > 1) {
+                                var differences = [];
+                                for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
+                                    differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
+                                }
+                                var sum = 0;
+                                for (var i = 0; i < differences.length; ++i) {
+                                    sum += differences[i];
+                                }
+                                var average = sum / differences.length;
+                                bpmDial.bpm = 60000 / average;
+                                zynthian.sketchpad.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
+                            }
                         }
                     }
-                    Item {
-                        Layout.fillWidth: true
+                }
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: ColumnLayout {
+                        SketchpadMultiSwitch {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            controlObj: zynthian.sketchpad.song
+                            controlProperty: "selectedScaleIndex"
+                            from: 0
+                            to: 11
+                            text: zynthian.sketchpad.song.selectedScale
+                        }
+                        QQC2.Label {
+                            text: qsTr("Scale")
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                }
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: SketchpadDial {
+                        id: volumeDial
+                        text: qsTr("Volume")
+                        controlObj: zynthian.master_alsa_mixer
+                        controlProperty: "volume"
+                        valueString: qsTr("%1%").arg(dial.value)
+
+                        dial {
+                            stepSize: 1
+                            from: 0
+                            to: 100
+                        }
+                    }
+                }
+
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: SketchpadDial {
+                        text: qsTr("Delay")
+                        controlObj: zynthian
+                        controlProperty: "delayKnobValue"
+                        valueString: qsTr("%1%").arg(dial.value)
+
+                        dial {
+                            stepSize: 1
+                            from: 0
+                            to: 100
+                        }
+                    }
+                }
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: ColumnLayout {
+                        Layout.alignment: Qt.AlignVCenter
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
+                        QQC2.Button {
+                            icon.name: "network-bluetooth"
+                            display: QQC2.AbstractButton.TextUnderIcon
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.fillWidth: true
+                            enabled: zynthian.btAudioEnabled
+                            onClicked: {
+                                bluetoothSetup.show();
+                            }
+                        }
+                        QQC2.Label {
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            wrapMode: Text.Wrap
+                            text: zynthian.btAudioConnected ? zynthian.btAudioDeviceName : qsTr("(disconnected)")
+                            enabled: zynthian.btAudioEnabled
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Item {
+                                Layout.fillWidth: true
+                            }
+                            QQC2.Switch {
+                                Layout.alignment: Qt.AlignVCenter
+                                implicitWidth: Kirigami.Units.gridUnit * 3
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                checked: zynthian.btAudioEnabled
+                                onToggled: {
+                                    zynthian.btAudioEnabled = checked
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                            }
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                            text: qsTr("BT Audio")
+                        }
+                    }
+                }
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: SketchpadDial {
+                        text: qsTr("Reverb")
+                        controlObj: zynthian
+                        controlProperty: "reverbKnobValue"
+                        valueString: qsTr("%1%").arg(dial.value)
+
+                        dial {
+                            stepSize: 1
+                            from: 0
+                            to: 100
+                        }
+                    }
+                }
+
+                Card {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    contentItem: RowLayout {
+                        Layout.alignment: Qt.AlignLeft
+                        QQC2.Label {
+                            text: qsTr("Click")
+                        }
+
+                        QQC2.Switch {
+                            Layout.alignment: Qt.AlignVCenter
+                            implicitWidth: Kirigami.Units.gridUnit * 3
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                            checked: zynthian.sketchpad.clickChannelEnabled
+                            onToggled: {
+                                zynthian.sketchpad.clickChannelEnabled = checked
+                            }
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Stop All Notes")
+                    onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Stop Playback")
+                    onClicked: {
+                        Zynthian.CommonUtils.stopMetronomeAndPlayback();
                     }
                 }
             }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                text: qsTr("Stop All Notes")
-                onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                text: qsTr("Stop Playback")
-                onClicked: {
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+        }
+        BluetoothConnections {
+            id: bluetoothSetup
+            visible: false
+            anchors.fill: parent
+            Connections {
+                target: zynthian
+                onGlobalPopupOpenedChanged: {
+                    if (zynthian.globalPopupOpened === false) {
+                        bluetoothSetup.hide();
+                    }
                 }
             }
         }

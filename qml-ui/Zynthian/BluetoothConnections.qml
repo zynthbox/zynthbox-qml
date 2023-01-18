@@ -31,6 +31,7 @@ import org.kde.bluezqt 1.0 as BluezQt
 
 Item {
     id: component
+    readonly property QtObject connectedDevice: _private.connectedDevice
     function show() {
         component.visible = true;
     }
@@ -49,6 +50,7 @@ Item {
         id: _private
         property QtObject manager: BluezQt.Manager
         property QtObject usableAdapter: _private.manager.usableAdapter
+        property QtObject connectedDevice: null
     }
     Connections {
         target: _private.manager
@@ -58,9 +60,18 @@ Item {
             for (var i = 0; i < devices.length; ++i) {
                 var device = devices[i];
                 if (device.connected) {
+                    _private.connectedDevice = device;
                     zynthian.bluetooth_config.connectBluetoothPorts();
                     break;
                 }
+            }
+        }
+    }
+    Connections {
+        target: _private.connectedDevice
+        onConnectedChanged: {
+            if (_private.connectedDevice.connected === false) {
+                _private.connectedDevice = null;
             }
         }
     }
@@ -101,6 +112,7 @@ Item {
                     target: btDeviceDelegate.device
                     onConnectedChanged: {
                         if (btDeviceDelegate.device.connected) {
+                            _private.connectedDevice = btDeviceDelegate.device;
                             zynthian.bluetooth_config.connectBluetoothPorts();
                         }
                     }

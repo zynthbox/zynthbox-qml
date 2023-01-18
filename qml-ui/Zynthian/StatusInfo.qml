@@ -443,27 +443,17 @@ MouseArea {
                     Layout.preferredWidth: 1
                     contentItem: ColumnLayout {
                         Layout.alignment: Qt.AlignVCenter
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                        }
                         QQC2.Button {
-                            icon.name: "network-bluetooth"
+                            icon.name: bluetoothSetup.connectedDevice === null ? "network-bluetooth" : "network-bluetooth-activated"
+                            text: bluetoothSetup.connectedDevice === null ? qsTr("(not connected)") : bluetoothSetup.connectedDevice.name
                             display: QQC2.AbstractButton.TextUnderIcon
                             Layout.alignment: Qt.AlignVCenter
                             Layout.fillWidth: true
+                            Layout.fillHeight: true
                             enabled: zynthian.btAudioEnabled
                             onClicked: {
                                 bluetoothSetup.show();
                             }
-                        }
-                        QQC2.Label {
-                            Layout.alignment: Qt.AlignVCenter
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            wrapMode: Text.Wrap
-                            text: zynthian.btAudioConnected ? zynthian.btAudioDeviceName : qsTr("(disconnected)")
-                            enabled: zynthian.btAudioEnabled
                         }
                         RowLayout {
                             Layout.fillWidth: true

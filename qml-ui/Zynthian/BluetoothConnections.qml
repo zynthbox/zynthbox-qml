@@ -185,7 +185,17 @@ Item {
                         if (btDeviceDelegate.device.connected) {
                             btDeviceDelegate.pendingCall = btDeviceDelegate.device.disconnectFromDevice();
                         } else {
-                            btDeviceDelegate.pendingCall = btDeviceDelegate.device.connectToDevice();
+                            if (!btDeviceDelegate.device.paired) {
+                                console.log("Device not paired. Pairing first and then connecting.")
+                                var pairPendingCall = btDeviceDelegate.device.pair()
+                                pairPendingCall.finished.connect(function() {
+                                    console.log("Pair pending call finished :", pairPendingCall.errorText)
+                                    btDeviceDelegate.pendingCall = btDeviceDelegate.device.connectToDevice();
+                                })
+                            } else {
+                                console.log("Device already paired. Connecting.")
+                                btDeviceDelegate.pendingCall = btDeviceDelegate.device.connectToDevice();
+                            }
                         }
                     }
                     QQC2.BusyIndicator {

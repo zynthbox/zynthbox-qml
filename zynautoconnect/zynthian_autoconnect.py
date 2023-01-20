@@ -468,8 +468,12 @@ def midi_autoconnect(force=False):
 	release_lock()
 
 def audio_autoconnect(force=False):
+	if not zynthian_gui_config.zyngui.isBootingComplete:
+		# If Booting is not complete, do not run autoconnect
+		# Autoconnect will be explicitly called once after booting is complete
+		return
 
-	if not force or not zynthian_gui_config.zyngui.isBootingComplete:
+	if not force:
 		logger.info("ZynAutoConnect: Audio Escaped ...")
 		return
 

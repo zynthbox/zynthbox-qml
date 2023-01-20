@@ -480,6 +480,7 @@ class zynthian_gui(QObject):
         self.__is__modal__screens__caching__complete__ = False
         self.__is__screens__caching__complete__ = False
         self.__passive_notification = ""
+        self.__splash_stopped = False
 
         # When true, 1-5 buttons selects channel 6-10
         self.channels_mod_active = False
@@ -3724,12 +3725,15 @@ class zynthian_gui(QObject):
             if self.isModalScreensCachingComplete and self.isScreensCachingComplete:
                 logging.debug("QML Caching complete. Calling stop_splash")
                 stop_splash_timer.stop()
+                
+                # Display main window as soon as possible so it doesn't take time to load after splash stops
+                self.displayMainWindow.emit()                
                 self.isBootingComplete = True
 
                 extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
                 blank_video_path = Path('/usr/share/zynthbox-bootsplash/blank.mp4')
 
-                process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path), str(blank_video_path)))
+                process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
 
                 with open("/tmp/mplayer-splash-control", "w") as f:
                     f.write("quit\n")
@@ -3737,8 +3741,10 @@ class zynthian_gui(QObject):
 
                 if process is not None:
                     process.wait()
+                
+                # Setting splashStopped to True will remove the overlay over main wwindow so nothing is displayed below splash until splash process exits
+                self.splashStopped = True
 
-                self.displayMainWindow.emit()
                 boot_end = timer()
 
                 logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
@@ -4425,6 +4431,20 @@ class zynthian_gui(QObject):
 
     passiveNotification = Property(str, get_passiveNotification, set_passiveNotification, notify=passiveNotificationChanged)
     ### END Property passiveNotification
+    
+    ### Property splashStopped
+    # This property will make sure to display an overlay over the main window until splash is stopped
+    def get_splashStopped(self):
+        return self.__splash_stopped
+            
+    def set_splashStopped(self, val):
+        self.__splash_stopped = val
+        self.splashStoppedChanged.emit()
+    
+    splashStoppedChanged = Signal()
+        
+    splashStopped = Property(bool, get_splashStopped, set_splashStopped, notify=splashStoppedChanged)
+    ### END Property splashStopped
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

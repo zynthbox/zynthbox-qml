@@ -120,7 +120,7 @@ Kirigami.AbstractApplicationWindow {
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
     pageStack: screensLayer
-    header: RowLayout {
+    header: RowLayout {            
         spacing: 0
         Zynthian.BreadcrumbButton {
             id: menuButton
@@ -207,7 +207,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
         }
-       /* Zynthian.BreadcrumbButton {
+    /* Zynthian.BreadcrumbButton {
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("1-6")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
@@ -347,7 +347,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
             visible: root.selectedChannel.channelAudioType === "sample-loop" &&
-                     clip && clip.path && clip.path.length >= 0
+                    clip && clip.path && clip.path.length >= 0
         }
         Zynthian.BreadcrumbButton {
             id: synthButton
@@ -683,6 +683,15 @@ Kirigami.AbstractApplicationWindow {
                 text: "/" + (4 - zynthian.sketchpad.currentBeat)
             }
         }
+    }
+    
+    Rectangle {
+        id: splashOverlay
+        parent: root.contentItem.parent
+        anchors.fill: parent
+        color: "#ff000000"
+        z: 9999999
+        visible: !zynthian.splashStopped
     }
 
     Loader {

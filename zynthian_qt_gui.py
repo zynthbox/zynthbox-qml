@@ -3743,7 +3743,15 @@ class zynthian_gui(QObject):
 
                 logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
+                # Explicitly run autoconnect after booting is complete
+                # as any requests made while booting is ignored
                 QMetaObject.invokeMethod(self, "zynautoconnect", Qt.QueuedConnection)
+
+                # Explicitly run update_jack_port after booting is complete
+                # as any requests made while booting is ignored
+                for i in range(0, self.sketchpad.song.channelsModel.count):
+                    channel = self.sketchpad.song.channelsModel.getChannel(i)
+                    channel.update_jack_port()
             else:
                 logging.debug("QML Caching not yet complete. Rescheduling stop_splash call")
 

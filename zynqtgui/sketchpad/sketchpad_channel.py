@@ -367,9 +367,14 @@ class sketchpad_channel(QObject):
         return self.__layers_snapshot
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
+    @Slot()
     def update_jack_port(self):
-        self.zyngui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
-        self.update_jack_port_timer.start()
+        if self.zyngui is not None and not self.zyngui.get_isBootingComplete():
+            logging.debug("Booting in progress. Ignoring port update request")
+            # QTimer.singleShot(1000, self.update_jack_port)
+        else:
+            self.zyngui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
+            self.update_jack_port_timer.start()
 
     def do_update_jack_port(self):
         def task(zyngui, channel):

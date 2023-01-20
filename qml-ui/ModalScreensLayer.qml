@@ -59,14 +59,14 @@ Zynthian.Stack {
                 if (!root.pageCache) {
                     root.pageCache = {};
                 }
-                console.log("Caching song_arranger")
-                zynthian.currentTaskMessage = "Loading song arranger page"
-                if (!root.pageCache["song_arranger"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["song_arranger"].visible = false;
-                }
+//                console.log("Caching song_arranger")
+//                zynthian.currentTaskMessage = "Loading song arranger page"
+//                if (!root.pageCache["song_arranger"]) {
+//                    file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
+//                    var component = Qt.createComponent(file);
+//                    root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                    root.pageCache["song_arranger"].visible = false;
+//                }
 
                 console.log("Caching song_player")
                 zynthian.currentTaskMessage = "Loading song player page"
@@ -86,14 +86,14 @@ Zynthian.Stack {
                     root.pageCache["playgrid"].visible = false;
                 }
 
-                console.log("Caching sketchpad_copier")
-                zynthian.currentTaskMessage = "Loading sketchpad copier page"
-                if (!root.pageCache["sketchpad_copier"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sketchpad_copier");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["sketchpad_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["sketchpad_copier"].visible = false;
-                }
+//                console.log("Caching sketchpad_copier")
+//                zynthian.currentTaskMessage = "Loading sketchpad copier page"
+//                if (!root.pageCache["sketchpad_copier"]) {
+//                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sketchpad_copier");
+//                    var component = Qt.createComponent(file);
+//                    root.pageCache["sketchpad_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                    root.pageCache["sketchpad_copier"].visible = false;
+//                }
 
                 console.log("Caching midi_key_range")
                 zynthian.currentTaskMessage = "Loading midi key range page"

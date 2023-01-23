@@ -243,6 +243,7 @@ Zynthian.ScreenPage {
 
                                 Image {
                                     id: synthImage
+                                    asynchronous: true
                                     visible: synthImage.status !== Image.Error
                                     anchors {
                                         fill: parent
@@ -255,6 +256,7 @@ Zynthian.ScreenPage {
                                 }
 
                                 Image {
+                                    asynchronous: true
                                     visible: synthImage.status === Image.Error
                                     anchors {
                                         fill: parent

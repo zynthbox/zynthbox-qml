@@ -35,48 +35,61 @@ import "pages" as Pages
 Zynthian.Stack {
     id: root
 
+    property var pageCache: ({})
+    property bool controlPageLoaded: false
+    property bool libraryPageLoaded: false
+
     Component.onCompleted: {
         zynthian.current_screen_id_changed()
     }
-
-    property var pageCache: {}
     onWidthChanged: {
         for (var i in pageCache) {
             root.pageCache[i].width = width;
             root.pageCache[i].height = height;
         }
     }
-
     data: [
         Timer {
-            id: preloadTimer
+            interval: 100
+            repeat: true
+            running: true
+            onTriggered: {
+                if (root.controlPageLoaded && root.libraryPageLoaded) {
+                    zynthian.isScreensCachingComplete = true
+
+                    repeat = false
+                    running = false
+                }
+            }
+        },
+        Timer {
             interval: 0
             running: true
             onTriggered: {
-                let file = ""
-                if (!root.pageCache) {
-                    root.pageCache = {};
-                }
-
                 console.log("Caching control")
                 zynthian.currentTaskMessage = "Loading control page"
                 if (!root.pageCache["control"]) {
-                    file = applicationWindow().pageScreenMapping.pageForScreen("control");
+                    let file = applicationWindow().pageScreenMapping.pageForScreen("control");
                     var component = Qt.createComponent(file);
                     root.pageCache["control"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
                     root.pageCache["control"].visible = false;
                 }
-
-                console.log("Caching layers_for_channel")
+                root.controlPageLoaded = true
+            }
+        },
+        Timer {
+            interval: 0
+            running: true
+            onTriggered: {
+                console.log("Caching library page")
                 zynthian.currentTaskMessage = "Loading library page"
                 if (!root.pageCache["layers_for_channel"]) {
-                    file = applicationWindow().pageScreenMapping.pageForScreen("layers_for_channel");
+                    let file = applicationWindow().pageScreenMapping.pageForScreen("layers_for_channel");
                     var component = Qt.createComponent(file);
                     root.pageCache["layers_for_channel"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
                     root.pageCache["layers_for_channel"].visible = false;
                 }
-
-                zynthian.isScreensCachingComplete = true
+                root.libraryPageLoaded = true
             }
         },
         Connections {

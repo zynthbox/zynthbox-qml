@@ -68,8 +68,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__bigknob_value__ != self.__zselector[0].value:
-            self.__bigknob_value__ = self.__zselector[0].value
-            self.bigKnobValueChanged.emit()
+            if self.zyngui.altButtonPressed:
+                pass
+            else:
+                self.__bigknob_value__ = self.__zselector[0].value
+                self.bigKnobValueChanged.emit()
             self.set_selector()
 
     @Slot(None)
@@ -79,8 +82,12 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__knob1_value__ != self.__zselector[1].value:
-            self.__knob1_value__ = self.__zselector[1].value
-            self.knob1ValueChanged.emit()
+            if self.zyngui.altButtonPressed:
+                currentVolume = self.zyngui.get_volume()
+                self.zyngui.set_volume(currentVolume + self.__zselector[1].value - 50)
+            else:
+                self.__knob1_value__ = self.__zselector[1].value
+                self.knob1ValueChanged.emit()
             self.set_selector()
 
     @Slot(None)
@@ -90,8 +97,12 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__knob2_value__ != self.__zselector[2].value:
-            self.__knob2_value__ = self.__zselector[2].value
-            self.knob2ValueChanged.emit()
+            if self.zyngui.altButtonPressed:
+                currentValue = self.zyngui.get_global_fx1_amount()
+                self.zyngui.set_global_fx1_amount(currentValue + self.__zselector[2].value - 50)
+            else:
+                self.__knob2_value__ = self.__zselector[2].value
+                self.knob2ValueChanged.emit()
             self.set_selector()
 
     @Slot(None)
@@ -101,30 +112,34 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__knob3_value__ != self.__zselector[3].value:
-            self.__knob3_value__ = self.__zselector[3].value
-            self.knob3ValueChanged.emit()
+            if self.zyngui.altButtonPressed:
+                currentValue = self.zyngui.get_global_fx2_amount()
+                self.zyngui.set_global_fx2_amount(currentValue + self.__zselector[3].value - 50)
+            else:
+                self.__knob3_value__ = self.__zselector[3].value
+                self.knob3ValueChanged.emit()
             self.set_selector()
 
     def zyncoder_read(self):
         # Big knob is encoder 0
         if self.__zselector[0]:
             self.__zselector[0].read_zyncoder()
-            QMetaObject.invokeMethod(self, "zyncoder_bigknob", Qt.QueuedConnection)
+            self.zyncoder_bigknob()
 
         # Small knob 1
         if self.__zselector[1]:
             self.__zselector[1].read_zyncoder()
-            QMetaObject.invokeMethod(self, "zyncoder_knob1", Qt.QueuedConnection)
+            self.zyncoder_knob1()
 
         # Small knob 2
         if self.__zselector[2]:
             self.__zselector[2].read_zyncoder()
-            QMetaObject.invokeMethod(self, "zyncoder_knob2", Qt.QueuedConnection)
+            self.zyncoder_knob2()
 
         # Small knob 3
         if self.__zselector[3]:
             self.__zselector[3].read_zyncoder()
-            QMetaObject.invokeMethod(self, "zyncoder_knob3", Qt.QueuedConnection)
+            self.zyncoder_knob3()
 
         return [0, 1, 2, 3]
 

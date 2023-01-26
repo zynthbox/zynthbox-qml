@@ -26,6 +26,7 @@ import os
 import sys
 import copy
 import liblo
+import queue
 import signal
 import math
 
@@ -447,7 +448,9 @@ class zynthian_gui(QObject):
         super(zynthian_gui, self).__init__(parent)
 
         self.__current_task_message = ""
+        self.__recent_task_messages = queue.Queue()
         self.__show_current_task_message = True
+        self.currentTaskMessageChanged.connect(self.save_currentTaskMessage, Qt.QueuedConnection)
         self.currentTaskMessage = f"Starting Zynthbox QML"
 
         self.zynmidi = None
@@ -668,6 +671,14 @@ class zynthian_gui(QObject):
         # Initialise libzl (which requires things found in zyncoder, specifically the zynthian midi router)
         libzl.init()
 
+    @Slot(None)
+    def save_currentTaskMessage(self):
+        while self.__recent_task_messages.empty() is False:
+            theMessage = self.__recent_task_messages.get()
+            if ((hasattr(self, "__booting_complete__") and not self.__booting_complete__) or not hasattr(self, "__booting_complete__")) and bootlog_fifo is not None and len(theMessage) > 0:
+                os.write(bootlog_fifo, f"{theMessage}\n".encode())
+            self.__recent_task_messages.task_done()
+
     def increment_blink_count(self):
         self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
 
@@ -759,12 +770,21 @@ class zynthian_gui(QObject):
 
             self.set_selector()
 
+    def get_volume(self):
+        value = 0
+        if self.master_alsa_mixer is not None:
+            value = self.master_alsa_mixer.volume
+        return value
+
+    def set_volume(self, value):
+        self.set_volume_actual(value, False)
+
     @Slot(None)
     def zyncoder_set_volume(self):
         if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_volume_actual(self.__zselector[1].value)
 
-    def set_volume_actual(self, volume):
+    def set_volume_actual(self, volume, takeControlOfSelector = True):
         """
         Set volume when global popup is active
         """
@@ -789,14 +809,26 @@ class zynthian_gui(QObject):
                     showVisualZero=True
                 )
 
-            self.set_selector()
+            if takeControlOfSelector is True:
+                self.set_selector()
+
+    def get_global_fx1_amount(self):
+        value = 0
+        if self.global_fx_engines[0] is not None:
+            controller = self.global_fx_engines[0][1]
+            if controller is not None:
+                value = controller.value
+        return value
+
+    def set_global_fx1_amount(self, value):
+        self.set_delay_actual(value, False)
 
     @Slot(None)
     def zyncoder_set_delay(self):
         if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_delay_actual(self.__zselector[2].value)
 
-    def set_delay_actual(self, delay_percent):
+    def set_delay_actual(self, delay_percent, takeControlOfSelector = True):
         """
         Set global fx delay when global popup is active
         """
@@ -824,14 +856,26 @@ class zynthian_gui(QObject):
                     showVisualZero=True
                 )
 
-                self.set_selector()
+                if takeControlOfSelector is True:
+                    self.set_selector()
+
+    def get_global_fx2_amount(self):
+        value = 0
+        if self.global_fx_engines[1] is not None:
+            controller = self.global_fx_engines[1][1]
+            if controller is not None:
+                value = controller.value
+        return value
+
+    def set_global_fx2_amount(self, value):
+        self.set_reverb_actual(value, False)
 
     @Slot(None)
     def zyncoder_set_reverb(self):
         if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_reverb_actual(self.__zselector[3].value)
 
-    def set_reverb_actual(self, reverb_percent):
+    def set_reverb_actual(self, reverb_percent, takeControlOfSelector = True):
         """
         Set global fx reverb when global popup is active
         """
@@ -859,7 +903,8 @@ class zynthian_gui(QObject):
                     showVisualZero=True
                 )
 
-                self.set_selector()
+                if takeControlOfSelector is True:
+                    self.set_selector()
 
     @Slot(None)
     def zyncoder_set_current_index(self):
@@ -4340,11 +4385,9 @@ class zynthian_gui(QObject):
     def set_currentTaskMessage(self, value):
         if value != self.__current_task_message and self.showCurrentTaskMessage:
             self.__current_task_message = value
+            self.__recent_task_messages.put(value)
             self.currentTaskMessageChanged.emit()
             QGuiApplication.instance().processEvents()
-
-            if ((hasattr(self, "__booting_complete__") and not self.__booting_complete__) or not hasattr(self, "__booting_complete__")) and bootlog_fifo is not None and len(value) > 0:
-                os.write(bootlog_fifo, f"{value}\n".encode())
 
     currentTaskMessageChanged = Signal()
 

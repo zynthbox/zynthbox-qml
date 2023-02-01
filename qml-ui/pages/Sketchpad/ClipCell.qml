@@ -255,7 +255,7 @@ QQC2.AbstractButton {
                      root.pattern.hasNotes
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
-            width: pattern ? (parent.width/16)*(pattern.bankPlaybackPosition%16) : 0
+            width: pattern ? (parent.width/(16*pattern.availableBars))*pattern.bankPlaybackPosition : 0
         }
     }
 

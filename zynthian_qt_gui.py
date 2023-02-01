@@ -3775,8 +3775,14 @@ class zynthian_gui(QObject):
                 self.displayMainWindow.emit()                
                 self.isBootingComplete = True
 
+                # Explicitly run update_jack_port after booting is complete
+                # as any requests made while booting is ignored
+                # zyngui.zynautoconnect will run after channel ports are updated
+                for i in range(0, self.sketchpad.song.channelsModel.count):
+                    channel = self.sketchpad.song.channelsModel.getChannel(i)
+                    channel.update_jack_port()
+
                 extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
-                blank_video_path = Path('/usr/share/zynthbox-bootsplash/blank.mp4')
 
                 process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
 
@@ -3793,16 +3799,6 @@ class zynthian_gui(QObject):
                 boot_end = timer()
 
                 logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
-
-                # Explicitly run autoconnect after booting is complete
-                # as any requests made while booting is ignored
-                QMetaObject.invokeMethod(self, "zynautoconnect", Qt.QueuedConnection)
-
-                # Explicitly run update_jack_port after booting is complete
-                # as any requests made while booting is ignored
-                for i in range(0, self.sketchpad.song.channelsModel.count):
-                    channel = self.sketchpad.song.channelsModel.getChannel(i)
-                    channel.update_jack_port()
             else:
                 logging.debug("QML Caching not yet complete. Rescheduling stop_splash call")
 

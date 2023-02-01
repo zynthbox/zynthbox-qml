@@ -3775,6 +3775,8 @@ class zynthian_gui(QObject):
                 self.displayMainWindow.emit()                
                 self.isBootingComplete = True
 
+                self.sketchpad.set_selector()
+
                 # Explicitly run update_jack_port after booting is complete
                 # as any requests made while booting is ignored
                 # zyngui.zynautoconnect will run after channel ports are updated

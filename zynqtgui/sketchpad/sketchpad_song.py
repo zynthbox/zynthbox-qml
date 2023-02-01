@@ -155,7 +155,7 @@ class sketchpad_song(QObject):
 
     @Slot(None)
     def doUpdateAutoconnectedSounds(self):
-        zynautoconnect.audio_autoconnect(True)
+        self.zyngui.zynautoconnect(True)
 
     def to_be_deleted(self):
         self.__to_be_deleted__ = True

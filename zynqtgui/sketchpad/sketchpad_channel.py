@@ -368,15 +368,21 @@ class sketchpad_channel(QObject):
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
     @Slot()
-    def update_jack_port(self):
+    def update_jack_port(self, run_in_thread=True):
         if self.zyngui is not None and not self.zyngui.get_isBootingComplete():
             logging.debug("Booting in progress. Ignoring port update request")
             # QTimer.singleShot(1000, self.update_jack_port)
         else:
             self.zyngui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
-            self.update_jack_port_timer.start()
 
-    def do_update_jack_port(self):
+            # If run_in_thread is set to False, directly call the method
+            # This will allow startup process to wait till all ports are updated before displaying splash screen
+            if run_in_thread:
+                self.update_jack_port_timer.start()
+            else:
+                self.do_update_jack_port(run_in_thread)
+
+    def do_update_jack_port(self, run_in_thread=True):
         def task(zyngui, channel):
             jack_basenames = []
 
@@ -431,8 +437,13 @@ class sketchpad_channel(QObject):
             self.set_channelSynthPorts(synth_ports)
             QMetaObject.invokeMethod(self.__song__, "updateAutoconnectedSounds", Qt.QueuedConnection)
 
-        worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
-        worker_thread.start()
+        # Do the task in a thread only if run_in_thread is set to True
+        # This will allow startup process to wait till all ports are updated before displaying splash screen
+        if run_in_thread:
+            worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
+            worker_thread.start()
+        else:
+            task(self.zyngui, self)
 
     @Slot(None)
     def clear(self):

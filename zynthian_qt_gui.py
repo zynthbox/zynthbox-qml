@@ -3775,14 +3775,19 @@ class zynthian_gui(QObject):
                 self.displayMainWindow.emit()                
                 self.isBootingComplete = True
 
-                self.sketchpad.set_selector()
-
                 # Explicitly run update_jack_port after booting is complete
                 # as any requests made while booting is ignored
                 # zyngui.zynautoconnect will run after channel ports are updated
                 for i in range(0, self.sketchpad.song.channelsModel.count):
                     channel = self.sketchpad.song.channelsModel.getChannel(i)
-                    channel.update_jack_port()
+                    # Allow jack ports connection to complete before showing UI
+                    # so do not update jack ports in a thread
+                    channel.update_jack_port(run_in_thread=False)
+
+                # Run sketchpad set_selector at last before hiding splash
+                # to ensure knobs work fine as it is the first page that is displayed
+                # after splash is hidden
+                self.sketchpad.set_selector()
 
                 extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
 

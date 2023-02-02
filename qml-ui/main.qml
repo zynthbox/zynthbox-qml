@@ -692,6 +692,18 @@ Kirigami.AbstractApplicationWindow {
         color: "#ff000000"
         z: 9999999
         visible: !zynthian.splashStopped
+
+        // Display currentTaskMessage on splashOverlay as it overlaps bootlog
+        // window before main window is displayed before splash is hidden
+        QQC2.Label {
+            width: parent.width
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 50
+            horizontalAlignment: Qt.AlignHCenter
+            font.pointSize: 12
+            color: "white"
+            text: zynthian.currentTaskMessage
+        }
     }
 
     Loader {

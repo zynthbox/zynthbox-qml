@@ -1339,7 +1339,7 @@ class zynthian_gui(QObject):
         except: pass
 
     def update_wsleds(self):
-        if not self.__booting_complete__:
+        if not self.splashStopped:
             for i in range(25):
                 color = QColor.fromHsl((int(self.rainbow_led_counter) + i * 10) % 359, 242, 127, 127)
                 self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))

@@ -22,7 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 # 
 #******************************************************************************
-
+import os
 import sys
 import logging
 from datetime import datetime
@@ -167,6 +167,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def __init__(self, selcap='Select', parent = None):
 		super(zynthian_gui_selector, self).__init__(parent)
 
+		self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
 		self.index = 0
 		self.list_data = []
 		self.list_metadata = []
@@ -195,12 +196,17 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def adjust_knob_speed(self):
 		if self.zselector and len(self.list_data) > 0:
 			logging.debug("ADJUSTING KNOB SPEED")
-			# never do custom_encoder_speed for the big knob
-			if self.index == 3 or self.zyngui.get_encoder_list_speed_multiplier() == 0:
-				self.zselector.custom_encoder_speed = 0
-			else:
-				self.zselector.custom_encoder_speed = round(len(self.list_data) / self.zyngui.get_encoder_list_speed_multiplier())
-			self.zselector.config(self.zselector_ctrl)
+
+			# DO NOT ADJUST KNOB SPEED for Z2_V3
+			# Since Z2_V3(miko) we have a stepped knob which misbehaves if custom_encoder_speed is set
+
+			if not self.isZ2V3:
+				# never do custom_encoder_speed for the big knob
+				if self.index == 3 or self.zyngui.get_encoder_list_speed_multiplier() == 0:
+					self.zselector.custom_encoder_speed = 1
+				else:
+					self.zselector.custom_encoder_speed = round(len(self.list_data) / self.zyngui.get_encoder_list_speed_multiplier())
+				self.zselector.config(self.zselector_ctrl)
 
 	def sync_selector_visibility(self):
 		if self.zselector == None:
@@ -313,7 +319,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 				self.select(self.zselector.value)
 				self.screen_at_timer_start = self.zyngui.get_current_screen_id()
 
-				if self.zyngui.get_current_screen_id() == "preset":
+				if not self.isZ2V3 and self.zyngui.get_current_screen_id() == "preset":
+					# This workaround is required only for smooth bigknob
+					# Without this preset selection keeps jumping up and down by 1 entry with smooth bigknob
 					self.auto_activation_timeout()
 				else:
 					self.auto_activation_timer_requested.emit(500)

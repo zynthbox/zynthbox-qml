@@ -123,6 +123,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
+        # This variable tells zynthian_qt_gui to load last state snapshot when booting when set to True
+        # or load default snapshot when set to False
+        self.init_should_load_last_state = False
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -211,8 +214,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
         if sketchpad is not None and Path(sketchpad).exists():
             self.loadSketchpad(sketchpad, True, False, _cb)
+            # Existing sketch found. Tell zynthian_qt_gui to load last_state snapshot
+            self.init_should_load_last_state = True
         else:
-            self.newSketchpad(None, _cb)
+            self.newSketchpad(None, _cb, load_snapshot=False)
+            # Existing sketch not found. Tell zynthian_qt_gui to load default snapshot
+            self.init_should_load_last_state = False
 
     @Slot(None)
     def zyncoder_set_selected_segment(self):
@@ -1224,7 +1231,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             return f"{name}-{counter}"
 
     @Slot(None)
-    def newSketchpad(self, base_sketchpad=None, cb=None):
+    def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True):
         def task():
             try:
                 self.__song__.bpm_changed.disconnect()
@@ -1261,12 +1268,21 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 logging.info(f"Loading new sketchpad from community sketchpad : {str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)}")
 
+                # Load sketchpad snapshot if available or else load default snapshot
+                snapshot_path = f"{str(self.__sketchpad_basepath__ / new_sketchpad_name / 'soundsets')}/{base_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
+                if Path(snapshot_path).exists():
+                    self.zyngui.currentTaskMessage = "Loading snapshot"
+                    logging.info(f"Loading snapshot : {snapshot_path}")
+                    self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+                elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
+                    logging.info(f"Loading default snapshot")
+                    self.zyngui.currentTaskMessage = "Loading snapshot"
+                    self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/",
                                                                   base_sketchpad_path.stem.replace(".sketchpad", ""), self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
                     str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
-
-                # In case a base sketchpad is supplied, handle loading snapshot from the source
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
@@ -1275,14 +1291,18 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 logging.info(f"Creating New Sketchpad")
                 self.zyngui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
 
+                # When zyngui is starting, it will load last_state or default snapshot
+                # based on the value of self.init_should_load_last_state
+                # Do not load snapshot again otherwise it will create multiple processes for same synths
+                if load_snapshot:
+                    if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
+                        logging.info(f"Loading default snapshot")
+                        self.zyngui.currentTaskMessage = "Loading snapshot"
+                        self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
                     str(self.__sketchpad_basepath__ / 'temp' / 'Sketchpad-1.sketchpad.json'))
-
-                if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
-                    logging.info(f"Loading default snapshot")
-                    self.zyngui.currentTaskMessage = "Loading snapshot"
-                    self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 # Connect all jack ports of respective channel after jack client initialization is done.
                 for i in range(0, self.__song__.channelsModel.count):
@@ -1408,20 +1428,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
             if sketchpad_path.parent.match("*/zynthian-my-data/sketchpads/community-sketchpads/*"):
                 def _cb():
-                    last_selected_sketchpad_path = Path(self.zyngui.screens['session_dashboard'].get_last_selected_sketchpad())
-
-                    if load_snapshot:
-                        # Load snapshot
-                        snapshot_path = f"{str(last_selected_sketchpad_path.parent / 'soundsets')}/{last_selected_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
-                        if Path(snapshot_path).exists():
-                            self.zyngui.currentTaskMessage = "Loading snapshot"
-                            logging.info(f"Loading snapshot : {snapshot_path}")
-                            self.zyngui.screens["layer"].load_snapshot(snapshot_path)
-                        elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
-                            logging.info(f"Loading default snapshot")
-                            self.zyngui.currentTaskMessage = "Loading snapshot"
-                            self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
-
                     # Connect all jack ports of respective channel after jack client initialization is done.
                     for i in range(0, self.__song__.channelsModel.count):
                         channel = self.__song__.channelsModel.getChannel(i)
@@ -1435,7 +1441,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
 
                 self.zyngui.currentTaskMessage = "Creating new sketchpad from community sketchpad"
-                self.newSketchpad(sketchpad, _cb)
+                # newSketchpad will handle loading snapshot based on the value of load_snapshot
+                self.newSketchpad(sketchpad, _cb, load_snapshot=load_snapshot)
             else:
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
                 self.zyngui.currentTaskMessage = "Loading sketchpad"

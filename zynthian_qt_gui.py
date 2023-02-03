@@ -1652,24 +1652,26 @@ class zynthian_gui(QObject):
         # Initialize OSC
         self.osc_init()
 
-        # Initial snapshot...
-        snapshot_loaded = False
-        # Try to load "last_state" snapshot ...
-        if zynthian_gui_config.restore_last_state:
-            snapshot_loaded = self.screens[
-                "snapshot"
-            ].load_last_state_snapshot()
-        # Try to load "default" snapshot ...
-        if not snapshot_loaded:
-            snapshot_loaded = self.screens["snapshot"].load_default_snapshot()
-        # Set empty state
-        if not snapshot_loaded:
-            # Init MIDI Subsystem => MIDI Profile
-            self.init_midi()
-            self.init_midi_services()
-            self.zynautoconnect()
-            # Show initial screen
-            self.show_screen(self.__home_screen)
+        ###
+        # Initial snapshot loading needs to be done here before starting the threads in below this block
+        # Not loading the snapshots here causes a crash. It is not yet known where and why the crash happens.
+        # When booting, snapshot loading occurs here based on what sketchpad is loaded.
+        # For other cases sketchpad handles loading correct snapshot
+        #
+        # If sketchpad is loading an existing sketch, load last state snapshot to let eh euser keep working on synths
+        # between restarts
+        # Otherwise load a default snapshot as a new sketch wil be created
+        ###
+        if self.screens["sketchpad"].init_should_load_last_state:
+            if not self.screens["snapshot"].load_last_state_snapshot():
+                # Try loading default snapshot if loading last_state snapshot fails
+                if not self.screens["snapshot"].load_default_snapshot():
+                    # Show error if loading default snapshot fails
+                    logging.error("Error loading default snapshot")
+        else:
+            if not self.screens["snapshot"].load_default_snapshot():
+                # Show error if loading default snapshot fails
+                logging.error("Error loading default snapshot")
 
         # Start polling threads
         self.start_polling()
@@ -2993,9 +2995,8 @@ class zynthian_gui(QObject):
 
     def zyncoder_thread_task(self):
         while not self.exit_flag:
-            if (
-                not self.zynread_wait_flag
-            ):  # FIXME: poor man's mutex? actually works only with this one FIXME: REVERT
+            # Do not read zyncoder values when booting is in progress
+            if self.isBootingComplete and not self.zynread_wait_flag: # FIXME: poor man's mutex? actually works only with this one FIXME: REVERT
                 self.zyncoder_read()
                 self.zynmidi_read()
                 self.osc_receive()
@@ -3309,14 +3310,16 @@ class zynthian_gui(QObject):
     # FIXME: is this necessary?
     def loading_refresh(self):
         while not self.exit_flag:
-            try:
-                if self.modal_screen:
-                    self.screens[self.modal_screen].refresh_loading()
-                else:
-                    self.screens[self.active_screen].refresh_loading()
-            except Exception as err:
-                logging.error("zynthian_gui.loading_refresh() => %s" % err)
-                self.show_screen("session_dashboard")
+            # Do not refresh when booting is in progress
+            if self.isBootingComplete:
+                try:
+                    if self.modal_screen:
+                        self.screens[self.modal_screen].refresh_loading()
+                    else:
+                        self.screens[self.active_screen].refresh_loading()
+                except Exception as err:
+                    logging.error("zynthian_gui.loading_refresh() => %s" % err)
+                    self.show_screen("session_dashboard")
             time.sleep(0.1)
 
     def wait_threads_end(self, n=20):

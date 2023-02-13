@@ -160,6 +160,18 @@ QQC2.AbstractButton {
                                   : ""
                     }
                 }
+
+                QQC2.Label {
+                    id: midiChannelLabel
+                    width: parent.width
+                    height: parent.height
+                    horizontalAlignment: "AlignHCenter"
+                    verticalAlignment: "AlignVCenter"
+                    font.pointSize: Kirigami.Units.gridUnit
+                    color: Kirigami.Theme.textColor
+                    visible: root.channel.channelAudioType === "external"
+                    text: root.channel.externalMidiChannel > -1 ? root.channel.externalMidiChannel + 1 : root.channel.id + 1
+                }
             }
         }
     }

@@ -69,7 +69,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
         if self.__bigknob_value__ != self.__zselector[0].value:
             if self.zyngui.altButtonPressed:
-                pass
+                currentValue = self.zyngui.sketchpad.song.bpm
+                self.zyngui.set_bpm(currentValue + self.__zselector[0].value - 50)
             else:
                 self.__bigknob_value__ = self.__zselector[0].value
                 self.bigKnobValueChanged.emit()

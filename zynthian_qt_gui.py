@@ -741,7 +741,11 @@ class zynthian_gui(QObject):
         if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200))
 
-    def set_bpm_actual(self, bpm):
+    @Slot(None)
+    def set_bpm(self, bpm):
+        self.set_bpm_actual(bpm, False)
+
+    def set_bpm_actual(self, bpm, takeControlOfSelector = True):
         """
             Set song bpm when global popup is active
         """
@@ -768,7 +772,8 @@ class zynthian_gui(QObject):
                     showValueLabel=True,
                 )
 
-            self.set_selector()
+            if takeControlOfSelector is True:
+                self.set_selector()
 
     def get_volume(self):
         value = 0

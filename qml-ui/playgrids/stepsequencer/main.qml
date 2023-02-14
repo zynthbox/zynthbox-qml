@@ -242,6 +242,7 @@ Zynthian.BasePlayGrid {
     signal hidePatternsMenu();
     signal showPatternsMenu();
     property bool showPatternSettings: false
+    signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter);
 
     property var mostRecentlyPlayedNote
     property var mostRecentNoteVelocity
@@ -405,6 +406,14 @@ Zynthian.BasePlayGrid {
             }
         }
 
+        readonly property var noteLengthNames: {
+            1: "1/4th",
+            2: "1/8th",
+            3: "1/16th",
+            4: "1/32th",
+            5: "1/64th",
+            6: "1/128th"
+        }
         /**
          * \brief Copy the range from startRow to endRow (inclusive) from model into the clipboard
          * @param model The model you wish to copy notes and metadata out of
@@ -1089,7 +1098,7 @@ Zynthian.BasePlayGrid {
                                     Qt.callLater(_private.updateUniqueCurrentRowNotes)
                                 }
                                 Timer {
-                                    id: sequenderPadNoteApplicator
+                                    id: sequencerPadNoteApplicator
                                     repeat: false; running: false; interval: 1
                                     onTriggered: {
                                         if (root.visible) {
@@ -1107,26 +1116,26 @@ Zynthian.BasePlayGrid {
                                 }
                                 Connections {
                                     target: _private
-                                    onSequenceChanged: sequenderPadNoteApplicator.restart();
-                                    onActivePatternChanged: sequenderPadNoteApplicator.restart();
-                                    onActiveBarChanged: sequenderPadNoteApplicator.restart();
-                                    onBankOffsetChanged: sequenderPadNoteApplicator.restart();
+                                    onSequenceChanged: sequencerPadNoteApplicator.restart();
+                                    onActivePatternChanged: sequencerPadNoteApplicator.restart();
+                                    onActiveBarChanged: sequencerPadNoteApplicator.restart();
+                                    onBankOffsetChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: _private.sequence
-                                    onModelReset: sequenderPadNoteApplicator.restart();
+                                    onModelReset: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: _private.activePatternModel
-                                    onLastModifiedChanged: sequenderPadNoteApplicator.restart();
+                                    onLastModifiedChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: ZynQuick.PlayGridManager
-                                    onCurrentMidiChannelChanged: sequenderPadNoteApplicator.restart();
+                                    onCurrentMidiChannelChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: zynthian.sketchpad
-                                    onSongChanged: sequenderPadNoteApplicator.restart();
+                                    onSongChanged: sequencerPadNoteApplicator.restart();
                                 }
                             }
                         }
@@ -1851,6 +1860,9 @@ Zynthian.BasePlayGrid {
                             noteSettingsPopup.close();
                         }
                     }
+                    onShowNoteSettingsPopup: {
+                        noteSettingsPopup.showSettings(patternModel, firstBar, lastBar, midiNoteFilter);
+                    }
                 }
                 onClosed: {
                     noteSettings.patternModel = null;
@@ -2077,46 +2089,47 @@ Zynthian.BasePlayGrid {
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                Zynthian.PlayGridButton {
-                    id:playPauseBtn
-                    text: _private.activePatternModel.recordLive
-                        ? "Stop"
-                        : _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
-                    visualPressAndHold: true
-                    onClicked: {
-                        if (_private.activePatternModel.recordLive) {
-                            // Otherwise we'll just turn it right back off again
-                            if (!pressingAndHolding) {
-                                _private.activePatternModel.recordLive = false;
-                            }
-                        }
-                        else {
-                            if (_private.sequence.isPlaying) {
-                                Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                            }
-                            // play
-                            else {
-                                Zynthian.CommonUtils.startMetronomeAndPlayback();
-                            }
-                        }
-                    }
-                    onPressAndHold: {
-                        _private.activePatternModel.recordLive = true;
-                        if (!ZynQuick.PlayGridManager.metronomeActive) {
-                            Zynthian.CommonUtils.startMetronomeAndPlayback();
-                        }
-                    }
-                    Kirigami.Icon {
-                        anchors {
-                            top: parent.top
-                            right: parent.right
-                        }
-                        width: parent.width * .3
-                        height: width
-                        source: "media-record-symbolic"
-                        opacity: _private.activePatternModel.recordLive ? 1 : 0.2
-                    }
-                }
+                // TODO We need to find a new home for the live recording functionality
+                // Perhaps it wants to live in the global record button when on Playground?
+                //Zynthian.PlayGridButton {
+                    //text: _private.activePatternModel.recordLive
+                        //? "Stop"
+                        //: _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
+                    //visualPressAndHold: true
+                    //onClicked: {
+                        //if (_private.activePatternModel.recordLive) {
+                            //// Otherwise we'll just turn it right back off again
+                            //if (!pressingAndHolding) {
+                                //_private.activePatternModel.recordLive = false;
+                            //}
+                        //}
+                        //else {
+                            //if (_private.sequence.isPlaying) {
+                                //Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                            //}
+                            //// play
+                            //else {
+                                //Zynthian.CommonUtils.startMetronomeAndPlayback();
+                            //}
+                        //}
+                    //}
+                    //onPressAndHold: {
+                        //_private.activePatternModel.recordLive = true;
+                        //if (!ZynQuick.PlayGridManager.metronomeActive) {
+                            //Zynthian.CommonUtils.startMetronomeAndPlayback();
+                        //}
+                    //}
+                    //Kirigami.Icon {
+                        //anchors {
+                            //top: parent.top
+                            //right: parent.right
+                        //}
+                        //width: parent.width * .3
+                        //height: width
+                        //source: "media-record-symbolic"
+                        //opacity: _private.activePatternModel.recordLive ? 1 : 0.2
+                    //}
+                //}
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
@@ -2162,6 +2175,15 @@ Zynthian.BasePlayGrid {
                         component.heardNotes = [];
                         component.heardVelocities = [];
                         component.listenForNotes = true;
+                    }
+                }
+                Zynthian.PlayGridButton {
+                    text: "%1\n%2".arg(noteLength).arg(velocity)
+                    enabled: component.mostRecentlyPlayedNote !== undefined
+                    property string noteLength: component.mostRecentlyPlayedNote === undefined ? "no" : _private.noteLengthNames[_private.noteLength]
+                    property string velocity: component.mostRecentlyPlayedNote === undefined ? "note" : component.mostRecentNoteVelocity
+                    onClicked: {
+                        component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote]);
                     }
                 }
 

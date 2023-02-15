@@ -183,6 +183,26 @@ MouseArea {
             bottom: parent.bottom
         }
         height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
+        QQC2.Label {
+            Layout.fillHeight: true
+            Layout.margins: statusIconsLayout.height / 4
+            color: Kirigami.Theme.textColor
+            font.pixelSize: height
+            text: "ALT"
+            visible: zynthian.altButtonPressed
+            Rectangle {
+                anchors {
+                    fill: parent
+                    margins: -2
+                }
+                color: "transparent"
+                border {
+                    width: 1
+                    color: Kirigami.Theme.textColor
+                }
+                radius: 3
+            }
+        }
         Kirigami.Icon {
             Layout.fillHeight: true
             Layout.preferredWidth: height

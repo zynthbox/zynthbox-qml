@@ -323,10 +323,12 @@ if zyntof_config:
 
 try:
 	zynswitch_bold_us = 1000 * int(os.environ.get('ZYNTHIAN_UI_SWITCH_BOLD_MS', 300))
-	zynswitch_long_us = 1000 * int(os.environ.get('ZYNTHIAN_UI_SWITCH_LONG_MS', 2000))
+	# zynswitch_long_us = 1000 * int(os.environ.get('ZYNTHIAN_UI_SWITCH_LONG_MS', 2000))
+	zynswitch_long_us = 1000 * int(os.environ.get('ZYNTHIAN_UI_SWITCH_LONG_MS', 2000000)) # 2 minutes' worth - this is a long time, but it's our default (people can change it, but we're using a held button as a held button, not auto-released)
 except:
 	zynswitch_bold_us = 300000
-	zynswitch_long_us = 2000000
+	# zynswitch_long_us = 2000000
+	zynswitch_long_us = 2000000000 # 2 minutes' worth - this is a long time, but it's our default (people can change it, but we're using a held button as a held button, not auto-released)
 
 #------------------------------------------------------------------------------
 # UI Geometric Parameters

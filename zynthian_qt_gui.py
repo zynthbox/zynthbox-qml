@@ -1716,7 +1716,7 @@ class zynthian_gui(QObject):
                 screen = self.active_screen
             else:
                 screen = self.__home_screen
-        elif screen is "layer" or screen is "main_layers_view" or screen is "fixed_layers":  #HACK replace completely layer with layers_for_channel
+        elif screen == "layer" or screen == "main_layers_view" or screen == "fixed_layers":  #HACK replace completely layer with layers_for_channel
             screen = "layers_for_channel"
 
         if (

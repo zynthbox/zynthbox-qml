@@ -129,14 +129,15 @@ QQC2.Popup {
             ColumnLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: false
-                Layout.minimumWidth: Kirigami.Units.gridUnit * 25
+                // Layout.minimumWidth: Kirigami.Units.gridUnit * 30
                 enabled: !zynthian.sketchpad.isRecording
+                spacing: Kirigami.Units.gridUnit/2
 
                 RowLayout {
                     Layout.fillWidth: false
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Recording Type")
                     }
@@ -144,7 +145,8 @@ QQC2.Popup {
                     QQC2.ComboBox {
                         id: recordingTypeCombo
 
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: recordingTypeComboModel
@@ -164,7 +166,7 @@ QQC2.Popup {
                     visible: recordingTypeCombo.currentIndex == 0
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Audio Source")
                     }
@@ -172,7 +174,8 @@ QQC2.Popup {
                     QQC2.ComboBox {
                         id: sourceCombo
 
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: sourceComboModel
@@ -193,8 +196,8 @@ QQC2.Popup {
 
                     QQC2.Switch {
                         Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 3
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                        implicitWidth: Kirigami.Units.gridUnit * 4
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                         checked: zynthian.sketchpad.recordSolo
                         onToggled: {
@@ -209,7 +212,7 @@ QQC2.Popup {
                              sourceCombo.currentIndex === 0 // and when source is internal
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                         Layout.alignment: Qt.AlignCenter
                         enabled: parent.enabled
                         text: qsTr("Source Channel")
@@ -218,7 +221,8 @@ QQC2.Popup {
                     QQC2.ComboBox {
                         id: channelCombo
 
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: channelComboModel
@@ -248,7 +252,7 @@ QQC2.Popup {
                              sourceCombo.currentIndex === 1 // and when source is external
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Channel")
                     }
@@ -256,7 +260,8 @@ QQC2.Popup {
                     QQC2.ComboBox {
                         id: recordingChannelCombo
 
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: recordingChannelComboModel
@@ -277,14 +282,15 @@ QQC2.Popup {
                     Layout.fillWidth: false
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                         Layout.alignment: Qt.AlignCenter
                         enabled: parent.enabled
                         text: qsTr("Target Channels")
                     }
 
                     QQC2.Button {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Select target channels")
                         onClicked: {
@@ -383,7 +389,7 @@ QQC2.Popup {
                 RowLayout {
                     Layout.fillWidth: false
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Count In (Bars)")
                     }
@@ -391,7 +397,8 @@ QQC2.Popup {
                     QQC2.ComboBox {
                         id: countInCombo
 
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: countInComboModel
@@ -409,12 +416,17 @@ QQC2.Popup {
                 RowLayout {
                     Layout.fillWidth: false
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Record Master Output")
                     }
 
-                    QQC2.CheckBox {
+                    QQC2.Switch {
+                        Layout.alignment: Qt.AlignVCenter
+                        implicitWidth: Kirigami.Units.gridUnit * 4
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                         checked: zynthian.sketchpad.recordMasterOutput
                         onToggled: {
                             zynthian.sketchpad.recordMasterOutput = checked
@@ -425,15 +437,16 @@ QQC2.Popup {
                 RowLayout {
                     Layout.fillWidth: false
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Metronome")
                     }
 
                     QQC2.Switch {
                         Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 3
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                        implicitWidth: Kirigami.Units.gridUnit * 4
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                         checked: zynthian.sketchpad.clickChannelEnabled
                         onToggled: {
@@ -463,6 +476,7 @@ QQC2.Popup {
                             bottom: parent.bottom
                             horizontalCenter: parent.horizontalCenter
                         }
+                        spacing: Kirigami.Units.gridUnit * 2
 
                         ColumnLayout {
                             Extras.Gauge {

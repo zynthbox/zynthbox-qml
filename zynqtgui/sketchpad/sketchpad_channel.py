@@ -166,7 +166,6 @@ class sketchpad_channel(QObject):
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
 
-    @Property(str, constant=True)
     def className(self):
         return "sketchpad_channel"
 
@@ -1281,3 +1280,5 @@ class sketchpad_channel(QObject):
             self.__sound_json_snapshot__ = json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
 
         logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
+
+    className = Property(str, className, constant=True)

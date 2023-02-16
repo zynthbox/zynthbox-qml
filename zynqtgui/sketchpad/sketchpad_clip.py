@@ -148,7 +148,6 @@ class sketchpad_clip(QObject):
 
             return f"{file_basename}-{counter}.clip.wav"
 
-    @Property(str, constant=True)
     def className(self):
         return "sketchpad_clip"
 
@@ -963,7 +962,6 @@ class sketchpad_clip(QObject):
 
     metadataMidiRecording = Property(str, get_metadata_midi_recording, set_metadata_midi_recording, notify=metadata_midi_recording_changed)
 
-    @Property(str, constant=True)
     def recordingDir(self):
         if self.wav_path.exists():
             return str(self.wav_path)
@@ -1143,3 +1141,6 @@ class sketchpad_clip(QObject):
         pass
     enabled = Property(bool, get_enabled, set_enabled, notify=enabled_changed)
     ### END Property enabled
+
+    className = Property(str, className, constant=True)
+    recordingDir = Property(str, recordingDir, constant=True)

@@ -3851,7 +3851,6 @@ class zynthian_gui(QObject):
     def get_main(self):
         return self.screens["main"]
 
-    @Property(QObject, constant=True)
     def about(self):
         return self.screens["about"]
 
@@ -3924,11 +3923,9 @@ class zynthian_gui(QObject):
     def get_channel(self):
         return self.screens["channel"]
 
-    @Property(QObject, constant=True)
     def audio_out(self):
         return self.screens["audio_out"]
 
-    @Property(QObject, constant=True)
     def audio_in(self):
         return self.screens["audio_in"]
 
@@ -3971,82 +3968,66 @@ class zynthian_gui(QObject):
     def get_guioptions(self):
         return self.screens["guioptions"]
 
-    @Property(QObject, constant=True)
     def test_touchpoints(self):
         return self.screens["test_touchpoints"]
 
-    @Property(QObject, constant=True)
     def playgrid(self):
         return self.screens["playgrid"]
 
-    @Property(QObject, constant=True)
     def miniplaygrid(self):
         return self.screens["miniplaygrid"]
 
-    @Property(QObject, constant=True)
     def sketchpad(self):
         return self.screens["sketchpad"]
 
-    @Property(QObject, constant=True)
     def audio_settings(self):
         return self.screens["audio_settings"]
 
-    @Property(QObject, constant=True)
     def wifi_settings(self):
         return self.screens["wifi_settings"]
 
-    @Property(QObject, constant=True)
     def test_knobs(self):
         return self.screens["test_knobs"]
 
-    @Property(QObject, constant=True)
     def synth_behaviour(self):
         return self.screens["synth_behaviour"]
 
-    @Property(QObject, constant=True)
     def snapshots_menu(self):
         return self.screens["snapshots_menu"]
 
-    @Property(QObject, constant=True)
     def network(self):
         return self.screens["network"]
 
-    @Property(QObject, constant=True)
     def hardware(self):
         return self.screens["hardware"]
 
-    @Property(QObject, constant=True)
     def master_alsa_mixer(self):
         return self.screens["master_alsa_mixer"]
 
-    @Property(QObject, constant=True)
     def session_dashboard(self):
         return self.screens["session_dashboard"]
 
-    @Property(QObject, constant=True)
     def song_arranger(self):
         return self.screens["song_arranger"]
 
-    @Property(QObject, constant=True)
     def song_player(self):
         return self.screens["song_player"]
 
-    @Property(QObject, constant=True)
     def sketchpad_copier(self):
         return self.screens["sketchpad_copier"]
 
-    @Property(QObject, constant=True)
     def sound_categories(self):
         return self.screens["sound_categories"]
 
-    @Property(QObject, constant=True)
     def led_config(self):
         return self.screens["led_config"]
 
-    @Property(QObject, constant=True)
     def bluetooth_config(self):
         return self.screens["bluetooth_config"]
 
+    def osd(self):
+        return self.__osd
+    
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):
         logging.debug("### Start long task")
@@ -4448,12 +4429,6 @@ class zynthian_gui(QObject):
     isScreensCachingComplete = Property(bool, get_isScreensCachingComplete, set_isScreensCachingComplete, notify=isScreensCachingCompleteChanged)
     ### END Property isScreensCachingComplete
 
-    ### Property osd
-    @Property(QObject, constant=True)
-    def osd(self):
-        return self.__osd
-    ### END Property osd
-
     ### Property knobTouchUpdateInProgress
     def get_knob_touch_update_in_progress(self):
         return self.__knob_touch_update_in_progress__
@@ -4519,6 +4494,30 @@ class zynthian_gui(QObject):
     displayRecordingPopup = Signal()
     openLeftSidebar = Signal()
     closeLeftSidebar = Signal()
+
+    about = Property(QObject, about, constant=True)
+    audio_out = Property(QObject, audio_out, constant=True)
+    audio_in = Property(QObject, audio_in, constant=True)
+    test_touchpoints = Property(QObject, test_touchpoints, constant=True)
+    playgrid = Property(QObject, playgrid, constant=True)
+    miniplaygrid = Property(QObject, miniplaygrid, constant=True)
+    sketchpad = Property(QObject, sketchpad, constant=True)
+    audio_settings = Property(QObject, audio_settings, constant=True)
+    wifi_settings = Property(QObject, wifi_settings, constant=True)
+    test_knobs = Property(QObject, test_knobs, constant=True)
+    synth_behaviour = Property(QObject, synth_behaviour, constant=True)
+    snapshots_menu = Property(QObject, snapshots_menu, constant=True)
+    network = Property(QObject, network, constant=True)
+    hardware = Property(QObject, hardware, constant=True)
+    master_alsa_mixer = Property(QObject, master_alsa_mixer, constant=True)
+    session_dashboard = Property(QObject, session_dashboard, constant=True)
+    song_arranger = Property(QObject, song_arranger, constant=True)
+    song_player = Property(QObject, song_player, constant=True)
+    sketchpad_copier = Property(QObject, sketchpad_copier, constant=True)
+    sound_categories = Property(QObject, sound_categories, constant=True)
+    led_config = Property(QObject, led_config, constant=True)
+    bluetooth_config = Property(QObject, bluetooth_config, constant=True)
+    osd = Property(QObject, osd, constant=True)
 
     current_screen_id = Property(
         str,

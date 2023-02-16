@@ -78,19 +78,19 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.ZynGui):
             self.__zselector[i].read_zyncoder()
         return [0, 1, 2, 3]
 
-    @Property(QObject, constant=True)
     def controller0(self):
         return self.__zselector[0]
 
-    @Property(QObject, constant=True)
     def controller1(self):
         return self.__zselector[1]
 
-    @Property(QObject, constant=True)
     def controller2(self):
         return self.__zselector[2]
 
-    @Property(QObject, constant=True)
     def controller3(self):
         return self.__zselector[3]
 
+    controller0 = Property(QObject, controller0, constant=True)
+    controller1 = Property(QObject, controller1, constant=True)
+    controller2 = Property(QObject, controller2, constant=True)
+    controller3 = Property(QObject, controller3, constant=True)

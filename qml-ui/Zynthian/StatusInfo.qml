@@ -328,7 +328,9 @@ MouseArea {
             Layout.topMargin: parent.height  -height
             QQC2.Label {
                 id: bpmLabel
-                text: zynthian.sketchpad.song.selectedScale +" "+ zynthian.sketchpad.song.bpm
+                // Hide scale info for now
+                // text: zynthian.sketchpad.song.selectedScale +" "+ zynthian.sketchpad.song.bpm
+                text: zynthian.sketchpad.song.bpm
                 font.pointSize: 9
             }
             Kirigami.Icon {
@@ -405,6 +407,7 @@ MouseArea {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
                     contentItem: ColumnLayout {
+                        visible: false // Hide scale for now
                         SketchpadMultiSwitch {
                             Layout.fillWidth: true
                             Layout.fillHeight: true

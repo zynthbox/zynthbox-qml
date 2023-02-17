@@ -860,9 +860,10 @@ Kirigami.AbstractApplicationWindow {
                     break
 
                 case "SWITCH_BACK_SHORT":
-                    slotSelectionDrawer.close()
-
-                    returnVal = true
+                    if (slotSelectionDrawer.opened) {
+                        slotSelectionDrawer.close()
+                        returnVal = true
+                    }
                     break
             }
 

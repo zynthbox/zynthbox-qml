@@ -41,6 +41,20 @@ QQC2.Popup {
     id: root
     property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
+    function cuiaCallback(cuia) {
+        var returnValue = false;
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                root.close();
+                returnValue = true;
+                break;
+        }
+
+        return returnValue;
+    }
+
     exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
     modal: true
     focus: true
@@ -48,7 +62,12 @@ QQC2.Popup {
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: !zynthian.sketchpad.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
-
+    width: parent.width * 0.95
+    height: parent.height * 0.95
+    leftPadding: 0
+    rightPadding: 0
+    topPadding: 0
+    bottomPadding: 0
     onOpenedChanged: {
         if (opened) {
             // Report dialog open to zynthian for passing cuia events to dialog
@@ -94,31 +113,15 @@ QQC2.Popup {
             }
         }
     }
-
     onOpened: {
         zynthian.recordingPopupActive = true
     }
     onClosed: {
         zynthian.recordingPopupActive = false
     }
-
-    function cuiaCallback(cuia) {
-        var returnValue = false;
-        switch (cuia) {
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
-                root.close();
-                returnValue = true;
-                break;
-        }
-
-        return returnValue;
-    }
-
-    ColumnLayout {
-        implicitWidth: root.parent.width * 0.6
-        implicitHeight: root.parent.height * 0.7
+    contentItem: ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: Kirigami.Units.largeSpacing
 
         Kirigami.Heading {
             Layout.fillWidth: true
@@ -136,8 +139,7 @@ QQC2.Popup {
 
             ColumnLayout {
                 Layout.fillHeight: true
-                Layout.fillWidth: false
-                // Layout.minimumWidth: Kirigami.Units.gridUnit * 30
+                Layout.fillWidth: true
                 enabled: !zynthian.sketchpad.isRecording
                 spacing: Kirigami.Units.gridUnit/2
 
@@ -145,7 +147,7 @@ QQC2.Popup {
                     Layout.fillWidth: false
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Recording Type")
                     }
@@ -174,7 +176,7 @@ QQC2.Popup {
                     visible: zynthian.sketchpad.recordingType === "audio"
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Audio Source")
                     }
@@ -220,7 +222,7 @@ QQC2.Popup {
                              zynthian.sketchpad.recordingSource === "internal" // and when source is internal
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
                         enabled: parent.enabled
                         text: qsTr("Source Channel")
@@ -260,7 +262,7 @@ QQC2.Popup {
                              zynthian.sketchpad.recordingSource === "external" // and when source is external
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Channel")
                     }
@@ -290,7 +292,7 @@ QQC2.Popup {
                     Layout.fillWidth: false
 
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
                         enabled: parent.enabled
                         text: qsTr("Target Channels")
@@ -397,7 +399,7 @@ QQC2.Popup {
                 RowLayout {
                     Layout.fillWidth: false
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Count In (Bars)")
                     }
@@ -424,7 +426,7 @@ QQC2.Popup {
                 RowLayout {
                     Layout.fillWidth: false
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Record Master Output")
@@ -445,7 +447,7 @@ QQC2.Popup {
                 RowLayout {
                     Layout.fillWidth: false
                     QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Metronome")
@@ -462,11 +464,12 @@ QQC2.Popup {
                         }
                     }
                 }
-            }
 
-            ColumnLayout {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
+                // Fill up remaining space so that the above items do not center themselves vertically in parent
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
             }
 
             ColumnLayout {

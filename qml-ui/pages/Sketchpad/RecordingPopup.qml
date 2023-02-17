@@ -163,7 +163,7 @@ QQC2.Popup {
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: recordingTypeCombo.currentIndex == 0
+                    visible: zynthian.sketchpad.recordingType === "audio"
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -208,8 +208,8 @@ QQC2.Popup {
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: recordingTypeCombo.currentIndex == 0 && // Visible when recordingType is audio
-                             sourceCombo.currentIndex === 0 // and when source is internal
+                    visible: zynthian.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
+                             zynthian.sketchpad.recordingSource === "internal" // and when source is internal
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -248,8 +248,8 @@ QQC2.Popup {
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: recordingTypeCombo.currentIndex == 0 && // Visible when recordingType is audio
-                             sourceCombo.currentIndex === 1 // and when source is external
+                    visible: zynthian.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
+                             zynthian.sketchpad.recordingSource === "external" // and when source is external
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -485,7 +485,7 @@ QQC2.Popup {
                                 minimumValue: -100
                                 maximumValue: 20
                                 value: visible
-                                       ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                       ? zynthian.sketchpad.recordingSource === "internal"
                                           ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                           : ZL.AudioLevels.captureA
                                        : -100
@@ -518,7 +518,7 @@ QQC2.Popup {
                                 minimumValue: -100
                                 maximumValue: 20
                                 value: visible
-                                        ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                        ? zynthian.sketchpad.recordingSource === "internal"
                                            ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                            : ZL.AudioLevels.captureB
                                         : -100

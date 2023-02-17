@@ -56,6 +56,14 @@ QQC2.Popup {
             // Assign clip to record on open so that correct clip is fetched
             zynthian.sketchpad.clipsToRecord = [root.selectedChannel.getClipToRecord()]
 
+            // Reset recordingType combo model to selected value when dialog opens
+            for (var i=0; i<recordingTypeComboModel.count; i++) {
+                if (recordingTypeComboModel.get(i).value === zynthian.sketchpad.recordingType) {
+                    recordingTypeCombo.currentIndex = i
+                    break
+                }
+            }
+
             // Reset source combo model to selected value when dialog opens
             for (var i=0; i<sourceComboModel.count; i++) {
                 if (sourceComboModel.get(i).value === zynthian.sketchpad.recordingSource) {
@@ -64,18 +72,18 @@ QQC2.Popup {
                 }
             }
 
-            // Reset channel combo model to selected value when dialog opens
-            for (var i=0; i<recordingChannelComboModel.count; i++) {
-                if (recordingChannelComboModel.get(i).value === zynthian.sketchpad.recordingChannel) {
-                    recordingChannelCombo.currentIndex = i
+            // Reset countIn combo model to selected value when dialog opens
+            for (var i=0; i<countInComboModel.count; i++) {
+                if (countInComboModel.get(i).value === zynthian.sketchpad.countInBars) {
+                    countInCombo.currentIndex = i
                     break
                 }
             }
 
-            // Reset recordingType combo model to selected value when dialog opens
-            for (var i=0; i<recordingTypeComboModel.count; i++) {
-                if (recordingTypeComboModel.get(i).value === zynthian.sketchpad.recordingType) {
-                    recordingTypeCombo.currentIndex = i
+            // Reset channel combo model to selected value when dialog opens
+            for (var i=0; i<recordingChannelComboModel.count; i++) {
+                if (recordingChannelComboModel.get(i).value === zynthian.sketchpad.recordingChannel) {
+                    recordingChannelCombo.currentIndex = i
                     break
                 }
             }

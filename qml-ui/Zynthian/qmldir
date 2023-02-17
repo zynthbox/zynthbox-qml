@@ -8,6 +8,7 @@ BluetoothConnections 1.0 BluetoothConnections.qml
 Breadcrumb 1.0 Breadcrumb.qml
 BreadcrumbButton 1.0 BreadcrumbButton.qml
 Card 1.0 Card.qml
+ComboBox 1.0 ComboBox.qml
 ControllerLoader 1.0 ControllerLoader.qml
 DialController 1.0 DialController.qml
 ModalLoadingOverlay 1.0 ModalLoadingOverlay.qml

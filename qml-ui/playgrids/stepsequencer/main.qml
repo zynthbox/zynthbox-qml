@@ -1522,7 +1522,7 @@ Zynthian.BasePlayGrid {
                                             Zynthian.PlayGridButton {
                                                 Layout.fillHeight: true
                                                 Layout.preferredHeight: patternsMenuItem.height / 2
-                                                text: patternsMenuItem.thisPattern ? qsTr("Part %1%2").arg(patternsMenuItem.associatedChannelIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
+                                                text: patternsMenuItem.thisPattern ? qsTr("Clip %1%2").arg(patternsMenuItem.associatedChannelIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
                                                 enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                                 onClicked: {
                                                     partPicker.pickPart(patternsMenuItem.associatedChannelIndex);

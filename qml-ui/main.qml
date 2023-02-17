@@ -1014,7 +1014,7 @@ Kirigami.AbstractApplicationWindow {
 
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("Parts")
+                            text: qsTr("Clips")
                         }
 
                         Sketchpad.PartBarDelegate {

@@ -50,7 +50,7 @@ ColumnLayout {
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.partButton.checked : false
         enabled: !root.songMode && !root.displaySceneButtons
-        text: qsTr("Parts")
+        text: qsTr("Clips")
         onClicked: {
             bottomStack.slotsBar.partButton.checked = true
         }

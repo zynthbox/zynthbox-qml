@@ -1239,7 +1239,7 @@ Zynthian.ScreenPage {
                                                         : root.lastSelectedObj.className === "sketchpad_track"
                                                             ? qsTr("Track")
                                                             : root.lastSelectedObj.className === "sketchpad_part"
-                                                              ? qsTr("Part")
+                                                              ? qsTr("Clip")
                                                               : root.lastSelectedObj.className === "sketchpad_segment"
                                                                 ? qsTr("Segment")
                                                                 : root.lastSelectedObj.className === "sketchpad_sketch"
@@ -1319,7 +1319,7 @@ Zynthian.ScreenPage {
                                                                : root.copySourceObj.className === "sketchpad_track"
                                                                    ? qsTr("Track")
                                                                    : root.copySourceObj.className === "sketchpad_part"
-                                                                     ? qsTr("Part")
+                                                                     ? qsTr("Clip")
                                                                      : root.copySourceObj.className === "sketchpad_segment"
                                                                        ? qsTr("Segment")
                                                                        : root.copySourceObj.className === "sketchpad_sketch"

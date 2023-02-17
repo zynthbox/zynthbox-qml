@@ -416,7 +416,7 @@ Rectangle {
                     },
                     Zynthian.TabbedControlViewAction {
                         id: partAction
-                        text: qsTr("Part")
+                        text: qsTr("Clip")
                         page: Qt.resolvedUrl("PartBar.qml")
                         preload: true
                         visible: root.controlType === BottomBar.ControlType.Part

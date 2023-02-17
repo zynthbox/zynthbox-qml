@@ -344,7 +344,7 @@ Rectangle {
                         Layout.fillHeight: true
                         checkable: true
                         enabled: !root.songMode && !root.displaySceneButtons
-                        text: qsTr("Parts")
+                        text: qsTr("Clips")
                         onCheckedChanged: {
                             if (checked) {
                                 bottomStack.currentIndex = 4

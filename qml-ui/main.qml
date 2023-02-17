@@ -505,7 +505,22 @@ Kirigami.AbstractApplicationWindow {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
             onClicked: {
-                applicationWindow().openRecordingPopup()
+                if (zynthian.current_screen_id === "playgrid") {
+                    zynthian.callable_ui_action("START_RECORD");
+                } else {
+                    // handle live-recording-is-going state here, otherwise you might turn it
+                    // on in the sequencer, then head out, and try and turn it off and it just
+                    // opens the recording popup, which isn't what you'd be after
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName)
+                    if (sequence.activePatternObject && sequence.activePatternObject.recordLive) {
+                        sequence.activePatternObject.recordLive = false;
+                        if (ZynQuick.PlayGridManager.metronomeActive) {
+                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                        }
+                    } else {
+                        applicationWindow().openRecordingPopup();
+                    }
+                }
             }
 
             Kirigami.Icon {
@@ -515,7 +530,7 @@ Kirigami.AbstractApplicationWindow {
                 source: "media-record-symbolic"
                 color: zynthian.sketchpad.isRecording ? "#fff44336" : "white"
             }
-        }        
+        }
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2

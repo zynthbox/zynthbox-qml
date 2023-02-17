@@ -99,6 +99,20 @@ Zynthian.BasePlayGrid {
 
         if (returnValue === false) {
             switch (cuia) {
+                case "START_RECORD":
+                    if (_private.activePatternModel.recordLive) {
+                        _private.activePatternModel.recordLive = false;
+                        if (ZynQuick.PlayGridManager.metronomeActive) {
+                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                        }
+                    } else {
+                        _private.activePatternModel.recordLive = true;
+                        if (!ZynQuick.PlayGridManager.metronomeActive) {
+                            Zynthian.CommonUtils.startMetronomeAndPlayback();
+                        }
+                    }
+                    returnValue = true;
+                    break;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
                 case "SWITCH_BACK_LONG":
@@ -2107,50 +2121,6 @@ Zynthian.BasePlayGrid {
                         }
                     }
                 }
-
-                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
-
-                // TODO We need to find a new home for the live recording functionality
-                // Perhaps it wants to live in the global record button when on Playground?
-                //Zynthian.PlayGridButton {
-                    //text: _private.activePatternModel.recordLive
-                        //? "Stop"
-                        //: _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
-                    //visualPressAndHold: true
-                    //onClicked: {
-                        //if (_private.activePatternModel.recordLive) {
-                            //// Otherwise we'll just turn it right back off again
-                            //if (!pressingAndHolding) {
-                                //_private.activePatternModel.recordLive = false;
-                            //}
-                        //}
-                        //else {
-                            //if (_private.sequence.isPlaying) {
-                                //Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                            //}
-                            //// play
-                            //else {
-                                //Zynthian.CommonUtils.startMetronomeAndPlayback();
-                            //}
-                        //}
-                    //}
-                    //onPressAndHold: {
-                        //_private.activePatternModel.recordLive = true;
-                        //if (!ZynQuick.PlayGridManager.metronomeActive) {
-                            //Zynthian.CommonUtils.startMetronomeAndPlayback();
-                        //}
-                    //}
-                    //Kirigami.Icon {
-                        //anchors {
-                            //top: parent.top
-                            //right: parent.right
-                        //}
-                        //width: parent.width * .3
-                        //height: width
-                        //source: "media-record-symbolic"
-                        //opacity: _private.activePatternModel.recordLive ? 1 : 0.2
-                    //}
-                //}
 
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 

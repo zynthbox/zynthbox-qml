@@ -142,7 +142,7 @@ QQC2.Popup {
                         text: qsTr("Recording Type")
                     }
 
-                    QQC2.ComboBox {
+                    Zynthian.ComboBox {
                         id: recordingTypeCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -171,7 +171,7 @@ QQC2.Popup {
                         text: qsTr("Audio Source")
                     }
 
-                    QQC2.ComboBox {
+                    Zynthian.ComboBox {
                         id: sourceCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -218,7 +218,7 @@ QQC2.Popup {
                         text: qsTr("Source Channel")
                     }
 
-                    QQC2.ComboBox {
+                    Zynthian.ComboBox {
                         id: channelCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -257,7 +257,7 @@ QQC2.Popup {
                         text: qsTr("Channel")
                     }
 
-                    QQC2.ComboBox {
+                    Zynthian.ComboBox {
                         id: recordingChannelCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
@@ -394,7 +394,7 @@ QQC2.Popup {
                         text: qsTr("Count In (Bars)")
                     }
 
-                    QQC2.ComboBox {
+                    Zynthian.ComboBox {
                         id: countInCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16

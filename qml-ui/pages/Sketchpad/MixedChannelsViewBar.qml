@@ -614,8 +614,31 @@ Rectangle {
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
-                                                if (waveformContainer.showWaveform) {
+
+                                                // Show waveform on click as well as longclick instead of opening picker dialog
+                                                /*if (waveformContainer.showWaveform) {
                                                     bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                }*/
+                                                if (waveformContainer.showWaveform) {
+                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                            bottomStack.bottomBar.controlObj = waveformContainer.clip;
+                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                            Qt.callLater(function() {
+                                                                bottomStack.bottomBar.waveEditorAction.trigger();
+                                                            })
+                                                        }
+                                                    } else {
+                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
+                                                            bottomStack.bottomBar.controlObj = root.selectedChannel;
+                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                            Qt.callLater(function() {
+                                                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                                            })
+                                                        }
+                                                    }
                                                 }
                                             }
                                             onPressAndHold: {

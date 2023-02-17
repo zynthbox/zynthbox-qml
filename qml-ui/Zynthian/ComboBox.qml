@@ -41,7 +41,9 @@ QQC2.Button {
     contentItem: QQC2.Label {
         horizontalAlignment: QQC2.Label.AlignLeft
         verticalAlignment: QQC2.Label.AlignVCenter
-        text: root.currentItem ? root.currentItem.label : ""
+        text: root.model.get(root.currentIndex) && root.model.get(root.currentIndex)[root.textRole]
+                ? root.model.get(root.currentIndex)[root.textRole]
+                : ""
         color: Kirigami.Theme.textColor
     }
     onCurrentIndexChanged: {

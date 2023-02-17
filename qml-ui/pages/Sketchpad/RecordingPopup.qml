@@ -40,7 +40,6 @@ import org.zynthian.quick 1.0 as ZynQuick
 QQC2.Popup {
     id: root
     property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
-
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
@@ -68,6 +67,33 @@ QQC2.Popup {
     rightPadding: 0
     topPadding: 0
     bottomPadding: 0
+    onSelectedChannelChanged: {
+        console.log("Recording popup selectedChannelChanged handler")
+
+        if (root.selectedChannel.channelAudioType === "external") {
+            zynthian.sketchpad.recordingSource = "external"
+            zynthian.sketchpad.recordingChannel = "*"
+        } else {
+            zynthian.sketchpad.recordingSource = "internal"
+        }
+
+        // Reset source combo model to selected value when channel changes
+        for (var i=0; i<sourceComboModel.count; i++) {
+            if (sourceComboModel.get(i).value === zynthian.sketchpad.recordingSource) {
+                sourceCombo.currentIndex = i
+                break
+            }
+        }
+
+        for (var i=0; i<recordingChannelComboModel.count; i++) {
+            if (recordingChannelComboModel.get(i).value === zynthian.sketchpad.recordingChannel) {
+                recordingChannelCombo.currentIndex = i
+                break
+            }
+        }
+
+        console.log(zynthian.sketchpad.recordingSource, zynthian.sketchpad.recordingChannel, sourceCombo.currentIndex, recordingChannelCombo.currentIndex)
+    }
     onOpenedChanged: {
         if (opened) {
             // Report dialog open to zynthian for passing cuia events to dialog
@@ -83,13 +109,13 @@ QQC2.Popup {
                 }
             }
 
-            // Reset source combo model to selected value when dialog opens
-            for (var i=0; i<sourceComboModel.count; i++) {
-                if (sourceComboModel.get(i).value === zynthian.sketchpad.recordingSource) {
-                    sourceCombo.currentIndex = i
-                    break
-                }
-            }
+//            // Reset source combo model to selected value when dialog opens
+//            for (var i=0; i<sourceComboModel.count; i++) {
+//                if (sourceComboModel.get(i).value === zynthian.sketchpad.recordingSource) {
+//                    sourceCombo.currentIndex = i
+//                    break
+//                }
+//            }
 
             // Reset countIn combo model to selected value when dialog opens
             for (var i=0; i<countInComboModel.count; i++) {
@@ -99,13 +125,13 @@ QQC2.Popup {
                 }
             }
 
-            // Reset channel combo model to selected value when dialog opens
-            for (var i=0; i<recordingChannelComboModel.count; i++) {
-                if (recordingChannelComboModel.get(i).value === zynthian.sketchpad.recordingChannel) {
-                    recordingChannelCombo.currentIndex = i
-                    break
-                }
-            }
+//            // Reset channel combo model to selected value when dialog opens
+//            for (var i=0; i<recordingChannelComboModel.count; i++) {
+//                if (recordingChannelComboModel.get(i).value === zynthian.sketchpad.recordingChannel) {
+//                    recordingChannelCombo.currentIndex = i
+//                    break
+//                }
+//            }
         } else {
             // Report dialog close to zynthian to stop receiving cuia events
             if (zynthian.openedDialog === root) {

@@ -465,6 +465,7 @@ MouseArea {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
                     contentItem: ColumnLayout {
+                        visible: false // Hide BT for now
                         Layout.alignment: Qt.AlignVCenter
                         QQC2.Label {
                             Layout.fillWidth: true

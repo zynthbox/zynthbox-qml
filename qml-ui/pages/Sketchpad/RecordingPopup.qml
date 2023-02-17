@@ -489,17 +489,15 @@ QQC2.Popup {
                         ColumnLayout {
                             Extras.Gauge {
                                 Layout.fillHeight: true
-
+                                Layout.leftMargin: -10 // Magic number to align valuebar corectly with bottom text. TODO : Find a proper way to vertically center valuebar in gauge
                                 minimumValue: -100
                                 maximumValue: 20
+                                font.pointSize: 8
                                 value: visible
                                        ? zynthian.sketchpad.recordingSource === "internal"
                                           ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                           : ZL.AudioLevels.captureA
                                        : -100
-
-                                font.pointSize: 8
-
                                 style: GaugeStyle {
                                     valueBar: Rectangle {
                                         color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
@@ -514,7 +512,7 @@ QQC2.Popup {
                             QQC2.Label {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
-                                horizontalAlignment: "AlignRight"
+                                horizontalAlignment: QQC2.Label.AlignHCenter
                                 text: qsTr("L")
                             }
                         }
@@ -522,17 +520,15 @@ QQC2.Popup {
                         ColumnLayout {
                             Extras.Gauge {
                                 Layout.fillHeight: true
-
+                                Layout.leftMargin: -10 // Magic number to align valuebar corectly with bottom text. TODO : Find a proper way to vertically center valuebar in gauge
                                 minimumValue: -100
                                 maximumValue: 20
+                                font.pointSize: 8
                                 value: visible
                                         ? zynthian.sketchpad.recordingSource === "internal"
                                            ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                            : ZL.AudioLevels.captureB
                                         : -100
-
-                                font.pointSize: 8
-
                                 style: GaugeStyle {
                                     valueBar: Rectangle {
                                         color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
@@ -547,7 +543,7 @@ QQC2.Popup {
                             QQC2.Label {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
-                                horizontalAlignment: "AlignRight"
+                                horizontalAlignment: QQC2.Label.AlignHCenter
                                 text: qsTr("R")
                             }
                         }

@@ -41,7 +41,7 @@ QQC2.Popup {
     id: root
     property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
-    function cuiaCallback(cuia) {
+    property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":

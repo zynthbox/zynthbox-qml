@@ -225,7 +225,6 @@ RowLayout {
         font.pointSize: 10
         visible: false
         Binding {
-            target: parent
             property: "text"
             delayed: true
             value: qsTr("%1 %2")

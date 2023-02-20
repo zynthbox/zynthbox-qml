@@ -187,7 +187,7 @@ MouseArea {
             Layout.fillHeight: true
             Layout.margins: statusIconsLayout.height / 4
             color: Kirigami.Theme.textColor
-            font.pixelSize: height
+            font.pixelSize: Math.floor(statusIconsLayout.height / 2)
             text: "ALT"
             visible: zynthian.altButtonPressed
             Rectangle {

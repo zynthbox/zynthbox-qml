@@ -2081,11 +2081,17 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    text: _private.sequence && _private.sequence.soloPatternObject
-                        ? "Pattern:\nCh" + "-" + (_private.sequence.soloPatternObject.channelIndex + 1) + "-P" + _private.sequence.soloPatternObject.partName + "\nSOLO"
-                        : _private.activePatternModel
-                            ? "Pattern:\nCh" + (_private.activePatternModel.channelIndex + 1) + "-P" + _private.activePatternModel.partName + "\n" + (_private.associatedChannel ? _private.associatedChannel.name : "(none)")
-                            : "";
+                    text: _private.sequence
+                        ? _private.sequence.soloPatternObject
+                            ? "SOLO\n"
+                                + "Ch" + (_private.sequence.soloPatternObject.channelIndex + 1) + "\n"
+                                + (_private.sequence.soloPatternObject.channelIndex + 1) + _private.sequence.soloPatternObject.partName
+                            : _private.activePatternModel
+                                ? "Pattern\n"
+                                    + "Ch" + _private.activePatternModel.channelIndex + 1 + "\n"
+                                    + (_private.activePatternModel.channelIndex + 1) + _private.activePatternModel.partName
+                                : "(no\npat\ntern)"
+                        : "(no\nsequ\nence)"
                     onClicked: {
                         component.showPatternsMenu();
                     }
@@ -2172,7 +2178,7 @@ Zynthian.BasePlayGrid {
                     text: "%1\n%2".arg(noteLength).arg(velocity)
                     enabled: component.mostRecentlyPlayedNote !== undefined
                     property string noteLength: component.mostRecentlyPlayedNote === undefined ? "no" : _private.noteLengthNames[_private.noteLength]
-                    property string velocity: component.mostRecentlyPlayedNote === undefined ? "note" : component.mostRecentNoteVelocity
+                    property string velocity: component.mostRecentlyPlayedNote === undefined ? "note" : "Vel " + component.mostRecentNoteVelocity
                     onClicked: {
                         component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote]);
                     }

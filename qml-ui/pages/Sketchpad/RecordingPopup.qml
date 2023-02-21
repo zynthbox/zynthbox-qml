@@ -43,6 +43,14 @@ QQC2.Popup {
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
+            case "NAVIGATE_LEFT":
+                returnValue = true
+                break
+
+            case "NAVIGATE_RIGHT":
+                returnValue = true
+                break
+
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
@@ -98,8 +106,6 @@ QQC2.Popup {
         if (opened) {
             // Report dialog open to zynthian for passing cuia events to dialog
             zynthian.openedDialog = root
-            // Assign clip to record on open so that correct clip is fetched
-            zynthian.sketchpad.clipsToRecord = [root.selectedChannel.getClipToRecord()]
 
             // Reset recordingType combo model to selected value when dialog opens
             for (var i=0; i<recordingTypeComboModel.count; i++) {
@@ -473,16 +479,7 @@ QQC2.Popup {
                     icon.name: zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
                     onClicked: {
-                        if (zynthian.sketchpad.clipsToRecord[0]) {
-                            if (!zynthian.sketchpad.isRecording) {
-                                // Start recording with first clip in clipsToRecord
-                                zynthian.sketchpad.clipsToRecord[0].queueRecording();
-                                Zynthian.CommonUtils.startMetronomeAndPlayback();
-                            } else {
-                                Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                                // bottomBar.tabbedView.initialAction.trigger()
-                            }
-                        }
+                        zynthian.callable_ui_action("START_RECORD")
                     }
                 }
             }

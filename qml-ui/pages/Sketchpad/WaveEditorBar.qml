@@ -253,7 +253,7 @@ GridLayout {
                 }
                 font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                 opacity: 1
-                text: qsTr("E", "End")
+                text: qsTr("%1:%2 E", "End").arg(Math.floor(waveBar.controlObj.length / 4)).arg(waveBar.controlObj.length % 4)
                 z: 100
 
                 onXChanged: {

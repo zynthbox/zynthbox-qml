@@ -141,7 +141,7 @@ QQC2.Popup {
 
         Kirigami.Heading {
             Layout.fillWidth: true
-            text: qsTr("Record clip for Channel %1").arg(selectedChannel.name)
+            text: qsTr("Record Channel %1 - Clip %2").arg(selectedChannel.name).arg(selectedChannel.selectedSlotRow + 1)
         }
         Rectangle {
             Layout.fillWidth: true

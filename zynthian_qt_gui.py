@@ -797,7 +797,7 @@ class zynthian_gui(QObject):
         volume = int(volume)
         if self.master_alsa_mixer is not None and \
                 self.master_alsa_mixer.volume != volume:
-            self.master_alsa_mixer.volume = volume
+            self.master_alsa_mixer.set_volume(volume, takeControlOfSelector)
 
             if not self.globalPopupOpened:
                 self.osd.updateOsd(
@@ -822,7 +822,7 @@ class zynthian_gui(QObject):
         if self.global_fx_engines[0] is not None:
             controller = self.global_fx_engines[0][1]
             if controller is not None:
-                value = controller.value
+                value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
         return value
 
     def set_global_fx1_amount(self, value):
@@ -869,7 +869,7 @@ class zynthian_gui(QObject):
         if self.global_fx_engines[1] is not None:
             controller = self.global_fx_engines[1][1]
             if controller is not None:
-                value = controller.value
+                value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
         return value
 
     def set_global_fx2_amount(self, value):

@@ -849,7 +849,7 @@ Zynthian.ScreenPage {
                                     subText: null
                                     subSubText: {
                                         if (channelHeaderDelegate.channel.channelAudioType === "sample-loop") {
-                                            return qsTr("Loop")
+                                            return qsTr("Audio")
                                         } else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig") {
                                             return qsTr("Smp: Trig")
                                         } else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice") {

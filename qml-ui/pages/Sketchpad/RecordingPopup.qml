@@ -377,7 +377,7 @@ QQC2.Popup {
                                             text: qsTr("Channel %1 (%2)")
                                                     .arg(targetChannelsDelegate.channel.name)
                                                     .arg(targetChannelsDelegate.channel.channelAudioType === "sample-loop"
-                                                            ? "Loop"
+                                                            ? "Audio"
                                                             : targetChannelsDelegate.channel.channelAudioType === "sample-trig"
                                                                 ? "Smp: Trig"
                                                                 : targetChannelsDelegate.channel.channelAudioType === "sample-slice"

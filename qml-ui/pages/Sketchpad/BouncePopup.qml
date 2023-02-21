@@ -71,7 +71,7 @@ QQC2.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Bounce To Loop"
+            text: "Bounce To Audio"
  
             QtObject {
                 id: _private

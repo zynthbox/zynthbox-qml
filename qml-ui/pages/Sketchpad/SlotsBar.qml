@@ -208,7 +208,7 @@ Rectangle {
                 samplePickerPopup.open()
             }
         } else if (type === "sample-loop") {
-            console.log("handleItemClick : Loop")
+            console.log("handleItemClick : Audio")
 
             var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 

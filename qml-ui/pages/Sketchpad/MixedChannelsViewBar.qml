@@ -219,7 +219,7 @@ Rectangle {
 
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: "Loop"
+                                            text: "Audio"
                                             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
                                             onClicked: {
                                                 root.selectedChannel.channelAudioType = "sample-loop"
@@ -321,7 +321,7 @@ Rectangle {
                                                  root.selectedChannel.channelAudioType === "synth"
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: "Bounce To Loop"
+                                            text: "Bounce To Audio"
                                             onClicked: {
                                                 bouncePopup.bounce(zynthian.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
                                             }

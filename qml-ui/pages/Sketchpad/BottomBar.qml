@@ -368,7 +368,7 @@ Rectangle {
 //                        // For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth"
 //                        model: ListModel {
 //                            ListElement { text: "Synth"; value: "synth" }
-//                            ListElement { text: "Loop"; value: "sample-loop" }
+//                            ListElement { text: "Audio"; value: "sample-loop" }
 //                            ListElement { text: "Smp: Trig"; value: "sample-trig" }
 //                            ListElement { text: "Smp: Slice"; value: "sample-slice" }
 //                            ListElement { text: "External"; value: "external" }

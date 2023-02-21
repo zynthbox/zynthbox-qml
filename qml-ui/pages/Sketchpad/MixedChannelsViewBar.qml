@@ -227,18 +227,18 @@ Rectangle {
                                         }
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: "Slice"
-                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-slice"
-                                            onClicked: {
-                                                root.selectedChannel.channelAudioType = "sample-slice"
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
                                             text: "Trig"
                                             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
                                             onClicked: {
                                                 root.selectedChannel.channelAudioType = "sample-trig"
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Slice"
+                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-slice"
+                                            onClicked: {
+                                                root.selectedChannel.channelAudioType = "sample-slice"
                                             }
                                         }
                                     }

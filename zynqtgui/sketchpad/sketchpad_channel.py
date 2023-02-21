@@ -932,6 +932,10 @@ class sketchpad_channel(QObject):
             if type == "sample-slice":
                 self.selectedSlotRow = 0
 
+            # Set keyZoneMode to "split-narrow" when type is changed to trig
+            if type == "sample-trig":
+                self.keyZoneMode = "split-narrow"
+
             for track in range(0, 10):
                 for part in range(0, 5):
                     self.onClipEnabledChanged(track, part)

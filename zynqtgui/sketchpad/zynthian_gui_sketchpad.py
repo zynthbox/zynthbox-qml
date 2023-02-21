@@ -115,7 +115,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.__long_operation__ = False
         self.__record_master_output__ = False
         self.__record_solo = False
-        self.__count_in_bars__ = 0
+        self.__count_in_bars__ = 1
         self.__global_fx_knob_value__ = 50
         self.clips_to_record = []
         self.__display_scene_buttons = False

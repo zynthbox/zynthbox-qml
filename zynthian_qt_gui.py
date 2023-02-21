@@ -2385,7 +2385,13 @@ class zynthian_gui(QObject):
                     logging.info("CUIA Start Recording")
                     channel = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
                     clip = channel.getClipToRecord()
-                    zl.clipsToRecord = [clip]
+
+                    # If sample[0] is empty, set sample[0] to recorded file along with selectedChannel's clip
+                    if channel.samples[channel.selectedSlotRow].path is not None and len(channel.samples[channel.selectedSlotRow].path) > 0:
+                        zl.clipsToRecord = [clip]
+                    else:
+                        zl.clipsToRecord = [clip, channel.samples[channel.selectedSlotRow]]
+
                     logging.info(f"Recording Clip : {clip}")
                     clip.queueRecording()
                     self.run_start_metronome_and_playback.emit()

@@ -148,7 +148,7 @@ ColumnLayout {
                         }
                         property bool performCurrentCheck: false;
                         function checkCurrent() {
-                            if (zynthian.session_dashboard.selectedChannel === delegate.channelIndex && delegate.channel.selectedSlotRow === index) {
+                            if (zynthian.session_dashboard.selectedChannel === delegate.channelIndex && delegate.channel != null && delegate.channel.selectedSlotRow === index) {
                                 setCurrent();
                             }
                         }

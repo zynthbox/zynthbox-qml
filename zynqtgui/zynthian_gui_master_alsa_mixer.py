@@ -40,6 +40,7 @@ from zynqtgui import zynthian_gui_config
 class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
+        self.__volume = 0
         self.audio_device = ""
         self.zyngui = zynthian_gui_config.zyngui
 
@@ -82,34 +83,25 @@ class zynthian_gui_master_alsa_mixer(QObject):
         pass
 
     def get_volume(self):
-        # FIXME : pyalsaaudio wrongly interpolates percentage value to dB value and causes audio to be not hearable
-        #         at 40%. Hence interpolate value from alsamixer(from 40 to 100) to 0 to 100 so that 40%
-        #         in alsamixer will mean 0% in UI
-        if self.__mixer is None:
-            return 0
-        vol = self.__mixer.getvolume()
-        if len(vol) == 0:
-            return 0
-        return int(np.interp(vol[0], (40, 100), (0, 100)))
+        return self.__volume
 
-    def set_volume(self, vol: int):
+    def set_volume(self, vol: int, takeControlOfSelector = True):
         logging.debug("SETTING VOLUME TO{}".format(vol))
-        if self.__mixer is None:
-            return
+        self.__volume = max(0, min(vol, 100))
+        if self.__mixer is not None:
+            if self.__volume == 0:
+                # If input volume is 0, force set alsa mixer value to 0 instead of interpolating
+                self.__mixer.setvolume(0)
+            else:
+                # FIXME : pyalsaaudio wrongly interpolates percentage value to dB value and causes audio to be not hearable
+                #         at 40%. Hence interpolate percentage value from UI(from 0 to 100) to 40 to 100 so that 0% in UI
+                #         will mean 40% for alsamixer
+                self.__mixer.setvolume(int(np.interp(self.__volume, (0, 100), (40, 100))))
 
-        if vol == 0:
-            # If input volume is 0, force set alsa mixer value to 0 instead of interpolating
-            self.__mixer.setvolume(0)
-        else:
-            # FIXME : pyalsaaudio wrongly interpolates percentage value to dB value and causes audio to be not hearable
-            #         at 40%. Hence interpolate percentage value from UI(from 0 to 100) to 40 to 100 so that 0% in UI
-            #         will mean 40% for alsamixer
-            self.__mixer.setvolume(int(np.interp(vol, (0, 100), (40, 100))))
-
-
-        # Call zyngui global set_selector when volume changes as
-        # volume is controlled by Small Knob 1 when global popup is opened
-        self.zyngui.set_selector()
+        if takeControlOfSelector == True:
+            # Call zyngui global set_selector when volume changes as
+            # volume is controlled by Small Knob 1 when global popup is opened
+            self.zyngui.set_selector()
 
         self.volume_changed.emit()
 

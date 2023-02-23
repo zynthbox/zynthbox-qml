@@ -137,10 +137,18 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "SELECT_UP":
-                    _private.nextBar();
+                    if (zynthian.altButtonPressed) {
+                        _private.octaveUp();
+                    } else {
+                        _private.nextBar();
+                    }
                     break;
                 case "SELECT_DOWN":
-                    _private.previousBar();
+                    if (zynthian.altButtonPressed) {
+                        _private.octaveDown();
+                    } else {
+                        _private.previousBar();
+                    }
                     break;
                 //case "SELECT_LEFT":
                     //returnValue = true;
@@ -421,6 +429,23 @@ Zynthian.BasePlayGrid {
         function nextBar() {
             if (sequence.activePatternObject.activeBar < sequence.activePatternObject.availableBars - 1) {
                 _private.sequence.activePatternObject.activeBar = _private.sequence.activePatternObject.activeBar + 1;
+            }
+        }
+
+        function octaveUp() {
+            // Don't scroll past the end
+            if (_private.activePatternModel.gridModelStartNote < 112) {
+                // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
+                _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote + 4;
+                _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+            }
+        }
+        function octaveDown() {
+            // Don't scroll past the end
+            if (_private.activePatternModel.gridModelStartNote > 0) {
+                // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
+                _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote - 4;
+                _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
             }
         }
 
@@ -2114,7 +2139,7 @@ Zynthian.BasePlayGrid {
                                 + (_private.sequence.soloPatternObject.channelIndex + 1) + _private.sequence.soloPatternObject.partName
                             : _private.activePatternModel
                                 ? "Pattern\n"
-                                    + "Ch" + _private.activePatternModel.channelIndex + 1 + "\n"
+                                    + "Ch" + (_private.activePatternModel.channelIndex + 1) + "\n"
                                     + (_private.activePatternModel.channelIndex + 1) + _private.activePatternModel.partName
                                 : "(no\npat\ntern)"
                         : "(no\nsequ\nence)"
@@ -2128,12 +2153,7 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     icon.name: "arrow-up"
                     onClicked: {
-                        // Don't scroll past the end
-                        if (_private.activePatternModel.gridModelStartNote < 112) {
-                            // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
-                            _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote + 4;
-                            _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
-                        }
+                        _private.octaveUp();
                     }
                 }
 
@@ -2145,12 +2165,7 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     icon.name: "arrow-down"
                     onClicked: {
-                        // Don't scroll past the end
-                        if (_private.activePatternModel.gridModelStartNote > 0) {
-                            // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
-                            _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote - 4;
-                            _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
-                        }
+                        _private.octaveDown();
                     }
                 }
 

@@ -121,7 +121,9 @@ Zynthian.BasePlayGrid {
                         // Remember to set this, or things will look a bit weird
                         ignoreNextBack = false;
                     } else {
-                        if (component.patternsMenuVisible) {
+                        if (_private.openDialogues > 0) {
+                            _private.closeDialogue();
+                        } else if (component.patternsMenuVisible) {
                             component.hidePatternsMenu();
                         } else if (_private.hasSelection) {
                             _private.deselectSelectedItem();
@@ -408,7 +410,9 @@ Zynthian.BasePlayGrid {
         signal goRight();
         signal deselectSelectedItem()
         signal activateSelectedItem()
+        signal closeDialogue()
         property bool hasSelection: false
+        property int openDialogues: 0
         function previousBar() {
             if (sequence.activePatternObject.activeBar > 0) {
                 sequence.activePatternObject.activeBar = sequence.activePatternObject.activeBar - 1;
@@ -635,6 +639,7 @@ Zynthian.BasePlayGrid {
                         target: _private
                         onGoLeft: drumPadRepeater.goPrevious();
                         onGoRight: drumPadRepeater.goNext();
+                        onCloseDialogue: drumPadRepeater.closeDialogue();
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
                         onKnob1Up: drumPadRepeater.velocityUp();
@@ -930,6 +935,13 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
                                     Qt.callLater(updateMostRecentFromSelection);
+                                }
+                            }
+                            function closeDialogue() {
+                                if (channelsViewDrawer.opened) {
+                                    channelsViewDrawer.close();
+                                } else if (partPicker.opened) {
+                                    partPicker.close();
                                 }
                             }
                             function deselectSelectedItem() {
@@ -1920,6 +1932,13 @@ Zynthian.BasePlayGrid {
                 width: parent.width
                 height: Kirigami.Units.gridUnit * 15
 
+                onOpenedChanged: {
+                    if (opened) {
+                        _private.openDialogues = _private.openDialogues + 1;
+                    } else {
+                        _private.openDialogues = _private.openDialogues - 1;
+                    }
+                }
                 Connections {
                     target: component
                     onIsVisibleChanged: {
@@ -1946,6 +1965,13 @@ Zynthian.BasePlayGrid {
                         if (partPicker.opened && component.isVisible === false) {
                             partPicker.close();
                         }
+                    }
+                }
+                onOpenedChanged: {
+                    if (opened) {
+                        _private.openDialogues = _private.openDialogues + 1;
+                    } else {
+                        _private.openDialogues = _private.openDialogues - 1;
                     }
                 }
                 onClosed: {

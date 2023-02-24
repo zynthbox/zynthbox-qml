@@ -521,6 +521,7 @@ class zynthian_gui(QObject):
         self.left_sidebar_active = False
 
         self.opened_dialog = None
+        self.dialogStack = []
         self.left_sidebar = None
 
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
@@ -4261,6 +4262,28 @@ class zynthian_gui(QObject):
     openedDialogChanged = Signal()
 
     openedDialog = Property(QObject, get_openedDialog, set_openedDialog, notify=openedDialogChanged)
+
+    @Slot(QObject)
+    def pushDialog(self, dialog):
+        self.dialogStack.append(dialog)
+        self.set_openedDialog(dialog)
+        pass
+
+    @Slot(QObject)
+    def popDialog(self, dialog):
+        if dialog in self.dialogStack:
+            updateOpened = False
+            if self.dialogStack[-1] is dialog:
+                updateOpened = True
+            else:
+                logging.warning("The dialog we just tried to pop from the list is not at the top of the stack. We still removed it, but there is likely something wrong if this happens.")
+            self.dialogStack.remove(dialog)
+            if len(self.dialogStack) > 0:
+                self.set_openedDialog(self.dialogStack[-1])
+            else:
+                self.set_openedDialog(None)
+        else:
+            logging.warning("The dialog we attempted to pop from the list is not in the list of opened dialogs. Something's out of wack.")
 
     ### End Property openedDialog
 

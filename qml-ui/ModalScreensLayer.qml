@@ -76,13 +76,13 @@ Zynthian.Stack {
             interval: 0
             running: true
             onTriggered: {
-                console.log("Caching song_player")
-                zynthian.currentTaskMessage = "Loading song player page"
-                if (!root.pageCache["song_player"]) {
-                    let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_player");
+                console.log("Caching song_manager")
+                zynthian.currentTaskMessage = "Loading song manager page"
+                if (!root.pageCache["song_manager"]) {
+                    let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_manager");
                     var component = Qt.createComponent(file);
-                    root.pageCache["song_player"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["song_player"].visible = false;
+                    root.pageCache["song_manager"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["song_manager"].visible = false;
                 }
                 root.songPlayerPageLoaded = true;
             }

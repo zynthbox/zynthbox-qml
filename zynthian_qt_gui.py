@@ -71,6 +71,7 @@ from zynqtgui.sketchpad_copier import zynthian_gui_sketchpad_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.zynthian_gui_bluetooth_config import zynthian_gui_bluetooth_config
 from zynqtgui.zynthian_gui_song_player import zynthian_gui_song_player
+from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
 from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
@@ -1642,6 +1643,7 @@ class zynthian_gui(QObject):
 
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
         self.screens["song_player"] = zynthian_gui_song_player(self)
+        self.screens["song_manager"] = zynthian_gui_song_manager(self)
         self.screens["sketchpad_copier"] = zynthian_gui_sketchpad_copier(self)
 
         self.screens["led_config"] = zynthian_gui_led_config(self)
@@ -2300,6 +2302,9 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCREEN_SONG_PLAYER":
             self.show_modal("song_player")
+
+        elif cuia == "SCREEN_SONG_MANAGER":
+            self.show_modal("song_manager")
 
         elif cuia == "SCREEN_PLAYGRID":
             self.show_modal("playgrid")
@@ -4020,6 +4025,9 @@ class zynthian_gui(QObject):
     def song_player(self):
         return self.screens["song_player"]
 
+    def song_manager(self):
+        return self.screens["song_manager"]
+
     def sketchpad_copier(self):
         return self.screens["sketchpad_copier"]
 
@@ -4520,6 +4528,7 @@ class zynthian_gui(QObject):
     session_dashboard = Property(QObject, session_dashboard, constant=True)
     song_arranger = Property(QObject, song_arranger, constant=True)
     song_player = Property(QObject, song_player, constant=True)
+    song_manager = Property(QObject, song_manager, constant=True)
     sketchpad_copier = Property(QObject, sketchpad_copier, constant=True)
     sound_categories = Property(QObject, sound_categories, constant=True)
     led_config = Property(QObject, led_config, constant=True)

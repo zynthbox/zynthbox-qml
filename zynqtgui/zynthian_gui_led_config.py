@@ -342,7 +342,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 3
-            if self.zyngui.modal_screen == "song_arranger":
+            if self.zyngui.modal_screen == "song_manager":
                 self.button_color_map[10] = {
                     'color': self.led_color_active,
                     'blink': False

@@ -106,6 +106,7 @@ QtObject {
         "channel": "ChannelPage.qml",
         "song_arranger": "SongArranger/main.qml",
         "song_player": "SongPlayerPage.qml",
+        "song_manager": "SongManagerPage.qml",
         "sketchpad_copier": "SketchpadCopier/main.qml",
         "sample_downloader": "SampleDownloaderPage.qml",
         "sound_downloader": "SoundDownloaderPage.qml",

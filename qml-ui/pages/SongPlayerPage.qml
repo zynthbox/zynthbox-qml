@@ -38,7 +38,7 @@ Zynthian.ScreenPage {
     screenId: "song_player"
     title: qsTr("Song Player")
 
-    function cuiaCallback(cuia) {
+    property var cuiaCallback: function(cuia) {
         var returnValue = false;
         if (multichannelRecorderPopup.opened) {
             returnValue = multichannelRecorderPopup.cuiaCallback(cuia);

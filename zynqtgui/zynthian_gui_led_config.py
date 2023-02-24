@@ -342,7 +342,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 3
-            if self.zyngui.modal_screen is None and self.zyngui.active_screen in ["layers_for_channel", "bank", "preset"]:
+            if self.zyngui.modal_screen == "song_arranger":
                 self.button_color_map[10] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -354,7 +354,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 4
-            if self.zyngui.modal_screen == "song_arranger":
+            if self.zyngui.modal_screen is None and self.zyngui.active_screen in ["layers_for_channel", "bank", "preset"]:
                 self.button_color_map[11] = {
                     'color': self.led_color_active,
                     'blink': False

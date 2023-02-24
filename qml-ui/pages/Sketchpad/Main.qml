@@ -618,9 +618,9 @@ Zynthian.ScreenPage {
                         id: songCell
                         Layout.fillWidth: true
                         Layout.fillHeight: false
-                        Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
-                        Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
-                        Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
+                        Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                        Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
+                        Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
 
                         highlightOnFocus: false
                         highlighted: !root.songMode && root.displayTrackButtons
@@ -633,7 +633,8 @@ Zynthian.ScreenPage {
                         }
                     }
 
-                    TableHeader {
+                    // Disable song mode button. This will be done in a new page
+                    /*TableHeader {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
@@ -659,7 +660,7 @@ Zynthian.ScreenPage {
                                 zynthian.sketchpad.displaySceneButtons = false
                             }
                         }
-                    }
+                    }*/
 
                     TableHeader {
                         Layout.fillWidth: true

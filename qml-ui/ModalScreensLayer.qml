@@ -36,11 +36,11 @@ Zynthian.Stack {
     id: root
 
     property var pageCache: ({})
-    property bool songPlayerPageLoaded: false
     property bool playgridPageLoaded: false
     property bool midiKeyRangePageLoaded: false
     property bool soundCategoriesPageLoaded: false
     property bool enginePageLoaded: false
+    property bool songManagerPageLoaded: false
 
     visible: depth > 0 || busy
     onVisibleChanged: {
@@ -60,11 +60,11 @@ Zynthian.Stack {
             repeat: true
             running: true
             onTriggered: {
-                if (root.songPlayerPageLoaded
-                        && root.playgridPageLoaded
+                if (root.playgridPageLoaded
                         && root.midiKeyRangePageLoaded
                         && root.soundCategoriesPageLoaded
-                        && root.enginePageLoaded) {
+                        && root.enginePageLoaded
+                        && root.songManagerPageLoaded) {
                     zynthian.isModalScreensCachingComplete = true
 
                     repeat = false
@@ -76,15 +76,15 @@ Zynthian.Stack {
             interval: 0
             running: true
             onTriggered: {
-                console.log("Caching song_manager")
-                zynthian.currentTaskMessage = "Loading song manager page"
-                if (!root.pageCache["song_manager"]) {
-                    let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_manager");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["song_manager"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["song_manager"].visible = false;
-                }
-                root.songPlayerPageLoaded = true;
+                // console.log("Caching song_player")
+                // zynthian.currentTaskMessage = "Loading song player page"
+                // if (!root.pageCache["song_player"]) {
+                //     let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_player");
+                //     var component = Qt.createComponent(file);
+                //     root.pageCache["song_player"] = component.createObject(root, {"width": root.width, "height": root.height});
+                //     root.pageCache["song_player"].visible = false;
+                // }
+                // root.songPlayerPageLoaded = true;
             }
         },
         Timer {
@@ -152,15 +152,15 @@ Zynthian.Stack {
             interval: 0
             running: true
             onTriggered: {
-//                    console.log("Caching song_arranger")
-//                    zynthian.currentTaskMessage = "Loading song arranger page"
-//                    if (!root.pageCache["song_arranger"]) {
-//                        let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
-//                        var component = Qt.createComponent(file);
-//                        root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
-//                        root.pageCache["song_arranger"].visible = false;
-//                    }
-
+                   console.log("Caching song_manager")
+                   zynthian.currentTaskMessage = "Loading song manager page"
+                   if (!root.pageCache["song_manager"]) {
+                       let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_manager");
+                       var component = Qt.createComponent(file);
+                       root.pageCache["song_manager"] = component.createObject(root, {"width": root.width, "height": root.height});
+                       root.pageCache["song_manager"].visible = false;
+                   }
+                   root.songManagerPageLoaded = true
             }
         },
         Timer {

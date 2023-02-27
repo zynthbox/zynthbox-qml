@@ -366,7 +366,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 5
-            if self.zyngui.modal_screen == "admin":
+            if (self.zyngui.modal_screen is None and self.zyngui.active_screen == "control") or (self.zyngui.modal_screen and self.zyngui.modal_screen in ["channel_wave_editor", "channel_external_setup"]):
                 self.button_color_map[12] = {
                     'color': self.led_color_active,
                     'blink': False

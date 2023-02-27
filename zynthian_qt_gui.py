@@ -120,6 +120,8 @@ from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
 from zynqtgui.zynthian_gui_control import zynthian_gui_control
 from zynqtgui.zynthian_gui_channel import zynthian_gui_channel
+from zynqtgui.zynthian_gui_channel_external_setup import zynthian_gui_channel_external_setup
+from zynqtgui.zynthian_gui_channel_wave_editor import zynthian_gui_channel_wave_editor
 
 # from zynqtgui.zynthian_gui_control_xy import zynthian_gui_control_xy
 # from zynqtgui.zynthian_gui_midi_profile import zynthian_gui_midi_profile
@@ -1574,6 +1576,8 @@ class zynthian_gui(QObject):
         self.screens["control_downloader"] = zynthian_gui_newstuff(self)
         self.screens["fx_control_downloader"] = self.screens["control_downloader"]
         self.screens["channel"] = zynthian_gui_channel(self)
+        self.screens["channel_external_setup"] = zynthian_gui_channel_external_setup(self)
+        self.screens["channel_wave_editor"] = zynthian_gui_channel_wave_editor(self)
         # self.screens['control_xy'] = zynthian_gui_control_xy(self)
         # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)
         # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)
@@ -2273,11 +2277,21 @@ class zynthian_gui(QObject):
             else:
                 self.show_screen("main")
 
-        elif cuia == "SCREEN_ADMIN":
+        elif cuia == "SCREEN_EDIT_CONTEXTUAL":
+            if self.sketchpad.song is not None:
+                channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+                if channel.channelAudioType == "synth": # The channel is set to send stuff to the zynthian engines
+                    self.show_screen("control")
+                elif channel.channelAudioType == "external": # The channel is set to spit midi events out through the midi_out port
+                    self.show_modal("channel_external_setup")
+                else: # The rest are different kinds of samples for SamplerSynth playback, so we'll show the wave editor for those
+                    self.show_modal("channel_wave_editor")
+
+        # elif cuia == "SCREEN_ADMIN":
             # Do not handle 5th under screen button globally.
             # This button has specific behaviour for ZL page. Not sure about other pages
             # self.show_modal("admin")
-            pass
+            # pass
 
         elif cuia == "SCREEN_LAYER":
             # self.show_screen("layers_for_channel")
@@ -3936,6 +3950,12 @@ class zynthian_gui(QObject):
     def get_channel(self):
         return self.screens["channel"]
 
+    def get_channel_external_setup(self):
+        return self.screens["channel_external_setup"]
+
+    def get_channel_wave_editor(self):
+        return self.screens["channel_wave_editor"]
+
     def audio_out(self):
         return self.screens["audio_out"]
 
@@ -4638,6 +4658,8 @@ class zynthian_gui(QObject):
     preset = Property(QObject, get_preset, constant=True)
     control = Property(QObject, get_control, constant=True)
     channel = Property(QObject, get_channel, constant=True)
+    channel_external_setup = Property(QObject, get_channel_external_setup, constant=True)
+    channel_wave_editor = Property(QObject, get_channel_wave_editor, constant=True)
     audio_recorder = Property(QObject, get_audio_recorder, constant=True)
     midi_recorder = Property(QObject, get_midi_recorder, constant=True)
     playgrid_downloader = Property(QObject, get_playgrid_downloader, constant=True)

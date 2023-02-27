@@ -82,6 +82,9 @@ Zynthian.Stack {
                 //     let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_player");
                 //     var component = Qt.createComponent(file);
                 //     root.pageCache["song_player"] = component.createObject(root, {"width": root.width, "height": root.height});
+                //     if (component.errorString() != "") {
+                //         console.log("Error loading song player:", component.errorString());
+                //     }
                 //     root.pageCache["song_player"].visible = false;
                 // }
                 // root.songPlayerPageLoaded = true;
@@ -97,6 +100,9 @@ Zynthian.Stack {
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");
                     var component = Qt.createComponent(file);
                     root.pageCache["playgrid"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    if (component.errorString() != "") {
+                        console.log("Error loading playgrid:", component.errorString());
+                    }
                     root.pageCache["playgrid"].visible = false;
                 }
 
@@ -113,6 +119,9 @@ Zynthian.Stack {
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen("midi_key_range");
                     var component = Qt.createComponent(file);
                     root.pageCache["midi_key_range"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    if (component.errorString() != "") {
+                        console.log("Error loading midi key range:", component.errorString());
+                    }
                     root.pageCache["midi_key_range"].visible = false;
                 }
                 root.midiKeyRangePageLoaded = true
@@ -128,6 +137,9 @@ Zynthian.Stack {
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen("sound_categories");
                     var component = Qt.createComponent(file);
                     root.pageCache["sound_categories"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    if (component.errorString() != "") {
+                        console.log("Error loading sound categories:", component.errorString());
+                    }
                     root.pageCache["sound_categories"].visible = false;
                 }
                 root.soundCategoriesPageLoaded = true
@@ -143,6 +155,9 @@ Zynthian.Stack {
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen("engine");
                     var component = Qt.createComponent(file);
                     root.pageCache["engine"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    if (component.errorString() != "") {
+                        console.log("Error loading engine page:", component.errorString());
+                    }
                     root.pageCache["engine"].visible = false;
                 }
                 root.enginePageLoaded = true
@@ -158,6 +173,9 @@ Zynthian.Stack {
                        let file = applicationWindow().pageScreenMapping.pageForModalScreen("song_manager");
                        var component = Qt.createComponent(file);
                        root.pageCache["song_manager"] = component.createObject(root, {"width": root.width, "height": root.height});
+                       if (component.errorString() != "") {
+                           console.log("Error loading song manager:", component.errorString());
+                       }
                        root.pageCache["song_manager"].visible = false;
                    }
                    root.songManagerPageLoaded = true
@@ -173,6 +191,9 @@ Zynthian.Stack {
 //                    let file = applicationWindow().pageScreenMapping.pageForModalScreen("sketchpad_copier");
 //                    var component = Qt.createComponent(file);
 //                    root.pageCache["sketchpad_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                    if (component.errorString() != "") {
+//                        console.log("Error loading sketchpad copier:", component.errorString());
+//                    }
 //                    root.pageCache["sketchpad_copier"].visible = false;
 //                }
             }
@@ -242,6 +263,9 @@ Zynthian.Stack {
                     if (file.length > 0) {
                         var component = Qt.createComponent(file);
                         root.pageCache[zynthian.current_modal_screen_id] = component.createObject(root, {"width": root.width, "height": root.height});
+                        if (component.errorString() != "") {
+                            console.log("Error loading page with id", zynthian.current_modal_screen_id, component.errorString());
+                        }
                         root.replace(root.pageCache[zynthian.current_modal_screen_id]);
                     } else {
                         print("Non managed modal screen " + zynthian.current_modal_screen_id);

@@ -167,7 +167,7 @@ class sketchpad_segments_model(QAbstractListModel):
         return self.__selected_segment_index
 
     def set_selectedSegmentIndex(self, index):
-        if self.__selected_segment_index != index:
+        if self.__selected_segment_index != index and index > -1 and index < len(self.__segments):
             self.__selected_segment_index = index
             self.selectedSegmentIndexChanged.emit()
             self.zyngui.sketchpad.set_selector()

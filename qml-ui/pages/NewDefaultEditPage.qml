@@ -70,7 +70,10 @@ RowLayout {
         ListView {
             id: pageSelectorListview
             anchors.fill: parent
-            model: root.selectedChannel.channelHasSynth ? zynthian.control.totalPages : 0
+            model: zynthian.current_screen_id === "control"
+                   && root.selectedChannel.channelHasSynth
+                    ? zynthian.control.totalPages
+                    : 0
             clip: true
             currentIndex: zynthian.control.selectedPage
             highlightFollowsCurrentItem: true
@@ -146,7 +149,11 @@ RowLayout {
                         Binding {
                             target: controlDelegate
                             property: "control"
-                            value: root.selectedChannel.channelHasSynth && zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
+                            value: zynthian.current_screen_id === "control"
+                                   && root.selectedChannel.channelHasSynth
+                                   && zynthian.control.all_controls[allControlsIndex]
+                                    ? zynthian.control.all_controls[allControlsIndex]
+                                    : null
                             delayed: true
                         }
 

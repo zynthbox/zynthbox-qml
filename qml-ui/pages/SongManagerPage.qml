@@ -122,12 +122,22 @@ Zynthian.ScreenPage {
             }
         }
         function knob1Up() {
+            segmentDetails.selectedSegment.barLength += 1;
         }
         function knob1Down() {
+            if (segmentDetails.selectedSegment.barLength > 0) {
+                segmentDetails.selectedSegment.barLength -= 1;
+            }
         }
         function knob2Up() {
+            if (segmentDetails.selectedSegment.beatLength < 15) {
+                segmentDetails.selectedSegment.beatLength += 1;
+            }
         }
         function knob2Down() {
+            if (segmentDetails.selectedSegment.beatLength > 0) {
+                segmentDetails.selectedSegment.beatLength -= 1;
+            }
         }
         function knob3Up() {
         }
@@ -140,13 +150,13 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            text: zynthian.sketchpad.song.sketchesModel.songMode ? qsTr("Song Mode: On") : qsTr("Song Mode: Off")
+            text: zynthian.sketchpad.song.sketchesModel.songMode ? qsTr("Song Playback: On") : qsTr("Song Playback: Off")
             onTriggered: {
                 zynthian.sketchpad.song.sketchesModel.songMode = !zynthian.sketchpad.song.sketchesModel.songMode;
             }
         },
         Kirigami.Action {
-            text: qsTr("Record Song")
+            text: qsTr("Export Song")
             enabled: zynthian.sketchpad.song.sketchesModel.songMode
                 ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0
                 : true
@@ -181,18 +191,17 @@ Zynthian.ScreenPage {
                 enabled: component.isVisible
                 onSelectedSegmentIndexChanged: {
                     // When selectedSegmentIndex changes (i.e. being set with Big Knob), adjust visible segments so that selected segment is brought into view
-                    console.log("Selected segment index:", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
                     if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex > (segmentsLayout.segmentOffset+7)) {
-                        console.log("selected segment is outside visible segments on the right :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7))
+                        // console.log("selected segment is outside visible segments on the right :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7))
                         segmentsLayout.segmentOffset = Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7)
                     } else if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < segmentsLayout.segmentOffset) {
-                        console.log("selected segment is outside visible segments on the left :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
+                        // console.log("selected segment is outside visible segments on the left :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
                         segmentsLayout.segmentOffset = zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
                     }
                 }
             }
             Repeater {
-                model: 11
+                model: segmentsLayout.lastVisibleSegmentCellIndex + 1
                 Sketchpad.TableHeader {
                     id: segmentHeader
 
@@ -335,6 +344,15 @@ Zynthian.ScreenPage {
                     barLengthInput.text = segmentDetails.selectedSegment.barLength
                     beatLengthInput.text = segmentDetails.selectedSegment.beatLength
                 }
+                Connections {
+                    target: segmentDetails.selectedSegment
+                    onBarLengthChanged: {
+                        barLengthInput.text = segmentDetails.selectedSegment.barLength
+                    }
+                    onBeatLengthChanged: {
+                        beatLengthInput.text = segmentDetails.selectedSegment.beatLength
+                    }
+                }
 
                 QQC2.Label {
                     Layout.fillWidth: true
@@ -358,6 +376,7 @@ Zynthian.ScreenPage {
                     QQC2.Label {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         text: qsTr("Bar")
@@ -365,6 +384,7 @@ Zynthian.ScreenPage {
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit / 10
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         text: "/"
@@ -372,6 +392,7 @@ Zynthian.ScreenPage {
                     QQC2.Label {
                         Layout.fillWidth: true
                         Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         text: qsTr("Beat")
@@ -387,6 +408,7 @@ Zynthian.ScreenPage {
                         id: barLengthInput
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         inputMethodHints: Qt.ImhDigitsOnly
@@ -399,6 +421,7 @@ Zynthian.ScreenPage {
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit / 10
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         text: "/"
@@ -407,6 +430,7 @@ Zynthian.ScreenPage {
                         id: beatLengthInput
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         inputMethodHints: Qt.ImhDigitsOnly

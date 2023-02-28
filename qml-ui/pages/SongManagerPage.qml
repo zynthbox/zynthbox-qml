@@ -221,6 +221,7 @@ Zynthian.ScreenPage {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                     text: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
                                 ? index === 0
                                     ? "<"
@@ -317,6 +318,9 @@ Zynthian.ScreenPage {
                     Repeater {
                         model: 10
                         QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                            horizontalAlignment: Text.AlignHCenter
                             text: "Ch" + (index + 1)
                         }
                     }
@@ -330,6 +334,7 @@ Zynthian.ScreenPage {
                             id: partBarDelegate
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit* 2
                             channel: zynthian.sketchpad.song.channelsModel.getChannel(model.index)
                             songMode: true
                         }

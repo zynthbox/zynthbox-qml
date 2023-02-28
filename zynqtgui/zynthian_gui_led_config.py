@@ -214,29 +214,44 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
                     continue
 
-                partClip = self.zyngui.sketchpad.song.getClipByPart(channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, i - 1)
+                ###
+                # Below logic lights up alloted slots for channel which is no longer needed
+                ###
+                # partClip = self.zyngui.sketchpad.song.getClipByPart(channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, i - 1)
+                #
+                # if channel is not None and partClip.enabled:
+                #     if channel.channelAudioType == "synth":
+                #         self.button_color_map[i] = {
+                #             'color': self.led_color_red,
+                #             'blink': False
+                #         }
+                #     elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
+                #         self.button_color_map[i] = {
+                #             'color': self.led_color_yellow,
+                #             'blink': False
+                #         }
+                #     elif channel.channelAudioType == "sample-loop":
+                #         self.button_color_map[i] = {
+                #             'color': self.led_color_green,
+                #             'blink': False
+                #         }
+                #     elif channel.channelAudioType == "external":
+                #         self.button_color_map[i] = {
+                #             'color': self.led_color_purple,
+                #             'blink': False
+                #         }
+                # else:
+                #     self.button_color_map[i] = {
+                #         'color': self.led_color_blue,
+                #         'blink': False
+                #     }
 
-                if channel is not None and partClip.enabled:
-                    if channel.channelAudioType == "synth":
-                        self.button_color_map[i] = {
-                            'color': self.led_color_red,
-                            'blink': False
-                        }
-                    elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_yellow,
-                            'blink': False
-                        }
-                    elif channel.channelAudioType == "sample-loop":
-                        self.button_color_map[i] = {
-                            'color': self.led_color_green,
-                            'blink': False
-                        }
-                    elif channel.channelAudioType == "external":
-                        self.button_color_map[i] = {
-                            'color': self.led_color_purple,
-                            'blink': False
-                        }
+                # Light up 1-5 buttons when respective channel is selected
+                if self.zyngui.session_dashboard.selectedChannel == i-1:
+                    self.button_color_map[i] = {
+                        'color': self.led_color_green,
+                        'blink': False
+                    }
                 else:
                     self.button_color_map[i] = {
                         'color': self.led_color_blue,

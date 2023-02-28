@@ -331,6 +331,10 @@ Zynthian.ScreenPage {
             ColumnLayout {
                 id: segmentDetails
                 property QtObject selectedSegment: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment
+                onSelectedSegmentChanged: {
+                    barLengthInput.text = segmentDetails.selectedSegment.barLength
+                    beatLengthInput.text = segmentDetails.selectedSegment.beatLength
+                }
 
                 QQC2.Label {
                     Layout.fillWidth: true
@@ -380,6 +384,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                     QQC2.TextField {
+                        id: barLengthInput
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         horizontalAlignment: "AlignHCenter"
@@ -399,6 +404,7 @@ Zynthian.ScreenPage {
                         text: "/"
                     }
                     QQC2.TextField {
+                        id: beatLengthInput
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         horizontalAlignment: "AlignHCenter"

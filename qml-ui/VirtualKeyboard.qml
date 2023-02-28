@@ -49,7 +49,7 @@ Item {
                     root.focusedTextField = applicationWindow().activeFocusItem
                     textfield.text = root.focusedTextField.text ? root.focusedTextField.text : ""
                     textfield.forceActiveFocus()
-                    textField.selectAll()
+                    textfield.selectAll()
                 } else if (!visible) {
                     // If VK is not visible, delete reference of last focused textfield
                     root.focusedTextField = null
@@ -100,6 +100,7 @@ Item {
             horizontalAlignment: "AlignHCenter"
             verticalAlignment: "AlignVCenter"
             selectByMouse: true
+            inputMethodHints: root.focusedTextField ? root.focusedTextField.inputMethodHints : 0
             onAccepted: {
                 // When temporary textfield is accepted, set text property of original focused textfield to
                 // this one and hide VK

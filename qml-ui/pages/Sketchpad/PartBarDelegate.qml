@@ -17,7 +17,8 @@ ColumnLayout {
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
     property QtObject selectedComponent
-    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
+    // Set to true to make this operate on song bits
+    property bool songMode: false
 
     signal clicked()
 

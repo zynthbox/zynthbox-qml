@@ -49,8 +49,6 @@ Rectangle {
     property QtObject selectedPartPattern
     property QtObject selectedComponent
 
-    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
-
     signal clicked()
 
     function cuiaCallback(cuia) {
@@ -128,14 +126,12 @@ Rectangle {
                             Layout.fillHeight: true
                             channel: zynthian.sketchpad.song.channelsModel.getChannel(model.index)
                             onClicked: {
-                                if (!root.songMode) {
-                                    zynthian.session_dashboard.selectedChannel = model.index
-                                    root.selectedPartChannel = partBarDelegate.channel
-                                    root.selectedPartClip = partBarDelegate.selectedPartClip
-                                    root.selectedPartPattern = partBarDelegate.selectedPartPattern
-                                    root.selectedComponent = partBarDelegate.selectedComponent
-                                    root.clicked()
-                                }
+                                zynthian.session_dashboard.selectedChannel = model.index
+                                root.selectedPartChannel = partBarDelegate.channel
+                                root.selectedPartClip = partBarDelegate.selectedPartClip
+                                root.selectedPartPattern = partBarDelegate.selectedPartPattern
+                                root.selectedComponent = partBarDelegate.selectedComponent
+                                root.clicked()
                             }
                         }
                     }
@@ -149,7 +145,6 @@ Rectangle {
                     // Part details colume, visible when not in song mode
                     ColumnLayout {
                         anchors.fill: parent
-                        visible: !root.songMode
 
                         QQC2.Label {
                             Layout.fillWidth: true
@@ -176,170 +171,6 @@ Rectangle {
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                        }
-                    }
-
-                    // Segment details colume, visible when in song mode
-                    ColumnLayout {
-                        id: segmentDetails
-
-                        property QtObject selectedSegment: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment
-
-                        anchors.fill: parent
-                        visible: root.songMode
-
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            horizontalAlignment: "AlignHCenter"
-                            verticalAlignment: "AlignVCenter"
-                            text: segmentDetails.selectedSegment.name
-                        }
-
-                        Kirigami.Separator {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: 2
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                horizontalAlignment: "AlignHCenter"
-                                verticalAlignment: "AlignVCenter"
-                                text: qsTr("Bar")
-                            }
-                            QQC2.Label {
-                                Layout.fillWidth: false
-                                Layout.fillHeight: false
-                                horizontalAlignment: "AlignHCenter"
-                                verticalAlignment: "AlignVCenter"
-                                text: "/"
-                            }
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                horizontalAlignment: "AlignHCenter"
-                                verticalAlignment: "AlignVCenter"
-                                text: qsTr("Beat")
-                            }
-                        }
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-
-                            QQC2.TextField {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                horizontalAlignment: "AlignHCenter"
-                                verticalAlignment: "AlignVCenter"
-                                inputMethodHints: Qt.ImhDigitsOnly
-                                activeFocusOnTab: false
-                                text: segmentDetails.selectedSegment.barLength
-                                onAccepted: {
-                                    segmentDetails.selectedSegment.barLength = parseInt(text)
-                                }
-                            }
-                            QQC2.Label {
-                                Layout.fillWidth: false
-                                Layout.fillHeight: true
-                                horizontalAlignment: "AlignHCenter"
-                                verticalAlignment: "AlignVCenter"
-                                text: "/"
-                            }
-                            QQC2.TextField {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                horizontalAlignment: "AlignHCenter"
-                                verticalAlignment: "AlignVCenter"
-                                inputMethodHints: Qt.ImhDigitsOnly
-                                activeFocusOnTab: false
-                                text: segmentDetails.selectedSegment.beatLength
-                                onAccepted: {
-                                    segmentDetails.selectedSegment.beatLength = parseInt(text)
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            text: qsTr("Play Segment")
-                            onClicked: {
-                                console.log(
-                                    "Playing Segment",
-                                    segmentDetails.selectedSegment.segmentId,
-                                    " : Offset",
-                                    segmentDetails.selectedSegment.getOffsetInBeats(),
-                                    ", durationInBeats",
-                                    (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength),
-                                    ", durationInTicks",
-                                    ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
-                                )
-
-                                ZynQuick.SegmentHandler.startPlayback(
-                                    ZynQuick.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
-                                    ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
-                                )
-                            }
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                        }
-
-                        QQC2.Button {
-                            text: qsTr("Add Before")
-                            onClicked: {
-                                zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId);
-                            }
-                        }
-                        QQC2.Button {
-                            text: confirmRemoval.visible ? qsTr("Don't Remove") : qsTr("Remove...")
-                            onClicked: {
-                                confirmRemoval.visible = !confirmRemoval.visible;
-                            }
-                            QQC2.Button {
-                                id: confirmRemoval
-                                anchors {
-                                    top: parent.top
-                                    right: parent.left
-                                    rightMargin: Kirigami.Units.smallSpacing
-                                    bottom: parent.bottom
-                                }
-                                visible: false
-                                width: parent.width
-                                text: qsTr("Remove")
-                                onClicked: {
-                                    confirmRemoval.visible = false;
-                                    if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count === 1) {
-                                        // If there's only this single segment, don't actually delete it, just clear it
-                                        zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clear();
-                                    } else {
-                                        // If there's more than one, we can remove the one we've got selected
-                                        if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex === zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count - 1) {
-                                            // If we've got the last segment selected, and we're deleting that, we need to go back a step to avoid ouchies
-                                            zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 1;
-                                            zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
-                                        } else {
-                                            zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        QQC2.Button {
-                            text: qsTr("Add After")
-                            onClicked: {
-                                zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
-                                zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentDetails.selectedSegment.segmentId + 1;
-                            }
                         }
                     }
                 }

@@ -43,7 +43,7 @@ Zynthian.ScreenPage {
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
-    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
+    property bool songMode: false;//zynthian.sketchpad.song.sketchesModel.songMode
 
     /*
     Used to temporarily store last clicked object by user

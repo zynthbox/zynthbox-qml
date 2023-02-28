@@ -32,6 +32,9 @@ import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 RowLayout {
+    id: root
+
+    property QtObject selectedChannel: applicationWindow().selectedChannel
     property QQC2.StackView stack
     property var cuiaCallback: function(cuia) {
         switch (cuia) {
@@ -67,7 +70,7 @@ RowLayout {
         ListView {
             id: pageSelectorListview
             anchors.fill: parent
-            model: zynthian.control.totalPages
+            model: root.selectedChannel.channelHasSynth ? zynthian.control.totalPages : 0
             clip: true
             currentIndex: zynthian.control.selectedPage
             highlightFollowsCurrentItem: true
@@ -126,7 +129,7 @@ RowLayout {
 
             color: "transparent"
             border.color: "#88ffffff"
-            border.width: (zynthian.control.selectedColumn % 4) === index ? 2 : 0
+            border.width: root.selectedChannel.channelHasSynth && (zynthian.control.selectedColumn % 4) === index ? 2 : 0
 
             ColumnLayout {
                 anchors.fill: parent
@@ -143,7 +146,7 @@ RowLayout {
                         Binding {
                             target: controlDelegate
                             property: "control"
-                            value: zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
+                            value: root.selectedChannel.channelHasSynth && zynthian.control.all_controls[allControlsIndex] ? zynthian.control.all_controls[allControlsIndex] : null
                             delayed: true
                         }
 

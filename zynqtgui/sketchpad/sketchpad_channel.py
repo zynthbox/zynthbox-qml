@@ -1245,6 +1245,16 @@ class sketchpad_channel(QObject):
     channelSynthPorts = Property('QVariantList', get_channelSynthPorts, notify=channelSynthPortsChanged)
     ### END Property channelSynthPorts
 
+    ### Property channelHasSynth
+    def get_channelHasSynth(self):
+        for sound in self.__chained_sounds__:
+            if sound >= 0 and self.checkIfLayerExists(sound):
+                return True
+        return False
+
+    channelHasSynth = Property(bool, get_channelHasSynth, notify=chained_sounds_changed)
+    ### END Property channelSynthPorts
+
     @Slot(None, result=QObject)
     def getClipToRecord(self):
         if self.channelAudioType in ["sample-trig", "sample-slice"]:

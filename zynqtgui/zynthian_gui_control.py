@@ -339,6 +339,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.index = 1
 		super().fill_list()
 		self.all_controls_changed.emit()
+		self.set_selectedColumn(0, True)
 
 
 	def set_selector(self, zs_hiden=True):
@@ -1066,8 +1067,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def get_selectedColumn(self):
 		return self.__selected_column
 
-	def set_selectedColumn(self, column):
-		if self.__selected_column != int(column):
+	def set_selectedColumn(self, column, force_set=False):
+		if self.__selected_column != int(column) or force_set is True:
 			self.__selected_column = int(column)
 			self.selectedColumnChanged.emit()
 			self.set_selector_actual()

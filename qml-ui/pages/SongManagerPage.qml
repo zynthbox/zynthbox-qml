@@ -37,8 +37,9 @@ import "Sketchpad" as Sketchpad
 
 Zynthian.ScreenPage {
     id: component
-    screenId: "song"
+    screenId: "song_manager"
     title: qsTr("Song")
+    property bool isVisible:zynthian.current_screen_id === "song_manager"
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
@@ -116,7 +117,7 @@ Zynthian.ScreenPage {
             }
         }
         function goRight() {
-            if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count) {
+            if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count - 1) {
                 zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex += 1;
             }
         }
@@ -177,16 +178,16 @@ Zynthian.ScreenPage {
 
             Connections {
                 target: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel
+                enabled: component.isVisible
                 onSelectedSegmentIndexChanged: {
                     // When selectedSegmentIndex changes (i.e. being set with Big Knob), adjust visible segments so that selected segment is brought into view
-                    if (zynthian.sketchpad.songMode) {
-                        if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex > (segmentsLayout.segmentOffset+7)) {
-                            console.log("selected segment is outside visible segments on the right :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7))
-                            segmentsLayout.segmentOffset = Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7)
-                        } else if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < segmentsLayout.segmentOffset) {
-                            console.log("selected segment is outside visible segments on the left :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
-                            segmentsLayout.segmentOffset = zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
-                        }
+                    console.log("Selected segment index:", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
+                    if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex > (segmentsLayout.segmentOffset+7)) {
+                        console.log("selected segment is outside visible segments on the right :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7))
+                        segmentsLayout.segmentOffset = Math.min(segmentsLayout.maximumSegmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7)
+                    } else if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < segmentsLayout.segmentOffset) {
+                        console.log("selected segment is outside visible segments on the left :", zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, segmentsLayout.segmentOffset, zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
+                        segmentsLayout.segmentOffset = zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
                     }
                 }
             }

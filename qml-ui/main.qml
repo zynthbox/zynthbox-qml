@@ -808,75 +808,6 @@ Kirigami.AbstractApplicationWindow {
             var returnVal = false
 
             switch (cuia) {
-                // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-                // and invoke respective handler when channelAudioType is synth, trig or slice
-                // Otherwise, when in loop mode, do not handle button to allow falling back to channel
-                // selection
-                case "CHANNEL_1":
-                case "CHANNEL_6":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 0
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
-                    break
-
-                case "CHANNEL_2":
-                case "CHANNEL_7":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 1
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
-                    break
-
-                case "CHANNEL_3":
-                case "CHANNEL_8":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 2
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
-                    break
-
-                case "CHANNEL_4":
-                case "CHANNEL_9":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 3
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
-                    break
-
-                case "CHANNEL_5":
-                case "CHANNEL_10":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 4
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
-                    break
-
                 case "SWITCH_BACK_SHORT":
                     if (slotSelectionDrawer.opened) {
                         slotSelectionDrawer.close()
@@ -902,14 +833,14 @@ Kirigami.AbstractApplicationWindow {
         }
         contentItem: Item {
             id: slotSelectionDelegate
-            property real margin: Kirigami.Units.gridUnit * 1
+            property real margin: Kirigami.Units.gridUnit * 1.5
 
             RowLayout {
                 anchors {
                     fill: parent
                     leftMargin: Kirigami.Units.gridUnit * 0.5
-                    topMargin: Kirigami.Units.gridUnit * 4
-                    bottomMargin: Kirigami.Units.gridUnit * 4
+                    topMargin: Kirigami.Units.gridUnit * 2
+                    bottomMargin: Kirigami.Units.gridUnit * 2
                 }
 
                 Rectangle {
@@ -925,91 +856,91 @@ Kirigami.AbstractApplicationWindow {
 
                     ColumnLayout {
                         id: slotsColumn
-                        property bool slotsColumnVisible: slotSelectionDrawer.visible && ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
 
                         anchors.fill: parent
                         anchors.margins: slotSelectionDelegate.margin
+                        anchors.bottomMargin: Kirigami.Units.gridUnit * 2
                         spacing: slotSelectionDelegate.margin
 
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
-                            visible: slotsColumn.slotsColumnVisible
-                            text: root.selectedChannel.channelAudioType === "synth"
-                                    ? qsTr("Synth Slots")
-                                    : ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
-                                        ? qsTr("Sample Slots")
-                                        : ""
+                            text: qsTr("Channels")
                         }
 
                         Repeater {
-                            model: slotsColumn.slotsColumnVisible
-                                    ? 5
-                                    : 0
+                            model: 5
                             delegate: Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                QQC2.Button {
-                                    id: slotsColumnDelegate
-                                    property string soundName: root.selectedChannel.chainedSoundsNames[index]
+                                Sketchpad.ChannelHeader2 {
+                                    id: channelHeaderDelegate
 
-                                    width: parent.width
-                                    height: Kirigami.Units.gridUnit * 3
-                                    anchors.centerIn: parent
-                                    text: index + 1
-                                    onClicked: {
-                                        root.selectedChannel.selectedSlotRow = index
-                                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                    property int channelDelta: zynthian.channelsModActive ? 5 : 0
+
+                                    anchors.fill: parent
+                                    channel: zynthian.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate.channelDelta)
+                                    text: channelHeaderDelegate.channel.name
+                                    subText: null
+                                    subSubText: {
+                                        if (channelHeaderDelegate.channel.channelAudioType === "sample-loop") {
+                                            return qsTr("Audio")
+                                        } else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig") {
+                                            return qsTr("Smp: Trig")
+                                        } else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice") {
+                                            return qsTr("Smp: Slice")
+                                        } else if (channelHeaderDelegate.channel.channelAudioType === "synth") {
+                                            return qsTr("Synth")
+                                        } else if (channelHeaderDelegate.channel.channelAudioType === "external") {
+                                            return qsTr("External")
+                                        }
                                     }
+                                    subSubTextSize: 7
+                                    highlightColor: "white"
 
-                                    Rectangle {
-                                        height: Kirigami.Units.gridUnit * 0.7
-                                        anchors.left: parent.left
-                                        anchors.right: parent.right
-                                        anchors.top: parent.top
-                                        color: "#99888888"
-                                        visible: root.selectedChannel.channelAudioType === "synth" &&
-                                                 synthName.text &&
-                                                 synthName.text.length > 0
+                                    Binding {
+                                        target: channelHeaderDelegate
+                                        property: "color"
+                                        when: root.visible
+                                        delayed: true
 
-                                        QQC2.Label {
-                                            id: synthName
-                                            anchors.fill: parent
-                                            elide: "ElideRight"
-                                            horizontalAlignment: "AlignHCenter"
-                                            verticalAlignment: "AlignVCenter"
-                                            font.pointSize: 7
-                                            text: slotsColumnDelegate.soundName.length > 0
-                                                    ? slotsColumnDelegate.soundName.split(" > ")[0]
-                                                    : ""
+                                        value: {
+                                            if (channelHeaderDelegate.channel.channelAudioType === "synth")
+                                                return "#66ff0000"
+                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop")
+                                                return "#6600ff00"
+                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig")
+                                                return "#66ffff00"
+                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice")
+                                                return "#66ffff00"
+                                            else if (channelHeaderDelegate.channel.channelAudioType === "external")
+                                                return "#998e24aa"
+                                            else
+                                                return "#66888888"
                                         }
                                     }
 
-                                    Rectangle {
-                                        height: Kirigami.Units.gridUnit * 0.7
-                                        anchors.left: parent.left
-                                        anchors.right: parent.right
-                                        anchors.bottom: parent.bottom
-                                        color: "#99888888"
-                                        visible: root.selectedChannel.channelAudioType === "synth" &&
-                                                 presetName.text &&
-                                                 presetName.text.length > 0
+                                    highlightOnFocus: false
+                                    highlighted: (index + channelHeaderDelegate.channelDelta) === zynthian.session_dashboard.selectedChannel // If song mode is not active, highlight if current cell is selected channel
 
-                                        QQC2.Label {
-                                            id: presetName
-                                            anchors.fill: parent
-                                            elide: "ElideRight"
-                                            horizontalAlignment: "AlignHCenter"
-                                            verticalAlignment: "AlignVCenter"
-                                            font.pointSize: 7
-                                            text: slotsColumnDelegate.soundName.length > 0
-                                                    ? slotsColumnDelegate.soundName.split(" > ")[1]
-                                                        ? slotsColumnDelegate.soundName.split(" > ")[1]
-                                                        : ""
-                                                    : ""
-                                        }
+                                    onPressed: {
+                                        zynthian.session_dashboard.selectedChannel = index + channelHeaderDelegate.channelDelta;
                                     }
                                 }
+                            }
+                        }
+
+                        QQC2.Button {
+                            text: "*"
+                            Layout.fillWidth: true
+                            background: Rectangle {
+                                color: Kirigami.Theme.backgroundColor
+                                border.width: zynthian.channelsModActive ? 1 : 0
+                                border.color: "white"
+                            }
+
+                            onClicked: {
+                                zynthian.channelsModActive = !zynthian.channelsModActive
                             }
                         }
                     }

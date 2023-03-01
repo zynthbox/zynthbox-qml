@@ -2432,8 +2432,8 @@ class zynthian_gui(QObject):
                 self.openLeftSidebar.emit()
 
         elif cuia == "SWITCH_CHANNELS_MOD_SHORT" or cuia == "SWITCH_CHANNELS_MOD_BOLD" or cuia == "SWITCH_CHANNELS_MOD_LONG":
-            self.channels_mod_active = not self.channels_mod_active
-            logging.debug(f'self.channels_mod_active({self.channels_mod_active})')
+            self.channelsModActive = not self.channelsModActive
+            logging.debug(f'self.channelsModActive({self.channelsModActive})')
 
         elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
             self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
@@ -2705,14 +2705,14 @@ class zynthian_gui(QObject):
 
         if press:
             if not fake_key in self.__fake_keys_pressed:
-                if self.channels_mod_active:
+                if self.channelsModActive:
                     self.fakeKeyboard.press(Key.ctrl)
 
                 self.__fake_keys_pressed.add(fake_key)
                 self.fakeKeyboard.press(fake_key)
         else:
             if fake_key in self.__fake_keys_pressed:
-                if self.channels_mod_active:
+                if self.channelsModActive:
                     self.fakeKeyboard.release(Key.ctrl)
 
                 self.__fake_keys_pressed.discard(fake_key)
@@ -4532,6 +4532,20 @@ class zynthian_gui(QObject):
         
     splashStopped = Property(bool, get_splashStopped, set_splashStopped, notify=splashStoppedChanged)
     ### END Property splashStopped
+
+    ### Property channelsModActive
+    def get_channelsModActive(self):
+        return self.channels_mod_active
+
+    def set_channelsModActive(self, val):
+        if self.channels_mod_active != val:
+            self.channels_mod_active = val
+            self.channelsModActiveChanged.emit()
+
+    channelsModActiveChanged = Signal()
+
+    channelsModActive = Property(bool, get_channelsModActive, set_channelsModActive, notify=channelsModActiveChanged)
+    ### END Property channelsModActive
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

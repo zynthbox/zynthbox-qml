@@ -91,6 +91,8 @@ function switchToScene(index) {
 function cuiaHandler(cuia, selectedChannel, bottomStack) {
     var clip
     var returnVal = false
+    // Select channel 6-10 when zynthian.channelsModActive is true
+    var channelDelta = zynthian.channelsModActive ? 5 : 0
 
     switch (cuia) {
         case "CHANNEL_1":
@@ -99,7 +101,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 //            clip = selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 //            clip.enabled = !clip.enabled
 //            selectedChannel.selectedSlotRow = 0;
-            zynthian.session_dashboard.selectedChannel = 0
+            zynthian.session_dashboard.selectedChannel = 0 + channelDelta
 
             returnVal = true
             break
@@ -110,7 +112,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 //            clip = selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 //            clip.enabled = !clip.enabled
 //            selectedChannel.selectedSlotRow = 1;
-            zynthian.session_dashboard.selectedChannel = 1
+            zynthian.session_dashboard.selectedChannel = 1 + channelDelta
 
             returnVal = true
             break
@@ -121,7 +123,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 //            clip = selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 //            clip.enabled = !clip.enabled
 //            selectedChannel.selectedSlotRow = 2;
-            zynthian.session_dashboard.selectedChannel = 2
+            zynthian.session_dashboard.selectedChannel = 2 + channelDelta
 
             returnVal = true
             break
@@ -132,7 +134,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 //            clip = selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 //            clip.enabled = !clip.enabled
 //            selectedChannel.selectedSlotRow = 3;
-            zynthian.session_dashboard.selectedChannel = 3
+            zynthian.session_dashboard.selectedChannel = 3 + channelDelta
 
             returnVal = true
             break
@@ -143,7 +145,7 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 //            clip = selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 //            clip.enabled = !clip.enabled
 //            selectedChannel.selectedSlotRow = 4;
-            zynthian.session_dashboard.selectedChannel = 4
+            zynthian.session_dashboard.selectedChannel = 4 + channelDelta
 
             returnVal = true
             break

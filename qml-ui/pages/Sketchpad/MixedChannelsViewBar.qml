@@ -55,10 +55,6 @@ Rectangle {
             returnValue = bouncePopup.cuiaCallback(cuia);
         } else {
             switch (cuia) {
-                case "SWITCH_CHANNELS_MOD_SHORT":
-                    returnValue = true;
-                    break;
-
                 case "NAVIGATE_LEFT":
                     if (zynthian.session_dashboard.selectedChannel > 0) {
                         zynthian.session_dashboard.selectedChannel -= 1;

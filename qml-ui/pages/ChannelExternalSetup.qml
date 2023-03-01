@@ -107,8 +107,14 @@ Zynthian.ScreenPage {
         id: _private
         property QtObject selectedChannel: component.isVisible ? applicationWindow().selectedChannel : null
         function goLeft() {
+            if (_private.selectedChannel && _private.selectedChannel.externalMidiChannel > -1) {
+                _private.selectedChannel.externalMidiChannel -= 1;
+            }
         }
         function goRight() {
+            if (_private.selectedChannel && _private.selectedChannel.externalMidiChannel < 15) {
+                _private.selectedChannel.externalMidiChannel += 1;
+            }
         }
         function knob1Up() {
         }
@@ -173,6 +179,7 @@ Zynthian.ScreenPage {
                             _private.selectedChannel.externalMidiChannel = model.index;
                         }
                     }
+                    checked: _private.selectedChannel && (_private.selectedChannel.externalMidiChannel === model.index || (_private.selectedChannel.externalMidiChannel === -1 && _private.selectedChannel.id === model.index))
                 }
             }
         }

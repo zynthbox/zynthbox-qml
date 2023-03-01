@@ -95,50 +95,55 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
     switch (cuia) {
         case "CHANNEL_1":
         case "CHANNEL_6":
-            bottomStack.slotsBar.partButton.checked = true
-            clip = selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-            clip.enabled = !clip.enabled
-            selectedChannel.selectedSlotRow = 0;
+//            bottomStack.slotsBar.partButton.checked = true
+//            clip = selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+//            clip.enabled = !clip.enabled
+//            selectedChannel.selectedSlotRow = 0;
+            zynthian.session_dashboard.selectedChannel = 0
 
             returnVal = true
             break
 
         case "CHANNEL_2":
         case "CHANNEL_7":
-            bottomStack.slotsBar.partButton.checked = true
-            clip = selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-            clip.enabled = !clip.enabled
-            selectedChannel.selectedSlotRow = 1;
+//            bottomStack.slotsBar.partButton.checked = true
+//            clip = selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+//            clip.enabled = !clip.enabled
+//            selectedChannel.selectedSlotRow = 1;
+            zynthian.session_dashboard.selectedChannel = 1
 
             returnVal = true
             break
 
         case "CHANNEL_3":
         case "CHANNEL_8":
-            bottomStack.slotsBar.partButton.checked = true
-            clip = selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-            clip.enabled = !clip.enabled
-            selectedChannel.selectedSlotRow = 2;
+//            bottomStack.slotsBar.partButton.checked = true
+//            clip = selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+//            clip.enabled = !clip.enabled
+//            selectedChannel.selectedSlotRow = 2;
+            zynthian.session_dashboard.selectedChannel = 2
 
             returnVal = true
             break
 
         case "CHANNEL_4":
         case "CHANNEL_9":
-            bottomStack.slotsBar.partButton.checked = true
-            clip = selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-            clip.enabled = !clip.enabled
-            selectedChannel.selectedSlotRow = 3;
+//            bottomStack.slotsBar.partButton.checked = true
+//            clip = selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+//            clip.enabled = !clip.enabled
+//            selectedChannel.selectedSlotRow = 3;
+            zynthian.session_dashboard.selectedChannel = 3
 
             returnVal = true
             break
 
         case "CHANNEL_5":
         case "CHANNEL_10":
-            bottomStack.slotsBar.partButton.checked = true
-            clip = selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
-            clip.enabled = !clip.enabled
-            selectedChannel.selectedSlotRow = 4;
+//            bottomStack.slotsBar.partButton.checked = true
+//            clip = selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+//            clip.enabled = !clip.enabled
+//            selectedChannel.selectedSlotRow = 4;
+            zynthian.session_dashboard.selectedChannel = 4
 
             returnVal = true
             break

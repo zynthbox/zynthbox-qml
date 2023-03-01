@@ -36,6 +36,7 @@ Zynthian.ScreenPage {
     title: zynthian.control.selector_path_element
 
     screenId: "control"
+    property bool isVisible:zynthian.current_screen_id === "control"
     property var cuiaCallback: function(cuia) {
         if (!stack.currentItem
             || !stack.currentItem.hasOwnProperty("cuiaCallback")
@@ -81,6 +82,19 @@ Zynthian.ScreenPage {
                 zynthian.control.active_custom_controller = candidate.controller.ctrl
             } else {
                 zynthian.control.active_custom_controller = null
+            }
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        enabled: root.isVisible
+        onSelectedChannelChanged: {
+            if (applicationWindow().selectedChannel) {
+                if (applicationWindow().selectedChannel.channelAudioType === "external") {
+                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                } else if (applicationWindow().selectedChannel.channelAudioType.startsWith("sample-")) {
+                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                }
             }
         }
     }

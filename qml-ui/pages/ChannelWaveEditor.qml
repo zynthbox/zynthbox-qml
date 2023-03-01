@@ -121,6 +121,19 @@ Zynthian.ScreenPage {
         function knob3Down() {
         }
     }
+    Connections {
+        target: applicationWindow()
+        enabled: component.isVisible
+        onSelectedChannelChanged: {
+            if (applicationWindow().selectedChannel) {
+                if (applicationWindow().selectedChannel.channelAudioType === "synth") {
+                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                } else if (applicationWindow().selectedChannel.channelAudioType === "external") {
+                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                }
+            }
+        }
+    }
 
     contextualActions: [
         Kirigami.Action {

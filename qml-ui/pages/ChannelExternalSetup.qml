@@ -37,6 +37,7 @@ Zynthian.ScreenPage {
     id: component
     screenId: "channel_external_setup"
     title: qsTr("Channel External Setup")
+    property bool isVisible:zynthian.current_screen_id === "channel_external_setup"
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
@@ -104,6 +105,7 @@ Zynthian.ScreenPage {
     }
     QtObject {
         id: _private
+        property QtObject selectedChannel: component.isVisible ? applicationWindow().selectedChannel : null
         function goLeft() {
         }
         function goRight() {
@@ -134,8 +136,45 @@ Zynthian.ScreenPage {
         }
     ]
 
-    QQC2.Label {
-        anchors.centerIn: parent
-        text: "Some things for changing when our current channel is in External mode"
+    ColumnLayout {
+        anchors.fill: parent
+        Kirigami.Heading {
+            Layout.fillWidth: true
+            text: qsTr("Pick External Midi Channel For Channel %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.minimumHeight: 1
+            Layout.maximumHeight: 1
+            color: Kirigami.Theme.textColor
+            opacity: 0.5
+        }
+        GridLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            columns: 4
+            Repeater {
+                model: 16
+                delegate: Zynthian.PlayGridButton {
+                    id: channelDelegate
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    text: _private.selectedChannel
+                        ? (_private.selectedChannel.externalMidiChannel === model.index
+                            ? qsTr("Reset to default from %1").arg(model.index + 1)
+                            : qsTr("Set to channel %1").arg(model.index + 1)
+                            ) +
+                          (_private.selectedChannel.id === model.index ? qsTr("\n(default)") : "\n")
+                        : ""
+                    onClicked: {
+                        if (_private.selectedChannel.externalMidiChannel === model.index) {
+                            _private.selectedChannel.externalMidiChannel = -1;
+                        } else {
+                            _private.selectedChannel.externalMidiChannel = model.index;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

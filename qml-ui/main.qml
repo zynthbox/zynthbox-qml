@@ -1155,27 +1155,4 @@ Kirigami.AbstractApplicationWindow {
             }
         }
     }
-
-//    Window {
-//        id: bootLogWindow
-//        visible: true
-//        flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint
-//        width: 200
-//        height: 200
-
-//        Rectangle {
-//            anchors.fill: parent
-//            color: "#2196f3"
-
-//            QQC2.Label {
-//                anchors {
-//                    left: parent.left
-//                    right: parent.right
-//                    bottom: parent.bottom
-//                }
-//                horizontalAlignment: "AlignHCenter"
-//                text: zynthian.currentTaskMessage
-//            }
-//        }
-//    }
 }

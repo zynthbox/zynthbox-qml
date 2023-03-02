@@ -272,79 +272,43 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     'blink': False
                 }
 
-            # 7 : FX Button
-            if self.zyngui.active_screen == "main":
-                # If main page is open, color it blue
+            # 7 : Mode Button
+            if self.zyngui.leftSidebarActive:
+                if channel is not None and channel.channelAudioType == "synth":
+                    self.button_color_map[7] = {
+                        'color': self.led_color_red,
+                        'blink': True
+                    }
+                elif channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
+                    self.button_color_map[7] = {
+                        'color': self.led_color_yellow,
+                        'blink': True
+                    }
+                elif self.zyngui.slotsBarFxActive:
+                    self.button_color_map[7] = {
+                        'color': self.led_color_blue,
+                        'blink': True
+                    }
+                elif channel is not None and channel.channelAudioType == "sample-loop":
+                    self.button_color_map[7] = {
+                        'color': self.led_color_green,
+                        'blink': True
+                    }
+                elif channel is not None and channel.channelAudioType == "external":
+                    self.button_color_map[7] = {
+                        'color': self.led_color_purple,
+                        'blink': True
+                    }
+                else: # Control should never reach here
+                    self.button_color_map[7] = {
+                        'color': self.led_color_blue,
+                        'blink': True
+                    }
+            else:
                 self.button_color_map[7] = {
                     'color': self.led_color_blue,
                     'blink': False
                 }
-            elif channel is not None and channel.channelAudioType == "synth":
-                if self.zyngui.leftSidebarActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_red,
-                        'blink': True
-                    }
-                else:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_red,
-                        'blink': False
-                    }
-            elif channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                if self.zyngui.leftSidebarActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_yellow,
-                        'blink': True
-                    }
-                else:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_yellow,
-                        'blink': False
-                    }
-            elif self.zyngui.slotsBarFxActive:
-                if self.zyngui.leftSidebarActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_blue,
-                        'blink': True
-                    }
-                else:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_blue,
-                        'blink': False
-                    }
-            elif channel is not None and channel.channelAudioType == "sample-loop":
-                if self.zyngui.leftSidebarActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_green,
-                        'blink': True
-                    }
-                else:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_green,
-                        'blink': False
-                    }
-            elif channel is not None and channel.channelAudioType == "external":
-                if self.zyngui.leftSidebarActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_purple,
-                        'blink': True
-                    }
-                else:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_purple,
-                        'blink': False
-                    }
-            else:
-                if self.zyngui.leftSidebarActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_blue,
-                        'blink': True
-                    }
-                else:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_blue,
-                        'blink': False
-                    }
 
             # Under screen button 1
             if self.zyngui.modal_screen is None and self.zyngui.active_screen == "sketchpad":

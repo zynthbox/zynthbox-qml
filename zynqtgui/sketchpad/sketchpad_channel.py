@@ -31,7 +31,6 @@ import tempfile
 import threading
 import traceback
 from pathlib import Path
-from subprocess import Popen
 
 import jack
 import numpy as np
@@ -42,12 +41,16 @@ from .sketchpad_clips_model import sketchpad_clips_model
 from .sketchpad_clip import sketchpad_clip
 from zynqtgui import zynthian_gui_config
 
+
 class sketchpad_channel(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
+    jclient: jack.Client = None
 
     def __init__(self, id: int, song: QObject, parent: QObject = None):
         super(sketchpad_channel, self).__init__(parent)
+        if sketchpad_channel.jclient is None:
+            sketchpad_channel.jclient = jack.Client("sketchpad_channel")
         self.zyngui = zynthian_gui_config.zyngui
         self.__id__ = id
         self.__name__ = None
@@ -405,13 +408,15 @@ class sketchpad_channel(QObject):
                 for port in zip([f"SamplerSynth-channel_{self.id + 1}:left_out", f"SamplerSynth-channel_{self.id + 1}:right_out"], [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
                     try:
                         if channelHasEffects or self.get_channel_audio_type().startswith("sample-") is False:
-                            p = Popen(("jack_disconnect", port[1], port[0]))
-                            p.wait()
+                            sketchpad_channel.jclient.disconnect(port[1], port[0])
                         else:
-                            p = Popen(("jack_connect", port[1], port[0]))
-                            p.wait()
-                    except Exception as e:
-                        logging.error(f"Error processing SamplerSynth jack port for Ch{self.id + 1} : {port}({str(e)})")
+                            sketchpad_channel.jclient.connect(port[1], port[0])
+                    except jack.JackErrorCode as e:
+                        if (abs(e.code) == 1):
+                            # In this case, we can usually assume it's because there's either nothing to disconnect (the ports are already disconnected) or nothing to connect (they're already connected)
+                            logging.debug(f"Expected error processing SamplerSynth jack ports for Ch{self.id + 1} : {port}({str(e)})")
+                        else:
+                            logging.error(f"Error processing SamplerSynth jack port for Ch{self.id + 1} : {port}({str(e)})")
             except Exception as e:
                 logging.error(f"Error processing SamplerSynth jack ports for Ch{self.id + 1}: {str(e)}")
 
@@ -424,12 +429,15 @@ class sketchpad_channel(QObject):
 
                     # Map first port from jack.Client.get_ports to channel A and second port to channel B
                     for port in zip(ports, [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
-                        logging.error(f"Connecting port {port[0]} -> {port[1]}")
+                        logging.debug(f"Connecting port {port[0]} -> {port[1]}")
                         port_names.append(port[0])
-                        p = Popen(("jack_connect", port[0], port[1]))
-                        p.wait()
-                except Exception as e:
-                    logging.error(f"Error processing jack port for Ch{self.id + 1} : {port}({str(e)})")
+                        sketchpad_channel.jclient.connect(port[0], port[1])
+                except jack.JackErrorCode as e:
+                    if (abs(e.code) == 1):
+                        # In this case, we can usually assume it's because there's either nothing to disconnect (the ports are already disconnected) or nothing to connect (they're already connected)
+                        logging.debug(f"Expected error processing jack ports for Ch{self.id + 1} : {port}({str(e)})")
+                    else:
+                        logging.error(f"Error processing jack port for Ch{self.id + 1} : {port}({str(e)})")
 
                 synth_ports.append(port_names)
 

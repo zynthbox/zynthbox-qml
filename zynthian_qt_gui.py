@@ -2282,10 +2282,13 @@ class zynthian_gui(QObject):
                 channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
                 if channel.channelAudioType == "synth": # The channel is set to send stuff to the zynthian engines
                     self.show_screen("control")
+                    self.forced_screen_back = "sketchpad"
                 elif channel.channelAudioType == "external": # The channel is set to spit midi events out through the midi_out port
                     self.show_modal("channel_external_setup")
+                    self.forced_screen_back = "sketchpad"
                 else: # The rest are different kinds of samples for SamplerSynth playback, so we'll show the wave editor for those
                     self.show_modal("channel_wave_editor")
+                    self.forced_screen_back = "sketchpad"
 
         # elif cuia == "SCREEN_ADMIN":
             # Do not handle 5th under screen button globally.

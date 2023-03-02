@@ -37,6 +37,7 @@ Zynthian.ScreenPage {
     id: component
     screenId: "channel_wave_editor"
     title: qsTr("Channel Wave Editor")
+    property bool isVisible:zynthian.current_screen_id === "channel_wave_editor"
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;

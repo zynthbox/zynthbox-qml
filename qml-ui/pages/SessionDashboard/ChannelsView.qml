@@ -337,7 +337,7 @@ ColumnLayout {
                                                 console.log("Opening bottom drawer");
                                                 bottomBar.forceActiveFocus();
                                                 bottomStack.currentIndex = ChannelsView.BottomStackControlType.Wave;
-                                                zynthian.bottomBarControlType = Sketchpad."bottombar-controltype-clip";
+                                                zynthian.bottomBarControlType = "bottombar-controltype-clip";
                                                 zynthian.bottomBarControlObj = channelDelegate.selectedClip;
                                                 bottomDrawer.open();
                                             }

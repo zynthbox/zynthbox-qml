@@ -150,10 +150,7 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            text: zynthian.sketchpad.song.sketchesModel.songMode ? qsTr("Song Playback: On") : qsTr("Song Playback: Off")
-            onTriggered: {
-                zynthian.sketchpad.song.sketchesModel.songMode = !zynthian.sketchpad.song.sketchesModel.songMode;
-            }
+            enabled: false
         },
         Kirigami.Action {
             text: qsTr("Export Song")

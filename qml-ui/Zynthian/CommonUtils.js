@@ -1,6 +1,20 @@
 .import org.zynthian.quick 1.0 as ZynQuick
 
 function startMetronomeAndPlayback() {
+    // Contextually work out whether we should start in song mode or not
+    // Logic is that alt+play starts song mode playback everywhere, except for when the song manager
+    // page is shown, where we invert that logic and allow you to start in not song mode using
+    // alt+play and play on its own starts playback in song mode.
+    var playInSongMode = false;
+    if (zynthian.current_screen_id === "song_manager") {
+        if (zynthian.altButtonPressed === false) {
+            playInSongMode = true;
+        }
+    } else if (zynthian.altButtonPressed) {
+        playInSongMode = true;
+    }
+    zynthian.sketchpad.song.sketchesModel.songMode = playInSongMode;
+
     if (zynthian.sketchpad.song.sketchesModel.songMode) {
         if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0) {
             ZynQuick.SegmentHandler.startPlayback(0, 0);
@@ -70,6 +84,7 @@ function stopMetronomeAndPlayback() {
         zynthian.sketchpad.resetMetronome();
         console.log("Metronome and Playback Stopped");
     }
+    zynthian.sketchpad.song.sketchesModel.songMode = false;
 }
 
 function toggleLayerChaining(layer) {

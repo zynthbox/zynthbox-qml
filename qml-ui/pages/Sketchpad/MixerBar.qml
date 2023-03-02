@@ -47,8 +47,8 @@ Rectangle {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
-                bottomBar.controlType = BottomBar.ControlType.Channel;
-                bottomBar.controlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
+                zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                zynthian.bottomBarControlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
 
                 bottomStack.slotsBar.bottomBarButton.checked = true
 
@@ -122,11 +122,11 @@ Rectangle {
                             if (zynthian.session_dashboard.selectedChannel !== channel.id) {
                                 zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                 zynthian.session_dashboard.selectedChannel = channel.id;
-                                bottomBar.controlType = BottomBar.ControlType.Channel;
-                                bottomBar.controlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
+                                zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                                zynthian.bottomBarControlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
                             } else {
-                                bottomBar.controlType = BottomBar.ControlType.Channel;
-                                bottomBar.controlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
+                                zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                                zynthian.bottomBarControlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
 
                                 bottomStack.currentIndex = 0
                             }

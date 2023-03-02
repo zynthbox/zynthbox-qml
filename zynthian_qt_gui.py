@@ -526,6 +526,9 @@ class zynthian_gui(QObject):
         self.dialogStack = []
         self.left_sidebar = None
 
+        self.__bottombar_control_obj = None
+        self.__bottombar_control_type = "bottombar-controltype-none"
+
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
         self.zynswitch_long_triggered.connect(self.zynswitch_long, Qt.QueuedConnection)
@@ -4549,6 +4552,37 @@ class zynthian_gui(QObject):
 
     channelsModActive = Property(bool, get_channelsModActive, set_channelsModActive, notify=channelsModActiveChanged)
     ### END Property channelsModActive
+
+    ### Property bottomBarControlObj
+    ### This property will store the object that is being controlled by bottomBar
+    def get_bottomBarControlObj(self):
+        return self.__bottombar_control_obj
+
+    def set_bottomBarControlObj(self, val):
+        if self.__bottombar_control_obj != val:
+            self.__bottombar_control_obj = val
+            self.bottomBarControlObjChanged.emit()
+
+    bottomBarControlObjChanged = Signal()
+
+    bottomBarControlObj = Property(QObject, get_bottomBarControlObj, set_bottomBarControlObj, notify=bottomBarControlObjChanged)
+    ### END Property bottomBarControlObj
+
+    ### Property bottomBarControlType
+    ### This property will store the type of object that is being controlled by bottombar
+    ### Allowed values : "bottombar-controltype-song", "bottombar-controltype-clip", "bottombar-controltype-channel", "bottombar-controltype-part", "bottombar-controltype-pattern", "bottombar-controltype-none"
+    def get_bottomBarControlType(self):
+        return self.__bottombar_control_type
+
+    def set_bottomBarControlType(self, val):
+        if self.__bottombar_control_type != val:
+            self.__bottombar_control_type = val
+            self.bottomBarControlTypeChanged.emit()
+
+    bottomBarControlTypeChanged = Signal()
+
+    bottomBarControlType = Property(str, get_bottomBarControlType, set_bottomBarControlType, notify=bottomBarControlTypeChanged)
+    ### END Property bottomBarControlType
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

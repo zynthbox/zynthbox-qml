@@ -50,7 +50,7 @@ GridLayout {
         }
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
-                bottomBar.filePickerDialog.folderModel.folder = bottomBar.controlObj.recordingDir;
+                bottomBar.filePickerDialog.folderModel.folder = zynthian.bottomBarControlObj.recordingDir;
                 bottomBar.filePickerDialog.open();
                 return true;
 
@@ -180,7 +180,7 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                            ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? ZL.AudioLevels.channels[bottomBar.controlObj.clipChannel.id]
+                              ? ZL.AudioLevels.channels[zynthian.bottomBarControlObj.clipChannel.id]
                               : ZL.AudioLevels.captureA
                            : -100
 
@@ -204,7 +204,7 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                             ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                               ? ZL.AudioLevels.channels[bottomBar.controlObj.clipChannel.id]
+                               ? ZL.AudioLevels.channels[zynthian.bottomBarControlObj.clipChannel.id]
                                : ZL.AudioLevels.captureB
                             : -100
 
@@ -290,9 +290,9 @@ GridLayout {
 
             text: qsTr("Paste Clip")
             visible: bottomBar.clipCopySource != null
-            enabled: bottomBar.clipCopySource != bottomBar.controlObj
+            enabled: bottomBar.clipCopySource != zynthian.bottomBarControlObj
             onClicked: {
-                bottomBar.controlObj.copyFrom(bottomBar.clipCopySource);
+                zynthian.bottomBarControlObj.copyFrom(bottomBar.clipCopySource);
                 bottomBar.clipCopySource = null;
             }
         }

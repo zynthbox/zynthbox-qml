@@ -59,7 +59,7 @@ GridLayout {
 //        Binding {
 //            target: volumeControl.slider
 //            property: "value"
-//            value: bottomBar.controlObj.volume
+//            value: zynthian.bottomBarControlObj.volume
 //        }
 
         VolumeControl {
@@ -69,20 +69,20 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit*2
 
-            headerText: bottomBar.controlObj.className && bottomBar.controlObj.className === "sketchpad_channel" ||
-                        bottomBar.controlObj.audioLevel <= -40
+            headerText: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ||
+                        zynthian.bottomBarControlObj.audioLevel <= -40
                             ? ""
-                            : (bottomBar.controlObj.audioLevel.toFixed(2) + " (dB)")
-            footerText: bottomBar.controlObj.name
-            audioLeveldB: bottomBar.controlObj.className && bottomBar.controlObj.className === "sketchpad_channel" ? bottomBar.controlObj.audioLevel : -400
+                            : (zynthian.bottomBarControlObj.audioLevel.toFixed(2) + " (dB)")
+            footerText: zynthian.bottomBarControlObj.name
+            audioLeveldB: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ? zynthian.bottomBarControlObj.audioLevel : -400
 
-            slider.value: bottomBar.controlObj.className && bottomBar.controlObj.className === "sketchpad_channel" ? bottomBar.controlObj.volume : 0
+            slider.value: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ? zynthian.bottomBarControlObj.volume : 0
             onValueChanged: {
-                bottomBar.controlObj.volume = slider.value
+                zynthian.bottomBarControlObj.volume = slider.value
             }
 
             onDoubleClicked: {
-                slider.value = bottomBar.controlObj.initialVolume;
+                slider.value = zynthian.bottomBarControlObj.initialVolume;
             }
         }
     }
@@ -91,7 +91,7 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-        visible: bottomBar.controlObj.className && bottomBar.controlObj.className === "sketchpad_channel" && !bottomBar.controlObj.isEmpty()
+        visible: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" && !zynthian.bottomBarControlObj.isEmpty()
 
         QQC2.Button {
             // As per #299 disable this button
@@ -115,7 +115,7 @@ GridLayout {
             text: qsTr("Copy Channel")
             visible: bottomBar.channelCopySource == null
             onClicked: {
-                bottomBar.channelCopySource = bottomBar.controlObj;
+                bottomBar.channelCopySource = zynthian.bottomBarControlObj;
             }
         }
 
@@ -124,9 +124,9 @@ GridLayout {
 
             text: qsTr("Paste Channel")
             visible: bottomBar.channelCopySource != null
-            enabled: bottomBar.channelCopySource != bottomBar.controlObj
+            enabled: bottomBar.channelCopySource != zynthian.bottomBarControlObj
             onClicked: {
-                bottomBar.controlObj.copyFrom(bottomBar.channelCopySource);
+                zynthian.bottomBarControlObj.copyFrom(bottomBar.channelCopySource);
                 bottomBar.channelCopySource = null;
             }
         }

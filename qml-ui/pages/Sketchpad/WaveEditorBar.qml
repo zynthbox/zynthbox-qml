@@ -42,10 +42,10 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
     property QtObject bottomBar: null
-    property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
-                                    ? bottomBar.controlObj // selected bottomBar object is clip/pattern
-                                    : bottomBar.controlObj != null && bottomBar.controlObj.samples != null
-                                        ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
+    property QtObject controlObj: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern")
+                                    ? zynthian.bottomBarControlObj // selected bottomBar object is clip/pattern
+                                    : zynthian.bottomBarControlObj != null && zynthian.bottomBarControlObj.samples != null
+                                        ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
                                         : null
     property QtObject channel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 

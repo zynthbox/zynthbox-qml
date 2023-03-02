@@ -41,10 +41,10 @@ GridLayout {
     Layout.maximumWidth: parent.width
 
     property QtObject bottomBar: null
-    property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
-                                    ? bottomBar.controlObj // selected bottomBar object is clip/pattern
-                                    : bottomBar.controlObj && bottomBar.controlObj.hasOwnProperty("samples") && bottomBar.controlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
-                                        ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow]
+    property QtObject controlObj: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern")
+                                    ? zynthian.bottomBarControlObj // selected bottomBar object is clip/pattern
+                                    : zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.hasOwnProperty("samples") && zynthian.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
+                                        ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow]
                                         : null
         
     function cuiaCallback(cuia) {
@@ -298,11 +298,11 @@ GridLayout {
             text: "<No Metadata>"
         }
         QQC2.Label {
-            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
+            visible: root.zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
             text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
         }
         QQC2.Label {
-            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && root.controlObj.path.length > 0
+            visible: root.zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
             text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
         }
     }

@@ -128,8 +128,8 @@ ColumnLayout {
                     root.channel.selectedSlotRow = index;
 
                     if (!root.songMode) {
-                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                        bottomStack.bottomBar.controlObj = root.channel.sceneClip;
+                        zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+                        zynthian.bottomBarControlObj = root.channel.sceneClip;
                         bottomStack.slotsBar.bottomBarButton.checked = true;
 
                         if (root.channel.channelAudioType === "sample-loop") {

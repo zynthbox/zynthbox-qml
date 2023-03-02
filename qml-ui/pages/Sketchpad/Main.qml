@@ -264,8 +264,8 @@ Zynthian.ScreenPage {
 
                     // when sample and slot is active, goto wave editor or show popup when empty
                     if (sample && sample.path && sample.path.length > 0) {
-                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
-                        bottomStack.bottomBar.controlObj = root.selectedChannel;
+                        zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                        zynthian.bottomBarControlObj = root.selectedChannel;
                         bottomStack.slotsBar.bottomBarButton.checked = true;
                         bottomStack.bottomBar.channelWaveEditorAction.trigger();
                     } else {
@@ -276,8 +276,8 @@ Zynthian.ScreenPage {
 
                     // when loop and slot is active, goto wave editor or show popup when empty
                     if (clip && clip.path && clip.path.length > 0) {
-                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                        bottomStack.bottomBar.controlObj = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex);
+                        zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+                        zynthian.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex);
                         bottomStack.slotsBar.bottomBarButton.checked = true;
                         bottomStack.bottomBar.waveEditorAction.trigger();
                     } else {
@@ -335,7 +335,7 @@ Zynthian.ScreenPage {
 
             // Check if channel wave editor bar is active
             if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
-                bottomBar.controlType === BottomBar.ControlType.Channel && // Checks if channel is selected
+                zynthian.bottomBarControlType === "bottombar-controltype-channel" && // Checks if channel is selected
                 bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 // Checks if current active page is wave editor or not
             ) {
                 zynthian.channelWaveEditorBarActive = true;
@@ -345,7 +345,7 @@ Zynthian.ScreenPage {
 
             // Check if clip wave editor bar is active
             if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
-                (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern) && // Checks if clip/pattern is selected
+                (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") && // Checks if clip/pattern is selected
                 bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 // Checks if current active page is wave editor or not
             ) {
                 zynthian.clipWaveEditorBarActive = true;
@@ -434,16 +434,16 @@ Zynthian.ScreenPage {
         onSong_changed: {
             console.log("$$$ Song Changed :", song)
 
-            bottomBar.controlType = BottomBar.ControlType.Song;
-            bottomBar.controlObj = root.song;
+            zynthian.bottomBarControlType = "bottombar-controltype-song";
+            zynthian.bottomBarControlObj = root.song;
             bottomStack.slotsBar.channelButton.checked = true
         }
     }
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
-        bottomBar.controlType = BottomBar.ControlType.Song;
-        bottomBar.controlObj = root.song;
+        zynthian.bottomBarControlType = "bottombar-controltype-song";
+        zynthian.bottomBarControlObj = root.song;
         bottomStack.slotsBar.channelButton.checked = true
     }
 
@@ -907,8 +907,8 @@ Zynthian.ScreenPage {
                                             // Open MixedChannelsViewBar and switch to channel
                                             // bottomStack.slotsBar.channelButton.checked = true
                                             root.resetBottomBar(false)
-                                            bottomBar.controlType = BottomBar.ControlType.Channel;
-                                            bottomBar.controlObj = channelHeaderDelegate.channel;
+                                            zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                                            zynthian.bottomBarControlObj = channelHeaderDelegate.channel;
                                         })
                                     }
                                 }
@@ -1095,13 +1095,13 @@ Zynthian.ScreenPage {
                                             //console.log("Clip : (" + channel.sceneClip.row+", "+channel.sceneClip.col+")", "Selected Channel :"+ zynthian.session_dashboard.selectedChannel)
 
                                             // Switch to highlighted clip only if previous selected bottombar object was a clip/pattern
-//                                            if (highlighted && (bottomBar.controlType === BottomBar.ControlType.Pattern || bottomBar.controlType === BottomBar.ControlType.Clip)) {
+//                                            if (highlighted && (zynthian.bottomBarControlType === "bottombar-controltype-pattern" || zynthian.bottomBarControlType === "bottombar-controltype-clip")) {
 //                                                if (channel.connectedPattern >= 0) {
-//                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
-//                                                    bottomBar.controlObj = channel.sceneClip;
+//                                                    zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+//                                                    zynthian.bottomBarControlObj = channel.sceneClip;
 //                                                } else {
-//                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
-//                                                    bottomBar.controlObj = channel.sceneClip;
+//                                                    zynthian.bottomBarControlType = "bottombar-controltype-clip";
+//                                                    zynthian.bottomBarControlObj = channel.sceneClip;
 //                                                }
 //                                            }
                                         });
@@ -1189,17 +1189,17 @@ Zynthian.ScreenPage {
 
                                         Qt.callLater(function() {
                                             if (channel.connectedPattern >= 0) {
-                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                bottomBar.controlObj = channel.sceneClip;
+                                                zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+                                                zynthian.bottomBarControlObj = channel.sceneClip;
                                             } else {
-                                                bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                bottomBar.controlObj = channel.sceneClip;
+                                                zynthian.bottomBarControlType = "bottombar-controltype-clip";
+                                                zynthian.bottomBarControlObj = channel.sceneClip;
                                             }
                                         })
                                     }
                                     onPressAndHold: {
-                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                        bottomStack.bottomBar.controlObj = channel.sceneClip;
+                                        zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+                                        zynthian.bottomBarControlObj = channel.sceneClip;
                                         bottomStack.slotsBar.bottomBarButton.checked = true;
 
                                         if (channel.channelAudioType === "sample-loop") {

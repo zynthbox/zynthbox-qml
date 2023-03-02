@@ -11,7 +11,7 @@ Zynthian.Card {
     id: root
 
     property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
-    property QtObject bottomBar: null
+    property QtObject controlObj: zynthian.bottomBarControlObj
 
     function cuiaCallback(cuia) {
         if (samplePickerDialog.opened) {

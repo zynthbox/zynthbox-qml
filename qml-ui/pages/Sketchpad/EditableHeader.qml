@@ -36,6 +36,9 @@ import Zynthian 1.0 as Zynthian
 StackLayout {
     id: titleStack
     property alias text: heading.text
+    property QtObject controlObj
+    property var controlType
+
     RowLayout {
         Kirigami.Heading {
             id: heading
@@ -45,7 +48,7 @@ StackLayout {
         QQC2.Button {
             icon.name: "document-edit"
             visible: controlObj &&
-                        controlType !== BottomBar.ControlType.Song &&
+                        controlType !== "bottombar-controltype-song" &&
                         controlObj.nameEditable
             onClicked: {
                 titleStack.currentIndex = 1;

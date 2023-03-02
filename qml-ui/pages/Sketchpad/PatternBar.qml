@@ -40,9 +40,9 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
+    property QtObject controlObj: zynthian.bottomBarControlObj
     property QtObject sequence: controlObj.clipChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart) : null
-    property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
         switch (cuia) {

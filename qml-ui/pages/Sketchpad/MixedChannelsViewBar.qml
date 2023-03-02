@@ -160,8 +160,8 @@ Rectangle {
                             EditableHeader {
                                 Layout.minimumWidth: parent.width / 4
                                 Layout.maximumWidth: parent.width / 4
-                                property QtObject controlObj: root.selectedChannel
-                                property int controlType: BottomBar.ControlType.Channel
+                                controlObj: root.selectedChannel
+                                controlType: "bottombar-controltype-channel"
 
                                 text: qsTr("Channel: %1").arg(controlObj ? controlObj.name : "")
                             }
@@ -618,8 +618,8 @@ Rectangle {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop") {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                            bottomStack.bottomBar.controlObj = waveformContainer.clip;
+                                                            zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+                                                            zynthian.bottomBarControlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.waveEditorAction.trigger();
@@ -627,8 +627,8 @@ Rectangle {
                                                         }
                                                     } else {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
-                                                            bottomStack.bottomBar.controlObj = root.selectedChannel;
+                                                            zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                                                            zynthian.bottomBarControlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();
@@ -641,8 +641,8 @@ Rectangle {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop") {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                            bottomStack.bottomBar.controlObj = waveformContainer.clip;
+                                                            zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+                                                            zynthian.bottomBarControlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.waveEditorAction.trigger();
@@ -650,8 +650,8 @@ Rectangle {
                                                         }
                                                     } else {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
-                                                            bottomStack.bottomBar.controlObj = root.selectedChannel;
+                                                            zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                                                            zynthian.bottomBarControlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();

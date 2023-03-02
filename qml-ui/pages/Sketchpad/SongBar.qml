@@ -55,7 +55,7 @@ GridLayout {
     Zynthian.SketchpadDial {
         id: bpmDial
         text: qsTr("BPM")
-        controlObj: root.bottomBar.controlObj
+        controlObj: zynthian.bottomBarControlObj
         controlProperty: "bpm"
 
         dial {
@@ -71,7 +71,7 @@ GridLayout {
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         Layout.leftMargin: 12
-        visible: !root.bottomBar.controlObj.isTemp
+        visible: !zynthian.bottomBarControlObj.isTemp
 
         QQC2.Label {
             Layout.alignment: Qt.AlignHCenter
@@ -87,10 +87,10 @@ GridLayout {
 
             ListView {
                 anchors.fill: parent
-                model: root.bottomBar.controlObj.versions
+                model: zynthian.bottomBarControlObj.versions
                 delegate: Kirigami.BasicListItem {
                     label: modelData
-                    highlighted: root.bottomBar.controlObj.name === modelData
+                    highlighted: zynthian.bottomBarControlObj.name === modelData
                     onClicked: {
                         zynthian.sketchpad.loadSketchpadVersion(modelData)
                     }
@@ -112,14 +112,14 @@ GridLayout {
         QQC2.ComboBox {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignCenter
-            model: root.bottomBar.controlObj.scaleModel
+            model: zynthian.bottomBarControlObj.scaleModel
             currentIndex: root.bottomBar &&
-                          root.bottomBar.controlObj &&
-                          root.bottomBar.controlObj.selectedScaleIndex
-                            ? root.bottomBar.controlObj.selectedScaleIndex
+                          zynthian.bottomBarControlObj &&
+                          zynthian.bottomBarControlObj.selectedScaleIndex
+                            ? zynthian.bottomBarControlObj.selectedScaleIndex
                             : 0
             onActivated: {
-                root.bottomBar.controlObj.selectedScaleIndex = index;
+                zynthian.bottomBarControlObj.selectedScaleIndex = index;
             }
         }
     }

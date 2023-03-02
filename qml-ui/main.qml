@@ -798,7 +798,7 @@ Kirigami.AbstractApplicationWindow {
 
     QQC2.Drawer {
         id: slotSelectionDrawer
-        width: Kirigami.Units.gridUnit * 16
+        width: Kirigami.Units.gridUnit * 24
         height: root.height
         edge: Qt.LeftEdge
         dragMargin: Kirigami.Units.gridUnit * 0.9
@@ -859,7 +859,7 @@ Kirigami.AbstractApplicationWindow {
 
                         anchors.fill: parent
                         anchors.margins: slotSelectionDelegate.margin
-                        anchors.bottomMargin: Kirigami.Units.gridUnit * 2
+                        anchors.bottomMargin: Kirigami.Units.gridUnit * 3
                         spacing: slotSelectionDelegate.margin
 
                         QQC2.Label {
@@ -876,7 +876,7 @@ Kirigami.AbstractApplicationWindow {
                                 Sketchpad.ChannelHeader2 {
                                     id: channelHeaderDelegate
 
-                                    property int channelDelta: zynthian.channelsModActive ? 5 : 0
+                                    property int channelDelta: 0
 
                                     anchors.fill: parent
                                     channel: zynthian.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate.channelDelta)
@@ -929,18 +929,93 @@ Kirigami.AbstractApplicationWindow {
                                 }
                             }
                         }
+                    }
+                }
 
-                        QQC2.Button {
-                            text: "*"
-                            Layout.fillWidth: true
-                            background: Rectangle {
-                                color: Kirigami.Theme.backgroundColor
-                                border.width: zynthian.channelsModActive ? 1 : 0
-                                border.color: "white"
-                            }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#222222"
+                    radius: 6
+                    border.color: Qt.rgba(Kirigami.Theme.textColor.r,
+                                          Kirigami.Theme.textColor.g,
+                                          Kirigami.Theme.textColor.b,
+                                          0.2)
+                    border.width: 1
 
-                            onClicked: {
-                                zynthian.channelsModActive = !zynthian.channelsModActive
+                    ColumnLayout {
+                        id: slotsColumn2
+
+                        anchors.fill: parent
+                        anchors.margins: slotSelectionDelegate.margin
+                        anchors.bottomMargin: Kirigami.Units.gridUnit * 3
+                        spacing: slotSelectionDelegate.margin
+
+                        QQC2.Label {
+                            Layout.alignment: Qt.AlignCenter
+                            text: qsTr("Channels")
+                        }
+
+                        Repeater {
+                            model: 5
+                            delegate: Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                Sketchpad.ChannelHeader2 {
+                                    id: channelHeaderDelegate2
+
+                                    property int channelDelta: 5
+
+                                    anchors.fill: parent
+                                    channel: zynthian.sketchpad.song.channelsModel.getChannel(index + channelHeaderDelegate2.channelDelta)
+                                    text: channelHeaderDelegate2.channel.name
+                                    subText: null
+                                    subSubText: {
+                                        if (channelHeaderDelegate2.channel.channelAudioType === "sample-loop") {
+                                            return qsTr("Audio")
+                                        } else if (channelHeaderDelegate2.channel.channelAudioType === "sample-trig") {
+                                            return qsTr("Smp: Trig")
+                                        } else if (channelHeaderDelegate2.channel.channelAudioType === "sample-slice") {
+                                            return qsTr("Smp: Slice")
+                                        } else if (channelHeaderDelegate2.channel.channelAudioType === "synth") {
+                                            return qsTr("Synth")
+                                        } else if (channelHeaderDelegate2.channel.channelAudioType === "external") {
+                                            return qsTr("External")
+                                        }
+                                    }
+                                    subSubTextSize: 7
+                                    highlightColor: "white"
+
+                                    Binding {
+                                        target: channelHeaderDelegate2
+                                        property: "color"
+                                        when: root.visible
+                                        delayed: true
+
+                                        value: {
+                                            if (channelHeaderDelegate2.channel.channelAudioType === "synth")
+                                                return "#66ff0000"
+                                            else if (channelHeaderDelegate2.channel.channelAudioType === "sample-loop")
+                                                return "#6600ff00"
+                                            else if (channelHeaderDelegate2.channel.channelAudioType === "sample-trig")
+                                                return "#66ffff00"
+                                            else if (channelHeaderDelegate2.channel.channelAudioType === "sample-slice")
+                                                return "#66ffff00"
+                                            else if (channelHeaderDelegate2.channel.channelAudioType === "external")
+                                                return "#998e24aa"
+                                            else
+                                                return "#66888888"
+                                        }
+                                    }
+
+                                    highlightOnFocus: false
+                                    highlighted: (index + channelHeaderDelegate2.channelDelta) === zynthian.session_dashboard.selectedChannel // If song mode is not active, highlight if current cell is selected channel
+
+                                    onPressed: {
+                                        zynthian.session_dashboard.selectedChannel = index + channelHeaderDelegate2.channelDelta;
+                                    }
+                                }
                             }
                         }
                     }

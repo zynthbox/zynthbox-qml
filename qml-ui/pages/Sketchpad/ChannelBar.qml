@@ -72,7 +72,7 @@ GridLayout {
             headerText: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ||
                             zynthian.bottomBarControlObj.audioLevel <= -40
                                 ? ""
-                                : zynthian.bottomBarControlObj.audioLevel === undefined
+                                : zynthian.bottomBarControlObj.audioLevel == null
                                     ? ""
                                     : (zynthian.bottomBarControlObj.audioLevel.toFixed(2) + " (dB)")
             footerText: zynthian.bottomBarControlObj.name

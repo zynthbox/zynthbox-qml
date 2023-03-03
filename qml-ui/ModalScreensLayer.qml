@@ -41,6 +41,7 @@ Zynthian.Stack {
     property bool soundCategoriesPageLoaded: false
     property bool enginePageLoaded: false
     property bool songManagerPageLoaded: false
+    property bool channelWaveEditorPageLoaded: false
 
     visible: depth > 0 || busy
     onVisibleChanged: {
@@ -64,7 +65,8 @@ Zynthian.Stack {
                         && root.midiKeyRangePageLoaded
                         && root.soundCategoriesPageLoaded
                         && root.enginePageLoaded
-                        && root.songManagerPageLoaded) {
+                        && root.songManagerPageLoaded
+                        && root.channelWaveEditorPageLoaded) {
                     zynthian.isModalScreensCachingComplete = true
 
                     repeat = false
@@ -179,6 +181,24 @@ Zynthian.Stack {
                        root.pageCache["song_manager"].visible = false;
                    }
                    root.songManagerPageLoaded = true
+            }
+        },
+        Timer {
+            interval: 0
+            running: true
+            onTriggered: {
+                   console.log("Caching Audio Edit Page")
+                   zynthian.currentTaskMessage = "Loading audio edit page"
+                   if (!root.pageCache["channel_wave_editor"]) {
+                       let file = applicationWindow().pageScreenMapping.pageForModalScreen("channel_wave_editor");
+                       var component = Qt.createComponent(file);
+                       root.pageCache["channel_wave_editor"] = component.createObject(root, {"width": root.width, "height": root.height});
+                       if (component.errorString() != "") {
+                           console.log("Error loading audio edit page:", component.errorString());
+                       }
+                       root.pageCache["channel_wave_editor"].visible = false;
+                   }
+                   root.channelWaveEditorPageLoaded = true
             }
         },
         Timer {

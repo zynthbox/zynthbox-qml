@@ -219,6 +219,7 @@ Zynthian.ScreenPage {
 
                     Sketchpad.WaveEditorBar {
                         anchors.fill: parent
+                        clip: true
                         controlObj: component.selectedClip
                         controlType: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                         ? "bottombar-controltype-clip"

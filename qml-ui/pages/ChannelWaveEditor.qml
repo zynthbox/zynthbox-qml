@@ -119,16 +119,46 @@ Zynthian.ScreenPage {
         function goRight() {
         }
         function knob1Up() {
+            // Increment startPosition by 0.01
+            // Clamp values between 0 and duration
+            if (component.selectedClipHasWav) {
+                component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition + 0.01, 0), component.selectedClip.duration)
+            }
         }
         function knob1Down() {
+            // Decrement startPosition by 0.01
+            // Clamp values between 0 and duration
+            if (component.selectedClipHasWav) {
+                component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition - 0.01, 0), component.selectedClip.duration)
+            }
         }
         function knob2Up() {
+            // Increment loopDelta by 0.01
+            // Clamp values between 0 and length
+            if (component.selectedClipHasWav) {
+                component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta + 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
+            }
         }
         function knob2Down() {
+            // Decrement loopDelta by 0.01
+            // Clamp values between 0 and length
+            if (component.selectedClipHasWav) {
+                component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta - 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
+            }
         }
         function knob3Up() {
+            // Increment length by.1
+            // Clamp values between 0 and 64
+            if (component.selectedClipHasWav) {
+                component.selectedClip.length = Math.min(Math.max(component.selectedClip.length + 1, 0), 64)
+            }
         }
         function knob3Down() {
+            // Decrement length by.1
+            // Clamp values between 0 and 64
+            if (component.selectedClipHasWav) {
+                component.selectedClip.length = Math.min(Math.max(component.selectedClip.length - 1, 0), 64)
+            }
         }
     }
     Connections {

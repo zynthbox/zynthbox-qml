@@ -31,7 +31,9 @@ ColumnLayout {
     Binding {
         target: dial
         property: "value"
-        value: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 1
+        value: enabled
+                ? controlObj && controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 1
+                : dial.from
     }
 
     QQC2.Dial {

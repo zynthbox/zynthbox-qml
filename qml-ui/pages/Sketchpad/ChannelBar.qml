@@ -70,9 +70,11 @@ GridLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit*2
 
             headerText: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ||
-                        zynthian.bottomBarControlObj.audioLevel <= -40
-                            ? ""
-                            : (zynthian.bottomBarControlObj.audioLevel.toFixed(2) + " (dB)")
+                            zynthian.bottomBarControlObj.audioLevel <= -40
+                                ? ""
+                                : zynthian.bottomBarControlObj.audioLevel === undefined
+                                    ? ""
+                                    : (zynthian.bottomBarControlObj.audioLevel.toFixed(2) + " (dB)")
             footerText: zynthian.bottomBarControlObj.name
             audioLeveldB: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ? zynthian.bottomBarControlObj.audioLevel : -400
 
@@ -91,7 +93,8 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-        visible: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" && !zynthian.bottomBarControlObj.isEmpty()
+        // This looks really dumb, but for some reason that i do not fathom, without the literal check on top, we'll be warned that we cannot assign undefined to a bool
+        visible: (zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" && !zynthian.bottomBarControlObj.isEmpty()) ? true : false
 
         QQC2.Button {
             // As per #299 disable this button

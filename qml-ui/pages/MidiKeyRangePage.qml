@@ -49,6 +49,7 @@ Zynthian.ScreenPage {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             Layout.preferredHeight: Layout.preferredWidth
+            implicitHeight: Layout.preferredWidth
             Layout.fillWidth: false
             Layout.fillHeight: false
             legend: ""
@@ -128,6 +129,7 @@ Zynthian.ScreenPage {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             Layout.preferredHeight: Layout.preferredWidth
+            implicitHeight: Layout.preferredWidth
             Layout.fillWidth: false
             Layout.fillHeight: false
             legend: ""

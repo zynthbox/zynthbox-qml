@@ -245,7 +245,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
 
             text: qsTr("Copy Clip")
-            visible: bottomBar.clipCopySource == null
+            visible: bottomBar ? (bottomBar.clipCopySource == null) : false
             onClicked: {
                 bottomBar.clipCopySource = root.controlObj;
             }
@@ -255,8 +255,8 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
 
             text: qsTr("Paste Clip")
-            visible: bottomBar.clipCopySource != null
-            enabled: bottomBar.clipCopySource != root.controlObj
+            visible: bottomBar ? (bottomBar.clipCopySource != null) : false
+            enabled: bottomBar ? (bottomBar.clipCopySource != root.controlObj) : false
             onClicked: {
                 root.controlObj.copyFrom(bottomBar.clipCopySource);
                 bottomBar.clipCopySource = null;

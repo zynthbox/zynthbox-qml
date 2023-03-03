@@ -197,7 +197,7 @@ Zynthian.ScreenPage {
                     x: scrollView.mirrored ? 0 : scrollView.width - width
                     y: scrollView.topPadding
                     height: scrollView.availableHeight
-                    active: scrollView.ScrollBar.horizontal.active
+                    active: scrollView.ScrollBar ? (scrollView.ScrollBar.horizontal.active) : false
                     contentItem: Rectangle {
                         implicitWidth: Kirigami.Units.gridUnit
                         implicitHeight: 150
@@ -213,7 +213,11 @@ Zynthian.ScreenPage {
                     cellWidth: width / 3
                     cellHeight: height / 2.2
                     currentIndex: zynthian.engine.current_index
-                    onCurrentIndexChanged: zynthian.engine.current_index = currentIndex
+                    onCurrentIndexChanged: {
+                        if (zynthian.engine.current_index != currentIndex) {
+                            zynthian.engine.current_index = currentIndex;
+                        }
+                    }
 
                     model: zynthian.engine.selector_list
 

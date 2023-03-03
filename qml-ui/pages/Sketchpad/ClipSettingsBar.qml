@@ -41,11 +41,13 @@ GridLayout {
     Layout.maximumWidth: parent.width
 
     property QtObject bottomBar: null
-    property QtObject controlObj: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern")
+    property string controlType: zynthian.bottomBarControlType
+    property QtObject controlObj: (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
                                     ? zynthian.bottomBarControlObj // selected bottomBar object is clip/pattern
                                     : zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.hasOwnProperty("samples") && zynthian.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
                                         ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow]
                                         : null
+    property bool showCopyPasteButtons: true
         
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -187,7 +189,9 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
-            text: root.controlObj && root.controlObj.bpm ? (root.controlObj.bpm <= 0 ? "" : root.controlObj.bpm.toFixed(2)) : ""
+            text: enabled
+                    ? root.controlObj && root.controlObj.bpm ? (root.controlObj.bpm <= 0 ? "" : root.controlObj.bpm.toFixed(2)) : ""
+                    : ""
             // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
             /** Float Matching : Matches exactly one '0' after decimal point
@@ -235,6 +239,7 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        visible: root.showCopyPasteButtons
 
         QQC2.Button {
             Layout.alignment: Qt.AlignCenter
@@ -298,12 +303,14 @@ GridLayout {
             text: "<No Metadata>"
         }
         QQC2.Label {
-            visible: zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
+            visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
             text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
+            font.pointSize: 10
         }
         QQC2.Label {
-            visible: zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
+            visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
             text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
+            font.pointSize: 10
         }
     }
 }

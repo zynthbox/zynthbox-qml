@@ -42,7 +42,8 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
     property QtObject bottomBar: null
-    property QtObject controlObj: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern")
+    property string controlType: zynthian.bottomBarControlType
+    property QtObject controlObj: (waveBar.controlType === "bottombar-controltype-clip" || waveBar.controlType === "bottombar-controltype-pattern")
                                     ? zynthian.bottomBarControlObj // selected bottomBar object is clip/pattern
                                     : zynthian.bottomBarControlObj != null && zynthian.bottomBarControlObj.samples != null
                                         ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel

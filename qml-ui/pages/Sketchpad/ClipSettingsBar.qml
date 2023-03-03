@@ -298,11 +298,11 @@ GridLayout {
             text: "<No Metadata>"
         }
         QQC2.Label {
-            visible: root.zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
+            visible: zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
             text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
         }
         QQC2.Label {
-            visible: root.zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
+            visible: zynthian.bottomBarControlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
             text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
         }
     }

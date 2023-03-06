@@ -517,7 +517,7 @@ Item {
         }
     }
 
-    QQC2.Popup {
+    Zynthian.Popup {
         id: channelPicker
         modal: true
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y

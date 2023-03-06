@@ -343,7 +343,7 @@ MouseArea {
         }
     }
 
-    QQC2.Popup {
+    Zynthian.Popup {
         id: popup
         visible: zynthian.globalPopupOpened
 

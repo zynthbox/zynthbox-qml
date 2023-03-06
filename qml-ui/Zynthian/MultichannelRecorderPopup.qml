@@ -33,7 +33,7 @@ import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
-QQC2.Popup {
+Zynthian.Popup {
     id: component
 
     /**

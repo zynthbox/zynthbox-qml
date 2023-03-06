@@ -37,7 +37,7 @@ import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
-QQC2.Popup {
+Zynthian.Popup {
     id: root
     property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
     property var cuiaCallback: function(cuia) {
@@ -102,35 +102,24 @@ QQC2.Popup {
 
         console.log(zynthian.sketchpad.recordingSource, zynthian.sketchpad.recordingChannel, sourceCombo.currentIndex, recordingChannelCombo.currentIndex)
     }
-    onOpenedChanged: {
-        if (opened) {
-            // Report dialog open to zynthian for passing cuia events to dialog
-            zynthian.openedDialog = root
-
-            // Reset recordingType combo model to selected value when dialog opens
-            for (var i=0; i<recordingTypeComboModel.count; i++) {
-                if (recordingTypeComboModel.get(i).value === zynthian.sketchpad.recordingType) {
-                    recordingTypeCombo.currentIndex = i
-                    break
-                }
-            }
-
-            // Reset countIn combo model to selected value when dialog opens
-            for (var i=0; i<countInComboModel.count; i++) {
-                if (countInComboModel.get(i).value === zynthian.sketchpad.countInBars) {
-                    countInCombo.currentIndex = i
-                    break
-                }
-            }
-        } else {
-            // Report dialog close to zynthian to stop receiving cuia events
-            if (zynthian.openedDialog === root) {
-                zynthian.openedDialog = null
-            }
-        }
-    }
     onOpened: {
         zynthian.recordingPopupActive = true
+
+        // Reset recordingType combo model to selected value when dialog opens
+        for (var i=0; i<recordingTypeComboModel.count; i++) {
+            if (recordingTypeComboModel.get(i).value === zynthian.sketchpad.recordingType) {
+                recordingTypeCombo.currentIndex = i
+                break
+            }
+        }
+
+        // Reset countIn combo model to selected value when dialog opens
+        for (var i=0; i<countInComboModel.count; i++) {
+            if (countInComboModel.get(i).value === zynthian.sketchpad.countInBars) {
+                countInCombo.currentIndex = i
+                break
+            }
+        }
     }
     onClosed: {
         zynthian.recordingPopupActive = false

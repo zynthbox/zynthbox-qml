@@ -475,7 +475,7 @@ Zynthian.Card {
         }
     }
 
-    QQC2.Popup {
+    Zynthian.Popup {
         id: noFreeSlotsPopup
         x: Math.round(parent.width/2 - width/2)
         y: Math.round(parent.height/2 - height/2)

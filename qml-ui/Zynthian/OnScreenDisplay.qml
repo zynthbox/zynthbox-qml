@@ -31,7 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-QQC2.Popup {
+Zynthian.Popup {
     id: component
     exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
     modal: true

@@ -1398,7 +1398,7 @@ Zynthian.BasePlayGrid {
                     }
                 }
             }
-            QQC2.Popup {
+            Zynthian.Popup {
                 id: patternMenuPopup
                 exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: Kirigami.Units.largeSpacing
@@ -1867,7 +1867,7 @@ Zynthian.BasePlayGrid {
                     }
                 }
             }
-            QQC2.Popup {
+            Zynthian.Popup {
                 id: stepSettingsPopup
                 exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: drumPad.y - height - Kirigami.Units.largeSpacing
@@ -1899,7 +1899,7 @@ Zynthian.BasePlayGrid {
                     onClose: stepSettingsPopup.close();
                 }
             }
-            QQC2.Popup {
+            Zynthian.Popup {
                 id: noteSettingsPopup
                 exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: drumPad.y - height - Kirigami.Units.largeSpacing
@@ -1970,7 +1970,7 @@ Zynthian.BasePlayGrid {
                     property QtObject bottomDrawer: channelsViewDrawer
                 }
             }
-            QQC2.Popup {
+            Zynthian.Popup {
                 id: partPicker
                 exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 function pickPart(associatedChannelIndex) {

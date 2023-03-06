@@ -27,6 +27,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import Zynthian 1.0 as Zynthian
 
 QQC2.Button {
     id: root
@@ -53,7 +54,7 @@ QQC2.Button {
         comboBoxPopup.open()
     }
 
-    QQC2.Popup {
+    Zynthian.Popup {
         id: comboBoxPopup
         parent: QQC2.Overlay.overlay
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

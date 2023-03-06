@@ -32,7 +32,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
-QQC2.Popup {
+Zynthian.Popup {
     id: root
     function bounce(trackName, channel) {
         _private.trackName = trackName;

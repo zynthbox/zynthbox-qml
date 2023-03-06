@@ -771,7 +771,7 @@ Rectangle {
         }
     }
 
-    QQC2.Popup {
+    Zynthian.Popup {
         id: samplePickerPopup
 
         parent: QQC2.Overlay.overlay

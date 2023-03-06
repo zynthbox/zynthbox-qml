@@ -128,7 +128,7 @@ Zynthian.Dialog {
                     }
                 }
             }
-            QQC2.Popup {
+            Zynthian.Popup {
                 id: noFreeSlotsPopup
                 parent: QQC2.Overlay.overlay
                 y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

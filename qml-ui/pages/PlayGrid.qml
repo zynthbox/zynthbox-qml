@@ -138,7 +138,7 @@ don't want to have to dig too far...
             Layout.fillHeight: true
             Layout.margins: 8
 
-            QQC2.Dialog {
+            Zynthian.Dialog {
                 id: settingsDialog
                 visible: false
                 title: qsTr("%1 Settings").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ")

@@ -275,7 +275,7 @@ Item {
         }
     }
 
-    QQC2.Dialog {
+    Zynthian.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
@@ -329,7 +329,7 @@ Item {
         }
     }
 
-    QQC2.Dialog {
+    Zynthian.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y

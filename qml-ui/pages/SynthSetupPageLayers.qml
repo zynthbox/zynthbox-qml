@@ -588,7 +588,7 @@ Zynthian.ScreenPage {
             }
         }
 
-        QQC2.Dialog {
+        Zynthian.Dialog {
             id: layerSetupDialog
             parent: applicationWindow().contentItem
             x: Math.round(parent.width/2 - width/2)

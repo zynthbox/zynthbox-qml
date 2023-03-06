@@ -37,7 +37,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 import "../Sketchpad" as Sketchpad
 
 
-QQC2.Dialog {
+Zynthian.Dialog {
     id: soundsDialog
 
     /* Disable Sounds Dialog as it is not used anymore

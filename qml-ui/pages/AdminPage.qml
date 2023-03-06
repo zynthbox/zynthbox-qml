@@ -74,7 +74,7 @@ Zynthian.SelectorPage {
         }
     }
 
-    QQC2.Dialog {
+    Zynthian.Dialog {
         property string label
 
         id: errorDialog

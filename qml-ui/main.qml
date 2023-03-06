@@ -617,7 +617,7 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    QQC2.Dialog {
+    Zynthian.Dialog {
         id: confirmDialog
         x: root.width / 2 - width / 2
         y: root.height / 2 - height / 2

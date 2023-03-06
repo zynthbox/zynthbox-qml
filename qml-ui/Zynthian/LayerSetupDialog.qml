@@ -34,7 +34,7 @@ import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
 
-QQC2.Dialog {
+Zynthian.Dialog {
     id: root
 
     property QtObject selectedChannel: applicationWindow().selectedChannel

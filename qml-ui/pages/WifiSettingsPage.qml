@@ -68,7 +68,7 @@ Zynthian.ScreenPage {
         color: Kirigami.Theme.backgroundColor
         radius: 2
 
-        QQC2.Dialog {
+        Zynthian.Dialog {
             id: connectDialog
 
             property string ssid

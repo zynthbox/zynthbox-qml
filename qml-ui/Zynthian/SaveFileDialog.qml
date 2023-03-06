@@ -5,7 +5,9 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-QQC2.Dialog {
+import Zynthian 1.0 as Zynthian
+
+Zynthian.Dialog {
     property alias headerText: header.text
     property alias conflict: conflictRow.visible
     property alias fileName: fileName.text

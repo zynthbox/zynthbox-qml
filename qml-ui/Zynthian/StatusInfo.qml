@@ -345,13 +345,21 @@ MouseArea {
 
     Zynthian.Popup {
         id: popup
-        visible: zynthian.globalPopupOpened
 
+        property var cuiaCallback: function(cuia) {
+            switch(cuia) {
+                // If Global button is pressed when global popup is open, close it
+                case "SCREEN_AUDIO_SETTINGS":
+                    popup.close()
+                    return true
+            }
+        }
+
+        visible: zynthian.globalPopupOpened
         y: parent.height
         x: parent.width - width
         width: Kirigami.Units.gridUnit * 20
         height: Kirigami.Units.gridUnit * 25
-
         exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
         modal: true
         onClosed: zynthian.globalPopupOpened = false

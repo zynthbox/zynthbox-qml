@@ -44,3 +44,4 @@ MultichannelRecorderPopup 1.0 MultichannelRecorderPopup.qml
 ResetableSlider 1.0 ResetableSlider.qml
 OnScreenDisplay 1.0 OnScreenDisplay.qml
 SampleVisualiser 1.0 SampleVisualiser.qml
+Dialog 1.0 Dialog.qml

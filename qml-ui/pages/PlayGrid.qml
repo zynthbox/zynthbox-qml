@@ -56,9 +56,6 @@ Zynthian.ScreenPage {
                 } else if (settingsPopup.visible) {
                     settingsPopup.visible = false;
                     returnValue = true;
-                } else if (settingsDialog.visible) {
-                    settingsDialog.visible = false;
-                    returnValue = true;
                 }
                 break;
             default:

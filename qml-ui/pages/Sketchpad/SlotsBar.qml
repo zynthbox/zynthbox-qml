@@ -59,16 +59,6 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     function cuiaCallback(cuia) {
-        if (samplePickerDialog.opened) {
-            return samplePickerDialog.cuiaCallback(cuia);
-        } else if (bankPickerDialog.opened) {
-            return bankPickerDialog.cuiaCallback(cuia);
-        } else if (loopPickerDialog.opened) {
-            return loopPickerDialog.cuiaCallback(cuia);
-        } else if (externalMidiChannelPicker.opened) {
-            return externalMidiChannelPicker.cuiaCallback(cuia);
-        }
-
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
                 handleItemClick()

@@ -51,42 +51,38 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         var returnValue = false;
-        if (bouncePopup.opened) {
-            returnValue = bouncePopup.cuiaCallback(cuia);
-        } else {
-            switch (cuia) {
-                case "NAVIGATE_LEFT":
-                    if (zynthian.session_dashboard.selectedChannel > 0) {
-                        zynthian.session_dashboard.selectedChannel -= 1;
+        switch (cuia) {
+            case "NAVIGATE_LEFT":
+                if (zynthian.session_dashboard.selectedChannel > 0) {
+                    zynthian.session_dashboard.selectedChannel -= 1;
+                }
+                returnValue = true;
+                break;
+
+            case "NAVIGATE_RIGHT":
+                if (zynthian.session_dashboard.selectedChannel < 9) {
+                    zynthian.session_dashboard.selectedChannel += 1;
+                }
+                returnValue = true;
+                break;
+
+            case "SELECT_UP":
+                if (root.selectedChannel.channelAudioType === "sample-trig") {
+                    if (root.selectedChannel.selectedSlotRow > 0) {
+                        root.selectedChannel.selectedSlotRow -= 1;
                     }
                     returnValue = true;
-                    break;
+                }
+                break;
 
-                case "NAVIGATE_RIGHT":
-                    if (zynthian.session_dashboard.selectedChannel < 9) {
-                        zynthian.session_dashboard.selectedChannel += 1;
+            case "SELECT_DOWN":
+                if (root.selectedChannel.channelAudioType === "sample-trig") {
+                    if (root.selectedChannel.selectedSlotRow < 4) {
+                        root.selectedChannel.selectedSlotRow += 1;
                     }
                     returnValue = true;
-                    break;
-
-                case "SELECT_UP":
-                    if (root.selectedChannel.channelAudioType === "sample-trig") {
-                        if (root.selectedChannel.selectedSlotRow > 0) {
-                            root.selectedChannel.selectedSlotRow -= 1;
-                        }
-                        returnValue = true;
-                    }
-                    break;
-
-                case "SELECT_DOWN":
-                    if (root.selectedChannel.channelAudioType === "sample-trig") {
-                        if (root.selectedChannel.selectedSlotRow < 4) {
-                            root.selectedChannel.selectedSlotRow += 1;
-                        }
-                        returnValue = true;
-                    }
-                    break;
-            }
+                }
+                break;
         }
         return returnValue;
     }

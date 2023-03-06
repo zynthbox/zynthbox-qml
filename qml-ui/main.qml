@@ -84,9 +84,6 @@ Kirigami.AbstractApplicationWindow {
             } else if (samplesMenu.visible) {
                 samplesMenu.visible = false;
                 result = true;
-            } else if (zynthian.globalPopupOpened) {
-                zynthian.globalPopupOpened = false;
-                result = true;
             }
         }
 

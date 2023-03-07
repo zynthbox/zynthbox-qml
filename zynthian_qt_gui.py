@@ -2098,11 +2098,10 @@ class zynthian_gui(QObject):
                         if cuia.startswith("SWITCH_BACK"):
                             logging.debug(f"SWITCH_BACK pressed. Dialog does not have a cuiaCallback property. Try closing.")
                             QMetaObject.invokeMethod(self.opened_dialog, "close", Qt.QueuedConnection)
+                            return
                     except Exception as e:
                         logging.debug(f"Attempted to close openedDialog, got error: {e}")
                         pass
-
-                    return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback on openeedDialog, got error: {}".format(e))
                 pass

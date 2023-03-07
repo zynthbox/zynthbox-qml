@@ -68,26 +68,14 @@ Kirigami.AbstractApplicationWindow {
     }
     property var cuiaCallback: function(cuia) {
         var result = false;
-
-        // If the virtual keyboard is open, pass thins directly to that
+        
+        // Since VK is not a Zynthian Menu/Popup/Drawer, CUIA events are not sent implicitly
+        // If the virtual keyboard is open, pass CUIA events explicitly
         if (virtualKeyboardLoader.item && virtualKeyboardLoader.item.visible) {
             result = virtualKeyboardLoader.item.cuiaCallback(cuia);
-        } else if (slotSelectionDrawer.opened) {
-            result = slotSelectionDrawer.cuiaCallback(cuia);
-        } else if (cuia.startsWith("SWITCH_BACK")) {
-            if (channelsMenu.visible) {
-                channelsMenu.visible = false;
-                result = true;
-            } else if (scenesMenu.visible) {
-                scenesMenu.visible = false;
-                result = true;
-            } else if (samplesMenu.visible) {
-                samplesMenu.visible = false;
-                result = true;
-            }
         }
-
-        return result;
+        
+        return result
     }
 
     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName)
@@ -184,7 +172,7 @@ Kirigami.AbstractApplicationWindow {
             }
 
 
-            QQC2.Menu {
+            Zynthian.Menu {
                 id: tracksMenu
                 y: parent.height
                 modal: true
@@ -247,7 +235,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
 
-            QQC2.Menu {
+            Zynthian.Menu {
                 id: scenesMenu
                 y: parent.height
                 modal: true
@@ -278,7 +266,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
             onClicked: channelsMenu.visible = true
-            QQC2.Menu {
+            Zynthian.Menu {
                 id: channelsMenu
                 y: parent.height
                 modal: true
@@ -315,7 +303,7 @@ Kirigami.AbstractApplicationWindow {
             onClicked: samplesMenu.visible = true
             visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
 
-            QQC2.Menu {
+            Zynthian.Menu {
                 id: samplesMenu
                 y: parent.height
                 modal: true
@@ -782,7 +770,7 @@ Kirigami.AbstractApplicationWindow {
         id: recordingPopup
     }
 
-    QQC2.Drawer {
+    Zynthian.Drawer {
         id: miniPlayGridDrawer
         width: root.width
         height: root.height * 0.66
@@ -793,7 +781,7 @@ Kirigami.AbstractApplicationWindow {
         contentItem: MiniPlayGrid {}
     }
 
-    QQC2.Drawer {
+    Zynthian.Drawer {
         id: slotSelectionDrawer
         width: Kirigami.Units.gridUnit * 24
         height: root.height
@@ -872,13 +860,6 @@ Kirigami.AbstractApplicationWindow {
                         returnVal = true
                     }
 
-                    break
-
-                case "SWITCH_BACK_SHORT":
-                    if (slotSelectionDrawer.opened) {
-                        slotSelectionDrawer.close()
-                        returnVal = true
-                    }
                     break
             }
 

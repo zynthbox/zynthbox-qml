@@ -471,6 +471,7 @@ class zynthian_gui(QObject):
         # 2nd element of the set is the zynthian controller to control fx
         self.global_fx_engines = []
 
+        self.__switch_channels_button_pressed__ = False
         self.__alt_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
@@ -2564,8 +2565,10 @@ class zynthian_gui(QObject):
             elif dtus == 0:
                 # logging.error("key press: {} {}".format(i, dtus))
 
-                # Handle alt button
-                if i == 17:
+                # Handle button press event
+                if i == 10:
+                    self.switchChannelsButtonPressed = True
+                elif i == 17:
                     self.altButtonPressed = True
                 elif i == 18:
                     self.startRecordButtonPressed = True
@@ -2593,8 +2596,10 @@ class zynthian_gui(QObject):
             elif dtus > 0:
                 # logging.error("key release: {} {}".format(i, dtus))
 
-                # Handle alt button
-                if i == 17:
+                # Handle button release event
+                if i == 10:
+                    self.switchChannelsButtonPressed = False
+                elif i == 17:
                     self.altButtonPressed = False
                 elif i == 18:
                     self.startRecordButtonPressed = False
@@ -2724,15 +2729,17 @@ class zynthian_gui(QObject):
 
         if press:
             if not fake_key in self.__fake_keys_pressed:
-                if self.channelsModActive:
-                    self.fakeKeyboard.press(Key.ctrl)
+                # Do not emulate Ctrl key with channelsModActive
+                # if self.channelsModActive:
+                #     self.fakeKeyboard.press(Key.ctrl)
 
                 self.__fake_keys_pressed.add(fake_key)
                 self.fakeKeyboard.press(fake_key)
         else:
             if fake_key in self.__fake_keys_pressed:
-                if self.channelsModActive:
-                    self.fakeKeyboard.release(Key.ctrl)
+                # Do not emulate Ctrl key with channelsModActive
+                # if self.channelsModActive:
+                #     self.fakeKeyboard.release(Key.ctrl)
 
                 self.__fake_keys_pressed.discard(fake_key)
                 self.fakeKeyboard.release(fake_key)
@@ -4109,6 +4116,21 @@ class zynthian_gui(QObject):
     longTaskStarted = Signal()
     longTaskEnded = Signal()
     ### END Alternative long task handling
+
+    ### Property switchChannelsButtonPressed
+    def get_switch_channels_button_pressed(self):
+        return self.__switch_channels_button_pressed__
+
+    def set_switch_channels_button_pressed(self, pressed):
+        if self.__switch_channels_button_pressed__ != pressed:
+            logging.debug(f"Switch Channels Button pressed : {pressed}")
+            self.__switch_channels_button_pressed__ = pressed
+            self.switch_channels_button_pressed_changed.emit()
+
+    switch_channels_button_pressed_changed = Signal()
+
+    switchChannelsButtonPressed = Property(bool, get_switch_channels_button_pressed, set_switch_channels_button_pressed, notify=switch_channels_button_pressed_changed)
+    ### END Property switchChannelsButtonPressed
 
     ### Property altButtonPressed
     def get_alt_button_pressed(self):

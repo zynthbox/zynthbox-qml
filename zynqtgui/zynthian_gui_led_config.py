@@ -247,8 +247,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 #     }
 
                 # Light up 1-5 buttons when respective channel is selected
-                # If self.zyngui.channelsModActive is true, light up 1-5 HW button when channels 6-10 is selected
-                channelDelta = 5 if self.zyngui.channelsModActive else 0
+                # If self.zyngui.switchChannelsButtonPressed is true, light up 1-5 HW button when channels 6-10 is selected
+                channelDelta = 5 if self.zyngui.switchChannelsButtonPressed else 0
                 if self.zyngui.session_dashboard.selectedChannel - channelDelta == i-1:
                     if channel.channelAudioType == "synth":
                         self.button_color_map[i] = {
@@ -277,7 +277,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     }
 
             # 6: * Button
-            if self.zyngui.channelsModActive:
+            if self.zyngui.switchChannelsButtonPressed:
                 self.button_color_map[6] = {
                     'color': self.led_color_green,
                     'blink': False

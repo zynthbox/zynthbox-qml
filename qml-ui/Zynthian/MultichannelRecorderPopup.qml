@@ -97,7 +97,7 @@ Zynthian.Popup {
         open();
     }
 
-    function cuiaCallback(cuia) {
+    property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
@@ -106,10 +106,10 @@ Zynthian.Popup {
                 component.close();
                 returnValue = true;
                 break;
-        case "SWITCH_SELECT_SHORT":
-            _private.startRecording();
-            returnValue = true;
-            break;
+            case "SWITCH_SELECT_SHORT":
+                _private.startRecording();
+                returnValue = true;
+                break;
         }
         return returnValue;
     }

@@ -37,24 +37,45 @@ class sketchpad_sketch(QObject):
 
         self.__song = song
         self.__sketch_id = sketch_id
-        self.__segments_model = sketchpad_segments_model(song, self)
+        self.__segments_models = [sketchpad_segments_model(song, self)]
+        self.__segments_model = 0
         self.__is_empty = True
 
     def serialize(self):
         logging.debug("### Serializing Sketch")
 
+        segmentsData = []
+        for segmentsModel in self.__segments_models:
+            segmentsData.append(segmentsModel.serialize())
         return {
             "sketchId": self.__sketch_id,
-            "segments": self.__segments_model.serialize(),
+            "segments": segmentsData,
         }
 
     def deserialize(self, obj):
         logging.debug("### Deserializing Sketch")
 
+        self.__segments_models = []
         if "sketchId" in obj:
             self.set_sketchId(obj["sketchId"], True)
         if "segments" in obj:
-            self.__segments_model.deserialize(obj["segments"])
+            if "barLength" in obj["segments"]:
+                # In this case, we've got an old single segment sitting around - we can get rid of this bit in a little bit
+                self.__segments_models.append(sketchpad_segments_model(self.__song, self))
+                self.__segments_models[0].deserialize(obj["segments"])
+            else:
+                for segmentData in obj["segments"]:
+                    segmentModel = sketchpad_segments_model(self.__song, self)
+                    segmentModel.deserialize(segmentData)
+                    self.__segments_models.append(segmentModel)
+        self.__segments_model = 0
+        if len(self.__segments_models) == 0:
+            self.__segments_models.append(sketchpad_segments_model(self.__song, self))
+        if self.__segments_models[0].count == 0:
+            newSegment = self.__segments_models[0].new_segment()
+            newSegment.barLength = 1
+        self.segmentsModelChanged.emit()
+        self.segmentsModelsCountChanged.emit()
 
     ### Property className
     def get_className(self):
@@ -84,11 +105,70 @@ class sketchpad_sketch(QObject):
     sketchId = Property(int, get_sketchId, notify=sketchIdChanged)
     ### END Property sketchId
 
-    ### Property segmentsModel
-    def get_segmentsModel(self):
-        return self.__segments_model
+    @Slot(None, result=int)
+    def newSegmentsModel(self):
+        newIndex = len(self.__segments_models)
+        newSegmentsModel = sketchpad_segments_model(self.__song, self)
+        newSegment = newSegmentsModel.new_segment()
+        newSegment.barLength = 1
+        self.__segments_models.append(newSegmentsModel)
+        self.segmentsModelsCountChanged.emit()
+        return newIndex
+
+    @Slot(int)
+    def removeSegmentsModel(self, index):
+        if index > -1 and index < len(self.__segments_models):
+            self.__segments_models.pop(index)
+            if len(self.__segments_models) == 0:
+                self.newSegmentsModel()
+            self.segmentsModelChanged.emit()
+            self.segmentsModelsCountChanged.emit()
+
+    @Slot(int, result=int)
+    def cloneSegmentAsNew(self, index):
+        if index > -1 and index < len(self.__segments_models):
+            newIndex = len(self.__segments_models)
+            newModel = sketchpad_segments_model(self.__song, self)
+            self.__segments_models.append(newModel)
+            newModel.copyFrom(self.__segments_models[index])
+            self.segmentsModelsCountChanged.emit()
+            return newIndex
+        return -1
+
+    ### Property segmentsModelsCount
+    def get_segmentsModelsCount(self):
+        return len(self.__segments_models)
+
+    segmentsModelsCountChanged = Signal()
+
+    segmentsModelsCount = Property(int, get_segmentsModelsCount, notify=segmentsModelsCountChanged)
+    ### END segmentsModelsCount
 
     segmentsModelChanged = Signal()
+
+    ### Property segmentsModelIndex
+    def get_segmentsModelIndex(self):
+        return self.__segments_model
+
+    def set_segmentsModelIndex(self, value):
+        if self.__segments_model != value and value > -1 and value < len(self.__segments_models):
+            self.__segments_model = value
+            self.segmentsModelChanged.emit()
+
+    segmentsModelIndex = Property(int, get_segmentsModelIndex, set_segmentsModelIndex, notify=segmentsModelChanged)
+    ### END Property segmentsModelIndex
+
+    @Slot(int, result=QObject)
+    def getSegmentsModel(self, index):
+        if index > -1 and index < len(self.__segments_models):
+            return self.__segments_models[index]
+        return None
+
+    ### Property segmentsModel
+    def get_segmentsModel(self):
+        if self.__segments_model > -1 and self.__segments_model < len(self.__segments_models):
+            return self.__segments_models[self.__segments_model]
+        return None
 
     segmentsModel = Property(QObject, get_segmentsModel, notify=segmentsModelChanged)
     ### END Property segmentsModel

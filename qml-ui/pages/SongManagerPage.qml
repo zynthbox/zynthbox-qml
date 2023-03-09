@@ -43,10 +43,6 @@ Zynthian.ScreenPage {
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
-        if (multichannelRecorderPopup.opened) {
-            returnValue = multichannelRecorderPopup.cuiaCallback(cuia);
-        }
-
         switch (cuia) {
             case "NAVIGATE_LEFT":
             case "SELECT_DOWN":
@@ -130,7 +126,7 @@ Zynthian.ScreenPage {
             }
         }
         function knob2Up() {
-            if (segmentDetails.selectedSegment.beatLength < 15) {
+            if (segmentDetails.selectedSegment.beatLength < 3) {
                 segmentDetails.selectedSegment.beatLength += 1;
             }
         }
@@ -147,7 +143,10 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            enabled: false
+            text: qsTr("Variations")
+            onTriggered: {
+                segmentModelPicker.open();
+            }
         },
         Kirigami.Action {
             enabled: false
@@ -165,9 +164,13 @@ Zynthian.ScreenPage {
     Zynthian.MultichannelRecorderPopup {
         id: multichannelRecorderPopup
     }
+    Zynthian.SegmentModelPicker {
+        id: segmentModelPicker
+    }
 
     ColumnLayout {
         anchors.fill: parent
+        // BEGIN Segments navigator bar
         RowLayout {
             id: segmentsLayout
             Layout.fillWidth: true
@@ -308,7 +311,64 @@ Zynthian.ScreenPage {
                 }
             }
         }
+        // END Segments navigator bar
+        // BEGIN Playback progress bar
         RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit
+            spacing: 0
+            Kirigami.Theme.inherit: false
+            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+            Repeater {
+                id: segmentsRepeater
+                property int totalDuration: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                model: component.isVisible && totalDuration > 0 ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel : 0
+                delegate: Item {
+                    property QtObject segment: model.segment
+                    property int duration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segment.barLength * 4 + segment.beatLength)
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: component.width * (duration / segmentsRepeater.totalDuration)
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    Rectangle {
+                        anchors {
+                            fill: parent;
+                            margins: 1
+                        }
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.focusColor
+                        }
+                        color: Kirigami.Theme.backgroundColor
+                    }
+                }
+            }
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumHeight: 1
+            Layout.maximumHeight: 1
+            visible: segmentsRepeater.totalDuration > 0
+            Item {
+                height: 1
+                width: 1
+                y: 0
+                x: component.visible && segmentsRepeater.totalDuration > 0 ? parent.width * (ZynQuick.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                Rectangle {
+                    anchors {
+                        bottom: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    height: Kirigami.Units.gridUnit + 10 // 10 because the default spacing is 5 and we want it to stick up and down by that spacing amount, why not
+                    width: 3
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    color: Kirigami.Theme.focusColor
+                }
+            }
+        }
+        // END Playback progress bar
+        RowLayout {
+            // BEGIN Segment picker grid
             ColumnLayout {
                 RowLayout {
                     Layout.fillWidth: true
@@ -338,7 +398,8 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            // Segment details colume, visible when in song mode
+            // END Segment picker grid
+            // BEGIN Segment details column
             ColumnLayout {
                 id: segmentDetails
                 property QtObject selectedSegment: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment
@@ -518,6 +579,7 @@ Zynthian.ScreenPage {
                     }
                 }
             }
+            // END Segment details column
         }
     }
 }

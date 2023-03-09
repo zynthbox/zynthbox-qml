@@ -29,6 +29,9 @@ import org.kde.kirigami 2.4 as Kirigami
 
 QQC2.Popup {
     id: root
+    exit: null; enter: null;
+    modal: true
+    focus: true
 
     /** Handle opened changed to push/pop dialog to zynthian dialog stack
       * This will allow main program to pass CUIA events to the dialog stack

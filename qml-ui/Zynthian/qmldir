@@ -48,3 +48,4 @@ Dialog 1.0 Dialog.qml
 Popup 1.0 Popup.qml
 Drawer 1.0 Drawer.qml
 Menu 1.0 Menu.qml
+SegmentModelPicker 1.0 SegmentModelPicker.qml

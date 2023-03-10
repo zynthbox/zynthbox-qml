@@ -544,23 +544,15 @@ Zynthian.ScreenPage {
                     }
                 }
                 QQC2.Button {
-                    text: confirmRemoval.visible ? qsTr("Don't Remove") : qsTr("Remove...")
+                    text: qsTr("Remove...")
                     onClicked: {
-                        confirmRemoval.visible = !confirmRemoval.visible;
+                        segmentRemover.open();
                     }
-                    QQC2.Button {
-                        id: confirmRemoval
-                        anchors {
-                            top: parent.top
-                            right: parent.left
-                            rightMargin: Kirigami.Units.smallSpacing
-                            bottom: parent.bottom
-                        }
-                        visible: false
-                        width: parent.width
-                        text: qsTr("Remove")
-                        onClicked: {
-                            confirmRemoval.visible = false;
+                    Zynthian.DialogQuestion {
+                        id: segmentRemover
+                        title: qsTr("Remove Segment?")
+                        text: qsTr("Are you sure you wish to remove this segment?\n\nThis action cannot be undone.")
+                        onAccepted: {
                             if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count === 1) {
                                 // If there's only this single segment, don't actually delete it, just clear it
                                 zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clear();

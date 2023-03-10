@@ -604,7 +604,6 @@ ColumnLayout {
         x: root.parent.mapFromGlobal(Math.round(Screen.width/2 - width/2), 0).x
         y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
         width: Kirigami.Units.gridUnit*12
-        modal: true
 
         onVisibleChanged: {
             if (visible) {
@@ -711,7 +710,6 @@ ColumnLayout {
         y: Math.round(parent.height/2 - height/2)
         width: Kirigami.Units.gridUnit*12
         height: Kirigami.Units.gridUnit*4
-        modal: true
 
         QQC2.Label {
             anchors.margins: Kirigami.Units.gridUnit

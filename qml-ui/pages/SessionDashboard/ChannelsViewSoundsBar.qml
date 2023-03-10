@@ -481,7 +481,6 @@ Zynthian.Card {
         y: Math.round(parent.height/2 - height/2)
         width: Kirigami.Units.gridUnit*12
         height: Kirigami.Units.gridUnit*4
-        modal: true
 
         QQC2.Label {
             width: parent.width

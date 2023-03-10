@@ -59,8 +59,6 @@ QQC2.Button {
         parent: QQC2.Overlay.overlay
         x: parent.width/2 - width/2
         y: parent.height/2 - height/2
-        exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
-        modal: true
         width: Kirigami.Units.gridUnit * 20
 
         ColumnLayout {

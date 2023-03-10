@@ -519,7 +519,6 @@ Item {
 
     Zynthian.Popup {
         id: channelPicker
-        modal: true
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
         x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width

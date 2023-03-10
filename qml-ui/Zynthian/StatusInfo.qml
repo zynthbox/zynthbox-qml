@@ -360,8 +360,6 @@ MouseArea {
         x: parent.width - width
         width: Kirigami.Units.gridUnit * 20
         height: Kirigami.Units.gridUnit * 25
-        exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
-        modal: true
         onClosed: zynthian.globalPopupOpened = false
         contentItem: Item {
             GridLayout {

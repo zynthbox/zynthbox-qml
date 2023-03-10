@@ -92,9 +92,6 @@ Rectangle {
         parent: QQC2.Overlay.overlay
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
         x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-        exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
-        modal: true
-        focus: true
         ChannelKeyZoneSetup {
             anchors.fill: parent
             implicitWidth: root.width

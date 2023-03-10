@@ -135,7 +135,6 @@ Zynthian.Dialog {
                 x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
                 width: Kirigami.Units.gridUnit*12
                 height: Kirigami.Units.gridUnit*4
-                modal: true
 
                 QQC2.Label {
                     width: parent.width

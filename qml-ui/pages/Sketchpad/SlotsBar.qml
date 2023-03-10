@@ -768,7 +768,6 @@ Rectangle {
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
         x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
         width: Kirigami.Units.gridUnit*12
-        modal: true
 
         ColumnLayout {
             anchors.fill: parent

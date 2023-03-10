@@ -1400,13 +1400,10 @@ Zynthian.BasePlayGrid {
             }
             Zynthian.Popup {
                 id: patternMenuPopup
-                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: Kirigami.Units.largeSpacing
                 x: -Kirigami.Units.largeSpacing * 2
                 width: drumsGridContainer.width - Kirigami.Units.largeSpacing * 2
                 height: drumsGridContainer.height - Kirigami.Units.largeSpacing * 3
-                modal: true
-                focus: true
                 Connections {
                     target: component
                     onShowPatternsMenu: {
@@ -1869,11 +1866,8 @@ Zynthian.BasePlayGrid {
             }
             Zynthian.Popup {
                 id: stepSettingsPopup
-                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: drumPad.y - height - Kirigami.Units.largeSpacing
                 x: Kirigami.Units.largeSpacing
-                modal: true
-                focus: true
                 function showStepSettings(model, row, column) {
                     stepSettings.model = model;
                     stepSettings.row = row;
@@ -1901,11 +1895,8 @@ Zynthian.BasePlayGrid {
             }
             Zynthian.Popup {
                 id: noteSettingsPopup
-                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: drumPad.y - height - Kirigami.Units.largeSpacing
                 x: Kirigami.Units.largeSpacing
-                modal: true
-                focus: true
                 function showSettings(patternModel, firstBar, lastBar, midiNoteFilter) {
                     noteSettings.midiNoteFilter = midiNoteFilter;
                     noteSettings.firstBar = firstBar;
@@ -1972,7 +1963,6 @@ Zynthian.BasePlayGrid {
             }
             Zynthian.Popup {
                 id: partPicker
-                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 function pickPart(associatedChannelIndex) {
                     partPicker.associatedChannelIndex = associatedChannelIndex;
                     open();
@@ -1998,7 +1988,6 @@ Zynthian.BasePlayGrid {
                     zynthian.popDialog(partPicker);
                     partPicker.associatedChannelIndex = -1;
                 }
-                modal: true
                 parent: QQC2.Overlay.overlay
                 x: Math.round(parent.width/2 - width/2)
                 y: Math.round(parent.height/2 - height/2)

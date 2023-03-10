@@ -477,8 +477,11 @@ Zynthian.ScreenPage {
                         inputMethodHints: Qt.ImhDigitsOnly
                         activeFocusOnTab: false
                         text: segmentDetails.selectedSegment.barLength
-                        onAccepted: {
-                            segmentDetails.selectedSegment.barLength = parseInt(text)
+                        onTextChanged: {
+                            var value = parseInt(text);
+                            if (text !== "" && value != segmentDetails.selectedSegment.barLength) {
+                                segmentDetails.selectedSegment.barLength = value;
+                            }
                         }
                     }
                     QQC2.Label {
@@ -499,8 +502,11 @@ Zynthian.ScreenPage {
                         inputMethodHints: Qt.ImhDigitsOnly
                         activeFocusOnTab: false
                         text: segmentDetails.selectedSegment.beatLength
-                        onAccepted: {
-                            segmentDetails.selectedSegment.beatLength = parseInt(text)
+                        onTextChanged: {
+                            var value = parseInt(text);
+                            if (text !== "" && value != segmentDetails.selectedSegment.barLength) {
+                                segmentDetails.selectedSegment.beatLength = value;
+                            }
                         }
                     }
                 }

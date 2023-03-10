@@ -130,10 +130,12 @@ Zynthian.Popup {
 
         Kirigami.Heading {
             Layout.fillWidth: true
+            Layout.fillHeight: false
             text: qsTr("Record Channel %1 - Clip %2").arg(selectedChannel.name).arg(selectedChannel.selectedSlotRow + 1)
         }
         Rectangle {
             Layout.fillWidth: true
+            Layout.fillHeight: false
             Layout.minimumHeight: 1
             Layout.maximumHeight: 1
             color: Kirigami.Theme.textColor
@@ -141,6 +143,7 @@ Zynthian.Popup {
         }
         RowLayout {
             Layout.fillWidth: true
+            Layout.fillHeight: true
 
             ColumnLayout {
                 Layout.fillHeight: true
@@ -161,7 +164,7 @@ Zynthian.Popup {
                         id: recordingTypeCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: recordingTypeComboModel
@@ -190,7 +193,7 @@ Zynthian.Popup {
                         id: sourceCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: sourceComboModel
@@ -237,7 +240,7 @@ Zynthian.Popup {
                         id: channelCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: channelComboModel
@@ -276,7 +279,7 @@ Zynthian.Popup {
                         id: recordingChannelCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: recordingChannelComboModel
@@ -304,7 +307,7 @@ Zynthian.Popup {
                         id: countInCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: countInComboModel
@@ -323,7 +326,7 @@ Zynthian.Popup {
                     Layout.fillWidth: false
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Record Master Output")
                     }
@@ -344,7 +347,7 @@ Zynthian.Popup {
                     Layout.fillWidth: false
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Metronome")
                     }

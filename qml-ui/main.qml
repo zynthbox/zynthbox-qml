@@ -602,44 +602,11 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    Zynthian.Dialog {
+    Zynthian.DialogQuestion {
         id: confirmDialog
-        x: root.width / 2 - width / 2
-        y: root.height / 2 - height / 2
-        dim: true
-        modal: true
-        width: Math.round(Math.max(implicitWidth, root.width * 0.8))
-        height: Math.round(Math.max(implicitHeight, root.height * 0.8))
-        contentItem: Kirigami.Heading {
-            level: 2
-            text: zynthian.confirm.text
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
+        text: zynthian.confirm.text
         onAccepted: zynthian.confirm.accept()
         onRejected: zynthian.confirm.reject()
-        footer: QQC2.Control {
-            leftPadding: confirmDialog.leftPadding
-            topPadding: Kirigami.Units.largeSpacing
-            rightPadding: confirmDialog.rightPadding
-            bottomPadding: confirmDialog.bottomPadding
-            contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
-                QQC2.Button {
-                    implicitWidth: 1
-                    Layout.fillWidth: true
-                    text: qsTr("No")
-                    onClicked: confirmDialog.reject()
-                }
-                QQC2.Button {
-                    implicitWidth: 1
-                    Layout.fillWidth: true
-                    text: qsTr("Yes")
-                    onClicked: confirmDialog.accept()
-                }
-            }
-        }
     }
 
     Zynthian.ModalLoadingOverlay {

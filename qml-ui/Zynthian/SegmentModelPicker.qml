@@ -84,6 +84,66 @@ Zynthian.Popup {
                     }
                 }
             }
+            Zynthian.Dialog {
+                id: modelRemover
+                function removeVariant(variantIndex) {
+                    modelRemover.variantIndex = variantIndex;
+                    modelRemover.open();
+                }
+                property int variantIndex: -1
+                onAccepted: {
+                    zynthian.sketchpad.song.sketchesModel.selectedSketch.removeSegmentsModel(modelRemover.variantIndex);
+                }
+
+                y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
+                x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+                width: Kirigami.Units.gridUnit * 20
+                height: Kirigami.Units.gridUnit * 10
+                parent: QQC2.Overlay.overlay
+                property var cuiaCallback: function(cuia) {
+                    result = false;
+                    switch (cuia) {
+                        case "SWITCH_BACK_SHORT":
+                        case "SWITCH_BACK_BOLD":
+                        case "SWITCH_BACK_LONG":
+                            modelRemover.reject();
+                            result = true;
+                            break;
+                        case "SWITCH_SELECT_SHORT":
+                            modelRemover.accept();
+                            result = true;
+                            break;
+                    }
+                    return result;
+                }
+                header: Kirigami.Heading {
+                    text: qsTr("Remove Variant?")
+                }
+                contentItem: QQC2.Label {
+                    wrapMode: Text.Wrap
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text: qsTr("Do you wish to remove Variant %1?\n\nThis cannot be undone.").arg(modelRemover.variantIndex + 1)
+                }
+                footer: RowLayout {
+                    Zynthian.PlayGridButton {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        text: qsTr("No")
+                        onClicked: {
+                            modelRemover.reject();
+                        }
+                    }
+                    Zynthian.PlayGridButton {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        text: qsTr("Yes")
+                        onClicked: {
+                            modelRemover.accept();
+                        }
+                    }
+                }
+            }
         }
         ListView {
             Layout.fillWidth: true
@@ -132,6 +192,7 @@ Zynthian.Popup {
                         Layout.fillHeight: true
                         text: qsTr("Remove")
                         onClicked: {
+                            modelRemover.removeVariant(model.index);
                         }
                     }
                 }

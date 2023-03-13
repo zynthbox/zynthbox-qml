@@ -30,7 +30,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-QQC2.Dialog {
+Zynthian.Dialog {
     id: component
 
     /**
@@ -38,28 +38,11 @@ QQC2.Dialog {
      */
     property string text
 
-    exit: null; enter: null;
-    modal: true
-    focus: true
-    y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-    x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+    x: Math.round(parent.width/2 - width/2)
+    y: Math.round(parent.height/2 - height/2)
     width: Kirigami.Units.gridUnit * 20
     height: Kirigami.Units.gridUnit * 10
     parent: QQC2.Overlay.overlay
-
-    /** Handle opened changed to push/pop dialog to zynthian dialog stack
-      * This will allow main program to pass CUIA events to the dialog stack
-      *
-      * Since this is a signal handler it is okay if one of the derived components
-      * overrides the same signal. In that case both the handlers will be called
-      */
-    onOpenedChanged: {
-        if (component.opened) {
-            zynthian.pushDialog(component)
-        } else {
-            zynthian.popDialog(component)
-        }
-    }
 
     property var cuiaCallback: function(cuia) {
         result = false;

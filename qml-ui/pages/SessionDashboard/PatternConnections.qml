@@ -72,7 +72,7 @@ Canvas {
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     Timer {
-        running: true
+        running: canvas.visible
         interval: 500
         onTriggered: canvas.requestPaint();
     }

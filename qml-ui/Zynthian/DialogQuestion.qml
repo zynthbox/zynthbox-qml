@@ -71,17 +71,19 @@ Zynthian.Dialog {
         text: component.text
     }
     footer: RowLayout {
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.fillWidth: true
             text: qsTr("No")
             onClicked: {
                 component.reject();
             }
         }
-        Zynthian.PlayGridButton {
+        QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.fillWidth: true
             text: qsTr("Yes")
             onClicked: {
                 component.accept();

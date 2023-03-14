@@ -39,7 +39,7 @@ import numpy as np
 import rpi_ws281x
 import time
 from datetime import datetime
-from threading import Thread, Lock
+from threading import Thread, Lock, Event
 from subprocess import Popen, check_output
 from ctypes import c_float, c_double, CDLL
 import xml.etree.ElementTree as ET
@@ -591,6 +591,12 @@ class zynthian_gui(QObject):
         self.zynswitch_defered_event = None
         self.exit_flag = False
         self.exit_code = 0
+
+        self.cpu_status_info_undervoltage = Event()
+        self.cpu_status_info_overtemp = Event()
+        self.cpu_status_thread = Thread(target=self.cpu_status_refresh, args=(self.cpu_status_info_undervoltage, self.cpu_status_info_overtemp))
+        self.cpu_status_thread.daemon = True # thread will exit with the program
+        self.cpu_status_thread.start()
 
         self.midi_filter_script = None
         self.midi_learn_mode = False
@@ -3329,6 +3335,26 @@ class zynthian_gui(QObject):
         except Exception as e:
             logging.error(e)
 
+    def cpu_status_refresh(self, cpu_status_info_undervoltage, cpu_status_info_overtemp):
+        while not self.exit_flag:
+            # Do not refresh when booting is in progress
+            if self.isBootingComplete and zynthian_gui_config.show_cpu_status:
+                try:
+                    # Get ARM flags
+                    res = check_output(("vcgencmd", "get_throttled")).decode(
+                        "utf-8", "ignore"
+                    )
+                    thr = int(res[12:], 16)
+                    cpu_status_info_undervoltage.clear()
+                    cpu_status_info_overtemp.clear()
+                    if thr & 0x1:
+                        cpu_status_info_undervoltage.set()
+                    elif thr & (0x4 | 0x2):
+                        cpu_status_info_overtemp.set()
+                except Exception as e:
+                    logging.error(e)
+            time.sleep(0.5) # Update this info once every half a second (don't really need it any more often than that)
+
     def start_loading_thread(self):
         self.loading_thread = Thread(target=self.loading_refresh, args=())
         self.loading_thread.daemon = True  # thread dies with the program
@@ -3497,21 +3523,14 @@ class zynthian_gui(QObject):
             if self.status_counter > 5:
                 self.status_counter = 0
 
-                self.status_info["undervoltage"] = False
-                self.status_info["overtemp"] = False
-                try:
-                    # Get ARM flags
-                    res = check_output(("vcgencmd", "get_throttled")).decode(
-                        "utf-8", "ignore"
-                    )
-                    thr = int(res[12:], 16)
-                    if thr & 0x1:
-                        self.status_info["undervoltage"] = True
-                    elif thr & (0x4 | 0x2):
-                        self.status_info["overtemp"] = True
-
-                except Exception as e:
-                    logging.error(e)
+                if self.cpu_status_info_undervoltage.is_set():
+                    self.status_info["undervoltage"] = True
+                else:
+                    self.status_info["undervoltage"] = False
+                if self.cpu_status_info_overtemp.is_set():
+                    self.status_info["overtemp"] = True
+                else:
+                    self.status_info["overtemp"] = False
 
                 try:
                     # Get Recorder Status

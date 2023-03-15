@@ -3336,24 +3336,41 @@ class zynthian_gui(QObject):
             logging.error(e)
 
     def cpu_status_refresh(self, cpu_status_info_undervoltage, cpu_status_info_overtemp):
+        watchdog_process = Popen(["python3", "cpu_watchdog.py"])
+        watchdog_fifo = None
         while not self.exit_flag:
             # Do not refresh when booting is in progress
             if self.isBootingComplete and zynthian_gui_config.show_cpu_status:
                 try:
-                    # Get ARM flags
-                    res = check_output(("vcgencmd", "get_throttled")).decode(
-                        "utf-8", "ignore"
-                    )
-                    thr = int(res[12:], 16)
-                    cpu_status_info_undervoltage.clear()
-                    cpu_status_info_overtemp.clear()
-                    if thr & 0x1:
-                        cpu_status_info_undervoltage.set()
-                    elif thr & (0x4 | 0x2):
-                        cpu_status_info_overtemp.set()
+                    if watchdog_fifo is None:
+                        watchdog_fifo = open("/tmp/cpu_watchdog", "r")
+
+                    data = ""
+                    while True:
+                        data = self.__boot_log_file.readline()[:-1].strip()
+                        if len(data) == 0:
+                            break
+                        else:
+                            if data.startswith("overtemp"):
+                                splitData = data.split(" ")
+                                if splitData[1] == "True":
+                                    cpu_status_info_overtemp.set()
+                                else:
+                                    cpu_status_info_overtemp.clear()
+                            if data.startswith("undervoltage"):
+                                splitData = data.split(" ")
+                                if splitData[1] == "True":
+                                    cpu_status_info_undervoltage.set()
+                                else:
+                                    cpu_status_info_undervoltage.clear()
+
                 except Exception as e:
                     logging.error(e)
-            time.sleep(0.5) # Update this info once every half a second (don't really need it any more often than that)
+            time.sleep(0.3)
+        if watchdog_fifo is not None:
+            watchdog_fifo.close()
+        if watchdog_process is not None:
+            watchdog_process.kill()
 
     def start_loading_thread(self):
         self.loading_thread = Thread(target=self.loading_refresh, args=())

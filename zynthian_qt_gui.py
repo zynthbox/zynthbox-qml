@@ -543,6 +543,13 @@ class zynthian_gui(QObject):
         self.__booting_complete__ = False
         self.rainbow_led_counter = 0
 
+        # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
+        # Use this timer to toggle state after 5000ms
+        self.channelsModTimer = QTimer(self)
+        self.channelsModTimer.setInterval(3000)
+        self.channelsModTimer.setSingleShot(True)
+        self.channelsModTimer.timeout.connect(self.channelsModTimerHandler)
+
         self.init_wsleds()
 
         speed_settings = QSettings("/home/pi/config/gui_optionsrc", QSettings.IniFormat)
@@ -684,6 +691,11 @@ class zynthian_gui(QObject):
 
         # Initialise libzl (which requires things found in zyncoder, specifically the zynthian midi router)
         libzl.init()
+
+    def channelsModTimerHandler(self):
+        # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
+        # Toggle state as timer handler is called
+        self.channelsModActive = not self.channelsModActive
 
     @Slot(None)
     def save_currentTaskMessage(self):
@@ -2459,6 +2471,9 @@ class zynthian_gui(QObject):
 
         elif cuia == "SWITCH_CHANNELS_MOD_SHORT" or cuia == "SWITCH_CHANNELS_MOD_BOLD" or cuia == "SWITCH_CHANNELS_MOD_LONG":
             self.channelsModActive = not self.channelsModActive
+            # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
+            # Since * button is pressed, start timer
+            self.channelsModTimer.start()
             logging.debug(f'self.channelsModActive({self.channelsModActive})')
 
         elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
@@ -2570,6 +2585,11 @@ class zynthian_gui(QObject):
                         return
             elif dtus == 0:
                 # logging.error("key press: {} {}".format(i, dtus))
+
+                if 5 <= i <= 9:
+                    # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
+                    # When 1-5 hw button is pressed during that 5000ms, * button state is retained and hence stop timer.
+                    self.channelsModTimer.stop()
 
                 # Handle button press event
                 if i == 10:

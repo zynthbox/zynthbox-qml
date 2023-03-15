@@ -106,8 +106,8 @@ function switchToScene(index) {
 function cuiaHandler(cuia, selectedChannel, bottomStack) {
     var clip
     var returnVal = false
-    // Select channel 6-10 when zynthian.switchChannelsButtonPressed is true
-    var channelDelta = zynthian.switchChannelsButtonPressed ? 5 : 0
+    // Select channel 6-10 when zynthian.channelsModActive is true
+    var channelDelta = zynthian.channelsModActive ? 5 : 0
 
     switch (cuia) {
         case "CHANNEL_1":

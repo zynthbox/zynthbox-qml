@@ -56,28 +56,33 @@ QQC2.Button {
 
     Zynthian.Popup {
         id: comboBoxPopup
-        parent: QQC2.Overlay.overlay
-        x: parent.width/2 - width/2
-        y: parent.height/2 - height/2
+        parent: applicationWindow()
         width: Kirigami.Units.gridUnit * 20
+        clip: true
 
-        ColumnLayout {
+        QQC2.ScrollView {
             anchors.fill: parent
-            spacing: 0
+            contentWidth: parent.width
 
-            Repeater {
-                id: popupRepeater
-                delegate: Kirigami.BasicListItem {
-                    id: delegate
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                    reserveSpaceForIcon: false
-                    highlighted: root.currentIndex === index
-                    label: model[root.textRole]
-                    onClicked: {
-                        root.currentIndex = index
-                        root.activated(index)
-                        comboBoxPopup.close()
+            ColumnLayout {
+                id: content
+                anchors.fill: parent
+                spacing: 0
+
+                Repeater {
+                    id: popupRepeater
+                    delegate: Kirigami.BasicListItem {
+                        id: delegate
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                        reserveSpaceForIcon: false
+                        highlighted: root.currentIndex === index
+                        label: model[root.textRole]
+                        onClicked: {
+                            root.currentIndex = index
+                            root.activated(index)
+                            comboBoxPopup.close()
+                        }
                     }
                 }
             }

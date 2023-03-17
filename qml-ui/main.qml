@@ -590,6 +590,11 @@ Kirigami.AbstractApplicationWindow {
 
     CustomTheme {
         id: customTheme
+        Component.onCompleted: {
+            // Force write config file after QML engine starts loading main page to load theme correctly
+            // Without this force write, bullseye doesn't load previously selected theme from plasmarc
+            zynthian.theme_chooser.select_action(zynthian.theme_chooser.current_index)
+        }
     }
 
     Instantiator {

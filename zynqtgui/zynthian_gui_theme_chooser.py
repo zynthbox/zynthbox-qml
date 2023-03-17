@@ -31,8 +31,9 @@ from pathlib import Path
 # Zynthian specific modules
 from . import zynthian_gui_selector
 
-from PySide2.QtCore import QSettings, Property, Signal
+from PySide2.QtCore import QSettings, Property, Signal, Slot
 from PySide2.QtGui import QGuiApplication, QFontDatabase, QColor
+from configparser import ConfigParser
 
 
 #------------------------------------------------------------------------------
@@ -82,6 +83,22 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 		self.audiofx_layer = None
 		self.audiofx_layers = None
 
+		# Read existing config to find previously selected theme name
+		try:
+			config = ConfigParser()
+			config.read("/root/.config/plasmarc")
+			selected_theme_name = config.get("Theme", "name")
+		except Exception as e:
+			selected_theme_name = None
+
+		# Prepare installed themes list
+		self.fill_list()
+
+		# Select correct index as per previously selected theme
+		if selected_theme_name is not None:
+			for index, theme in enumerate(self.list_data):
+				if selected_theme_name == theme[0]:
+					self.select_action(index)
 
 	def fill_list(self):
 		self.list_data=[]
@@ -96,16 +113,20 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 
 		super().fill_list()
 
-
+	@Slot(int)
 	def select_action(self, i, t='S'):
 		if i < 0 or i >= len(self.list_data):
 			return
-		f = open("/root/.config/plasmarc", "w")
-		f.write("[Theme]\nname={}".format(self.list_data[i][0]))
+		self.current_index = i
+
+		config_file = Path("/root/.config/plasmarc")
+		config = ConfigParser()
+		config.read(config_file)
+		config.set("Theme", "name", self.list_data[self.current_index][0])
+		with open(config_file, "w") as fd:
+			config.write(fd)
+
 		self.apply_font()
-		f.close()
-
-
 
 	def apply_font(self):
 		plasma_settings = QSettings("/root/.config/plasmarc", QSettings.IniFormat)

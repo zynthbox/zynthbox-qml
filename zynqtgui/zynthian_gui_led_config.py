@@ -206,7 +206,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     }
 
             # 6: * Button
-            if self.zyngui.channelsModActive:
+            if not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive:
                 self.button_color_map[6] = {
                     'color': self.led_color_green,
                     'blink': False

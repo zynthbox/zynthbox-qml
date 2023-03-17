@@ -38,15 +38,78 @@ import "pages/Sketchpad" as Sketchpad
 Kirigami.AbstractApplicationWindow {
     id: root
 
-    readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
+    readonly property var pageScreenMapping: {
+        "sketchpad": "Sketchpad/Main.qml",
+        "main": "MainPage.qml",
+        "layer": "SynthSetupPage.qml",
+        "fixed_layers": "SynthSetupPage.qml",
+        "main_layers_view": "SynthSetupPage.qml",
+        "layers_for_channel": "SynthSetupPage.qml",
+        "bank": "SynthSetupPage.qml",
+        "preset": "SynthSetupPage.qml",
+        "control": "ControlPage.qml",
+        "layer_effects": "FXSetupPage.qml",
+        "effect_types": "FXSetupPage.qml",
+        "layer_effect_chooser": "FXSetupPage.qml",
+        "layer_midi_effects": "MidiFXSetupPage.qml",
+        "midi_effect_types": "MidiFXSetupPage.qml",
+        "session_dashboard": "SessionDashboard/Main.qml",
+        "midi_key_range": "MidiKeyRangePage.qml",
+        "engine": "EnginePage.qml",
+        "midi_chan": "MidiChanPage.qml",
+        "layer_options": "LayerOptionsPage.qml",
+        "snapshot": "SnapshotPage.qml",
+        "audio_in": "AudioInPage.qml",
+        "audio_out": "AudioOutPage.qml",
+        "audio_recorder": "AudioRecorderPage.qml",
+        "midi_recorder": "MidiRecorderPage.qml",
+        "admin": "AdminPage.qml",
+        "about": "AboutPage.qml",
+        "info": "InfoPage.qml",
+        "option": "OptionPage.qml",
+        "theme_chooser": "ThemePage.qml",
+        "theme_downloader": "ThemeDownloaderPage.qml",
+        "module_downloader": "ModuleDownloaderPage.qml",
+        "norns_shield": "NornsPage.qml",
+        "test_touchpoints": "TestTouchpoints.qml",
+        "audio_settings":"AudioSettingsPage.qml",
+        "synth_behaviour":"SynthBehaviourPage.qml",
+        "snapshots_menu":"SnapshotsMenuPage.qml",
+        "network":"NetworkPage.qml",
+        "hardware":"HardwarePage.qml",
+        "playgrid": "PlayGrid.qml",
+        "playgrid_downloader": "PlayGridDownloaderPage.qml",
+        "channel": "ChannelPage.qml",
+        "channel_external_setup": "ChannelExternalSetup.qml",
+        "channel_wave_editor": "ChannelWaveEditor.qml",
+        "song_arranger": "SongArranger/main.qml",
+        "song_player": "SongPlayerPage.qml",
+        "song_manager": "SongManagerPage.qml",
+        "sketchpad_copier": "SketchpadCopier/main.qml",
+        "sample_downloader": "SampleDownloaderPage.qml",
+        "sound_downloader": "SoundDownloaderPage.qml",
+//        "soundfont_downloader": "SoundfontDownloaderPage.qml",
+        "soundset_downloader": "SoundsetsDownloaderPage.qml",
+        "control_downloader": "ControlDownloaderPage.qml",
+        "fx_control_downloader": "FXControlDownloaderPage.qml",
+        "sequence_downloader": "SequenceDownloaderPage.qml",
+        "sketchpad_downloader": "SketchpadDownloaderPage.qml",
+        "network_info": "NetworkInfoPage.qml",
+        "guioptions" : "GuiOptionsPage.qml",
+        "sound_categories": "SoundCategories/Main.qml",
+        "wifi_settings":"WifiSettingsPage.qml",
+        "test_knobs":"TestKnobsPage.qml"
+    }
+
     readonly property Item currentPage: {
-        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "sketchpad") {
-            return dashboardLayer.currentItem;
-        } else if (modalScreensLayer.depth > 0) {
-            return modalScreensLayer.currentItem;
-        } else {
-            return screensLayer.currentItem
-        }
+        return pageStack.currentItem
+//        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "sketchpad") {
+//            return dashboardLayer.currentItem;
+//        } else if (modalScreensLayer.depth > 0) {
+//            return modalScreensLayer.currentItem;
+//        } else {
+//            return screensLayer.currentItem
+//        }
     }
     readonly property Item playGrids: playGridsRepeater
 
@@ -104,7 +167,7 @@ Kirigami.AbstractApplicationWindow {
     Component.onCompleted: displayWindowTimer.start()
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
-    pageStack: screensLayer
+    pageStack: pageManager
     header: RowLayout {            
         spacing: 0
         Zynthian.BreadcrumbButton {
@@ -451,7 +514,7 @@ Kirigami.AbstractApplicationWindow {
                 case "layer_midi_effect_chooser":
                     return true;
                 default:
-                    return screensLayer.depth > 2
+                    return false //screensLayer.depth > 2
                 }
             }
             property string effectScreen: ""
@@ -560,6 +623,13 @@ Kirigami.AbstractApplicationWindow {
         interval: 100
         repeat: false
         onTriggered: {
+//            var pagesToCache = ["sketchpad", "main", "control", "layers_for_channel", "playgrid", "midi_key_range", "sound_categories", "engine", "song_manager", "channel_wave_editor"];
+//            for (var page in pagesToCache) {
+//                pageManager.getPage(pagesToCache[page])
+//            }
+
+            zynthian.isModalScreensCachingComplete = true
+            zynthian.isScreensCachingComplete = true
             zynthian.stop_splash();
         }
     }
@@ -570,22 +640,9 @@ Kirigami.AbstractApplicationWindow {
         onSelected_channel_changed: root.selectedChannel = root.channels[zynthian.session_dashboard.selectedChannel]
     }
 
-    ScreensLayer {
-        id: screensLayer
-        parent: root.contentItem
+    PageManager {
+        id: pageManager
         anchors.fill: parent
-        initialItem: root.pageScreenMapping.pageForScreen('fixed_layers')
-    }
-
-    ModalScreensLayer {
-        id: modalScreensLayer
-        anchors.fill: parent
-    }
-
-    DashboardScreensLayer {
-        id: dashboardLayer
-        anchors.fill: parent
-        visible: root.footer.height > 0 //HACK
     }
 
     CustomTheme {

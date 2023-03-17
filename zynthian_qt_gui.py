@@ -693,9 +693,11 @@ class zynthian_gui(QObject):
         libzl.init()
 
     def channelsModTimerHandler(self):
-        # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
-        # Toggle state as timer handler is called
-        self.channelsModActive = not self.channelsModActive
+        # If * button is pressed, it toggles itself on/off for 5000ms before returning
+        # to state where it shows current channel.
+
+        # Set channelsModActive to true when channel 5-10 is active
+        self.channelsModActive = self.session_dashboard.selectedChannel >= 5
 
     @Slot(None)
     def save_currentTaskMessage(self):
@@ -1320,6 +1322,12 @@ class zynthian_gui(QObject):
     def set_left_sidebar_active(self, isActive):
         if self.left_sidebar_active != isActive:
             self.left_sidebar_active = isActive
+
+            if isActive:
+                # If leftSidebar is opened and stop channelsModTimer and call timer handler immediately
+                self.channelsModTimer.stop()
+                self.channelsModTimerHandler()
+
             self.leftSidebarActiveChanged.emit()
 
     leftSidebarActiveChanged = Signal()

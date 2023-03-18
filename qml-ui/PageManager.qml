@@ -33,7 +33,9 @@ Zynthian.Stack {
             console.log("Page cache found for page :", pageResolvedUrl)
             return root.pageCache[page]
         } else {
-            return pageResolvedUrl
+            console.log("Page cache not found for page :", pageResolvedUrl)
+            root.pageCache[page] = cachePage(page)
+            return root.pageCache[page]
         }
 
     }
@@ -50,8 +52,7 @@ Zynthian.Stack {
         root.pageCache["channel_wave_editor"] = cachePage("channel_wave_editor")
         root.pageCache["sketchpad"] = cachePage("sketchpad")
 
-        root.initialItem = root.pageCache["sketchpad"]
-        root.initialItem.visible = true
+        zynthian.show_modal("sketchpad")
     }
 
     background: Rectangle {
@@ -67,13 +68,17 @@ Zynthian.Stack {
             if (page != "" && root.currentPage != page) {
                 root.currentPage = page
                 console.log("Changing page to", page)
-                if (root.depth <= 0) {
-                    root.push(root.getPage(page))
+                
+                if (zynthian.current_modal_screen_id === "confirm") {
+                    // Confirm page is not a seperate page. Show confirm dialog if confirm page is requested
+                    applicationWindow().showConfirmationDialog()
                 } else {
-                    root.currentItem.visible = false
+                    if (root.currentItem) {
+                        root.currentItem.visible = false
+                    }
                     root.replace(root.getPage(page))
+                    root.currentItem.visible = true
                 }
-                root.currentItem.visible = true
             }
         }
     }

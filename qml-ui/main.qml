@@ -92,7 +92,6 @@ Kirigami.AbstractApplicationWindow {
     minimumWidth: screen.width
     minimumHeight: screen.height
     onCurrentPageChanged: zynthian.current_qml_page = currentPage
-    Component.onCompleted: displayWindowTimer.start()
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
     pageStack: pageManager
@@ -543,18 +542,6 @@ Kirigami.AbstractApplicationWindow {
         currentPage: root.currentPage
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
-    }
-
-    Timer {
-        id: displayWindowTimer
-        // This interval makes sure to wait until all the pages are cached before showing window
-        interval: 100
-        repeat: false
-        onTriggered: {
-            zynthian.isModalScreensCachingComplete = true
-            zynthian.isScreensCachingComplete = true
-            zynthian.stop_splash();
-        }
     }
 
     // Listen to selected_channel_changed signal to

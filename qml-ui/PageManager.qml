@@ -87,7 +87,6 @@ Zynthian.Stack {
     ]
     property string currentPage: ""
     property var pageCache: ({})
-    property bool cachingComplete: false
 
     // Get absolute url of page file by page name
     function pageResolvedUrl(page) {
@@ -122,9 +121,8 @@ Zynthian.Stack {
             root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
         }
 
-        // Set cachingComplete to true after all pages are cached.
-        // This will set off stop_splash call
-        root.cachingComplete = true
+        // Caching complete. Call stop_splash
+        zynthian.stop_splash();
     }
 
     background: Rectangle {

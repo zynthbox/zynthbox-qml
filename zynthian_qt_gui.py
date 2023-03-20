@@ -3889,11 +3889,14 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
-        logging.debug("QML Caching complete. Calling stop_splash")
-
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
+
+        # Display sketchpad page and run set_selector at last before hiding splash
+        # to ensure knobs work fine
+        self.show_modal("sketchpad")
+        self.sketchpad.set_selector()
 
         # Explicitly run update_jack_port after booting is complete
         # as any requests made while booting is ignored
@@ -3903,11 +3906,6 @@ class zynthian_gui(QObject):
             # Allow jack ports connection to complete before showing UI
             # so do not update jack ports in a thread
             channel.update_jack_port(run_in_thread=False)
-
-        # Display sketchpad page and run set_selector at last before hiding splash
-        # to ensure knobs work fine
-        self.show_modal("sketchpad")
-        self.sketchpad.set_selector()
 
         extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
 

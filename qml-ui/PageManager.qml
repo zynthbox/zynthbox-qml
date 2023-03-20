@@ -76,7 +76,6 @@ Zynthian.Stack {
         "control": "Synth Edit",
         "layers_for_channel": "Library",
         "playgrid": "Playgrid",
-        "midi_key_range": "Key Range",
         "sound_categories": "Sound Categories",
         "engine": "Synths",
         "song_manager": "Song Player",
@@ -90,7 +89,6 @@ Zynthian.Stack {
         "control",
         "layers_for_channel",
         "playgrid",
-        "midi_key_range",
         "sound_categories",
         "engine",
         "song_manager",
@@ -105,7 +103,10 @@ Zynthian.Stack {
         if (root.pageDisplayNames[page] != null) {
             return root.pageDisplayNames[page]
         } else {
-            return page.replace(/_/g, " ")
+            // If display name is not found, generate a display name by replacing all _ with " " and capitalizing first letter of each word
+            return page
+                    .replace(/_/g, " ")
+                    .replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase() })
         }
     }
 

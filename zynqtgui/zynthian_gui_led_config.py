@@ -256,7 +256,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 1
-            if self.zyngui.modal_screen is None and self.zyngui.active_screen == "sketchpad":
+            if self.zyngui.current_screen_id == "sketchpad":
                 self.button_color_map[8] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -268,7 +268,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 2
-            if self.zyngui.modal_screen == "playgrid":
+            if self.zyngui.current_screen_id == "playgrid":
                 self.button_color_map[9] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -280,7 +280,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 3
-            if self.zyngui.modal_screen == "song_manager":
+            if self.zyngui.current_screen_id == "song_manager":
                 self.button_color_map[10] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -292,7 +292,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 4
-            if self.zyngui.modal_screen is None and self.zyngui.active_screen in ["layers_for_channel", "bank", "preset"]:
+            if self.zyngui.current_screen_id in ["layers_for_channel", "bank", "preset"]:
                 self.button_color_map[11] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -304,7 +304,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 5
-            if (self.zyngui.modal_screen is None and self.zyngui.active_screen == "control") or (self.zyngui.modal_screen and self.zyngui.modal_screen in ["channel_wave_editor", "channel_external_setup"]):
+            if self.zyngui.current_screen_id == "control" or self.zyngui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]:
                 self.button_color_map[12] = {
                     'color': self.led_color_active,
                     'blink': False

@@ -38,16 +38,7 @@ import "pages/Sketchpad" as Sketchpad
 Kirigami.AbstractApplicationWindow {
     id: root
 
-    readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
-    readonly property Item currentPage: {
-        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "sketchpad") {
-            return dashboardLayer.currentItem;
-        } else if (modalScreensLayer.depth > 0) {
-            return modalScreensLayer.currentItem;
-        } else {
-            return screensLayer.currentItem
-        }
-    }
+    readonly property Item currentPage: pageStack.currentItem
     readonly property Item playGrids: playGridsRepeater
 
     property bool headerVisible: true
@@ -101,10 +92,9 @@ Kirigami.AbstractApplicationWindow {
     minimumWidth: screen.width
     minimumHeight: screen.height
     onCurrentPageChanged: zynthian.current_qml_page = currentPage
-    Component.onCompleted: displayWindowTimer.start()
     onWidthChanged: width = screen.width
     onHeightChanged: height = screen.height
-    pageStack: screensLayer
+    pageStack: pageManager
     header: RowLayout {            
         spacing: 0
         Zynthian.BreadcrumbButton {
@@ -451,7 +441,7 @@ Kirigami.AbstractApplicationWindow {
                 case "layer_midi_effect_chooser":
                     return true;
                 default:
-                    return screensLayer.depth > 2
+                    return false //screensLayer.depth > 2
                 }
             }
             property string effectScreen: ""
@@ -554,38 +544,15 @@ Kirigami.AbstractApplicationWindow {
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
 
-    Timer {
-        id: displayWindowTimer
-        // This interval makes sure to wait until all the pages are cached before showing window
-        interval: 100
-        repeat: false
-        onTriggered: {
-            zynthian.stop_splash();
-        }
-    }
-
     // Listen to selected_channel_changed signal to
     Connections {
         target: zynthian.session_dashboard
         onSelected_channel_changed: root.selectedChannel = root.channels[zynthian.session_dashboard.selectedChannel]
     }
 
-    ScreensLayer {
-        id: screensLayer
-        parent: root.contentItem
+    PageManager {
+        id: pageManager
         anchors.fill: parent
-        initialItem: root.pageScreenMapping.pageForScreen('fixed_layers')
-    }
-
-    ModalScreensLayer {
-        id: modalScreensLayer
-        anchors.fill: parent
-    }
-
-    DashboardScreensLayer {
-        id: dashboardLayer
-        anchors.fill: parent
-        visible: root.footer.height > 0 //HACK
     }
 
     CustomTheme {

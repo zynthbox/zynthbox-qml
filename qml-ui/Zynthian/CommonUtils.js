@@ -168,3 +168,19 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 
     return returnVal
 }
+
+// Method to instantiate a component from URL
+// Returns the created object
+function instantiateComponent(url, params) {
+    console.log("Instantiating component :", url)
+
+    var component = Qt.createComponent(url);
+    var obj = component.createObject(applicationWindow(), params)
+    if (component.errorString() != "") {
+        console.log("Error instantiating component", url, ":", component.errorString());
+    } else {
+        console.log("Component object created :", url)
+    }
+    
+    return obj
+}

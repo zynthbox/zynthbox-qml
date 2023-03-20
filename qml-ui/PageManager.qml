@@ -71,32 +71,29 @@ Zynthian.Stack {
         "wifi_settings":"WifiSettingsPage.qml",
         "test_knobs":"TestKnobsPage.qml"
     }
-    
-    property var currentPage: ""
+
+    // List of pages that will be cached on start
+    property var pagesToCache: [
+        "main",
+        "control",
+        "layers_for_channel",
+        "playgrid",
+        "midi_key_range",
+        "sound_categories",
+        "engine",
+        "song_manager",
+        "channel_wave_editor",
+        "sketchpad",
+    ]
+    property string currentPage: ""
     property var pageCache: ({})
-    
+    property bool cachingComplete: false
+
     // Get absolute url of page file by page name
     function pageResolvedUrl(page) {
         return Qt.resolvedUrl("./pages/" + root.pageScreenMapping[page])
     }
-    
-    // Instantiates and returns a new page object
-    function createPageObject(page) {
-        // zynthian.currentTaskMessage = "Loading " + page + " page"
 
-        console.log("Caching page :", pageResolvedUrl(page))
-
-        var component = Qt.createComponent(pageResolvedUrl(page));
-        var obj = component.createObject(applicationWindow(), {"width": root.width, "height": root.height, visible: false})
-        if (component.errorString() != "") {
-            console.log("Error caching page", pageResolvedUrl(page), ":", component.errorString());
-        } else {
-            console.log("Page cached :", pageResolvedUrl(page))
-        }
-
-        return obj
-    }
-    
     // Get page instance
     // This method checks if page exists in cache. If not found in cache then the object is cached
     function getPage(page) {
@@ -111,27 +108,23 @@ Zynthian.Stack {
             return root.pageCache[page]
         } else {
             console.log("Page cache not found for page :", pageResolvedUrl(page))
-            root.pageCache[page] = createPageObject(page)
+            root.pageCache[page] = Zynthian.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
             return root.pageCache[page]
         }
-
     }
 
     Component.onCompleted: {
-        // Cache all the main pages when starting up
-        root.pageCache["main"] = createPageObject("main")
-        root.pageCache["control"] = createPageObject("control")
-        root.pageCache["layers_for_channel"] = createPageObject("layers_for_channel")
-        root.pageCache["playgrid"] = createPageObject("playgrid")
-        root.pageCache["midi_key_range"] = createPageObject("midi_key_range")
-        root.pageCache["sound_categories"] = createPageObject("sound_categories")
-        root.pageCache["engine"] = createPageObject("engine")
-        root.pageCache["song_manager"] = createPageObject("song_manager")
-        root.pageCache["channel_wave_editor"] = createPageObject("channel_wave_editor")
-        root.pageCache["sketchpad"] = createPageObject("sketchpad")
+        var component
 
-        // Display initial page 
-        zynthian.show_modal("sketchpad")
+        // Cache all the main pages when starting up
+        for (var pageIndex in root.pagesToCache) {
+            var pageName = root.pagesToCache[pageIndex]
+            root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
+        }
+
+        // Set cachingComplete to true after all pages are cached.
+        // This will set off stop_splash call
+        root.cachingComplete = true
     }
 
     background: Rectangle {

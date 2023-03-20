@@ -113,8 +113,6 @@ Zynthian.Stack {
     }
 
     Component.onCompleted: {
-        var component
-
         // Cache all the main pages when starting up
         for (var pageIndex in root.pagesToCache) {
             var pageName = root.pagesToCache[pageIndex]

@@ -174,8 +174,13 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 function instantiateComponent(url, params) {
     console.log("Instantiating component :", url)
 
+    var start = Date.now()
     var component = Qt.createComponent(url);
     var obj = component.createObject(applicationWindow(), params)
+    var end = Date.now()
+
+    console.log("Time to load " + url + " : " + (end - start) + "ms")
+
     if (component.errorString() != "") {
         console.log("Error instantiating component", url, ":", component.errorString());
     } else {

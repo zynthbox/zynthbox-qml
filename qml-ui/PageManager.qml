@@ -100,6 +100,12 @@ Zynthian.Stack {
     // Get page instance
     // This method checks if page exists in cache. If not found in cache then the object is cached
     function getPage(page) {
+        // Point all library pages to layers_for_channel cache
+        if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(page) >= 0) {
+            console.log("Page", page, "is a library page. Using layers_for_channel cache")
+            page = "layers_for_channel"
+        }
+
         if (root.pageCache[page] != null) {
             console.log("Page cache found for page :", pageResolvedUrl(page))
             return root.pageCache[page]

@@ -116,6 +116,7 @@ Zynthian.Stack {
         // Cache all the main pages when starting up
         for (var pageIndex in root.pagesToCache) {
             var pageName = root.pagesToCache[pageIndex]
+            zynthian.currentTaskMessage = "Loading page : " + pageName.replace(/_/g, " ")
             root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
         }
 

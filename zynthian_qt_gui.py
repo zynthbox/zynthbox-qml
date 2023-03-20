@@ -4979,7 +4979,7 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty("zynthian", zyngui)
 
     def load_qml():
-        zyngui.currentTaskMessage = f"Loading main page"
+        zyngui.currentTaskMessage = f"Loading pages"
         engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
 
         if not engine.rootObjects() or not app.topLevelWindows():

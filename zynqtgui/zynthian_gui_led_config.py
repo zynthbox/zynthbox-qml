@@ -80,18 +80,22 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
         self.led_color_red = rpi_ws281x.Color(247, 124, 124)
         self.led_color_yellow = rpi_ws281x.Color(255, 235, 59)
         self.led_color_purple = rpi_ws281x.Color(142, 36, 170)
-        self.led_color_light = self.led_color_blue
+
+        self.led_color_inactive = self.led_color_blue
         self.led_color_active = self.led_color_green
-        self.led_color_admin = self.led_color_red
+
+        self.led_color_channel_synth = self.led_color_red
+        self.led_color_channel_loop = self.led_color_green
+        self.led_color_channel_sample = self.led_color_yellow
+        self.led_color_channel_external = self.led_color_purple
 
         self.button_color_map = {}
 
-        # Initialise all button with off color and not blinking
+        self.channel = None
+
+        # Initialise all button with inactive color and not blinking
         for i in range(25):
-            self.button_color_map[i] = {
-                'color': self.led_color_blue,
-                'blink': False
-            }
+            self.set_button_color(i, self.led_color_inactive)
 
     def show(self):
         pass
@@ -102,321 +106,168 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
+    def set_button_color(self, button_id, color, blink=False, blinkMode='onOffOnBeat'):
+        self.button_color_map[button_id] = {
+            'color': color,
+            'blink': blink,
+            'blinkMode': blinkMode
+        }
+
+    def set_button_color_by_channel(self, button_id, blink=False, blinkMode='onOffOnBeat'):
+        if self.channel.channelAudioType == "synth":
+            self.button_color_map[button_id] = {
+                'color': self.led_color_channel_synth,
+                'blink': blink,
+                'blinkMode': blinkMode
+            }
+        elif self.channel.channelAudioType in ["sample-trig", "sample-slice"]:
+            self.button_color_map[button_id] = {
+                'color': self.led_color_channel_sample,
+                'blink': blink,
+                'blinkMode': blinkMode
+            }
+        elif self.channel.channelAudioType == "sample-loop":
+            self.button_color_map[button_id] = {
+                'color': self.led_color_channel_loop,
+                'blink': blink,
+                'blinkMode': blinkMode
+            }
+        elif self.channel.channelAudioType == "external":
+            self.button_color_map[button_id] = {
+                'color': self.led_color_channel_external,
+                'blink': blink,
+                'blinkMode': blinkMode
+            }
+
     def update_button_colors(self):
         try:
-            channel = None
-            if self.zyngui.sketchpad.song is not None:
-                channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
-
-            # Menu
-            if self.zyngui.modal_screen is None and self.zyngui.active_screen == "main":
-                self.button_color_map[0] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[0] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # Light up 1-5 buttons as per opened screen / bottomBar
-            for i in range(1, 6):
-                # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
-                # This is global (i.e. for all screens)
-                if self.zyngui.leftSidebarActive:
-                    # Lights up selected slots for channel
-                    partClip = self.zyngui.sketchpad.song.getClipByPart(channel.id,
-                                                                        self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex,
-                                                                        i - 1)
-
-                    if channel is not None and partClip.enabled:
-                        if channel.channelAudioType == "synth":
-                            self.button_color_map[i] = {
-                                'color': self.led_color_red,
-                                'blink': False
-                            }
-                        elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                            self.button_color_map[i] = {
-                                'color': self.led_color_yellow,
-                                'blink': False
-                            }
-                        elif channel.channelAudioType == "sample-loop":
-                            self.button_color_map[i] = {
-                                'color': self.led_color_green,
-                                'blink': False
-                            }
-                        elif channel.channelAudioType == "external":
-                            self.button_color_map[i] = {
-                                'color': self.led_color_purple,
-                                'blink': False
-                            }
-                    else:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_blue,
-                            'blink': False
-                        }
-
-                    continue
-
-                # Light up 1-5 buttons when respective channel is selected
-                # If self.zyngui.channelsModActive is true, light up 1-5 HW button when channels 6-10 is selected
-                channelDelta = 5 if self.zyngui.channelsModActive else 0
-                if self.zyngui.session_dashboard.selectedChannel - channelDelta == i-1:
-                    if channel.channelAudioType == "synth":
-                        self.button_color_map[i] = {
-                            'color': self.led_color_red,
-                            'blink': False
-                        }
-                    elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_yellow,
-                            'blink': False
-                        }
-                    elif channel.channelAudioType == "sample-loop":
-                        self.button_color_map[i] = {
-                            'color': self.led_color_green,
-                            'blink': False
-                        }
-                    elif channel.channelAudioType == "external":
-                        self.button_color_map[i] = {
-                            'color': self.led_color_purple,
-                            'blink': False
-                        }
-                else:
-                    self.button_color_map[i] = {
-                        'color': self.led_color_blue,
-                        'blink': False
-                    }
-
-            # 6: * Button
-            if not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive:
-                if channel.channelAudioType == "synth":
-                    self.button_color_map[6] = {
-                        'color': self.led_color_red,
-                        'blink': False
-                    }
-                elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                    self.button_color_map[6] = {
-                        'color': self.led_color_yellow,
-                        'blink': False
-                    }
-                elif channel.channelAudioType == "sample-loop":
-                    self.button_color_map[6] = {
-                        'color': self.led_color_green,
-                        'blink': False
-                    }
-                elif channel.channelAudioType == "external":
-                    self.button_color_map[6] = {
-                        'color': self.led_color_purple,
-                        'blink': False
-                    }
-            else:
-                self.button_color_map[6] = {
-                    'color': self.led_color_blue,
-                    'blink': False
-                }
-
-            # 7 : Mode Button
-            if self.zyngui.leftSidebarActive:
-                if channel is not None and channel.channelAudioType == "synth":
-                    self.button_color_map[7] = {
-                        'color': self.led_color_red,
-                        'blink': False
-                    }
-                elif channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_yellow,
-                        'blink': False
-                    }
-                elif self.zyngui.slotsBarFxActive:
-                    self.button_color_map[7] = {
-                        'color': self.led_color_blue,
-                        'blink': False
-                    }
-                elif channel is not None and channel.channelAudioType == "sample-loop":
-                    self.button_color_map[7] = {
-                        'color': self.led_color_green,
-                        'blink': False
-                    }
-                elif channel is not None and channel.channelAudioType == "external":
-                    self.button_color_map[7] = {
-                        'color': self.led_color_purple,
-                        'blink': False
-                    }
-                else: # Control should never reach here
-                    self.button_color_map[7] = {
-                        'color': self.led_color_blue,
-                        'blink': False
-                    }
-            else:
-                self.button_color_map[7] = {
-                    'color': self.led_color_blue,
-                    'blink': False
-                }
-
-            # Under screen button 1
-            if self.zyngui.current_screen_id == "sketchpad":
-                self.button_color_map[8] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[8] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # Under screen button 2
-            if self.zyngui.current_screen_id == "playgrid":
-                self.button_color_map[9] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[9] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # Under screen button 3
-            if self.zyngui.current_screen_id == "song_manager":
-                self.button_color_map[10] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[10] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # Under screen button 4
-            if self.zyngui.current_screen_id in ["layers_for_channel", "bank", "preset"]:
-                self.button_color_map[11] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[11] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # Under screen button 5
-            if self.zyngui.current_screen_id == "control" or self.zyngui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]:
-                self.button_color_map[12] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[12] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # ALT button
-            self.button_color_map[13] = {
-                'color': self.led_color_light,
-                'blink': False
-            }
-
-            # Recording Button
-            if not self.zyngui.sketchpad.isRecording:
-                self.button_color_map[14] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[14] = {
-                    'color': self.led_color_red,
-                    'blink': False
-                }
-
-            # Play button
-            if self.zyngui.sketchpad.isMetronomeRunning:
-                self.button_color_map[15] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[15] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
-            # Save button
-            if self.zyngui.sketchpad.clickChannelEnabled:
-                if self.zyngui.sketchpad.isMetronomeRunning:
-                    self.button_color_map[16] = {
-                        'color': self.led_color_blue,
-                        'blink': True,
-                        'blinkMode': 'onOffOnBeat'
-                    }
-                else:
-                    self.button_color_map[16] = {
-                        'color': self.led_color_blue,
-                        'blink': False
-                    }
-            else:
-                self.button_color_map[16] = {
-                    'color': self.led_color_off,
-                    'blink': False
-                }
-
-            # Stop button
-            self.button_color_map[17] = {
-                'color': self.led_color_blue,
-                'blink': False
-            }
-
-            # Back/No button
-            self.button_color_map[18] = {
-                'color': self.led_color_red,
-                'blink': False
-            }
-
-            # Up button
-            self.button_color_map[19] = {
-                'color': self.led_color_light,
-                'blink': False
-            }
-
-            # Select/Yes button
-            self.button_color_map[20] = {
-                'color': self.led_color_green,
-                'blink': False
-            }
-
-            # Left Button
-            self.button_color_map[21] = {
-                'color': self.led_color_light,
-                'blink': False
-            }
-
-            # Bottom Button
-            self.button_color_map[22] = {
-                'color': self.led_color_light,
-                'blink': False
-            }
-
-            # Right Button
-            self.button_color_map[23] = {
-                'color': self.led_color_light,
-                'blink': False
-            }
-
-            # Master Button
-            if self.zyngui.globalPopupOpened:
-                self.button_color_map[24] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
-            else:
-                self.button_color_map[24] = {
-                    'color': self.led_color_light,
-                    'blink': False
-                }
-
+            if self.zyngui.sketchpad.song is not None and (self.channel is None or (
+                    self.channel is not None and self.channel.id != self.zyngui.session_dashboard.selectedChannel)):
+                logging.debug(f"LED Config : Setting channel to {self.zyngui.session_dashboard.selectedChannel}")
+                self.channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
         except Exception as e:
             logging.error(e)
+
+        # Menu
+        if self.zyngui.modal_screen is None and self.zyngui.active_screen == "main":
+            self.set_button_color(0, self.led_color_active)
+        else:
+            self.set_button_color(0, self.led_color_inactive)
+
+        # Light up 1-5 buttons as per opened screen / bottomBar
+        for i in range(1, 6):
+            # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
+            # This is global (i.e. for all screens)
+            if self.zyngui.leftSidebarActive:
+                # Lights up selected slots for channel
+                partClip = self.zyngui.sketchpad.song.getClipByPart(self.channel.id,
+                                                                    self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex,
+                                                                    i - 1)
+
+                if self.channel is not None and partClip.enabled:
+                    self.set_button_color_by_channel(i)
+                else:
+                    self.set_button_color(i, self.led_color_inactive)
+
+                continue
+
+            # Light up 1-5 buttons when respective channel is selected
+            # If self.zyngui.channelsModActive is true, light up 1-5 HW button when channels 6-10 is selected
+            channelDelta = 5 if self.zyngui.channelsModActive else 0
+            if self.zyngui.session_dashboard.selectedChannel - channelDelta == i-1:
+                self.set_button_color_by_channel(i)
+            else:
+                self.set_button_color(i, self.led_color_inactive)
+
+        # 6: * Button
+        if not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive:
+            self.set_button_color_by_channel(6)
+        else:
+            self.set_button_color(6, self.led_color_inactive)
+
+        # 7 : Mode Button
+        if self.zyngui.leftSidebarActive:
+            self.set_button_color_by_channel(7)
+        else:
+            self.set_button_color(7, self.led_color_inactive)
+
+        # Under screen button 1
+        if self.zyngui.current_screen_id == "sketchpad":
+            self.set_button_color(8, self.led_color_active)
+        else:
+            self.set_button_color(8, self.led_color_inactive)
+
+        # Under screen button 2
+        if self.zyngui.current_screen_id == "playgrid":
+            self.set_button_color(9, self.led_color_active)
+        else:
+            self.set_button_color(9, self.led_color_inactive)
+
+        # Under screen button 3
+        if self.zyngui.current_screen_id == "song_manager":
+            self.set_button_color(10, self.led_color_active)
+        else:
+            self.set_button_color(10, self.led_color_inactive)
+
+        # Under screen button 4
+        if self.zyngui.current_screen_id in ["layers_for_channel", "bank", "preset"]:
+            self.set_button_color(11, self.led_color_active)
+        else:
+            self.set_button_color(11, self.led_color_inactive)
+
+        # Under screen button 5
+        if self.zyngui.current_screen_id == "control" or self.zyngui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]:
+            self.set_button_color(12, self.led_color_active)
+        else:
+            self.set_button_color(12, self.led_color_inactive)
+
+        # ALT button
+        self.set_button_color(13, self.led_color_inactive)
+
+        # Recording Button
+        if not self.zyngui.sketchpad.isRecording:
+            self.set_button_color(14, self.led_color_inactive)
+        else:
+            self.set_button_color(14, self.led_color_red)
+
+        # Play button
+        if self.zyngui.sketchpad.isMetronomeRunning:
+            self.set_button_color(15, self.led_color_active)
+        else:
+            self.set_button_color(15, self.led_color_inactive)
+
+        # Save button
+        if self.zyngui.sketchpad.clickChannelEnabled:
+            if self.zyngui.sketchpad.isMetronomeRunning:
+                self.set_button_color(16, self.led_color_inactive, True)
+            else:
+                self.set_button_color(16, self.led_color_inactive)
+        else:
+            self.set_button_color(16, self.led_color_off)
+
+        # Stop button
+        self.set_button_color(17, self.led_color_inactive)
+
+        # Back/No button
+        self.set_button_color(18, self.led_color_red)
+
+        # Up button
+        self.set_button_color(19, self.led_color_inactive)
+
+        # Select/Yes button
+        self.set_button_color(20, self.led_color_green)
+
+        # Left Button
+        self.set_button_color(21, self.led_color_inactive)
+
+        # Bottom Button
+        self.set_button_color(22, self.led_color_inactive)
+
+        # Right Button
+        self.set_button_color(23, self.led_color_inactive)
+
+        # Master Button
+        if self.zyngui.globalPopupOpened:
+            self.set_button_color(24, self.led_color_active)
+        else:
+            self.set_button_color(24, self.led_color_inactive)

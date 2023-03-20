@@ -71,6 +71,18 @@ Zynthian.Stack {
         "wifi_settings":"WifiSettingsPage.qml",
         "test_knobs":"TestKnobsPage.qml"
     }
+    readonly property var pageDisplayNames: {
+        "main": "Main Menu",
+        "control": "Synth Edit",
+        "layers_for_channel": "Library",
+        "playgrid": "Playgrid",
+        "midi_key_range": "Key Range",
+        "sound_categories": "Sound Categories",
+        "engine": "Synths",
+        "song_manager": "Song Player",
+        "channel_wave_editor": "Audio Editor",
+        "sketchpad": "Sketchpad"
+    }
 
     // List of pages that will be cached on start
     property var pagesToCache: [
@@ -87,6 +99,15 @@ Zynthian.Stack {
     ]
     property string currentPage: ""
     property var pageCache: ({})
+
+    // Function to get display name of page
+    function getPageDisplayName(page) {
+        if (root.pageDisplayNames[page] != null) {
+            return root.pageDisplayNames[page]
+        } else {
+            return page.replace(/_/g, " ")
+        }
+    }
 
     // Get absolute url of page file by page name
     function pageResolvedUrl(page) {
@@ -116,7 +137,7 @@ Zynthian.Stack {
         // Cache all the main pages when starting up
         for (var pageIndex in root.pagesToCache) {
             var pageName = root.pagesToCache[pageIndex]
-            zynthian.currentTaskMessage = "Loading page : " + pageName.replace(/_/g, " ")
+            zynthian.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)
             root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
         }
 

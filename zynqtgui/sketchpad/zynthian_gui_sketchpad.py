@@ -1324,7 +1324,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             if cb is not None:
                 cb()
 
-            self.zyngui.currentTaskMessage = "Finalizing"
+            if self.zyngui.isBootingComplete:
+                self.zyngui.currentTaskMessage = "Finalizing"
 
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
@@ -1436,7 +1437,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                     if cb is not None:
                         cb()
 
-                    self.zyngui.currentTaskMessage = "Finalizing"
+                    if self.zyngui.isBootingComplete:
+                        self.zyngui.currentTaskMessage = "Finalizing"
                     self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
 
@@ -1472,7 +1474,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 if cb is not None:
                     cb()
 
-                self.zyngui.currentTaskMessage = "Finalizing"
+                if self.zyngui.isBootingComplete:
+                    self.zyngui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
                 QTimer.singleShot(3000, self.zyngui.end_long_task)
 

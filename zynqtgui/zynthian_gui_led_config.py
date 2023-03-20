@@ -134,22 +134,22 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                         if channel.channelAudioType == "synth":
                             self.button_color_map[i] = {
                                 'color': self.led_color_red,
-                                'blink': True
+                                'blink': False
                             }
                         elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
                             self.button_color_map[i] = {
                                 'color': self.led_color_yellow,
-                                'blink': True
+                                'blink': False
                             }
                         elif channel.channelAudioType == "sample-loop":
                             self.button_color_map[i] = {
                                 'color': self.led_color_green,
-                                'blink': True
+                                'blink': False
                             }
                         elif channel.channelAudioType == "external":
                             self.button_color_map[i] = {
                                 'color': self.led_color_purple,
-                                'blink': True
+                                'blink': False
                             }
                     else:
                         self.button_color_map[i] = {
@@ -191,10 +191,26 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
             # 6: * Button
             if not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive:
-                self.button_color_map[6] = {
-                    'color': self.led_color_green,
-                    'blink': False
-                }
+                if channel.channelAudioType == "synth":
+                    self.button_color_map[6] = {
+                        'color': self.led_color_red,
+                        'blink': False
+                    }
+                elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
+                    self.button_color_map[6] = {
+                        'color': self.led_color_yellow,
+                        'blink': False
+                    }
+                elif channel.channelAudioType == "sample-loop":
+                    self.button_color_map[6] = {
+                        'color': self.led_color_green,
+                        'blink': False
+                    }
+                elif channel.channelAudioType == "external":
+                    self.button_color_map[6] = {
+                        'color': self.led_color_purple,
+                        'blink': False
+                    }
             else:
                 self.button_color_map[6] = {
                     'color': self.led_color_blue,
@@ -206,32 +222,32 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 if channel is not None and channel.channelAudioType == "synth":
                     self.button_color_map[7] = {
                         'color': self.led_color_red,
-                        'blink': True
+                        'blink': False
                     }
                 elif channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
                     self.button_color_map[7] = {
                         'color': self.led_color_yellow,
-                        'blink': True
+                        'blink': False
                     }
                 elif self.zyngui.slotsBarFxActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_blue,
-                        'blink': True
+                        'blink': False
                     }
                 elif channel is not None and channel.channelAudioType == "sample-loop":
                     self.button_color_map[7] = {
                         'color': self.led_color_green,
-                        'blink': True
+                        'blink': False
                     }
                 elif channel is not None and channel.channelAudioType == "external":
                     self.button_color_map[7] = {
                         'color': self.led_color_purple,
-                        'blink': True
+                        'blink': False
                     }
                 else: # Control should never reach here
                     self.button_color_map[7] = {
                         'color': self.led_color_blue,
-                        'blink': True
+                        'blink': False
                     }
             else:
                 self.button_color_map[7] = {

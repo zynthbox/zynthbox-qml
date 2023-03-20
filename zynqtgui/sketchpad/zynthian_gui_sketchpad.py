@@ -872,12 +872,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.is_set_selector_running = True
 
     @Slot(None)
-    def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True,):
+    def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True, force=False):
         # Hide selectors and return if dependent variables is None or a long operation is in progress
-        if self.__song__ is None or \
+        if (self.__song__ is None or \
                 (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) or \
                 (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
-                self.longOperation:
+                self.longOperation):
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
             if self.__zselector[1] is not None:
@@ -1197,7 +1197,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     ongoingCountIn = Property(int, get_ongoingCountIn, set_ongoingCountIn, notify=ongoingCountInChanged)
 
     def show(self):
-        self.set_selector()
+        if self.zyngui.isBootingComplete:
+            self.set_selector(force=True)
 
     @Signal
     def current_beat_changed(self):

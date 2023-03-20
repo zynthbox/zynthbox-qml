@@ -159,22 +159,6 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
                     continue
 
-                # If main page is open, light buttons as per selected tab in order : Modules(modules), Apps(appimages), Sessions(sessions), Templates(templates), Discover(discover)
-                if self.zyngui.active_screen == "main":
-                    tabs = ["modules", "appimages", ("sessions", "sessions-versions"), "templates", "discover"]
-                    if self.zyngui.main.visibleCategory == tabs[i-1] or self.zyngui.main.visibleCategory in tabs[i-1]:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_green,
-                            'blink': False
-                        }
-                    else:
-                        self.button_color_map[i] = {
-                            'color': self.led_color_blue,
-                            'blink': False
-                        }
-
-                    continue
-
                 # Light up 1-5 buttons when respective channel is selected
                 # If self.zyngui.channelsModActive is true, light up 1-5 HW button when channels 6-10 is selected
                 channelDelta = 5 if self.zyngui.channelsModActive else 0

@@ -690,6 +690,7 @@ class zynthian_gui(QObject):
         # Initialise libzl (which requires things found in zyncoder, specifically the zynthian midi router)
         libzl.init()
 
+    @Slot()
     def channelsModTimerHandler(self):
         # If * button is pressed, it toggles itself on/off for 5000ms before returning
         # to state where it shows current channel.
@@ -1323,8 +1324,8 @@ class zynthian_gui(QObject):
 
             if isActive:
                 # If leftSidebar is opened and stop channelsModTimer and call timer handler immediately
-                self.channelsModTimer.stop()
-                self.channelsModTimerHandler()
+                QMetaObject.invokeMethod(self.channelsModTimer, "stop", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "channelsModTimerHandler", Qt.QueuedConnection)
 
             self.leftSidebarActiveChanged.emit()
 
@@ -2092,6 +2093,8 @@ class zynthian_gui(QObject):
     def callable_ui_action(self, cuia, params=None):
         logging.debug("CUIA '{}' => {}".format(cuia, params))
 
+        channelDelta = 5 if self.channelsModActive else 0
+
         # Before anything else, try and ask the main window whether there's anything to be done
         try:
             cuia_callback = zynthian_gui_config.top.property("cuiaCallback")
@@ -2395,29 +2398,29 @@ class zynthian_gui(QObject):
             self.toggle_modal("stepseq")
 
         elif cuia == "CHANNEL_1":
-            self.screens["session_dashboard"].selectedChannel = 0
+            self.screens["session_dashboard"].selectedChannel = 0 + channelDelta
         elif cuia == "CHANNEL_2":
-            self.screens["session_dashboard"].selectedChannel = 1
+            self.screens["session_dashboard"].selectedChannel = 1 + channelDelta
         elif cuia == "CHANNEL_3":
-            self.screens["session_dashboard"].selectedChannel = 2
+            self.screens["session_dashboard"].selectedChannel = 2 + channelDelta
         elif cuia == "CHANNEL_4":
-            self.screens["session_dashboard"].selectedChannel = 3
+            self.screens["session_dashboard"].selectedChannel = 3 + channelDelta
         elif cuia == "CHANNEL_5":
-            self.screens["session_dashboard"].selectedChannel = 4
-        elif cuia == "CHANNEL_6":
-            self.screens["session_dashboard"].selectedChannel = 5
-        elif cuia == "CHANNEL_7":
-            self.screens["session_dashboard"].selectedChannel = 6
-        elif cuia == "CHANNEL_8":
-            self.screens["session_dashboard"].selectedChannel = 7
-        elif cuia == "CHANNEL_9":
-            self.screens["session_dashboard"].selectedChannel = 8
-        elif cuia == "CHANNEL_10":
-            self.screens["session_dashboard"].selectedChannel = 9
-        elif cuia == "CHANNEL_11":
-            self.screens["session_dashboard"].selectedChannel = 10
-        elif cuia == "CHANNEL_12":
-            self.screens["session_dashboard"].selectedChannel = 11
+            self.screens["session_dashboard"].selectedChannel = 4 + channelDelta
+        # elif cuia == "CHANNEL_6":
+        #     self.screens["session_dashboard"].selectedChannel = 5
+        # elif cuia == "CHANNEL_7":
+        #     self.screens["session_dashboard"].selectedChannel = 6
+        # elif cuia == "CHANNEL_8":
+        #     self.screens["session_dashboard"].selectedChannel = 7
+        # elif cuia == "CHANNEL_9":
+        #     self.screens["session_dashboard"].selectedChannel = 8
+        # elif cuia == "CHANNEL_10":
+        #     self.screens["session_dashboard"].selectedChannel = 9
+        # elif cuia == "CHANNEL_11":
+        #     self.screens["session_dashboard"].selectedChannel = 10
+        # elif cuia == "CHANNEL_12":
+        #     self.screens["session_dashboard"].selectedChannel = 11
 
         elif cuia == "CHANNEL_PREVIOUS":
             if self.screens["session_dashboard"].selectedChannel > 0:
@@ -2479,7 +2482,7 @@ class zynthian_gui(QObject):
             self.channelsModActive = not self.channelsModActive
             # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
             # Since * button is pressed, start timer
-            self.channelsModTimer.start()
+            QMetaObject.invokeMethod(self.channelsModTimer, "start", Qt.QueuedConnection)
             logging.debug(f'self.channelsModActive({self.channelsModActive})')
 
         elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
@@ -2595,7 +2598,7 @@ class zynthian_gui(QObject):
                 if 5 <= i <= 9:
                     # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
                     # When 1-5 hw button is pressed during that 5000ms, * button state is retained and hence stop timer.
-                    self.channelsModTimer.stop()
+                    QMetaObject.invokeMethod(self.channelsModTimer, "stop", Qt.QueuedConnection)
 
                 # Handle button press event
                 if i == 10:

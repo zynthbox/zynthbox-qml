@@ -89,7 +89,7 @@ Zynthian.BasePlayGrid {
                 }
                 return true;
             }
-            return true;
+            return false;
         }
         var returnValue = false;
 
@@ -98,6 +98,8 @@ Zynthian.BasePlayGrid {
         }
 
         if (returnValue === false) {
+            var channelDelta = zynthian.channelsModActive ? 5 : 0
+
             switch (cuia) {
                 case "START_RECORD":
                     if (_private.activePatternModel.recordLive) {
@@ -171,40 +173,19 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "CHANNEL_1":
-                    returnValue = backButtonClearPatternHelper(0);
+                    returnValue = backButtonClearPatternHelper(0 + channelDelta);
                     break;
                 case "CHANNEL_2":
-                    returnValue = backButtonClearPatternHelper(1);
+                    returnValue = backButtonClearPatternHelper(1 + channelDelta);
                     break;
                 case "CHANNEL_3":
-                    returnValue = backButtonClearPatternHelper(2);
+                    returnValue = backButtonClearPatternHelper(2 + channelDelta);
                     break;
                 case "CHANNEL_4":
-                    returnValue = backButtonClearPatternHelper(3);
+                    returnValue = backButtonClearPatternHelper(3 + channelDelta);
                     break;
                 case "CHANNEL_5":
-                    returnValue = backButtonClearPatternHelper(4);
-                    break;
-                case "CHANNEL_6":
-                    returnValue = backButtonClearPatternHelper(5);
-                    break;
-                case "CHANNEL_7":
-                    returnValue = backButtonClearPatternHelper(6);
-                    break;
-                case "CHANNEL_8":
-                    returnValue = backButtonClearPatternHelper(7);
-                    break;
-                case "CHANNEL_9":
-                    returnValue = backButtonClearPatternHelper(8);
-                    break;
-                case "CHANNEL_10":
-                    returnValue = backButtonClearPatternHelper(9);
-                    break;
-                case "CHANNEL_11":
-                    returnValue = backButtonClearPatternHelper(10);
-                    break;
-                case "CHANNEL_12":
-                    returnValue = backButtonClearPatternHelper(11);
+                    returnValue = backButtonClearPatternHelper(4 + channelDelta);
                     break;
                 default:
                     break;

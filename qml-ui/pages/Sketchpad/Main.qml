@@ -156,8 +156,6 @@ Zynthian.ScreenPage {
     ]
 
     cuiaCallback: function(cuia) {
-        console.log("ZL Cuia Handler :", cuia)
-
         if (sketchpadPickerDialog.opened) {
             return sketchpadPickerDialog.cuiaCallback(cuia);
         }
@@ -214,34 +212,6 @@ Zynthian.ScreenPage {
                     }
 
                     return true;
-                } else {
-//                    // Cycle through the channelAudioTypes when alt button is pressed
-//                    if (root.selectedChannel.channelAudioType === "synth") {
-//                        root.selectedChannel.channelAudioType = "sample-trig"
-//                    } else if (root.selectedChannel.channelAudioType === "sample-trig") {
-//                        root.selectedChannel.channelAudioType = "sample-slice"
-//                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
-//                        root.selectedChannel.channelAudioType = "sample-loop"
-//                    } else if (root.selectedChannel.channelAudioType === "sample-loop") {
-//                        // HACK
-//                        // FIXME : When changing channelAudioType to external it somehow first gets selected to "synth"
-//                        //         And then on changing the value 2nd time it finally changes to "external"
-//                        //         Couldn't find any probable cause for the issue but forcefully setting to external twice
-//                        //         seems to do temporarily solve the problem. But this issue needs to be fixed ASAP
-//                        root.selectedChannel.channelAudioType = "external"
-//                        root.selectedChannel.channelAudioType = "external"
-//                    } else if (root.selectedChannel.channelAudioType === "external") {
-//                        root.selectedChannel.channelAudioType = "synth"
-//                    }
-
-//                    // Toggle between Part and Channel bar with FX Button
-//                    if (!bottomStack.slotsBar.partButton.checked) {
-//                        bottomStack.slotsBar.partButton.checked = true
-//                    } else {
-//                        bottomStack.slotsBar.channelButton.checked = true
-//                    }
-
-//                    return true;
                 }
 
                 return false;
@@ -291,9 +261,7 @@ Zynthian.ScreenPage {
                 return true
         }
 
-        // If cuia is not handled by any bottomBars or the switch block
-        // call the common cuiaHandler
-        return Zynthian.CommonUtils.cuiaHandler(cuia, root.selectedChannel, bottomStack)
+        return false
     }
 
     Connections {

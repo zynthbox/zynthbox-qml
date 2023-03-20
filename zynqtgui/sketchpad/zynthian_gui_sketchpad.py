@@ -877,7 +877,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if (self.__song__ is None or \
                 (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) or \
                 (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
-                self.longOperation):
+                self.longOperation) and not force:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
             if self.__zselector[1] is not None:

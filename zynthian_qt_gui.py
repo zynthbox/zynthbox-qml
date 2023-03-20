@@ -484,8 +484,6 @@ class zynthian_gui(QObject):
         self.__down_button_pressed__ = False
         self.__right_button_pressed__ = False
         self.__global_popup_opened__ = False
-        self.__is__modal__screens__caching__complete__ = False
-        self.__is__screens__caching__complete__ = False
         self.__passive_notification = ""
         self.__splash_stopped = False
 
@@ -3891,54 +3889,43 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
-        def task():
-            if self.isModalScreensCachingComplete and self.isScreensCachingComplete:
-                logging.debug("QML Caching complete. Calling stop_splash")
-                stop_splash_timer.stop()
-                
-                # Display main window as soon as possible so it doesn't take time to load after splash stops
-                self.displayMainWindow.emit()                
-                self.isBootingComplete = True
+        logging.debug("QML Caching complete. Calling stop_splash")
 
-                # Explicitly run update_jack_port after booting is complete
-                # as any requests made while booting is ignored
-                # zyngui.zynautoconnect will run after channel ports are updated
-                for i in range(0, self.sketchpad.song.channelsModel.count):
-                    channel = self.sketchpad.song.channelsModel.getChannel(i)
-                    # Allow jack ports connection to complete before showing UI
-                    # so do not update jack ports in a thread
-                    channel.update_jack_port(run_in_thread=False)
+        # Display main window as soon as possible so it doesn't take time to load after splash stops
+        self.displayMainWindow.emit()
+        self.isBootingComplete = True
 
-                # Run sketchpad set_selector at last before hiding splash
-                # to ensure knobs work fine as it is the first page that is displayed
-                # after splash is hidden
-                self.sketchpad.set_selector()
+        # Explicitly run update_jack_port after booting is complete
+        # as any requests made while booting is ignored
+        # zyngui.zynautoconnect will run after channel ports are updated
+        for i in range(0, self.sketchpad.song.channelsModel.count):
+            channel = self.sketchpad.song.channelsModel.getChannel(i)
+            # Allow jack ports connection to complete before showing UI
+            # so do not update jack ports in a thread
+            channel.update_jack_port(run_in_thread=False)
 
-                extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
+        # Display sketchpad page and run set_selector at last before hiding splash
+        # to ensure knobs work fine
+        self.show_modal("sketchpad")
+        self.sketchpad.set_selector()
 
-                process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
+        extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
 
-                with open("/tmp/mplayer-splash-control", "w") as f:
-                    f.write("quit\n")
-                    f.close()
+        process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
 
-                if process is not None:
-                    process.wait()
-                
-                # Setting splashStopped to True will remove the overlay over main wwindow so nothing is displayed below splash until splash process exits
-                self.splashStopped = True
+        with open("/tmp/mplayer-splash-control", "w") as f:
+            f.write("quit\n")
+            f.close()
 
-                boot_end = timer()
+        if process is not None:
+            process.wait()
 
-                logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
-            else:
-                logging.debug("QML Caching not yet complete. Rescheduling stop_splash call")
+        # Setting splashStopped to True will remove the overlay over main wwindow so nothing is displayed below splash until splash process exits
+        self.splashStopped = True
 
-        stop_splash_timer = QTimer()
-        stop_splash_timer.setInterval(500)
-        stop_splash_timer.setSingleShot(False)
-        stop_splash_timer.timeout.connect(task)
-        stop_splash_timer.start()
+        boot_end = timer()
+
+        logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
     def get_encoder_list_speed_multiplier(self):
         return self.__encoder_list_speed_multiplier
@@ -4562,35 +4549,6 @@ class zynthian_gui(QObject):
 
     showCurrentTaskMessage = Property(bool, get_showCurrentTaskMessage, set_showCurrentTaskMessage, notify=showCurrentTaskMessageChanged)
     ### END Property showCurrentTaskMessage
-
-    ### Property isModalScreensCachingComplete
-    def get_isModalScreensCachingComplete(self):
-        return self.__is__modal__screens__caching__complete__
-
-    def set_isModalScreensCachingComplete(self, value):
-        if value != self.__is__modal__screens__caching__complete__:
-            self.__is__modal__screens__caching__complete__ = value
-            self.isModalScreensCachingCompleteChanged.emit()
-
-    isModalScreensCachingCompleteChanged = Signal()
-
-    isModalScreensCachingComplete = Property(bool, get_isModalScreensCachingComplete, set_isModalScreensCachingComplete, notify=isModalScreensCachingCompleteChanged)
-    ### END Property isModalScreensCachingComplete
-
-    ### Property isScreensCachingComplete
-    def get_isScreensCachingComplete(self):
-        return self.__is__screens__caching__complete__
-
-    def set_isScreensCachingComplete(self, value):
-        if value != self.__is__screens__caching__complete__:
-            self.__is__screens__caching__complete__ = value
-            self.isScreensCachingCompleteChanged.emit()
-            self.isScreensCachingCompleteChanged.emit()
-
-    isScreensCachingCompleteChanged = Signal()
-
-    isScreensCachingComplete = Property(bool, get_isScreensCachingComplete, set_isScreensCachingComplete, notify=isScreensCachingCompleteChanged)
-    ### END Property isScreensCachingComplete
 
     ### Property knobTouchUpdateInProgress
     def get_knob_touch_update_in_progress(self):

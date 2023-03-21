@@ -32,7 +32,7 @@ from pathlib import Path
 from . import zynthian_gui_selector
 
 from PySide2.QtCore import QSettings, Property, Signal, Slot
-from PySide2.QtGui import QGuiApplication, QFontDatabase, QColor
+from PySide2.QtGui import QGuiApplication, QFontDatabase, QColor, QFont
 from configparser import ConfigParser
 
 
@@ -175,6 +175,7 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 		font = app.font()
 		font.setFamily(font_settings.value("family", "Roboto"))
 		font.setPointSize(int(font_settings.value("size", 12)))
+		font.setHintingPreference(QFont.PreferFullHinting)
 		app.setFont(font)
 
 		font_settings.endGroup()
@@ -185,6 +186,7 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 		font = app.font()
 		font.setFamily("Roboto")
 		font.setPointSize(12)
+		font.setHintingPreference(QFont.PreferFullHinting)
 		app.setFont(font)
 
 

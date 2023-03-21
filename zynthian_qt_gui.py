@@ -1417,6 +1417,7 @@ class zynthian_gui(QObject):
             except:
                 pass
         else:
+            logging.debug("LED : External app active")
             for i in range(0, 25):
                 self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 50, 200))
 

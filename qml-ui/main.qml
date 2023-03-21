@@ -743,7 +743,7 @@ Kirigami.AbstractApplicationWindow {
                         root.selectedChannel.channelAudioType === "sample-trig" ||
                         root.selectedChannel.channelAudioType === "sample-slice") {
                         root.selectedChannel.selectedSlotRow = 0
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                         returnVal = true
                     }
 
@@ -756,7 +756,7 @@ Kirigami.AbstractApplicationWindow {
                         root.selectedChannel.channelAudioType === "sample-trig" ||
                         root.selectedChannel.channelAudioType === "sample-slice") {
                         root.selectedChannel.selectedSlotRow = 1
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                         returnVal = true
                     }
 
@@ -769,7 +769,7 @@ Kirigami.AbstractApplicationWindow {
                         root.selectedChannel.channelAudioType === "sample-trig" ||
                         root.selectedChannel.channelAudioType === "sample-slice") {
                         root.selectedChannel.selectedSlotRow = 2
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                         returnVal = true
                     }
 
@@ -782,7 +782,7 @@ Kirigami.AbstractApplicationWindow {
                         root.selectedChannel.channelAudioType === "sample-trig" ||
                         root.selectedChannel.channelAudioType === "sample-slice") {
                         root.selectedChannel.selectedSlotRow = 3
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                         returnVal = true
                     }
 
@@ -795,7 +795,7 @@ Kirigami.AbstractApplicationWindow {
                         root.selectedChannel.channelAudioType === "sample-trig" ||
                         root.selectedChannel.channelAudioType === "sample-slice") {
                         root.selectedChannel.selectedSlotRow = 4
-                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                         returnVal = true
                     }
 

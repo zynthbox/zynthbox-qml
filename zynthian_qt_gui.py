@@ -1729,6 +1729,9 @@ class zynthian_gui(QObject):
         # Init GlobalFX
         self.init_global_fx()
 
+        # Reset channels LED state on selectedChannel change
+        self.session_dashboard.selected_channel_changed.connect(self.channelsModTimerHandler)
+
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
         self.stop_polling()

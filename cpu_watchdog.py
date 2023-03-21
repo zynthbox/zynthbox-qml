@@ -23,12 +23,12 @@
 #
 #********
 
-import logging
 import os
 import sys
 import time
-from subprocess import check_output
+import logging
 from pathlib import Path
+from subprocess import check_output
 
 logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=logging.DEBUG)
 

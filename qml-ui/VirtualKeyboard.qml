@@ -114,6 +114,7 @@ Item {
     InputPanel {
         id: inputPanel
         active: Qt.inputMethod.visible
+        visible: Qt.inputMethod.visible
         anchors {
             left: parent.left
             right: parent.right

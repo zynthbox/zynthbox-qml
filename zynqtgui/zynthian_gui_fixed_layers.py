@@ -225,6 +225,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
+                ctrl = None
                 # Find volume control as per self.__engine_config__
                 for name in layer.controllers_dict:
                     # Check if engine has specific mapping of volume controller name
@@ -248,12 +249,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     else:
                         logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
 
-                if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                    gctrl = MixerControl(self)
-                    gctrl.set_zctrl(ctrl)
-                    self.__volume_ctrls.append(gctrl)
-                else:
-                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
+                if ctrl is not None:
+                    if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
+                        gctrl = MixerControl(self)
+                        gctrl.set_zctrl(ctrl)
+                        self.__volume_ctrls.append(gctrl)
+                    else:
+                        self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
         self.volume_controls_changed.emit()
 
     def select(self, index=None):

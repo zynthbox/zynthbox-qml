@@ -136,7 +136,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     implicitWidth: 1
                     checkable: true
-                    checked: true
+                    checked: zynthian.engine.shown_category == "Instrument"
                     autoExclusive: true
                     text: qsTr("LV2 Instruments")
                     onToggled: {
@@ -172,6 +172,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     implicitWidth: 1
                     checkable: true
+                    checked: zynthian.engine.shown_category == "None"
                     autoExclusive: true
                     text: qsTr("Other Synths")
                     onToggled: {

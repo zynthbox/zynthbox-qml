@@ -10,6 +10,9 @@
     "JV/Red Zeppelin 5": {
         "volumeControl": ["level"]
     },
+    "JV/Calf Monosynth": {
+        "volumeControl": ["master"]
+    },
     "default": {
         "volumeControl": ["volume", "Volume"]
     }

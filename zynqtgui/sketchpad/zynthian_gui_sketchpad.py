@@ -353,6 +353,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 step=volume_control_obj.step_size,
                 defaultValue=None,
                 currentValue=volume_control_obj.value,
+                startLabel=f"{round(volume_control_obj.value_min, 2)}", # Round off label value upto 2 decimals
+                stopLabel=f"{round(volume_control_obj.value_max, 2)}", # Round off label value upto 2 decimals
+                valueLabel=f"{round(volume_control_obj.value, 2)}", # Round off label value upto 2 decimals
                 setValueFunction=self.set_layer_volume_actual,
                 showValueLabel=True,
                 showResetToDefault=False,

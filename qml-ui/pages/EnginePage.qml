@@ -56,40 +56,20 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         switch (cuia) {
         case "SELECT_UP":
-            if (view.currentIndex < 3) {
-                tabbarScope.forceActiveFocus();
-            } else {
-                view.moveCurrentIndexUp();
-            }
+            view.moveCurrentIndexUp();
             return true;
         case "SELECT_DOWN":
-            if (tabbarScope.activeFocus) {
-                view.forceActiveFocus();
+            if (view.currentIndex === -1) {
+                view.currentIndex = 0;
             } else {
-                if (view.currentIndex === -1) {
-                    view.currentIndex = 0;
-                } else {
-                    view.moveCurrentIndexDown();
-                }
+                view.moveCurrentIndexDown();
             }
             return true;
         case "NAVIGATE_LEFT":
-            if (tabbarScope.activeFocus) {
-                lv2Switch.checked = true;
-                lv2Switch.toggled();
-                view.currentIndex = -1;
-            } else {
-                view.moveCurrentIndexLeft();
-            }
-            return true;
+            view.moveCurrentIndexLeft();
+            return true
         case "NAVIGATE_RIGHT":
-            if (tabbarScope.activeFocus) {
-                othersSwitch.checked = true;
-                othersSwitch.toggled();
-                view.currentIndex = -1;
-            } else {
-                view.moveCurrentIndexRight();
-            }
+            view.moveCurrentIndexRight();
             return true;
         default:
             return false;
@@ -113,81 +93,65 @@ Zynthian.ScreenPage {
 
     ColumnLayout {
         anchors.fill: parent
-        FocusScope {
-            id: tabbarScope
-            visible: (zynthian.engine.synth_engine_type !== "Audio Effect" &&
-                        zynthian.engine.synth_engine_type !== "MIDI Tool")
-            Layout.fillWidth: true
-            implicitHeight: tabbarLayout.implicitHeight
-            Zynthian.Card {
-                anchors {
-                    fill: parent
-                    margins: -1
-                }
-                highlighted: true
-                visible: tabbarScope.activeFocus
-            }
-            RowLayout {
-                id: tabbarLayout
-                anchors.fill: parent
 
-                QQC2.Button {
-                    id: lv2Switch
-                    Layout.fillWidth: true
-                    implicitWidth: 1
-                    checkable: true
-                    checked: zynthian.engine.shown_category == "Instrument"
-                    autoExclusive: true
-                    text: qsTr("LV2 Instruments")
-                    onToggled: {
-                        if (checked) {
-                            zynthian.engine.shown_category = "Instrument";
-                        }
+        RowLayout {
+            id: tabbarLayout
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            QQC2.Button {
+                id: lv2Switch
+                Layout.fillWidth: true
+                implicitWidth: 1
+                checkable: true
+                checked: zynthian.engine.shown_category == "Instrument"
+                autoExclusive: true
+                text: qsTr("LV2 Instruments")
+                onToggled: {
+                    if (checked) {
+                        zynthian.engine.shown_category = "Instrument";
                     }
-                    onClicked: view.forceActiveFocus()
-                    Component.onCompleted: {
+                }
+                Component.onCompleted: {
+                    if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
+                        zynthian.engine.synth_engine_type !== "MIDI Tool") {
+                        zynthian.engine.shown_category = "Instrument";
+                    } else {
+                        zynthian.engine.shown_category = null;
+                    }
+                    zynthian.engine.current_index = -1;
+                    view.contentY = 0;
+                }
+                Connections {
+                    target: zynthian.engine
+                    onSynth_engine_typeChanged: {
                         if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
                             zynthian.engine.synth_engine_type !== "MIDI Tool") {
                             zynthian.engine.shown_category = "Instrument";
                         } else {
                             zynthian.engine.shown_category = null;
                         }
-                        zynthian.engine.current_index = -1;
-                        view.contentY = 0;
-                    }
-                    Connections {
-                        target: zynthian.engine
-                        onSynth_engine_typeChanged: {
-                            if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
-                                zynthian.engine.synth_engine_type !== "MIDI Tool") {
-                                zynthian.engine.shown_category = "Instrument";
-                            } else {
-                                zynthian.engine.shown_category = null;
-                            }
-                        }
                     }
                 }
-                QQC2.Button {
-                    id: othersSwitch
-                    Layout.fillWidth: true
-                    implicitWidth: 1
-                    checkable: true
-                    checked: zynthian.engine.shown_category == "None"
-                    autoExclusive: true
-                    text: qsTr("Other Synths")
-                    onToggled: {
-                        if (checked) {
-                            zynthian.engine.shown_category = "None";
-                        }
+            }
+            QQC2.Button {
+                id: othersSwitch
+                Layout.fillWidth: true
+                implicitWidth: 1
+                checkable: true
+                checked: zynthian.engine.shown_category == "None"
+                autoExclusive: true
+                text: qsTr("Other Synths")
+                onToggled: {
+                    if (checked) {
+                        zynthian.engine.shown_category = "None";
                     }
-                    onClicked: view.forceActiveFocus()
                 }
             }
         }
         Zynthian.Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            highlighted: view.activeFocus
             contentItem: QQC2.ScrollView {
                 id: scrollView
 

@@ -1,6 +1,6 @@
 {
     "JV/synthv1": {
-        "volumeControl": ["OUT1_VOLUME"],
+        "volumeControl": ["OUT1_VOLUME", "OUT2_VOLUME"],
         "description": "Synth V1 small description"
     },
     "JV/amsynth": {

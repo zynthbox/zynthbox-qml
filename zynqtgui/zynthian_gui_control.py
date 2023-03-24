@@ -1079,6 +1079,13 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def get_totalColumns(self):
 		return math.ceil(len(self.__all_controls) / 3)
 
+	@Slot(int, result="QVariant")
+	def getAllControlAt(self, index):
+		if index < len(self.__all_controls):
+			return self.__all_controls[index]
+		else:
+			return None
+
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()
 	custom_control_page_changed = Signal()

@@ -146,19 +146,26 @@ RowLayout {
 
                         property int allControlsIndex: zynthian.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
                         property var control: null
-                        Binding {
-                            target: controlDelegate
-                            property: "control"
-                            value: zynthian.current_screen_id === "control"
-                                   && root.selectedChannel.channelHasSynth
-                                   && zynthian.control.all_controls[allControlsIndex]
-                                    ? zynthian.control.all_controls[allControlsIndex]
-                                    : null
-                            delayed: true
+
+                        function updateControl() {
+                            controlDelegate.control = Qt.binding(function() {
+                                // Do not use all_controls property here in js as it will slow things down if array is large enough
+                                // Instead fetch the required controls as required
+                                return zynthian.current_screen_id === "control"
+                                       && root.selectedChannel.channelHasSynth
+                                        ? zynthian.control.getAllControlAt(controlDelegate.allControlsIndex)
+                                        : null
+                            })
                         }
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        Component.onCompleted: controlDelegate.updateControl()
+
+                        Connections {
+                            target: zynthian.control
+                            onAll_controlsChanged: controlDelegate.updateControl()
+                        }
 
                         Zynthian.ControllerLoader {
                             visible: controlDelegate.control != null

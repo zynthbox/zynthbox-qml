@@ -450,6 +450,7 @@ class zynthian_gui(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui, self).__init__(parent)
 
+        self.bpmBeforePressingMetronome = 0
         self.__current_task_message = ""
         self.__recent_task_messages = queue.Queue()
         self.__show_current_task_message = True
@@ -2489,8 +2490,8 @@ class zynthian_gui(QObject):
             QMetaObject.invokeMethod(self.channelsModTimer, "start", Qt.QueuedConnection)
             logging.debug(f'self.channelsModActive({self.channelsModActive})')
 
-        elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
-            self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
+        # elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
+        #     self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -2614,6 +2615,7 @@ class zynthian_gui(QObject):
                 elif i == 19:
                     self.playButtonPressed = True
                 elif i == 20:
+                    self.bpmBeforePressingMetronome = self.sketchpad.song.bpm
                     self.metronomeButtonPressed = True
                 elif i == 21:
                     self.stopButtonPressed = True
@@ -2645,6 +2647,10 @@ class zynthian_gui(QObject):
                 elif i == 19:
                     self.playButtonPressed = False
                 elif i == 20:
+                    # Toggle metronome only if metronome+BK is not used to change bpm
+                    if self.sketchpad.song.bpm == self.bpmBeforePressingMetronome:
+                        # BPM did not change. Toggle metronome state
+                        self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
                     self.metronomeButtonPressed = False
                 elif i == 21:
                     self.stopButtonPressed = False

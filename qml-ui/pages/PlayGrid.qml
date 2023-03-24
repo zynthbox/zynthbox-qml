@@ -634,6 +634,12 @@ don't want to have to dig too far...
         onRemovedHardwareInputDevice: {
             applicationWindow().showPassiveNotification("Removed Midi Input Device: " + humanReadableName);
         }
+        onPleaseStartPlayback: {
+            Zynthian.CommonUtils.startMetronomeAndPlayback();
+        }
+        onPleaseStopPlayback: {
+            Zynthian.CommonUtils.stopMetronomeAndPlayback();
+        }
     }
     Binding {
         target: ZynQuick.PlayGridManager

@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal
-from PySide2.QtGui import QCursor, QGuiApplication, QPixmap
+from PySide2.QtGui import QCursor, QGuiApplication, QPixmap, QFont
 from PySide2.QtQml import QQmlApplicationEngine
 
 
@@ -59,6 +59,14 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
     bootLogInterface = BootLogInterface(app)
+
+    font = app.font()
+    font.setFamily("Roboto")
+    font.setWeight(QFont.Medium)
+    font.setPointSize(12)
+    font.setHintingPreference(QFont.PreferFullHinting)
+    app.setFont(font)
+
 
     nullCursor = QPixmap(16, 16)
     nullCursor.fill(Qt.transparent)

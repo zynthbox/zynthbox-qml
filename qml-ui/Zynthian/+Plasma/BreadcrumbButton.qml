@@ -90,7 +90,6 @@ QQC2.ToolButton {
             elementId: root.highlighted || root.pressed ? "focus-right" : "right"
         }
     }
-    contentItem.opacity: checked ? 1 : 0.5
     font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
 }
 

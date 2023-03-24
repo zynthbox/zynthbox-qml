@@ -138,7 +138,7 @@ Kirigami.AbstractApplicationWindow {
                 tracksMenu.open()
             }
             //onPressAndHold: zynthian.current_screen_id = 'main'
-            highlighted: zynthian.current_screen_id === 'sketchpad'
+            // highlighted: zynthian.current_screen_id === 'sketchpad'
 
             ColumnLayout {
                 anchors.left: parent.left
@@ -149,14 +149,12 @@ Kirigami.AbstractApplicationWindow {
                 QQC2.Label {
                     Layout.alignment: Qt.AlignHCenter
                     font.pointSize: 10
-                    opacity: 0.5
                     text: zynthian.sketchpad.song.name
                 }
 
                 QQC2.Label {
                     Layout.alignment: Qt.AlignHCenter
                     font.pointSize: 10
-                    opacity: 0.5
                     text: zynthian.sketchpad.song.scenesModel.selectedTrackName + "ˬ"
                 }
             }

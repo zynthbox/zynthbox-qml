@@ -23,11 +23,108 @@
 #
 # ******************************************************************************
 
-from PySide2.QtCore import Property, QTimer, Signal, Slot
-
 import logging
-
+import os
 import rpi_ws281x
+import sys
+import time
+
+from PySide2.QtCore import Property, QTimer, Signal, Slot
+from PySide2.QtGui import QColor
+
+
+led_color_off = rpi_ws281x.Color(0, 0, 0)
+led_color_blue = rpi_ws281x.Color(0, 50, 200)
+led_color_green = rpi_ws281x.Color(0, 255, 0)
+led_color_red = rpi_ws281x.Color(247, 124, 124)
+led_color_yellow = rpi_ws281x.Color(255, 235, 59)
+led_color_purple = rpi_ws281x.Color(142, 36, 170)
+
+led_color_inactive = led_color_blue
+led_color_active = led_color_green
+
+led_color_channel_synth = led_color_red
+led_color_channel_loop = led_color_green
+led_color_channel_sample = led_color_green
+led_color_channel_external = led_color_yellow
+
+wsleds: rpi_ws281x.PixelStrip = None
+
+
+def init_wsleds():
+    global wsleds
+
+    wiring_layout = os.environ.get('ZYNTHIAN_WIRING_LAYOUT', "DUMMIES")
+
+    if wsleds is None:
+        if wiring_layout=="Z2_V1":
+            # LEDS with PWM1 (pin 13, channel 1)
+            pin = 13
+            chan = 1
+        elif wiring_layout in ("Z2_V2", "Z2_V3"):
+            # LEDS with SPI0 (pin 10, channel 0)
+            pin = 10
+            chan = 0
+        else:
+            return 0
+
+        wsleds = rpi_ws281x.PixelStrip(25, pin, dma=10, channel=chan, strip_type=rpi_ws281x.ws.WS2811_STRIP_GRB)
+        wsleds.begin()
+
+
+########################################################################################################################
+# Standalone script to set led colors
+########################################################################################################################
+
+if __name__ == "__main__":
+    def print_help():
+        print("ERROR : Invalid argument")
+        print()
+        print("Usage :")
+        print(f"  {sys.argv[0]} <command>")
+        print("  Commands :")
+        print("    - rainbow : Display rainbow colors infinitely")
+        print("    - on      : Set colors of all buttons to blue")
+        print("    - off     : Set colors of all buttons to off")
+
+    if len(sys.argv) <= 1:
+        print_help()
+        sys.exit(0)
+
+    init_wsleds()
+
+    if sys.argv[1] == "rainbow":
+        # Display rainbow colors
+        rainbow_led_counter = 0
+        while True:
+            for i in range(25):
+                color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127)
+                wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
+            wsleds.show()
+            rainbow_led_counter += 3
+            rainbow_led_counter = rainbow_led_counter % 359
+            time.sleep(0.05)
+    elif sys.argv[1] == "on":
+        # Turn on all leds with blue color
+        for i in range(25):
+            wsleds.setPixelColor(i, led_color_inactive)
+        wsleds.show()
+        sys.exit(0)
+    elif sys.argv[1] == "off":
+        # Turn off all leds
+        for i in range(25):
+            wsleds.setPixelColor(i, led_color_off)
+        wsleds.show()
+        sys.exit(0)
+    else:
+        print_help()
+        sys.exit(1)
+
+
+########################################################################################################################
+# END Standalone script to set led colors
+########################################################################################################################
+
 
 from . import zynthian_qt_gui_base
 
@@ -38,7 +135,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
     To set a led color to a button :
     self.button_color_map[0] = {
-        'color': <One of the self.led_color_*>,
+        'color': <One of the led_color_*>,
         'blink': <True or False> # Setting to True will make the led blink as per the blinkMode
         'blinkMode': <'toggleOnBeat'(default) or 'onOffOnBeat'> # toggleOnBeat will toggle on/off state on every beat
                                                                 # onOffOnBeat will blink the button color on=off on every beat
@@ -73,21 +170,6 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
     """
     def __init__(self, parent=None):
         super(zynthian_gui_led_config, self).__init__(parent)
-
-        self.led_color_off = rpi_ws281x.Color(0, 0, 0)
-        self.led_color_blue = rpi_ws281x.Color(0, 50, 200)
-        self.led_color_green = rpi_ws281x.Color(0, 255, 0)
-        self.led_color_red = rpi_ws281x.Color(247, 124, 124)
-        self.led_color_yellow = rpi_ws281x.Color(255, 235, 59)
-        self.led_color_purple = rpi_ws281x.Color(142, 36, 170)
-
-        self.led_color_inactive = self.led_color_blue
-        self.led_color_active = self.led_color_green
-
-        self.led_color_channel_synth = self.led_color_red
-        self.led_color_channel_loop = self.led_color_green
-        self.led_color_channel_sample = self.led_color_green
-        self.led_color_channel_external = self.led_color_yellow
 
         self.channel = None
 
@@ -131,26 +213,28 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
         if setChannelColor:
             if self.channel.channelAudioType == "synth":
-                buttonColor = self.led_color_channel_synth
+                buttonColor = led_color_channel_synth
             elif self.channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                buttonColor = self.led_color_channel_sample
+                buttonColor = led_color_channel_sample
             elif self.channel.channelAudioType == "sample-loop":
-                buttonColor = self.led_color_channel_loop
+                buttonColor = led_color_channel_loop
             elif self.channel.channelAudioType == "external":
-                buttonColor = self.led_color_channel_external
+                buttonColor = led_color_channel_external
         else:
             assert color is not None, "color cannot be None when setChannelColor is False"
 
             buttonColor = color
 
-        self.zyngui.wsleds.setPixelColor(buttonId, buttonColor)
+        wsleds.setPixelColor(buttonId, buttonColor)
 
     def init(self):
+        init_wsleds()
+
         # Initialise all button with inactive color and not blinking
         for i in range(25):
-            self.set_button_color(i, self.led_color_inactive)
+            self.set_button_color(i, led_color_inactive)
 
-        self.zyngui.wsleds.show()
+        wsleds.show()
 
         # Connect to required signals for updating led
         self.zyngui.isExternalAppActiveChanged.connect(self.update_button_colors)
@@ -165,6 +249,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
         self.zyngui.sketchpad.metronome_running_changed.connect(self.update_button_colors)
         self.zyngui.sketchpad.click_channel_enabled_changed.connect(self.update_button_colors)
         self.zyngui.globalPopupOpenedChanged.connect(self.update_button_colors)
+
+        self.update_button_colors()
 
     @Slot()
     def selected_channel_changed_handler(self):
@@ -206,32 +292,32 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
         if self.zyngui.isExternalAppActive:
             for button_id in range(0, 25):
-                self.set_button_color(button_id, self.led_color_inactive)
+                self.set_button_color(button_id, led_color_inactive)
         else:
-            self.set_button_color(self.button_menu, self.led_color_active if menu_page_active else self.led_color_inactive)
-            self.set_button_color(self.button_1, self.led_color_inactive, setChannelColor=partClipEnabled[0] if self.zyngui.leftSidebarActive else selectedChannelIndex == 0)
-            self.set_button_color(self.button_2, self.led_color_inactive, setChannelColor=partClipEnabled[1] if self.zyngui.leftSidebarActive else selectedChannelIndex == 1)
-            self.set_button_color(self.button_3, self.led_color_inactive, setChannelColor=partClipEnabled[2] if self.zyngui.leftSidebarActive else selectedChannelIndex == 2)
-            self.set_button_color(self.button_4, self.led_color_inactive, setChannelColor=partClipEnabled[3] if self.zyngui.leftSidebarActive else selectedChannelIndex == 3)
-            self.set_button_color(self.button_5, self.led_color_inactive, setChannelColor=partClipEnabled[4] if self.zyngui.leftSidebarActive else selectedChannelIndex == 4)
-            self.set_button_color(self.button_star, self.led_color_inactive, setChannelColor=not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive)
-            self.set_button_color(self.button_mode, self.led_color_inactive, setChannelColor=self.zyngui.leftSidebarActive)
-            self.set_button_color(self.button_under_screen_1, self.led_color_active if sketchpad_page_active else self.led_color_inactive)
-            self.set_button_color(self.button_under_screen_2, self.led_color_active if playgrid_page_active else self.led_color_inactive)
-            self.set_button_color(self.button_under_screen_3, self.led_color_active if song_manager_page_active else self.led_color_inactive)
-            self.set_button_color(self.button_under_screen_4, self.led_color_active if library_page_active else self.led_color_inactive)
-            self.set_button_color(self.button_under_screen_5, self.led_color_active if edit_page_active else self.led_color_inactive)
-            self.set_button_color(self.button_alt, self.led_color_inactive)
-            self.set_button_color(self.button_record, self.led_color_red if self.zyngui.sketchpad.isRecording else self.led_color_inactive)
-            self.set_button_color(self.button_play, self.led_color_active if self.zyngui.sketchpad.isMetronomeRunning else self.led_color_inactive)
-            self.set_button_color(self.button_metronome, self.led_color_inactive if self.zyngui.sketchpad.clickChannelEnabled else self.led_color_off, blink=self.zyngui.sketchpad.isMetronomeRunning)
-            self.set_button_color(self.button_stop, self.led_color_inactive)
-            self.set_button_color(self.button_back, self.led_color_red)
-            self.set_button_color(self.button_up, self.led_color_inactive)
-            self.set_button_color(self.button_select, self.led_color_active)
-            self.set_button_color(self.button_left, self.led_color_inactive)
-            self.set_button_color(self.button_down, self.led_color_inactive)
-            self.set_button_color(self.button_right, self.led_color_inactive)
-            self.set_button_color(self.button_global, self.led_color_active if self.zyngui.globalPopupOpened else self.led_color_inactive)
+            self.set_button_color(self.button_menu, led_color_active if menu_page_active else led_color_inactive)
+            self.set_button_color(self.button_1, led_color_inactive, setChannelColor=partClipEnabled[0] if self.zyngui.leftSidebarActive else selectedChannelIndex == 0)
+            self.set_button_color(self.button_2, led_color_inactive, setChannelColor=partClipEnabled[1] if self.zyngui.leftSidebarActive else selectedChannelIndex == 1)
+            self.set_button_color(self.button_3, led_color_inactive, setChannelColor=partClipEnabled[2] if self.zyngui.leftSidebarActive else selectedChannelIndex == 2)
+            self.set_button_color(self.button_4, led_color_inactive, setChannelColor=partClipEnabled[3] if self.zyngui.leftSidebarActive else selectedChannelIndex == 3)
+            self.set_button_color(self.button_5, led_color_inactive, setChannelColor=partClipEnabled[4] if self.zyngui.leftSidebarActive else selectedChannelIndex == 4)
+            self.set_button_color(self.button_star, led_color_inactive, setChannelColor=not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive)
+            self.set_button_color(self.button_mode, led_color_inactive, setChannelColor=self.zyngui.leftSidebarActive)
+            self.set_button_color(self.button_under_screen_1, led_color_active if sketchpad_page_active else led_color_inactive)
+            self.set_button_color(self.button_under_screen_2, led_color_active if playgrid_page_active else led_color_inactive)
+            self.set_button_color(self.button_under_screen_3, led_color_active if song_manager_page_active else led_color_inactive)
+            self.set_button_color(self.button_under_screen_4, led_color_active if library_page_active else led_color_inactive)
+            self.set_button_color(self.button_under_screen_5, led_color_active if edit_page_active else led_color_inactive)
+            self.set_button_color(self.button_alt, led_color_inactive)
+            self.set_button_color(self.button_record, led_color_red if self.zyngui.sketchpad.isRecording else led_color_inactive)
+            self.set_button_color(self.button_play, led_color_active if self.zyngui.sketchpad.isMetronomeRunning else led_color_inactive)
+            self.set_button_color(self.button_metronome, led_color_inactive if self.zyngui.sketchpad.clickChannelEnabled else led_color_off, blink=self.zyngui.sketchpad.isMetronomeRunning)
+            self.set_button_color(self.button_stop, led_color_inactive)
+            self.set_button_color(self.button_back, led_color_red)
+            self.set_button_color(self.button_up, led_color_inactive)
+            self.set_button_color(self.button_select, led_color_active)
+            self.set_button_color(self.button_left, led_color_inactive)
+            self.set_button_color(self.button_down, led_color_inactive)
+            self.set_button_color(self.button_right, led_color_inactive)
+            self.set_button_color(self.button_global, led_color_active if self.zyngui.globalPopupOpened else led_color_inactive)
 
-        self.zyngui.wsleds.show()
+        wsleds.show()

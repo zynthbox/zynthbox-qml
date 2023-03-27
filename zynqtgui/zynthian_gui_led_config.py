@@ -186,21 +186,24 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
         library_page_active = self.zyngui.current_screen_id in ["layers_for_channel", "bank", "preset"]
         edit_page_active = self.zyngui.current_screen_id == "control" or self.zyngui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]
 
-        for index, button in enumerate([self.button_1, self.button_2, self.button_3, self.button_4, self.button_5]):
-            # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
-            # This is global (i.e. for all screens)
-            if self.zyngui.leftSidebarActive:
-                # Lights up selected slots for channel
-                partClip = self.zyngui.sketchpad.song.getClipByPart(self.channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, index)
-                self.set_button_color(button, self.led_color_inactive, setChannelColor=partClip.enabled)
-            else:
-                # Light up 1-5 buttons when respective channel is selected
-                # If self.zyngui.channelsModActive is true, light up 1-5 HW button when channels 6-10 is selected
-                channelDelta = 5 if self.zyngui.channelsModActive else 0
-                selectedChannelIndex = self.zyngui.session_dashboard.selectedChannel - channelDelta
-                self.set_button_color(button, self.led_color_inactive, setChannelColor=selectedChannelIndex == index)
+        # Light up 1-5 buttons when respective part clip is enabled when leftSidebar is active
+        partClipEnabled = [
+            self.zyngui.sketchpad.song.getClipByPart(self.channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, 0).enabled,
+            self.zyngui.sketchpad.song.getClipByPart(self.channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, 1).enabled,
+            self.zyngui.sketchpad.song.getClipByPart(self.channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, 2).enabled,
+            self.zyngui.sketchpad.song.getClipByPart(self.channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, 3).enabled,
+            self.zyngui.sketchpad.song.getClipByPart(self.channel.id, self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex, 4).enabled,
+        ]
+        # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
+        channelDelta = 5 if self.zyngui.channelsModActive else 0
+        selectedChannelIndex = self.zyngui.session_dashboard.selectedChannel - channelDelta
 
         self.set_button_color(self.button_menu, self.led_color_active if menu_page_active else self.led_color_inactive)
+        self.set_button_color(self.button_1, self.led_color_inactive, setChannelColor=partClipEnabled[0] if self.zyngui.leftSidebarActive else selectedChannelIndex == 0)
+        self.set_button_color(self.button_2, self.led_color_inactive, setChannelColor=partClipEnabled[1] if self.zyngui.leftSidebarActive else selectedChannelIndex == 1)
+        self.set_button_color(self.button_3, self.led_color_inactive, setChannelColor=partClipEnabled[2] if self.zyngui.leftSidebarActive else selectedChannelIndex == 2)
+        self.set_button_color(self.button_4, self.led_color_inactive, setChannelColor=partClipEnabled[3] if self.zyngui.leftSidebarActive else selectedChannelIndex == 3)
+        self.set_button_color(self.button_5, self.led_color_inactive, setChannelColor=partClipEnabled[4] if self.zyngui.leftSidebarActive else selectedChannelIndex == 4)
         self.set_button_color(self.button_star, self.led_color_inactive, setChannelColor=not self.zyngui.leftSidebarActive and self.zyngui.channelsModActive)
         self.set_button_color(self.button_mode, self.led_color_inactive, setChannelColor=self.zyngui.leftSidebarActive)
         self.set_button_color(self.button_under_screen_1, self.led_color_active if sketchpad_page_active else self.led_color_inactive)

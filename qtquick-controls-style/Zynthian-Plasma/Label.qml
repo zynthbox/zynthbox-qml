@@ -20,7 +20,6 @@ T.Label {
     // Work around Qt bug where NativeRendering breaks for non-integer scale factors
     // https://bugreports.qt.io/browse/QTBUG-70481
     renderType: Screen.devicePixelRatio % 1 !== 0 ? Text.QtRendering : Text.NativeRendering
-    font.hintingPreference: Font.PreferFullHinting
 
     //font data is the system one by default
     color: control.visible ? Kirigami.Theme.textColor : ""

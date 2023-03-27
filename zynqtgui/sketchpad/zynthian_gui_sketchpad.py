@@ -48,25 +48,25 @@ from .. import zynthian_gui_config
 from zyngine import zynthian_controller
 import jack
 
-
 @ctypes.CFUNCTYPE(None, ctypes.c_int)
 def libzlCb(beat):
-    if beat % 32 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate4th.emit(beat / 32)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision6 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate4th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision6)
 
-    if beat % 16 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate8th.emit(beat / 16)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision5 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate8th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision5)
 
-    if beat % 8 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate16th.emit(beat / 8)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision4 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate16th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision4)
 
-    if beat % 4 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate32th.emit(beat / 4)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision3 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate32th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision3)
 
-    if beat % 2 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate64th.emit(beat / 2)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision2 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate64th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision2)
 
-    zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate128th.emit(beat)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate128th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision)
 
 
 class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
@@ -79,6 +79,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
         zynthian_gui_sketchpad.__instance__ = self
         libzl.registerGraphicTypes()
+
+        self.beatSubdivision = libzl.getMultiplier()
+        self.beatSubdivision2 = self.beatSubdivision / 2
+        self.beatSubdivision3 = self.beatSubdivision2 / 2
+        self.beatSubdivision4 = self.beatSubdivision3 / 2
+        self.beatSubdivision5 = self.beatSubdivision4 / 2
+        self.beatSubdivision6 = self.beatSubdivision5 / 2
 
         self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
         self.is_set_selector_running = False

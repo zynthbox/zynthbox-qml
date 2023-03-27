@@ -175,7 +175,6 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 		font = app.font()
 		font.setFamily(font_settings.value("family", "Roboto"))
 		font.setPointSize(int(font_settings.value("size", 12)))
-		font.setWeight(QFont.Medium)
 		font.setHintingPreference(QFont.PreferFullHinting)
 		app.setFont(font)
 
@@ -186,7 +185,6 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 		app = QGuiApplication.instance()
 		font = app.font()
 		font.setFamily("Roboto")
-		font.setWeight(QFont.Medium)
 		font.setPointSize(12)
 		font.setHintingPreference(QFont.PreferFullHinting)
 		app.setFont(font)

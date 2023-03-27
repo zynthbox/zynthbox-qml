@@ -846,11 +846,11 @@ Zynthian.ScreenPage {
                                             else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop")
                                                 return "#6600ff00"
                                             else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig")
-                                                return "#66ffff00"
+                                                return "#6600ff00"
                                             else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice")
-                                                return "#66ffff00"
+                                                return "#6600ff00"
                                             else if (channelHeaderDelegate.channel.channelAudioType === "external")
-                                                return "#998e24aa"
+                                                return "#66ffff00"
                                             else
                                                 return "#66888888"
                                         }

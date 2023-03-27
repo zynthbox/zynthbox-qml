@@ -86,8 +86,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
         self.led_color_channel_synth = self.led_color_red
         self.led_color_channel_loop = self.led_color_green
-        self.led_color_channel_sample = self.led_color_yellow
-        self.led_color_channel_external = self.led_color_purple
+        self.led_color_channel_sample = self.led_color_green
+        self.led_color_channel_external = self.led_color_yellow
 
         self.button_color_map = {}
         self.channel = None

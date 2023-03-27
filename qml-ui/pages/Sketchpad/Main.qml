@@ -1152,34 +1152,39 @@ Zynthian.ScreenPage {
                                         }
 
                                         zynthian.session_dashboard.selectedChannel = channel.id;
-                                        zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
-                                        bottomStack.slotsBar.partButton.checked = true
 
-                                        Qt.callLater(function() {
-                                            if (channel.connectedPattern >= 0) {
-                                                zynthian.bottomBarControlType = "bottombar-controltype-pattern";
-                                                zynthian.bottomBarControlObj = channel.sceneClip;
-                                            } else {
-                                                zynthian.bottomBarControlType = "bottombar-controltype-clip";
-                                                zynthian.bottomBarControlObj = channel.sceneClip;
-                                            }
-                                        })
-                                    }
-                                    onPressAndHold: {
-                                        zynthian.bottomBarControlType = "bottombar-controltype-pattern";
-                                        zynthian.bottomBarControlObj = channel.sceneClip;
-                                        bottomStack.slotsBar.bottomBarButton.checked = true;
+                                        root.resetBottomBar(false)
+                                        zynthian.bottomBarControlType = "bottombar-controltype-channel";
+                                        zynthian.bottomBarControlObj = channel;
 
-                                        if (channel.channelAudioType === "sample-loop") {
-                                            if (channel.sceneClip && channel.sceneClip.path && channel.sceneClip.path.length > 0) {
-                                                bottomStack.bottomBar.waveEditorAction.trigger();
-                                            } else {
-                                                bottomStack.bottomBar.recordingAction.trigger();
-                                            }
-                                        } else {
-                                            bottomStack.bottomBar.patternAction.trigger();
-                                        }
+//                                        zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
+//                                        bottomStack.slotsBar.partButton.checked = true
+
+//                                        Qt.callLater(function() {
+//                                            if (channel.connectedPattern >= 0) {
+//                                                zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+//                                                zynthian.bottomBarControlObj = channel.sceneClip;
+//                                            } else {
+//                                                zynthian.bottomBarControlType = "bottombar-controltype-clip";
+//                                                zynthian.bottomBarControlObj = channel.sceneClip;
+//                                            }
+//                                        })
                                     }
+//                                    onPressAndHold: {
+//                                        zynthian.bottomBarControlType = "bottombar-controltype-pattern";
+//                                        zynthian.bottomBarControlObj = channel.sceneClip;
+//                                        bottomStack.slotsBar.bottomBarButton.checked = true;
+
+//                                        if (channel.channelAudioType === "sample-loop") {
+//                                            if (channel.sceneClip && channel.sceneClip.path && channel.sceneClip.path.length > 0) {
+//                                                bottomStack.bottomBar.waveEditorAction.trigger();
+//                                            } else {
+//                                                bottomStack.bottomBar.recordingAction.trigger();
+//                                            }
+//                                        } else {
+//                                            bottomStack.bottomBar.patternAction.trigger();
+//                                        }
+//                                    }
                                 }
                             }
                         }

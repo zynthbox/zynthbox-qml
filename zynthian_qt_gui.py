@@ -491,23 +491,6 @@ class zynthian_gui(QObject):
         # When true, 1-5 buttons selects channel 6-10
         self.channels_mod_active = False
 
-        # Create variables for LED control
-        self.wsleds_blink = False
-        self.wsleds_num = 25
-        self.wsleds = None
-        self.wsleds_blink_count = 0
-        self.wsleds_start_blink_complete = False # Determines if a blink is already complete for a tick and needs reset for blinkMode onOffOnBeat
-
-        # This Timer will be used to blink the leds in sync to BPM when metronome is not running.
-        # When metronome is running, we will be using the metronome callback to blink LED as it is more accurate.
-        # It will also allow us to be in sync with metronome when metronome is running
-        self.wsleds_blink_timer = QTimer()
-        # Set a random interval when initializing
-        # Will be updated by sketchpad when bpm is set or changes
-        self.wsleds_blink_timer.setInterval(500)
-        self.wsleds_blink_timer.setSingleShot(False)
-        self.wsleds_blink_timer.timeout.connect(self.increment_blink_count)
-
         self.song_bar_active = False
         self.slots_bar_part_active = False
         self.sound_combinator_active = False
@@ -548,8 +531,6 @@ class zynthian_gui(QObject):
         self.channelsModTimer.setInterval(3000)
         self.channelsModTimer.setSingleShot(True)
         self.channelsModTimer.timeout.connect(self.channelsModTimerHandler)
-
-        self.init_wsleds()
 
         speed_settings = QSettings("/home/pi/config/gui_optionsrc", QSettings.IniFormat)
         if speed_settings.status() != QSettings.NoError:
@@ -706,12 +687,6 @@ class zynthian_gui(QObject):
             if ((hasattr(self, "__booting_complete__") and not self.__booting_complete__) or not hasattr(self, "__booting_complete__")) and bootlog_fifo is not None and len(theMessage) > 0:
                 os.write(bootlog_fifo, f"{theMessage}\n".encode())
             self.__recent_task_messages.task_done()
-
-    def increment_blink_count(self):
-        self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
-
-        if self.wsleds_blink_count % 2 == 0:
-            self.wsleds_start_blink_complete = False
 
     ### SHOW SCREEN QUEUE
     '''
@@ -1334,44 +1309,6 @@ class zynthian_gui(QObject):
 
     leftSidebarActive = Property(bool, get_left_sidebar_active, set_left_sidebar_active, notify=leftSidebarActiveChanged)
 
-    def init_wsleds(self):
-        if zynthian_gui_config.wiring_layout=="Z2_V1":
-            # LEDS with PWM1 (pin 13, channel 1)
-            pin = 13
-            chan = 1
-        elif zynthian_gui_config.wiring_layout in ("Z2_V2", "Z2_V3"):
-            # LEDS with SPI0 (pin 10, channel 0)
-            pin = 10
-            chan = 0
-        else:
-            return 0
-
-        self.wsleds = rpi_ws281x.PixelStrip(self.wsleds_num, pin, dma=10, channel=chan,
-                                            strip_type=rpi_ws281x.ws.WS2811_STRIP_GRB)
-        self.wsleds.begin()
-
-        # Light all LEDs
-        for i in range(25):
-            color = QColor.fromHsl((i * 10) % 359, 242, 127, 127)
-            self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
-        self.wsleds.show()
-
-        return self.wsleds_num
-
-    def end_wsleds(self):
-        # Light-off all LEDs
-        for i in range(0,25):
-            self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 0, 0))
-        self.wsleds.show()
-
-    def update_wsleds(self):
-        for i in range(25):
-            color = QColor.fromHsl((int(self.rainbow_led_counter) + i * 10) % 359, 242, 127, 127)
-            self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
-        self.wsleds.show()
-        self.rainbow_led_counter += 3
-        self.rainbow_led_counter = self.rainbow_led_counter % 359
-
     # ---------------------------------------------------------------------------
     # MIDI Router Init & Config
     # ---------------------------------------------------------------------------
@@ -1666,7 +1603,6 @@ class zynthian_gui(QObject):
         # Start polling threads
         self.start_polling()
         self.start_loading_thread()
-        self.start_status_thread()
         self.start_zyncoder_thread()
 
         # Run autoconnect if needed
@@ -1683,7 +1619,10 @@ class zynthian_gui(QObject):
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
-        self.end_wsleds()
+
+        # Turn off leds
+        Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "off"))
+
         app.exit(0)
         self.stop_polling()
         self.osc_end()
@@ -3444,23 +3383,6 @@ class zynthian_gui(QObject):
     def file_exists(self, file_path):
         return os.path.isfile(file_path)
 
-    #------------------------------------------------------------------
-    # Status Refresh Thread
-    #------------------------------------------------------------------
-
-    def start_status_thread(self):
-        self.status_thread=Thread(target=self.status_thread_task, args=())
-        self.status_thread.daemon = True # thread dies with the program
-        self.status_thread.start()
-
-
-    def status_thread_task(self):
-        while not self.isBootingComplete:
-            #self.refresh_status()
-            if self.wsleds:
-                self.update_wsleds()
-            time.sleep(0.05)
-
     # ------------------------------------------------------------------
     # Polling
     # ------------------------------------------------------------------
@@ -3854,9 +3776,7 @@ class zynthian_gui(QObject):
         self.displayMainWindow.emit()
         self.isBootingComplete = True
 
-        # Initialize LED config and connect to required signals
-        # to be able to update LEDs on value change instead
-        self.led_config.init()
+        
 
         # Display sketchpad page and run set_selector at last before hiding splash
         # to ensure knobs work fine
@@ -3885,6 +3805,11 @@ class zynthian_gui(QObject):
 
         # Setting splashStopped to True will remove the overlay over main wwindow so nothing is displayed below splash until splash process exits
         self.splashStopped = True
+
+        # Stop rainbow and initialize LED config and connect to required signals
+        # to be able to update LEDs on value change instead
+        rainbow_led_process.terminate()
+        self.led_config.init()
 
         boot_end = timer()
 
@@ -4866,6 +4791,9 @@ if __name__ == "__main__":
         os.mkfifo("/tmp/bootlog.fifo")
 
     threading.Thread(target=open_bootlog_fifo).start()
+
+    # Start rainbow led process
+    rainbow_led_process = Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "rainbow"))
 
     # Enable qml debugger if ZYNTHBOX_DEBUG env variable is set
     if os.environ.get("ZYNTHBOX_DEBUG"):

@@ -193,7 +193,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             libzl.registerTimerCallback(libzlCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
-            self.metronomeBeatUpdate8th.connect(self.zyngui.increment_blink_count)
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
 
@@ -1663,10 +1662,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 libzl.startTimer(self.__song__.bpm)
 
-                # Stop blink timer when metronome starts as blink will be handled by metronome update callback
-                # to have more accurate representation of bpm
-                self.zyngui.wsleds_blink_timer.stop()
-
                 self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
@@ -1691,9 +1686,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if self.metronome_schedule_stop:
             logging.debug(f"Stopping timer as it was scheduled to stop.")
             libzl.stopTimer()
-
-            # Start blink timer when metronome stops to keep blinking in sync with bpm
-            self.zyngui.wsleds_blink_timer.start()
 
             self.click_channel_click.stopOnChannel(-2)
             self.click_channel_clack.stopOnChannel(-2)

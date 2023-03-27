@@ -545,15 +545,6 @@ class sketchpad_song(QObject):
         if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != math.floor(bpm) or force_set is True:
             self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
 
-            # Update blink timer interval with change in bpm
-            self.zyngui.wsleds_blink_timer.stop()
-            self.zyngui.wsleds_blink_timer.setInterval(60000/(2*bpm))
-
-            # Start blink timer only if metronome is not running
-            # If metronome is running it is already blinking in sync with bpm
-            if not self.zyngui.sketchpad.isMetronomeRunning:
-                self.zyngui.wsleds_blink_timer.start()
-
             libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
             # Call zyngui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened

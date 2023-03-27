@@ -381,17 +381,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             selected_channel.volume = volume
             logging.debug(f"### zyncoder_update_channel_volume {selected_channel.volume}")
             self.set_selector()
-            self.zyngui.osd.updateOsd(
-                parameterName="channel_volume",
-                description=f"{selected_channel.name} Volume",
-                start=-40,
-                stop=20,
-                step=1,
-                defaultValue=0,
-                currentValue=selected_channel.volume,
-                setValueFunction=self.set_channel_volume_actual,
-                showValueLabel=True
-            )
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
@@ -440,7 +429,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### zyncoder_update_channel_pan from {selected_channel_obj.pan} to {pan}")
             selected_channel_obj.pan = pan
             self.set_selector()
-            self.zyngui.osd.updateOsd("channel_pan", f"Channel {selected_channel_obj.id + 1}: Pan", 1, -1, 0.1, 0, selected_channel_obj.pan, self.set_selected_channel_pan, startLabel="L", stopLabel="R", showValueLabel=False, visualZero=0)
 
     def set_selected_channel_pan(self, pan):
         if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:

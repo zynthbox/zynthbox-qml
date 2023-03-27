@@ -1364,66 +1364,13 @@ class zynthian_gui(QObject):
             self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 0, 0))
         self.wsleds.show()
 
-    # To blink led call this method in update_wsleds
-    # self.wsled_blink(0, self.wscolor_active)
-    def wsled_blink(self, i, color):
-        try:
-            if self.wsleds_blink:
-                if color is not self.led_config.led_color_light:
-                    self.wsleds.setPixelColor(i, self.led_config.led_color_light)
-                else:
-                    self.wsleds.setPixelColor(i, self.led_config.led_color_off)
-            else:
-                self.wsleds.setPixelColor(i, color)
-        except: pass
-
     def update_wsleds(self):
-        if not self.splashStopped:
-            for i in range(25):
-                color = QColor.fromHsl((int(self.rainbow_led_counter) + i * 10) % 359, 242, 127, 127)
-                self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
-            self.wsleds.show()
-            self.rainbow_led_counter += 3
-            self.rainbow_led_counter = self.rainbow_led_counter % 359
-
-            return
-        elif not self.is_external_app_active():
-            try:
-                self.led_config.update_button_colors()
-
-                if self.wsleds_blink_count % 2 == 1:
-                    self.wsleds_blink = True
-                else:
-                    self.wsleds_blink = False
-
-                for button_id, button in self.led_config.button_color_map.items():
-                    if button["blink"]:
-                        if "blinkMode" in button:
-                            if button["blinkMode"] == "toggleOnBeat":
-                                self.wsled_blink(button_id, button["color"])
-                            elif button["blinkMode"] == "onOffOnBeat":
-                                if not self.wsleds_start_blink_complete:
-                                    self.wsleds.setPixelColor(button_id, self.led_config.led_color_off)
-                                    self.wsleds.show()
-                                    time.sleep(0.05)
-                                    self.wsleds.setPixelColor(button_id, button["color"])
-                                    self.wsleds.show()
-                                    self.wsleds_start_blink_complete = True
-                                else:
-                                    self.wsleds.setPixelColor(button_id, button["color"])
-                        else:
-                            self.wsled_blink(button_id, button["color"])
-                    else:
-                        self.wsleds.setPixelColor(button_id, button["color"])
-            except:
-                pass
-        else:
-            logging.debug("LED : External app active")
-            for i in range(0, 25):
-                self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 50, 200))
-
-        # Refresh LEDs
+        for i in range(25):
+            color = QColor.fromHsl((int(self.rainbow_led_counter) + i * 10) % 359, 242, 127, 127)
+            self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
         self.wsleds.show()
+        self.rainbow_led_counter += 3
+        self.rainbow_led_counter = self.rainbow_led_counter % 359
 
     # ---------------------------------------------------------------------------
     # MIDI Router Init & Config
@@ -1736,6 +1683,7 @@ class zynthian_gui(QObject):
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
+        self.end_wsleds()
         app.exit(0)
         self.stop_polling()
         self.osc_end()
@@ -3507,12 +3455,11 @@ class zynthian_gui(QObject):
 
 
     def status_thread_task(self):
-        while not self.exit_flag:
+        while not self.isBootingComplete:
             #self.refresh_status()
             if self.wsleds:
                 self.update_wsleds()
             time.sleep(0.05)
-        self.end_wsleds()
 
     # ------------------------------------------------------------------
     # Polling
@@ -3906,6 +3853,10 @@ class zynthian_gui(QObject):
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
+
+        # Initialize LED config and connect to required signals
+        # to be able to update LEDs on value change instead
+        self.led_config.init()
 
         # Display sketchpad page and run set_selector at last before hiding splash
         # to ensure knobs work fine
@@ -4653,6 +4604,15 @@ class zynthian_gui(QObject):
     bottomBarControlType = Property(str, get_bottomBarControlType, set_bottomBarControlType, notify=bottomBarControlTypeChanged)
     ### END Property bottomBarControlType
 
+    ### Property isExternalAppActive
+    def get_isExternalAppActive(self):
+        return hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
+
+    isExternalAppActiveChanged = Signal()
+
+    isExternalAppActive = Property(bool, get_isExternalAppActive, notify=isExternalAppActiveChanged)
+    ### END Property isExternalAppActive
+
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
     deferred_loading_timer_start = Signal()
@@ -5002,6 +4962,9 @@ if __name__ == "__main__":
         # assuming there is one and only one window for now
         zynthian_gui_config.top = app.topLevelWindows()[0]
         zynthian_gui_config.app = app
+
+        # Norify isExternalActive changed when top window active value changes
+        zynthian_gui_config.top.activeChanged.connect(lambda: zyngui.isExternalAppActiveChanged.emit())
 
     # Delay loading qml to let zyngui complete it's init sequence
     # Without the delay, UI sometimes doest start when `systemctl restart zynthian` is ran

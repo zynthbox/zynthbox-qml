@@ -428,54 +428,9 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.select_path_element = "Main"
         super().set_select_path()
 
-    @Slot('void')
-    def restart_gui(self):
-        logging.info("RESTART ZYNTHIAN-UI")
-        self.last_state_action()
-        #self.zyngui.exit(102)
-        self.zyngui.screens["admin"].restart_gui()
-
-    def exit_to_console(self):
-        logging.info("EXIT TO CONSOLE")
-        self.last_state_action()
-        self.zyngui.exit(101)
-
-    @Slot('void')
-    def reboot(self):
-        self.zyngui.show_confirm(
-            "Do you really want to reboot?", self.reboot_confirmed
-        )
-
-    def reboot_confirmed(self, params=None):
-        logging.info("REBOOT")
-        self.last_state_action()
-        #self.zyngui.exit(100)
-        self.zyngui.screens["admin"].reboot_confirmed()
-
-    @Slot('void')
-    def power_off(self):
-        self.zyngui.show_confirm(
-            "Do you really want to power off?", self.power_off_confirmed
-        )
-
     @Slot(None)
     def refresh(self):
         self.fill_list()
-
-    def power_off_confirmed(self, params=None):
-        logging.info("POWER OFF")
-        self.last_state_action()
-        #self.zyngui.exit(0)
-        self.zyngui.screens["admin"].power_off_confirmed()
-
-    def last_state_action(self):
-        if (
-            zynthian_gui_config.restore_last_state
-            and len(self.zyngui.screens["layer"].layers) > 0
-        ):
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-        else:
-            self.zyngui.screens["snapshot"].delete_last_state_snapshot()
 
     ### Property visibleCategory
     def get_visibleCategory(self):

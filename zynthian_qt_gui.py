@@ -1736,6 +1736,7 @@ class zynthian_gui(QObject):
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
+        app.exit(0)
         self.stop_polling()
         self.osc_end()
         zynautoconnect.stop()

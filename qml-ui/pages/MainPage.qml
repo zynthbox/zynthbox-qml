@@ -48,7 +48,7 @@ Zynthian.ScreenPage {
                 return false
 
             case "SWITCH_SELECT_BOLD":
-                zynthian.main.power_off()
+                zynthian.admin.power_off()
                 return true
             case "SELECT_UP":
                 mainviewGridId.moveCurrentIndexUp();
@@ -245,15 +245,15 @@ Zynthian.ScreenPage {
             text: qsTr("Power")
             Kirigami.Action {
                 text: qsTr("Restart UI")
-                onTriggered: zynthian.main.restart_gui()
+                onTriggered: zynthian.admin.restart_gui()
             }
             Kirigami.Action {
                 text: qsTr("Reboot")
-                onTriggered: zynthian.main.reboot()
+                onTriggered: zynthian.admin.reboot()
             }
             Kirigami.Action {
                 text: qsTr("Power Off")
-                onTriggered: zynthian.main.power_off()
+                onTriggered: zynthian.admin.power_off()
             }
         }
     ]

@@ -33,7 +33,7 @@ import apt_pkg
 from time import sleep
 from threading import Thread
 from subprocess import run, check_output, Popen, PIPE, STDOUT
-from PySide2.QtCore import Signal
+from PySide2.QtCore import Signal, Slot
 
 # Zynthian specific modules
 import zynconf
@@ -958,10 +958,12 @@ class zynthian_gui_admin(zynthian_gui_selector):
         self.zyngui.show_info("UPDATE SYSTEM")
         self.start_command([self.sys_dir + "/scripts/update_system.sh"])
 
+    @Slot()
     def restart_gui(self):
         logging.info("RESTART ZYNTHIAN-UI")
         self.last_state_action()
         self.zyngui.exit()
+        self.zyngui.stop()
         self.start_command(["systemctl restart jack2 zynthian mod-ttymidi"])
 
     def exit_to_console(self):
@@ -970,6 +972,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
         #self.zyngui.exit(101)
         self.start_command(["systemctl stop zynthian"])
 
+    @Slot()
     def reboot(self):
         self.zyngui.show_confirm(
             "Do you really want to reboot?", self.reboot_confirmed
@@ -979,8 +982,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
         logging.info("REBOOT")
         self.last_state_action()
         self.zyngui.exit()
+        self.zyngui.stop()
         self.start_command(["reboot"])
 
+    @Slot()
     def power_off(self):
         self.zyngui.show_confirm(
             "Do you really want to power off?", self.power_off_confirmed
@@ -990,7 +995,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
         logging.info("POWER OFF")
         self.last_state_action()
         self.zyngui.exit()
-        self.start_command(["halt"])
+        self.zyngui.stop()
+        self.start_command(["systemctl", "poweroff"])
 
     def last_state_action(self):
         if (

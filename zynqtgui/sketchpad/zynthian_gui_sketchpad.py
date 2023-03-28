@@ -50,23 +50,23 @@ import jack
 
 @ctypes.CFUNCTYPE(None, ctypes.c_int)
 def libzlCb(beat):
-    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision6 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate4th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision6)
-
-    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision5 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate8th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision5)
-
-    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision4 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate16th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision4)
-
-    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision3 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate32th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision3)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate4th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision)
 
     if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision2 == 0:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate64th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision2)
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate8th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision2)
 
-    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision:
-        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate128th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision)
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision3 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate16th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision3)
+
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision4 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate32th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision4)
+
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision5 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate64th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision5)
+
+    if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision6 == 0:
+        zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate128th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision6)
 
 
 class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):

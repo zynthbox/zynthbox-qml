@@ -637,7 +637,7 @@ don't want to have to dig too far...
         onAddedHardwareOutputDevice: {
             applicationWindow().showPassiveNotification("New Midi Output Detected: " + humanReadableName);
         }
-        onRemovedHardwareOutpotDevice: {
+        onRemovedHardwareOutputDevice: {
             applicationWindow().showPassiveNotification("Removed Midi Output Device: " + humanReadableName);
         }
         onPleaseStartPlayback: {

@@ -960,6 +960,11 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
     @Slot()
     def restart_gui(self):
+        self.zyngui.show_confirm(
+            "Do you really want to restart gui?", self.restart_gui_confirmed
+        )
+
+    def restart_gui_confirmed(self):
         logging.info("RESTART ZYNTHIAN-UI")
         self.last_state_action()
         self.zyngui.exit()

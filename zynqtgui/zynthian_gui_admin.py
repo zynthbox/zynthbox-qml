@@ -964,7 +964,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
             "Do you really want to restart gui?", self.restart_gui_confirmed
         )
 
-    def restart_gui_confirmed(self):
+    def restart_gui_confirmed(self, params=None):
         logging.info("RESTART ZYNTHIAN-UI")
         self.last_state_action()
         self.zyngui.exit()

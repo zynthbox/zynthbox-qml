@@ -634,6 +634,12 @@ don't want to have to dig too far...
         onRemovedHardwareInputDevice: {
             applicationWindow().showPassiveNotification("Removed Midi Input Device: " + humanReadableName);
         }
+        onAddedHardwareOutputDevice: {
+            applicationWindow().showPassiveNotification("New Midi Output Detected: " + humanReadableName);
+        }
+        onRemovedHardwareOutpotDevice: {
+            applicationWindow().showPassiveNotification("Removed Midi Output Device: " + humanReadableName);
+        }
         onPleaseStartPlayback: {
             Zynthian.CommonUtils.startMetronomeAndPlayback();
         }

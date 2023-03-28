@@ -172,6 +172,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_led_config, self).__init__(parent)
 
         self.channel = None
+        self.button_config = {}
 
         self.button_menu = 0
         self.button_1 = 1
@@ -199,6 +200,31 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
         self.button_right = 23
         self.button_global = 24
 
+        self.zyngui.sketchpad.metronomeBeatUpdate32th.connect(self.metronomeBeatUpdate32thHandler)
+
+    @Slot()
+    def metronomeBeatUpdate32thHandler(self, beat):
+        if beat == 0:
+            self.blinkOff()
+        elif beat == 2:
+            self.blinkOn()
+
+    @Slot()
+    def blinkOff(self):
+        for button_id, config in self.button_config.items():
+            if config["blink"] is True:
+                wsleds.setPixelColor(button_id, led_color_off)
+
+        wsleds.show()
+
+    @Slot()
+    def blinkOn(self):
+        for button_id, config in self.button_config.items():
+            if config["blink"] is True:
+                wsleds.setPixelColor(button_id, config["color"])
+
+        wsleds.show()
+
     def show(self):
         pass
 
@@ -208,7 +234,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
-    def set_button_color(self, buttonId, color, setChannelColor=False, blink=False, blinkMode='onOffOnBeat'):
+    def set_button_color(self, buttonId, color, setChannelColor=False, blink=False):
         buttonColor = None
 
         if setChannelColor:
@@ -224,6 +250,11 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
             assert color is not None, "color cannot be None when setChannelColor is False"
 
             buttonColor = color
+
+        self.button_config[buttonId] = {
+            'color': buttonColor,
+            'blink': blink
+        }
 
         wsleds.setPixelColor(buttonId, buttonColor)
 
@@ -310,7 +341,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
             self.set_button_color(self.button_alt, led_color_inactive)
             self.set_button_color(self.button_record, led_color_red if self.zyngui.sketchpad.isRecording else led_color_inactive)
             self.set_button_color(self.button_play, led_color_active if self.zyngui.sketchpad.isMetronomeRunning else led_color_inactive)
-            self.set_button_color(self.button_metronome, led_color_inactive if self.zyngui.sketchpad.clickChannelEnabled else led_color_off, blink=self.zyngui.sketchpad.isMetronomeRunning)
+            self.set_button_color(self.button_metronome, led_color_inactive if self.zyngui.sketchpad.clickChannelEnabled else led_color_off, blink=self.zyngui.sketchpad.clickChannelEnabled)
             self.set_button_color(self.button_stop, led_color_inactive)
             self.set_button_color(self.button_back, led_color_red)
             self.set_button_color(self.button_up, led_color_inactive)

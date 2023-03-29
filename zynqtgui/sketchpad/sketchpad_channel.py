@@ -500,7 +500,7 @@ class sketchpad_channel(QObject):
             # Update synth volume when channel volume changes
             for sound in self.chainedSounds:
                 if sound >= 0 and self.checkIfLayerExists(sound):
-                    volume_control_obj = self.zyngui.fixed_layers.volume_controls[sound]
+                    volume_control_obj = self.zyngui.fixed_layers.volumeControllers[sound]
 
                     # Interpolate channel volume (-40 -> 20) to volume control object's range
                     if volume_control_obj is not None and \

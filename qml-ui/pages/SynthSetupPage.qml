@@ -488,7 +488,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.isBootingComplete && visible ? zynthian.layers_for_channel.volume_controls : []
+                            model: zynthian.isBootingComplete && visible ? zynthian.layers_for_channel.volumeControllers : []
                             delegate: ColumnLayout {
                                 Layout.preferredHeight: parent.height/5
                                 spacing: Kirigami.Units.largeSpacing

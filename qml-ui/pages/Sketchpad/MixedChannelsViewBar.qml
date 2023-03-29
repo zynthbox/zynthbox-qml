@@ -367,10 +367,8 @@ Rectangle {
                                         Rectangle {
                                             id: delegate
 
-                                            property QtObject volumeControlObj: zynthian.layers_for_channel.volume_controls[index]
-                                            property real volumePercent: volumeControlObj
-                                                                            ? (volumeControlObj.value - volumeControlObj.value_min)/(volumeControlObj.value_max - volumeControlObj.value_min)
-                                                                            : 0
+                                            property var volumeControlObj: zynthian.fixed_layers.volumeControllers[root.selectedChannel.chainedSounds[index]]
+                                            property real volume: volumeControlObj != null ? volumeControlObj.value/100 : 0
 
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -393,7 +391,7 @@ Rectangle {
                                             opacity: enabled ? 1 : 0
 
                                             Rectangle {
-                                                width: parent.width * delegate.volumePercent
+                                                width: parent.width * delegate.volume
                                                 anchors {
                                                     left: parent.left
                                                     top: parent.top

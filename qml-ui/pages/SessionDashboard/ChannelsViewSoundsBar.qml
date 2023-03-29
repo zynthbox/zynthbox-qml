@@ -128,7 +128,7 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
-                property QtObject volumeControlObject: zynthian.fixed_layers.volume_controls[chainedSound] ? zynthian.fixed_layers.volume_controls[chainedSound] : null
+                property QtObject volumeControlObject: zynthian.fixed_layers.volumeControllers[chainedSound] ? zynthian.fixed_layers.volumeControllers[chainedSound] : null
                 property real volumePercent: volumeControlObject
                                                 ? (volumeControlObject.value - volumeControlObject.value_min)/(volumeControlObject.value_max - volumeControlObject.value_min)
                                                 : 0

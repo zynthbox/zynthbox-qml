@@ -41,7 +41,7 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
     def __init__(self, parent = None):
         super(zynthian_gui_layers_for_channel, self).__init__('ChannelLayers', parent)
         self.__total_chains = 5
-        self.__volume_ctrls = []
+        self.__volume_controllers = []
         # self.zyngui.screens['session_dashboard'].selected_channel_changed.connect(self.update_channel_sounds)
         self.zyngui.screens['layer'].layer_deleted.connect(self.update_channel_sounds)
 
@@ -49,7 +49,7 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
         try:
             self.list_data = []
             self.list_metadata = []
-            self.__volume_ctrls = []
+            self.__volume_controllers = []
             song = self.zyngui.screens['sketchpad'].song
 
             if song is not None:
@@ -63,13 +63,13 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
                         if chan < 0 and not self.zyngui.screens['fixed_layers'].index_is_valid(i) and element[1] not in used_empty_channels:
                             self.list_data.append(element)
                             self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
-                            self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                            self.__volume_controllers.append(self.zyngui.screens['fixed_layers'].volumeControllers[i])
                             used_empty_channels.append(element[1])
                             break
                         elif element[1] == chan:
                             self.list_data.append(element)
                             self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
-                            self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                            self.__volume_controllers.append(self.zyngui.screens['fixed_layers'].volumeControllers[i])
                             break
 
                 #duplicate_chans = []
@@ -82,13 +82,13 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
                     #if element[1] in chain:
                         #self.list_data.append(element)
                         #self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
-                        #self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                        #self.__volume_controllers.append(self.zyngui.screens['fixed_layers'].volumeControllers[i])
                     #elif used_empty_channels < empty_channels_needed and len(self.list_data) < self.__total_chains and  not self.zyngui.screens['fixed_layers'].index_is_valid(i):
                         #self.list_data.append(element)
                         #self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
-                        #self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                        #self.__volume_controllers.append(self.zyngui.screens['fixed_layers'].volumeControllers[i])
                         #used_empty_channels += 1
-                self.volume_controls_changed.emit()
+                self.volumeControllersChanged.emit()
                 self.zyngui.screens["sketchpad"].connect_control_objects()
         except Exception as e:
             logging.error(e)
@@ -158,12 +158,14 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
         self.zyngui.screens['fixed_layers'].select_action(midichan, t)
         self.select(i)
 
-    def get_volume_controls(self):
-        return self.__volume_ctrls
-    @Signal
-    def volume_controls_changed(self):
-        pass
-    volume_controls = Property('QVariantList', get_volume_controls, notify = volume_controls_changed)
+    ### Property volumeControllers
+    def get_volumeControllers(self):
+        return self.__volume_controllers
+
+    volumeControllersChanged = Signal()
+
+    volumeControllers = Property("QVariantList", get_volumeControllers, notify=volumeControllersChanged)
+    ### END Property volumeControllers
 
     def set_select_path(self):
         self.select_path_element = self.zyngui.screens['fixed_layers'].select_path_element

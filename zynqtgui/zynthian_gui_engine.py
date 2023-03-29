@@ -253,8 +253,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
 			# Try to set created synth engine's volume to max
 			try:
 				logging.info(f"Setting synth volume to max when initializing")
-				self.zyngui.fixed_layers.get_volume_controls()[self.midi_chan].value = \
-					self.zyngui.fixed_layers.get_volume_controls()[self.midi_chan].value_max
+				self.zyngui.fixed_layers.volumeControllers[self.midi_chan].value = \
+					self.zyngui.fixed_layers.volumeControllers[self.midi_chan].value_max
 			except:
 				logging.error(f"Error setting synth volume to max when initializing")
 

@@ -59,6 +59,7 @@ class LayerVolumeController(QObject):
     def add_control(self, control):
         if control not in self.__controls:
             self.__controls.append(control)
+            # Interpolate controller's value to percentage
             self.set_value(np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max)))
 
             self.controllable_changed.emit()
@@ -84,6 +85,7 @@ class LayerVolumeController(QObject):
             self.__value = value
 
             for control in self.__controls:
+                # Interpolate volume percentage to controller's value range
                 control.set_value(
                     np.interp(value, (self.value_min, self.value_max), (control.value_min, control.value_max)), True)
 

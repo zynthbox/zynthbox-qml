@@ -27,6 +27,8 @@ import sys
 import logging
 import math
 
+import numpy as np
+
 # Zynthian specific modules
 from . import zynthian_gui_layer
 from . import zynthian_gui_selector
@@ -34,6 +36,70 @@ from . import zynthian_gui_selector
 from zyncoder import *
 
 from PySide2.QtCore import Qt, QObject, QTimer, Slot, Signal, Property
+
+
+# A proxy controller to control all layers' volume of a channel
+class VolumeController(QObject):
+    def __init__(self, parent, controls=None):
+        super().__init__(parent)
+
+        if controls is None:
+            controls = []
+
+        self.__controls = controls
+        self.__value = 100
+
+        self.valueChanged.emit()
+
+    def add_control(self, control):
+        if control not in self.__controls:
+            mixer_control = MixerControl(self)
+            mixer_control.set_zctrl(control)
+            self.__controls.append(mixer_control)
+            self.set_value(np.interp(mixer_control.value, (mixer_control.value_min, mixer_control.value_max), (self.value_min, self.value_max)))
+
+    ### Property value
+    ### This property will interpolate the input value (0 - 100) to all volume controllers' respective value
+    def get_value(self):
+        return self.__value
+
+    # Set value of all volume controllers by percentage
+    def set_value(self, value_percent: int):
+        value = int(np.clip(value_percent, 0, 100))
+
+        if self.__value != value:
+            self.__value = value
+
+            for control in self.__controls:
+                control.value = np.interp(value, (self.value_min, self.value_max), (control.value_min, control.value_max))
+
+            self.valueChanged.emit()
+
+    valueChanged = Signal()
+
+    value = Property(int, get_value, set_value, notify=valueChanged)
+    ### END Property value
+
+    ### Property value_min
+    def get_value_min(self):
+        return 0
+
+    value_min = Property(int, get_value_min, constant=True)
+    ### END Property value_min
+
+    ### Property value_max
+    def get_value_max(self):
+        return 100
+
+    value_max = Property(int, get_value_max, constant=True)
+    ### END Property value_max
+
+    ### Property step_size
+    def get_step_size(self):
+        return 1
+
+    step_size = Property(int, get_step_size, constant=True)
+    ### END Property step_size
 
 #------------------------------------------------------------------------------
 # minimal controller proxy for the mixer: TODO: port all the controllers to this?
@@ -135,6 +201,12 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__start_midi_chan = 0
         self.__volume_ctrls = []
 
+        # Array of VolumeController object
+        self.__volume_controllers: list[VolumeController] = []
+
+        for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
+            self.__volume_controllers.append(VolumeController(self))
+
         self.__mixer_timer = QTimer()
         self.__mixer_timer.setInterval(250)
         self.__mixer_timer.setSingleShot(True)
@@ -225,20 +297,20 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
-                ctrl = None
                 # Find volume control as per self.__engine_config__
                 for name in layer.controllers_dict:
+                    ctrl = None
                     # Check if engine has specific mapping of volume controller name
                     # otherwise use global `*` controller mapping name from self.__engine_config__
                     if layer.engine.nickname in self.__engine_config__ and \
-                       "volumeControl" in self.__engine_config__[layer.engine.nickname] and \
-                       name in self.__engine_config__[layer.engine.nickname]['volumeControl']:
+                            "volumeControl" in self.__engine_config__[layer.engine.nickname] and \
+                            name in self.__engine_config__[layer.engine.nickname]['volumeControl']:
                         # Check if config has engine specific volume controller name
                         logging.debug(f"### VOLUME : Found volume control for engine '{layer.engine.nickname}'")
                         ctrl = layer.controllers_dict[name]
                     elif "default" in self.__engine_config__ and \
-                         "volumeControl" in self.__engine_config__['default'] and \
-                         name in self.__engine_config__['default']['volumeControl']:
+                            "volumeControl" in self.__engine_config__['default'] and \
+                            name in self.__engine_config__['default']['volumeControl']:
                         # Check if config has global volume controller name
                         logging.debug(f"### VOLUME : Volume control for engine '{layer.engine.nickname}' not found. Using default config")
                         ctrl = layer.controllers_dict[name]
@@ -249,14 +321,18 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     else:
                         logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
 
-                if ctrl is not None:
-                    if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                        gctrl = MixerControl(self)
-                        gctrl.set_zctrl(ctrl)
-                        self.__volume_ctrls.append(gctrl)
-                    else:
-                        self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
+                    if ctrl is not None:
+                        # Add channel volume controller to VolumeController
+                        self.__volume_controllers[i - self.__start_midi_chan].add_control(ctrl)
+
+                        if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
+                            gctrl = MixerControl(self)
+                            gctrl.set_zctrl(ctrl)
+                            self.__volume_ctrls.append(gctrl)
+                        else:
+                            self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
         self.volume_controls_changed.emit()
+        self.volumeControllersChanged.emit()
 
     def select(self, index=None):
         super().select(index)
@@ -429,5 +505,14 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.select_path = "Layers"
         self.select_path_element = str(self.list_data[self.index][1] + 1)
         super().set_select_path()
+
+    ### Property volumeControllers
+    def get_volumeControllers(self):
+        return self.__volume_controllers
+
+    volumeControllersChanged = Signal()
+
+    volumeControllers = Property("QVariantList", get_volumeControllers, notify=volumeControllersChanged)
+    ### END Property volumeControllers
 
 #------------------------------------------------------------------------------

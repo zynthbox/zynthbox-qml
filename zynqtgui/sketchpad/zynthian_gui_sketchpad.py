@@ -320,7 +320,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        self.set_layer_volume_actual(self.__zselector[1].value / 1000)
+        self.set_layer_volume_actual(self.__zselector[1].value)
 
     def set_layer_volume_actual(self, volume):
         if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
@@ -335,10 +335,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         try:
             if ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
                         selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                volume_control_obj = self.zyngui.fixed_layers.volume_controls[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
             elif self.zyngui.sound_combinator_active and \
                     selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                volume_control_obj = self.zyngui.fixed_layers.volume_controls[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
             else:
                 volume_control_obj = None
         except:
@@ -359,9 +359,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 step=volume_control_obj.step_size,
                 defaultValue=None,
                 currentValue=volume_control_obj.value,
-                startLabel=f"{round(volume_control_obj.value_min, 2)}", # Round off label value upto 2 decimals
-                stopLabel=f"{round(volume_control_obj.value_max, 2)}", # Round off label value upto 2 decimals
-                valueLabel=f"{round(volume_control_obj.value, 2)}", # Round off label value upto 2 decimals
+                startLabel=f"{volume_control_obj.value_min}",
+                stopLabel=f"{volume_control_obj.value_max}",
+                valueLabel=f"{volume_control_obj.value}",
                 setValueFunction=self.set_layer_volume_actual,
                 showValueLabel=True,
                 showResetToDefault=False,
@@ -669,16 +669,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 if self.zyngui.sound_combinator_active and \
                         selected_channel.checkIfLayerExists(
                             selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                    volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
-                    volume = volume_control_obj.value * 1000
-                    min_value = volume_control_obj.value_min * 1000
-                    max_value = volume_control_obj.value_max * 1000
+                    volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                    volume = volume_control_obj.value
+                    min_value = volume_control_obj.value_min
+                    max_value = volume_control_obj.value_max
                 elif ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
                         selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                    volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
-                    volume = volume_control_obj.value * 1000
-                    min_value = volume_control_obj.value_min * 1000
-                    max_value = volume_control_obj.value_max * 1000
+                    volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                    volume = volume_control_obj.value
+                    min_value = volume_control_obj.value_min
+                    max_value = volume_control_obj.value_max
             except Exception as e:
                 logging.error(f"Error configuring knob 1 : {str(e)}")
 
@@ -688,7 +688,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.__zselector_ctrl[1].set_options(
                 {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1',
                  'short_name': 'Knob1',
-                 'midi_cc': 0, 'value_max': round(max_value), 'value_min': round(min_value), 'value': round(volume)})
+                 'midi_cc': 0, 'value_max': max_value + 1, 'value_min': min_value, 'value': volume})
 
             self.__zselector[1].config(self.__zselector_ctrl[1])
             self.__zselector[1].custom_encoder_speed = 0

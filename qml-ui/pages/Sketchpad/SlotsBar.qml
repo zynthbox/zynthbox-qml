@@ -605,8 +605,8 @@ Rectangle {
                     QQC2.Slider {
                         id: volumeSlider
 
-                        property QtObject volumeControlObject: null
                         property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
+                        property QtObject volumeControlObject: zynthian.fixed_layers.volumeControllers[chainedSound]
 
                         orientation: Qt.Horizontal
 
@@ -683,7 +683,7 @@ Rectangle {
                                                             : ""
                                                 : ""
 
-                            volumeSlider.volumeControlObject = zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
+                            volumeSlider.volumeControlObject = zynthian.layers_for_channel.volumeControllers[root.selectedSlotRowItem.channel.selectedSlotRow]
                                                                 ? zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
                                                                 : null
                         }

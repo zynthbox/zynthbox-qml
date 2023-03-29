@@ -174,12 +174,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def connect_control_objects(self):
         selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
 
-        if self.__volume_control_obj == self.zyngui.layers_for_channel.get_volume_controls()[selected_channel.selectedSlotRow]:
+        if self.__volume_control_obj == self.zyngui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]:
             return
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.disconnect(self.set_selector)
 
-        self.__volume_control_obj = self.zyngui.layers_for_channel.get_volume_controls()[selected_channel.selectedSlotRow]
+        self.__volume_control_obj = self.zyngui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]
 
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.connect(self.set_selector)
@@ -278,7 +278,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             if channel.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
                 prev_volume = None
                 try:
-                    prev_volume = self.zyngui.fixed_layers.volume_controls[selected_channel].value
+                    prev_volume = self.zyngui.fixed_layers.volumeControllers[selected_channel].value
                     logging.debug(f"### Volume Previous : {prev_volume}")
                 except Exception as e:
                     logging.debug(f"Error resetting volume : {str(e)}")
@@ -288,9 +288,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 if prev_volume is not None:
                     try:
-                        logging.debug(f"### Volume after preset change : {self.zyngui.fixed_layers.volume_controls[selected_channel].value}")
-                        self.zyngui.fixed_layers.volume_controls[selected_channel].value = prev_volume
-                        logging.debug(f"### Volume after reset : {self.zyngui.fixed_layers.volume_controls[selected_channel].value}")
+                        logging.debug(f"### Volume after preset change : {self.zyngui.fixed_layers.volumeControllers[selected_channel].value}")
+                        self.zyngui.fixed_layers.volumeControllers[selected_channel].value = prev_volume
+                        logging.debug(f"### Volume after reset : {self.zyngui.fixed_layers.volumeControllers[selected_channel].value}")
                     except Exception as e:
                         logging.debug(f"Error resetting volume : {str(e)}")
 

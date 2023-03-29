@@ -469,7 +469,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.main_layers_view.volume_controls
+                            model: zynthian.main_layers_view.volumeControllers
                             delegate: ColumnLayout {
                                 spacing: Kirigami.Units.largeSpacing
                                 enabled: modelData.value_max > 0

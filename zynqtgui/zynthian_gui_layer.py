@@ -93,7 +93,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if midi_chan in self.layer_midi_map:
 			prev_volume = None
 			try:
-				prev_volume = self.zyngui.fixed_layers.volume_controls[midi_chan].value
+				prev_volume = self.zyngui.fixed_layers.volumeControllers[midi_chan].value
 				logging.debug(f"### Volume Previous : {prev_volume}")
 			except Exception as e:
 				logging.debug(f"Error resetting volume : {str(e)}")
@@ -105,10 +105,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if prev_volume is not None:
 				try:
 					logging.debug(
-						f"### Volume after preset change : {self.zyngui.fixed_layers.volume_controls[midi_chan].value}")
-					self.zyngui.fixed_layers.volume_controls[midi_chan].value = prev_volume
+						f"### Volume after preset change : {self.zyngui.fixed_layers.volumeControllers[midi_chan].value}")
+					self.zyngui.fixed_layers.volumeControllers[midi_chan].value = prev_volume
 					logging.debug(
-						f"### Volume after reset : {self.zyngui.fixed_layers.volume_controls[midi_chan].value}")
+						f"### Volume after reset : {self.zyngui.fixed_layers.volumeControllers[midi_chan].value}")
 				except Exception as e:
 					logging.debug(f"Error resetting volume : {str(e)}")
 
@@ -123,7 +123,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if midi_chan in self.layer_midi_map:
 			prev_volume = None
 			try:
-				prev_volume = self.zyngui.fixed_layers.volume_controls[midi_chan].value
+				prev_volume = self.zyngui.fixed_layers.volumeControllers[midi_chan].value
 				logging.debug(f"### Volume Previous : {prev_volume}")
 			except Exception as e:
 				logging.debug(f"Error resetting volume : {str(e)}")
@@ -135,10 +135,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if prev_volume is not None:
 				try:
 					logging.debug(
-						f"### Volume after preset change : {self.zyngui.fixed_layers.volume_controls[midi_chan].value}")
-					self.zyngui.fixed_layers.volume_controls[midi_chan].value = prev_volume
+						f"### Volume after preset change : {self.zyngui.fixed_layers.volumeControllers[midi_chan].value}")
+					self.zyngui.fixed_layers.volumeControllers[midi_chan].value = prev_volume
 					logging.debug(
-						f"### Volume after reset : {self.zyngui.fixed_layers.volume_controls[midi_chan].value}")
+						f"### Volume after reset : {self.zyngui.fixed_layers.volumeControllers[midi_chan].value}")
 				except Exception as e:
 					logging.debug(f"Error resetting volume : {str(e)}")
 
@@ -153,7 +153,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if midi_chan in self.layer_midi_map:
 			prev_volume = None
 			try:
-				prev_volume = self.zyngui.fixed_layers.volume_controls[midi_chan].value
+				prev_volume = self.zyngui.fixed_layers.volumeControllers[midi_chan].value
 				logging.debug(f"### Volume Previous : {prev_volume}")
 			except Exception as e:
 				logging.debug(f"Error resetting volume : {str(e)}")
@@ -166,8 +166,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 				if prev_volume is not None:
 					try:
-						logging.debug(f"### Volume after preset change : {self.zyngui.fixed_layers.volume_controls[midi_chan].value}")
-						self.zyngui.fixed_layers.volume_controls[midi_chan].value = prev_volume
+						logging.debug(f"### Volume after preset change : {self.zyngui.fixed_layers.volumeControllers[midi_chan].value}")
+						self.zyngui.fixed_layers.volumeControllers[midi_chan].value = prev_volume
 						logging.debug(f"### Volume after reset : {self.zyngui.fixed_layers.volume_controls[midi_chan].value}")
 					except Exception as e:
 						logging.debug(f"Error resetting volume : {str(e)}")

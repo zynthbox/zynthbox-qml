@@ -38,32 +38,45 @@ from zyncoder import *
 from PySide2.QtCore import Qt, QObject, QTimer, Slot, Signal, Property
 
 
-# A proxy controller to control all layers' volume of a channel
-class VolumeController(QObject):
-    def __init__(self, parent, controls=None):
-        super().__init__(parent)
-
-        if controls is None:
-            controls = []
-
-        self.__controls = controls
+#------------------------------------------------------------------------------
+# Volume controller proxy for controlling layer volume
+#
+# This provides an abstraction to all the volume controllers of a synth layer
+# and allows to control all of them by percentage. Setting value of this
+# controller will interpolate the value to the respective volume controller
+# value and set it accordingly
+#------------------------------------------------------------------------------
+class LayerVolumeController(QObject):
+    def __init__(self, name, parent=None):
+        super(LayerVolumeController, self).__init__(parent)
+        self.__controls = []
         self.__value = 100
-
-        self.valueChanged.emit()
+        self.__value_min = 0
+        self.__value_max = 100
+        self.__step_size = 1
+        self.__name = name
 
     def add_control(self, control):
         if control not in self.__controls:
-            mixer_control = MixerControl(self)
-            mixer_control.set_zctrl(control)
-            self.__controls.append(mixer_control)
-            self.set_value(np.interp(mixer_control.value, (mixer_control.value_min, mixer_control.value_max), (self.value_min, self.value_max)))
+            self.__controls.append(control)
+            self.set_value(np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max)))
+
+            self.controllable_changed.emit()
+            self.value_changed.emit()
+
+    ### Property controllable
+    def get_controllable(self):
+        return len(self.__controls) > 0
+
+    controllable_changed = Signal()
+
+    controllable = Property(bool, get_controllable, notify=controllable_changed)
+    ### END Property controllable
 
     ### Property value
-    ### This property will interpolate the input value (0 - 100) to all volume controllers' respective value
     def get_value(self):
         return self.__value
 
-    # Set value of all volume controllers by percentage
     def set_value(self, value_percent: int):
         value = int(np.clip(value_percent, 0, 100))
 
@@ -71,122 +84,43 @@ class VolumeController(QObject):
             self.__value = value
 
             for control in self.__controls:
-                control.value = np.interp(value, (self.value_min, self.value_max), (control.value_min, control.value_max))
+                control.set_value(
+                    np.interp(value, (self.value_min, self.value_max), (control.value_min, control.value_max)), True)
 
-            self.valueChanged.emit()
+            self.value_changed.emit()
 
-    valueChanged = Signal()
+    value_changed = Signal()
 
-    value = Property(int, get_value, set_value, notify=valueChanged)
+    value = Property(int, get_value, set_value, notify=value_changed)
     ### END Property value
 
     ### Property value_min
     def get_value_min(self):
-        return 0
+        return self.__value_min
 
     value_min = Property(int, get_value_min, constant=True)
     ### END Property value_min
 
     ### Property value_max
     def get_value_max(self):
-        return 100
+        return self.__value_max
 
     value_max = Property(int, get_value_max, constant=True)
     ### END Property value_max
 
     ### Property step_size
     def get_step_size(self):
-        return 1
+        return self.__step_size
 
     step_size = Property(int, get_step_size, constant=True)
     ### END Property step_size
 
-#------------------------------------------------------------------------------
-# minimal controller proxy for the mixer: TODO: port all the controllers to this?
-#------------------------------------------------------------------------------
-class MixerControl(QObject):
-    def __init__(self, parent=None):
-        super(MixerControl, self).__init__(parent)
-        self.__zctrl = None
-
-    def set_zctrl(self, zctrl):
-        if self.__zctrl == zctrl:
-            return
-        self.__zctrl = zctrl
-        self.controllable_changed.emit()
-        self.refresh()
-
-    @Slot(None)
-    def refresh(self):
-        self.value_min_changed.emit()
-        self.value_max_changed.emit()
-        self.name_changed.emit()
-        self.value_changed.emit()
-
-    @Signal
-    def controllable_changed(self):
-        pass
-
-    def get_controllable(self):
-        return self.__zctrl is not None
-
-    controllable = Property(bool, get_controllable, notify=controllable_changed)
-
-    @Signal
-    def value_changed(self):
-        pass
-    def get_value(self):
-        if self.__zctrl == None:
-            return 0
-        return self.__zctrl.value
-    def set_value(self, value):
-        if self.__zctrl == None:
-            return
-        if self.__zctrl.value == value:
-            return
-
-        self.__zctrl.set_value(value, True)
-        self.value_changed.emit()
-    value = Property(float, get_value, set_value, notify = value_changed)
-
-    @Signal
-    def value_min_changed(self):
-        pass
-    def get_value_min(self):
-        if self.__zctrl == None:
-            return 0
-        return self.__zctrl.value_min
-    value_min = Property(float, get_value_min, notify = value_min_changed)
-
-    @Signal
-    def value_max_changed(self):
-        pass
-    def get_value_max(self):
-        if self.__zctrl == None:
-            return 0
-        return self.__zctrl.value_max
-    value_max = Property(float, get_value_max, notify = value_max_changed)
-
-    @Signal
-    def step_size_changed(self):
-        pass
-    def get_step_size(self):
-        if self.__zctrl == None:
-            return 0
-        if self.__zctrl.is_integer or self.__zctrl.is_toggle:
-            return 1
-        else:
-            return (self.__zctrl.value_max - self.__zctrl.value_min) / 100.0
-    step_size = Property(float, get_step_size, notify = step_size_changed)
-
-    @Signal
-    def name_changed(self):
-        pass
+    ### Property name
     def get_name(self):
-        if self.__zctrl == None:
-            return ""
-        return self.__zctrl.name
-    name = Property(str, get_name, notify = name_changed)
+        return self.__name
+
+    name = Property(str, get_name, constant=True)
+    ### END Property step_size
 
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
@@ -199,13 +133,11 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.__layers_count = 15
         self.__start_midi_chan = 0
-        self.__volume_ctrls = []
 
-        # Array of VolumeController object
-        self.__volume_controllers: list[VolumeController] = []
-
+        # List of LayerVolumeController (one per midi channel)
+        self.__volume_controllers: list[LayerVolumeController] = []
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
-            self.__volume_controllers.append(VolumeController(self))
+            self.__volume_controllers.append(LayerVolumeController(self))
 
         self.__mixer_timer = QTimer()
         self.__mixer_timer.setInterval(250)
@@ -264,10 +196,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""
-                if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                    self.__volume_ctrls.append(MixerControl(self))
-                else:
-                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(None)
 
             if i < 15:
                 metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
@@ -322,16 +250,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                         logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
 
                     if ctrl is not None:
-                        # Add channel volume controller to VolumeController
+                        # Add found volume controller
                         self.__volume_controllers[i - self.__start_midi_chan].add_control(ctrl)
 
-                        if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                            gctrl = MixerControl(self)
-                            gctrl.set_zctrl(ctrl)
-                            self.__volume_ctrls.append(gctrl)
-                        else:
-                            self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
-        self.volume_controls_changed.emit()
         self.volumeControllersChanged.emit()
 
     def select(self, index=None):
@@ -493,13 +414,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         else:
             return -1
     active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
-
-    def get_volume_controls(self):
-        return self.__volume_ctrls
-    @Signal
-    def volume_controls_changed(self):
-        pass
-    volume_controls = Property('QVariantList', get_volume_controls, notify = volume_controls_changed)
 
     def set_select_path(self):
         self.select_path = "Layers"

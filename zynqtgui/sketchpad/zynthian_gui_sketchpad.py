@@ -196,6 +196,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
 
+            self.zyngui.fixed_layers.volumeControllersChanged.connect(self.set_selector_timer.start)
+
             if cb is not None:
                 cb()
 

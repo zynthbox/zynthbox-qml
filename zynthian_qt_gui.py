@@ -1623,7 +1623,6 @@ class zynthian_gui(QObject):
         # Turn off leds
         Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "off"))
 
-        app.exit(0)
         self.stop_polling()
         self.osc_end()
         zynautoconnect.stop()
@@ -3413,8 +3412,15 @@ class zynthian_gui(QObject):
                 self.stop()
                 self.wait_threads_end()
                 logging.info("EXITING ZYNTHIAN-UI ...")
-                zynthian_gui_config.app.exit(self.exit_code)
-                return
+
+                if self.exit_code == 100:
+                    Popen(("systemctl", "poweroff"))
+                elif self.exit_code == 101:
+                    Popen(("reboot"))
+                elif self.exit_code == 102:
+                    Popen(("systemctl", "restart", "jack2", "zynthian"))
+                else:
+                    Popen(("systemctl", "restart", "jack2", "zynthian"))
             # Refresh Current Layer
             elif self.curlayer and not self.loading:
                 self.curlayer.refresh()

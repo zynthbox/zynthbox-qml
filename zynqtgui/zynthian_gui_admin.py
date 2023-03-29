@@ -827,15 +827,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def restart_gui_confirmed(self, params=None):
         logging.info("RESTART ZYNTHIAN-UI")
         self.last_state_action()
-        self.zyngui.exit()
-        self.zyngui.stop()
-        self.start_command(["systemctl restart jack2 zynthian mod-ttymidi"])
-
-    def exit_to_console(self):
-        logging.info("EXIT TO CONSOLE")
-        self.last_state_action()
-        #self.zyngui.exit(101)
-        self.start_command(["systemctl stop zynthian"])
+        self.zyngui.exit(102)
 
     @Slot()
     def reboot(self):
@@ -846,10 +838,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def reboot_confirmed(self, params=None):
         logging.info("REBOOT")
         self.last_state_action()
-        self.zyngui.exit()
-        self.zyngui.stop()
-        self.start_command(["reboot"])
-
+        self.zyngui.exit(101)
     @Slot()
     def power_off(self):
         self.zyngui.show_confirm(
@@ -859,9 +848,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def power_off_confirmed(self, params=None):
         logging.info("POWER OFF")
         self.last_state_action()
-        self.zyngui.exit()
-        self.zyngui.stop()
-        self.start_command(["systemctl", "poweroff"])
+        self.zyngui.exit(100)
 
     def last_state_action(self):
         if (

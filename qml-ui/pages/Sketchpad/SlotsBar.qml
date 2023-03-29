@@ -592,6 +592,15 @@ Rectangle {
                             }
                             wrapMode: "WrapAnywhere"
                             font.pointSize: 10
+                            text: root.selectedSlotRowItem
+                                      ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                          ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
+                                          : fxButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                              ? root.selectedSlotRowItem.channel.getEffectsNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                              : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
+                                                  ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
+                                                  : ""
+                                      : ""
                         }
 
                         MouseArea {
@@ -627,74 +636,7 @@ Rectangle {
                             volumeControlObject.value = value;
                         }
                     }
-
-                    Connections {
-                        target: bottomStack
-                        onCurrentIndexChanged: sidebarUpdateTimer.restart()
-                    }
-                    Connections {
-                        enabled: bottomStack.currentIndex === 2
-                        target: zynthian.session_dashboard
-                        onSelectedChannelChanged: sidebarUpdateTimer.restart()
-                    }
-                    // This depends on an explicitly commented-out property, so let's probably comment this out as well
-                    //Connections {
-                        //enabled: root.selectedSlotRowItem != null && bottomStack.currentIndex === 2
-                        //target: root.selectedSlotRowItem
-                        //onSelectedRowChanged: sidebarUpdateTimer.restart()
-                    //}
-                    Connections {
-                        enabled: root.selectedSlotRowItem != null &&
-                                 root.selectedSlotRowItem.channel != null &&
-                                 bottomStack.currentIndex === 2
-                        target: enabled ? root.selectedSlotRowItem.channel : null
-                        onChainedSoundsChanged: sidebarUpdateTimer.restart()
-                        onSamplesChanged: sidebarUpdateTimer.restart()
-                    }
-                    Connections {
-                        enabled: bottomStack.currentIndex === 2
-                        target: synthsButton
-                        onCheckedChanged: sidebarUpdateTimer.restart()
-                    }
-                    Connections {
-                        enabled: bottomStack.currentIndex === 2
-                        target: fxButton
-                        onCheckedChanged: sidebarUpdateTimer.restart()
-                    }
-                    Connections {
-                        enabled: bottomStack.currentIndex === 2
-                        target: samplesButton
-                        onCheckedChanged: sidebarUpdateTimer.restart()
-                    }
-
-                    Timer {
-                        id: sidebarUpdateTimer
-                        interval: 0
-                        repeat: false
-                        onTriggered: {
-                            console.log("### Updating sidebar")
-                            detailsText.text = root.selectedSlotRowItem
-                                                ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                                    ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
-                                                    : fxButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                                        ? root.selectedSlotRowItem.channel.getEffectsNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                                        : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
-                                                            ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
-                                                            : ""
-                                                : ""
-
-                            volumeSlider.volumeControlObject = zynthian.layers_for_channel.volumeControllers[root.selectedSlotRowItem.channel.selectedSlotRow]
-                                                                ? zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
-                                                                : null
-                        }
-                    }
                 }
-
-//                Kirigami.Separator {
-//                    Layout.fillHeight: true
-//                    Layout.preferredWidth: 1
-//                    color: "#ff31363b"
-//                }
             }
         }
     }

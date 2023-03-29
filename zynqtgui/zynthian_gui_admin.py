@@ -826,6 +826,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
     def restart_gui_confirmed(self, params=None):
         logging.info("RESTART ZYNTHIAN-UI")
+        self.zyngui.showMessageDialog.emit("Restarting GUI")
         self.last_state_action()
         self.zyngui.exit(102)
 
@@ -837,6 +838,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
     def reboot_confirmed(self, params=None):
         logging.info("REBOOT")
+        self.zyngui.showMessageDialog.emit("Rebooting device")
         self.last_state_action()
         self.zyngui.exit(101)
     @Slot()
@@ -847,6 +849,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
     def power_off_confirmed(self, params=None):
         logging.info("POWER OFF")
+        self.zyngui.showMessageDialog.emit("Powering off device")
         self.last_state_action()
         self.zyngui.exit(100)
 

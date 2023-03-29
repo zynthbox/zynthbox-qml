@@ -25,7 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.11
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.4 as QQC2
 import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
@@ -81,6 +81,7 @@ Kirigami.AbstractApplicationWindow {
     signal layerSetupDialogPickSoundClicked()
     signal soundsDialogAccepted()
     signal soundsDialogRejected()
+    signal showMessageDialog(string message)
 
     function showConfirmationDialog() { confirmDialog.open() }
     function hideConfirmationDialog() { confirmDialog.close() }
@@ -541,6 +542,13 @@ Kirigami.AbstractApplicationWindow {
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
+    Component.onCompleted: {
+        zynthian.showMessageDialog.connect(root.showMessageDialog)
+    }
+    onShowMessageDialog: {
+        messageDialog.text = message
+        messageDialog.open()
+    }
 
     // Listen to selected_channel_changed signal to
     Connections {
@@ -671,10 +679,6 @@ Kirigami.AbstractApplicationWindow {
         onPassiveNotificationChanged: {
             applicationWindow().showPassiveNotification(zynthian.passiveNotification, 1500)
         }
-    }
-
-    Connections {
-        target: zynthian
         onLongTaskStarted: {
             alternateLoadingOverlay.open = true;
         }
@@ -1149,6 +1153,26 @@ Kirigami.AbstractApplicationWindow {
     }
 
     Zynthian.OnScreenDisplay { }
+
+    Zynthian.Popup {
+        id: messageDialog
+
+        property alias text: messageLabel.text
+
+        parent: QQC2.Overlay.overlay
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit*24
+        height: Kirigami.Units.gridUnit*6
+
+        QQC2.Label {
+            id: messageLabel
+            anchors.fill: parent
+            anchors.margins: Kirigami.Units.gridUnit
+            horizontalAlignment: QQC2.Label.AlignHCenter
+            verticalAlignment: QQC2.Label.AlignVCenter
+        }
+    }
 
     Window {
         id: clipPickerMenu

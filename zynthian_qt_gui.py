@@ -4563,6 +4563,7 @@ class zynthian_gui(QObject):
     displayRecordingPopup = Signal()
     openLeftSidebar = Signal()
     closeLeftSidebar = Signal()
+    showMessageDialog = Signal(str)
 
     about = Property(QObject, about, constant=True)
     audio_out = Property(QObject, audio_out, constant=True)

@@ -61,24 +61,24 @@ Rectangle {
 
     function setControlObjByType(obj, type) {
         if (type === "song") {
-            zynthian.bottomBarControlType = "bottombar-controltype-song"
+            zynqtgui.bottomBarControlType = "bottombar-controltype-song"
         } else if (type === "clip") {
-            zynthian.bottomBarControlType = "bottombar-controltype-clip"
+            zynqtgui.bottomBarControlType = "bottombar-controltype-clip"
         } else if (type === "channel") {
-            zynthian.bottomBarControlType = "bottombar-controltype-channel"
+            zynqtgui.bottomBarControlType = "bottombar-controltype-channel"
         } else if (type === "part") {
-            zynthian.bottomBarControlType = "bottombar-controltype-part"
+            zynqtgui.bottomBarControlType = "bottombar-controltype-part"
         } else if (type === "pattern") {
-            zynthian.bottomBarControlType = "bottombar-controltype-pattern"
+            zynqtgui.bottomBarControlType = "bottombar-controltype-pattern"
         }
 
-        zynthian.bottomBarControlObj = obj
+        zynqtgui.bottomBarControlObj = obj
     }
 
     Connections {
-        target: zynthian
+        target: zynqtgui
         onBottomBarControlObjChanged: {
-            if (zynthian.bottomBarControlType === "bottombar-controltype-pattern") {
+            if (zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") {
                 patternAction.trigger();
             }
         }
@@ -114,16 +114,16 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.maximumHeight: Kirigami.Units.gridUnit * 2
-                visible: zynthian.bottomBarControlType !== "bottombar-controltype-channel"
+                visible: zynqtgui.bottomBarControlType !== "bottombar-controltype-channel"
 
                 EditableHeader {
-                    controlObj: zynthian.bottomBarControlObj
-                    controlType: zynthian.bottomBarControlType
+                    controlObj: zynqtgui.bottomBarControlObj
+                    controlType: zynqtgui.bottomBarControlType
                     text: {
-                        let text = zynthian.bottomBarControlObj ? zynthian.bottomBarControlObj.name : "";
-                        switch (zynthian.bottomBarControlType) {
+                        let text = zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.name : "";
+                        switch (zynqtgui.bottomBarControlType) {
                         case "bottombar-controltype-song":
-                            return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynthian.bottomBarControlObj.sketchpadFolderName).arg(text);
+                            return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
                         case "bottombar-controltype-clip":
                         case "bottombar-controltype-pattern":
                             return qsTr("CLIP: %1").arg(text);
@@ -132,8 +132,8 @@ Rectangle {
                         case "bottombar-controltype-part":
                             return qsTr("PART: %1").arg(text);
     //                    case "bottombar-controltype-pattern":
-    //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName)
-    //                        var pattern = sequence.getByPart(zynthian.bottomBarControlObj.clipChannel.connectedPattern, 0)
+    //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+    //                        var pattern = sequence.getByPart(zynqtgui.bottomBarControlObj.clipChannel.connectedPattern, 0)
     //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:
                             return text;
@@ -148,122 +148,122 @@ Rectangle {
 
                 // Selecting custom slices not required. Keeping the dropdown commented if later required for something else
     //            QQC2.Label {
-    //                visible: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") &&
-    //                         zynthian.bottomBarControlObj.clipChannel.channelAudioType === "sample-slice"
+    //                visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") &&
+    //                         zynqtgui.bottomBarControlObj.clipChannel.channelAudioType === "sample-slice"
     //                text: qsTr("Slices")
     //            }
 
     //            QQC2.ComboBox {
-    //                visible: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") &&
-    //                         zynthian.bottomBarControlObj.clipChannel.channelAudioType === "sample-slice"
+    //                visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") &&
+    //                         zynqtgui.bottomBarControlObj.clipChannel.channelAudioType === "sample-slice"
     //                model: [4, 8, 12, 16]
-    //                currentIndex: find(zynthian.bottomBarControlObj.slices)
-    //                onActivated: zynthian.bottomBarControlObj.slices = model[index]
+    //                currentIndex: find(zynqtgui.bottomBarControlObj.slices)
+    //                onActivated: zynqtgui.bottomBarControlObj.slices = model[index]
     //            }
 
                 QQC2.Label {
-                    visible: zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern"
-                    text: zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.path
-                            ? qsTr("Sample (0): %1").arg(zynthian.bottomBarControlObj.path.split('/').pop())
+                    visible: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
+                    text: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.path
+                            ? qsTr("Sample (0): %1").arg(zynqtgui.bottomBarControlObj.path.split('/').pop())
                             : qsTr("No File Loaded")
                 }
 
                 SidebarButton {
                     icon.name: "document-save-symbolic"
-                    active: zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern"
-                             && zynthian.bottomBarControlObj.hasOwnProperty("path")
-                             && zynthian.bottomBarControlObj.path.length > 0
+                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
+                             && zynqtgui.bottomBarControlObj.hasOwnProperty("path")
+                             && zynqtgui.bottomBarControlObj.path.length > 0
 
                     onClicked: {
-                        zynthian.bottomBarControlObj.saveMetadata();
+                        zynqtgui.bottomBarControlObj.saveMetadata();
                     }
                 }
 
                 SidebarButton {
                     icon.name: "document-open"
-                    active: zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern"
-                    enabled: zynthian.bottomBarControlObj ? !zynthian.bottomBarControlObj.isPlaying : false
+                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
+                    enabled: zynqtgui.bottomBarControlObj ? !zynqtgui.bottomBarControlObj.isPlaying : false
 
                     onClicked: {
-                        pickerDialog.folderModel.folder = zynthian.bottomBarControlObj.recordingDir;
+                        pickerDialog.folderModel.folder = zynqtgui.bottomBarControlObj.recordingDir;
                         pickerDialog.open();
                     }
                 }
 
                 SidebarButton {
                     icon.name: "delete"
-                    active: (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.deletable
+                    active: (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.deletable
 
                     onClicked: {
-                        zynthian.bottomBarControlObj.delete();
+                        zynqtgui.bottomBarControlObj.delete();
                     }
                 }
 
                 SidebarButton {
                     icon.name: "edit-clear-all"
-                    active: (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.clearable
-                    enabled: zynthian.bottomBarControlObj ? !zynthian.bottomBarControlObj.isPlaying : false
+                    active: (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.clearable
+                    enabled: zynqtgui.bottomBarControlObj ? !zynqtgui.bottomBarControlObj.isPlaying : false
 
                     onClicked: {
-                        zynthian.bottomBarControlObj.clear()
+                        zynqtgui.bottomBarControlObj.clear()
                     }
                 }
 
                 SidebarButton {
                     icon.name: "user-trash-symbolic"
-                    active: zynthian.bottomBarControlObj != null && zynthian.bottomBarControlObj.path != null && zynthian.bottomBarControlObj.path.length > 0
+                    active: zynqtgui.bottomBarControlObj != null && zynqtgui.bottomBarControlObj.path != null && zynqtgui.bottomBarControlObj.path.length > 0
 
                     onClicked: {
-                        zynthian.bottomBarControlObj.deleteClip()
+                        zynqtgui.bottomBarControlObj.deleteClip()
                     }
                 }
 
                 SidebarButton {
-                    icon.name: zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                    active: zynthian.bottomBarControlType !== "bottombar-controltype-part" &&
-                             (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.playable && zynthian.bottomBarControlObj.path
+                    icon.name: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    active: zynqtgui.bottomBarControlType !== "bottombar-controltype-part" &&
+                             (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable && zynqtgui.bottomBarControlObj.path
 
                     onClicked: {
-                        if (zynthian.bottomBarControlObj.isPlaying) {
+                        if (zynqtgui.bottomBarControlObj.isPlaying) {
                             console.log("Stopping Sound Loop")
-                            zynthian.bottomBarControlObj.stop();
+                            zynqtgui.bottomBarControlObj.stop();
                         } else {
                             console.log("Playing Sound Loop")
-                            zynthian.bottomBarControlObj.playSolo();
+                            zynqtgui.bottomBarControlObj.playSolo();
                         }
                     }
                 }
 
                 SidebarButton {
                     icon.name: "media-playback-start"
-                    active: zynthian.bottomBarControlType === "bottombar-controltype-part" &&
-                             (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.playable
+                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-part" &&
+                             (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable
 
                     onClicked: {
                         console.log("Starting Part")
-                        zynthian.bottomBarControlObj.play();
+                        zynqtgui.bottomBarControlObj.play();
                     }
                 }
 
                 SidebarButton {
                     icon.name: "media-playback-stop"
-                    active: zynthian.bottomBarControlType === "bottombar-controltype-part" &&
-                             (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.playable
+                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-part" &&
+                             (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable
 
                     onClicked: {
                         console.log("Stopping Part")
-                        zynthian.bottomBarControlObj.stop();
+                        zynqtgui.bottomBarControlObj.stop();
                     }
                 }
 
     //            SidebarButton {
     //                icon.name: "media-record-symbolic"
     //                icon.color: "#f44336"
-    //                active: (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.recordable && !zynthian.bottomBarControlObj.path
-    //                enabled: !zynthian.sketchpad.isRecording
+    //                active: (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.recordable && !zynqtgui.bottomBarControlObj.path
+    //                enabled: !zynqtgui.sketchpad.isRecording
 
     //                onClicked: {
-    //                    zynthian.bottomBarControlObj.queueRecording();
+    //                    zynqtgui.bottomBarControlObj.queueRecording();
     //                }
     //            }
             }
@@ -278,20 +278,20 @@ Rectangle {
                 visibleFocusRects: false
 
                 initialHeaderItem: RowLayout {
-                    visible: zynthian.bottomBarControlType === "bottombar-controltype-channel"
+                    visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                     EditableHeader {
                         id: tabbedViewHeader
-                        controlObj: zynthian.bottomBarControlObj
-                        controlType: zynthian.bottomBarControlType
+                        controlObj: zynqtgui.bottomBarControlObj
+                        controlType: zynqtgui.bottomBarControlType
                         Binding {
                             target: tabbedViewHeader
                             property: "text"
                             delayed: true
                             value: {
-                                let text = zynthian.bottomBarControlObj ? zynthian.bottomBarControlObj.name : "";
-                                switch (zynthian.bottomBarControlType) {
+                                let text = zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.name : "";
+                                switch (zynqtgui.bottomBarControlType) {
                                 case "bottombar-controltype-song":
-                                    return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynthian.bottomBarControlObj.sketchpadFolderName).arg(text);
+                                    return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
                                 case "bottombar-controltype-clip":
                                 case "bottombar-controltype-pattern":
                                     return qsTr("CLIP: %1").arg(text);
@@ -300,7 +300,7 @@ Rectangle {
                                 case "bottombar-controltype-part":
                                     return qsTr("PART: %1").arg(text);
         //                        case "bottombar-controltype-pattern":
-        //                            return qsTr("PATTERN: %1").arg(zynthian.bottomBarControlObj.col+1);
+        //                            return qsTr("PATTERN: %1").arg(zynqtgui.bottomBarControlObj.col+1);
                                 default:
                                     return text;
                                 }
@@ -312,38 +312,38 @@ Rectangle {
                     }
                 }
                 finalHeaderItem: RowLayout {
-                    visible: zynthian.bottomBarControlType === "bottombar-controltype-channel"
+                    visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                     Item {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                     }
     //                QQC2.Label {
-    //                    visible: zynthian.bottomBarControlObj.connectedPattern >= 0
-    //                    property QtObject sequence: zynthian.bottomBarControlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
-    //                    property QtObject pattern: sequence ? sequence.getByPart(zynthian.bottomBarControlObj.id, zynthian.bottomBarControlObj.selectedPart) : null
-    //                    text: qsTr("Pattern %1").arg(zynthian.bottomBarControlObj.connectedPattern+1)
+    //                    visible: zynqtgui.bottomBarControlObj.connectedPattern >= 0
+    //                    property QtObject sequence: zynqtgui.bottomBarControlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+    //                    property QtObject pattern: sequence ? sequence.getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart) : null
+    //                    text: qsTr("Pattern %1").arg(zynqtgui.bottomBarControlObj.connectedPattern+1)
     //                }
                     QQC2.Button {
-                        visible: zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.connectedPattern < 0
+                        visible: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.connectedPattern < 0
                         Layout.fillHeight: true
 
                         text: qsTr("Midi")
                         //enabled: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
 
                         onClicked: {
-                            zynthian.session_dashboard.midiSelectionRequested();
+                            zynqtgui.session_dashboard.midiSelectionRequested();
                         }
                     }
     //                SidebarButton {
     //                    icon.name: "edit-clear-all"
-    //                    active: (zynthian.bottomBarControlObj != null) && zynthian.bottomBarControlObj.clearable
-    //                    enabled: zynthian.bottomBarControlObj ? !zynthian.bottomBarControlObj.isPlaying : false
+    //                    active: (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.clearable
+    //                    enabled: zynqtgui.bottomBarControlObj ? !zynqtgui.bottomBarControlObj.isPlaying : false
 
     //                    onClicked: {
-    //                        zynthian.bottomBarControlObj.clear()
+    //                        zynqtgui.bottomBarControlObj.clear()
 
-    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(zynthian.bottomBarControlObj.id, zynthian.bottomBarControlObj.selectedPart);
+    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart);
     //                        seq.enabled = false;
-    //                        zynthian.bottomBarControlObj.connectedPattern = -1;
+    //                        zynqtgui.bottomBarControlObj.connectedPattern = -1;
     //                    }
     //                }
 
@@ -351,9 +351,9 @@ Rectangle {
 //                        target: channelAudioTypeDropdown
 //                        property: "currentIndex"
 //                        delayed: true
-//                        value: zynthian.bottomBarControlObj &&
-//                               zynthian.bottomBarControlObj.channelAudioType
-//                                 ? channelAudioTypeDropdown.findCurrentIndex(zynthian.bottomBarControlObj.channelAudioType)
+//                        value: zynqtgui.bottomBarControlObj &&
+//                               zynqtgui.bottomBarControlObj.channelAudioType
+//                                 ? channelAudioTypeDropdown.findCurrentIndex(zynqtgui.bottomBarControlObj.channelAudioType)
 //                                 : -1
 //                    }
 
@@ -381,19 +381,19 @@ Rectangle {
 //                        textRole: "text"
 //                        currentIndex:  -1
 //                        onActivated: {
-//                            zynthian.bottomBarControlObj.channelAudioType = channelAudioTypeDropdown.model.get(index).value;
+//                            zynqtgui.bottomBarControlObj.channelAudioType = channelAudioTypeDropdown.model.get(index).value;
 //                        }
 //                    }
                 }
 
                 initialAction: {
-                    switch (zynthian.bottomBarControlType) {
+                    switch (zynqtgui.bottomBarControlType) {
                     case "bottombar-controltype-song":
                         return songAction;
                     case "bottombar-controltype-clip":
-                        return zynthian.bottomBarControlObj.hasOwnProperty("path") && zynthian.bottomBarControlObj.path.length > 0 ? clipSettingsAction : recordingAction;
+                        return zynqtgui.bottomBarControlObj.hasOwnProperty("path") && zynqtgui.bottomBarControlObj.path.length > 0 ? clipSettingsAction : recordingAction;
                     case "bottombar-controltype-channel":
-                        if (zynthian.bottomBarControlObj.channelAudioType === "synth")
+                        if (zynqtgui.bottomBarControlObj.channelAudioType === "synth")
                             return channelSoundsAction;
                         else {
                             return sampleSoundsAction;
@@ -402,7 +402,7 @@ Rectangle {
                     case "bottombar-controltype-part":
                         return partAction;
                     case "bottombar-controltype-pattern":
-                        return zynthian.bottomBarControlObj.hasOwnProperty("path") && zynthian.bottomBarControlObj.path.length > 0 ? clipSettingsAction : patternAction;
+                        return zynqtgui.bottomBarControlObj.hasOwnProperty("path") && zynqtgui.bottomBarControlObj.path.length > 0 ? clipSettingsAction : patternAction;
                     default:
                         return clipSettingsAction;
                     }
@@ -416,7 +416,7 @@ Rectangle {
                         text: qsTr("Song")
                         page: Qt.resolvedUrl("SongBar.qml")
                         preload: true
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-song"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-song"
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -424,7 +424,7 @@ Rectangle {
                         text: qsTr("Clip")
                         page: Qt.resolvedUrl("PartBar.qml")
                         preload: true
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-part"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-part"
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -432,14 +432,14 @@ Rectangle {
                         text: qsTr("Audio")
                         page: Qt.resolvedUrl("RecordingBar.qml")
                         preload: true
-                        visible: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") && zynthian.bottomBarControlObj.recordable && !zynthian.bottomBarControlObj.path
+                        visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && zynqtgui.bottomBarControlObj.recordable && !zynqtgui.bottomBarControlObj.path
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
                         text: qsTr("Clip Info")
                         page: Qt.resolvedUrl("ClipInfoBar.qml")
                         preload: true
-                        visible: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") && zynthian.bottomBarControlObj.path !== undefined && zynthian.bottomBarControlObj.path.length > 0
+                        visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && zynqtgui.bottomBarControlObj.path !== undefined && zynqtgui.bottomBarControlObj.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -447,7 +447,7 @@ Rectangle {
                         text: qsTr("Clip Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
                         preload: true
-                        visible: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") && zynthian.bottomBarControlObj.path !== undefined && zynthian.bottomBarControlObj.path.length > 0
+                        visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && zynqtgui.bottomBarControlObj.path !== undefined && zynqtgui.bottomBarControlObj.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -455,7 +455,7 @@ Rectangle {
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
                         preload: true
-                        visible: (zynthian.bottomBarControlType === "bottombar-controltype-clip" || zynthian.bottomBarControlType === "bottombar-controltype-pattern") && zynthian.bottomBarControlObj.path !== undefined && zynthian.bottomBarControlObj.path.length > 0
+                        visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && zynqtgui.bottomBarControlObj.path !== undefined && zynqtgui.bottomBarControlObj.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -463,7 +463,7 @@ Rectangle {
                         text: qsTr("Pattern")
                         page: Qt.resolvedUrl("PatternBar.qml")
                         preload: true
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-pattern"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -471,7 +471,7 @@ Rectangle {
                         text: qsTr("Channel")
                         page: Qt.resolvedUrl("ChannelBar.qml")
                         preload: true
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-channel"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -479,7 +479,7 @@ Rectangle {
                         text: qsTr("Sounds")
                         page: Qt.resolvedUrl("../SessionDashboard/ChannelsViewSoundsBar.qml")
                         preload: true
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-channel"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -487,37 +487,37 @@ Rectangle {
                         text: qsTr("Samples")
                         page: Qt.resolvedUrl("SamplesBar.qml")
                         preload: true
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-channel"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                         initialProperties: {"bottomBar": root}
                     },
-                    // Duplicate tab instance but for different placement and zynthian.bottomBarControlObj for channel
+                    // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel
                     Zynthian.TabbedControlViewAction {
                         id: channelclipSettingsAction
 
-                        property QtObject clip: zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.samples ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow] : null
+                        property QtObject clip: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.samples ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] : null
 
                         text: qsTr("Smp. Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-channel" &&
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel" &&
                                  clip && clip.path && clip.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
-                    // Duplicate tab instance but for different placement and zynthian.bottomBarControlObj for channel
+                    // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel
                     Zynthian.TabbedControlViewAction {
                         id: channelWaveEditorAction
 
-                        property QtObject clip: zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.samples ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow] : null
+                        property QtObject clip: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.samples ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] : null
 
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-channel" &&
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel" &&
                                  clip && clip.path && clip.path.length > 0
                         initialProperties: {"bottomBar": root}
                     }
                    /* Zynthian.TabbedControlViewAction {
                         text: qsTr("FX")
                         page: Qt.resolvedUrl("FXBar.qml")
-                        visible: zynthian.bottomBarControlType === "bottombar-controltype-channel"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                         initialProperties: {"bottomBar": root}
                     },*/
                 ]
@@ -534,13 +534,13 @@ Rectangle {
         x: parent.x
         y: parent.y
 
-        headerText: qsTr("%1 : Pick an audio file").arg(zynthian.bottomBarControlObj ? zynthian.bottomBarControlObj.channelName : "")
-        rootFolder: "/zynthian/zynthian-my-data"
+        headerText: qsTr("%1 : Pick an audio file").arg(zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.channelName : "")
+        rootFolder: "/zynqtgui/zynqtgui-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            zynthian.bottomBarControlObj.path = file.filePath
+            zynqtgui.bottomBarControlObj.path = file.filePath
         }
     }
 }

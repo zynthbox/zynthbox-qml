@@ -13,7 +13,7 @@ ColumnLayout {
     id: root
     property QtObject channel
     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
-    property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
+    property QtObject sequence: zynqtgui.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
     property QtObject selectedComponent
@@ -30,7 +30,7 @@ ColumnLayout {
             id: partDelegate
             property int partIndex: index
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
-            property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
 
             Layout.fillWidth: true
@@ -39,7 +39,7 @@ ColumnLayout {
             border{
                 color: Kirigami.Theme.highlightColor
                 width: root.songMode
-                        ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
+                        ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
                             ? 1
                             : 0
                         : partDelegate.clip && partDelegate.clip.inCurrentScene
@@ -109,7 +109,7 @@ ColumnLayout {
                 anchors.fill: parent
                 onClicked: {
                     if (root.songMode) {
-                        zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
                     } else {
                         partDelegate.clip.enabled = !partDelegate.clip.enabled;
                         root.channel.selectedPart = index;
@@ -128,8 +128,8 @@ ColumnLayout {
                     root.channel.selectedSlotRow = index;
 
                     if (!root.songMode) {
-                        zynthian.bottomBarControlType = "bottombar-controltype-pattern";
-                        zynthian.bottomBarControlObj = root.channel.sceneClip;
+                        zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+                        zynqtgui.bottomBarControlObj = root.channel.sceneClip;
                         bottomStack.slotsBar.bottomBarButton.checked = true;
 
                         if (root.channel.channelAudioType === "sample-loop") {

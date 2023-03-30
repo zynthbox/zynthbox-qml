@@ -163,15 +163,15 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
             metadata = {}
-            if i in self.zyngui.screens['layer'].layer_midi_map:
-                layer = self.zyngui.screens['layer'].layer_midi_map[i]
+            if i in self.zynqtgui.screens['layer'].layer_midi_map:
+                layer = self.zynqtgui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
                     self.list_data.append((str(i+1),i,"{}".format(layer.engine.name.replace("Jalv/", ""))))
                 else:
                     self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
                 effects_label = ""
                 first = True
-                for sl in self.zyngui.screens['layer'].get_fxchain_layers(layer):
+                for sl in self.zynqtgui.screens['layer'].get_fxchain_layers(layer):
                     sl0 = None
                     bullet = ""
                     if sl.is_parallel_audio_routed(sl0):
@@ -183,7 +183,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     first = False
                     sl0 = sl
                 first = True
-                for sl in self.zyngui.screens['layer'].get_midichain_layers(layer):
+                for sl in self.zynqtgui.screens['layer'].get_midichain_layers(layer):
                     sl0 = None
                     bullet = ""
                     if sl.is_parallel_midi_routed(sl0):
@@ -200,10 +200,10 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                 metadata["effects_label"] = ""
 
             if i < 15:
-                metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
+                metadata["midi_cloned"] = self.zynqtgui.screens['layer'].is_midi_cloned(i, i+1)
                 metadata["midi_cloned_to"] = []
                 for j in range(15):
-                    if i != j and self.zyngui.screens['layer'].is_midi_cloned(i, j):
+                    if i != j and self.zynqtgui.screens['layer'].is_midi_cloned(i, j):
                         metadata["midi_cloned_to"].append(j)
             else:
                 metadata["midi_cloned"] = False
@@ -219,14 +219,14 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()
-        self.zyngui.screens['layers_for_channel'].fill_list()
+        self.zynqtgui.screens['layers_for_channel'].fill_list()
         self.__mixer_timer.start()
         super().fill_list()
 
     def update_mixers(self):
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
-            if i in self.zyngui.screens['layer'].layer_midi_map:
-                layer = self.zyngui.screens['layer'].layer_midi_map[i]
+            if i in self.zynqtgui.screens['layer'].layer_midi_map:
+                layer = self.zynqtgui.screens['layer'].layer_midi_map[i]
                 # Find volume control as per self.__engine_config__
                 for name in layer.controllers_dict:
                     ctrl = None
@@ -267,7 +267,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         if i < 0 or i >= len(self.list_data):
             return
 
-        self.zyngui.screens['bank'].set_show_top_sounds(False)
+        self.zynqtgui.screens['bank'].set_show_top_sounds(False)
 
         self.select(i)
 
@@ -278,13 +278,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         if chan < 0:
             return
 
-        if chan in self.zyngui.screens['layer'].layer_midi_map:
-            self.zyngui.screens['layer'].current_index = self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[chan])
+        if chan in self.zynqtgui.screens['layer'].layer_midi_map:
+            self.zynqtgui.screens['layer'].current_index = self.zynqtgui.screens['layer'].root_layers.index(self.zynqtgui.screens['layer'].layer_midi_map[chan])
 
-        self.zyngui.screens['layer'].activate_midichan_layer(chan)
+        self.zynqtgui.screens['layer'].activate_midichan_layer(chan)
 
-        if t=='B' and chan in self.zyngui.screens['layer'].layer_midi_map:
-            self.zyngui.screens['layer'].layer_options()
+        if t=='B' and chan in self.zynqtgui.screens['layer'].layer_midi_map:
+            self.zynqtgui.screens['layer'].layer_options()
 
         self.fill_list()
 
@@ -333,8 +333,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     def sync_index_from_curlayer(self):
         midi_chan = -1
-        if self.zyngui.curlayer:
-            midi_chan = self.zyngui.curlayer.midi_chan
+        if self.zynqtgui.curlayer:
+            midi_chan = self.zynqtgui.curlayer.midi_chan
         else:
             midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
 
@@ -355,12 +355,12 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     @Slot(None)
     def ask_clear_visible_range(self):
-        self.zyngui.show_confirm("Do you really want to remove all sounds?", self.clear_visible_range)
+        self.zynqtgui.show_confirm("Do you really want to remove all sounds?", self.clear_visible_range)
 
     def clear_visible_range(self, params=None):
         for chan in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1):
-            self.zyngui.screens['layer'].remove_midichan_layer(chan)
-        self.zyngui.screens['layer'].reset_channel_status_range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1)
+            self.zynqtgui.screens['layer'].remove_midichan_layer(chan)
+        self.zynqtgui.screens['layer'].reset_channel_status_range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1)
 
     @Slot(int, result=bool)
     def index_is_valid(self, index):
@@ -371,7 +371,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         if midi_chan < 0:
             return False
 
-        return midi_chan in self.zyngui.screens['layer'].layer_midi_map
+        return midi_chan in self.zynqtgui.screens['layer'].layer_midi_map
 
     @Signal
     def current_index_valid_changed(self):
@@ -391,13 +391,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         layer_name = "T-RACK: "
         found = False
         for chan in range(5, 10):
-            if chan in self.zyngui.screens['layer'].layer_midi_map:
+            if chan in self.zynqtgui.screens['layer'].layer_midi_map:
                 if found:
-                    layer_name += ", {}".format(self.zyngui.screens['layer'].layer_midi_map[chan].preset_name)
+                    layer_name += ", {}".format(self.zynqtgui.screens['layer'].layer_midi_map[chan].preset_name)
                 else:
-                    layer_name += "{}".format(self.zyngui.screens['layer'].layer_midi_map[chan].preset_name)
+                    layer_name += "{}".format(self.zynqtgui.screens['layer'].layer_midi_map[chan].preset_name)
                     found = True
-                #layer_name += self.zyngui.screens['layer'].layer_midi_map[chan].preset_name
+                #layer_name += self.zynqtgui.screens['layer'].layer_midi_map[chan].preset_name
         if not found:
             layer_name += "None"
         return layer_name

@@ -61,7 +61,7 @@ Item {
                 var device = devices[i];
                 if (device.connected) {
                     _private.connectedDevice = device;
-                    zynthian.bluetooth_config.connectBluetoothPorts();
+                    zynqtgui.bluetooth_config.connectBluetoothPorts();
                     break;
                 }
             }
@@ -113,7 +113,7 @@ Item {
                     onConnectedChanged: {
                         if (btDeviceDelegate.device.connected) {
                             _private.connectedDevice = btDeviceDelegate.device;
-                            zynthian.bluetooth_config.connectBluetoothPorts();
+                            zynqtgui.bluetooth_config.connectBluetoothPorts();
                         }
                     }
                 }

@@ -184,7 +184,7 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 			if t=='S':
 				self.toggle_playing(fpath)
 			else:
-				self.zyngui.show_confirm("Do you really want to delete '{}'?".format(self.list_data[i][2]), self.delete_confirmed, fpath)
+				self.zynqtgui.show_confirm("Do you really want to delete '{}'?".format(self.list_data[i][2]), self.delete_confirmed, fpath)
 
 
 	def get_next_filenum(self):
@@ -197,7 +197,7 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 
 	def get_new_filename(self):
 		try:
-			parts = self.zyngui.curlayer.get_presetpath().split('#',2)
+			parts = self.zynqtgui.curlayer.get_presetpath().split('#',2)
 			file_name = parts[1].replace("/",";").replace(">",";").replace(" ; ",";")
 		except:
 			file_name = "jack_capture"
@@ -212,7 +212,7 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 			except Exception as e:
 				#logging.error(e)
 				pass
-		self.zyngui.show_modal("audio_recorder")
+		self.zynqtgui.show_modal("audio_recorder")
 
 
 	def start_recording(self):
@@ -230,8 +230,8 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 				self.rec_proc = Popen(("/usr/local/bin/jack_capture", "--daemon", self.get_new_filename()), cwd=capture_dir)				
 			except Exception as e:
 				logging.error("ERROR STARTING AUDIO RECORD: %s" % e)
-				self.zyngui.show_info("ERROR STARTING AUDIO RECORD:\n %s" % e)
-				self.zyngui.hide_info_timer(5000)
+				self.zynqtgui.show_info("ERROR STARTING AUDIO RECORD:\n %s" % e)
+				self.zynqtgui.hide_info_timer(5000)
 
 			self.update_list()
 			return True
@@ -248,8 +248,8 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 				self.rec_proc = None
 			except Exception as e:
 				logging.error("ERROR STOPPING AUDIO RECORD: %s" % e)
-				self.zyngui.show_info("ERROR STOPPING AUDIO RECORD:\n %s" % e)
-				self.zyngui.hide_info_timer(5000)
+				self.zynqtgui.show_info("ERROR STOPPING AUDIO RECORD:\n %s" % e)
+				self.zynqtgui.hide_info_timer(5000)
 
 			self.update_list()
 			return True
@@ -299,15 +299,15 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 			thread = threading.Thread(target=runInThread, args=(self.end_playing, cmd), daemon=True)
 			thread.start()
 			sleep(0.5)
-			self.zyngui.zynautoconnect_audio()
+			self.zynqtgui.zynautoconnect_audio()
 			self.show_playing_volume()
 			self.send_controller_value(self.volume_zctrl)
 			self.current_playback_fpath=fpath
 
 		except Exception as e:
 			logging.error("ERROR STARTING AUDIO PLAY: %s" % e)
-			self.zyngui.show_info("ERROR STARTING AUDIO PLAY:\n %s" % e)
-			self.zyngui.hide_info_timer(5000)
+			self.zynqtgui.show_info("ERROR STARTING AUDIO PLAY:\n %s" % e)
+			self.zynqtgui.hide_info_timer(5000)
 
 		self.update_list()
 		return True
@@ -336,8 +336,8 @@ class zynthian_gui_audio_recorder(zynthian_gui_selector):
 					sleep(0.1)
 			except Exception as e:
 				logging.error("ERROR STOPPING AUDIO PLAY: %s" % e)
-				self.zyngui.show_info("ERROR STOPPING AUDIO PLAY:\n %s" % e)
-				self.zyngui.hide_info_timer(5000)
+				self.zynqtgui.show_info("ERROR STOPPING AUDIO PLAY:\n %s" % e)
+				self.zynqtgui.hide_info_timer(5000)
 			return True
 
 		else:

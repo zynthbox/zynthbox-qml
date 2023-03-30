@@ -138,12 +138,12 @@ Zynthian.Stack {
         // Cache all the main pages when starting up
         for (var pageIndex in root.pagesToCache) {
             var pageName = root.pagesToCache[pageIndex]
-            zynthian.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)
+            zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)
             root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
         }
 
         // Caching complete. Call stop_splash
-        zynthian.stop_splash();
+        zynqtgui.stop_splash();
     }
 
     background: Rectangle {
@@ -151,16 +151,16 @@ Zynthian.Stack {
     }
 
     Connections {
-        target: zynthian
-        onCurrent_screen_idChanged: handlePageChange(zynthian.current_screen_id)
-        onCurrent_modal_screen_idChanged: handlePageChange(zynthian.current_screen_id)
+        target: zynqtgui
+        onCurrent_screen_idChanged: handlePageChange(zynqtgui.current_screen_id)
+        onCurrent_modal_screen_idChanged: handlePageChange(zynqtgui.current_screen_id)
 
         function handlePageChange(page) {
             if (page != "" && root.currentPage != page) {
                 root.currentPage = page
                 console.log("Changing page to", page)
                 
-                if (zynthian.current_modal_screen_id === "confirm") {
+                if (zynqtgui.current_modal_screen_id === "confirm") {
                     // Confirm page is not a seperate page. Show confirm dialog if confirm page is requested
                     applicationWindow().showConfirmationDialog()
                 } else {

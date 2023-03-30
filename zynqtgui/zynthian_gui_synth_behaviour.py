@@ -52,7 +52,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
         self.child_pid = None
         self.last_action = None
 
-        if self.zyngui.allow_headphones():
+        if self.zynqtgui.allow_headphones():
             self.default_rbpi_headphones()
 
         self.default_vncserver()
@@ -60,7 +60,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
 
-        if self.zyngui.allow_headphones():
+        if self.zynqtgui.allow_headphones():
             if zynthian_gui_config.rbpi_headphones:
                 self.list_data.append(
                     (self.stop_rbpi_headphones, 0, "[x] RBPi Headphones")
@@ -179,13 +179,13 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
         super().set_select_path()
 
     def execute_commands(self):
-        self.zyngui.start_loading()
+        self.zynqtgui.start_loading()
 
         error_counter = 0
         for cmd in self.commands:
             logging.info("Executing Command: %s" % cmd)
-            self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-            self.zyngui.add_info("{}\n".format(cmd))
+            self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+            self.zynqtgui.add_info("{}\n".format(cmd))
             try:
                 self.proc = Popen(
                     cmd,
@@ -194,7 +194,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                     stderr=STDOUT,
                     universal_newlines=True,
                 )
-                self.zyngui.add_info("RESULT:\n", "EMPHASIS")
+                self.zynqtgui.add_info("RESULT:\n", "EMPHASIS")
                 for line in self.proc.stdout:
                     if re.search("ERROR", line, re.IGNORECASE):
                         error_counter += 1
@@ -204,25 +204,25 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                     else:
                         tag = None
                     logging.info(line.rstrip())
-                    self.zyngui.add_info(line, tag)
-                self.zyngui.add_info("\n")
+                    self.zynqtgui.add_info(line, tag)
+                self.zynqtgui.add_info("\n")
             except Exception as e:
                 logging.error(e)
-                self.zyngui.add_info("ERROR: %s\n" % e, "ERROR")
+                self.zynqtgui.add_info("ERROR: %s\n" % e, "ERROR")
 
         if error_counter > 0:
             logging.info("COMPLETED WITH {} ERRORS!".format(error_counter))
-            self.zyngui.add_info(
+            self.zynqtgui.add_info(
                 "COMPLETED WITH {} ERRORS!".format(error_counter), "WARNING"
             )
         else:
             logging.info("COMPLETED OK!")
-            self.zyngui.add_info("COMPLETED OK!", "SUCCESS")
+            self.zynqtgui.add_info("COMPLETED OK!", "SUCCESS")
 
         self.commands = None
-        self.zyngui.add_info("\n\n")
-        self.zyngui.hide_info_timer(5000)
-        self.zyngui.stop_loading()
+        self.zynqtgui.add_info("\n\n")
+        self.zynqtgui.hide_info_timer(5000)
+        self.zynqtgui.stop_loading()
 
     def start_command(self, cmds):
         if not self.commands:
@@ -233,32 +233,32 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
             self.thread.start()
 
     def killable_execute_commands(self):
-        # self.zyngui.start_loading()
+        # self.zynqtgui.start_loading()
         for cmd in self.commands:
             logging.info("Executing Command: %s" % cmd)
-            self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-            self.zyngui.add_info("{}\n".format(cmd))
+            self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+            self.zynqtgui.add_info("{}\n".format(cmd))
             try:
                 proc = Popen(cmd.split(" "), stdout=PIPE, stderr=PIPE)
                 self.child_pid = proc.pid
-                self.zyngui.add_info("\nPID: %s" % self.child_pid)
+                self.zynqtgui.add_info("\nPID: %s" % self.child_pid)
                 (output, error) = proc.communicate()
                 self.child_pid = None
                 if error:
                     result = "ERROR: %s" % error
                     logging.error(result)
-                    self.zyngui.add_info(result, "ERROR")
+                    self.zynqtgui.add_info(result, "ERROR")
                 if output:
                     logging.info(output)
-                    self.zyngui.add_info(output)
+                    self.zynqtgui.add_info(output)
             except Exception as e:
                 result = "ERROR: %s" % e
                 logging.error(result)
-                self.zyngui.add_info(result, "ERROR")
+                self.zynqtgui.add_info(result, "ERROR")
 
         self.commands = None
-        self.zyngui.hide_info_timer(5000)
-        # self.zyngui.stop_loading()
+        self.zynqtgui.hide_info_timer(5000)
+        # self.zynqtgui.stop_loading()
 
     def killable_start_command(self, cmds):
         if not self.commands:
@@ -276,7 +276,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
             os.kill(self.child_pid, signal.SIGTERM)
             self.child_pid = None
             if self.last_action == self.test_midi:
-                self.zyngui.all_sounds_off()
+                self.zynqtgui.all_sounds_off()
 
     # ------------------------------------------------------------------------------
     # CONFIG OPTIONS
@@ -299,7 +299,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                 )
             # Call autoconnect after a little time
             sleep(0.5)
-            self.zyngui.zynautoconnect_audio()
+            self.zynqtgui.zynautoconnect_audio()
 
         except Exception as e:
             logging.error(e)
@@ -370,7 +370,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
             }
         )
 
-        self.zyngui.zynautoconnect_midi()
+        self.zynqtgui.zynautoconnect_midi()
         self.fill_list()
 
     def toggle_midi_sys(self):
@@ -409,7 +409,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
             }
         )
 
-        self.zyngui.set_active_channel()
+        self.zynqtgui.set_active_channel()
         sleep(0.5)
         self.fill_list()
 
@@ -468,7 +468,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                 )
             # Call autoconnect after a little time
             sleep(0.5)
-            self.zyngui.zynautoconnect_midi()
+            self.zynqtgui.zynautoconnect_midi()
 
         except Exception as e:
             logging.error(e)
@@ -520,7 +520,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                 )
             # Call autoconnect after a little time
             sleep(0.5)
-            self.zyngui.zynautoconnect_midi()
+            self.zynqtgui.zynautoconnect_midi()
 
         except Exception as e:
             logging.error(e)
@@ -571,7 +571,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                 )
             # Call autoconnect after a little time
             sleep(0.5)
-            self.zyngui.zynautoconnect_midi()
+            self.zynqtgui.zynautoconnect_midi()
 
         except Exception as e:
             logging.error(e)
@@ -621,7 +621,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
                 )
             # Call autoconnect after a little time
             sleep(0.5)
-            self.zyngui.zynautoconnect()
+            self.zynqtgui.zynautoconnect()
 
         except Exception as e:
             logging.error(e)
@@ -657,7 +657,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
 
     def midi_profile(self):
         logging.info("MIDI Profile")
-        self.zyngui.show_modal("midi_profile")
+        self.zynqtgui.show_modal("midi_profile")
 
     # ------------------------------------------------------------------------------
     # NETWORK FEATURES
@@ -667,9 +667,9 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
         logging.info("STARTING VNC SERVICES")
 
         # Save state and stop engines
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-            self.zyngui.screens["layer"].reset()
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
+            self.zynqtgui.screens["layer"].reset()
             restore_state = True
         else:
             restore_state = False
@@ -694,7 +694,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
 
         # Restore state
         if restore_state:
-            self.zyngui.screens["snapshot"].load_last_state_snapshot(True)
+            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
 
         self.fill_list()
 
@@ -702,9 +702,9 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
         logging.info("STOPPING VNC SERVICES")
 
         # Save state and stop engines
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-            self.zyngui.screens["layer"].reset()
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
+            self.zynqtgui.screens["layer"].reset()
             restore_state = True
         else:
             restore_state = False
@@ -728,7 +728,7 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
 
         # Restore state
         if restore_state:
-            self.zyngui.screens["snapshot"].load_last_state_snapshot(True)
+            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
 
         self.fill_list()
 

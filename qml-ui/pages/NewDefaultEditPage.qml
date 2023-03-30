@@ -39,19 +39,19 @@ RowLayout {
     property var cuiaCallback: function(cuia) {
         switch (cuia) {
             case "SELECT_UP":
-                zynthian.control.selectPrevPage()
+                zynqtgui.control.selectPrevPage()
                 return true
 
             case "SELECT_DOWN":
-                zynthian.control.selectNextPage()
+                zynqtgui.control.selectNextPage()
                 return true
 
             case "NAVIGATE_LEFT":
-                zynthian.control.selectPrevColumn()
+                zynqtgui.control.selectPrevColumn()
                 return true
 
             case "NAVIGATE_RIGHT":
-                zynthian.control.selectNextColumn()
+                zynqtgui.control.selectNextColumn()
                 return true
         }
 
@@ -70,12 +70,12 @@ RowLayout {
         ListView {
             id: pageSelectorListview
             anchors.fill: parent
-            model: zynthian.current_screen_id === "control"
+            model: zynqtgui.current_screen_id === "control"
                    && root.selectedChannel.channelHasSynth
-                    ? zynthian.control.totalPages
+                    ? zynqtgui.control.totalPages
                     : 0
             clip: true
-            currentIndex: zynthian.control.selectedPage
+            currentIndex: zynqtgui.control.selectedPage
             highlightFollowsCurrentItem: true
             QQC2.ScrollBar.vertical: QQC2.ScrollBar {
                 width: Kirigami.Units.gridUnit * 0.3
@@ -93,7 +93,7 @@ RowLayout {
                 height: ListView.view.height / 6
                 color: "transparent"
                 border.color: "#88ffffff"
-                border.width: zynthian.control.selectedPage === index ? 2 : 0
+                border.width: zynqtgui.control.selectedPage === index ? 2 : 0
                 radius: 2
 
                 QQC2.Label {
@@ -113,7 +113,7 @@ RowLayout {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        zynthian.control.selectedPage = index
+                        zynqtgui.control.selectedPage = index
                     }
                 }
             }
@@ -132,7 +132,7 @@ RowLayout {
 
             color: "transparent"
             border.color: "#88ffffff"
-            border.width: root.selectedChannel.channelHasSynth && (zynthian.control.selectedColumn % 4) === index ? 2 : 0
+            border.width: root.selectedChannel.channelHasSynth && (zynqtgui.control.selectedColumn % 4) === index ? 2 : 0
 
             ColumnLayout {
                 anchors.fill: parent
@@ -144,16 +144,16 @@ RowLayout {
                     delegate: Item {
                         id: controlDelegate
 
-                        property int allControlsIndex: zynthian.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
+                        property int allControlsIndex: zynqtgui.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
                         property var control: null
 
                         function updateControl() {
                             controlDelegate.control = Qt.binding(function() {
                                 // Do not use all_controls property here in js as it will slow things down if array is large enough
                                 // Instead fetch the required controls as required
-                                return zynthian.current_screen_id === "control"
+                                return zynqtgui.current_screen_id === "control"
                                        && root.selectedChannel.channelHasSynth
-                                        ? zynthian.control.getAllControlAt(controlDelegate.allControlsIndex)
+                                        ? zynqtgui.control.getAllControlAt(controlDelegate.allControlsIndex)
                                         : null
                             })
                         }
@@ -163,7 +163,7 @@ RowLayout {
                         Component.onCompleted: controlDelegate.updateControl()
 
                         Connections {
-                            target: zynthian.control
+                            target: zynqtgui.control
                             onAll_controlsChanged: controlDelegate.updateControl()
                         }
 

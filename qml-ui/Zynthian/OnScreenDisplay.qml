@@ -55,7 +55,7 @@ Zynthian.Popup {
         }
     }
     Connections {
-        target: zynthian.osd
+        target: zynqtgui.osd
         onUpdate: {
             if (!hideTimer.isHeld) {
                 hideTimer.restart();
@@ -64,7 +64,7 @@ Zynthian.Popup {
         }
     }
 
-    readonly property bool invertedScale: zynthian.osd.start > zynthian.osd.stop
+    readonly property bool invertedScale: zynqtgui.osd.start > zynqtgui.osd.stop
     Item {
         implicitWidth: Kirigami.Units.gridUnit * 20
         implicitHeight: Kirigami.Units.gridUnit * 10
@@ -83,7 +83,7 @@ Zynthian.Popup {
                 Layout.fillHeight: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                text: zynthian.osd.description
+                text: zynqtgui.osd.description
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -97,20 +97,20 @@ Zynthian.Popup {
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                         }
                         QQC2.Label {
-                            text: zynthian.osd.startLabel === "" ? zynthian.osd.start : zynthian.osd.startLabel
+                            text: zynqtgui.osd.startLabel === "" ? zynqtgui.osd.start : zynqtgui.osd.startLabel
                         }
                         Item {
                             Layout.fillWidth: true
                         }
                         QQC2.Label {
-                            visible: zynthian.osd.showValueLabel
-                            text: zynthian.osd.valueLabel
+                            visible: zynqtgui.osd.showValueLabel
+                            text: zynqtgui.osd.valueLabel
                         }
                         Item {
                             Layout.fillWidth: true
                         }
                         QQC2.Label {
-                            text: zynthian.osd.stopLabel === "" ? zynthian.osd.stop : zynthian.osd.stopLabel
+                            text: zynqtgui.osd.stopLabel === "" ? zynqtgui.osd.stop : zynqtgui.osd.stopLabel
                         }
                         Item {
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
@@ -124,9 +124,9 @@ Zynthian.Popup {
                             icon.name: "arrow-left"
                             onPressed: hideTimer.pressed();
                             onReleased: hideTimer.released();
-                            enabled: component.invertedScale ? zynthian.osd.value < zynthian.osd.start : zynthian.osd.value > zynthian.osd.start
+                            enabled: component.invertedScale ? zynqtgui.osd.value < zynqtgui.osd.start : zynqtgui.osd.value > zynqtgui.osd.start
                             onClicked: {
-                                zynthian.osd.setValue(zynthian.osd.name, component.invertedScale ? zynthian.osd.value + zynthian.osd.step : zynthian.osd.value - zynthian.osd.step);
+                                zynqtgui.osd.setValue(zynqtgui.osd.name, component.invertedScale ? zynqtgui.osd.value + zynqtgui.osd.step : zynqtgui.osd.value - zynqtgui.osd.step);
                             }
                         }
                         Item {
@@ -145,7 +145,7 @@ Zynthian.Popup {
                                         property var currentValue: undefined
                                         onPressedChanged: {
                                             if (pressed) {
-                                                currentValue = zynthian.osd.value;
+                                                currentValue = zynqtgui.osd.value;
                                                 hideTimer.pressed();
                                             } else {
                                                 currentValue = undefined;
@@ -154,11 +154,11 @@ Zynthian.Popup {
                                         }
                                         onXChanged: {
                                             if (pressed && currentValue !== undefined) {
-                                                var delta = (zynthian.osd.stop - zynthian.osd.start) * ((slidePoint.x - slidePoint.startX) / sliderItem.width);
+                                                var delta = (zynqtgui.osd.stop - zynqtgui.osd.start) * ((slidePoint.x - slidePoint.startX) / sliderItem.width);
                                                 if (component.invertedScale) {
-                                                    zynthian.osd.setValue(zynthian.osd.name, Math.min(Math.max(currentValue + delta, zynthian.osd.stop), zynthian.osd.start));
+                                                    zynqtgui.osd.setValue(zynqtgui.osd.name, Math.min(Math.max(currentValue + delta, zynqtgui.osd.stop), zynqtgui.osd.start));
                                                 } else {
-                                                    zynthian.osd.setValue(zynthian.osd.name, Math.min(Math.max(currentValue + delta, zynthian.osd.start), zynthian.osd.stop));
+                                                    zynqtgui.osd.setValue(zynqtgui.osd.name, Math.min(Math.max(currentValue + delta, zynqtgui.osd.start), zynqtgui.osd.stop));
                                                 }
                                             }
                                         }
@@ -182,7 +182,7 @@ Zynthian.Popup {
                                     leftMargin: (height / 2) + 4
                                     rightMargin: (height / 2) + 3 // This is uneven, but otherwise the visual ends up weird
                                 }
-                                property double zeroOffset: (zynthian.osd.visualZero - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start)
+                                property double zeroOffset: (zynqtgui.osd.visualZero - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)
                                 Rectangle {
                                     anchors {
                                         left: parent.left
@@ -191,7 +191,7 @@ Zynthian.Popup {
                                         bottom: parent.bottom
                                     }
                                     color: Kirigami.Theme.textColor
-                                    width: (component.invertedScale ? zynthian.osd.value < zynthian.osd.visualZero : zynthian.osd.value > zynthian.osd.visualZero) ? parent.width * ((zynthian.osd.value - zynthian.osd.visualZero) / (zynthian.osd.stop - zynthian.osd.start)) : 0
+                                    width: (component.invertedScale ? zynqtgui.osd.value < zynqtgui.osd.visualZero : zynqtgui.osd.value > zynqtgui.osd.visualZero) ? parent.width * ((zynqtgui.osd.value - zynqtgui.osd.visualZero) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
                                     Rectangle {
                                         anchors {
                                             top: parent.top
@@ -221,7 +221,7 @@ Zynthian.Popup {
                                         bottom: parent.bottom
                                     }
                                     color: Kirigami.Theme.textColor
-                                    width: (component.invertedScale ? zynthian.osd.value > zynthian.osd.visualZero : zynthian.osd.value < zynthian.osd.visualZero) ? (parent.width * barContainer.zeroOffset) - parent.width * ((zynthian.osd.value - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start)) : 0
+                                    width: (component.invertedScale ? zynqtgui.osd.value > zynqtgui.osd.visualZero : zynqtgui.osd.value < zynqtgui.osd.visualZero) ? (parent.width * barContainer.zeroOffset) - parent.width * ((zynqtgui.osd.value - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start)) : 0
                                     Rectangle {
                                         anchors {
                                             top: parent.top
@@ -240,9 +240,9 @@ Zynthian.Popup {
                                     bottom: parent.bottom
                                     bottomMargin: -5
                                     left: parent.left
-                                    leftMargin: (parent.width * ((zynthian.osd.defaultValue - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start))) - 3
+                                    leftMargin: (parent.width * ((zynqtgui.osd.defaultValue - zynqtgui.osd.start) / (zynqtgui.osd.stop - zynqtgui.osd.start))) - 3
                                 }
-                                visible: zynthian.osd.showVisualZero
+                                visible: zynqtgui.osd.showVisualZero
                                 width: 5
                                 clip: true
                                 Rectangle {
@@ -262,9 +262,9 @@ Zynthian.Popup {
                             icon.name: "arrow-right"
                             onPressed: hideTimer.pressed();
                             onReleased: hideTimer.released();
-                            enabled: component.invertedScale ? zynthian.osd.value > zynthian.osd.stop : zynthian.osd.value < zynthian.osd.stop
+                            enabled: component.invertedScale ? zynqtgui.osd.value > zynqtgui.osd.stop : zynqtgui.osd.value < zynqtgui.osd.stop
                             onClicked: {
-                                zynthian.osd.setValue(zynthian.osd.name, component.invertedScale ? zynthian.osd.value - zynthian.osd.step : zynthian.osd.value + zynthian.osd.step);
+                                zynqtgui.osd.setValue(zynqtgui.osd.name, component.invertedScale ? zynqtgui.osd.value - zynqtgui.osd.step : zynqtgui.osd.value + zynqtgui.osd.step);
                             }
                         }
                     }
@@ -277,13 +277,13 @@ Zynthian.Popup {
                     Layout.fillWidth: true
                 }
                 QQC2.Button {
-                    visible: zynthian.osd.showResetToDefault
+                    visible: zynqtgui.osd.showResetToDefault
                     text: qsTr("Reset to default")
                     onPressed: hideTimer.pressed();
                     onReleased: hideTimer.released();
-                    enabled: zynthian.osd.value !== zynthian.osd.defaultValue
+                    enabled: zynqtgui.osd.value !== zynqtgui.osd.defaultValue
                     onClicked: {
-                        zynthian.osd.setValue(zynthian.osd.name, zynthian.osd.defaultValue);
+                        zynqtgui.osd.setValue(zynqtgui.osd.name, zynqtgui.osd.defaultValue);
                     }
                 }
                 Item {

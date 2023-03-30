@@ -70,7 +70,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 
 	def get_new_snapshot(self):
-		parts = self.zyngui.screens['layer'].layers[0].get_presetpath().split('#',2)
+		parts = self.zynqtgui.screens['layer'].layers[0].get_presetpath().split('#',2)
 		name = parts[1].replace("/",";").replace(">",";").replace(" ; ",";")
 		return self.get_next_name() + '-' + name + '.zss'
 
@@ -199,7 +199,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 
 	def show(self):
-		if not self.zyngui.curlayer:
+		if not self.zynqtgui.curlayer:
 			self.action="LOAD"
 
 		super().show()
@@ -230,36 +230,36 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 		elif self.action=="LOAD":
 			if fpath:
 				if t=='S':
-					self.zyngui.screens['layer'].load_snapshot(fpath)
-					#self.zyngui.show_screen('control')
+					self.zynqtgui.screens['layer'].load_snapshot(fpath)
+					#self.zynqtgui.show_screen('control')
 				else:
-					self.zyngui.show_confirm("Do you really want to delete '{}'?".format(fname), self.delete_confirmed, fpath)
+					self.zynqtgui.show_confirm("Do you really want to delete '{}'?".format(fname), self.delete_confirmed, fpath)
 		elif self.action=="SAVE":
 			if fpath=='NEW_SNAPSHOT':
 				fpath=self.get_snapshot_fpath(self.get_new_snapshot())
-				self.zyngui.screens['layer'].save_snapshot(fpath)
-				self.zyngui.show_screen("session_dashboard")
+				self.zynqtgui.screens['layer'].save_snapshot(fpath)
+				self.zynqtgui.show_screen("session_dashboard")
 			elif fpath:
 				if isfile(fpath):
-					self.zyngui.show_confirm("Do you really want to overwrite the snapshot %s?" % fname, self.cb_confirm_save_snapshot,[fpath])
+					self.zynqtgui.show_confirm("Do you really want to overwrite the snapshot %s?" % fname, self.cb_confirm_save_snapshot,[fpath])
 				else:
-					self.zyngui.screens['layer'].save_snapshot(fpath)
-					self.zyngui.show_screen("session_dashboard")
+					self.zynqtgui.screens['layer'].save_snapshot(fpath)
+					self.zynqtgui.show_screen("session_dashboard")
 
 
 	def cb_confirm_save_snapshot(self, params):
-		self.zyngui.screens['layer'].save_snapshot(params[0])
-		self.zyngui.show_screen("session_dashboard")
+		self.zynqtgui.screens['layer'].save_snapshot(params[0])
+		self.zynqtgui.show_screen("session_dashboard")
 
 
 	def save_default_snapshot(self):
-		self.zyngui.screens['layer'].save_snapshot(self.default_snapshot_fpath)
+		self.zynqtgui.screens['layer'].save_snapshot(self.default_snapshot_fpath)
 
 
 	def load_default_snapshot(self, quiet=False):
 		if isfile(self.default_snapshot_fpath):
 			self.isLoading += 1
-			result = self.zyngui.screens['layer'].load_snapshot(self.default_snapshot_fpath, quiet)
+			result = self.zynqtgui.screens['layer'].load_snapshot(self.default_snapshot_fpath, quiet)
 			self.isLoading -= 1
 			return result
 
@@ -269,14 +269,14 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 	def schedule_save_last_state_snapshot(self):
 		# HACK to use a timer from another thread
-		if self.isLoading == 0 and not self.zyngui.sketchpad.song.isLoading:
+		if self.isLoading == 0 and not self.zynqtgui.sketchpad.song.isLoading:
 			self.save_last_state_timer_requested.emit()
 		else:
 			logging.info("Not saving snapshot while we're loading")
 
 	def save_last_state_snapshot(self):
-		if self.isLoading == 0 and not self.zyngui.sketchpad.song.isLoading:
-			self.zyngui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)
+		if self.isLoading == 0 and not self.zynqtgui.sketchpad.song.isLoading:
+			self.zynqtgui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)
 		else:
 			logging.info("Not saving snapshot while we're loading")
 
@@ -284,7 +284,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 	def load_last_state_snapshot(self, quiet=False):
 		if isfile(self.last_state_snapshot_fpath):
 			self.isLoading += 1
-			result = self.zyngui.screens['layer'].load_snapshot(self.last_state_snapshot_fpath, quiet)
+			result = self.zynqtgui.screens['layer'].load_snapshot(self.last_state_snapshot_fpath, quiet)
 			self.isLoading -= 1
 			return result
 
@@ -352,8 +352,8 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 		if pn in self.midi_programs:
 			fpath=self.list_data[self.midi_programs[pn]][0]
 			logging.debug("Snapshot Program Change %s: %s" % (pn,fpath))
-			self.zyngui.show_modal("snapshot")
-			self.zyngui.screens['layer'].load_snapshot(fpath)
+			self.zynqtgui.show_modal("snapshot")
+			self.zynqtgui.screens['layer'].load_snapshot(fpath)
 			return True
 		else:
 			return False
@@ -361,7 +361,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 	def midi_program_change_offset(self,offset):
 		try:
-			f=basename(self.zyngui.screens['layer'].last_snapshot_fpath)
+			f=basename(self.zynqtgui.screens['layer'].last_snapshot_fpath)
 			pn=self.get_midi_number(f)+offset
 		except:
 			pn=0

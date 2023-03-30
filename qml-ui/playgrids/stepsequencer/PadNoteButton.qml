@@ -204,7 +204,7 @@ QQC2.Button {
                                     } else {
                                         if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
                                             if (!longPressTimer.pressingAndHolding) {
-                                                if (zynthian.altButtonPressed) {
+                                                if (zynqtgui.altButtonPressed) {
                                                     component.tapped(-1);
                                                 } else {
                                                     component.tapped(index);
@@ -220,7 +220,7 @@ QQC2.Button {
                     }
                     Rectangle {
                         anchors.fill: parent;
-                        color: zynthian.theme_chooser.noteColors[subNote.midiNote]
+                        color: zynqtgui.theme_chooser.noteColors[subNote.midiNote]
                         opacity: 0.3
                     }
                     Rectangle {
@@ -230,7 +230,7 @@ QQC2.Button {
                             bottom: parent.bottom
                         }
                         height: subnoteLayout.maxHalfSubnoteHeight + (subnoteLayout.dividedSubNoteHeight * (subNoteVelocity / 127) * 100)
-                        color: zynthian.theme_chooser.noteColors[subNote.midiNote]
+                        color: zynqtgui.theme_chooser.noteColors[subNote.midiNote]
                     }
                     Rectangle {
                         anchors.fill: parent;

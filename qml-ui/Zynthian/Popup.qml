@@ -33,7 +33,7 @@ QQC2.Popup {
     modal: true
     focus: true
 
-    /** Handle opened changed to push/pop dialog to zynthian dialog stack
+    /** Handle opened changed to push/pop dialog to zynqtgui dialog stack
       * This will allow main program to pass CUIA events to the dialog stack
       *
       * Since this is a signal handler it is okay if one of the derived components
@@ -41,9 +41,9 @@ QQC2.Popup {
       */
     onOpenedChanged: {
         if (root.opened) {
-            zynthian.pushDialog(root)
+            zynqtgui.pushDialog(root)
         } else {
-            zynthian.popDialog(root)
+            zynqtgui.popDialog(root)
         }
     }
 }

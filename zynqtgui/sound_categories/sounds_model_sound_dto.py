@@ -30,13 +30,13 @@ from PySide2.QtCore import Property, QObject, Signal
 
 
 class sounds_model_sound_dto(QObject):
-    def __init__(self, parent, zyngui, name, type, category="0"):
+    def __init__(self, parent, zynqtgui, name, type, category="0"):
         super().__init__(parent)
         self.__sounds_base_path__ = Path('/zynthian/zynthian-my-data/sounds')
         self.__community_sounds_path__ = self.__sounds_base_path__ / 'community-sounds'
         self.__my_sounds_path__ = self.__sounds_base_path__ / 'my-sounds'
 
-        self.zyngui = zyngui
+        self.zynqtgui = zynqtgui
         self.__name__ = name
         self.__type__ = type
 
@@ -93,7 +93,7 @@ class sounds_model_sound_dto(QObject):
                     os.fsync(file.fileno())
 
             # Notify model about updated item
-            self.zyngui.sound_categories.__sounds_model__.emit_category_updated(self)
+            self.zynqtgui.sound_categories.__sounds_model__.emit_category_updated(self)
             self.category_changed.emit()
 
     category_changed = Signal()

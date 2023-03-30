@@ -48,7 +48,7 @@ import os
 from pathlib import Path
 
 from zynqtgui import zynthian_gui_config
-from zynqtgui.zynthian_gui_config import zyngui
+from zynqtgui.zynthian_gui_config import zynqtgui
 
 
 class sketchpad_song(QObject):
@@ -57,7 +57,7 @@ class sketchpad_song(QObject):
     def __init__(self, sketchpad_folder: str, name, parent=None, load_history=True):
         super(sketchpad_song, self).__init__(parent)
 
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
         self.__metronome_manager__ = parent
         self.sketchpad_folder = sketchpad_folder
 
@@ -155,7 +155,7 @@ class sketchpad_song(QObject):
 
     @Slot(None)
     def doUpdateAutoconnectedSounds(self):
-        self.zyngui.zynautoconnect(True)
+        self.zynqtgui.zynautoconnect(True)
 
     def to_be_deleted(self):
         self.__to_be_deleted__ = True
@@ -225,7 +225,7 @@ class sketchpad_song(QObject):
                     soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
                     soundsets_dir.mkdir(parents=True, exist_ok=True)
 
-                    self.__metronome_manager__.zyngui.screens["layer"].save_snapshot(
+                    self.__metronome_manager__.zynqtgui.screens["layer"].save_snapshot(
                         str(soundsets_dir) + "/" + self.__name__ + ".zss")
                 except Exception as e:
                     logging.error(f"Error saving snapshot to sketchpad folder : {str(e)}")
@@ -288,7 +288,7 @@ class sketchpad_song(QObject):
         self.isLoadingChanged.emit()
         filename = self.__name__ + ".sketchpad.json"
 
-        self.zyngui.currentTaskMessage = f"Restoring sketchpad"
+        self.zynqtgui.currentTaskMessage = f"Restoring sketchpad"
 
         try:
             logging.info(f"Restoring {self.sketchpad_folder + filename}, loadHistory({load_history})")
@@ -330,7 +330,7 @@ class sketchpad_song(QObject):
                     self.set_volume(self.__volume__, True)
 
                     # Restore ALSA Mixer volume from sketchpad
-                    # self.__metronome_manager__.zyngui.screens["master_alsa_mixer"].volume = self.__volume__
+                    # self.__metronome_manager__.zynqtgui.screens["master_alsa_mixer"].volume = self.__volume__
                 if "selectedScaleIndex" in sketchpad:
                     self.set_selected_scale_index(sketchpad["selectedScaleIndex"], True)
                 if "octave" in sketchpad:
@@ -546,9 +546,9 @@ class sketchpad_song(QObject):
             self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
 
             libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
-            # Call zyngui global set_selector when bpm changes as bpm is controlled by Big Knob
+            # Call zynqtgui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened
-            self.zyngui.set_selector()
+            self.zynqtgui.set_selector()
 
             self.bpm_changed.emit()
             self.schedule_save()

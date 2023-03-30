@@ -30,7 +30,7 @@ from PySide2.QtCore import QTimer, Slot
 from . import zynthian_qt_gui_base
 
 
-class zynthian_gui_bluetooth_config(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_bluetooth_config(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_bluetooth_config, self).__init__(parent)
         self.zita_j2a_process = None
@@ -70,7 +70,7 @@ class zynthian_gui_bluetooth_config(zynthian_qt_gui_base.ZynGui):
             # If zita-j2a bridge is running do run autoconnect to connect to bluetooth ports
             if self.zita_j2a_process is not None and self.zita_j2a_process.poll() is None:
                 logging.info("Successfully started zita-j2a bridge. Bluetooth device should play audio now")
-                self.zyngui.zynautoconnect()
+                self.zynqtgui.zynautoconnect()
             else:
                 logging.error("Failed to start zita-j2a bridge. Check if bluetooth device is connected")
                 if (self.connection_attempt_count < 5):

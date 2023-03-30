@@ -71,8 +71,8 @@ class zynthian_engine_puredata(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 
 		self.type = "Special"
 		self.name = "PureData"
@@ -127,8 +127,8 @@ class zynthian_engine_puredata(zynthian_engine):
 		self.start()
 		self.refresh_all()
 		sleep(0.5)
-		self.zyngui.zynautoconnect_midi(True)
-		self.zyngui.zynautoconnect_audio(False)
+		self.zynqtgui.zynautoconnect_midi(True)
+		self.zynqtgui.zynautoconnect_audio(False)
 		layer.send_ctrl_midi_cc()
 		return True
 

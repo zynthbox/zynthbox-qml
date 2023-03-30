@@ -81,8 +81,8 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 	# Initialization
 	# ---------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 		self.name = "FluidSynth"
 		self.nickname = "FS"
 		self.jackname = "fluidsynth"
@@ -296,7 +296,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 				i = self.get_free_parts()[0]
 				layer.part_i = i
 				layer.jackname = "{}:((l|r)_{:02d}|fx_(l|r)_({:02d}|{:02d}))".format(self.jackname,i,i*2,i*2+1)
-				self.zyngui.zynautoconnect_audio()
+				self.zynqtgui.zynautoconnect_audio()
 				logging.debug("Add part {} => {}".format(i, layer.jackname))
 			except Exception as e:
 				logging.error("Can't add part! => {}".format(e))

@@ -59,7 +59,7 @@ GridLayout {
 //        Binding {
 //            target: volumeControl.slider
 //            property: "value"
-//            value: zynthian.bottomBarControlObj.volume
+//            value: zynqtgui.bottomBarControlObj.volume
 //        }
 
         VolumeControl {
@@ -69,22 +69,22 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit*2
 
-            headerText: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ||
-                            zynthian.bottomBarControlObj.audioLevel <= -40
+            headerText: zynqtgui.bottomBarControlObj.className && zynqtgui.bottomBarControlObj.className === "sketchpad_channel" ||
+                            zynqtgui.bottomBarControlObj.audioLevel <= -40
                                 ? ""
-                                : zynthian.bottomBarControlObj.audioLevel == null
+                                : zynqtgui.bottomBarControlObj.audioLevel == null
                                     ? ""
-                                    : (zynthian.bottomBarControlObj.audioLevel.toFixed(2) + " (dB)")
-            footerText: zynthian.bottomBarControlObj.name
-            audioLeveldB: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ? zynthian.bottomBarControlObj.audioLevel : -400
+                                    : (zynqtgui.bottomBarControlObj.audioLevel.toFixed(2) + " (dB)")
+            footerText: zynqtgui.bottomBarControlObj.name
+            audioLeveldB: zynqtgui.bottomBarControlObj.className && zynqtgui.bottomBarControlObj.className === "sketchpad_channel" ? zynqtgui.bottomBarControlObj.audioLevel : -400
 
-            slider.value: zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" ? zynthian.bottomBarControlObj.volume : 0
+            slider.value: zynqtgui.bottomBarControlObj.className && zynqtgui.bottomBarControlObj.className === "sketchpad_channel" ? zynqtgui.bottomBarControlObj.volume : 0
             onValueChanged: {
-                zynthian.bottomBarControlObj.volume = slider.value
+                zynqtgui.bottomBarControlObj.volume = slider.value
             }
 
             onDoubleClicked: {
-                slider.value = zynthian.bottomBarControlObj.initialVolume;
+                slider.value = zynqtgui.bottomBarControlObj.initialVolume;
             }
         }
     }
@@ -94,7 +94,7 @@ GridLayout {
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
         // This looks really dumb, but for some reason that i do not fathom, without the literal check on top, we'll be warned that we cannot assign undefined to a bool
-        visible: (zynthian.bottomBarControlObj.className && zynthian.bottomBarControlObj.className === "sketchpad_channel" && !zynthian.bottomBarControlObj.isEmpty()) ? true : false
+        visible: (zynqtgui.bottomBarControlObj.className && zynqtgui.bottomBarControlObj.className === "sketchpad_channel" && !zynqtgui.bottomBarControlObj.isEmpty()) ? true : false
 
         QQC2.Button {
             // As per #299 disable this button
@@ -102,7 +102,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             text: "Channel Editor"
             onClicked: {
-                zynthian.current_modal_screen_id = "channel"
+                zynqtgui.current_modal_screen_id = "channel"
             }
         }
     }
@@ -118,7 +118,7 @@ GridLayout {
             text: qsTr("Copy Channel")
             visible: bottomBar.channelCopySource == null
             onClicked: {
-                bottomBar.channelCopySource = zynthian.bottomBarControlObj;
+                bottomBar.channelCopySource = zynqtgui.bottomBarControlObj;
             }
         }
 
@@ -127,9 +127,9 @@ GridLayout {
 
             text: qsTr("Paste Channel")
             visible: bottomBar.channelCopySource != null
-            enabled: bottomBar.channelCopySource != zynthian.bottomBarControlObj
+            enabled: bottomBar.channelCopySource != zynqtgui.bottomBarControlObj
             onClicked: {
-                zynthian.bottomBarControlObj.copyFrom(bottomBar.channelCopySource);
+                zynqtgui.bottomBarControlObj.copyFrom(bottomBar.channelCopySource);
                 bottomBar.channelCopySource = null;
             }
         }

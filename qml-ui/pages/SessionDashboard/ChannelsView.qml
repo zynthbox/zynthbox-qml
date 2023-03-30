@@ -50,7 +50,7 @@ ColumnLayout {
         leftMargin: Kirigami.Units.gridUnit
     }
 
-    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
     spacing: Kirigami.Units.largeSpacing
 
     function cuiaCallback(cuia) {
@@ -64,16 +64,16 @@ ColumnLayout {
 
         switch (cuia) {
             case "SELECT_UP":
-                if (zynthian.session_dashboard.selectedChannel > 0) {
-                    zynthian.session_dashboard.selectedChannel -= 1
+                if (zynqtgui.session_dashboard.selectedChannel > 0) {
+                    zynqtgui.session_dashboard.selectedChannel -= 1
                     return true;
                 } else {
                     return false;
                 }
 
             case "SELECT_DOWN":
-                if (zynthian.session_dashboard.selectedChannel < 5) {
-                    zynthian.session_dashboard.selectedChannel += 1
+                if (zynqtgui.session_dashboard.selectedChannel < 5) {
+                    zynqtgui.session_dashboard.selectedChannel += 1
                     return true;
                 } else {
                     return false;
@@ -100,7 +100,7 @@ ColumnLayout {
 
                 Repeater {
                     id: channelsRepeater
-                    model: zynthian.sketchpad.song.channelsModel
+                    model: zynqtgui.sketchpad.song.channelsModel
                     delegate: Rectangle {
                         property QtObject channel: model.channel
                         property int channelIndex: index
@@ -113,8 +113,8 @@ ColumnLayout {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        visible: index >= zynthian.session_dashboard.visibleChannelsStart && index <= zynthian.session_dashboard.visibleChannelsEnd
-                        border.width: zynthian.session_dashboard.selectedChannel === channelIndex ? 1 : 0
+                        visible: index >= zynqtgui.session_dashboard.visibleChannelsStart && index <= zynqtgui.session_dashboard.visibleChannelsEnd
+                        border.width: zynqtgui.session_dashboard.selectedChannel === channelIndex ? 1 : 0
                         border.color: Kirigami.Theme.highlightColor
                         color: "transparent"
                         radius: 4
@@ -122,7 +122,7 @@ ColumnLayout {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                zynthian.session_dashboard.selectedChannel = channelIndex;
+                                zynqtgui.session_dashboard.selectedChannel = channelIndex;
                             }
                         }
 
@@ -164,7 +164,7 @@ ColumnLayout {
                                 border.color: "#ff999999"
                                 border.width: 1
                                 radius: 4
-                                opacity: zynthian.session_dashboard.selectedChannel === channelIndex ? 1 : 0.5
+                                opacity: zynqtgui.session_dashboard.selectedChannel === channelIndex ? 1 : 0.5
 
                                 RowLayout {
                                     anchors {
@@ -186,7 +186,7 @@ ColumnLayout {
                                         }
 
                                         Connections {
-                                            target: zynthian.fixed_layers
+                                            target: zynqtgui.fixed_layers
                                             onList_updated: {
                                                 soundLabel.updateSoundName();
                                             }
@@ -207,7 +207,7 @@ ColumnLayout {
                                             for (var id in channelDelegate.channel.chainedSounds) {
                                                 if (channelDelegate.channel.chainedSounds[id] >= 0 &&
                                                     channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[id])) {
-                                                    text = zynthian.fixed_layers.selector_list.getDisplayValue(channelDelegate.channel.chainedSounds[id]);
+                                                    text = zynqtgui.fixed_layers.selector_list.getDisplayValue(channelDelegate.channel.chainedSounds[id]);
                                                     break;
                                                 }
                                             }
@@ -226,8 +226,8 @@ ColumnLayout {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        if (zynthian.session_dashboard.selectedChannel !== index) {
-                                            zynthian.session_dashboard.selectedChannel = index;
+                                        if (zynqtgui.session_dashboard.selectedChannel !== index) {
+                                            zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
                                             // soundsDialog.open();
                                             console.log("Opening bottom drawer");
@@ -252,13 +252,13 @@ ColumnLayout {
                                     Layout.alignment: Qt.AlignVCenter
                                     radius: 2
                                     highlighted: channelDelegate.selectedClip === channel.sceneClip && channel.sceneClip.inCurrentScene
-                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
+                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
                                     property QtObject pattern: sequence ? sequence.getByPart(channelIndex, channel.selectedPart) : null
                                     Connections {
                                         target: control.pattern
                                         onEnabledChanged: {
                                             if (channel.sceneClip.col === control.pattern.bankOffset / control.pattern.bankLength && ((control.pattern.enabled && !channel.sceneClip.inCurrentScene) || (!control.pattern.enabled && channel.sceneClip.inCurrentScene))) {
-                                                zynthian.sketchpad.song.scenesModel.toggleClipInCurrentScene(channel.sceneClip);
+                                                zynqtgui.sketchpad.song.scenesModel.toggleClipInCurrentScene(channel.sceneClip);
                                             }
                                         }
                                     }
@@ -289,7 +289,7 @@ ColumnLayout {
                                     onClicked: {
                                         channelDelegate.selectedClip = channel.sceneClip;
 
-                                        zynthian.sketchpad.song.scenesModel.toggleClipInCurrentScene(channel.sceneClip);
+                                        zynqtgui.sketchpad.song.scenesModel.toggleClipInCurrentScene(channel.sceneClip);
                                         if (control.pattern) {
                                             pattern.bank = channel.sceneClip.col === 0 ? "A" : "B";
 
@@ -320,25 +320,25 @@ ColumnLayout {
                                 border.color: "#99999999"
                                 border.width: 1
                                 radius: 4
-                                opacity: zynthian.session_dashboard.selectedChannel === channelIndex ? 1 : 0.5
+                                opacity: zynqtgui.session_dashboard.selectedChannel === channelIndex ? 1 : 0.5
 
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        if (zynthian.session_dashboard.selectedChannel !== index) {
-                                            zynthian.session_dashboard.selectedChannel = index;
+                                        if (zynqtgui.session_dashboard.selectedChannel !== index) {
+                                            zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
                                             if (channelDelegate.channelHasConnectedPattern) {
-                                                zynthian.current_modal_screen_id = "playgrid";
+                                                zynqtgui.current_modal_screen_id = "playgrid";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
                                                 sequence.setActiveChannel(channel.id, channel.selectedPart);
                                             } else if (channelDelegate.hasWavLoaded) {
                                                 console.log("Opening bottom drawer");
                                                 bottomBar.forceActiveFocus();
                                                 bottomStack.currentIndex = ChannelsView.BottomStackControlType.Wave;
-                                                zynthian.bottomBarControlType = "bottombar-controltype-clip";
-                                                zynthian.bottomBarControlObj = channelDelegate.selectedClip;
+                                                zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
+                                                zynqtgui.bottomBarControlObj = channelDelegate.selectedClip;
                                                 bottomDrawer.open();
                                             }
                                         }
@@ -359,7 +359,7 @@ ColumnLayout {
                                         width: parent.width
                                         height: 1
                                         color: Kirigami.Theme.textColor
-                                        opacity: zynthian.session_dashboard.selectedChannel === channelIndex ? 1 : 0.1
+                                        opacity: zynqtgui.session_dashboard.selectedChannel === channelIndex ? 1 : 0.1
                                     }
 
                                     Rectangle {  //Start loop
@@ -381,7 +381,7 @@ ColumnLayout {
                                         color: Kirigami.Theme.neutralTextColor
                                         opacity: 0.6
                                         width: Kirigami.Units.smallSpacing
-                                        x: ((((60/zynthian.sketchpad.song.bpm) * channelDelegate.selectedClip.length) / channelDelegate.selectedClip.duration) * parent.width) + ((channelDelegate.selectedClip.startPosition / channelDelegate.selectedClip.duration) * parent.width)
+                                        x: ((((60/zynqtgui.sketchpad.song.bpm) * channelDelegate.selectedClip.length) / channelDelegate.selectedClip.duration) * parent.width) + ((channelDelegate.selectedClip.startPosition / channelDelegate.selectedClip.duration) * parent.width)
                                     }
 
                                     Rectangle { // Progress
@@ -400,7 +400,7 @@ ColumnLayout {
                                     id: patternVisualiser
                                     anchors.fill: parent
                                     visible: channelDelegate.channelHasConnectedPattern
-                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
+                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
                                     property QtObject pattern: sequence ? sequence.getByPart(channelIndex, channelDelegate.channel.selectedPart) : null
                                     source: pattern ? pattern.thumbnailUrl : ""
                                     Rectangle { // Progress
@@ -446,12 +446,12 @@ ColumnLayout {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
                                     radius: 2
-                                    enabled: zynthian.session_dashboard.selectedChannel === channelIndex
+                                    enabled: zynqtgui.session_dashboard.selectedChannel === channelIndex
                                     visible: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
 
                                     onClicked: {
-                                        if (zynthian.session_dashboard.selectedChannel !== index) {
-                                            zynthian.session_dashboard.selectedChannel = index;
+                                        if (zynqtgui.session_dashboard.selectedChannel !== index) {
+                                            zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
                                             clipFilePickerDialog.clipObj = channelDelegate.selectedClip;
                                             clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clipObj.recordingDir;
@@ -475,14 +475,14 @@ ColumnLayout {
 
                                     radius: 2
                                     visible: channelDelegate.hasWavLoaded || channelDelegate.channelHasConnectedPattern
-                                    enabled: zynthian.session_dashboard.selectedChannel === channelIndex && !zynthian.sketchpad.isMetronomeRunning
+                                    enabled: zynqtgui.session_dashboard.selectedChannel === channelIndex && !zynqtgui.sketchpad.isMetronomeRunning
 
                                     onClicked: {
-                                        if (zynthian.session_dashboard.selectedChannel !== index) {
-                                            zynthian.session_dashboard.selectedChannel = index;
+                                        if (zynqtgui.session_dashboard.selectedChannel !== index) {
+                                            zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
                                             if (channelDelegate.channelHasConnectedPattern) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(channelDelegate.channelIndex, channelDelegate.channel.selectedPart);
+                                                var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(channelDelegate.channelIndex, channelDelegate.channel.selectedPart);
                                                 seq.enabled = false;
                                                 channelDelegate.channel.connectedPattern = -1;
                                             } else {
@@ -507,12 +507,12 @@ ColumnLayout {
 
                                     text: qsTr("Midi")
                                     radius: 2
-                                    enabled: zynthian.session_dashboard.selectedChannel === channelIndex
+                                    enabled: zynqtgui.session_dashboard.selectedChannel === channelIndex
                                     visible: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
 
                                     onClicked: {
-                                        if (zynthian.session_dashboard.selectedChannel !== index) {
-                                            zynthian.session_dashboard.selectedChannel = index;
+                                        if (zynqtgui.session_dashboard.selectedChannel !== index) {
+                                            zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
                                             playgridPickerPopup.channelObj = channel;
                                             playgridPickerPopup.channelIndex = channelIndex;
@@ -527,22 +527,22 @@ ColumnLayout {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit*2
                                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
-                                    enabled: zynthian.session_dashboard.selectedChannel === channelIndex
+                                    enabled: zynqtgui.session_dashboard.selectedChannel === channelIndex
                                     radius: 2
                                     visible: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
 
                                     onClicked: {
-                                        if (zynthian.session_dashboard.selectedChannel !== index) {
-                                            zynthian.session_dashboard.selectedChannel = index;
+                                        if (zynqtgui.session_dashboard.selectedChannel !== index) {
+                                            zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
-                                            if (!zynthian.sketchpad.isRecording) {
-                                                zynthian.sketchpad.recordingSource = "internal"
-                                                zynthian.sketchpad.recordingChannel = ""
+                                            if (!zynqtgui.sketchpad.isRecording) {
+                                                zynqtgui.sketchpad.recordingSource = "internal"
+                                                zynqtgui.sketchpad.recordingChannel = ""
                                                 channelDelegate.selectedClip.queueRecording();
                                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
                                             } else {
                                                 channelDelegate.selectedClip.stopRecording();
-                                                zynthian.sketchpad.song.scenesModel.addClipToCurrentScene(channelDelegate.selectedClip);
+                                                zynqtgui.sketchpad.song.scenesModel.addClipToCurrentScene(channelDelegate.selectedClip);
                                             }
                                         }
                                     }
@@ -551,9 +551,9 @@ ColumnLayout {
                                         width: Kirigami.Units.gridUnit
                                         height: Kirigami.Units.gridUnit
                                         anchors.centerIn: parent
-                                        source: zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                                        color: zynthian.session_dashboard.selectedChannel === channelIndex && !zynthian.sketchpad.isRecording ? "#f44336" : Kirigami.Theme.textColor
-                                        opacity: zynthian.session_dashboard.selectedChannel === channelIndex ? 1 : 0.6
+                                        source: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                                        color: zynqtgui.session_dashboard.selectedChannel === channelIndex && !zynqtgui.sketchpad.isRecording ? "#f44336" : Kirigami.Theme.textColor
+                                        opacity: zynqtgui.session_dashboard.selectedChannel === channelIndex ? 1 : 0.6
                                     }
                                 }
                             }
@@ -573,22 +573,22 @@ ColumnLayout {
         id: clipFilePickerDialog
 
         headerText: qsTr("%1 : Pick an audio file").arg(clipObj ? clipObj.channelName : "")
-        rootFolder: "/zynthian/zynthian-my-data"
+        rootFolder: "/zynqtgui/zynqtgui-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
             if (clipObj) {
                 clipObj.path = file.filePath
-                zynthian.sketchpad.song.scenesModel.addClipToCurrentScene(clipObj);
+                zynqtgui.sketchpad.song.scenesModel.addClipToCurrentScene(clipObj);
             }
         }
     }
 
     Connections {
-        target: zynthian.session_dashboard
+        target: zynqtgui.session_dashboard
         onMidiSelectionRequested: {
-            var channelDelegate = channelsRepeater.itemAt(zynthian.session_dashboard.selectedChannel)
+            var channelDelegate = channelsRepeater.itemAt(zynqtgui.session_dashboard.selectedChannel)
             playgridPickerPopup.channelObj = channelDelegate.channel;
             playgridPickerPopup.channelIndex = channelDelegate.channelIndex;
             playgridPickerPopup.clipObj = channelDelegate.selectedClip;
@@ -631,7 +631,7 @@ ColumnLayout {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*3
                         Layout.alignment: Qt.AlignCenter
                         text: model.text
-                        visible: !zynthian.sketchpad.song.channelsModel.checkIfPatternAlreadyConnected(index)
+                        visible: !zynqtgui.sketchpad.song.channelsModel.checkIfPatternAlreadyConnected(index)
 
                         onClicked: {
                             if (playgridPickerPopup.channelObj) {
@@ -639,7 +639,7 @@ ColumnLayout {
                                 playgridPickerPopup.channelObj.clipsModel.getClip(1).clear();
                                 playgridPickerPopup.channelObj.connectedPattern = index;
 
-                                var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(playgridPickerPopup.channelIndex, playgridPickerPopup.channelObj.selectedPart);
+                                var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(playgridPickerPopup.channelIndex, playgridPickerPopup.channelObj.selectedPart);
                                 seq.midiChannel = playgridPickerPopup.channelObj.connectedSound;
                                 seq.bank = "A"
                                 seq.enabled = true;
@@ -647,7 +647,7 @@ ColumnLayout {
                                 playgridPickerPopup.close();
 
                                 if (playgridPickerPopup.clipObj) {
-                                    zynthian.sketchpad.song.scenesModel.addClipToCurrentScene(playgridPickerPopup.clipObj);
+                                    zynqtgui.sketchpad.song.scenesModel.addClipToCurrentScene(playgridPickerPopup.clipObj);
                                 } else {
                                     console.log("Error setting clip to scene")
                                 }
@@ -671,7 +671,7 @@ ColumnLayout {
                 wrapMode: "WordWrap"
                 font.italic: true
                 font.pointSize: 11
-                visible: zynthian.sketchpad.song.channelsModel.connectedPatternsCount >= 5
+                visible: zynqtgui.sketchpad.song.channelsModel.connectedPatternsCount >= 5
                 opacity: 0.7
             }
         }
@@ -725,7 +725,7 @@ ColumnLayout {
     }
 
     Connections {
-        target: zynthian.sketchpad
+        target: zynqtgui.sketchpad
         onCannotRecordEmptyLayer: {
             cannotRecordEmptyLayerPopup.open();
         }

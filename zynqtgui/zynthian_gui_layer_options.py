@@ -90,14 +90,14 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 			self.list_data.append((self.midifx_remove, None, "Remove MIDI-FX"))
 
 		# Root Layer Options
-		elif len(self.zyngui.screens['layer'].root_layers) > 0:
-			self.layer = self.zyngui.screens['layer'].root_layers[self.layer_index]
+		elif len(self.zynqtgui.screens['layer'].root_layers) > 0:
+			self.layer = self.zynqtgui.screens['layer'].root_layers[self.layer_index]
 
-			self.audiofx_layers = self.zyngui.screens['layer'].get_fxchain_layers(self.layer)
+			self.audiofx_layers = self.zynqtgui.screens['layer'].get_fxchain_layers(self.layer)
 			if self.audiofx_layers and len(self.audiofx_layers)>0:
 				self.audiofx_layers.remove(self.layer)
 
-			self.midifx_layers = self.zyngui.screens['layer'].get_midichain_layers(self.layer)
+			self.midifx_layers = self.zynqtgui.screens['layer'].get_midichain_layers(self.layer)
 			if self.midifx_layers and len(self.midifx_layers)>0:
 				self.midifx_layers.remove(self.layer)
 
@@ -182,7 +182,7 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 
 	def show(self):
 		if self.layer_index is None:
-			self.layer_index = self.zyngui.screens['layer'].index
+			self.layer_index = self.zynqtgui.screens['layer'].index
 
 		if self.layer_index is not None:
 			super().show()
@@ -190,7 +190,7 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 				self.index = len(self.list_data)-1
 
 		else:
-			self.zyngui.show_active_screen()
+			self.zynqtgui.show_active_screen()
 
 	def select_action(self, i, t='S'):
 		self.index = i
@@ -208,14 +208,14 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 	def audiofx_layer_action(self, layer, t='S'):
 		self.index = 0
 		self.audiofx_layer = layer
-		self.audiofx_layer_index = self.zyngui.screens['layer'].layers.index(layer)
+		self.audiofx_layer_index = self.zynqtgui.screens['layer'].layers.index(layer)
 		self.show()
 
 
 	def midifx_layer_action(self, layer, t='S'):
 		self.index = 0
 		self.midifx_layer = layer
-		self.midifx_layer_index = self.zyngui.screens['layer'].layers.index(layer)
+		self.midifx_layer_index = self.zynqtgui.screens['layer'].layers.index(layer)
 		self.show()
 
 
@@ -241,60 +241,60 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 
 
 	def layer_presets(self):
-		self.zyngui.set_curlayer(self.layer)
-		self.zyngui.show_screen('bank')
+		self.zynqtgui.set_curlayer(self.layer)
+		self.zynqtgui.show_screen('bank')
 		# If there is only one bank, jump to preset selection
 		if len(self.layer.bank_list)<=1:
-			self.zyngui.screens['bank'].select_action(0)
+			self.zynqtgui.screens['bank'].select_action(0)
 
 
 	def layer_midi_chan(self):
-		chan_list = self.zyngui.screens['layer'].get_free_midi_chans() + [self.layer.midi_chan]
+		chan_list = self.zynqtgui.screens['layer'].get_free_midi_chans() + [self.layer.midi_chan]
 		chan_list.sort()
-		self.zyngui.screens['midi_chan'].set_mode("SET", self.layer.midi_chan, chan_list)
-		self.zyngui.show_modal('midi_chan')
+		self.zynqtgui.screens['midi_chan'].set_mode("SET", self.layer.midi_chan, chan_list)
+		self.zynqtgui.show_modal('midi_chan')
 
 
 	def layer_clone(self):
-		self.zyngui.screens['midi_chan'].set_mode("CLONE", self.layer.midi_chan)
-		self.zyngui.show_modal('midi_chan')
+		self.zynqtgui.screens['midi_chan'].set_mode("CLONE", self.layer.midi_chan)
+		self.zynqtgui.show_modal('midi_chan')
 
 
 	def layer_note_range(self):
-		self.zyngui.screens['midi_key_range'].config(self.layer.midi_chan)
-		self.zyngui.show_modal('midi_key_range')
+		self.zynqtgui.screens['midi_key_range'].config(self.layer.midi_chan)
+		self.zynqtgui.show_modal('midi_key_range')
 
 
 	def layer_transpose(self):
-		self.zyngui.show_modal('transpose')
+		self.zynqtgui.show_modal('transpose')
 
 
 	def layer_midi_routing(self):
-		self.zyngui.screens['midi_out'].set_layer(self.layer)
-		self.zyngui.show_modal('midi_out')
+		self.zynqtgui.screens['midi_out'].set_layer(self.layer)
+		self.zynqtgui.show_modal('midi_out')
 
 
 	def layer_audio_routing(self):
-		self.zyngui.screens['audio_out'].set_layer(self.layer)
-		self.zyngui.show_modal('audio_out')
+		self.zynqtgui.screens['audio_out'].set_layer(self.layer)
+		self.zynqtgui.show_modal('audio_out')
 
 
 	def layer_audio_capture(self):
-		self.zyngui.screens['audio_in'].set_layer(self.layer)
-		self.zyngui.show_modal('audio_in')
+		self.zynqtgui.screens['audio_in'].set_layer(self.layer)
+		self.zynqtgui.show_modal('audio_in')
 
 
 	def layer_remove(self):
-		self.zyngui.show_confirm("Do you really want to remove this layer?", self.layer_remove_confirmed)
+		self.zynqtgui.show_confirm("Do you really want to remove this layer?", self.layer_remove_confirmed)
 
 
 	def layer_remove_confirmed(self, params=None):
-		self.zyngui.screens['layer'].remove_root_layer(self.layer_index)
-		self.zyngui.show_active_screen()
+		self.zynqtgui.screens['layer'].remove_root_layer(self.layer_index)
+		self.zynqtgui.show_active_screen()
 
 
 	def layer_midi_unlearn(self):
-		self.zyngui.show_confirm("Do you really want to clean MIDI-learn for this layer?", self.layer_midi_unlearn_confirmed)
+		self.zynqtgui.show_confirm("Do you really want to clean MIDI-learn for this layer?", self.layer_midi_unlearn_confirmed)
 
 
 	def layer_midi_unlearn_confirmed(self, params=None):
@@ -306,63 +306,63 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 	@Slot('void')
 	def audiofx_add(self):
 		midi_chan=self.layer.midi_chan
-		#self.zyngui.screens['layer'].add_fxchain_layer(midi_chan)
-		self.zyngui.show_screen("layer_effects")
+		#self.zynqtgui.screens['layer'].add_fxchain_layer(midi_chan)
+		self.zynqtgui.show_screen("layer_effects")
 
 
 	def audiofx_reset(self):
-		self.zyngui.show_confirm("Do you really want to remove all audio-FXs for this layer?", self.audiofx_reset_confirmed)
+		self.zynqtgui.show_confirm("Do you really want to remove all audio-FXs for this layer?", self.audiofx_reset_confirmed)
 
 
 	def audiofx_reset_confirmed(self, params=None):
 		# Remove all layers
 		for sl in self.audiofx_layers:
-			i = self.zyngui.screens['layer'].layers.index(sl)
-			self.zyngui.screens['layer'].remove_layer(i)
+			i = self.zynqtgui.screens['layer'].layers.index(sl)
+			self.zynqtgui.screens['layer'].remove_layer(i)
 
 		self.reset()
 		self.show()
 
 
 	def audiofx_presets(self):
-		self.zyngui.set_curlayer(self.audiofx_layer, True)
-		self.zyngui.show_modal('bank')
+		self.zynqtgui.set_curlayer(self.audiofx_layer, True)
+		self.zynqtgui.show_modal('bank')
 		# If there is only one bank, jump to preset selection
 		if len(self.audiofx_layer.bank_list)<=1:
-			self.zyngui.screens['bank'].select_action(0)
+			self.zynqtgui.screens['bank'].select_action(0)
 
 
 	def audiofx_can_move_upchain(self):
-		ups = self.zyngui.screens['layer'].get_fxchain_upstream(self.audiofx_layer)
+		ups = self.zynqtgui.screens['layer'].get_fxchain_upstream(self.audiofx_layer)
 		if len(ups)>0 and self.layer not in ups:
 			return True
 
 
 	def audiofx_move_upchain(self):
-		ups = self.zyngui.screens['layer'].get_fxchain_upstream(self.audiofx_layer)
-		self.zyngui.screens['layer'].swap_fxchain(ups[0], self.audiofx_layer)
+		ups = self.zynqtgui.screens['layer'].get_fxchain_upstream(self.audiofx_layer)
+		self.zynqtgui.screens['layer'].swap_fxchain(ups[0], self.audiofx_layer)
 		self.back_action()
 
 
 	def audiofx_can_move_downchain(self):
-		downs = self.zyngui.screens['layer'].get_fxchain_downstream(self.audiofx_layer)
+		downs = self.zynqtgui.screens['layer'].get_fxchain_downstream(self.audiofx_layer)
 		if len(downs)>0 and self.layer not in downs:
 			return True
 
 
 	def audiofx_move_downchain(self):
-		downs = self.zyngui.screens['layer'].get_fxchain_downstream(self.audiofx_layer)
-		self.zyngui.screens['layer'].swap_fxchain(self.audiofx_layer, downs[0])
+		downs = self.zynqtgui.screens['layer'].get_fxchain_downstream(self.audiofx_layer)
+		self.zynqtgui.screens['layer'].swap_fxchain(self.audiofx_layer, downs[0])
 		self.back_action()
 
 
 	def audiofx_replace(self):
 		midi_chan=self.layer.midi_chan
-		self.zyngui.screens['layer'].replace_fxchain_layer(self.audiofx_layer_index)
+		self.zynqtgui.screens['layer'].replace_fxchain_layer(self.audiofx_layer_index)
 
 
 	def audiofx_remove(self):
-		self.zyngui.screens['layer'].remove_layer(self.audiofx_layer_index)
+		self.zynqtgui.screens['layer'].remove_layer(self.audiofx_layer_index)
 		self.back_action()
 
 
@@ -371,63 +371,63 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 	@Slot('void')
 	def midifx_add(self):
 		midi_chan=self.layer.midi_chan
-		#self.zyngui.screens['layer'].add_midichain_layer(midi_chan)
-		self.zyngui.show_screen("layer_midi_effects")
+		#self.zynqtgui.screens['layer'].add_midichain_layer(midi_chan)
+		self.zynqtgui.show_screen("layer_midi_effects")
 
 
 	def midifx_reset(self):
-		self.zyngui.show_confirm("Do you really want to remove all MIDI-FXs for this layer?", self.midifx_reset_confirmed)
+		self.zynqtgui.show_confirm("Do you really want to remove all MIDI-FXs for this layer?", self.midifx_reset_confirmed)
 
 
 	def midifx_reset_confirmed(self, params=None):
 		# Remove all layers
 		for sl in self.midifx_layers:
-			i = self.zyngui.screens['layer'].layers.index(sl)
-			self.zyngui.screens['layer'].remove_layer(i)
+			i = self.zynqtgui.screens['layer'].layers.index(sl)
+			self.zynqtgui.screens['layer'].remove_layer(i)
 
 		self.reset()
 		self.show()
 
 
 	def midifx_presets(self):
-		self.zyngui.set_curlayer(self.midifx_layer, True)
-		self.zyngui.show_modal('bank')
+		self.zynqtgui.set_curlayer(self.midifx_layer, True)
+		self.zynqtgui.show_modal('bank')
 		# If there is only one bank, jump to preset selection
 		if len(self.midifx_layer.bank_list)<=1:
-			self.zyngui.screens['bank'].select_action(0)
+			self.zynqtgui.screens['bank'].select_action(0)
 
 
 	def midifx_can_move_upchain(self):
-		ups = self.zyngui.screens['layer'].get_midichain_upstream(self.midifx_layer)
+		ups = self.zynqtgui.screens['layer'].get_midichain_upstream(self.midifx_layer)
 		if len(ups)>0 and self.layer not in ups:
 			return True
 
 
 	def midifx_move_upchain(self):
-		ups = self.zyngui.screens['layer'].get_midichain_upstream(self.midifx_layer)
-		self.zyngui.screens['layer'].swap_midichain(ups[0], self.midifx_layer)
+		ups = self.zynqtgui.screens['layer'].get_midichain_upstream(self.midifx_layer)
+		self.zynqtgui.screens['layer'].swap_midichain(ups[0], self.midifx_layer)
 		self.back_action()
 
 
 	def midifx_can_move_downchain(self):
-		downs = self.zyngui.screens['layer'].get_midichain_downstream(self.midifx_layer)
+		downs = self.zynqtgui.screens['layer'].get_midichain_downstream(self.midifx_layer)
 		if len(downs)>0 and self.layer not in downs:
 			return True
 
 
 	def midifx_move_downchain(self):
-		downs = self.zyngui.screens['layer'].get_midichain_downstream(self.midifx_layer)
-		self.zyngui.screens['layer'].swap_midichain(self.midifx_layer, downs[0])
+		downs = self.zynqtgui.screens['layer'].get_midichain_downstream(self.midifx_layer)
+		self.zynqtgui.screens['layer'].swap_midichain(self.midifx_layer, downs[0])
 		self.back_action()
 
 
 	def midifx_replace(self):
 		midi_chan=self.layer.midi_chan
-		self.zyngui.screens['layer'].replace_midichain_layer(self.midifx_layer_index)
+		self.zynqtgui.screens['layer'].replace_midichain_layer(self.midifx_layer_index)
 
 
 	def midifx_remove(self):
-		self.zyngui.screens['layer'].remove_layer(self.midifx_layer_index)
+		self.zynqtgui.screens['layer'].remove_layer(self.midifx_layer_index)
 		self.back_action()
 
 

@@ -3514,7 +3514,7 @@ class zynthian_gui(QObject):
         action = zynthian_gui_keybinding.getInstance().get_key_action(keyseq)
 
         if action != None:
-            zyngui.callable_ui_action(action)
+            zynqtgui.callable_ui_action(action)
 
     @Slot("void")
     def go_back(self):
@@ -3791,7 +3791,7 @@ class zynthian_gui(QObject):
 
         # Explicitly run update_jack_port after booting is complete
         # as any requests made while booting is ignored
-        # zyngui.zynautoconnect will run after channel ports are updated
+        # zynqtgui.zynautoconnect will run after channel ports are updated
         for i in range(0, self.sketchpad.song.channelsModel.count):
             channel = self.sketchpad.song.channelsModel.getChannel(i)
             # Allow jack ports connection to complete before showing UI
@@ -4725,7 +4725,7 @@ def exit_handler(signo, stack_frame):
     elif signo == signal.SIGTERM:
         exit_code = 101
 
-    zyngui.exit(exit_code)
+    zynqtgui.exit(exit_code)
 
 
 signal.signal(signal.SIGHUP, exit_handler)
@@ -4736,7 +4736,7 @@ signal.signal(signal.SIGTERM, exit_handler)
 
 def delete_window():
     exit_code = 101
-    zyngui.exit(exit_code)
+    zynqtgui.exit(exit_code)
 
 
 # Function to handle computer keyboard key press
@@ -4761,7 +4761,7 @@ def delete_window():
 
 # action = zynthian_gui_keybinding.getInstance().get_key_action(keysym, event.state)
 # if action != None:
-# zyngui.callable_ui_action(action)
+# zynqtgui.callable_ui_action(action)
 
 
 # zynthian_gui_config.top.bind("<Key>", cb_keybinding)
@@ -4777,8 +4777,8 @@ def delete_window():
 
 # zynthian_gui_config.top.mainloop()
 
-# logging.info("Exit with code {} ...\n\n".format(zyngui.exit_code))
-# exit(zyngui.exit_code)
+# logging.info("Exit with code {} ...\n\n".format(zynqtgui.exit_code))
+# exit(zynqtgui.exit_code)
 
 
 # ------------------------------------------------------------------------------
@@ -4850,8 +4850,8 @@ if __name__ == "__main__":
     qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")
 
     logging.info("STARTING ZYNTHIAN-UI ...")
-    zynthian_gui_config.zyngui = zyngui = zynthian_gui()
-    zyngui.start()
+    zynthian_gui_config.zynqtgui = zynqtgui = zynthian_gui()
+    zynqtgui.start()
 
     QIcon.setThemeName("breeze")
 
@@ -4875,20 +4875,20 @@ if __name__ == "__main__":
     palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
     app.setPalette(palette)
 
-    zyngui.screens["theme_chooser"].apply_font()
+    zynqtgui.screens["theme_chooser"].apply_font()
     # font = app.font()
     # font.setPointSize(12)
     # font.setFamily("Roboto")
     # app.setFont(font)
 
-    zyngui.show_screen(zyngui.home_screen)
-    zyngui.screens["preset"].disable_show_fav_presets()
+    zynqtgui.show_screen(zynqtgui.home_screen)
+    zynqtgui.screens["preset"].disable_show_fav_presets()
 
     engine.addImportPath(os.fspath(Path(__file__).resolve().parent / "qml-ui"))
-    engine.rootContext().setContextProperty("zynthian", zyngui)
+    engine.rootContext().setContextProperty("zynqtgui", zynqtgui)
 
     def load_qml():
-        zyngui.currentTaskMessage = f"Loading pages"
+        zynqtgui.currentTaskMessage = f"Loading pages"
         engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
 
         if not engine.rootObjects() or not app.topLevelWindows():
@@ -4899,9 +4899,9 @@ if __name__ == "__main__":
         zynthian_gui_config.app = app
 
         # Norify isExternalActive changed when top window active value changes
-        zynthian_gui_config.top.activeChanged.connect(lambda: zyngui.isExternalAppActiveChanged.emit())
+        zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())
 
-    # Delay loading qml to let zyngui complete it's init sequence
+    # Delay loading qml to let zynqtgui complete it's init sequence
     # Without the delay, UI sometimes doest start when `systemctl restart zynthian` is ran
     QTimer.singleShot(1000, load_qml)
 

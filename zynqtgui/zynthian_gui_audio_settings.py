@@ -36,7 +36,7 @@ from . import zynthian_qt_gui_base,zynthian_gui_master_alsa_mixer
 from zyncoder import *
 
 
-class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_audio_settings(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_audio_settings, self).__init__(parent)
         try:

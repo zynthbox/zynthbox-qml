@@ -41,7 +41,7 @@ Zynthian.ScreenPage {
             implicitWidth: 300
             implicitHeight: 300
             from: 0
-            controlObj: zynthian
+            controlObj: zynqtgui
             controlProperty: "encoder_list_speed_multiplier"
         }
     }

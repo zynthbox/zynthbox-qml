@@ -36,13 +36,13 @@ import Zynthian 1.0 as Zynthian
 QQC2.AbstractButton {
     id: root
 
-    readonly property QtObject song: zynthian.sketchpad.song
+    readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property int colIndex: index
     property bool isPlaying
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property bool highlighted: channel.sceneClip.row === zynthian.session_dashboard.selectedChannel &&
-                               channel.sceneClip.col === zynthian.sketchpad.song.scenesModel.selectedTrackIndex // zynthian.bottomBarControlObj === channel.sceneClip
+    property bool highlighted: channel.sceneClip.row === zynqtgui.session_dashboard.selectedChannel &&
+                               channel.sceneClip.col === zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex // zynqtgui.bottomBarControlObj === channel.sceneClip
     property color highlightColor: highlighted
                                        ? Kirigami.Theme.highlightColor
                                        : "transparent"
@@ -109,7 +109,7 @@ QQC2.AbstractButton {
 //                     root.pattern &&
 //                     root.pattern.hasNotes
 //            text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
-//            property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynthian.sketchpad.isMetronomeRunning
+//            property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynqtgui.sketchpad.isMetronomeRunning
 //                    ? patternPlaybackLabel.playbackPosition + "/"
 //                    : ""
 //            property int playbackPosition: 1
@@ -242,7 +242,7 @@ QQC2.AbstractButton {
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: visible ? (channel.sceneClip.progress - channel.sceneClip.startPosition)/adjustment : 0
-            property double adjustment: visible ? (((60/zynthian.sketchpad.song.bpm) * channel.sceneClip.length) / parent.width) : 1
+            property double adjustment: visible ? (((60/zynqtgui.sketchpad.song.bpm) * channel.sceneClip.length) / parent.width) : 1
         }
         Rectangle {
             id: patternProgressRect

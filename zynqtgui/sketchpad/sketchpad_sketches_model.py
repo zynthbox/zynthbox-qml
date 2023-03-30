@@ -34,7 +34,7 @@ class sketchpad_sketches_model(QAbstractListModel):
 
     def __init__(self, song):
         super().__init__(song)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.__song = song
         self.__selected_sketch_index = 0
@@ -130,7 +130,7 @@ class sketchpad_sketches_model(QAbstractListModel):
         if value != self.__song_mode:
             self.__song_mode = value
             self.songModeChanged.emit()
-            self.zyngui.sketchpad.set_selector()
+            self.zynqtgui.sketchpad.set_selector()
 
     songModeChanged = Signal()
 

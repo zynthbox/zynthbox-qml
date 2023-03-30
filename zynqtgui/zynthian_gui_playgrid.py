@@ -43,14 +43,14 @@ from . import zynthian_gui_config
 from . import zynthian_gui_controller
 from .sketchpad import zynthian_gui_sketchpad
 
-class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_playgrid(zynthian_qt_gui_base.zynqtgui):
 
     __zynquick_pgmanager__ = None
     __metronome_manager__ = None
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
-        zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_sketchpad = self.zyngui.screens["sketchpad"]
+        zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_sketchpad = self.zynqtgui.screens["sketchpad"]
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
         self.__bigknob_value__ = 0
@@ -68,9 +68,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__bigknob_value__ != self.__zselector[0].value:
-            if self.zyngui.altButtonPressed:
-                currentValue = self.zyngui.sketchpad.song.bpm
-                self.zyngui.set_bpm(currentValue + self.__zselector[0].value - 50)
+            if self.zynqtgui.altButtonPressed:
+                currentValue = self.zynqtgui.sketchpad.song.bpm
+                self.zynqtgui.set_bpm(currentValue + self.__zselector[0].value - 50)
             else:
                 self.__bigknob_value__ = self.__zselector[0].value
                 self.bigKnobValueChanged.emit()
@@ -83,9 +83,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__knob1_value__ != self.__zselector[1].value:
-            if self.zyngui.altButtonPressed:
-                currentVolume = self.zyngui.get_volume()
-                self.zyngui.set_volume(currentVolume + self.__zselector[1].value - 50)
+            if self.zynqtgui.altButtonPressed:
+                currentVolume = self.zynqtgui.get_volume()
+                self.zynqtgui.set_volume(currentVolume + self.__zselector[1].value - 50)
             else:
                 self.__knob1_value__ = self.__zselector[1].value
                 self.knob1ValueChanged.emit()
@@ -98,9 +98,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__knob2_value__ != self.__zselector[2].value:
-            if self.zyngui.altButtonPressed:
-                currentValue = self.zyngui.get_global_fx1_amount()
-                self.zyngui.set_global_fx1_amount(currentValue + self.__zselector[2].value - 50)
+            if self.zynqtgui.altButtonPressed:
+                currentValue = self.zynqtgui.get_global_fx1_amount()
+                self.zynqtgui.set_global_fx1_amount(currentValue + self.__zselector[2].value - 50)
             else:
                 self.__knob2_value__ = self.__zselector[2].value
                 self.knob2ValueChanged.emit()
@@ -113,9 +113,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             return
 
         if self.__knob3_value__ != self.__zselector[3].value:
-            if self.zyngui.altButtonPressed:
-                currentValue = self.zyngui.get_global_fx2_amount()
-                self.zyngui.set_global_fx2_amount(currentValue + self.__zselector[3].value - 50)
+            if self.zynqtgui.altButtonPressed:
+                currentValue = self.zynqtgui.get_global_fx2_amount()
+                self.zynqtgui.set_global_fx2_amount(currentValue + self.__zselector[3].value - 50)
             else:
                 self.__knob3_value__ = self.__zselector[3].value
                 self.knob3ValueChanged.emit()
@@ -164,7 +164,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             self.__zselector_ctrl[1] = zynthian_controller(None, 'playgrid_knob1', 'playgrid_knob1', {'midi_cc': 0, 'value': 0})
             self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1], self)
             self.__zselector[1].index = 0
-        if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
+        if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() == self:
             self.__zselector[1].show()
         else:
             if self.__zselector[1]:
@@ -179,7 +179,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             self.__zselector_ctrl[2] = zynthian_controller(None, 'playgrid_knob2', 'playgrid_knob2', {'midi_cc': 0, 'value': 0})
             self.__zselector[2] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[2], self)
             self.__zselector[2].index = 1
-        if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
+        if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() == self:
             self.__zselector[2].show()
         else:
             if self.__zselector[2]:
@@ -194,7 +194,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             self.__zselector_ctrl[3] = zynthian_controller(None, 'playgrid_knob3', 'playgrid_knob3', {'midi_cc': 0, 'value': 0})
             self.__zselector[3] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[3], self)
             self.__zselector[3].index = 2
-        if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
+        if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() == self:
             self.__zselector[3].show()
         else:
             if self.__zselector[3]:
@@ -206,8 +206,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):
-        if (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) or \
-                (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self):
+        if (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) or \
+                (self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self):
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
             if self.__zselector[1] is not None:
@@ -296,4 +296,4 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str)
     def setCurrentTaskMessage(self, msg):
-        self.zyngui.currentTaskMessage = msg
+        self.zynqtgui.currentTaskMessage = msg

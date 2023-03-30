@@ -30,6 +30,6 @@ QQC2.Button {
     property string category: "*"
 
     checkable: true
-    text: zynthian.sound_categories.getCategoryNameFromKey(category)
-    onClicked: zynthian.sound_categories.setCategoryFilter(category)
+    text: zynqtgui.sound_categories.getCategoryNameFromKey(category)
+    onClicked: zynqtgui.sound_categories.setCategoryFilter(category)
 }

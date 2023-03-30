@@ -30,7 +30,7 @@ from . import zynthian_gui_config
 class zynthian_osd(QObject):
     def __init__(self, parent=None):
         super(zynthian_osd, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
         self.__parameterName = ""
         self.__description = ""
         self.__start = 0

@@ -50,7 +50,7 @@ GridLayout {
         }
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
-                bottomBar.filePickerDialog.folderModel.folder = zynthian.bottomBarControlObj.recordingDir;
+                bottomBar.filePickerDialog.folderModel.folder = zynqtgui.bottomBarControlObj.recordingDir;
                 bottomBar.filePickerDialog.open();
                 return true;
 
@@ -152,8 +152,8 @@ GridLayout {
 //        }
 
 //        QQC2.Label {
-//            text: zynthian.sketchpad.countInValue
-//            visible: zynthian.sketchpad.isRecording && zynthian.sketchpad.countInValue > 0
+//            text: zynqtgui.sketchpad.countInValue
+//            visible: zynqtgui.sketchpad.isRecording && zynqtgui.sketchpad.countInValue > 0
 //        }
     }
 
@@ -180,7 +180,7 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                            ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? ZL.AudioLevels.channels[zynthian.bottomBarControlObj.clipChannel.id]
+                              ? ZL.AudioLevels.channels[zynqtgui.bottomBarControlObj.clipChannel.id]
                               : ZL.AudioLevels.captureA
                            : -100
 
@@ -204,7 +204,7 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                             ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                               ? ZL.AudioLevels.channels[zynthian.bottomBarControlObj.clipChannel.id]
+                               ? ZL.AudioLevels.channels[zynqtgui.bottomBarControlObj.clipChannel.id]
                                : ZL.AudioLevels.captureB
                             : -100
 
@@ -239,11 +239,11 @@ GridLayout {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 6
             Layout.alignment: Qt.AlignCenter
 
-            icon.name: zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+            icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
             onClicked: {
                 applicationWindow().openRecordingPopup()
-//                if (!zynthian.sketchpad.isRecording) {
+//                if (!zynqtgui.sketchpad.isRecording) {
 //                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
 //                    controlObj.queueRecording();
 //                    Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -290,9 +290,9 @@ GridLayout {
 
             text: qsTr("Paste Clip")
             visible: bottomBar.clipCopySource != null
-            enabled: bottomBar.clipCopySource != zynthian.bottomBarControlObj
+            enabled: bottomBar.clipCopySource != zynqtgui.bottomBarControlObj
             onClicked: {
-                zynthian.bottomBarControlObj.copyFrom(bottomBar.clipCopySource);
+                zynqtgui.bottomBarControlObj.copyFrom(bottomBar.clipCopySource);
                 bottomBar.clipCopySource = null;
             }
         }

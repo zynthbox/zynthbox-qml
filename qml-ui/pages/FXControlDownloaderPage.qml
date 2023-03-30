@@ -32,5 +32,5 @@ Zynthian.NewStuffPage {
     screenId: "fx_control_downloader"
     title: qsTr("Edit Pages Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-fxengineeditpages.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynqtgui-fxengineeditpages.knsrc").toString().slice(7)
 }

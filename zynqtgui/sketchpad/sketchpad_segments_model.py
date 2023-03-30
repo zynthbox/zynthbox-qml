@@ -34,7 +34,7 @@ class sketchpad_segments_model(QAbstractListModel):
 
     def __init__(self, song, sketch):
         super().__init__(song)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.__song = song
         self.__sketch = sketch
@@ -170,7 +170,7 @@ class sketchpad_segments_model(QAbstractListModel):
         if self.__selected_segment_index != index and index > -1 and index < len(self.__segments):
             self.__selected_segment_index = index
             self.selectedSegmentIndexChanged.emit()
-            self.zyngui.sketchpad.set_selector()
+            self.zynqtgui.sketchpad.set_selector()
 
     selectedSegmentIndexChanged = Signal()
 

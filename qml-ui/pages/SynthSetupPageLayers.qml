@@ -36,7 +36,7 @@ Zynthian.ScreenPage {
     id: root
     backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: zynthian.current_screen_id = "session_dashboard"
+        onTriggered: zynqtgui.current_screen_id = "session_dashboard"
     }
     contextualActions: [
         Kirigami.Action {
@@ -56,7 +56,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Save Sound...")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynqtgui.main_layers_view.current_index_valid
                 onTriggered: {
                     saveDialog.mode = "sound";
                     saveDialog.open();
@@ -64,7 +64,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Get New Sounds...")
-                onTriggered: zynthian.show_modal("sound_downloader")
+                onTriggered: zynqtgui.show_modal("sound_downloader")
             }
             Kirigami.Action {
                 text: qsTr("Load Soundset...")
@@ -82,21 +82,21 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Get New Soundsets...")
-                onTriggered: zynthian.show_modal("soundset_downloader")
+                onTriggered: zynqtgui.show_modal("soundset_downloader")
             }
             Kirigami.Action {
                 text: qsTr("Clear Sound")
-                enabled: zynthian.main_layers_view.current_index_valid
-                onTriggered: zynthian.layer.ask_remove_current_layer()
+                enabled: zynqtgui.main_layers_view.current_index_valid
+                onTriggered: zynqtgui.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
                 text: qsTr("Clear Block")
-                enabled: zynthian.main_layers_view.current_index_valid
-                onTriggered: zynthian.main_layers_view.ask_clear_visible_range()
+                enabled: zynqtgui.main_layers_view.current_index_valid
+                onTriggered: zynqtgui.main_layers_view.ask_clear_visible_range()
             }
             Kirigami.Action {
                 text: qsTr("Clear All")
-                onTriggered: zynthian.layer.ask_reset()
+                onTriggered: zynqtgui.layer.ask_reset()
             }
         },
         Kirigami.Action {
@@ -104,74 +104,74 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Synths")
                 onTriggered: {
-                    zynthian.layer.select_engine(zynthian.main_layers_view.active_midi_channel)
+                    zynqtgui.layer.select_engine(zynqtgui.main_layers_view.active_midi_channel)
                 }
             }
             Kirigami.Action {
                 text: qsTr("Effect Layer")
                 onTriggered: {
-                    zynthian.layer.new_effect_layer(zynthian.main_layers_view.active_midi_channel)
+                    zynqtgui.layer.new_effect_layer(zynqtgui.main_layers_view.active_midi_channel)
                 }
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynqtgui.main_layers_view.current_index_valid
                 onTriggered: {
-                    zynthian.layer_options.show(); //FIXME: that show() method should change name
-                    zynthian.current_screen_id = "layer_effects";
+                    zynqtgui.layer_options.show(); //FIXME: that show() method should change name
+                    zynqtgui.current_screen_id = "layer_effects";
                 }
             }
             Kirigami.Action {
                 text: qsTr("Remove All Audio-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynqtgui.main_layers_view.current_index_valid
                 onTriggered: {
-                    zynthian.layer_effects.fx_reset()
+                    zynqtgui.layer_effects.fx_reset()
                 }
             }
             Kirigami.Action {
                 text: qsTr("MIDI-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynqtgui.main_layers_view.current_index_valid
                 onTriggered: {
-                    zynthian.layer_options.show() //FIXME: that show() method should change name
-                    zynthian.current_screen_id = "layer_midi_effects";
+                    zynqtgui.layer_options.show() //FIXME: that show() method should change name
+                    zynqtgui.current_screen_id = "layer_midi_effects";
                 }
             }
             Kirigami.Action {
                 text: qsTr("Remove All MIDI-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynqtgui.main_layers_view.current_index_valid
                 onTriggered: {
-                    zynthian.layer_midi_effects.fx_reset()
+                    zynqtgui.layer_midi_effects.fx_reset()
                 }
             }
         },
         Kirigami.Action {
             text: qsTr("Edit")
             onTriggered: {
-                zynthian.control.single_effect_engine = null;
-                zynthian.current_screen_id = "control";
+                zynqtgui.control.single_effect_engine = null;
+                zynqtgui.current_screen_id = "control";
             }
         }
     ]
 
 
     cuiaCallback: function(cuia) {
-        let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
+        let currentScreenIndex = root.screenIds.indexOf(zynqtgui.current_screen_id);
         layerSetupDialog.close(); // Close the new layer popup at any keyboard interaction
 
         switch (cuia) {
         case "NAVIGATE_LEFT":
             var newIndex = Math.max(0, currentScreenIndex - 1);
-            zynthian.current_screen_id = root.screenIds[newIndex];
+            zynqtgui.current_screen_id = root.screenIds[newIndex];
             return true;
         case "NAVIGATE_RIGHT":
             var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
-            zynthian.current_screen_id = root.screenIds[newIndex];
+            zynqtgui.current_screen_id = root.screenIds[newIndex];
             return true;
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            zynthian.current_screen_id = "main_layers_view";
-            zynthian.go_back();
+            zynqtgui.current_screen_id = "main_layers_view";
+            zynqtgui.go_back();
             return true;
         default:
             return false;
@@ -180,12 +180,12 @@ Zynthian.ScreenPage {
 
 
     property var screenIds: ["main_layers_view", "bank", "preset"]
-    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.effective_count), qsTr("Presets (%1)").arg(zynthian.preset.effective_count)]
+    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynqtgui.bank.effective_count), qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
         //don't remove modal screens
-        if (zynthian.current_modal_screen_id.length === 0) {
-            zynthian.current_screen_id = screenId;
+        if (zynqtgui.current_modal_screen_id.length === 0) {
+            zynqtgui.current_screen_id = screenId;
         }
     }
 
@@ -206,12 +206,12 @@ Zynthian.ScreenPage {
                     implicitWidth: 1
                     text: qsTr("1 - 5")
                     checkable: true
-                    checked: zynthian.main_layers_view.start_midi_chan === 0
+                    checked: zynqtgui.main_layers_view.start_midi_chan === 0
                     autoExclusive: true
                     onToggled: {
                         if (checked) {
-                            zynthian.main_layers_view.start_midi_chan = 0;
-                            zynthian.main_layers_view.activate_index(0);
+                            zynqtgui.main_layers_view.start_midi_chan = 0;
+                            zynqtgui.main_layers_view.activate_index(0);
                         }
                     }
                 }
@@ -220,12 +220,12 @@ Zynthian.ScreenPage {
                     text: qsTr("6.x")
                     implicitWidth: 1
                     checkable: true
-                    checked: zynthian.main_layers_view.start_midi_chan === 5
+                    checked: zynqtgui.main_layers_view.start_midi_chan === 5
                     autoExclusive: true
                     onToggled: {
                         if (checked) {
-                            zynthian.main_layers_view.start_midi_chan = 5;
-                            zynthian.main_layers_view.activate_index(0);
+                            zynqtgui.main_layers_view.start_midi_chan = 5;
+                            zynqtgui.main_layers_view.activate_index(0);
                         }
                     }
                 }
@@ -234,19 +234,19 @@ Zynthian.ScreenPage {
                     text: qsTr("11-15")
                     implicitWidth: 1
                     checkable: true
-                    checked: zynthian.main_layers_view.start_midi_chan === 10
+                    checked: zynqtgui.main_layers_view.start_midi_chan === 10
                     autoExclusive: true
                     onToggled: {
                         if (checked) {
-                            zynthian.main_layers_view.start_midi_chan = 10;
-                            zynthian.main_layers_view.activate_index(0);
+                            zynqtgui.main_layers_view.start_midi_chan = 10;
+                            zynqtgui.main_layers_view.activate_index(0);
                         }
                     }
                 }
                 QQC2.Button {
                     implicitWidth: Math.round(parent.width/3.2)
                     text: "|"
-                    enabled: zynthian.main_layers_view.start_midi_chan !== 5 && layersView.view.currentIndex < layersView.view.count - 1
+                    enabled: zynqtgui.main_layers_view.start_midi_chan !== 5 && layersView.view.currentIndex < layersView.view.count - 1
                     onClicked: {
                         if (layersView.view.currentItem) {
                             layersView.view.currentItem.toggleCloned();
@@ -267,19 +267,19 @@ Zynthian.ScreenPage {
                     screenId: layersView.screenId
                     selector: layersView.selector
                     readonly property int ownIndex: index
-                    highlighted: zynthian.current_screen_id === layersView.screenId
+                    highlighted: zynqtgui.current_screen_id === layersView.screenId
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
                     function toggleCloned() {
                         if (model.metadata.midi_cloned) {
-                            zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
-                            zynthian.layer.remove_clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
+                            zynqtgui.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
+                            zynqtgui.layer.remove_clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
                         } else {
-                            zynthian.layer.clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
-                            zynthian.layer.clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
+                            zynqtgui.layer.clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
+                            zynqtgui.layer.clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
                         }
-                        zynthian.layer.ensure_contiguous_cloned_layers();
+                        zynqtgui.layer.ensure_contiguous_cloned_layers();
                     }
                     contentItem: ColumnLayout {
                         RowLayout {
@@ -327,33 +327,33 @@ Zynthian.ScreenPage {
                                     QQC2.MenuItem {
                                         width: parent.width
                                         text: qsTr("Range && Transpose...")
-                                        onClicked: zynthian.current_modal_screen_id = "midi_key_range";
+                                        onClicked: zynqtgui.current_modal_screen_id = "midi_key_range";
                                     }
                                     QQC2.MenuItem {
                                         width: parent.width
                                         text: qsTr("Add Audio FX...")
                                         onClicked: {
-                                            zynthian.layer_options.show();
-                                            zynthian.current_screen_id = "layer_effects";
+                                            zynqtgui.layer_options.show();
+                                            zynqtgui.current_screen_id = "layer_effects";
                                         }
                                     }
                                     QQC2.MenuItem {
                                         width: parent.width
                                         text: qsTr("Add Midi FX...")
                                         onClicked: {
-                                            zynthian.layer_options.show();
-                                            zynthian.current_screen_id = "layer_midi_effects";
+                                            zynqtgui.layer_options.show();
+                                            zynqtgui.current_screen_id = "layer_midi_effects";
                                         }
                                     }
                                     QQC2.MenuItem {
                                         width: parent.width
                                         text: qsTr("Layer Options...")
                                         onClicked: {
-                                            let oldCurrent_screen_id = zynthian.current_screen_id;
+                                            let oldCurrent_screen_id = zynqtgui.current_screen_id;
                                             delegate.selector.current_index = delegate.ownIndex;
                                             delegate.selector.activate_index_secondary(delegate.ownIndex);
                                             delegate.itemActivatedSecondary(delegate.screenId, delegate.ownIndex);
-                                            if (zynthian.current_screen_id === oldCurrent_screen_id) {
+                                            if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
                                                 delegate.currentScreenIdRequested(screenId);
                                             }
                                         }
@@ -412,7 +412,7 @@ Zynthian.ScreenPage {
                     Kirigami.Heading {
                         Layout.fillWidth: true
                         level: 2
-                        text: qsTr("Banks (%1)").arg(zynthian.bank.effective_count)
+                        text: qsTr("Banks (%1)").arg(zynqtgui.bank.effective_count)
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
                     }
@@ -420,10 +420,10 @@ Zynthian.ScreenPage {
                         id: favModeButton
                         text: qsTr("Fav-Mode")
                         checkable: true
-                        checked: zynthian.bank.show_top_sounds
+                        checked: zynqtgui.bank.show_top_sounds
                         onToggled: {
-                            zynthian.bank.show_top_sounds = checked;
-                            zynthian.current_screen_id = "bank";
+                            zynqtgui.bank.show_top_sounds = checked;
+                            zynqtgui.current_screen_id = "bank";
                         }
                     }
                 }
@@ -439,7 +439,7 @@ Zynthian.ScreenPage {
                         text: model.display === "None" ? qsTr("Single") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
-                        highlighted: zynthian.current_screen_id === bankView.screenId
+                        highlighted: zynqtgui.current_screen_id === bankView.screenId
                         onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                         onItemActivated: bankView.itemActivated(screenId, index)
                         onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
@@ -469,7 +469,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.main_layers_view.volumeControllers
+                            model: zynqtgui.main_layers_view.volumeControllers
                             delegate: ColumnLayout {
                                 spacing: Kirigami.Units.largeSpacing
                                 enabled: modelData.value_max > 0
@@ -517,19 +517,19 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Presets (%1)").arg(zynthian.preset.effective_count)
+                    text: qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
                 QQC2.Button {
                     id: favToggleButton
-                    icon.name: zynthian.preset.current_is_favorite ? "starred-symbolic" : "non-starred-symbolic"
+                    icon.name: zynqtgui.preset.current_is_favorite ? "starred-symbolic" : "non-starred-symbolic"
                     text: qsTr("Toggle")
                     LayoutMirroring.enabled: true
                     LayoutMirroring.childrenInherit: true
                     onClicked: {
-                        zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite;
-                        zynthian.current_screen_id = "preset";
+                        zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+                        zynqtgui.current_screen_id = "preset";
                     }
                     MouseArea { //HACK: try to enlarge hit area a bit, probably useless
                         anchors {
@@ -539,8 +539,8 @@ Zynthian.ScreenPage {
                             rightMargin: -16
                         }
                         onClicked: {
-                            zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite;
-                            zynthian.current_screen_id = "preset";
+                            zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+                            zynqtgui.current_screen_id = "preset";
                         }
                     }
                 }
@@ -558,7 +558,7 @@ Zynthian.ScreenPage {
 
 
         Connections {
-            target: zynthian
+            target: zynqtgui
             onActive_midi_channelChanged: presetSyncPosTimer.restart()
         }
         Timer {
@@ -571,15 +571,15 @@ Zynthian.ScreenPage {
             }
         }
         Connections {
-            target: zynthian.main_layers_view
+            target: zynqtgui.main_layers_view
             onCurrent_index_validChanged: {
-                if (!zynthian.main_layers_view.current_index_valid) {
-                    if (zynthian.current_screen_id !== "layer" &&
-                        zynthian.current_screen_id !== "fixed_layers" &&
-                        zynthian.current_screen_id !== "main_layers_view" &&
-                        zynthian.current_screen_id !== "bank" &&
-                        zynthian.current_screen_id !== "confirm" &&
-                        zynthian.current_screen_id !== "preset") {
+                if (!zynqtgui.main_layers_view.current_index_valid) {
+                    if (zynqtgui.current_screen_id !== "layer" &&
+                        zynqtgui.current_screen_id !== "fixed_layers" &&
+                        zynqtgui.current_screen_id !== "main_layers_view" &&
+                        zynqtgui.current_screen_id !== "bank" &&
+                        zynqtgui.current_screen_id !== "confirm" &&
+                        zynqtgui.current_screen_id !== "preset") {
                         layerSetupDialog.open();
                     }
                 } else {
@@ -624,7 +624,7 @@ Zynthian.ScreenPage {
                     Timer { //HACK why is this necessary?
                         id: newSynthWorkaroundTimer
                         interval: 200
-                        onTriggered: zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
+                        onTriggered: zynqtgui.layer.select_engine(zynqtgui.main_layers_view.index_to_midi(zynqtgui.main_layers_view.current_index))
 
                     }
                 }
@@ -635,9 +635,9 @@ Zynthian.ScreenPage {
             id: saveDialog
             property string mode: "sound"
 
-            conflictMessageLabel.visible: saveDialog.mode === "soundset" ? zynthian.layer.soundset_file_exists(fileNameToSave) : zynthian.layer.layer_file_exists(fileNameToSave);
+            conflictMessageLabel.visible: saveDialog.mode === "soundset" ? zynqtgui.layer.soundset_file_exists(fileNameToSave) : zynqtgui.layer.layer_file_exists(fileNameToSave);
             headerText: saveDialog.mode === "soundset" ? qsTr("Save a Soundset file") : qsTr("Save a Sound file")
-            rootFolder: "/zynthian/zynthian-my-data/"
+            rootFolder: "/zynqtgui/zynqtgui-my-data/"
             noFilesMessage: saveDialog.mode === "soundset" ? qsTr("No Soundsets present") : qsTr("No sounds present")
             folderModel {
                 nameFilters: [saveDialog.mode === "soundset" ? "*.soundset" : "*.*.sound"]
@@ -649,8 +649,8 @@ Zynthian.ScreenPage {
                     id: infoRepeater
                     model: saveDialog.currentFileInfo
                         ? (saveDialog.mode === "soundset"
-                            ? zynthian.layer.soundset_metadata_from_file(saveDialog.currentFileInfo.fileName)
-                            : zynthian.layer.sound_metadata_from_file(saveDialog.currentFileInfo.fileName))
+                            ? zynqtgui.layer.soundset_metadata_from_file(saveDialog.currentFileInfo.fileName)
+                            : zynqtgui.layer.sound_metadata_from_file(saveDialog.currentFileInfo.fileName))
                         : []
                     delegate: QQC2.Label {
                         width: modelData.preset_name ? parent.width - 10 : implicitWidth
@@ -702,9 +702,9 @@ Zynthian.ScreenPage {
             onFileSelected: {
                 console.log(file.filePath);
                 if (mode === "soundset") {
-                    zynthian.layer.save_soundset_to_file(file.fileName);
+                    zynqtgui.layer.save_soundset_to_file(file.fileName);
                 } else { //Sound
-                    zynthian.layer.save_curlayer_to_file(file.fileName);
+                    zynqtgui.layer.save_curlayer_to_file(file.fileName);
                 }
             }
 
@@ -717,7 +717,7 @@ Zynthian.ScreenPage {
             property string mode: "sound"
 
             headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
-            rootFolder: "/zynthian/zynthian-my-data/"
+            rootFolder: "/zynqtgui/zynqtgui-my-data/"
             folderModel {
                 nameFilters: [(pickerDialog.mode === "soundset" ? "*.soundset" : "*.*." + pickerDialog.mode)]
             }
@@ -727,8 +727,8 @@ Zynthian.ScreenPage {
                     id: infoRepeater
                     model: pickerDialog.currentFileInfo
                         ? (pickerDialog.mode === "soundset"
-                            ? zynthian.layer.soundset_metadata_from_file(pickerDialog.currentFileInfo.fileName)
-                            : zynthian.layer.sound_metadata_from_file(pickerDialog.currentFileInfo.fileName))
+                            ? zynqtgui.layer.soundset_metadata_from_file(pickerDialog.currentFileInfo.fileName)
+                            : zynqtgui.layer.sound_metadata_from_file(pickerDialog.currentFileInfo.fileName))
                         : []
                     delegate: QQC2.Label {
                         width: modelData.preset_name ? parent.width - 10 : implicitWidth
@@ -780,20 +780,20 @@ Zynthian.ScreenPage {
             onFileSelected: {
                 console.log(file.filePath);
                 if (pickerDialog.mode === "soundset") {
-                    zynthian.layer.load_soundset_from_file(file.filePath)
+                    zynqtgui.layer.load_soundset_from_file(file.filePath)
                 } else {
-                    //zynthian.layer.load_layer_from_file(file.filePath)
-                    layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(file.filePath);
+                    //zynqtgui.layer.load_layer_from_file(file.filePath)
+                    layerReplaceDialog.sourceChannels = zynqtgui.layer.load_layer_channels_from_file(file.filePath);
                     if (layerReplaceDialog.sourceChannels.length > 1) {
                         layerReplaceDialog.fileToLoad = file.filePath;
                         layerReplaceDialog.open();
                     } else {
                         let map = {}
-                        map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index);
-                        zynthian.layer.load_layer_from_file(file.filePath, map);
+                        map[layerReplaceDialog.sourceChannels[0].toString()] = zynqtgui.main_layers_view.index_to_midi(zynqtgui.main_layers_view.current_index);
+                        zynqtgui.layer.load_layer_from_file(file.filePath, map);
                     }
                 }
-                zynthian.bank.show_top_sounds = false;
+                zynqtgui.bank.show_top_sounds = false;
                 pickerDialog.accept()
             }
         }
@@ -825,7 +825,7 @@ Zynthian.ScreenPage {
                 for (i in map) {
                     print("Mapping midi channel " + i + " to " + map[i]);
                 }
-                zynthian.layer.load_layer_from_file(fileToLoad, map);
+                zynqtgui.layer.load_layer_from_file(fileToLoad, map);
                 clear();
             }
             onRejected: {
@@ -840,7 +840,7 @@ Zynthian.ScreenPage {
                 }
                 Repeater {
                     id: channelReplaceRepeater
-                    model: zynthian.main_layers_view.selector_list
+                    model: zynqtgui.main_layers_view.selector_list
                     delegate: QQC2.RadioButton {
                         id: delegate
                         enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length
@@ -860,7 +860,7 @@ Zynthian.ScreenPage {
                             target: layerReplaceDialog
                             onFileToLoadChanged: {
                                 checked = false
-                                checked = index === zynthian.main_layers_view.current_index
+                                checked = index === zynqtgui.main_layers_view.current_index
                             }
                         }
                         indicator.opacity: enabled

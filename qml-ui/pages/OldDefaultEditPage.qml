@@ -35,7 +35,7 @@ RowLayout {
     onVisibleChanged: {
         if (visible) {
             // FIXME: why needed?
-            zynthian.control.activate_index(zynthian.control.current_index)
+            zynqtgui.control.activate_index(zynqtgui.control.current_index)
         }
     }
 

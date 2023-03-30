@@ -34,15 +34,15 @@ import JuceGraphics 1.0
 Zynthian.ScreenPage {
     id: root
 
-    readonly property QtObject song: zynthian.sketchpad.song
-    readonly property QtObject channel: zynthian.channel.channel
-    readonly property QtObject part: zynthian.channel.part
-    readonly property QtObject clip: channel.clipsModel.getClip(zynthian.channel.partId);
+    readonly property QtObject song: zynqtgui.sketchpad.song
+    readonly property QtObject channel: zynqtgui.channel.channel
+    readonly property QtObject part: zynqtgui.channel.part
+    readonly property QtObject clip: channel.clipsModel.getClip(zynqtgui.channel.partId);
 
     screenId: "channel"
-    title: qsTr("%1 Details").arg(root.channel.name)//zynthian.channel.selector_path_element
+    title: qsTr("%1 Details").arg(root.channel.name)//zynqtgui.channel.selector_path_element
 
-    //Component.onCompleted: zynthian.fixed_layers.activate_index(6)
+    //Component.onCompleted: zynqtgui.fixed_layers.activate_index(6)
 
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
@@ -69,7 +69,7 @@ Zynthian.ScreenPage {
                 from: 0
                 to: root.song.partsModel.count - 1
                 value: root.channel.partId
-                onValueModified: zynthian.channel.partId = value
+                onValueModified: zynqtgui.channel.partId = value
                 textFromValue: function(value) {
                     return root.part.name
                 }
@@ -109,7 +109,7 @@ Zynthian.ScreenPage {
                                     implicitHeight: channelTitle.implicitHeight + topPadding + bottomPadding
                                     to: root.song.channelsModel.count - 1
                                     value: root.channel.channelId
-                                    onValueModified: zynthian.channel.channelId = value
+                                    onValueModified: zynqtgui.channel.channelId = value
                                     contentItem: Kirigami.Heading {
                                         id: channelTitle
                                         //Layout.fillWidth: true
@@ -141,8 +141,8 @@ Zynthian.ScreenPage {
                             id: midiButton
                             text: qsTr("Load Voices")
                             onClicked: {
-                                zynthian.sketchpad.restoreLayersFromChannel(zynthian.channel.channelId)
-                                //zynthian.fixed_layers.activate_index(6)
+                                zynqtgui.sketchpad.restoreLayersFromChannel(zynqtgui.channel.channelId)
+                                //zynqtgui.fixed_layers.activate_index(6)
                             }
                         }
                         /*QQC2.Button {
@@ -180,10 +180,10 @@ Zynthian.ScreenPage {
                                     from: 0
                                     to: 5
                                     textFromValue: function(value) {
-                                        return zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(index+6, 0)).substring(3, 15)
+                                        return zynqtgui.fixed_layers.selector_list.data(zynqtgui.fixed_layers.selector_list.index(index+6, 0)).substring(3, 15)
                                     }
                                     onValueModified: {
-                                        zynthian.layer.copy_midichan_layer(value, index+5);
+                                        zynqtgui.layer.copy_midichan_layer(value, index+5);
                                     }
                                 }*/
                                 QQC2.ComboBox {
@@ -194,8 +194,8 @@ Zynthian.ScreenPage {
                                     }
                                     Component.onCompleted: {
                                         filteredLayersModel.append({"display": qsTr("None")});
-                                        for (var i = 0; i < zynthian.fixed_layers.selector_list.count; ++i) {
-                                            filteredLayersModel.append({"display": zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(i, 0))})
+                                        for (var i = 0; i < zynqtgui.fixed_layers.selector_list.count; ++i) {
+                                            filteredLayersModel.append({"display": zynqtgui.fixed_layers.selector_list.data(zynqtgui.fixed_layers.selector_list.index(i, 0))})
                                         }
                                         voiceCombo.updateText();
                                     }
@@ -211,7 +211,7 @@ Zynthian.ScreenPage {
                                         }
                                     }
                                     Connections {
-                                        target: zynthian.fixed_layers
+                                        target: zynqtgui.fixed_layers
                                         onSpecial_layer_nameChanged: voiceCombo.updateText();
                                     }
                                     Connections {
@@ -223,18 +223,18 @@ Zynthian.ScreenPage {
                                     textRole: "display"
                                     onActivated: {
                                         if (index === 0) {
-                                            zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
-                                            zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
+                                            zynqtgui.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
+                                            zynqtgui.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
                                             voiceCombo.updateText()
                                         } else {
                                             print("COPYING "+(index-1)+" "+ channelDelegate.targetMidiChan)
-                                            zynthian.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
+                                            zynqtgui.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
                                             print("COPIED")
 
                                             voiceCombo.updateText()
                                         }
-                                        //zynthian.fixed_layers.activate_index(6)
-                                        zynthian.sketchpad.saveLayersToChannel(zynthian.channel.channelId)
+                                        //zynqtgui.fixed_layers.activate_index(6)
+                                        zynqtgui.sketchpad.saveLayersToChannel(zynqtgui.channel.channelId)
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display
@@ -272,9 +272,9 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 font: topSoundHeading.font
                                 from: 0
-                                to: zynthian.layer.selector_list.count
+                                to: zynqtgui.layer.selector_list.count
                                 textFromValue: function(value) {
-                                    return zynthian.layer.selector_list.data(zynthian.layer.selector_list.index(value, 0)).substring(0, 5)
+                                    return zynqtgui.layer.selector_list.data(zynqtgui.layer.selector_list.index(value, 0)).substring(0, 5)
                                 }
                             }
                         }
@@ -289,9 +289,9 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 font: topSoundHeading.font
                                 from: 0
-                                to: zynthian.bank.selector_list.count
+                                to: zynqtgui.bank.selector_list.count
                                 textFromValue: function(value) {
-                                    return zynthian.bank.selector_list.data(zynthian.bank.selector_list.index(value, 0)).substring(0, 5)
+                                    return zynqtgui.bank.selector_list.data(zynqtgui.bank.selector_list.index(value, 0)).substring(0, 5)
                                 }
                             }
                         }
@@ -306,9 +306,9 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 font: topSoundHeading.font
                                 from: 0
-                                to: zynthian.preset.selector_list.count
+                                to: zynqtgui.preset.selector_list.count
                                 textFromValue: function(value) {
-                                    return zynthian.preset.selector_list.data(zynthian.preset.selector_list.index(value, 0)).substring(0, 5)
+                                    return zynqtgui.preset.selector_list.data(zynqtgui.preset.selector_list.index(value, 0)).substring(0, 5)
                                 }
                             }
                         }*/
@@ -322,11 +322,11 @@ Zynthian.ScreenPage {
                 contentItem: ColumnLayout {
                     QQC2.ToolButton {
                         Layout.alignment: Qt.AlignCenter
-                        icon.name: zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
                         onClicked: {
-                            if (!zynthian.sketchpad.isRecording) {
+                            if (!zynqtgui.sketchpad.isRecording) {
                                 root.clip.clear();
                                 root.clip.queueRecording();
                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -348,7 +348,7 @@ Zynthian.ScreenPage {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.sketchpad.recordingSource = sourceComboModel.get(index).value
+                            zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
                         }
                     }
                     QQC2.ComboBox {
@@ -365,7 +365,7 @@ Zynthian.ScreenPage {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.sketchpad.recordingChannel = channelComboModel.get(index).value
+                            zynqtgui.sketchpad.recordingChannel = channelComboModel.get(index).value
                         }
                     }
                 }

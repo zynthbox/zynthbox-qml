@@ -6,17 +6,17 @@ function startMetronomeAndPlayback() {
     // page is shown, where we invert that logic and allow you to start in not song mode using
     // alt+play and play on its own starts playback in song mode.
     var playInSongMode = false;
-    if (zynthian.current_screen_id === "song_manager") {
-        if (zynthian.altButtonPressed === false) {
+    if (zynqtgui.current_screen_id === "song_manager") {
+        if (zynqtgui.altButtonPressed === false) {
             playInSongMode = true;
         }
-    } else if (zynthian.altButtonPressed) {
+    } else if (zynqtgui.altButtonPressed) {
         playInSongMode = true;
     }
-    zynthian.sketchpad.song.sketchesModel.songMode = playInSongMode;
+    zynqtgui.sketchpad.song.sketchesModel.songMode = playInSongMode;
 
-    if (zynthian.sketchpad.song.sketchesModel.songMode) {
-        if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0) {
+    if (zynqtgui.sketchpad.song.sketchesModel.songMode) {
+        if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0) {
             ZynQuick.SegmentHandler.startPlayback(0, 0);
         }
     } else {
@@ -29,20 +29,20 @@ function startMetronomeAndPlayback() {
                 console.debug("Sequence could not be fetched, and playback could not be prepared");
             }
         }
-        if (zynthian.sketchpad.clipToRecord) {
+        if (zynqtgui.sketchpad.clipToRecord) {
             ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
         }
-        zynthian.sketchpad.startPlayback();
+        zynqtgui.sketchpad.startPlayback();
         console.log("Metronome and Playback Started");
     }
 }
 
 function stopMetronomeAndPlayback() {
-    if (zynthian.sketchpad.song.sketchesModel.songMode) {
-        zynthian.sketchpad.stopAllPlayback();
-        zynthian.callable_ui_action("ALL_NOTES_OFF")
+    if (zynqtgui.sketchpad.song.sketchesModel.songMode) {
+        zynqtgui.sketchpad.stopAllPlayback();
+        zynqtgui.callable_ui_action("ALL_NOTES_OFF")
         ZynQuick.SegmentHandler.stopPlayback();
-        zynthian.sketchpad.resetMetronome();
+        zynqtgui.sketchpad.resetMetronome();
     } else {
         console.log("Stopping Metronome and Playback");
         for (var i = 0; i < 10; ++i) {
@@ -54,18 +54,18 @@ function stopMetronomeAndPlayback() {
             }
         }
 
-        if (zynthian.sketchpad.isRecording) {
+        if (zynqtgui.sketchpad.isRecording) {
             ZynQuick.MidiRecorder.stopRecording()
-            zynthian.sketchpad.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
+            zynqtgui.sketchpad.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
 
-            if (zynthian.sketchpad.recordingType === "audio") {
-                zynthian.sketchpad.stopAudioRecording()
+            if (zynqtgui.sketchpad.recordingType === "audio") {
+                zynqtgui.sketchpad.stopAudioRecording()
             } else {
-                for (var clipIndex in zynthian.sketchpad.clipsToRecord) {
-                    var clip = zynthian.sketchpad.clipsToRecord[clipIndex]
+                for (var clipIndex in zynqtgui.sketchpad.clipsToRecord) {
+                    var clip = zynqtgui.sketchpad.clipsToRecord[clipIndex]
 
                     if (!clip.isChannelSample) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName)
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
                         var pattern = sequence.getByPart(clip.row, clip.part)
 
                         console.log("Applying pattern to", pattern, " for ", clip, clip.row, clip.col, clip.part)
@@ -74,33 +74,33 @@ function stopMetronomeAndPlayback() {
                 }
             }
 
-            zynthian.sketchpad.stopRecording()
+            zynqtgui.sketchpad.stopRecording()
         }
 
-        zynthian.sketchpad.stopAllPlayback();
-        zynthian.callable_ui_action("ALL_NOTES_OFF")
-        zynthian.playgrid.stopMetronomeRequest();
-        zynthian.song_arranger.stop();
-        zynthian.sketchpad.resetMetronome();
+        zynqtgui.sketchpad.stopAllPlayback();
+        zynqtgui.callable_ui_action("ALL_NOTES_OFF")
+        zynqtgui.playgrid.stopMetronomeRequest();
+        zynqtgui.song_arranger.stop();
+        zynqtgui.sketchpad.resetMetronome();
         console.log("Metronome and Playback Stopped");
     }
-    zynthian.sketchpad.song.sketchesModel.songMode = false;
+    zynqtgui.sketchpad.song.sketchesModel.songMode = false;
 }
 
 function toggleLayerChaining(layer) {
     if (layer.metadata.midi_cloned) {
-        zynthian.layer.remove_clone_midi(layer.metadata.midi_channel, layer.metadata.midi_channel + 1);
-        zynthian.layer.remove_clone_midi(layer.metadata.midi_channel + 1, layer.metadata.midi_channel);
+        zynqtgui.layer.remove_clone_midi(layer.metadata.midi_channel, layer.metadata.midi_channel + 1);
+        zynqtgui.layer.remove_clone_midi(layer.metadata.midi_channel + 1, layer.metadata.midi_channel);
     } else {
-        zynthian.layer.clone_midi(layer.metadata.midi_channel, layer.metadata.midi_channel + 1);
-        zynthian.layer.clone_midi(layer.metadata.midi_channel + 1, layer.metadata.midi_channel);
+        zynqtgui.layer.clone_midi(layer.metadata.midi_channel, layer.metadata.midi_channel + 1);
+        zynqtgui.layer.clone_midi(layer.metadata.midi_channel + 1, layer.metadata.midi_channel);
     }
-    zynthian.layer.ensure_contiguous_cloned_layers();
-    zynthian.fixed_layers.show();
+    zynqtgui.layer.ensure_contiguous_cloned_layers();
+    zynqtgui.fixed_layers.show();
 }
 
 function switchToScene(index) {
-    zynthian.sketchpad.song.scenesModel.selectedSceneIndex = index
+    zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex = index
 }
 
 // Method to instantiate a component from URL

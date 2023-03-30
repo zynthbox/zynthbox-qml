@@ -89,19 +89,19 @@ QQC2.ToolBar {
                     BreadcrumbButton {
                         id: toolButton
                         Layout.fillWidth: true
-                        text: zynthian[model.screenId].selector_path_element
-                               || zynthian[model.screenId].selector_path.replace("Jalv/", "")
+                        text: zynqtgui[model.screenId].selector_path_element
+                               || zynqtgui[model.screenId].selector_path.replace("Jalv/", "")
                                //|| model.page.title //HACK for name shortening
                         // HACK to hide home button as there is already one
                         visible: (index > 1 /*|| root.layerManager.depth > 1*/) && text.length > 0
-                        highlighted: model.screenId === zynthian.current_screen_id;
+                        highlighted: model.screenId === zynqtgui.current_screen_id;
                         //enabled: root.layerManager.depth === 1
 
                         onClicked: {
                             //if (root.layerManager.depth > 1 && applicationWindow().pageScreenMapping.pageForScreen(model.screenId).length === 0) {
-                                //zynthian.current_modal_screen_id = model.screenId;
+                                //zynqtgui.current_modal_screen_id = model.screenId;
                             //}
-                            zynthian.current_screen_id = model.screenId;
+                            zynqtgui.current_screen_id = model.screenId;
                         }
                     }
                 }

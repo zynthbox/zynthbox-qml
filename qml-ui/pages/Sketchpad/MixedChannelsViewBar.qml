@@ -39,10 +39,10 @@ import JuceGraphics 1.0
 Rectangle {
     id: root
 
-    readonly property QtObject song: zynthian.sketchpad.song
+    readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property QtObject selectedChannel: applicationWindow().selectedChannel
 
-    property QtObject sequence: root.selectedChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
+    property QtObject sequence: root.selectedChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
 
 
@@ -53,15 +53,15 @@ Rectangle {
         var returnValue = false;
         switch (cuia) {
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedChannel > 0) {
-                    zynthian.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.session_dashboard.selectedChannel > 0) {
+                    zynqtgui.session_dashboard.selectedChannel -= 1;
                 }
                 returnValue = true;
                 break;
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedChannel < 9) {
-                    zynthian.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.session_dashboard.selectedChannel < 9) {
+                    zynqtgui.session_dashboard.selectedChannel += 1;
                 }
                 returnValue = true;
                 break;
@@ -96,8 +96,8 @@ Rectangle {
             anchors.fill: parent
             implicitWidth: root.width
             implicitHeight: root.height
-            readonly property QtObject song: zynthian.sketchpad.song
-            selectedChannel: song ? song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel) : null
+            readonly property QtObject song: zynqtgui.sketchpad.song
+            selectedChannel: song ? song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null
         }
     }
 
@@ -312,7 +312,7 @@ Rectangle {
                                             Layout.fillHeight: true
                                             text: "Bounce To Audio"
                                             onClicked: {
-                                                bouncePopup.bounce(zynthian.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
+                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
                                             }
                                         }
                                         Item {
@@ -339,7 +339,7 @@ Rectangle {
                                                 root.selectedChannel.channelAudioType === "sample-slice"
                                                     ? root.selectedChannel.samples
                                                     : root.selectedChannel.channelAudioType === "sample-loop"
-                                                        ? [root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex), null, null, null, null]
+                                                        ? [root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex), null, null, null, null]
                                                         : root.selectedChannel.channelAudioType === "external"
                                                             ? [qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""), null, null, null, null]
                                                             : []
@@ -367,7 +367,7 @@ Rectangle {
                                         Rectangle {
                                             id: delegate
 
-                                            property var volumeControlObj: zynthian.fixed_layers.volumeControllers[root.selectedChannel.chainedSounds[index]]
+                                            property var volumeControlObj: zynqtgui.fixed_layers.volumeControllers[root.selectedChannel.chainedSounds[index]]
                                             property real volume: volumeControlObj != null ? volumeControlObj.value/100 : 0
 
                                             anchors.fill: parent
@@ -454,10 +454,10 @@ Rectangle {
                                                 }
                                                 onPressAndHold: {
                                                     if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[index])) {
-                                                        zynthian.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
-                                                        zynthian.control.single_effect_engine = null;
-                                                        zynthian.current_screen_id = "control";
-                                                        zynthian.forced_screen_back = "sketchpad"
+                                                        zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
+                                                        zynqtgui.control.single_effect_engine = null;
+                                                        zynqtgui.current_screen_id = "control";
+                                                        zynqtgui.forced_screen_back = "sketchpad"
                                                     }
                                                 }
                                             }
@@ -479,7 +479,7 @@ Rectangle {
                                                             root.selectedChannel.channelAudioType === "sample-loop"
 
                                 property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
-                                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+                                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
                                                             : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
                                 Layout.fillWidth: true
@@ -562,7 +562,7 @@ Rectangle {
                                                 color: Kirigami.Theme.neutralTextColor
                                                 opacity: 0.6
                                                 width: Kirigami.Units.smallSpacing
-                                                x: ((((60/zynthian.sketchpad.song.bpm) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width)
+                                                x: ((((60/zynqtgui.sketchpad.song.bpm) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width)
                                             }
 
                                             // Progress line
@@ -609,8 +609,8 @@ Rectangle {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop") {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            zynthian.bottomBarControlType = "bottombar-controltype-pattern";
-                                                            zynthian.bottomBarControlObj = waveformContainer.clip;
+                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+                                                            zynqtgui.bottomBarControlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.waveEditorAction.trigger();
@@ -618,8 +618,8 @@ Rectangle {
                                                         }
                                                     } else {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            zynthian.bottomBarControlType = "bottombar-controltype-channel";
-                                                            zynthian.bottomBarControlObj = root.selectedChannel;
+                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                                            zynqtgui.bottomBarControlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();
@@ -632,8 +632,8 @@ Rectangle {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop") {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            zynthian.bottomBarControlType = "bottombar-controltype-pattern";
-                                                            zynthian.bottomBarControlObj = waveformContainer.clip;
+                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+                                                            zynqtgui.bottomBarControlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.waveEditorAction.trigger();
@@ -641,8 +641,8 @@ Rectangle {
                                                         }
                                                     } else {
                                                         if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
-                                                            zynthian.bottomBarControlType = "bottombar-controltype-channel";
-                                                            zynthian.bottomBarControlObj = root.selectedChannel;
+                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                                            zynqtgui.bottomBarControlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
                                                             Qt.callLater(function() {
                                                                 bottomStack.bottomBar.channelWaveEditorAction.trigger();
@@ -722,11 +722,11 @@ Rectangle {
                                                 anchors.fill:parent
                                                 onClicked: {
                                                     if (patternContainer.showPattern) {
-                                                        var screenBack = zynthian.current_screen_id;
-                                                        zynthian.current_modal_screen_id = "playgrid";
-                                                        zynthian.forced_screen_back = "sketchpad";
+                                                        var screenBack = zynqtgui.current_screen_id;
+                                                        zynqtgui.current_modal_screen_id = "playgrid";
+                                                        zynqtgui.forced_screen_back = "sketchpad";
                                                         ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
+                                                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
                                                         sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
                                                     }
                                                 }

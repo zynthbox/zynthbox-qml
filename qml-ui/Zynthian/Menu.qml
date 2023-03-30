@@ -30,7 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 QQC2.Menu {
     id: root
 
-    /** Handle opened changed to push/pop dialog to zynthian dialog stack
+    /** Handle opened changed to push/pop dialog to zynqtgui dialog stack
       * This will allow main program to pass CUIA events to the dialog stack
       *
       * Since this is a signal handler it is okay if one of the derived components
@@ -38,9 +38,9 @@ QQC2.Menu {
       */
     onOpenedChanged: {
         if (root.opened) {
-            zynthian.pushDialog(root)
+            zynqtgui.pushDialog(root)
         } else {
-            zynthian.popDialog(root)
+            zynqtgui.popDialog(root)
         }
     }
 }

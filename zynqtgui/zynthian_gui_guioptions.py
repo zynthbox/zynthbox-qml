@@ -34,7 +34,7 @@ from PySide2.QtCore import Qt, QObject, Signal, Slot, Property
 # Zynthian GUI Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_guioptions(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_guioptions(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_guioptions, self).__init__(parent)
         self.title = "Gui Options"

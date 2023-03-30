@@ -94,10 +94,10 @@ Zynthian.ScreenPage {
                     : qsTr("Load")
             onTriggered: {
                 if (isSaveBtn) {
-                    saveSoundDialog.fileName = zynthian.sound_categories.suggestedSoundFileName()
+                    saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
                     saveSoundDialog.open()
                 } else {
-                    zynthian.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
+                    zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
                 }
             }
         },
@@ -115,13 +115,13 @@ Zynthian.ScreenPage {
     }
 
     Connections {
-        target: zynthian
+        target: zynqtgui
         onCurrent_screen_idChanged: {
             // Refresh sounds model on page open
-            if (zynthian.current_screen_id === root.screenId) {
+            if (zynqtgui.current_screen_id === root.screenId) {
                 soundTypeComboBox.currentIndex = 0
-                zynthian.sound_categories.setSoundTypeFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
-                zynthian.sound_categories.load_sounds_model()
+                zynqtgui.sound_categories.setSoundTypeFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
+                zynqtgui.sound_categories.load_sounds_model()
 
                 if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
                     soundButtonGroup.checkedButton.checked = false
@@ -145,12 +145,12 @@ Zynthian.ScreenPage {
             id: fileCheckTimer
             interval: 50
             onTriggered: {
-                saveSoundDialog.conflict = zynthian.sound_categories.checkIfSoundFileExists(saveSoundDialog.fileName);
+                saveSoundDialog.conflict = zynqtgui.sound_categories.checkIfSoundFileExists(saveSoundDialog.fileName);
             }
         }
 
         onAccepted: {
-            zynthian.sound_categories.saveSound(saveSoundDialog.fileName, categoryButtonGroup.checkedButton.category)
+            zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, categoryButtonGroup.checkedButton.category)
         }
     }
     
@@ -270,7 +270,7 @@ Zynthian.ScreenPage {
 
                         model: ["my-sounds", "community-sounds"]
                         onActivated: {
-                            zynthian.sound_categories.setSoundTypeFilter(model[index])
+                            zynqtgui.sound_categories.setSoundTypeFilter(model[index])
                         }
 
                         delegate: QQC2.ItemDelegate {
@@ -300,7 +300,7 @@ Zynthian.ScreenPage {
 
                         width: Kirigami.Units.gridUnit * 2
                         height: soundTypeComboBox.height
-                        onClicked: zynthian.sound_categories.load_sounds_model()
+                        onClicked: zynqtgui.sound_categories.load_sounds_model()
 
                         Kirigami.Icon {
                             anchors.fill: parent
@@ -347,7 +347,7 @@ Zynthian.ScreenPage {
 
                             Repeater {
                                 id: soundButtonsRepeater
-                                model: zynthian.sound_categories.soundsModel
+                                model: zynqtgui.sound_categories.soundsModel
                                 delegate: QQC2.Button {
                                     property QtObject soundObj: model.sound
 
@@ -372,7 +372,7 @@ Zynthian.ScreenPage {
                                             margins: Kirigami.Units.gridUnit * 0.5
                                         }
 
-                                        text: zynthian.sound_categories.getCategoryNameFromKey(soundObj.category)
+                                        text: zynqtgui.sound_categories.getCategoryNameFromKey(soundObj.category)
                                         font.pointSize: 8
                                     }
 
@@ -383,7 +383,7 @@ Zynthian.ScreenPage {
                                             margins: Kirigami.Units.gridUnit * 0.5
                                         }
 
-                                        text: zynthian.layer.load_layer_channels_from_file(soundObj.path).length
+                                        text: zynqtgui.layer.load_layer_channels_from_file(soundObj.path).length
                                         font.pointSize: 8
                                     }
                                 }
@@ -452,7 +452,7 @@ Zynthian.ScreenPage {
                     model: root.visible
                             ? soundButtonGroup.checkedButton != null &&
                               soundButtonGroup.checkedButton.checked
-                                ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
+                                ? zynqtgui.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
                                 : root.channel.chainedSoundsNames
                             : null
 

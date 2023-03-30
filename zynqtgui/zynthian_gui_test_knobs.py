@@ -32,7 +32,7 @@ from . import zynthian_gui_controller
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
-class zynthian_gui_test_knobs(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_test_knobs(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent = None):
         super(zynthian_gui_test_knobs, self).__init__(parent)
 
@@ -51,9 +51,9 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.ZynGui):
     def set_selector(self, zs_hiden=True):
         for i in range(4):
             if self.__zselector[i] is not None:
-                if not (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) and \
-                        self.zyngui.get_current_screen_id() is not None and \
-                        self.zyngui.get_current_screen() == self:
+                if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+                        self.zynqtgui.get_current_screen_id() is not None and \
+                        self.zynqtgui.get_current_screen() == self:
                     self.__zselector[i].show()
                 else:
                     self.__zselector[i].hide()
@@ -65,9 +65,9 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.ZynGui):
                      'value_max': 100,
                      'value': 0})
                 self.__zselector[i].config(self.__zselector_ctrl[i])
-            elif not (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) and \
-                    self.zyngui.get_current_screen_id() is not None and \
-                    self.zyngui.get_current_screen() == self:
+            elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+                    self.zynqtgui.get_current_screen_id() is not None and \
+                    self.zynqtgui.get_current_screen() == self:
                 self.__zselector_ctrl[i] = zynthian_controller(None, 'test knob {}'.format(i), 'test knob {}'.format(i),
                                                                {'midi_cc': 0, 'value': 0, 'value_max': 100})
                 self.__zselector[i] = zynthian_gui_controller(i, self.__zselector_ctrl[i], self)

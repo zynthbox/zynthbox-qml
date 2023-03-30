@@ -51,7 +51,7 @@ class sketchpad_channel(QObject):
         super(sketchpad_channel, self).__init__(parent)
         if sketchpad_channel.jclient is None:
             sketchpad_channel.jclient = jack.Client("sketchpad_channel")
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
         self.__id__ = id
         self.__name__ = None
         self.__song__ = song
@@ -67,7 +67,7 @@ class sketchpad_channel(QObject):
         self.__connected_pattern__ = -1
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
-        self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
+        self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
         self.__samples__ = []
         self.__keyzone_mode__ = "all-full"
@@ -113,7 +113,7 @@ class sketchpad_channel(QObject):
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
         try:
-            self.zyngui.sketchpad.song.scenesModel.selectedTrackIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+            self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         except:
             pass
         self.channel_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
@@ -121,13 +121,13 @@ class sketchpad_channel(QObject):
 
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
         self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
-        self.zyngui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler_throttle.start)
+        self.zynqtgui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler_throttle.start)
 
         ### Proxy recordingPopupActive from zynthian_qt_gui
-        self.zyngui.recordingPopupActiveChanged.connect(self.recordingPopupActiveChanged.emit)
+        self.zynqtgui.recordingPopupActiveChanged.connect(self.recordingPopupActiveChanged.emit)
 
         # Re-read sound snapshot json when a new snapshot is loaded
-        self.zyngui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
+        self.zynqtgui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
 
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
     def onClipEnabledChanged(self, trackIndex, partNum):
@@ -176,12 +176,12 @@ class sketchpad_channel(QObject):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
 
     def select_correct_layer(self):
-        zyngui = self.__song__.get_metronome_manager().zyngui
-        if self.checkIfLayerExists(zyngui.active_midi_channel):
+        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
+        if self.checkIfLayerExists(zynqtgui.active_midi_channel):
             logging.info("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
-            # zyngui.screens['session_dashboard'].set_selected_channel(zyngui.screens['session_dashboard'].selectedChannel, True)
+            # zynqtgui.screens['session_dashboard'].set_selected_channel(zynqtgui.screens['session_dashboard'].selectedChannel, True)
             try:
-                zyngui.screens["layers_for_channel"].update_channel_sounds()
+                zynqtgui.screens["layers_for_channel"].update_channel_sounds()
             except:
                 pass
         else:
@@ -322,7 +322,7 @@ class sketchpad_channel(QObject):
             if "routeThroughGlobalFX" in obj:
                 self.set_routeThroughGlobalFX(obj["routeThroughGlobalFX"], True)
                 # Run autoconnect to update jack connections when routeThrouGlobalFX is set
-                self.zyngui.zynautoconnect()
+                self.zynqtgui.zynautoconnect()
         except Exception as e:
             logging.error(f"Error during channel deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
@@ -371,11 +371,11 @@ class sketchpad_channel(QObject):
 
     @Slot()
     def update_jack_port(self, run_in_thread=True):
-        if self.zyngui is not None and not self.zyngui.get_isBootingComplete():
+        if self.zynqtgui is not None and not self.zynqtgui.get_isBootingComplete():
             logging.debug("Booting in progress. Ignoring port update request")
             # QTimer.singleShot(1000, self.update_jack_port)
         else:
-            self.zyngui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
+            self.zynqtgui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
 
             # If run_in_thread is set to False, directly call the method
             # This will allow startup process to wait till all ports are updated before displaying splash screen
@@ -385,16 +385,16 @@ class sketchpad_channel(QObject):
                 self.do_update_jack_port(run_in_thread)
 
     def do_update_jack_port(self, run_in_thread=True):
-        def task(zyngui, channel):
+        def task(zynqtgui, channel):
             jack_basenames = []
 
             channelHasEffects = False
             for ch in channel.chainedSounds:
                 if ch >= 0 and channel.checkIfLayerExists(ch):
-                    layer = zyngui.screens['layer'].layer_midi_map[ch]
+                    layer = zynqtgui.screens['layer'].layer_midi_map[ch]
 
                     # Iterate over all connected layers (including fx layer) on midi channel `channel`
-                    for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
+                    for fxlayer in zynqtgui.screens['layer'].get_fxchain_layers(layer):
                         try:
                             jack_basenames.append(fxlayer.jackname.split(":")[0])
 
@@ -447,10 +447,10 @@ class sketchpad_channel(QObject):
         # Do the task in a thread only if run_in_thread is set to True
         # This will allow startup process to wait till all ports are updated before displaying splash screen
         if run_in_thread:
-            worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
+            worker_thread = threading.Thread(target=task, args=(self.zynqtgui, self))
             worker_thread.start()
         else:
-            task(self.zyngui, self)
+            task(self.zynqtgui, self)
 
     @Slot(None)
     def clear(self):
@@ -500,7 +500,7 @@ class sketchpad_channel(QObject):
             # Update synth volume when channel volume changes
             for sound in self.chainedSounds:
                 if sound >= 0 and self.checkIfLayerExists(sound):
-                    volume_control_obj = self.zyngui.fixed_layers.volumeControllers[sound]
+                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[sound]
 
                     # Interpolate channel volume (-40 -> 20) to volume control object's range
                     if volume_control_obj is not None and \
@@ -509,7 +509,7 @@ class sketchpad_channel(QObject):
 
             self.volume_changed.emit()
             self.__song__.schedule_save()
-            self.zyngui.sketchpad.set_selector()
+            self.zynqtgui.sketchpad.set_selector()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 
@@ -528,7 +528,7 @@ class sketchpad_channel(QObject):
             self.__pan__ = pan
 
             self.panChanged.emit()
-            self.zyngui.sketchpad.set_selector()
+            self.zynqtgui.sketchpad.set_selector()
             if force_set is False:
                 self.__song__.schedule_save()
 
@@ -628,8 +628,8 @@ class sketchpad_channel(QObject):
 
     @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):
-        zyngui = self.__song__.get_metronome_manager().zyngui
-        assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
+        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
+        assigned_layers = [x for x in zynqtgui.screens["layer"].layer_midi_map.keys()]
         next_free_layer = -1
 
         logging.debug(f"Already Assigned layers : {assigned_layers}")
@@ -643,7 +643,7 @@ class sketchpad_channel(QObject):
             return False
         else:
             logging.debug(f"Next free layer : {next_free_layer}")
-            zyngui.screens["fixed_layers"].activate_index(next_free_layer)
+            zynqtgui.screens["fixed_layers"].activate_index(next_free_layer)
 
             for channel_id in range(self.__song__.channelsModel.count):
                 channel = self.__song__.channelsModel.getChannel(channel_id)
@@ -655,8 +655,8 @@ class sketchpad_channel(QObject):
             return True
 
     def getFreeLayers(self):
-        zyngui = self.__song__.get_metronome_manager().zyngui
-        assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
+        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
+        assigned_layers = [x for x in zynqtgui.screens["layer"].layer_midi_map.keys()]
         free_layers = []
 
         for x in range(0, 16):
@@ -669,7 +669,7 @@ class sketchpad_channel(QObject):
     def getLayerNameByMidiChannel(self, channel):
         if self.checkIfLayerExists(channel):
             try:
-                layer = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_data[channel]
+                layer = self.__song__.get_metronome_manager().zynqtgui.screens["fixed_layers"].list_data[channel]
                 return layer[2]
             except:
                 return ""
@@ -680,7 +680,7 @@ class sketchpad_channel(QObject):
     def getEffectsNameByMidiChannel(self, channel):
         if self.checkIfLayerExists(channel):
             try:
-                fx = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_metadata[channel]
+                fx = self.__song__.get_metronome_manager().zynqtgui.screens["fixed_layers"].list_metadata[channel]
                 return fx["effects_label"]
             except:
                 return ""
@@ -689,13 +689,13 @@ class sketchpad_channel(QObject):
 
     @Slot(int, result=bool)
     def checkIfLayerExists(self, channel):
-        return channel in self.__song__.get_metronome_manager().zyngui.screens["layer"].layer_midi_map.keys()
+        return channel in self.__song__.get_metronome_manager().zynqtgui.screens["layer"].layer_midi_map.keys()
 
     @Slot(int, result='QVariantList')
     def chainForLayer(chan):
         chain = []
         for i in range (16):
-            if zyngui.screens['layer'].is_midi_cloned(chan, i) or zyngui.screens['layer'].is_midi_cloned(i, chan):
+            if zynqtgui.screens['layer'].is_midi_cloned(chan, i) or zynqtgui.screens['layer'].is_midi_cloned(i, chan):
                 cain.append(i)
         return chain
 
@@ -703,20 +703,20 @@ class sketchpad_channel(QObject):
     def printableChainForLayer(chan):
         chain = ""
         for i in range (16):
-            if zyngui.screens['layer'].is_midi_cloned(chan, i) or zyngui.screens['layer'].is_midi_cloned(i, chan):
+            if zynqtgui.screens['layer'].is_midi_cloned(chan, i) or zynqtgui.screens['layer'].is_midi_cloned(i, chan):
                 cain.append(" {}".format(i))
         return chain
 
     @Slot(int)
     def selectSound(self, index):
-        zyngui = self.__song__.get_metronome_manager().zyngui
+        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
 
         if index in self.__chained_sounds__:
-            zyngui.screens["fixed_layers"].activate_index(index)
+            zynqtgui.screens["fixed_layers"].activate_index(index)
         else:
             chained = [index]
             for i in range (16):
-                if i != index and zyngui.screens['layer'].is_midi_cloned(index, i) or zyngui.screens['layer'].is_midi_cloned(i, index):
+                if i != index and zynqtgui.screens['layer'].is_midi_cloned(index, i) or zynqtgui.screens['layer'].is_midi_cloned(i, index):
                     chained.append(i)
                     if len(chained) >= 5:
                         break
@@ -732,11 +732,11 @@ class sketchpad_channel(QObject):
 
             #for _index in range(0, len(sounds_to_clone) - 1):
                 #logging.error(f"Removing cloned layers {sounds_to_clone[_index], sounds_to_clone[_index + 1]}")
-                #zyngui.screens['layer'].remove_clone_midi(sounds_to_clone[_index], sounds_to_clone[_index + 1])
-                #zyngui.screens['layer'].remove_clone_midi(sounds_to_clone[_index + 1], sounds_to_clone[_index])
+                #zynqtgui.screens['layer'].remove_clone_midi(sounds_to_clone[_index], sounds_to_clone[_index + 1])
+                #zynqtgui.screens['layer'].remove_clone_midi(sounds_to_clone[_index + 1], sounds_to_clone[_index])
 
             #self.set_chained_sounds([index, -1, -1, -1, -1])
-            #zyngui.screens["fixed_layers"].activate_index(index)
+            #zynqtgui.screens["fixed_layers"].activate_index(index)
 
         self.chained_sounds_changed.emit()
 
@@ -745,11 +745,11 @@ class sketchpad_channel(QObject):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
 
         try: #can be called before creation
-            zyngui = self.__song__.get_metronome_manager().zyngui
-            zyngui.screens['fixed_layers'].fill_list() #This will update *also* layers for channel
-            # zyngui.screens['session_dashboard'].set_selected_channel(zyngui.screens['session_dashboard'].selectedChannel, True)
-            zyngui.screens['layers_for_channel'].activate_index(0)
-            zyngui.set_curlayer(None)
+            zynqtgui = self.__song__.get_metronome_manager().zynqtgui
+            zynqtgui.screens['fixed_layers'].fill_list() #This will update *also* layers for channel
+            # zynqtgui.screens['session_dashboard'].set_selected_channel(zynqtgui.screens['session_dashboard'].selectedChannel, True)
+            zynqtgui.screens['layers_for_channel'].activate_index(0)
+            zynqtgui.set_curlayer(None)
         except Exception as e:
             logging.error(f"Error filling list : {str(e)}")
 
@@ -818,12 +818,12 @@ class sketchpad_channel(QObject):
 
     @Slot(int)
     def remove_and_unchain_sound(self, chan, cb=None):
-        zyngui = self.__song__.get_metronome_manager().zyngui
+        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
 
         def task():
-            zyngui.screens['layers_for_channel'].fill_list()
+            zynqtgui.screens['layers_for_channel'].fill_list()
 
-            zyngui.layer.remove_root_layer(chan)
+            zynqtgui.layer.remove_root_layer(chan)
             self.select_correct_layer()
             self.__song__.schedule_save()
             self.chained_sounds_changed.emit()
@@ -831,10 +831,10 @@ class sketchpad_channel(QObject):
             if cb is not None:
                 cb()
 
-            zyngui.end_long_task()
+            zynqtgui.end_long_task()
 
-        self.zyngui.currentTaskMessage = f"Removing chained sound at slot `{self.selectedSlotRow + 1}` from channel `{self.name}`"
-        zyngui.do_long_task(task)
+        self.zynqtgui.currentTaskMessage = f"Removing chained sound at slot `{self.selectedSlotRow + 1}` from channel `{self.name}`"
+        zynqtgui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
         update_jack_ports = True
@@ -842,7 +842,7 @@ class sketchpad_channel(QObject):
         # Stop all playing notes
         for old_chan in self.__chained_sounds__:
             if old_chan > -1:
-                self.zyngui.raw_all_notes_off_chan(old_chan)
+                self.zynqtgui.raw_all_notes_off_chan(old_chan)
 
         chained_sounds = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):
@@ -855,12 +855,12 @@ class sketchpad_channel(QObject):
         self.__chained_sounds__ = chained_sounds
 
         try: #can be called before creation
-            self.zyngui.screens['layers_for_channel'].fill_list()
+            self.zynqtgui.screens['layers_for_channel'].fill_list()
             if self.connectedSound >= 0:
-                self.zyngui.screens['layers_for_channel'].layer_selection_consistency_check()
+                self.zynqtgui.screens['layers_for_channel'].layer_selection_consistency_check()
             else:
-                self.zyngui.screens['layers_for_channel'].select_action(
-                    self.zyngui.screens['layers_for_channel'].current_index)
+                self.zynqtgui.screens['layers_for_channel'].select_action(
+                    self.zynqtgui.screens['layers_for_channel'].current_index)
         except:
             pass
 
@@ -933,7 +933,7 @@ class sketchpad_channel(QObject):
 
         if force_set or type != self.__channel_audio_type__:
             self.__channel_audio_type__ = type
-            self.zyngui.sketchpad.set_selector()
+            self.zynqtgui.sketchpad.set_selector()
             self.channel_audio_type_changed.emit()
 
             # Set selectedSlotRow to 0 when type is changed to slice as slice mode always operatoes on slot 0
@@ -1039,7 +1039,7 @@ class sketchpad_channel(QObject):
         try:
             for sound in self.chainedSounds:
                 if sound >= 0 and self.checkIfLayerExists(sound):
-                    layer = self.zyngui.layer.layer_midi_map[sound]
+                    layer = self.zynqtgui.layer.layer_midi_map[sound]
                     info.append({
                         'presetIndex': layer.preset_index,
                         'presetLength': len(layer.preset_list),
@@ -1086,7 +1086,7 @@ class sketchpad_channel(QObject):
     def set_selectedSlotRow(self, row):
         if self.__selected_slot_row__ != row:
             self.__selected_slot_row__ = row
-            self.zyngui.sketchpad.set_selector()
+            self.zynqtgui.sketchpad.set_selector()
             self.selectedSlotRowChanged.emit()
 
     selectedSlotRowChanged = Signal()
@@ -1199,7 +1199,7 @@ class sketchpad_channel(QObject):
     def get_selectedPartNames(self):
         partNames = []
         for i in range(5):
-            clip = self.getClipsModelByPart(i).getClip(self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip = self.getClipsModelByPart(i).getClip(self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
 
             if clip.enabled:
                 partNames.append(chr(i+65).lower())
@@ -1217,7 +1217,7 @@ class sketchpad_channel(QObject):
     ### Proxy recordingPopupActive from zynthian_qt_gui
 
     def get_recordingPopupActive(self):
-        return self.zyngui.recordingPopupActive
+        return self.zynqtgui.recordingPopupActive
 
     recordingPopupActiveChanged = Signal()
 
@@ -1232,7 +1232,7 @@ class sketchpad_channel(QObject):
         if self.route_through_global_fx != val or force_set is True:
             self.route_through_global_fx = val
             self.routeThroughGlobalFXChanged.emit()
-            self.zyngui.zynautoconnect()
+            self.zynqtgui.zynautoconnect()
 
     routeThroughGlobalFXChanged = Signal()
 
@@ -1277,7 +1277,7 @@ class sketchpad_channel(QObject):
 
     @Slot(str, result=None)
     def setChannelSoundFromSnapshotJson(self, snapshot):
-        self.zyngui.sound_categories.loadChannelSoundFromJson(self.id, snapshot)
+        self.zynqtgui.sound_categories.loadChannelSoundFromJson(self.id, snapshot)
 
     def mute_all_clips_in_channel(self):
         for clip_model_index in range(5):
@@ -1299,7 +1299,7 @@ class sketchpad_channel(QObject):
         if self.connectedSound == -1:
             self.__sound_json_snapshot__ = ""
         else:
-            self.__sound_json_snapshot__ = json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
+            self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.export_multichannel_snapshot(self.connectedSound))
 
         logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 

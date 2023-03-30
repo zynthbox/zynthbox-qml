@@ -33,7 +33,7 @@ from zynqtgui import zynthian_gui_config
 class sketchpad_sketch(QObject):
     def __init__(self, sketch_id, song):
         super().__init__(song)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.__song = song
         self.__sketch_id = sketch_id

@@ -66,8 +66,8 @@ class zynthian_engine_mixer(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 
 		self.type = "Mixer"
 		self.name = "Audio Levels"
@@ -172,7 +172,7 @@ class zynthian_engine_mixer(zynthian_engine):
 		except:
 			pass
 
-		if self.allow_headphones() and self.zyngui and self.zyngui.get_zynthian_config("rbpi_headphones"):
+		if self.allow_headphones() and self.zynqtgui and self.zynqtgui.get_zynthian_config("rbpi_headphones"):
 			try:
 				zctrls_headphones = self.get_mixer_zctrls(self.rbpi_device_name, ["Headphone","PCM"])
 				if "Headphone" in zctrls_headphones:
@@ -367,7 +367,7 @@ class zynthian_engine_mixer(zynthian_engine):
 					else:
 						amixer_command = "amixer -M -c {} set '{}' '{}'".format(self.device_name, zctrl.graph_path[0], zctrl.get_value2label())
 				else:
-					if zctrl.symbol=="Headphone" and self.allow_headphones() and self.zyngui and self.zyngui.get_zynthian_config("rbpi_headphones"):
+					if zctrl.symbol=="Headphone" and self.allow_headphones() and self.zynqtgui and self.zynqtgui.get_zynthian_config("rbpi_headphones"):
 						devname = self.rbpi_device_name
 					else:
 						devname = self.device_name
@@ -425,7 +425,7 @@ class zynthian_engine_mixer(zynthian_engine):
 	#----------------------------------------------------------------------------
 
 	def midi_control_change(self, chan, ccnum, val):
-		if self.zyngui.is_single_active_channel():
+		if self.zynqtgui.is_single_active_channel():
 			for ch in range(0,16):
 				try:
 					self.learned_cc[ch][ccnum].midi_control_change(val)

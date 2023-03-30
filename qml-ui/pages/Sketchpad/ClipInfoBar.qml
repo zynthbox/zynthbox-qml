@@ -38,7 +38,7 @@ GridLayout {
     id: waveBar
     rows: 1
     Layout.fillWidth: true
-    property QtObject controlObj: zynthian.bottomBarControlObj
+    property QtObject controlObj: zynqtgui.bottomBarControlObj
 
     function cuiaCallback(cuia) {
         switch (cuia) {

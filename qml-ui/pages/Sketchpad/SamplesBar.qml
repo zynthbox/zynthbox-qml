@@ -10,8 +10,8 @@ import org.zynthian.quick 1.0 as ZynQuick
 Zynthian.Card {
     id: root
 
-    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
-    property QtObject controlObj: zynthian.bottomBarControlObj
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    property QtObject controlObj: zynqtgui.bottomBarControlObj
 
     function cuiaCallback(cuia) {
         if (samplePickerDialog.opened) {
@@ -135,8 +135,8 @@ Zynthian.Card {
                         Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
                         Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
 
-                        enabled: (controlObj.samples !== undefined && !zynthian.sketchpad.isRecording)
-                        icon.name: controlObj.samples !== undefined && zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        enabled: (controlObj.samples !== undefined && !zynqtgui.sketchpad.isRecording)
+                        icon.name: controlObj.samples !== undefined && zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         onClicked: {
                             applicationWindow().openRecordingPopup()
                         }
@@ -161,7 +161,7 @@ Zynthian.Card {
         y: parent.y
 
         headerText: qsTr("%1 : Pick an audio file").arg(controlObj ? controlObj.name : "")
-        rootFolder: "/zynthian/zynthian-my-data"
+        rootFolder: "/zynqtgui/zynqtgui-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }

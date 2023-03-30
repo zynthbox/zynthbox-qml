@@ -55,7 +55,7 @@ class zynthian_gui_midi_out(zynthian_gui_selector):
 			["MIDI-OUT", "Hardware MIDI Out"],
 			["NET-OUT", "Network MIDI Out" ]
 		])
-		for layer in zynthian_gui_config.zyngui.screens["layer"].get_midichain_roots():
+		for layer in zynthian_gui_config.zynqtgui.screens["layer"].get_midichain_roots():
 			if layer.midi_chan!=self.layer.midi_chan:
 				midi_outs[layer.get_midi_jackname()] = layer.get_basepath()
 			

@@ -31,7 +31,7 @@ from zynqtgui import zynthian_gui_config
 class sketchpad_segment(QObject):
     def __init__(self, sketch, segment_model, song):
         super().__init__(song)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.__song = song
         self.__sketch = sketch
@@ -148,8 +148,8 @@ class sketchpad_segment(QObject):
         if self.__bar_length != length or force_set:
             self.__bar_length = length
 
-            if self.zyngui.sketchpad.song is not None:
-                self.zyngui.sketchpad.song.schedule_save()
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
 
             self.barLengthChanged.emit()
 
@@ -166,8 +166,8 @@ class sketchpad_segment(QObject):
         if self.__beat_length != length or force_set:
             self.__beat_length = length
 
-            if self.zyngui.sketchpad.song is not None:
-                self.zyngui.sketchpad.song.schedule_save()
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
 
             self.beatLengthChanged.emit()
 
@@ -197,7 +197,7 @@ class sketchpad_segment(QObject):
         """
 
         if clip not in self.__clips:
-            channel = self.zyngui.sketchpad.song.channelsModel.getChannel(clip.row)
+            channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(clip.row)
 
             # If channel mode is not sample-trig, remove all other part clips from segment
             # This is required because only sample-trig can have multiple selectable parts while
@@ -209,11 +209,11 @@ class sketchpad_segment(QObject):
 
             logging.debug(f"Adding clip(row: {clip.row}, col: {clip.col}) to segment {self.segmentId}")
             self.__clips.append(clip)
-            self.zyngui.sketchpad.song.sketchesModel.clipAdded.emit(self.__sketch.sketchId, self.segmentId, clip)
+            self.zynqtgui.sketchpad.song.sketchesModel.clipAdded.emit(self.__sketch.sketchId, self.segmentId, clip)
             self.clipsChanged.emit()
 
-            if self.zyngui.sketchpad.song is not None:
-                self.zyngui.sketchpad.song.schedule_save()
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
 
     @Slot(QObject, result=None)
     def removeClip(self, clip):
@@ -224,11 +224,11 @@ class sketchpad_segment(QObject):
         if clip in self.__clips:
             logging.debug(f"Removing clip(row: {clip.row}, col: {clip.col}) from segment {self.segmentId}")
             self.__clips.remove(clip)
-            self.zyngui.sketchpad.song.sketchesModel.clipRemoved.emit(self.__sketch.sketchId, self.segmentId, clip)
+            self.zynqtgui.sketchpad.song.sketchesModel.clipRemoved.emit(self.__sketch.sketchId, self.segmentId, clip)
             self.clipsChanged.emit()
 
-            if self.zyngui.sketchpad.song is not None:
-                self.zyngui.sketchpad.song.schedule_save()
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
 
     @Slot(QObject, result=None)
     def toggleClip(self, clip):
@@ -248,11 +248,11 @@ class sketchpad_segment(QObject):
         """
 
         # Remove all previously selected clips of current sketchpad from this segment
-        self.__clips = [clip for clip in self.__clips if clip.col != self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex]
+        self.__clips = [clip for clip in self.__clips if clip.col != self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex]
 
         # Add all clips of current sketchpad from selected scene to this segment
-        for scene_clip in self.zyngui.sketchpad.song.scenesModel.getScene(sceneIndex)["clips"]:
-            if scene_clip.col == self.zyngui.sketchpad.song.scenesModel.selectedTrackIndex:
+        for scene_clip in self.zynqtgui.sketchpad.song.scenesModel.getScene(sceneIndex)["clips"]:
+            if scene_clip.col == self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex:
                 self.addClip(scene_clip)
 
     @Slot(QObject)

@@ -31,10 +31,10 @@ import org.kde.kirigami 2.4 as Kirigami
 RowLayout {
     id: infoBar
     
-    property var clip: root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+    property var clip: root.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
     property int topLayerIndex: 0
     property int topLayer: -1
-    property int selectedSoundSlot: zynthian.soundCombinatorActive
+    property int selectedSoundSlot: zynqtgui.soundCombinatorActive
     ? root.selectedChannel.selectedSlotRow
     : root.selectedChannel.selectedSlotRow
     property int selectedSoundSlotExists: clip.clipChannel.checkIfLayerExists(clip.clipChannel.chainedSounds[selectedSoundSlot])
@@ -62,7 +62,7 @@ RowLayout {
         infoBar.topLayerIndex = layerIndex
         infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipChannel.chainedSounds[layerIndex]
         layerLabel.layerCount = count
-        //                        infoBar.selectedChannel = zynthian.soundCombinatorActive
+        //                        infoBar.selectedChannel = zynqtgui.soundCombinatorActive
         //                                                    ? infoBar.clip.clipChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
         //                                                    : infoBar.clip.clipChannel.connectedSound
         
@@ -77,21 +77,21 @@ RowLayout {
     }
     
     Connections {
-        target: zynthian.fixed_layers
+        target: zynqtgui.fixed_layers
         onList_updated: {
             updateSoundNameTimer.restart()
         }
     }
     
     Connections {
-        target: zynthian.session_dashboard
+        target: zynqtgui.session_dashboard
         onSelectedChannelChanged: {
             updateSoundNameTimer.restart()
         }
     }
     
     Connections {
-        target: zynthian.bank
+        target: zynqtgui.bank
         onList_updated: {
             updateSoundNameTimer.restart()
         }
@@ -185,7 +185,7 @@ RowLayout {
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "sample-loop"
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-        text: zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
+        text: zynqtgui.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
     }
     QQC2.Label {
         property QtObject sample: infoBar.clip && infoBar.clip.clipChannel.samples[infoBar.clip.clipChannel.selectedSlotRow]
@@ -196,7 +196,7 @@ RowLayout {
                  infoBar.clip.clipChannel.channelAudioType === "sample-slice")
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-        text: zynthian.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
+        text: zynqtgui.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
     }
     
     Item {
@@ -213,9 +213,9 @@ RowLayout {
         checkable: true
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
         // Bind to current index to properly update when preset changed from other screen
-        checked: zynthian.preset.current_index && zynthian.preset.current_is_favorite
+        checked: zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
         onToggled: {
-            zynthian.preset.current_is_favorite = checked
+            zynqtgui.preset.current_is_favorite = checked
         }
     }
     QQC2.Label {
@@ -228,7 +228,7 @@ RowLayout {
             property: "text"
             delayed: true
             value: qsTr("%1 %2")
-                    .arg("T" + (zynthian.session_dashboard.selectedChannel+1))
+                    .arg("T" + (zynqtgui.session_dashboard.selectedChannel+1))
                     .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
         }
     }

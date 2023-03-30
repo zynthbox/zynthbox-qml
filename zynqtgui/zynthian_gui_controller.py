@@ -51,7 +51,7 @@ class zynthian_gui_controller(QObject):
 
 	def __init__(self, indx, zctrl, parent=None):
 		super(zynthian_gui_controller, self).__init__(parent)
-		self.zyngui = zynthian_gui_config.zyngui
+		self.zynqtgui = zynthian_gui_config.zynqtgui
 		self.zctrl=None
 		self.n_values=127
 		self.ctrl_max_value=127
@@ -115,7 +115,7 @@ class zynthian_gui_controller(QObject):
 
 	def calculate_plot_values(self):
 		# FIXME: probably what's needed would be an actual threading semaphore?
-		self.zyngui.zynread_wait_flag = True
+		self.zynqtgui.zynread_wait_flag = True
 
 		if self.ctrl_value>self.ctrl_max_value:
 			self.ctrl_value=self.ctrl_max_value
@@ -187,7 +187,7 @@ class zynthian_gui_controller(QObject):
 
 		self.value_print_changed.emit()
 
-		self.zyngui.zynread_wait_flag = False
+		self.zynqtgui.zynread_wait_flag = False
 		#print("VALUE: %s" % self.ctrl_value)
 		#print("VALUE PLOT: %s" % self.ctrl_value_plot)
 		#print("VALUE PRINT: %s" % self.ctrl_value_print)
@@ -198,13 +198,13 @@ class zynthian_gui_controller(QObject):
 		if self.zctrl.midi_cc==0:
 			#self.erase_midi_bind()
 			self.ctrl_midi_bind = "/{}".format(self.zctrl.value_range)
-		elif self.zyngui.midi_learn_mode:
+		elif self.zynqtgui.midi_learn_mode:
 			self.ctrl_midi_bind = "??"
-		elif self.zyngui.midi_learn_zctrl and self.zctrl==self.zyngui.midi_learn_zctrl:
+		elif self.zynqtgui.midi_learn_zctrl and self.zctrl==self.zynqtgui.midi_learn_zctrl:
 			self.ctrl_midi_bind = "??"
 		elif self.zctrl.midi_learn_cc and self.zctrl.midi_learn_cc>0:
 			midi_cc = self.zctrl.midi_learn_cc
-			if not self.zyngui.is_single_active_channel():
+			if not self.zynqtgui.is_single_active_channel():
 				midi_cc = "{}#{}".format(self.zctrl.midi_learn_chan+1,midi_cc)
 			self.ctrl_midi_bind = midi_cc
 		elif self.zctrl.midi_cc and self.zctrl.midi_cc>0:
@@ -212,7 +212,7 @@ class zynthian_gui_controller(QObject):
 			swap_info= zyncoder.lib_zyncoder.get_midi_filter_cc_swap(self.zctrl.midi_chan, self.zctrl.midi_cc)
 			midi_chan = swap_info >> 8
 			midi_cc = swap_info & 0xFF
-			if not self.zyngui.is_single_active_channel():
+			if not self.zynqtgui.is_single_active_channel():
 				midi_cc = "{}#{}".format(midi_chan+1,midi_cc)
 			self.ctrl_midi_bind = midi_cc
 		self.midi_bind_changed.emit()

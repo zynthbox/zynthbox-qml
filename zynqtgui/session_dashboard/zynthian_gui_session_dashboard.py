@@ -69,20 +69,20 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 logging.info("Session dashboard Init Sketchpad CB (No restore)")
                 self.set_selected_channel(self.__selected_channel__, True)
 
-                selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
+                selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
                 selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
 
             self.__name__ = None
             self.__id__ = 0
 
-            self.zyngui.screens["sketchpad"].init_sketchpad(None, cb)
+            self.zynqtgui.screens["sketchpad"].init_sketchpad(None, cb)
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
 
-        self.zyngui.screens["layer"].layer_created.connect(self.layer_created)
-        self.zyngui.screens["layer_effects"].fx_layers_changed.connect(self.fx_layers_changed)
+        self.zynqtgui.screens["layer"].layer_created.connect(self.layer_created)
+        self.zynqtgui.screens["layer_effects"].fx_layers_changed.connect(self.fx_layers_changed)
 
         self.show()
 
@@ -102,27 +102,27 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def emit_chained_sounds_changed(self):
-        selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
+        selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
         if selected_channel is not None:
             selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
-        self.zyngui.screens['sketchpad'].song.channelsModel.connected_sounds_count_changed.emit()
+        self.zynqtgui.screens['sketchpad'].song.channelsModel.connected_sounds_count_changed.emit()
         # self.set_selected_channel(self.selectedChannel, True)
 
     @Slot(None)
     def set_selected_channel_complete(self):
-        self.zyngui.fixed_layers.fill_list()
+        self.zynqtgui.fixed_layers.fill_list()
 
         # Do make a call to switch sound (and eventually update bank and preset screens) when any page other than
         # sketchpad is open. Otherwise sound change is already reactive to selectedChannel and calling
         # change_o_channel_sound causes UI stutters as showing bank and preset screen is a bit time consuming.
-        if self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen_id() != "sketchpad":
+        if self.zynqtgui.get_current_screen_id() is not None and \
+                self.zynqtgui.get_current_screen_id() != "sketchpad":
             self.curlayer_updated_on_channel_change = True
             QMetaObject.invokeMethod(self, "change_to_channel_sound", Qt.QueuedConnection)
         else:
             self.curlayer_updated_on_channel_change = False
 
-        self.zyngui.sketchpad.set_selector()
+        self.zynqtgui.sketchpad.set_selector()
         self.selected_channel_change_in_progress = False
 
     ### Property name
@@ -194,9 +194,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     ### Property selectedChannelName
     def get_selected_channel_name(self):
-        channel = self.zyngui.screens["sketchpad"].song.channelsModel.getChannel(self.__selected_channel__)
+        channel = self.zynqtgui.screens["sketchpad"].song.channelsModel.getChannel(self.__selected_channel__)
         if channel.connectedSound >= 0:
-            return self.zyngui.screens["fixed_layers"].selector_list.getDisplayValue(channel.connectedSound)
+            return self.zynqtgui.screens["fixed_layers"].selector_list.getDisplayValue(channel.connectedSound)
         else:
             return ""
     selected_channel_name_changed = Signal()
@@ -285,9 +285,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.session_sketchpads_model_changed.emit()
             if "lastSelectedSketchpad" in session:
                 self.__last_selected_sketchpad__ = session["lastSelectedSketchpad"]
-                self.zyngui.screens["sketchpad"].init_sketchpad(self.__last_selected_sketchpad__, sketchpad_loaded_cb)
+                self.zynqtgui.screens["sketchpad"].init_sketchpad(self.__last_selected_sketchpad__, sketchpad_loaded_cb)
             else:
-                self.zyngui.screens["sketchpad"].init_sketchpad(None, sketchpad_loaded_cb)
+                self.zynqtgui.screens["sketchpad"].init_sketchpad(None, sketchpad_loaded_cb)
 
             return True
         except Exception as e:
@@ -328,7 +328,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot()
     def change_to_channel_sound(self):
-        self.zyngui.screens["layers_for_channel"].update_channel_sounds()
+        self.zynqtgui.screens["layers_for_channel"].update_channel_sounds()
 
     def get_last_selected_sketchpad(self):
         return self.__last_selected_sketchpad__

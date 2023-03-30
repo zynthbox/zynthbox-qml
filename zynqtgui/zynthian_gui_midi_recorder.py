@@ -100,7 +100,7 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 			if self.smf_player == None:
 				self.smf_player = libsmf.addSmf()
 				libsmf.attachPlayer(self.smf_player)
-				self.zyngui.zynautoconnect()
+				self.zynqtgui.zynautoconnect()
 		except:
 			pass
 
@@ -218,7 +218,7 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 			if t=='S':
 				self.toggle_playing(fpath)
 			else:
-				self.zyngui.show_confirm("Do you really want to delete '{}'?".format(self.list_data[i][2]), self.delete_confirmed, fpath)
+				self.zynqtgui.show_confirm("Do you really want to delete '{}'?".format(self.list_data[i][2]), self.delete_confirmed, fpath)
 
 
 	def get_next_filenum(self):
@@ -231,7 +231,7 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 
 	def get_new_filename(self):
 		try:
-			parts = self.zyngui.curlayer.get_presetpath().split('#',2)
+			parts = self.zynqtgui.curlayer.get_presetpath().split('#',2)
 			file_name = parts[1].replace("/",";").replace(">",";").replace(" ; ",";")
 		except:
 			file_name = "jack_capture"
@@ -245,7 +245,7 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 		except Exception as e:
 			logging.error(e)
 
-		self.zyngui.show_modal("midi_recorder")
+		self.zynqtgui.show_modal("midi_recorder")
 
 
 	def start_recording(self):
@@ -254,7 +254,7 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 			if self.smf_recorder == None:
 				self.smf_recorder = libsmf.addSmf()
 				libsmf.attachRecorder(self.smf_recorder)
-				self.zyngui.zynautoconnect()
+				self.zynqtgui.zynautoconnect()
 				sleep(0.1)
 			libsmf.unload(self.smf_recorder)
 			libsmf.startRecording()
@@ -312,8 +312,8 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 			self.smf_timer.start()
 		except Exception as e:
 			logging.error("ERROR STARTING MIDI PLAY: %s" % e)
-			self.zyngui.show_info("ERROR STARTING MIDI PLAY:\n %s" % e)
-			self.zyngui.hide_info_timer(5000)
+			self.zynqtgui.show_info("ERROR STARTING MIDI PLAY:\n %s" % e)
+			self.zynqtgui.hide_info_timer(5000)
 
 		self.update_list()
 		return True

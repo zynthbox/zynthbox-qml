@@ -45,10 +45,10 @@ Rectangle {
     property alias samplesButton: samplesButton
     property alias fxButton: fxButton
     property alias soundCombinatorButton: soundCombinatorButton
-    property bool songMode: false;//zynthian.sketchpad.song.sketchesModel.songMode
-    property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
+    property bool songMode: false;//zynqtgui.sketchpad.song.sketchesModel.songMode
+    property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
-    readonly property QtObject song: zynthian.sketchpad.song
+    readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property QtObject selectedChannel: applicationWindow().selectedChannel
 
     // FIXME : Sample picker dialog was having issues when selecting sample for channel T6-T10
@@ -66,15 +66,15 @@ Rectangle {
                 return true;
 
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedChannel > 0) {
-                    zynthian.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.session_dashboard.selectedChannel > 0) {
+                    zynqtgui.session_dashboard.selectedChannel -= 1;
                 }
 
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedChannel < 9) {
-                    zynthian.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.session_dashboard.selectedChannel < 9) {
+                    zynqtgui.session_dashboard.selectedChannel += 1;
                 }
 
                 return true;
@@ -130,10 +130,10 @@ Rectangle {
 
     function selectConnectedSound() {
         if (root.selectedSlotRowItem.channel.connectedSound >= 0) {
-            zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
+            zynqtgui.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
 
             if (root.selectedSlotRowItem.channel.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
                 pattern.midiChannel = root.selectedSlotRowItem.channel.connectedSound;
             }
         }
@@ -154,7 +154,7 @@ Rectangle {
 
             var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
 
-            if (zynthian.backButtonPressed) {
+            if (zynqtgui.backButtonPressed) {
                 // Back is pressed. Clear Slot
                 if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
                     root.selectedSlotRowItem.channel.remove_and_unchain_sound(chainedSound)
@@ -168,27 +168,27 @@ Rectangle {
 
             var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
 
-            if (zynthian.backButtonPressed) {
+            if (zynqtgui.backButtonPressed) {
                 // Back is pressed. Clear Slot
                 if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
-                    zynthian.start_loading()
-                    zynthian.fixed_layers.activate_index(chainedSound)
-                    zynthian.layer_effects.fx_reset_confirmed()
-                    zynthian.stop_loading()
+                    zynqtgui.start_loading()
+                    zynqtgui.fixed_layers.activate_index(chainedSound)
+                    zynqtgui.layer_effects.fx_reset_confirmed()
+                    zynqtgui.stop_loading()
                 }
             } else {
-                zynthian.fixed_layers.activate_index(chainedSound)
-                zynthian.layer_options.show();
-                var screenBack = zynthian.current_screen_id;
-                zynthian.current_screen_id = "layer_effects";
+                zynqtgui.fixed_layers.activate_index(chainedSound)
+                zynqtgui.layer_options.show();
+                var screenBack = zynqtgui.current_screen_id;
+                zynqtgui.current_screen_id = "layer_effects";
                 root.openBottomDrawerOnLoad = true;
-                zynthian.forced_screen_back = screenBack;
+                zynqtgui.forced_screen_back = screenBack;
             }
         } else if (samplesButton.checked || type === "sample-trig" || type === "sample-slice") {
             // Clicked entry is samples
             console.log("handleItemClick : Samples")
 
-            if (zynthian.backButtonPressed) {
+            if (zynqtgui.backButtonPressed) {
                 // Back is pressed. Clear Slot
                 root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].clear()
             } else {
@@ -197,9 +197,9 @@ Rectangle {
         } else if (type === "sample-loop") {
             console.log("handleItemClick : Audio")
 
-            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
 
-            if (zynthian.backButtonPressed) {
+            if (zynqtgui.backButtonPressed) {
                 clip.clear()
             } else {
                 loopPickerDialog.folderModel.folder = clip.recordingDir
@@ -413,10 +413,10 @@ Rectangle {
                         delegate: Rectangle {
                             id: channelDelegate
 
-                            property bool highlighted: index === zynthian.session_dashboard.selectedChannel
+                            property bool highlighted: index === zynqtgui.session_dashboard.selectedChannel
     //                            property int selectedRow: 0
                             property int channelIndex: index
-                            property QtObject channel: zynthian.sketchpad.song.channelsModel.getChannel(index)
+                            property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(index)
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -457,11 +457,11 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    if (zynthian.session_dashboard.selectedChannel !== channelDelegate.channelIndex ||
+                                                    if (zynqtgui.session_dashboard.selectedChannel !== channelDelegate.channelIndex ||
                                                         channelDelegate.channel.selectedSlotRow !== index) {
                                                         channelsSlotsRow.currentIndex = index
                                                         channelDelegate.channel.selectedSlotRow = index
-                                                        zynthian.session_dashboard.selectedChannel = channelDelegate.channelIndex;
+                                                        zynqtgui.session_dashboard.selectedChannel = channelDelegate.channelIndex;
                                                     } else {
                                                         handleItemClick()
                                                     }
@@ -532,7 +532,7 @@ Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         font.pointSize: 14
                         text: qsTr("Ch%1-Slot%2")
-                                .arg(zynthian.session_dashboard.selectedChannel + 1)
+                                .arg(zynqtgui.session_dashboard.selectedChannel + 1)
                                 .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
                     }
                     QQC2.Label {
@@ -615,7 +615,7 @@ Rectangle {
                         id: volumeSlider
 
                         property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
-                        property QtObject volumeControlObject: zynthian.fixed_layers.volumeControllers[chainedSound]
+                        property QtObject volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound]
 
                         orientation: Qt.Horizontal
 
@@ -653,7 +653,7 @@ Rectangle {
         headerText: qsTr("%1-S%2 : Pick a sample")
                         .arg(root.selectedChannel.name)
                         .arg(root.selectedChannel.selectedSlotRow + 1)
-        rootFolder: "/zynthian/zynthian-my-data"
+        rootFolder: "/zynqtgui/zynqtgui-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
@@ -674,7 +674,7 @@ Rectangle {
         headerText: qsTr("%1-S%2 : Pick a bank")
                         .arg(root.selectedSlotRowItem.channel.name)
                         .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
-        rootFolder: "/zynthian/zynthian-my-data"
+        rootFolder: "/zynqtgui/zynqtgui-my-data"
         folderModel {
             nameFilters: ["sample-bank.json"]
         }
@@ -694,12 +694,12 @@ Rectangle {
 
         headerText: qsTr("%1 : Pick an audio file")
                         .arg(root.selectedChannel.name)
-        rootFolder: "/zynthian/zynthian-my-data"
+        rootFolder: "/zynqtgui/zynqtgui-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
+            root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
         }
     }
 
@@ -734,7 +734,7 @@ Rectangle {
                 text: qsTr("Pick sample")
 
                 onClicked: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
+                    samplePickerDialog.folderModel.folder = '/zynqtgui/zynqtgui-my-data/samples'
                     samplePickerDialog.open()
                     samplePickerPopup.close()
                 }
@@ -747,7 +747,7 @@ Rectangle {
                 text: qsTr("Pick sample-bank")
 
                 onClicked: {
-                    bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
+                    bankPickerDialog.folderModel.folder = '/zynqtgui/zynqtgui-my-data/sample-banks'
                     bankPickerDialog.open()
                     samplePickerPopup.close()
                 }
@@ -760,7 +760,7 @@ Rectangle {
                 text: qsTr("Download Samples")
                 visible: false // Hide for now
                 onClicked: {
-                    zynthian.current_modal_screen_id = "sample_downloader"
+                    zynqtgui.current_modal_screen_id = "sample_downloader"
                     samplePickerPopup.close()
                 }
             }

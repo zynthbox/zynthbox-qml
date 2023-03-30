@@ -77,8 +77,8 @@ class zynthian_engine_sfizz(zynthian_engine):
 	# Initialization
 	# ---------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 		self.name = "Sfizz"
 		self.nickname = "SF"
 		self.jackname = self.get_next_jackname("sfizz")

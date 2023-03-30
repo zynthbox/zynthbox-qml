@@ -32,12 +32,12 @@ Zynthian.NewStuffPage {
     screenId: "module_downloader"
     title: qsTr("Module Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-modules.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynqtgui-modules.knsrc").toString().slice(7)
     Connections {
         target: component.backAction
         onTriggered: {
             // or whatever this function would be called
-            zynthian.main.refresh();
+            zynqtgui.main.refresh();
         }
     }
 }

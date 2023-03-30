@@ -44,13 +44,13 @@ QQC2.ScrollView {
 
     property string screenId
     //TODO: Bind the base selector type to qml?
-    readonly property QtObject selector: screenId.length > 0 ? zynthian[screenId] : null
+    readonly property QtObject selector: screenId.length > 0 ? zynqtgui[screenId] : null
     signal currentScreenIdRequested(string screenId)
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)
 
     Component.onCompleted: {
-        if (zynthian.current_screen_id === root.screenId) {
+        if (zynqtgui.current_screen_id === root.screenId) {
             view.forceActiveFocus();
         }
     }
@@ -109,7 +109,7 @@ QQC2.ScrollView {
         delegate: SelectorDelegate {
             screenId: root.screenId
             selector: root.selector
-            highlighted: zynthian.current_screen_id === root.screenId
+            highlighted: zynqtgui.current_screen_id === root.screenId
             onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
             onItemActivated: root.itemActivated(screenId, index)
             onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -118,9 +118,9 @@ QQC2.ScrollView {
 
     Connections {
         id: focusConnection
-        target: zynthian
+        target: zynqtgui
         onCurrent_screen_idChanged: {
-            if (zynthian.current_screen_id === root.screenId) {
+            if (zynqtgui.current_screen_id === root.screenId) {
                 view.forceActiveFocus();
             }
         }
@@ -130,10 +130,10 @@ QQC2.ScrollView {
         // Force view position only when current visible page has this selectorview
         //
         // Check if current page is SelectorView's page
-        // For all other pages except "layers_for_channel", zynthian.current_screen_id and root.screenId should be same for a SelectorView
+        // For all other pages except "layers_for_channel", zynqtgui.current_screen_id and root.screenId should be same for a SelectorView
         // In "layers_for_channel" page, there are 2 SelectorViews (preset and bank) which belong to layers_for_channel page
-        if (zynthian.current_screen_id === root.screenId ||
-            (['bank', 'preset'].indexOf(root.screenId) >= 0 && zynthian.current_screen_id === "layers_for_channel")) {
+        if (zynqtgui.current_screen_id === root.screenId ||
+            (['bank', 'preset'].indexOf(root.screenId) >= 0 && zynqtgui.current_screen_id === "layers_for_channel")) {
 
             root.view.positionViewAtIndex(root.currentIndex, ListView.SnapPosition)
             root.view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
@@ -173,7 +173,7 @@ QQC2.ScrollView {
 
     background: SelectorViewBackground {
         id: background
-        //highlighted: view.activeFocus || zynthian.current_screen_id === root.screenId || (zynthian.current_screen_id === "layer" && root.screenId === "fixed_layers")
+        //highlighted: view.activeFocus || zynqtgui.current_screen_id === root.screenId || (zynqtgui.current_screen_id === "layer" && root.screenId === "fixed_layers")
     }
 }
 

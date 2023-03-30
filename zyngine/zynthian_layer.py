@@ -38,8 +38,8 @@ class zynthian_layer:
 	# ---------------------------------------------------------------------------
 
 
-	def __init__(self, engine, midi_chan, zyngui=None):
-		self.zyngui = zyngui
+	def __init__(self, engine, midi_chan, zynqtgui=None):
+		self.zynqtgui = zynqtgui
 		self.engine = engine
 		self.midi_chan = midi_chan
 
@@ -84,14 +84,14 @@ class zynthian_layer:
 
 			#TODO: Improve this Dirty Hack!!
 			#if self.engine.nickname=='MD':
-				#self.zyngui.screens['preset'].fill_list()
-				#if self.zyngui.active_screen=='bank':
+				#self.zynqtgui.screens['preset'].fill_list()
+				#if self.zynqtgui.active_screen=='bank':
 					#if self.preset_name:
-						#self.zyngui.show_screen('control')
+						#self.zynqtgui.show_screen('control')
 					#else:
-						#self.zyngui.show_screen('preset')
+						#self.zynqtgui.show_screen('preset')
 
-			self.zyngui.refresh_screen()
+			self.zynqtgui.refresh_screen()
 
 
 	def reset(self):
@@ -397,7 +397,7 @@ class zynthian_layer:
 	def send_ctrl_midi_cc(self):
 		for k, zctrl in self.controllers_dict.items():
 			if zctrl.midi_cc:
-				self.zyngui.zynmidi.set_midi_control(zctrl.midi_chan, zctrl.midi_cc, int(zctrl.value))
+				self.zynqtgui.zynmidi.set_midi_control(zctrl.midi_chan, zctrl.midi_cc, int(zctrl.value))
 				logging.debug("Sending MIDI CC{}={} for {}".format(zctrl.midi_cc, zctrl.value, k))
 
 
@@ -428,7 +428,7 @@ class zynthian_layer:
 				midi_chan = swap_info >> 8
 				midi_cc = swap_info & 0xFF
 
-				if self.zyngui.is_single_active_channel():
+				if self.zynqtgui.is_single_active_channel():
 					for k, zctrl in self.controllers_dict.items():
 						try:
 							if zctrl.midi_learn_cc and zctrl.midi_learn_cc>0:
@@ -659,7 +659,7 @@ class zynthian_layer:
 			ao += ["system:playback_1", "system:playback_2"]
 			
 		self.audio_out=ao
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def add_audio_out(self, jackname):
@@ -670,7 +670,7 @@ class zynthian_layer:
 			self.audio_out.append(jackname)
 			logging.debug("Connecting Audio Output {} => {}".format(self.get_audio_jackname(), jackname))
 
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def del_audio_out(self, jackname):
@@ -683,7 +683,7 @@ class zynthian_layer:
 		except:
 			pass
 
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def toggle_audio_out(self, jackname):
@@ -695,17 +695,17 @@ class zynthian_layer:
 		else:
 			self.audio_out.remove(jackname)
 
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def reset_audio_out(self):
 		self.audio_out=["system:playback_1", "system:playback_2"]
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def mute_audio_out(self):
 		self.audio_out=[]
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	# ---------------------------------------------------------------------------
@@ -719,7 +719,7 @@ class zynthian_layer:
 
 	def set_audio_in(self, ai):		
 		self.audio_in=ai
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def add_audio_in(self, jackname):
@@ -727,7 +727,7 @@ class zynthian_layer:
 			self.audio_in.append(jackname)
 			logging.debug("Connecting Audio Capture {} => {}".format(jackname, self.get_audio_jackname()))
 
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def del_audio_in(self, jackname):
@@ -737,7 +737,7 @@ class zynthian_layer:
 		except:
 			pass
 
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def toggle_audio_in(self, jackname):
@@ -748,17 +748,17 @@ class zynthian_layer:
 
 		logging.debug("Toggling Audio Capture: {}".format(jackname))
 
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def reset_audio_in(self):
 		self.audio_in=["system:capture_1", "system:capture_2"]
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def mute_audio_in(self):
 		self.audio_in=[]
-		self.zyngui.zynautoconnect_audio()
+		self.zynqtgui.zynautoconnect_audio()
 
 
 	def is_parallel_audio_routed(self, layer):
@@ -784,7 +784,7 @@ class zynthian_layer:
 		#logging.debug("Setting MIDI connections:")
 		#for jn in mo:
 		#	logging.debug("  {} => {}".format(self.engine.jackname, jn))
-		self.zyngui.zynautoconnect_midi()
+		self.zynqtgui.zynautoconnect_midi()
 
 
 	def add_midi_out(self, jackname):
@@ -795,7 +795,7 @@ class zynthian_layer:
 			self.midi_out.append(jackname)
 			logging.debug("Connecting MIDI {} => {}".format(self.get_midi_jackname(), jackname))
 
-		self.zyngui.zynautoconnect_midi()
+		self.zynqtgui.zynautoconnect_midi()
 
 
 	def del_midi_out(self, jackname):
@@ -808,7 +808,7 @@ class zynthian_layer:
 		except:
 			pass
 
-		self.zyngui.zynautoconnect_midi()
+		self.zynqtgui.zynautoconnect_midi()
 
 
 	def toggle_midi_out(self, jackname):
@@ -820,12 +820,12 @@ class zynthian_layer:
 		else:
 			self.midi_out.remove(jackname)
 
-		self.zyngui.zynautoconnect_midi()
+		self.zynqtgui.zynautoconnect_midi()
 
 
 	def mute_midi_out(self):
 		self.midi_out=[]
-		self.zyngui.zynautoconnect_midi()
+		self.zynqtgui.zynautoconnect_midi()
 
 
 	def is_parallel_midi_routed(self, layer):

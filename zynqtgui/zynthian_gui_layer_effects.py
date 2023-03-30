@@ -54,15 +54,15 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		else:
 			self.types_screen = "effect_types"
 			self.effect_chooser_screen = "layer_effect_chooser"
-		self.zyngui.screens[self.types_screen].show()
-		self.zyngui.screens[self.effect_chooser_screen].show()
+		self.zynqtgui.screens[self.types_screen].show()
+		self.zynqtgui.screens[self.effect_chooser_screen].show()
 		super().show()
 		if len(self.list_data) == 1:
 			self.select_action(0)
-			self.zyngui.screens[self.types_screen].select(0) #For some reason it needs a further select
-			self.zyngui.screens[self.types_screen].select_action(0)
-			self.zyngui.screens[self.types_screen].select(0) #For some reason it needs a further select
-			self.zyngui.screens[self.effect_chooser_screen].select(0) #Select, don't activate
+			self.zynqtgui.screens[self.types_screen].select(0) #For some reason it needs a further select
+			self.zynqtgui.screens[self.types_screen].select_action(0)
+			self.zynqtgui.screens[self.types_screen].select(0) #For some reason it needs a further select
+			self.zynqtgui.screens[self.effect_chooser_screen].select(0) #Select, don't activate
 
 	def select(self, index=None):
 		self.current_effect_engine_changed.emit()
@@ -72,11 +72,11 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		self.list_data=[]
 
 		if self.midi_mode:
-			self.fx_layers = self.zyngui.screens['layer'].get_midichain_layers(self.zyngui.curlayer)
+			self.fx_layers = self.zynqtgui.screens['layer'].get_midichain_layers(self.zynqtgui.curlayer)
 		else:
-			self.fx_layers = self.zyngui.screens['layer'].get_fxchain_layers(self.zyngui.curlayer)
+			self.fx_layers = self.zynqtgui.screens['layer'].get_fxchain_layers(self.zynqtgui.curlayer)
 		if self.fx_layers and len(self.fx_layers) > 0:
-			self.fx_layers.remove(self.zyngui.curlayer)
+			self.fx_layers.remove(self.zynqtgui.curlayer)
 
 		if self.fx_layers != None and len(self.fx_layers) > 0:
 			# Add Audio-FX layers
@@ -105,7 +105,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			else:
 				self.list_data.append(('ADD-SERIAL-FX',len(self.list_data),"Add Midi-FX"))
 				self.select_action(0)
-				self.zyngui.screens[self.types_screen].select_action(0)
+				self.zynqtgui.screens[self.types_screen].select_action(0)
 		else:
 			if self.fx_layers != None and len(self.fx_layers) > 0:
 				self.list_data.append(('ADD-SERIAL-FX',len(self.list_data),"Add Serial Audio-FX"))
@@ -114,7 +114,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			else:
 				self.list_data.append(('ADD-SERIAL-FX',len(self.list_data),"Add Audio-FX"))
 				self.select_action(0)
-				self.zyngui.screens[self.types_screen].select_action(0)
+				self.zynqtgui.screens[self.types_screen].select_action(0)
 
 		super().fill_list()
 
@@ -137,20 +137,20 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			self.fx_reset()
 			return
 		elif self.list_data[i][0] == 'ADD-SERIAL-FX':
-			self.zyngui.screens[self.effect_chooser_screen].layer_chain_parallel = False
+			self.zynqtgui.screens[self.effect_chooser_screen].layer_chain_parallel = False
 
 		elif self.list_data[i][0] == 'ADD-PARALLEL-FX':
-			self.zyngui.screens[self.effect_chooser_screen].layer_chain_parallel = True
+			self.zynqtgui.screens[self.effect_chooser_screen].layer_chain_parallel = True
 
 		if self.fx_layers != None and i < len(self.fx_layers):
 			self.fx_layer = self.fx_layers[i]
 			if t is 'B':
-				self.zyngui.show_confirm("Do you really want to remove This effect?", self.fx_remove_confirmed)
+				self.zynqtgui.show_confirm("Do you really want to remove This effect?", self.fx_remove_confirmed)
 		else:
 			self.fx_layer = None
 
 		if self.fx_layer != None:
-			self.zyngui.screens[self.types_screen].show()
+			self.zynqtgui.screens[self.types_screen].show()
 		self.set_select_path()
 
 
@@ -165,55 +165,55 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 	def fx_layer_action(self, layer, t='S'):
 		self.fx_layer = layer
-		self.fx_layer_index = self.zyngui.screens['layer'].layers.index(layer)
+		self.fx_layer_index = self.zynqtgui.screens['layer'].layers.index(layer)
 		self.show()
 
 	@Slot(None)
 	def fx_reset(self):
 		if self.midi_mode:
-			self.zyngui.show_confirm("Do you really want to remove all Midi-FXs for this layer?", self.fx_reset_confirmed)
+			self.zynqtgui.show_confirm("Do you really want to remove all Midi-FXs for this layer?", self.fx_reset_confirmed)
 		else:
-			self.zyngui.show_confirm("Do you really want to remove all Audio-FXs for this layer?", self.fx_reset_confirmed)
+			self.zynqtgui.show_confirm("Do you really want to remove all Audio-FXs for this layer?", self.fx_reset_confirmed)
 
 
 	def fx_remove_confirmed(self, params=None):
 		if self.fx_layer is None:
 			return
-		i = self.zyngui.screens['layer'].layers.index(self.fx_layer)
-		self.zyngui.screens['layer'].remove_layer(i)
+		i = self.zynqtgui.screens['layer'].layers.index(self.fx_layer)
+		self.zynqtgui.screens['layer'].remove_layer(i)
 		self.fx_layers_changed.emit()
 
 		self.fx_layer = None
 		self.fill_list()
-		self.zyngui.screens['main_layers_view'].fill_list()
-		self.zyngui.screens["fixed_layers"].fill_list()
+		self.zynqtgui.screens['main_layers_view'].fill_list()
+		self.zynqtgui.screens["fixed_layers"].fill_list()
 
 
 	@Slot(None)
 	def fx_reset_confirmed(self, params=None):
 		# Remove all layers
 		for sl in self.fx_layers:
-			i = self.zyngui.screens['layer'].layers.index(sl)
-			self.zyngui.screens['layer'].remove_layer(i)
+			i = self.zynqtgui.screens['layer'].layers.index(sl)
+			self.zynqtgui.screens['layer'].remove_layer(i)
 
 		self.fx_layers_changed.emit()
 		self.fx_layer = None
 		self.fill_list()
-		self.zyngui.screens['main_layers_view'].fill_list()
-		self.zyngui.screens["fixed_layers"].fill_list()
+		self.zynqtgui.screens['main_layers_view'].fill_list()
+		self.zynqtgui.screens["fixed_layers"].fill_list()
 
 	def index_supports_immediate_activation(self, index=None):
 		return True
 
 	def set_select_path(self):
 		if self.midi_mode:
-			if self.zyngui.curlayer:
-				self.select_path = self.zyngui.curlayer.get_basepath() + " Midi-FX"
+			if self.zynqtgui.curlayer:
+				self.select_path = self.zynqtgui.curlayer.get_basepath() + " Midi-FX"
 			else:
 				self.select_path = "Midi-FX"
 		else:
-			if self.zyngui.curlayer:
-				self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX"
+			if self.zynqtgui.curlayer:
+				self.select_path = self.zynqtgui.curlayer.get_basepath() + " Audio-FX"
 			else:
 				self.select_path = "Audio-FX"
 		if self.fx_layers != None and len(self.fx_layers) > 0:

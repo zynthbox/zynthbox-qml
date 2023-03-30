@@ -168,7 +168,7 @@ def midi_autoconnect(force=False):
 		last_hw_str = hw_str
 
 	#Get Engines list from UI
-	zyngine_list=zynthian_gui_config.zyngui.screens["engine"].zyngines
+	zyngine_list=zynthian_gui_config.zynqtgui.screens["engine"].zyngines
 
 	#Get Engines MIDI input, output & feedback ports:
 	engines_in={}
@@ -284,7 +284,7 @@ def midi_autoconnect(force=False):
 	#logger.debug("Connecting ZynMidiRouter to engines ...")
 
 	#Get layers list from UI
-	layers_list=zynthian_gui_config.zyngui.screens["layer"].layers
+	layers_list=zynthian_gui_config.zynqtgui.screens["layer"].layers
 
 	#Connect MIDI chain elements
 	for i, layer in enumerate(layers_list):
@@ -313,12 +313,12 @@ def midi_autoconnect(force=False):
 
 
 	#Connect ZynMidiRouter to MIDI-chain roots
-	midichain_roots = zynthian_gui_config.zyngui.screens["layer"].get_midichain_roots()
+	midichain_roots = zynthian_gui_config.zynqtgui.screens["layer"].get_midichain_roots()
 
 	# => Get Root-engines info
 	root_engine_info = {}
 	for mcrl in midichain_roots:
-		for mcprl in zynthian_gui_config.zyngui.screens["layer"].get_midichain_pars(mcrl):
+		for mcprl in zynthian_gui_config.zynqtgui.screens["layer"].get_midichain_pars(mcrl):
 			if mcprl.get_midi_jackname():
 				jackname = mcprl.get_midi_jackname()
 				if jackname in root_engine_info:
@@ -351,7 +351,7 @@ def midi_autoconnect(force=False):
 					pass
 
 	# Connect Engine's MIDI output to assigned ports
-	for layer in zynthian_gui_config.zyngui.screens["layer"].root_layers:
+	for layer in zynthian_gui_config.zynqtgui.screens["layer"].root_layers:
 		if layer.midi_chan is None:
 			continue
 
@@ -468,7 +468,7 @@ def midi_autoconnect(force=False):
 	release_lock()
 
 def audio_autoconnect(force=False):
-	if not zynthian_gui_config.zyngui.isBootingComplete:
+	if not zynthian_gui_config.zynqtgui.isBootingComplete:
 		# If Booting is not complete, do not run autoconnect
 		# Autoconnect will be explicitly called once after booting is complete
 		return
@@ -508,8 +508,8 @@ def audio_autoconnect(force=False):
 
 	# Connect the global effects passthrough wet output to the global effects
 	hasGlobalEffects = False
-	if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
-		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+	if len(zynthian_gui_config.zynqtgui.global_fx_engines) > 0:
+		for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
 			try:
 				engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
 				# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
@@ -558,8 +558,8 @@ def audio_autoconnect(force=False):
 			return
 
 		# Connect Global effects output to bluealsa (if available)
-		if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
-			for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+		if len(zynthian_gui_config.zynqtgui.global_fx_engines) > 0:
+			for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
 				try:
 					engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True)
 					# Some engines only take mono output, but we want them to receive both our left and right outputs, so connect l and r both to that one output
@@ -596,7 +596,7 @@ def audio_autoconnect(force=False):
 
 	# Connect global FX ports to system playback
 	try:
-		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+		for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
 			try:
 				engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True);
 				for port in zip(engineOutPorts, playback_ports):
@@ -614,7 +614,7 @@ def audio_autoconnect(force=False):
 
 	# Connect each channel's ports to either that channel's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the channel
 	# If there's no song yet, we can't do a lot...
-	song = zynthian_gui_config.zyngui.screens["sketchpad"].song
+	song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
 	if not song:
 		pass
 	else:
@@ -629,8 +629,8 @@ def audio_autoconnect(force=False):
 					if len(channel.chainedSounds) > 0:
 						for chainedSound in channel.chainedSounds:
 							if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
-								layer = zynthian_gui_config.zyngui.screens['layer'].layer_midi_map[chainedSound]
-								effectsLayers = zynthian_gui_config.zyngui.screens['layer'].get_fxchain_layers(layer)
+								layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[chainedSound]
+								effectsLayers = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_layers(layer)
 								if effectsLayers != None and len(effectsLayers) > 0:
 									# As there are effects, connect the channel's outputs to their inputs
 									for sl in effectsLayers:
@@ -687,7 +687,7 @@ def audio_autoconnect(force=False):
 	###
 
 	#Get layers list from UI
-	layers_list=zynthian_gui_config.zyngui.screens["layer"].layers
+	layers_list=zynthian_gui_config.zynqtgui.screens["layer"].layers
 
 	#Connect Synth Engines to assigned outputs
 	for i, layer in enumerate(layers_list):
@@ -759,11 +759,11 @@ def audio_autoconnect(force=False):
 
 	### Connect synth engines to global effects
 	try:
-		if zynthian_gui_config.zyngui.sketchpad.song:
-			for midi_channel in zynthian_gui_config.zyngui.layer.layer_midi_map:
-				synth_engine = zynthian_gui_config.zyngui.layer.layer_midi_map[midi_channel]
+		if zynthian_gui_config.zynqtgui.sketchpad.song:
+			for midi_channel in zynthian_gui_config.zynqtgui.layer.layer_midi_map:
+				synth_engine = zynthian_gui_config.zynqtgui.layer.layer_midi_map[midi_channel]
 				for channel_index in range(0, 10):
-					channel = zynthian_gui_config.zyngui.sketchpad.song.channelsModel.getChannel(channel_index)
+					channel = zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_index)
 
 					# Find which channel midichannel belongs to
 					if channel is not None and midi_channel in channel.chainedSounds:
@@ -924,14 +924,14 @@ def audio_autoconnect(force=False):
 	capture_ports = get_audio_capture_ports()
 	if len(capture_ports)>0:
 
-		root_layers = zynthian_gui_config.zyngui.screens["layer"].get_fxchain_roots()
+		root_layers = zynthian_gui_config.zynqtgui.screens["layer"].get_fxchain_roots()
 		#Connect system capture ports to FX-layers root ...
 		for rl in root_layers:
 			if not rl.get_audio_jackname() or layer.engine.type!="Audio Effect":
 				continue
 
 			# Connect to FX-layers roots and their "pars" (parallel layers)
-			for rlp in zynthian_gui_config.zyngui.screens["layer"].get_fxchain_pars(rl):
+			for rlp in zynthian_gui_config.zynqtgui.screens["layer"].get_fxchain_pars(rl):
 				#Get Root Layer Input ports ...
 				rlp_in = jclient.get_ports(rlp.get_audio_jackname(), is_input=True, is_audio=True)
 				if len(rlp_in)>0:
@@ -1094,7 +1094,7 @@ def cb_jack_xrun(delayed_usecs: float):
 	global xrun_count
 
 	xrun_count += 1
-	zynthian_gui_config.zyngui.status_info['xrun'] = True
+	zynthian_gui_config.zynqtgui.status_info['xrun'] = True
 
 
 def get_jackd_cpu_load():

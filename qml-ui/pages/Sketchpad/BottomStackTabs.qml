@@ -29,8 +29,8 @@ import org.kde.kirigami 2.6 as Kirigami
 ColumnLayout {
     id: root
 
-    property bool songMode: false;//zynthian.sketchpad.song.sketchesModel.songMode
-    property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
+    property bool songMode: false;//zynqtgui.sketchpad.song.sketchesModel.songMode
+    property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
     QQC2.Button {
         Layout.fillWidth: true

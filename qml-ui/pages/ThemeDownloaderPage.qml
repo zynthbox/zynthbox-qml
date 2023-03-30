@@ -32,5 +32,5 @@ Zynthian.NewStuffPage {
     screenId: "theme_downloader"
     title: qsTr("Theme Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynqtgui-themes.knsrc").toString().slice(7)
 }

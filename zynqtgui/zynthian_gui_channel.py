@@ -34,7 +34,7 @@ from PySide2.QtCore import Qt, QObject, Signal, Slot, Property
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_channel(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_channel(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_channel, self).__init__(parent)
         self.title = "Channels"
@@ -78,7 +78,7 @@ class zynthian_gui_channel(zynthian_qt_gui_base.ZynGui):
 
     @Property(QObject, notify=__channel_changed__)
     def channel(self):
-        return self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.__channel_id__)
+        return self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.__channel_id__)
 
 
     @Signal
@@ -87,7 +87,7 @@ class zynthian_gui_channel(zynthian_qt_gui_base.ZynGui):
 
     @Property(QObject, notify=__part_changed__)
     def part(self):
-        return self.zyngui.screens['sketchpad'].song.partsModel.getPart(self.__part_id__)
+        return self.zynqtgui.screens['sketchpad'].song.partsModel.getPart(self.__part_id__)
 
     def set_select_path(self):
         self.select_path = self.title

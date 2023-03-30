@@ -147,10 +147,10 @@ class sketchpad_channels_model(QAbstractListModel):
 
     ### Property connectedSoundsCount
     def get_connected_sounds_count(self):
-        zyngui = self.__song__.get_metronome_manager().zyngui
+        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
         assigned_layers = []
 
-        channels_model = zyngui.screens["sketchpad"].song.channelsModel
+        channels_model = zynqtgui.screens["sketchpad"].song.channelsModel
 
         for i in range(0, channels_model.count):
             channel = channels_model.getChannel(i)

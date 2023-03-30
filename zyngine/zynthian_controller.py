@@ -444,7 +444,7 @@ class zynthian_controller:
 					logging.error(e)
 
 			# Call GUI method
-			self.engine.zyngui.init_midi_learn(self)
+			self.engine.zynqtgui.init_midi_learn(self)
 
 
 	def midi_unlearn(self):
@@ -466,7 +466,7 @@ class zynthian_controller:
 
 			if unlearned:
 				# Call GUI method
-				self.engine.zyngui.refresh_midi_learn()
+				self.engine.zynqtgui.refresh_midi_learn()
 				# Return success
 				return True
 			else:
@@ -525,7 +525,7 @@ class zynthian_controller:
 
 			if learned:
 				# Call GUI method
-				self.engine.zyngui.end_midi_learn()
+				self.engine.zynqtgui.end_midi_learn()
 				# Return success
 				return True
 			else:
@@ -536,7 +536,7 @@ class zynthian_controller:
 
 	def _cb_midi_learn(self, chan, cc):
 		if self._set_midi_learn(chan, cc):
-			self.engine.zyngui.end_midi_learn()
+			self.engine.zynqtgui.end_midi_learn()
 			return True
 
 
@@ -585,8 +585,8 @@ class zynthian_controller:
 	def refresh_gui(self):
 		#Refresh GUI controller in screen when needed ...
 		try:
-			if (self.engine.zyngui.active_screen=='control' and not self.engine.zyngui.modal_screen) or self.engine.zyngui.modal_screen=='alsa_mixer':
-				self.engine.zyngui.screens['control'].set_controller_value(self)
+			if (self.engine.zynqtgui.active_screen=='control' and not self.engine.zynqtgui.modal_screen) or self.engine.zynqtgui.modal_screen=='alsa_mixer':
+				self.engine.zynqtgui.screens['control'].set_controller_value(self)
 		except Exception as e:
 			logging.debug(e)
 

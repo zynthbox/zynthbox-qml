@@ -45,8 +45,8 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 		self.effects_types_screen = "effect_types"
 
 		self.single_category = "    " # Hack to get an empty list
-		if self.zyngui.curlayer:
-			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+		if self.zynqtgui.curlayer:
+			self.set_fxchain_mode(self.zynqtgui.curlayer.midi_chan)
 
 
 	def show(self):
@@ -57,18 +57,18 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 			self.effects_screen = "layer_effects"
 			self.effects_types_screen = "effect_types"
 
-		if self.zyngui.curlayer:
+		if self.zynqtgui.curlayer:
 			if self.midi_mode:
-				self.set_midichain_mode(self.zyngui.curlayer.midi_chan)
+				self.set_midichain_mode(self.zynqtgui.curlayer.midi_chan)
 			else:
-				self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+				self.set_fxchain_mode(self.zynqtgui.curlayer.midi_chan)
 			self.reset_index = False
 
 		super().show()
 
-		if self.zyngui.screens[self.effects_screen].fx_layer != None:
+		if self.zynqtgui.screens[self.effects_screen].fx_layer != None:
 			for i, item in enumerate(self.list_data):
-				if item[0] == self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer):
+				if item[0] == self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer):
 					self.select(i)
 					return
 
@@ -81,35 +81,35 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 	def select_action(self, i, t='S'):
 		if i is not None and i >= 0 and i < len(self.list_data) and self.list_data[i][0]:
 			try: #FIXME: why needed
-				self.zyngui.start_loading()
-				if self.zyngui.screens[self.effects_screen].fx_layer != None and self.zyngui.screens[self.effects_screen].fx_layer in self.zyngui.screens['layer'].layers:
-					self.zyngui.screens['layer'].replace_layer_index = self.zyngui.screens['layer'].layers.index(self.zyngui.screens[self.effects_screen].fx_layer)
+				self.zynqtgui.start_loading()
+				if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.screens[self.effects_screen].fx_layer in self.zynqtgui.screens['layer'].layers:
+					self.zynqtgui.screens['layer'].replace_layer_index = self.zynqtgui.screens['layer'].layers.index(self.zynqtgui.screens[self.effects_screen].fx_layer)
 
 				else:
-					self.zyngui.screens['layer'].replace_layer_index = None
+					self.zynqtgui.screens['layer'].replace_layer_index = None
 				logging.debug(self.layer_chain_parallel)
-				self.zyngui.screens['layer'].layer_chain_parallel = self.layer_chain_parallel
+				self.zynqtgui.screens['layer'].layer_chain_parallel = self.layer_chain_parallel
 				#sometimes this raises an invalid index exection, despite the indexes having been checked already
-				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zyngui.curlayer.midi_chan, False)
+				self.zynqtgui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zynqtgui.curlayer.midi_chan, False)
 
-				self.zyngui.screens[self.effects_screen].show()
+				self.zynqtgui.screens[self.effects_screen].show()
 
-				if self.zyngui.screens['layer'].replace_layer_index is None:
-					self.zyngui.screens[self.effects_screen].select_action(len(self.zyngui.screens[self.effects_screen].fx_layers) - 1)
+				if self.zynqtgui.screens['layer'].replace_layer_index is None:
+					self.zynqtgui.screens[self.effects_screen].select_action(len(self.zynqtgui.screens[self.effects_screen].fx_layers) - 1)
 				else:
-					self.zyngui.screens[self.effects_screen].select_action(self.zyngui.screens['layer'].replace_layer_index)
+					self.zynqtgui.screens[self.effects_screen].select_action(self.zynqtgui.screens['layer'].replace_layer_index)
 
-				self.zyngui.screens['layer'].replace_layer_index = None
+				self.zynqtgui.screens['layer'].replace_layer_index = None
 
-				self.zyngui.screens['main_layers_view'].fill_list()
-				self.zyngui.stop_loading()
+				self.zynqtgui.screens['main_layers_view'].fill_list()
+				self.zynqtgui.stop_loading()
 				if self.midi_mode:
-					self.zyngui.show_screen("layer_midi_effect_chooser")
+					self.zynqtgui.show_screen("layer_midi_effect_chooser")
 				else:
-					self.zyngui.show_screen("layer_effect_chooser")
+					self.zynqtgui.show_screen("layer_effect_chooser")
 
-				self.zyngui.screens["fixed_layers"].fill_list()
-				self.zyngui.screens['snapshot'].save_last_state_snapshot()
+				self.zynqtgui.screens["fixed_layers"].fill_list()
+				self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
 			except:
 				pass
 
@@ -120,8 +120,8 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 	def set_select_path(self):
 		self.select_path = ''
-		if self.zyngui.screens[self.effects_screen].fx_layer != None:
-			self.select_path = self.engine_info[self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer)][0]
+		if self.zynqtgui.screens[self.effects_screen].fx_layer != None:
+			self.select_path = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][0]
 		self.selector_path_changed.emit()
 		self.selector_path_element_changed.emit()
 

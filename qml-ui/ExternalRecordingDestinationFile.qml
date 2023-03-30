@@ -33,17 +33,17 @@ ColumnLayout {
     id: component
     objectName: "clipPickerFile"
 
-    property bool isRecording: zynthian.main.isRecording
+    property bool isRecording: zynqtgui.main.isRecording
     function startRecording() {
         // If the current module is an alsa thing, don't use jack to record it and instead record using alsa
-        if (zynthian.main.currentModuleRecordAlsa === true) {
-            zynthian.main.start_recording_alsa();
+        if (zynqtgui.main.currentModuleRecordAlsa === true) {
+            zynqtgui.main.start_recording_alsa();
         } else {
-            zynthian.main.start_recording();
+            zynqtgui.main.start_recording();
         }
     }
     function stopRecording() {
-        zynthian.main.stop_recording();
+        zynqtgui.main.stop_recording();
     }
 
     Kirigami.Heading {
@@ -58,29 +58,29 @@ ColumnLayout {
     }
     QQC2.Label {
         Layout.fillWidth: true
-        visible: zynthian.main.mostRecentRecordingFile != ""
+        visible: zynqtgui.main.mostRecentRecordingFile != ""
         wrapMode: Text.Wrap
-        text: qsTr("Your most recent recording is:\n%1").arg(zynthian.main.mostRecentRecordingFile)
+        text: qsTr("Your most recent recording is:\n%1").arg(zynqtgui.main.mostRecentRecordingFile)
     }
     RowLayout {
         Layout.fillWidth: true
         QQC2.Button {
             Layout.fillWidth: true
-            visible: zynthian.main.mostRecentRecordingFile != ""
+            visible: zynqtgui.main.mostRecentRecordingFile != ""
             text: qsTr("Discard Recording")
             onClicked: {
-                zynthian.main.discardMostRecentRecording();
+                zynqtgui.main.discardMostRecentRecording();
             }
         }
         QQC2.Button {
             Layout.fillWidth: true
-            visible: zynthian.main.mostRecentRecordingFile != ""
-            text: zynthian.main.isPlaying ? qsTr("Stop Playback") : qsTr("Play Recording")
+            visible: zynqtgui.main.mostRecentRecordingFile != ""
+            text: zynqtgui.main.isPlaying ? qsTr("Stop Playback") : qsTr("Play Recording")
             onClicked: {
-                if (zynthian.main.isPlaying) {
-                    zynthian.main.stopMostRecentRecordingPlayback();
+                if (zynqtgui.main.isPlaying) {
+                    zynqtgui.main.stopMostRecentRecordingPlayback();
                 } else {
-                    zynthian.main.playMostRecentRecording();
+                    zynqtgui.main.playMostRecentRecording();
                 }
             }
         }

@@ -29,10 +29,10 @@ from . import zynthian_gui_config
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
-class ZynGui(QObject):
+class zynqtgui(QObject):
     def __init__(self, parent=None):
-        super(ZynGui, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
+        super(zynqtgui, self).__init__(parent)
+        self.zynqtgui = zynthian_gui_config.zynqtgui
         self.select_path = ""
         self.shown = True
 

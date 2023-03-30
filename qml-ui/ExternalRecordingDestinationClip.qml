@@ -44,26 +44,26 @@ ColumnLayout {
     function startRecording() {
         isRecording = true;
         component.recordingSample = component.selectedSample;
-        var baseFolder = zynthian.sketchpad.song.channelsModel.getChannel(channelsList.currentIndex).bankDir;
+        var baseFolder = zynqtgui.sketchpad.song.channelsModel.getChannel(channelsList.currentIndex).bankDir;
         var date = new Date();
         var recordingTimestamp = date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
-        var fileNameFriendlyModuleName = zynthian.main.currentModuleName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        component.recordingFilename = baseFolder + "/" + recordingTimestamp + "_" + fileNameFriendlyModuleName + "_" + zynthian.sketchpad.song.bpm + "-BPM.clip.wav";
+        var fileNameFriendlyModuleName = zynqtgui.main.currentModuleName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        component.recordingFilename = baseFolder + "/" + recordingTimestamp + "_" + fileNameFriendlyModuleName + "_" + zynqtgui.sketchpad.song.bpm + "-BPM.clip.wav";
         ZL.AudioLevels.clearRecordPorts();
         // If the current module is an alsa thing, don't use jack to record it and instead record using alsa
-        if (zynthian.main.currentModuleRecordAlsa === true) {
-            zynthian.main.start_recording_alsa();
+        if (zynqtgui.main.currentModuleRecordAlsa === true) {
+            zynqtgui.main.start_recording_alsa();
         } else {
             // If the current module's recording ports are empty, record the system output
-            if (zynthian.main.currentModuleRecordingPortsLeft === "" && zynthian.main.currentModuleRecordingPortsRight === "") {
+            if (zynqtgui.main.currentModuleRecordingPortsLeft === "" && zynqtgui.main.currentModuleRecordingPortsRight === "") {
                 ZL.AudioLevels.addRecordPort("system:playback_1", 0);
                 ZL.AudioLevels.addRecordPort("system:playback_2", 1);
             } else {
-                var splitLeftPorts = zynthian.main.currentModuleRecordingPortsLeft.split(",");
+                var splitLeftPorts = zynqtgui.main.currentModuleRecordingPortsLeft.split(",");
                 for (var i = 0; i < splitLeftPorts.length; ++i) {
                     ZL.AudioLevels.addRecordPort(splitLeftPorts[i], 0);
                 }
-                var splitRightPorts = zynthian.main.currentModuleRecordingPortsRight.split(",");
+                var splitRightPorts = zynqtgui.main.currentModuleRecordingPortsRight.split(",");
                 for (var i = 0; i < splitRightPorts.length; ++i) {
                     ZL.AudioLevels.addRecordPort(splitRightPorts[i], 1);
                 }
@@ -75,9 +75,9 @@ ColumnLayout {
     }
     function stopRecording() {
         isRecording = false;
-        if (zynthian.main.currentModuleRecordAlsa === true) {
+        if (zynqtgui.main.currentModuleRecordAlsa === true) {
             // If we've recorded using alsa, we'll need to move that file into its proper home before we attempt to set it on the clip
-            zynthian.main.stop_recording_and_move(component.recordingFilename);
+            zynqtgui.main.stop_recording_and_move(component.recordingFilename);
         } else {
             ZL.AudioLevels.shouldRecordPorts = false;
             ZL.AudioLevels.stopRecording();
@@ -118,7 +118,7 @@ ColumnLayout {
                 Binding {
                     target: delegate
                     property: "channel"
-                    value: zynthian.sketchpad.song.channelsModel.getChannel(index)
+                    value: zynqtgui.sketchpad.song.channelsModel.getChannel(index)
                     when: component.visible
                     delayed: true
                 }
@@ -148,7 +148,7 @@ ColumnLayout {
                         }
                         property bool performCurrentCheck: false;
                         function checkCurrent() {
-                            if (zynthian.session_dashboard.selectedChannel === delegate.channelIndex && delegate.channel != null && delegate.channel.selectedSlotRow === index) {
+                            if (zynqtgui.session_dashboard.selectedChannel === delegate.channelIndex && delegate.channel != null && delegate.channel.selectedSlotRow === index) {
                                 setCurrent();
                             }
                         }
@@ -164,7 +164,7 @@ ColumnLayout {
                             }
                         }
                         Connections {
-                            target: zynthian.session_dashboard
+                            target: zynqtgui.session_dashboard
                             onSelectedChannelChanged: checkCurrentTimer.restart()
                         }
                         Connections {
@@ -180,7 +180,7 @@ ColumnLayout {
                             }
                         }
                         onClicked: {
-                            zynthian.session_dashboard.selectedChannel = delegate.channelIndex;
+                            zynqtgui.session_dashboard.selectedChannel = delegate.channelIndex;
                             delegate.channel.selectedSlotRow = index;
                         }
                     }

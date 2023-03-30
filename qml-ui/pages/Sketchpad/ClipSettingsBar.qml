@@ -41,11 +41,11 @@ GridLayout {
     Layout.maximumWidth: parent.width
 
     property QtObject bottomBar: null
-    property string controlType: zynthian.bottomBarControlType
+    property string controlType: zynqtgui.bottomBarControlType
     property QtObject controlObj: (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
-                                    ? zynthian.bottomBarControlObj // selected bottomBar object is clip/pattern
-                                    : zynthian.bottomBarControlObj && zynthian.bottomBarControlObj.hasOwnProperty("samples") && zynthian.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
-                                        ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow]
+                                    ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
+                                    : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
+                                        ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
                                         : null
     property bool showCopyPasteButtons: true
         

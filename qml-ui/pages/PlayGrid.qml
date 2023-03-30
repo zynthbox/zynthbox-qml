@@ -97,7 +97,7 @@ don't want to have to dig too far...
         Kirigami.Action {
             text: "Get New Playgrids"
             onTriggered: {
-                zynthian.show_modal("playgrid_downloader");
+                zynqtgui.show_modal("playgrid_downloader");
             }
         }
     property var thePlayGridActions: []
@@ -293,7 +293,7 @@ don't want to have to dig too far...
                                 display: QQC2.AbstractButton.TextBesideIcon
                                 onClicked: {
                                     settingsPopup.visible = false;
-                                    zynthian.show_modal("playgrid_downloader");
+                                    zynqtgui.show_modal("playgrid_downloader");
                                 }
                             }
                             QQC2.Button {
@@ -650,12 +650,12 @@ don't want to have to dig too far...
     Binding {
         target: ZynQuick.PlayGridManager
         property: "zlDashboard"
-        value: zynthian.session_dashboard
+        value: zynqtgui.session_dashboard
     }
     Binding {
         target: ZynQuick.SegmentHandler
         property: "song"
-        value: zynthian.sketchpad.song
+        value: zynqtgui.sketchpad.song
     }
     // Our basic structure is logically scene contains channels which contain patterns, and accessing them is done through the song's inverted-structure channels model
     // the channels contain clips models (each of which holds information for all channel/part combinations for that channel), and each clip in that model holds the data pertaining to one scene/part/channel
@@ -699,12 +699,12 @@ don't want to have to dig too far...
                             // This operation is potentially a bit pricy, as setting the song
                             // to something new will cause the global sequence to be reloaded
                             // to match what is in that song
-                            channelPartSceneDelegate.sequence.song = zynthian.sketchpad.song;
+                            channelPartSceneDelegate.sequence.song = zynqtgui.sketchpad.song;
                         }
                     }
                     onPatternChanged: {
                         if (channelPartSceneDelegate.pattern) {
-                            channelPartSceneDelegate.pattern.zlDashboard = zynthian.session_dashboard;
+                            channelPartSceneDelegate.pattern.zlDashboard = zynqtgui.session_dashboard;
                             channelPartSceneDelegate.pattern.zlChannel = baseChannelDelegate.theChannel;
                             channelPartSceneDelegate.pattern.zlPart = channelPartDelegate.part;
                             channelPartSceneDelegate.pattern.zlScene = channelPartSceneDelegate.sceneClip;
@@ -725,7 +725,7 @@ don't want to have to dig too far...
     Binding {
         target: channelsRepeater
         property: "model"
-        value: zynthian.sketchpad.song.channelsModel
+        value: zynqtgui.sketchpad.song.channelsModel
         delayed: true
     }
 }

@@ -40,8 +40,8 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
-    property QtObject controlObj: zynthian.bottomBarControlObj
-    property QtObject sequence: controlObj.clipChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
+    property QtObject controlObj: zynqtgui.bottomBarControlObj
+    property QtObject sequence: controlObj.clipChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart) : null
 
     function cuiaCallback(cuia) {
@@ -113,11 +113,11 @@ GridLayout {
             MouseArea {
                 anchors.fill:parent
                 onClicked: {
-                    var screenBack = zynthian.current_screen_id;
-                    zynthian.current_modal_screen_id = "playgrid";
-                    zynthian.forced_screen_back = "sketchpad";
+                    var screenBack = zynqtgui.current_screen_id;
+                    zynqtgui.current_modal_screen_id = "playgrid";
+                    zynqtgui.forced_screen_back = "sketchpad";
                     ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
                     sequence.setActiveChannel(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart);
                 }
             }

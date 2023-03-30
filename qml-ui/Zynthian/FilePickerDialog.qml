@@ -21,9 +21,9 @@ import Zynthian 1.0 as Zynthian
   *      width: Math.round(parent.width * 0.8)
   *      height: Math.round(parent.height * 0.8)
   *
-  *      rootFolder: '/zynthian/zynthian-my-data'
+  *      rootFolder: '/zynqtgui/zynqtgui-my-data'
   *      folderModel {
-  *          folder: '/zynthian/zynthian-my-data/sketchpads'
+  *          folder: '/zynqtgui/zynqtgui-my-data/sketchpads'
   *          nameFilters: ["*.wav"]
   *      }
   *      onFileSelected: {
@@ -139,8 +139,8 @@ Zynthian.Dialog {
             QQC2.Label {
                 id: conflictLabel
                 opacity: namedFile.text !== "" && (root.autoExtension === "" || namedFile.text.endsWith(root.autoExtension)
-                    ? zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text)
-                    : zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text + root.autoExtension)
+                    ? zynqtgui.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text)
+                    : zynqtgui.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text + root.autoExtension)
                     )
                 visible: opacity > 0
                 Layout.preferredHeight: opacity > 0 ? implicitHeight : 0
@@ -283,17 +283,17 @@ Zynthian.Dialog {
                                 horizontalCenter: parent.horizontalCenter
                             }
                             function getHelp(folderName) {
-                                if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
+                                if (folderName == "file:///zynqtgui/zynqtgui-my-data/sounds/community-sounds") {
                                     return qsTr("When you use Get New Sounds, you will be able to find them here");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
+                                } else if (folderName == "file:///zynqtgui/zynqtgui-my-data/sounds/my-sounds") {
                                     return qsTr("This is where you should store your own sounds");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/community-soundsets") {
+                                } else if (folderName == "file:///zynqtgui/zynqtgui-my-data/soundsets/community-soundsets") {
                                     return qsTr("When you use Get New Soundsets, you will be able to find them here");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
+                                } else if (folderName == "file:///zynqtgui/zynqtgui-my-data/soundsets/my-soundsets") {
                                     return qsTr("This is where you should store your own soundsets");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/community-sequences") {
+                                } else if (folderName == "file:///zynqtgui/zynqtgui-my-data/sequences/community-sequences") {
                                     return qsTr("When you use Get New Sequences, you will be able to find them here");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
+                                } else if (folderName == "file:///zynqtgui/zynqtgui-my-data/sequences/my-sequences") {
                                     return qsTr("This is where you should store sequences you create");
                                 }
                                 return "";

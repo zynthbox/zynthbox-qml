@@ -39,7 +39,7 @@ Zynthian.ScrollableScreenPage {
     Kirigami.Heading {
         level: 3
         wrapMode: Text.Wrap
-        text: zynthian.info.text
+        text: zynqtgui.info.text
         onTextChanged: {
             autoHideTimer.restart()
             root.flickable.contentY = root.flickable.contentHeight - root.flickable.height
@@ -49,7 +49,7 @@ Zynthian.ScrollableScreenPage {
             interval: 3000
             onTriggered: {
                 print("autohidetimer triggered")
-                zynthian.info.back_action()
+                zynqtgui.info.back_action()
             }
         }
     }

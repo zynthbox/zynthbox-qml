@@ -55,7 +55,7 @@ class zynthian_gui_touchscreen_calibration:
 	# Function to initialise class
 	def __init__(self):
 		self.shown = False
-		self.zyngui=zynthian_gui_config.zyngui
+		self.zynqtgui=zynthian_gui_config.zynqtgui
 		self.height = zynthian_gui_config.display_height
 		self.width = zynthian_gui_config.display_width
 		self.debounce = 0.5 * self.height # Clicks cannot be closer than this
@@ -262,7 +262,7 @@ class zynthian_gui_touchscreen_calibration:
 
 				#TODO: Allow user to check calibration
 
-				self.zyngui.zynswitch_defered('S',1)
+				self.zynqtgui.zynswitch_defered('S',1)
 				return
 
 		self.drawCross()
@@ -386,7 +386,7 @@ class zynthian_gui_touchscreen_calibration:
 		if self.shown:
 			self.canvas.itemconfig(self.countdown_text, text="Closing in %ds" % (self.countdown))
 			if self.countdown <= 0:
-				self.zyngui.zynswitch_defered('S',1)
+				self.zynqtgui.zynswitch_defered('S',1)
 				return
 			if not self.pressed:
 				self.countdown -= 1

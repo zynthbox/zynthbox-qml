@@ -39,7 +39,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.Popup {
     id: root
-    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
@@ -65,7 +65,7 @@ Zynthian.Popup {
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    closePolicy: !zynthian.sketchpad.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
+    closePolicy: !zynqtgui.sketchpad.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
     width: parent.width * 0.95
     height: parent.height * 0.95
     leftPadding: 0
@@ -76,35 +76,35 @@ Zynthian.Popup {
         console.log("Recording popup selectedChannelChanged handler")
 
         if (root.selectedChannel.channelAudioType === "external") {
-            zynthian.sketchpad.recordingSource = "external"
-            zynthian.sketchpad.recordingChannel = "*"
+            zynqtgui.sketchpad.recordingSource = "external"
+            zynqtgui.sketchpad.recordingChannel = "*"
         } else {
-            zynthian.sketchpad.recordingSource = "internal"
+            zynqtgui.sketchpad.recordingSource = "internal"
         }
 
         // Reset source combo model to selected value when channel changes
         for (var i=0; i<sourceComboModel.count; i++) {
-            if (sourceComboModel.get(i).value === zynthian.sketchpad.recordingSource) {
+            if (sourceComboModel.get(i).value === zynqtgui.sketchpad.recordingSource) {
                 sourceCombo.currentIndex = i
                 break
             }
         }
 
         for (var i=0; i<recordingChannelComboModel.count; i++) {
-            if (recordingChannelComboModel.get(i).value === zynthian.sketchpad.recordingChannel) {
+            if (recordingChannelComboModel.get(i).value === zynqtgui.sketchpad.recordingChannel) {
                 recordingChannelCombo.currentIndex = i
                 break
             }
         }
 
-        console.log(zynthian.sketchpad.recordingSource, zynthian.sketchpad.recordingChannel, sourceCombo.currentIndex, recordingChannelCombo.currentIndex)
+        console.log(zynqtgui.sketchpad.recordingSource, zynqtgui.sketchpad.recordingChannel, sourceCombo.currentIndex, recordingChannelCombo.currentIndex)
     }
     onOpened: {
-        zynthian.recordingPopupActive = true
+        zynqtgui.recordingPopupActive = true
 
         // Reset recordingType combo model to selected value when dialog opens
         for (var i=0; i<recordingTypeComboModel.count; i++) {
-            if (recordingTypeComboModel.get(i).value === zynthian.sketchpad.recordingType) {
+            if (recordingTypeComboModel.get(i).value === zynqtgui.sketchpad.recordingType) {
                 recordingTypeCombo.currentIndex = i
                 break
             }
@@ -112,14 +112,14 @@ Zynthian.Popup {
 
         // Reset countIn combo model to selected value when dialog opens
         for (var i=0; i<countInComboModel.count; i++) {
-            if (countInComboModel.get(i).value === zynthian.sketchpad.countInBars) {
+            if (countInComboModel.get(i).value === zynqtgui.sketchpad.countInBars) {
                 countInCombo.currentIndex = i
                 break
             }
         }
     }
     onClosed: {
-        zynthian.recordingPopupActive = false
+        zynqtgui.recordingPopupActive = false
     }
     contentItem: ColumnLayout {
         anchors.fill: parent
@@ -145,7 +145,7 @@ Zynthian.Popup {
             ColumnLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                enabled: !zynthian.sketchpad.isRecording
+                enabled: !zynqtgui.sketchpad.isRecording
                 spacing: Kirigami.Units.gridUnit/2
 
                 RowLayout {
@@ -171,14 +171,14 @@ Zynthian.Popup {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.sketchpad.recordingType = recordingTypeComboModel.get(index).value
+                            zynqtgui.sketchpad.recordingType = recordingTypeComboModel.get(index).value
                         }
                     }
                 }
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: zynthian.sketchpad.recordingType === "audio"
+                    visible: zynqtgui.sketchpad.recordingType === "audio"
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
@@ -200,7 +200,7 @@ Zynthian.Popup {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.sketchpad.recordingSource = sourceComboModel.get(index).value
+                            zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
                         }
                     }
 
@@ -214,17 +214,17 @@ Zynthian.Popup {
                         implicitWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.sketchpad.recordSolo
+                        checked: zynqtgui.sketchpad.recordSolo
                         onToggled: {
-                            zynthian.sketchpad.recordSolo = checked
+                            zynqtgui.sketchpad.recordSolo = checked
                         }
                     }
                 }
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: zynthian.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
-                             zynthian.sketchpad.recordingSource === "internal" // and when source is internal
+                    visible: zynqtgui.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
+                             zynqtgui.sketchpad.recordingSource === "internal" // and when source is internal
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
@@ -254,17 +254,17 @@ Zynthian.Popup {
                             ListElement { text: "Channel 10"; value: 9 }
                         }
                         textRole: "text"
-                        currentIndex: visible ? zynthian.session_dashboard.selectedChannel : -1
+                        currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
                         onActivated: {
-                            zynthian.session_dashboard.selectedChannel = channelComboModel.get(index).value
+                            zynqtgui.session_dashboard.selectedChannel = channelComboModel.get(index).value
                         }
                     }
                 }
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: zynthian.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
-                             zynthian.sketchpad.recordingSource === "external" // and when source is external
+                    visible: zynqtgui.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
+                             zynqtgui.sketchpad.recordingSource === "external" // and when source is external
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
@@ -287,7 +287,7 @@ Zynthian.Popup {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
+                            zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
                         }
                     }
                 }
@@ -315,7 +315,7 @@ Zynthian.Popup {
                             ListElement { text: "4"; value: 4 }
                         }
                         textRole: "text"
-                        onActivated: zynthian.sketchpad.countInBars = countInComboModel.get(index).value
+                        onActivated: zynqtgui.sketchpad.countInBars = countInComboModel.get(index).value
                     }
                 }
 
@@ -333,9 +333,9 @@ Zynthian.Popup {
                         implicitWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.sketchpad.recordMasterOutput
+                        checked: zynqtgui.sketchpad.recordMasterOutput
                         onToggled: {
-                            zynthian.sketchpad.recordMasterOutput = checked
+                            zynqtgui.sketchpad.recordMasterOutput = checked
                         }
                     }
                 }
@@ -354,9 +354,9 @@ Zynthian.Popup {
                         implicitWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.sketchpad.clickChannelEnabled
+                        checked: zynqtgui.sketchpad.clickChannelEnabled
                         onToggled: {
-                            zynthian.sketchpad.clickChannelEnabled = checked
+                            zynqtgui.sketchpad.clickChannelEnabled = checked
                         }
                     }
                 }
@@ -393,7 +393,7 @@ Zynthian.Popup {
                                 maximumValue: 20
                                 font.pointSize: 8
                                 value: visible
-                                       ? zynthian.sketchpad.recordingSource === "internal"
+                                       ? zynqtgui.sketchpad.recordingSource === "internal"
                                           ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                           : ZL.AudioLevels.captureA
                                        : -100
@@ -424,7 +424,7 @@ Zynthian.Popup {
                                 maximumValue: 20
                                 font.pointSize: 8
                                 value: visible
-                                        ? zynthian.sketchpad.recordingSource === "internal"
+                                        ? zynqtgui.sketchpad.recordingSource === "internal"
                                            ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                            : ZL.AudioLevels.captureB
                                         : -100
@@ -465,10 +465,10 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignCenter
 
-                    icon.name: zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                    icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
                     onClicked: {
-                        zynthian.callable_ui_action("START_RECORD")
+                        zynqtgui.callable_ui_action("START_RECORD")
                     }
                 }
             }

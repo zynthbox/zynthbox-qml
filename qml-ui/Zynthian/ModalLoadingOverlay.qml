@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 //NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
 Rectangle {
     id: root
-    property bool open: zynthian.is_loading
+    property bool open: zynqtgui.is_loading
 
     z: 999999
     color: Qt.rgba(0, 0,0, 0.8)

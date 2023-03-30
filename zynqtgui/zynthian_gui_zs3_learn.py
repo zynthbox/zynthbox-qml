@@ -49,9 +49,9 @@ class zynthian_gui_zs3_learn(zynthian_gui_selector):
 
 		#Add list of programs
 		try:
-			midich=self.zyngui.curlayer.get_midi_chan()
-			zs3_indexes=self.zyngui.screens['layer'].get_midi_chan_zs3_used_indexes(midich)
-			select_zs3_idx = self.zyngui.screens['layer'].get_last_zs3_index(midich)
+			midich=self.zynqtgui.curlayer.get_midi_chan()
+			zs3_indexes=self.zynqtgui.screens['layer'].get_midi_chan_zs3_used_indexes(midich)
+			select_zs3_idx = self.zynqtgui.screens['layer'].get_last_zs3_index(midich)
 			self.num_programs=len(zs3_indexes)
 			for i, zs3_index in enumerate(zs3_indexes):
 				zs3_title="Program {}".format(zs3_index)
@@ -92,23 +92,23 @@ class zynthian_gui_zs3_learn(zynthian_gui_selector):
 		self.index=i
 		zs3_index=self.list_data[self.index][0]
 		if isinstance(zs3_index, int):
-			midich=self.zyngui.curlayer.get_midi_chan()
+			midich=self.zynqtgui.curlayer.get_midi_chan()
 			if t=='S':
-				self.zyngui.screens['layer'].set_midi_chan_zs3(midich, zs3_index)
-				self.zyngui.exit_midi_learn_mode()
+				self.zynqtgui.screens['layer'].set_midi_chan_zs3(midich, zs3_index)
+				self.zynqtgui.exit_midi_learn_mode()
 			elif t=='B':
-				self.zyngui.screens['zs3_options'].config(midich, zs3_index)
-				self.zyngui.show_modal('zs3_options')
+				self.zynqtgui.screens['zs3_options'].config(midich, zs3_index)
+				self.zynqtgui.show_modal('zs3_options')
 
 
 	def back_action(self):
-		self.zyngui.exit_midi_learn_mode()
+		self.zynqtgui.exit_midi_learn_mode()
 		return ''
 
 
 	def set_select_path(self):
-		if self.zyngui.curlayer:
-			self.select_path = (self.zyngui.curlayer.get_basepath() + " /PROG MIDI-Learn")
+		if self.zynqtgui.curlayer:
+			self.select_path = (self.zynqtgui.curlayer.get_basepath() + " /PROG MIDI-Learn")
 		else:
 			self.select_path = ("PROG MIDI-Learn")
 

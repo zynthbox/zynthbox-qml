@@ -33,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    title: zynthian.midi_key_range.select_path ? zynthian.midi_key_range.select_path : ""
+    title: zynqtgui.midi_key_range.select_path ? zynqtgui.midi_key_range.select_path : ""
 
     screenId: "midi_key_range"
     property var cuiaCallback: function(cuia) {
@@ -53,9 +53,9 @@ Zynthian.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: false
             legend: ""
-            controller.ctrl: zynthian.midi_key_range.octave_controller
+            controller.ctrl: zynqtgui.midi_key_range.octave_controller
             valueLabel: {
-                let str = zynthian.midi_key_range.octave_controller.value_print;
+                let str = zynqtgui.midi_key_range.octave_controller.value_print;
                 str = str.replace(".0", "");
                 return str;
             }
@@ -77,16 +77,16 @@ Zynthian.ScreenPage {
                         Layout.columnSpan: 2
                         text: qsTr("Full Keyboard")
                         checkable: true
-                        checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126
+                        checked: zynqtgui.midi_key_range.note_low_controller.value === 0 && zynqtgui.midi_key_range.note_high_controller.value === 126
                         Binding {
                             target: fullButton
                             property: "checked"
-                            value: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126
+                            value: zynqtgui.midi_key_range.note_low_controller.value === 0 && zynqtgui.midi_key_range.note_high_controller.value === 126
                         }
                         onToggled: {
-                            zynthian.midi_key_range.note_low_controller.value = 0;
-                            zynthian.midi_key_range.note_high_controller.value = 126;
-                            checked = zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126;
+                            zynqtgui.midi_key_range.note_low_controller.value = 0;
+                            zynqtgui.midi_key_range.note_high_controller.value = 126;
+                            checked = zynqtgui.midi_key_range.note_low_controller.value === 0 && zynqtgui.midi_key_range.note_high_controller.value === 126;
                         }
                     }
                     QQC2.Button {
@@ -97,12 +97,12 @@ Zynthian.ScreenPage {
                         Binding {
                             target: lowerButton
                             property: "checked"
-                            value: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59
+                            value: zynqtgui.midi_key_range.note_low_controller.value === 0 && zynqtgui.midi_key_range.note_high_controller.value === 59
                         }
                         onClicked: {
-                            zynthian.midi_key_range.note_low_controller.value = 0;
-                            zynthian.midi_key_range.note_high_controller.value = 59;
-                            checked = zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59;
+                            zynqtgui.midi_key_range.note_low_controller.value = 0;
+                            zynqtgui.midi_key_range.note_high_controller.value = 59;
+                            checked = zynqtgui.midi_key_range.note_low_controller.value === 0 && zynqtgui.midi_key_range.note_high_controller.value === 59;
                         }
                     }
                     QQC2.Button {
@@ -113,13 +113,13 @@ Zynthian.ScreenPage {
                         Binding {
                             target: higherButton
                             property: "checked"
-                            value: zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126
+                            value: zynqtgui.midi_key_range.note_low_controller.value === 60 && zynqtgui.midi_key_range.note_high_controller.value === 126
                         }
                         onClicked: {
-                            zynthian.midi_key_range.note_high_controller.value = 126;
-                            zynthian.midi_key_range.note_low_controller.value = 60;
-                            zynthian.midi_key_range.note_low_controller.value = 60;
-                            checked = zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126;
+                            zynqtgui.midi_key_range.note_high_controller.value = 126;
+                            zynqtgui.midi_key_range.note_low_controller.value = 60;
+                            zynqtgui.midi_key_range.note_low_controller.value = 60;
+                            checked = zynqtgui.midi_key_range.note_low_controller.value === 60 && zynqtgui.midi_key_range.note_high_controller.value === 126;
                         }
                     }
                 }
@@ -133,10 +133,10 @@ Zynthian.ScreenPage {
             Layout.fillWidth: false
             Layout.fillHeight: false
             legend: ""
-            controller.ctrl: zynthian.midi_key_range.get_halftone_controller
+            controller.ctrl: zynqtgui.midi_key_range.get_halftone_controller
             stepSize: 1
             valueLabel: {
-                let str = zynthian.midi_key_range.get_halftone_controller.value_print;
+                let str = zynqtgui.midi_key_range.get_halftone_controller.value_print;
                 str = str.replace(".0", "");
                 return str;
             }
@@ -145,14 +145,14 @@ Zynthian.ScreenPage {
         RowLayout {
             QQC2.Button {
                 text: "-"
-                onClicked: zynthian.midi_key_range.note_low_controller.value = Math.max(0, zynthian.midi_key_range.note_low_controller.value - 1)
+                onClicked: zynqtgui.midi_key_range.note_low_controller.value = Math.max(0, zynqtgui.midi_key_range.note_low_controller.value - 1)
             }
             QQC2.Label {
-                text: qsTr("Low note: %1").arg(zynthian.midi_key_range.get_midi_note_name(Math.round(zynthian.midi_key_range.note_low_controller.value)))
+                text: qsTr("Low note: %1").arg(zynqtgui.midi_key_range.get_midi_note_name(Math.round(zynqtgui.midi_key_range.note_low_controller.value)))
             }
             QQC2.Button {
                 text: "+"
-                onClicked: zynthian.midi_key_range.note_low_controller.value = Math.min(126, zynthian.midi_key_range.note_low_controller.value + 1)
+                onClicked: zynqtgui.midi_key_range.note_low_controller.value = Math.min(126, zynqtgui.midi_key_range.note_low_controller.value + 1)
             }
         }
         Item {
@@ -163,14 +163,14 @@ Zynthian.ScreenPage {
             Layout.alignment: Qt.AlignRight
             QQC2.Button {
                 text: "-"
-                onClicked: zynthian.midi_key_range.note_high_controller.value = Math.max(0, zynthian.midi_key_range.note_high_controller.value - 1)
+                onClicked: zynqtgui.midi_key_range.note_high_controller.value = Math.max(0, zynqtgui.midi_key_range.note_high_controller.value - 1)
             }
             QQC2.Label {
-                text: qsTr("High note: %1").arg(zynthian.midi_key_range.get_midi_note_name(Math.round(zynthian.midi_key_range.note_high_controller.value)))
+                text: qsTr("High note: %1").arg(zynqtgui.midi_key_range.get_midi_note_name(Math.round(zynqtgui.midi_key_range.note_high_controller.value)))
             }
             QQC2.Button {
                 text: "+"
-                onClicked: zynthian.midi_key_range.note_high_controller.value = Math.min(126, zynthian.midi_key_range.note_high_controller.value + 1)
+                onClicked: zynqtgui.midi_key_range.note_high_controller.value = Math.min(126, zynqtgui.midi_key_range.note_high_controller.value + 1)
             }
         }
         Item {
@@ -193,7 +193,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: white
                         implicitWidth: 0
                         Layout.fillHeight: true
-                        opacity: index >= zynthian.midi_key_range.note_low_controller.value && index <= zynthian.midi_key_range.note_high_controller.value ? 1 : 0.5
+                        opacity: index >= zynqtgui.midi_key_range.note_low_controller.value && index <= zynqtgui.midi_key_range.note_high_controller.value ? 1 : 0.5
                         Rectangle {
                             anchors {
                                 fill: parent
@@ -233,7 +233,7 @@ Zynthian.ScreenPage {
                         when: !fromMouse.pressed
                         target: fromHandle
                         property: "x"
-                        value: keyboardLayout.width / 128 * zynthian.midi_key_range.note_low_controller.value
+                        value: keyboardLayout.width / 128 * zynqtgui.midi_key_range.note_low_controller.value
                     }
                     drag {
                         target: fromHandle
@@ -243,7 +243,7 @@ Zynthian.ScreenPage {
                     }
                     onReleased: {
                         print(Math.round(mapToItem(keyboardLayout, mouse.x, 0).x / (keyboardLayout.width/128)))
-                        zynthian.midi_key_range.note_low_controller.value = Math.round(mapToItem(keyboardLayout, mouse.x, 0).x / (keyboardLayout.width/128))
+                        zynqtgui.midi_key_range.note_low_controller.value = Math.round(mapToItem(keyboardLayout, mouse.x, 0).x / (keyboardLayout.width/128))
                     }
                 }
 
@@ -253,7 +253,7 @@ Zynthian.ScreenPage {
                         horizontalCenter: parent.horizontalCenter
                         topMargin: Kirigami.Units.smallSpacing
                     }
-                    text: zynthian.midi_key_range.get_midi_note_name(Math.round(zynthian.midi_key_range.note_low_controller.value))
+                    text: zynqtgui.midi_key_range.get_midi_note_name(Math.round(zynqtgui.midi_key_range.note_low_controller.value))
                 }
             }
 
@@ -277,7 +277,7 @@ Zynthian.ScreenPage {
                         when: !toMouse.pressed
                         target: toHandle
                         property: "x"
-                        value: keyboardLayout.width / 128 * zynthian.midi_key_range.note_high_controller.value
+                        value: keyboardLayout.width / 128 * zynqtgui.midi_key_range.note_high_controller.value
                     }
                     drag {
                         target: toHandle
@@ -287,7 +287,7 @@ Zynthian.ScreenPage {
                     }
                     onReleased: {
                         print(Math.round(mapToItem(keyboardLayout, mouse.x, 0).x / (keyboardLayout.width/128)))
-                        zynthian.midi_key_range.note_high_controller.value = Math.round(mapToItem(keyboardLayout, mouse.x, 0).x / (keyboardLayout.width/128))
+                        zynqtgui.midi_key_range.note_high_controller.value = Math.round(mapToItem(keyboardLayout, mouse.x, 0).x / (keyboardLayout.width/128))
                     }
                 }
 
@@ -297,7 +297,7 @@ Zynthian.ScreenPage {
                         horizontalCenter: parent.horizontalCenter
                         topMargin: Kirigami.Units.smallSpacing
                     }
-                    text: zynthian.midi_key_range.get_midi_note_name(Math.round(zynthian.midi_key_range.note_high_controller.value))
+                    text: zynqtgui.midi_key_range.get_midi_note_name(Math.round(zynqtgui.midi_key_range.note_high_controller.value))
                 }
             }
         }

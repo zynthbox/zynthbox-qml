@@ -39,11 +39,11 @@ Zynthian.ScreenPage {
     property var networkInfo: ({})
 
     Connections {
-        target: zynthian
+        target: zynqtgui
         onCurrent_screen_idChanged: {
-            if (zynthian.current_screen_id === root.screenId) {
-                console.log(JSON.stringify(zynthian.network.getNetworkInfo(), null, 2))
-                root.networkInfo = zynthian.network.getNetworkInfo()
+            if (zynqtgui.current_screen_id === root.screenId) {
+                console.log(JSON.stringify(zynqtgui.network.getNetworkInfo(), null, 2))
+                root.networkInfo = zynqtgui.network.getNetworkInfo()
                 console.log(Object.keys(root.networkInfo))
             }
         }
@@ -74,18 +74,18 @@ Zynthian.ScreenPage {
                     Layout.preferredWidth: Kirigami.Units.gridUnit*12
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
                     horizontalAlignment: TextInput.AlignHCenter
-                    text: zynthian.network.getHostname()
+                    text: zynqtgui.network.getHostname()
                 }
 
                 QQC2.Button {
                     Layout.alignment: Qt.AlignVCenter
                     Layout.preferredWidth: Kirigami.Units.gridUnit*4
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                    enabled: hostname.text !== zynthian.network.getHostname()
+                    enabled: hostname.text !== zynqtgui.network.getHostname()
                     text: qsTr("Update")
                     onClicked: {
-                        zynthian.network.setHostname(hostname.text)
-                        hostname.text = zynthian.network.getHostname()
+                        zynqtgui.network.setHostname(hostname.text)
+                        hostname.text = zynqtgui.network.getHostname()
                     }
                 }
             }

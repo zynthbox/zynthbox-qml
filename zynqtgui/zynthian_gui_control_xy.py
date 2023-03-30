@@ -43,7 +43,7 @@ class zynthian_gui_control_xy():
 		self.hline = None
 		self.vline = None
 		self.shown = False
-		self.zyngui = zynthian_gui_config.zyngui
+		self.zynqtgui = zynthian_gui_config.zynqtgui
 
 		# Init X vars
 		self.padx=24
@@ -168,10 +168,10 @@ class zynthian_gui_control_xy():
 		if self.last_motion_ts is None or (datetime.now()-self.last_motion_ts).total_seconds()>0.1:
 			if self.last_motion_ts is not None:
 				self.last_motion_ts = None
-				self.zyngui.screens['control'].set_controller_value(self.x_zctrl)
-				self.zyngui.screens['control'].set_controller_value(self.y_zctrl)
+				self.zynqtgui.screens['control'].set_controller_value(self.x_zctrl)
+				self.zynqtgui.screens['control'].set_controller_value(self.y_zctrl)
 
-			self.zyngui.screens['control'].zyncoder_read()
+			self.zynqtgui.screens['control'].zyncoder_read()
 			self.get_controller_values()
 
 

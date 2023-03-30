@@ -162,7 +162,7 @@ class selector_list_model(QAbstractListModel):
 # Zynthian Listbox Selector GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
 
 	def __init__(self, selcap='Select', parent = None):
 		super(zynthian_gui_selector, self).__init__(parent)
@@ -188,8 +188,8 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.screen_at_timer_start = None
 		self.auto_activation_timer_requested.connect(self.schedule_activation, Qt.QueuedConnection)
 
-		self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
-		self.zyngui.encoder_list_speed_multiplier_changed.connect(self.adjust_knob_speed)
+		self.zynqtgui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
+		self.zynqtgui.encoder_list_speed_multiplier_changed.connect(self.adjust_knob_speed)
 
 	auto_activation_timer_requested = Signal(int)
 
@@ -202,16 +202,16 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 			if not self.isZ2V3:
 				# never do custom_encoder_speed for the big knob
-				if self.index == 3 or self.zyngui.get_encoder_list_speed_multiplier() == 0:
+				if self.index == 3 or self.zynqtgui.get_encoder_list_speed_multiplier() == 0:
 					self.zselector.custom_encoder_speed = 1
 				else:
-					self.zselector.custom_encoder_speed = round(len(self.list_data) / self.zyngui.get_encoder_list_speed_multiplier())
+					self.zselector.custom_encoder_speed = round(len(self.list_data) / self.zynqtgui.get_encoder_list_speed_multiplier())
 				self.zselector.config(self.zselector_ctrl)
 
 	def sync_selector_visibility(self):
 		if self.zselector == None:
 			return
-		if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+		if self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self:
 			self.set_selector()
 			self.zselector.show()
 		elif self.zselector:
@@ -236,16 +236,16 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.set_select_path()
 
 	def preload(self):
-		self.zyngui.restore_curlayer()
+		self.zynqtgui.restore_curlayer()
 		self.fill_list()
 		self.set_selector()
 		self.set_select_path()
 
 	def set_selector(self, zs_hiden=False):
 		if self.zselector is not None:
-			if not (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) and \
-					self.zyngui.get_current_screen_id() is not None and \
-					self.zyngui.get_current_screen() == self:
+			if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+					self.zynqtgui.get_current_screen_id() is not None and \
+					self.zynqtgui.get_current_screen() == self:
 				self.zselector.show()
 			else:
 				self.zselector.hide()
@@ -253,9 +253,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		if self.zselector:
 			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
 			self.zselector.config(self.zselector_ctrl)
-		elif not (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) and \
-			self.zyngui.get_current_screen_id() is not None and \
-			self.zyngui.get_current_screen() == self:
+		elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+			self.zynqtgui.get_current_screen_id() is not None and \
+			self.zynqtgui.get_current_screen() == self:
 			self.zselector_ctrl = zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
 			self.zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
 			self.zselector.show()
@@ -317,9 +317,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 			self.zselector.read_zyncoder()
 			if self.index!=self.zselector.value:
 				self.select(self.zselector.value)
-				self.screen_at_timer_start = self.zyngui.get_current_screen_id()
+				self.screen_at_timer_start = self.zynqtgui.get_current_screen_id()
 
-				if not self.isZ2V3 and self.zyngui.get_current_screen_id() == "preset":
+				if not self.isZ2V3 and self.zynqtgui.get_current_screen_id() == "preset":
 					# This workaround is required only for smooth bigknob
 					# Without this preset selection keeps jumping up and down by 1 entry with smooth bigknob
 					self.auto_activation_timeout()
@@ -340,15 +340,15 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def auto_activation_timeout(self):
 		if self.zselector == None:
 			return
-		if self.screen_at_timer_start == self.zyngui.get_current_screen_id() and self.index_supports_immediate_activation(self.index):
-			old_screen = self.zyngui.get_current_screen_id()
+		if self.screen_at_timer_start == self.zynqtgui.get_current_screen_id() and self.index_supports_immediate_activation(self.index):
+			old_screen = self.zynqtgui.get_current_screen_id()
 			self.select(self.index)
 			self.select_action(self.index, 'S')
-			if self.zyngui.get_current_screen_id() != old_screen:
-				if self.zyngui.modal_screen:
-					self.zyngui.show_modal(old_screen)
+			if self.zynqtgui.get_current_screen_id() != old_screen:
+				if self.zynqtgui.modal_screen:
+					self.zynqtgui.show_modal(old_screen)
 				else:
-					self.zyngui.show_screen(old_screen)
+					self.zynqtgui.show_screen(old_screen)
 			self.zselector.set_value(self.index, True, True)
 
 	@Slot('int')
@@ -383,14 +383,14 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def select_up(self, n=1):
 		new_index = max(0, self.index - n)
-		self.screen_at_timer_start = self.zyngui.get_current_screen_id()
+		self.screen_at_timer_start = self.zynqtgui.get_current_screen_id()
 		self.schedule_activation()
 		self.select(new_index)
 
 
 	def select_down(self, n=1):
 		new_index = min(len(self.list_data) - 1, self.index + n)
-		self.screen_at_timer_start = self.zyngui.get_current_screen_id()
+		self.screen_at_timer_start = self.zynqtgui.get_current_screen_id()
 		self.schedule_activation()
 		self.select(new_index)
 
@@ -425,9 +425,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 			dts=(datetime.now()-self.listbox_push_ts).total_seconds()
 			#logging.debug("LISTBOX RELEASE => %s" % dts)
 			if dts < 0.3:
-				self.zyngui.zynswitch_defered('S',3)
+				self.zynqtgui.zynswitch_defered('S',3)
 			elif dts>=0.3 and dts<2:
-				self.zyngui.zynswitch_defered('B',3)
+				self.zynqtgui.zynswitch_defered('B',3)
 
 
 	# TODO: remove
@@ -453,11 +453,11 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 			dts=(datetime.now()-self.loading_push_ts).total_seconds()
 			logging.debug("LOADING RELEASE => %s" % dts)
 			if dts<0.3:
-				self.zyngui.zynswitch_defered('S',2)
+				self.zynqtgui.zynswitch_defered('S',2)
 			elif dts>=0.3 and dts<2:
-				self.zyngui.zynswitch_defered('B',2)
+				self.zynqtgui.zynswitch_defered('B',2)
 			elif dts>=2:
-				self.zyngui.zynswitch_defered('L',2)
+				self.zynqtgui.zynswitch_defered('L',2)
 
 
 	current_index_changed = Signal()

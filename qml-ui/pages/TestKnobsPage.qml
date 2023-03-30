@@ -40,22 +40,22 @@ Zynthian.ScreenPage {
         Zynthian.DialController {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller.ctrl: zynthian.test_knobs.controller0
+            controller.ctrl: zynqtgui.test_knobs.controller0
         }
         Zynthian.DialController {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller.ctrl: zynthian.test_knobs.controller1
+            controller.ctrl: zynqtgui.test_knobs.controller1
         }
         Zynthian.DialController {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller.ctrl: zynthian.test_knobs.controller2
+            controller.ctrl: zynqtgui.test_knobs.controller2
         }
         Zynthian.DialController {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller.ctrl: zynthian.test_knobs.controller3
+            controller.ctrl: zynqtgui.test_knobs.controller3
         }
     }
 }

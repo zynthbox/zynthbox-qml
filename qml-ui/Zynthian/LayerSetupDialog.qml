@@ -63,20 +63,20 @@ Zynthian.Dialog {
                 onPressed: {
                     Qt.callLater(function() {
                         if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
-                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+                            zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
                             root.accept()
-                            zynthian.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
+                            zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
                             newSynthWorkaroundTimer.restart()
-                            zynthian.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                            zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                         } else if (!root.selectedChannel.createChainedSoundInNextFreeLayer(root.selectedChannel.selectedSlotRow)) {
                             root.reject();
                             noFreeSlotsPopup.open();
                         } else {
-                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+                            zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
                             root.accept()
-                            zynthian.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
+                            zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
                             newSynthWorkaroundTimer.restart()
-                            zynthian.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                            zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                         }
                     })
                 }
@@ -87,7 +87,7 @@ Zynthian.Dialog {
                 visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                 text: qsTr("Change preset")
                 onClicked: {
-                    zynthian.current_screen_id = "preset"
+                    zynqtgui.current_screen_id = "preset"
                     root.accept();
                 }
             }
@@ -96,7 +96,7 @@ Zynthian.Dialog {
                 Layout.preferredWidth: 1
                 text: qsTr("Load A Sound")
                 onClicked: {
-                    zynthian.show_modal("sound_categories")
+                    zynqtgui.show_modal("sound_categories")
                     root.accept();
                 }
             }
@@ -123,7 +123,7 @@ Zynthian.Dialog {
                 interval: 200
                 onTriggered: {
                     if (root.selectedChannel.connectedPattern >= 0) {
-                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
                         pattern.midiChannel = root.selectedChannel.connectedSound;
                     }
                 }

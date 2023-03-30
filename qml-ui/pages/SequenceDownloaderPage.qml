@@ -32,5 +32,5 @@ Zynthian.NewStuffPage {
     screenId: "sequence_downloader"
     title: qsTr("Sequence Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-sequences.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynqtgui-sequences.knsrc").toString().slice(7)
 }

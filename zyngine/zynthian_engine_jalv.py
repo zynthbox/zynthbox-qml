@@ -163,8 +163,8 @@ class zynthian_engine_jalv(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, plugin_name, plugin_type, zyngui=None, dryrun=False):
-		super().__init__(zyngui)
+	def __init__(self, plugin_name, plugin_type, zynqtgui=None, dryrun=False):
+		super().__init__(zynqtgui)
 
 		self.type = plugin_type
 		self.name = "Jalv/" + plugin_name
@@ -233,7 +233,7 @@ class zynthian_engine_jalv(zynthian_engine):
 	def get_jalv_jackname(self):
 		try:
 			jname = re.sub("[\_]{2,}","_",re.sub("[\'\*\(\)\[\]\s]","_",self.plugin_name))
-			jname_count = self.zyngui.screens['layer'].get_jackname_count(jname)
+			jname_count = self.zynqtgui.screens['layer'].get_jackname_count(jname)
 		except:
 			jname_count = 0
 

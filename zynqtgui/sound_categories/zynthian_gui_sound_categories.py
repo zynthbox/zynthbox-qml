@@ -36,7 +36,7 @@ from .sounds_model_sound_dto import sounds_model_sound_dto
 from .. import zynthian_qt_gui_base
 
 
-class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_sound_categories, self).__init__(parent)
         self.__sounds_base_path__ = Path('/zynthian/zynthian-my-data/sounds')
@@ -112,7 +112,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 self.__sounds_model__.add_sound(
                     sounds_model_sound_dto(
                         self,
-                        self.zyngui,
+                        self.zynqtgui,
                         file.name,
                         "community-sounds",
                         self.get_category_for_sound(file)
@@ -124,18 +124,18 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 self.__sounds_model__.add_sound(
                     sounds_model_sound_dto(
                         self,
-                        self.zyngui,
+                        self.zynqtgui,
                         file.name,
                         "my-sounds",
                         self.get_category_for_sound(file)
                     )
                 )
 
-            self.zyngui.end_long_task()
+            self.zynqtgui.end_long_task()
 
-        self.zyngui.currentTaskMessage = "Reading and sorting sounds into categories"
+        self.zynqtgui.currentTaskMessage = "Reading and sorting sounds into categories"
         self.__sounds_model__.clear()
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     @Slot(str)
     def setSoundTypeFilter(self, _filter):
@@ -152,7 +152,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
     # Return an array of 5 elements with sound name if available or empty string
     @Slot(str, result='QVariantList')
     def getSoundNamesFromSoundFile(self, path):
-        metadata = self.zyngui.layer.sound_metadata_from_file(path)
+        metadata = self.zynqtgui.layer.sound_metadata_from_file(path)
         res = []
 
         for layer in metadata:
@@ -177,7 +177,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str, str)
     def saveSound(self, filename, category):
-        final_name = self.zyngui.layer.save_curlayer_to_file(str(self.__my_sounds_path__ / filename), category)
+        final_name = self.zynqtgui.layer.save_curlayer_to_file(str(self.__my_sounds_path__ / filename), category)
 
         if final_name is not None:
             logging.info(f"Saved sound file to {str(self.__my_sounds_path__ / filename)}")
@@ -211,11 +211,11 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### Loading sound : {filepath}")
 
             if channelIndex == -1:
-                channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
             else:
-                channel = self.zyngui.sketchpad.song.channelsModel.getChannel(channelIndex)
+                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channelIndex)
 
-            source_channels = self.zyngui.layer.load_layer_channels_from_file(filepath)
+            source_channels = self.zynqtgui.layer.load_layer_channels_from_file(filepath)
             free_layers = channel.getFreeLayers()
             used_layers = []
 
@@ -224,7 +224,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                     used_layers.append(i)
 
             logging.debug(f"### Before Removing")
-            logging.debug(f"# Selected Channel         : {self.zyngui.session_dashboard.selectedChannel}")
+            logging.debug(f"# Selected Channel         : {self.zynqtgui.session_dashboard.selectedChannel}")
             logging.debug(f"# Source Channels        : {source_channels}")
             logging.debug(f"# Free Layers            : {free_layers}")
             logging.debug(f"# Used Layers            : {used_layers}")
@@ -280,8 +280,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                             for i in range(5 - len(new_chained_sounds)):
                                 new_chained_sounds.append(-1)
 
-                        self.zyngui.currentTaskMessage = f"Loading selected sounds in channel `{channel.name}`"
-                        self.zyngui.layer.load_layer_from_file(filepath, new_channels_map)
+                        self.zynqtgui.currentTaskMessage = f"Loading selected sounds in channel `{channel.name}`"
+                        self.zynqtgui.layer.load_layer_from_file(filepath, new_channels_map)
 
                         channel.chainedSounds = new_chained_sounds
 
@@ -302,14 +302,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                     # If there are no sounds in curent channel, immediately do post removal task
                     post_removal_task()
 
-            self.zyngui.end_long_task()
+            self.zynqtgui.end_long_task()
 
-        self.zyngui.currentTaskMessage = "Loading sound"
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.currentTaskMessage = "Loading sound"
+        self.zynqtgui.do_long_task(task)
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):
-        channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
         suggested = ""
         try:
             # Get preset name of connectedSound

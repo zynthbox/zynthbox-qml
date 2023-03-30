@@ -43,7 +43,7 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     property QtObject bottomBar: null
-    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
     property QtObject selectedPartChannel
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
@@ -64,21 +64,21 @@ Rectangle {
                 break
 
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedChannel > 0) {
-                    zynthian.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.session_dashboard.selectedChannel > 0) {
+                    zynqtgui.session_dashboard.selectedChannel -= 1;
                 }
                 returnVal = true
                 break
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedChannel < 9) {
-                    zynthian.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.session_dashboard.selectedChannel < 9) {
+                    zynqtgui.session_dashboard.selectedChannel += 1;
                 }
                 returnVal = true
                 break
         }
 
-        console.log("### Part Bar CUIA Callback :", selectedChannel.id, zynthian.sketchpad.song.scenesModel.selectedTrackIndex, cuia, clip)
+        console.log("### Part Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, cuia, clip)
 
         return returnVal;
     }
@@ -124,9 +124,9 @@ Rectangle {
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            channel: zynthian.sketchpad.song.channelsModel.getChannel(model.index)
+                            channel: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
                             onClicked: {
-                                zynthian.session_dashboard.selectedChannel = model.index
+                                zynqtgui.session_dashboard.selectedChannel = model.index
                                 root.selectedPartChannel = partBarDelegate.channel
                                 root.selectedPartClip = partBarDelegate.selectedPartClip
                                 root.selectedPartPattern = partBarDelegate.selectedPartPattern

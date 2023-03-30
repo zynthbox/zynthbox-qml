@@ -332,7 +332,7 @@ ColumnLayout {
                             }
                             width: height
                             radius: height / 2
-                            color: subnoteDelegate.subnote ? zynthian.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
+                            color: subnoteDelegate.subnote ? zynqtgui.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
                         }
                         QQC2.Label {
                             id: subnoteDelegateLabel

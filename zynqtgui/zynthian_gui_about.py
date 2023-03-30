@@ -42,7 +42,7 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 # Some About data
 #------------------------------------------------------------------------------
 
-class zynthian_gui_about(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_about(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_about, self).__init__(parent)
         self.cache = None

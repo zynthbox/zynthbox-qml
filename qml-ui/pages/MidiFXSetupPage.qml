@@ -34,13 +34,13 @@ Zynthian.MultiSelectorPage {
     id: root
 
     screenIds: ["layer_midi_effects", "midi_effect_types", "layer_midi_effect_chooser"]
-    screenTitles: [qsTr("Active FX (%1)").arg(zynthian.layer_midi_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynthian.midi_effect_types.effective_count), qsTr("FX (%1)").arg(zynthian.layer_midi_effect_chooser.effective_count)]
+    screenTitles: [qsTr("Active FX (%1)").arg(zynqtgui.layer_midi_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynqtgui.midi_effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_midi_effect_chooser.effective_count)]
 
     previousScreen: "preset"
 
     backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: zynthian.current_screen_id = "preset"
+        onTriggered: zynqtgui.current_screen_id = "preset"
     }
     contextualActions: [
         Kirigami.Action {
@@ -51,24 +51,24 @@ Zynthian.MultiSelectorPage {
         },
         Kirigami.Action {
             text: qsTr("Edit")
-            enabled: zynthian.layer_midi_effects.current_effect_engine.length > 0
+            enabled: zynqtgui.layer_midi_effects.current_effect_engine.length > 0
             onTriggered: {
-                zynthian.control.single_effect_engine = zynthian.layer_midi_effects.current_effect_engine;
-                zynthian.current_screen_id = "control";
+                zynqtgui.control.single_effect_engine = zynqtgui.layer_midi_effects.current_effect_engine;
+                zynqtgui.current_screen_id = "control";
             }
         }
     ]
     onVisibleChanged: {
         if (visible) {
-            zynthian.control.single_effect_engine = ""
+            zynqtgui.control.single_effect_engine = ""
         }
     }
     Connections {
         id: currentConnection
-        target: zynthian
+        target: zynqtgui
         onCurrent_screen_idChanged: {
-            print(zynthian.current_screen_id +" "+ applicationWindow().pageStack.lastItem +" "+ root)
-            if (zynthian.current_screen_id !== "layer_midi_effects" && zynthian.current_screen_id !== "midi_effect_types" && zynthian.current_screen_id !== "layer_midi_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
+            print(zynqtgui.current_screen_id +" "+ applicationWindow().pageStack.lastItem +" "+ root)
+            if (zynqtgui.current_screen_id !== "layer_midi_effects" && zynqtgui.current_screen_id !== "midi_effect_types" && zynqtgui.current_screen_id !== "layer_midi_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
                 pageRemoveTimer.restart()
             }
         }
@@ -77,7 +77,7 @@ Zynthian.MultiSelectorPage {
         id: pageRemoveTimer
         interval: Kirigami.Units.longDuration
         onTriggered: {
-            if (zynthian.current_screen_id !== "layer_midi_effects" && zynthian.current_screen_id !== "midi_effect_types" && zynthian.current_screen_id !== "layer_midi_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
+            if (zynqtgui.current_screen_id !== "layer_midi_effects" && zynqtgui.current_screen_id !== "midi_effect_types" && zynqtgui.current_screen_id !== "layer_midi_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
                 applicationWindow().pageStack.pop();
             }
         }

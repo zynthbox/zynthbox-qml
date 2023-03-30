@@ -61,9 +61,9 @@ Zynthian.Dialog {
                 print("Mapping midi channel " + i + " to " + map[i]);
             }
             if (fileToLoad != "") {
-                zynthian.layer.load_layer_from_file(fileToLoad, map);
+                zynqtgui.layer.load_layer_from_file(fileToLoad, map);
             } else if (jsonToLoad != "") {
-                zynthian.layer.load_layer_from_json(jsonToLoad, map);
+                zynqtgui.layer.load_layer_from_json(jsonToLoad, map);
             }
             clear();
         }
@@ -84,7 +84,7 @@ Zynthian.Dialog {
             flow: GridLayout.TopToBottom
             Repeater {
                 id: channelReplaceRepeater
-                model: component.visible ? zynthian.fixed_layers.selector_list : []
+                model: component.visible ? zynqtgui.fixed_layers.selector_list : []
                 delegate: QQC2.RadioButton {
                     id: delegate
                     enabled: channelReplaceRepeater.count - index >= component.sourceChannels.length
@@ -104,7 +104,7 @@ Zynthian.Dialog {
                         target: component
                         onFileToLoadChanged: {
                             checked = false
-                            checked = index === zynthian.fixed_layers.current_index
+                            checked = index === zynqtgui.fixed_layers.current_index
                         }
                     }
                     indicator.opacity: enabled

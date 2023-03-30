@@ -33,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    title: zynthian.about.selector_path
+    title: zynqtgui.about.selector_path
 
     screenId: "about"
 
@@ -43,35 +43,35 @@ Zynthian.ScreenPage {
             Layout.alignment: Qt.AlignCenter
             QQC2.Label {
                 Kirigami.FormData.label: "Zynthbox OS:"
-                text: zynthian.about.zynthbox_version
+                text: zynqtgui.about.zynthbox_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Qt:"
-                text: zynthian.about.qt_version
+                text: zynqtgui.about.qt_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Kirigami:"
-                text: zynthian.about.kirigami_version
+                text: zynqtgui.about.kirigami_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Libzl:"
-                text: zynthian.about.libzl_version
+                text: zynqtgui.about.libzl_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Zynthian Quick Components:"
-                text: zynthian.about.zynthiancomponents_version
+                text: zynqtgui.about.zynthiancomponents_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Distribution:"
-                text: zynthian.about.distribution_version
+                text: zynqtgui.about.distribution_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Kernel:"
-                text: zynthian.about.kernel_version
+                text: zynqtgui.about.kernel_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Hostname:"
-                text: zynthian.network.getHostname()
+                text: zynqtgui.network.getHostname()
             }
         }
     }

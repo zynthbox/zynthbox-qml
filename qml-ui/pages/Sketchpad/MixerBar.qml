@@ -38,8 +38,8 @@ import org.zynthian.quick 1.0 as ZynQuick
 Rectangle {
     id: root
 
-    readonly property QtObject song: zynthian.sketchpad.song
-    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    readonly property QtObject song: zynqtgui.sketchpad.song
+    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -47,23 +47,23 @@ Rectangle {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
-                zynthian.bottomBarControlType = "bottombar-controltype-channel";
-                zynthian.bottomBarControlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
+                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
 
                 bottomStack.slotsBar.bottomBarButton.checked = true
 
                 return true;
 
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedChannel > 0) {
-                    zynthian.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.session_dashboard.selectedChannel > 0) {
+                    zynqtgui.session_dashboard.selectedChannel -= 1;
                 }
 
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedChannel < 9) {
-                    zynthian.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.session_dashboard.selectedChannel < 9) {
+                    zynqtgui.session_dashboard.selectedChannel += 1;
                 }
 
                 return true;
@@ -119,14 +119,14 @@ Rectangle {
                         id: channelsVolumeRow
 
                         function handleClick(channel) {
-                            if (zynthian.session_dashboard.selectedChannel !== channel.id) {
-                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                zynthian.session_dashboard.selectedChannel = channel.id;
-                                zynthian.bottomBarControlType = "bottombar-controltype-channel";
-                                zynthian.bottomBarControlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
+                            if (zynqtgui.session_dashboard.selectedChannel !== channel.id) {
+                                zynqtgui.session_dashboard.disableNextSoundSwitchTimer();
+                                zynqtgui.session_dashboard.selectedChannel = channel.id;
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
                             } else {
-                                zynthian.bottomBarControlType = "bottombar-controltype-channel";
-                                zynthian.bottomBarControlObj = zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
 
                                 bottomStack.currentIndex = 0
                             }
@@ -140,7 +140,7 @@ Rectangle {
                             model: root.song.channelsModel
 
                             delegate: Rectangle {
-                                property bool highlighted: index === zynthian.session_dashboard.selectedChannel
+                                property bool highlighted: index === zynqtgui.session_dashboard.selectedChannel
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 color: highlighted ? "#22ffffff" : "transparent"
@@ -262,7 +262,7 @@ Rectangle {
                                                     }
                                                     Component.onCompleted: soundLabel.updateSoundName();
                                                     Connections {
-                                                        target: zynthian.fixed_layers
+                                                        target: zynqtgui.fixed_layers
                                                         onList_updated: soundnameUpdater.restart();
                                                     }
 
@@ -292,7 +292,7 @@ Rectangle {
                                                                 for (var id in model.channel.chainedSounds) {
                                                                     if (model.channel.chainedSounds[id] >= 0 &&
                                                                         model.channel.checkIfLayerExists(model.channel.chainedSounds[id])) {
-                                                                        var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.channel.chainedSounds[id]).split(">");
+                                                                        var soundName = zynqtgui.fixed_layers.selector_list.getDisplayValue(model.channel.chainedSounds[id]).split(">");
                                                                         text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
                                                                         break;
                                                                     }
@@ -418,32 +418,32 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
                             headerText: root.visible
-                                            ? zynthian.sketchpad.masterAudioLevel <= -40
+                                            ? zynqtgui.sketchpad.masterAudioLevel <= -40
                                                 ? ""
-                                                : (zynthian.sketchpad.masterAudioLevel.toFixed(2) + " (dB)")
+                                                : (zynqtgui.sketchpad.masterAudioLevel.toFixed(2) + " (dB)")
                                             : ""
                             footerText: "Master"
-                            audioLeveldB: visible ? zynthian.sketchpad.masterAudioLevel :  -400
+                            audioLeveldB: visible ? zynqtgui.sketchpad.masterAudioLevel :  -400
                             inputAudioLevelVisible: false
 
                             Binding {
                                 target: masterVolume.slider
                                 property: "value"
-                                value: zynthian.master_alsa_mixer.volume
+                                value: zynqtgui.master_alsa_mixer.volume
                             }
 
                             slider {
-                                value: zynthian.master_alsa_mixer.volume
+                                value: zynqtgui.master_alsa_mixer.volume
                                 from: 0
                                 to: 100
                                 stepSize: 1
                             }
                             onValueChanged: {
-                                zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
-                                zynthian.sketchpad.song.volume = masterVolume.slider.value;
+                                zynqtgui.master_alsa_mixer.volume = masterVolume.slider.value;
+                                zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
                             }
                             onDoubleClicked: {
-                                zynthian.master_alsa_mixer.volume = zynthian.master_alsa_mixer.initialVolume
+                                zynqtgui.master_alsa_mixer.volume = zynqtgui.master_alsa_mixer.initialVolume
                             }
                         }
                     }

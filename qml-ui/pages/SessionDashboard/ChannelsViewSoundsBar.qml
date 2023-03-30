@@ -20,12 +20,12 @@ Zynthian.Card {
         value: applicationWindow().selectedChannel
     }
 
-    property int selectedChannelIndex: zynthian.session_dashboard.selectedChannel;
+    property int selectedChannelIndex: zynqtgui.session_dashboard.selectedChannel;
     property var chainedSounds: selectedChannel ? selectedChannel.chainedSounds : []
     property bool openBottomDrawerOnLoad: false
 
     Connections {
-        target: zynthian.fixed_layers
+        target: zynqtgui.fixed_layers
         onList_updated: {
             // Update sound / preset /synth labels on change
             for (var i = 0; i < chainedSoundsRepeater.count; ++i ) {
@@ -37,7 +37,7 @@ Zynthian.Card {
     Connections {
         id: currentScreenConnection
         property string oldScreen: "session_dashboard"
-        target: zynthian
+        target: zynqtgui
         onCurrent_screen_idChanged: {
             for (var i = 0; i < chainedSoundsRepeater.count; ++i ) {
                 chainedSoundsRepeater.itemAt(i).update();
@@ -62,7 +62,7 @@ Zynthian.Card {
 //            case "NAVIGATE_LEFT":
 //                var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow];
 //                if (selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
-//                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
+//                    zynqtgui.layer.selectPrevPreset(selectedMidiChannel);
 //                    chainedSoundsRepeater.itemAt(selectedRowIndex).update();
 //                }
 //                return true;
@@ -70,7 +70,7 @@ Zynthian.Card {
 //            case "NAVIGATE_RIGHT":
 //                var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow];
 //                if (selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
-//                    zynthian.layer.selectNextPreset(selectedMidiChannel);
+//                    zynqtgui.layer.selectNextPreset(selectedMidiChannel);
 //                    chainedSoundsRepeater.itemAt(root.selectedChannel.selectedSlotRow).update();
 //                }
 //                return true;
@@ -128,7 +128,7 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
-                property QtObject volumeControlObject: zynthian.fixed_layers.volumeControllers[chainedSound] ? zynthian.fixed_layers.volumeControllers[chainedSound] : null
+                property QtObject volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound] ? zynqtgui.fixed_layers.volumeControllers[chainedSound] : null
                 property real volumePercent: volumeControlObject
                                                 ? (volumeControlObject.value - volumeControlObject.value_min)/(volumeControlObject.value_max - volumeControlObject.value_min)
                                                 : 0
@@ -329,18 +329,18 @@ Zynthian.Card {
                         enabled: root.selectedChannel.selectedSlotRow === index && soundDelegate.chainedSound !== -1
                         onClicked: {
                             if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                zynthian.start_loading()
+                                zynqtgui.start_loading()
 
                                 // Open library edit page
-                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                zynqtgui.fixed_layers.activate_index(soundDelegate.chainedSound)
 
-                                zynthian.stop_loading()
+                                zynqtgui.stop_loading()
 
-                                zynthian.control.single_effect_engine = null;
+                                zynqtgui.control.single_effect_engine = null;
                                 root.openBottomDrawerOnLoad = true;
-                                var screenBack = zynthian.current_screen_id;
-                                zynthian.current_screen_id = "control";
-                                zynthian.forced_screen_back = screenBack;
+                                var screenBack = zynqtgui.current_screen_id;
+                                zynqtgui.current_screen_id = "control";
+                                zynqtgui.forced_screen_back = screenBack;
 
                                 bottomDrawer.close();
                             }
@@ -365,18 +365,18 @@ Zynthian.Card {
                         enabled: root.selectedChannel.selectedSlotRow === index && soundDelegate.chainedSound !== -1
                         onClicked: {
                             if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                zynthian.start_loading()
+                                zynqtgui.start_loading()
 
                                 // Open library edit page
                                 // Not sure if switching to the channel is required here
-                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
+                                zynqtgui.fixed_layers.activate_index(soundDelegate.chainedSound);
 
-                                zynthian.stop_loading()
+                                zynqtgui.stop_loading()
 
                                 root.openBottomDrawerOnLoad = true;
-                                var screenBack = zynthian.current_screen_id;
-                                zynthian.current_modal_screen_id = "midi_key_range";
-                                zynthian.forced_screen_back = screenBack
+                                var screenBack = zynqtgui.current_screen_id;
+                                zynqtgui.current_modal_screen_id = "midi_key_range";
+                                zynqtgui.forced_screen_back = screenBack
 
                                 bottomDrawer.close();
                             }
@@ -432,12 +432,12 @@ Zynthian.Card {
                                 if (soundDelegate.chainedSound === -1 || root.selectedChannel.selectedSlotRow !== index) {
                                     root.selectedChannel.selectedSlotRow = index;
                                 } else {
-                                    zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
-                                    zynthian.layer_options.show();
-                                    var screenBack = zynthian.current_screen_id;
-                                    zynthian.current_screen_id = "layer_effects";
+                                    zynqtgui.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                    zynqtgui.layer_options.show();
+                                    var screenBack = zynqtgui.current_screen_id;
+                                    zynqtgui.current_screen_id = "layer_effects";
                                     root.openBottomDrawerOnLoad = true;
-                                    zynthian.forced_screen_back = screenBack;
+                                    zynqtgui.forced_screen_back = screenBack;
 
                                     bottomDrawer.close();
                                 }
@@ -455,8 +455,8 @@ Zynthian.Card {
                         enabled: root.selectedChannel.selectedSlotRow === index && fxLabel.text.length > 0
                         onClicked: {
                             if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
-                                zynthian.layer_effects.fx_reset()
+                                zynqtgui.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                zynqtgui.layer_effects.fx_reset()
 
                                 bottomDrawer.close();
                             }

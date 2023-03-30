@@ -162,7 +162,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.sync_selectors_visibility()
 
 	def sync_selectors_visibility(self):
-		if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+		if self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self:
 			for ctrl in self.zgui_controllers:
 				ctrl.show()
 			for ctrl in self.zgui_custom_controllers_map.values():
@@ -187,8 +187,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 		try:
 			self.__conf = JSONDecoder().decode(json)
 			if self.__single_effect_engine == None:
-				if self.zyngui.curlayer is not None and self.zyngui.curlayer.engine.nickname in self.__conf:
-					self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
+				if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.engine.nickname in self.__conf:
+					self.set_custom_control_page(self.__conf[self.zynqtgui.curlayer.engine.nickname]["custom_control_page"])
 				else:
 					self.set_custom_control_page("")
 			else:
@@ -238,14 +238,14 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def show(self):
 		super().show()
 
-		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+		if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self:
 			self.click_listbox()
 
 		# logging.error("SHOWING {}".format(time.time() * 1000))
-		if self.zyngui.curlayer:
+		if self.zynqtgui.curlayer:
 			path = "/root/.local/share/zynthian/engineeditpages/"
 			entries = []
-			engine = self.zyngui.curlayer.engine.nickname
+			engine = self.zynqtgui.curlayer.engine.nickname
 			if self.__single_effect_engine != None:
 				engine = self.__single_effect_engine
 			if Path(path).exists():
@@ -275,7 +275,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		# logging.error("SHOWed {}".format(time.time() * 1000))
 
-		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+		if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self:
 			self.sync_selectors_visibility()
 			self.set_mode_control()
 			self.selectedPage = 0
@@ -295,19 +295,19 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.list_data = []
 		self.__all_controls = []
 
-		if not self.zyngui.curlayer:
+		if not self.zynqtgui.curlayer:
 			logging.info("Can't fill control screen list for None layer!")
 			return
 
-		self.layers = self.zyngui.screens['layer'].get_fxchain_layers()
+		self.layers = self.zynqtgui.screens['layer'].get_fxchain_layers()
 		# If no FXChain layers, then use the curlayer itself
 		if self.layers is None or len(self.layers)==0:
-			self.layers = [self.zyngui.curlayer]
+			self.layers = [self.zynqtgui.curlayer]
 
-		midichain_layers = self.zyngui.screens['layer'].get_midichain_layers()
+		midichain_layers = self.zynqtgui.screens['layer'].get_midichain_layers()
 		if midichain_layers is not None and len(midichain_layers)>1:
 			try:
-				midichain_layers.remove(self.zyngui.curlayer)
+				midichain_layers.remove(self.zynqtgui.curlayer)
 			except:
 				pass
 			self.layers += midichain_layers
@@ -332,7 +332,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 				i += 1
 				j += 1
 		if self.__single_effect_engine == None:
-			self.index = self.zyngui.curlayer.get_active_screen_index()
+			self.index = self.zynqtgui.curlayer.get_active_screen_index()
 		else:
 			self.index = 0
 		if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
@@ -351,7 +351,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		logging.debug(f"Edit Page set_selector")
 
-		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+		if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self:
 			try:
 				if self.controller0 is not None:
 					self.controller0.hide()
@@ -458,18 +458,18 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def controller_by_category(self, cat, index):
 		controllers = []
 		if self.__single_effect_engine != None:
-			fxchain_layers = self.zyngui.screens['layer'].get_fxchain_layers()
+			fxchain_layers = self.zynqtgui.screens['layer'].get_fxchain_layers()
 			if fxchain_layers != None:
 				for layer in fxchain_layers:
 					if layer.engine.nickname == self.__single_effect_engine:
 						controllers = layer.get_ctrl_screens()
-			midichain_layers = self.zyngui.screens['layer'].get_midichain_layers()
+			midichain_layers = self.zynqtgui.screens['layer'].get_midichain_layers()
 			if midichain_layers != None:
 				for layer in midichain_layers:
 					if layer.engine.nickname == self.__single_effect_engine:
 						controllers = layer.get_ctrl_screens()
-		elif self.zyngui.curlayer:
-			controllers = self.zyngui.curlayer.get_ctrl_screens()
+		elif self.zynqtgui.curlayer:
+			controllers = self.zynqtgui.curlayer.get_ctrl_screens()
 		else:
 			return None
 		if cat in controllers:
@@ -488,10 +488,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	@Slot(str, int, result=QObject)
 	def amixer_controller_by_category(self, cat, index):
-		if not self.zyngui.screens["layer"].amixer_layer:
+		if not self.zynqtgui.screens["layer"].amixer_layer:
 			return None
 
-		controllers = self.zyngui.screens["layer"].amixer_layer.get_ctrl_screens()
+		controllers = self.zynqtgui.screens["layer"].amixer_layer.get_ctrl_screens()
 		if cat in controllers:
 			controllers_cat = controllers[cat]
 			if index < 0 or index >= len(controllers_cat):
@@ -510,7 +510,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		return self.__control_pages_model
 
 	def set_custom_control_page(self, path):
-		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
+		if self.zynqtgui.curlayer is None or self.zynqtgui.curlayer.engine is None:
 			return
 		final_path = path
 		if not final_path.endswith("/contents/main.qml"):
@@ -527,7 +527,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 				ctrl.setup_zyncoder()
 		try:
 			if self.__single_effect_engine == None:
-				self.__conf[self.zyngui.curlayer.engine.nickname] = {"custom_control_page": self.__custom_control_page}
+				self.__conf[self.zynqtgui.curlayer.engine.nickname] = {"custom_control_page": self.__custom_control_page}
 			else:
 				self.__conf[self.__single_effect_engine] = {"custom_control_page": self.__custom_control_page}
 			json = JSONEncoder().encode(self.__conf)
@@ -540,9 +540,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
 	def get_default_custom_control_page(self):
-		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
+		if self.zynqtgui.curlayer is None or self.zynqtgui.curlayer.engine is None:
 			return None
-		engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
+		engine_folder_name = self.zynqtgui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
 		# TODO: also search for stuff installed in ~/.local
 		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
 		if Path(path).exists():
@@ -555,7 +555,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
 	def get_custom_control_page(self):
-		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
+		if self.zynqtgui.curlayer is None or self.zynqtgui.curlayer.engine is None:
 			return None
 		if self.__custom_control_page == None:
 			return self.get_default_custom_control_page()
@@ -572,7 +572,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def set_controller_screen(self):
 		#Get Mutex Lock 
-		#self.zyngui.lock.acquire()
+		#self.zynqtgui.lock.acquire()
 
 		# Destroy all the custom controllers
 		self.zgui_custom_controllers_map={}
@@ -588,7 +588,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 				screen_layer = screen_info[3]
 
 			#Get controllers for the current screen
-			self.zyngui.curlayer.set_active_screen_index(self.index)
+			self.zynqtgui.curlayer.set_active_screen_index(self.index)
 			if len(screen_info) > 3:
 				self.zcontrollers = screen_layer.get_ctrl_screen(screen_title)
 
@@ -632,12 +632,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.custom_control_page_changed.emit()
 			self.default_custom_control_page_changed.emit()
 		#Release Mutex Lock
-		#self.zyngui.lock.release()
+		#self.zynqtgui.lock.release()
 
 
 	def set_zcontroller(self, i, ctrl):
 		if i < len(self.zgui_controllers):
-			self.zgui_controllers[i].set_visible(self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self)
+			self.zgui_controllers[i].set_visible(self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self)
 			self.zgui_controllers[i].config(ctrl)
 		else:
 			self.zgui_controllers.append(zynthian_gui_controller(i, ctrl, self))
@@ -647,7 +647,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def set_custom_zcontroller(self, i, ctrl):
 		if i < len(self.zgui_custom_controllers):
-			self.zgui_custom_controllers[i].set_visible(self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self)
+			self.zgui_custom_controllers[i].set_visible(self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self)
 			self.zgui_custom_controllers[i].config(ctrl)
 		else:
 			self.zgui_custom_controllers.append(zynthian_gui_controller(i + self.custom_controller_id_start, ctrl, self))
@@ -753,12 +753,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 			return 'control'
 
 		# If in MIDI-learn mode, back to instrument control
-		elif self.zyngui.midi_learn_mode or self.zyngui.midi_learn_zctrl:
-			self.zyngui.exit_midi_learn_mode()
+		elif self.zynqtgui.midi_learn_mode or self.zynqtgui.midi_learn_zctrl:
+			self.zynqtgui.exit_midi_learn_mode()
 			return ''
 
 		else:
-			self.zyngui.screens['layer'].restore_curlayer()
+			self.zynqtgui.screens['layer'].restore_curlayer()
 			return None
 
 
@@ -855,7 +855,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	@Slot()
 	def zyncoder_set_big_knob_value(self):
 		try:
-			if self.zyngui.get_current_screen() == self and self.custom_control_page == "":
+			if self.zynqtgui.get_current_screen() == self and self.custom_control_page == "":
 				self.selected_column_gui_controller.read_zyncoder()
 
 				if (self.selected_column_gui_controller.value // self.bigknob_multiplier) != self.selectedColumn:
@@ -864,10 +864,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 			pass
 
 	def zyncoder_read(self, zcnums=None):
-		if not self.zyngui.isBootingComplete:
+		if not self.zynqtgui.isBootingComplete:
 			return
 
-		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+		if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self:
 			return
 
 		#Read Controller
@@ -888,9 +888,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 				# 			continue
 				# 		res=self.zgui_controllers[i].read_zyncoder()
 				#
-				# 		if res and self.zyngui.midi_learn_mode:
+				# 		if res and self.zynqtgui.midi_learn_mode:
 				# 			logging.debug("MIDI-learn ZController {}".format(i))
-				# 			self.zyngui.midi_learn_mode = False
+				# 			self.zynqtgui.midi_learn_mode = False
 				# 			self.midi_learn(i)
 				#
 				# 		if res and self.xyselect_mode:
@@ -990,7 +990,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def cb_listbox_push(self,event):
 		if self.xyselect_mode:
 			logging.debug("XY-Controller Mode ...")
-			self.zyngui.show_control_xy(self.x_zctrl, self.y_zctrl)
+			self.zynqtgui.show_control_xy(self.x_zctrl, self.y_zctrl)
 		else:
 			super().cb_listbox_push(event)
 
@@ -1005,9 +1005,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 			dts=(datetime.now()-self.listbox_push_ts).total_seconds()
 			#logging.debug("LISTBOX RELEASE => %s" % dts)
 			if dts<0.3:
-				self.zyngui.start_loading()
+				self.zynqtgui.start_loading()
 				self.click_listbox()
-				self.zyngui.stop_loading()
+				self.zynqtgui.stop_loading()
 
 
 	# TODO: remove?
@@ -1022,9 +1022,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 				index=self.get_cursel()
 				if index!=self.index:
 					#logging.debug("LISTBOX MOTION => %d" % self.index)
-					self.zyngui.start_loading()
+					self.zynqtgui.start_loading()
 					self.select_listbox(self.get_cursel())
-					self.zyngui.stop_loading()
+					self.zynqtgui.stop_loading()
 					sleep(0.04)
 
 
@@ -1036,17 +1036,17 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if (event.num == 4 or event.delta == 120) and self.index < (len(self.list_data)-1):
 			index += 1
 		if index!=self.index:
-			self.zyngui.start_loading()
+			self.zynqtgui.start_loading()
 			self.select_listbox(index)
-			self.zyngui.stop_loading()
+			self.zynqtgui.stop_loading()
 
 
 	def set_select_path(self):
-		if self.zyngui.curlayer:
-			if self.mode=='control' and self.zyngui.midi_learn_mode:
-				self.select_path = (self.zyngui.curlayer.get_basepath() + "/CTRL MIDI-Learn")
+		if self.zynqtgui.curlayer:
+			if self.mode=='control' and self.zynqtgui.midi_learn_mode:
+				self.select_path = (self.zynqtgui.curlayer.get_basepath() + "/CTRL MIDI-Learn")
 			else:
-				self.select_path = (self.zyngui.curlayer.get_presetpath())
+				self.select_path = (self.zynqtgui.curlayer.get_presetpath())
 			self.select_path_element = "EDIT"
 		super().set_select_path()
 

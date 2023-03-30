@@ -32,5 +32,5 @@ Zynthian.NewStuffPage {
     screenId: "soundsets_downloader"
     title: qsTr("Soundsets Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-soundsets.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynqtgui-soundsets.knsrc").toString().slice(7)
 }

@@ -51,7 +51,7 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
         self.list_data = []
         # As per #299 rename Snapshots to Soundsets
         self.list_data.append((self.load_snapshot, 0, "Load Soundset"))
-        if len(self.zyngui.screens["layer"].layers) > 0:
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
             self.list_data.append((self.save_snapshot, 0, "Save Soundset"))
             # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
         super().fill_list()
@@ -67,13 +67,13 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
         super().set_select_path()
 
     # def execute_commands(self):
-    #     self.zyngui.start_loading()
+    #     self.zynqtgui.start_loading()
 
     #     error_counter = 0
     #     for cmd in self.commands:
     #         logging.info("Executing Command: %s" % cmd)
-    #         self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-    #         self.zyngui.add_info("{}\n".format(cmd))
+    #         self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+    #         self.zynqtgui.add_info("{}\n".format(cmd))
     #         try:
     #             self.proc = Popen(
     #                 cmd,
@@ -82,7 +82,7 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
     #                 stderr=STDOUT,
     #                 universal_newlines=True,
     #             )
-    #             self.zyngui.add_info("RESULT:\n", "EMPHASIS")
+    #             self.zynqtgui.add_info("RESULT:\n", "EMPHASIS")
     #             for line in self.proc.stdout:
     #                 if re.search("ERROR", line, re.IGNORECASE):
     #                     error_counter += 1
@@ -92,25 +92,25 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
     #                 else:
     #                     tag = None
     #                 logging.info(line.rstrip())
-    #                 self.zyngui.add_info(line, tag)
-    #             self.zyngui.add_info("\n")
+    #                 self.zynqtgui.add_info(line, tag)
+    #             self.zynqtgui.add_info("\n")
     #         except Exception as e:
     #             logging.error(e)
-    #             self.zyngui.add_info("ERROR: %s\n" % e, "ERROR")
+    #             self.zynqtgui.add_info("ERROR: %s\n" % e, "ERROR")
 
     #     if error_counter > 0:
     #         logging.info("COMPLETED WITH {} ERRORS!".format(error_counter))
-    #         self.zyngui.add_info(
+    #         self.zynqtgui.add_info(
     #             "COMPLETED WITH {} ERRORS!".format(error_counter), "WARNING"
     #         )
     #     else:
     #         logging.info("COMPLETED OK!")
-    #         self.zyngui.add_info("COMPLETED OK!", "SUCCESS")
+    #         self.zynqtgui.add_info("COMPLETED OK!", "SUCCESS")
 
     #     self.commands = None
-    #     self.zyngui.add_info("\n\n")
-    #     self.zyngui.hide_info_timer(5000)
-    #     self.zyngui.stop_loading()
+    #     self.zynqtgui.add_info("\n\n")
+    #     self.zynqtgui.hide_info_timer(5000)
+    #     self.zynqtgui.stop_loading()
 
     # def start_command(self, cmds):
     #     if not self.commands:
@@ -121,32 +121,32 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
     #         self.thread.start()
 
     # def killable_execute_commands(self):
-    #     # self.zyngui.start_loading()
+    #     # self.zynqtgui.start_loading()
     #     for cmd in self.commands:
     #         logging.info("Executing Command: %s" % cmd)
-    #         self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-    #         self.zyngui.add_info("{}\n".format(cmd))
+    #         self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+    #         self.zynqtgui.add_info("{}\n".format(cmd))
     #         try:
     #             proc = Popen(cmd.split(" "), stdout=PIPE, stderr=PIPE)
     #             self.child_pid = proc.pid
-    #             self.zyngui.add_info("\nPID: %s" % self.child_pid)
+    #             self.zynqtgui.add_info("\nPID: %s" % self.child_pid)
     #             (output, error) = proc.communicate()
     #             self.child_pid = None
     #             if error:
     #                 result = "ERROR: %s" % error
     #                 logging.error(result)
-    #                 self.zyngui.add_info(result, "ERROR")
+    #                 self.zynqtgui.add_info(result, "ERROR")
     #             if output:
     #                 logging.info(output)
-    #                 self.zyngui.add_info(output)
+    #                 self.zynqtgui.add_info(output)
     #         except Exception as e:
     #             result = "ERROR: %s" % e
     #             logging.error(result)
-    #             self.zyngui.add_info(result, "ERROR")
+    #             self.zynqtgui.add_info(result, "ERROR")
 
     #     self.commands = None
-    #     self.zyngui.hide_info_timer(5000)
-    #     # self.zyngui.stop_loading()
+    #     self.zynqtgui.hide_info_timer(5000)
+    #     # self.zynqtgui.stop_loading()
 
     # def killable_start_command(self, cmds):
     #     if not self.commands:
@@ -164,7 +164,7 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
     #         os.kill(self.child_pid, signal.SIGTERM)
     #         self.child_pid = None
     #         if self.last_action == self.test_midi:
-    #             self.zyngui.all_sounds_off()
+    #             self.zynqtgui.all_sounds_off()
 
     # ------------------------------------------------------------------------------
     # SNAPSHOTS OPTIONS
@@ -172,23 +172,23 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
 
     def load_snapshot(self):
         logging.info("Load Snapshot")
-        self.zyngui.load_snapshot()
+        self.zynqtgui.load_snapshot()
 
     def save_snapshot(self):
         logging.info("Save Snapshot")
-        self.zyngui.save_snapshot()
+        self.zynqtgui.save_snapshot()
 
     def clean_all(self):
-        self.zyngui.show_confirm(
+        self.zynqtgui.show_confirm(
             "Do you really want to clean all?", self.clean_all_confirmed
         )
 
     def clean_all_confirmed(self, params=None):
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-        self.zyngui.screens["layer"].reset()
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
+        self.zynqtgui.screens["layer"].reset()
         if zynseq.libseq:
             zynseq.load("")
-        self.zyngui.show_screen("layer")
+        self.zynqtgui.show_screen("layer")
 
 # ------------------------------------------------------------------------------

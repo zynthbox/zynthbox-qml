@@ -35,7 +35,7 @@ class sketchpad_scenes_model(QAbstractListModel):
 
     def __init__(self, song=None):
         super().__init__(song)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
         self.__song__ = song
         self.__selected_track_index__ = 0
         self.__selected_scene_index__ = 0
@@ -203,7 +203,7 @@ class sketchpad_scenes_model(QAbstractListModel):
             clip = scene["clips"][i]
 
             # Start all clips except clip to be recorded
-            if clip != self.zyngui.sketchpad.clipToRecord and \
+            if clip != self.zynqtgui.sketchpad.clipToRecord and \
                     (trackIndex < 0 or (0 <= trackIndex == clip.col)):
                 # We will now allow playing multiple parts of a sample-loop channel and hence play all clips in part
                 # clip.part == clip.clipChannel.selectedPart and \

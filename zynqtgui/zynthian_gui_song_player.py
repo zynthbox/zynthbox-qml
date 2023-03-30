@@ -37,7 +37,7 @@ from . import zynthian_qt_gui_base
 # Zynthian Listing effects for active layer GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_song_player(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_song_player(zynthian_qt_gui_base.zynqtgui):
 
     def __init__(self, parent = None):
         super(zynthian_gui_song_player, self).__init__(parent)

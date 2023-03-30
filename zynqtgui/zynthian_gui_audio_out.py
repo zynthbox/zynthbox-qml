@@ -47,7 +47,7 @@ class zynthian_gui_audio_out(zynthian_gui_selector):
 	def set_layer(self, layer):
 		self.layer = layer
 		try:
-			self.end_layer = self.zyngui.screens['layer'].get_fxchain_ends(self.layer)[0]
+			self.end_layer = self.zynqtgui.screens['layer'].get_fxchain_ends(self.layer)[0]
 		except:
 			self.end_layer = None
 
@@ -57,7 +57,7 @@ class zynthian_gui_audio_out(zynthian_gui_selector):
 
 		for k in zynautoconnect.get_audio_input_ports().keys():
 			try:
-				title = self.zyngui.screens['layer'].get_layer_by_jackname(k).get_basepath()
+				title = self.zynqtgui.screens['layer'].get_layer_by_jackname(k).get_basepath()
 			except:
 				title = k
 

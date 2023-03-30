@@ -36,19 +36,19 @@ from zynqtgui.sketchpad.sketchpad_song import sketchpad_song
 from zynqtgui.sketchpad.sketchpad_channel import sketchpad_channel
 
 
-class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_song_arranger(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_song_arranger, self).__init__(parent)
         self.__bars__ = 24
         self.__sketchpad__ = None
         self.__channels_model__ = song_arranger_channels_model(self)
-        self.__metronome_manager__: zynthian_gui_sketchpad = self.zyngui.sketchpad
+        self.__metronome_manager__: zynthian_gui_sketchpad = self.zynqtgui.sketchpad
         self.__is_playing__ = False
         self.__start_from_bar__ = 0
         self.__playing_bar__ = -1
 
         self.__metronome_manager__.current_bar_changed.connect(self.current_bar_changed_handler)
-        self.zyngui.sketchpad.song_changed.connect(self.generate_channels_model)
+        self.zynqtgui.sketchpad.song_changed.connect(self.generate_channels_model)
 
     ### Property bars
     def get_bars(self):
@@ -105,9 +105,9 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.playing_bar_changed.emit()
 
     def generate_channels_model(self):
-        logging.info(f"Generating channels model from Sketchpad({self.zyngui.sketchpad.song})")
+        logging.info(f"Generating channels model from Sketchpad({self.zynqtgui.sketchpad.song})")
 
-        self.__sketchpad__:sketchpad_song = self.zyngui.sketchpad.song
+        self.__sketchpad__:sketchpad_song = self.zynqtgui.sketchpad.song
         self.__channels_model__.clear()
 
         try:
@@ -116,7 +116,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Already disconnected : {str(e)}")
 
         # try:
-        #     self.zyngui.sketchpad.song_changed.disconnect()
+        #     self.zynqtgui.sketchpad.song_changed.disconnect()
         # except Exception as e:
         #     logging.error(f"Already disconnected: {str(e)}")
 

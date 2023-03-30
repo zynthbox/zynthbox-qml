@@ -46,7 +46,7 @@ from zynqtgui import zynthian_gui_config
 class sketchpad_clip(QObject):
     def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_channel_sample=False):
         super(sketchpad_clip, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
+        self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.is_channel_sample = is_channel_sample
         self.__row_index__ = row_index
@@ -201,7 +201,7 @@ class sketchpad_clip(QObject):
             self.current_beat_changed.emit()
 
     def channel_volume_changed(self):
-        if self.channel is not None and not self.zyngui.sketchpad.longOperation:
+        if self.channel is not None and not self.zynqtgui.sketchpad.longOperation:
             self.channel.volume = self.__song__.channelsModel.getChannel(self.__row_index__).volume
             logging.info(f"Channel volume changed : {self.channel.volume}")
 
@@ -446,7 +446,7 @@ class sketchpad_clip(QObject):
 
             # Make a call to set selector to update knob values so that on drag value doesn't
             # flicker back to the knob values
-            self.zyngui.sketchpad.set_selector_throttled()
+            self.zynqtgui.sketchpad.set_selector_throttled()
 
             self.length_changed.emit()
             if force_set is False:
@@ -1012,7 +1012,7 @@ class sketchpad_clip(QObject):
                 (self.wav_path / self.__path__).unlink()
                 self.clear()
 
-        self.__song__.get_metronome_manager().zyngui.show_confirm("Do you really want to delete this clip? This action is irreversible.", cb)
+        self.__song__.get_metronome_manager().zynqtgui.show_confirm("Do you really want to delete this clip? This action is irreversible.", cb)
 
     ### Property metadataAudioType
     def get_metadata_audio_type(self):

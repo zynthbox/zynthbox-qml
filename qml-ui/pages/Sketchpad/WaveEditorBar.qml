@@ -42,13 +42,13 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
     property QtObject bottomBar: null
-    property string controlType: zynthian.bottomBarControlType
+    property string controlType: zynqtgui.bottomBarControlType
     property QtObject controlObj: (waveBar.controlType === "bottombar-controltype-clip" || waveBar.controlType === "bottombar-controltype-pattern")
-                                    ? zynthian.bottomBarControlObj // selected bottomBar object is clip/pattern
-                                    : zynthian.bottomBarControlObj != null && zynthian.bottomBarControlObj.samples != null
-                                        ? zynthian.bottomBarControlObj.samples[zynthian.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
+                                    ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
+                                    : zynqtgui.bottomBarControlObj != null && zynqtgui.bottomBarControlObj.samples != null
+                                        ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
                                         : null
-    property QtObject channel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -67,7 +67,7 @@ GridLayout {
         property real pixelToSecs: (wav.end - wav.start) / width
 
         // Calculate amount of pixels represented by 1 beat
-        property real pixelsPerBeat: (60/zynthian.sketchpad.song.bpm) / wav.pixelToSecs
+        property real pixelsPerBeat: (60/zynqtgui.sketchpad.song.bpm) / wav.pixelToSecs
 
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -140,7 +140,7 @@ GridLayout {
                         waveBar.controlObj.startPosition += delta
                     }
                     onPressedChanged: {
-                        zynthian.knobTouchUpdateInProgress = pressed
+                        zynqtgui.knobTouchUpdateInProgress = pressed
                     }
                 }
             }
@@ -186,7 +186,7 @@ GridLayout {
 
                     yAxis.enabled: false
                     onGrabChanged: {
-                        zynthian.knobTouchUpdateInProgress = startHandleDragHandler.active
+                        zynqtgui.knobTouchUpdateInProgress = startHandleDragHandler.active
                     }
                 }
             }
@@ -229,7 +229,7 @@ GridLayout {
 
                     yAxis.enabled: false
                     onGrabChanged: {
-                        zynthian.knobTouchUpdateInProgress = loopHandleDragHandler.active
+                        zynqtgui.knobTouchUpdateInProgress = loopHandleDragHandler.active
                     }
                 }
             }
@@ -290,7 +290,7 @@ GridLayout {
                             endHandle.x = endLoopLine.x - endHandle.width
                         }
 
-                        zynthian.knobTouchUpdateInProgress = endHandleDragHandler.active
+                        zynqtgui.knobTouchUpdateInProgress = endHandleDragHandler.active
                     }
                 }
             }
@@ -342,7 +342,7 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.controlObj
-                    ? ((((60/zynthian.sketchpad.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
+                    ? ((((60/zynqtgui.sketchpad.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
                     : 0
                 onXChanged: {
                     if (!endHandleDragHandler.active) {

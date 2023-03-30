@@ -35,7 +35,7 @@ Zynthian.SelectorPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Themes")
-            onTriggered: zynthian.show_modal("theme_chooser")
+            onTriggered: zynqtgui.show_modal("theme_chooser")
         }
     ]
 
@@ -101,7 +101,7 @@ Zynthian.SelectorPage {
     }
 
     Connections {
-        target: zynthian.admin
+        target: zynqtgui.admin
 
         onCheckForUpdatesStarted: {
             progressDialog.label = qsTr("Checking for updates");

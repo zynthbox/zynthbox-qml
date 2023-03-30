@@ -65,8 +65,8 @@ class zynthian_gui_bank(zynthian_gui_selector):
 	def fill_list(self):
 		self.list_data = []
 		if self.__show_top_sounds:
-			self.zyngui.screens['preset'].reload_top_sounds()
-			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
+			self.zynqtgui.screens['preset'].reload_top_sounds()
+			top_sounds = self.zynqtgui.screens['preset'].get_all_top_sounds()
 			for engine in top_sounds:
 				parts = engine.split("/")
 				readable_name = engine
@@ -76,13 +76,13 @@ class zynthian_gui_bank(zynthian_gui_selector):
 					self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
 			self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
 		else:
-			if not self.zyngui.curlayer:
+			if not self.zynqtgui.curlayer:
 				logging.info("Can't fill bank list for None layer!")
 				super().fill_list()
 				return
-			self.zyngui.curlayer.load_bank_list()
-			self.list_data = self.zyngui.curlayer.bank_list
-		self.zyngui.screens['preset'].set_select_path()
+			self.zynqtgui.curlayer.load_bank_list()
+			self.list_data = self.zynqtgui.curlayer.bank_list
+		self.zynqtgui.screens['preset'].set_select_path()
 		super().fill_list()
 
 	def get_show_top_sounds(self):
@@ -94,17 +94,17 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		self.__show_top_sounds = show
 		self.fill_list()
 		self.show()
-		if show and self.zyngui.curlayer:
-			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
+		if show and self.zynqtgui.curlayer:
+			top_sounds = self.zynqtgui.screens['preset'].get_all_top_sounds()
 			self.select_action(0)
-			self.zyngui.screens['preset'].select(0)
-		elif self.zyngui.curlayer:
-			self.zyngui.screens['preset'].set_top_sounds_engine(None)
-			self.zyngui.screens['bank'].show()
-			self.zyngui.screens['preset'].show()
+			self.zynqtgui.screens['preset'].select(0)
+		elif self.zynqtgui.curlayer:
+			self.zynqtgui.screens['preset'].set_top_sounds_engine(None)
+			self.zynqtgui.screens['bank'].show()
+			self.zynqtgui.screens['preset'].show()
 		else:
-			self.zyngui.screens['preset'].set_top_sounds_engine(None)
-			self.zyngui.screens['preset'].fill_list()
+			self.zynqtgui.screens['preset'].set_top_sounds_engine(None)
+			self.zynqtgui.screens['preset'].fill_list()
 
 		self.show_top_sounds_changed.emit()
 
@@ -112,20 +112,20 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		if self.__show_top_sounds: #don't support autosync when top sounds is enabled
 			super().show()
 			return
-		if not self.zyngui.curlayer:
+		if not self.zynqtgui.curlayer:
 			logging.info("Can't show bank list for None layer!")
 			super().show()
 			return
-		if not self.zyngui.curlayer.get_bank_name():
-			self.zyngui.curlayer.set_bank(0)
-		if self.zyngui.screens['preset'].get_show_only_favorites():
+		if not self.zynqtgui.curlayer.get_bank_name():
+			self.zynqtgui.curlayer.set_bank(0)
+		if self.zynqtgui.screens['preset'].get_show_only_favorites():
 			self.select(0)
-		elif self.zyngui.curlayer != None:
-			for i in range(len(self.zyngui.curlayer.bank_list)):
-				if self.zyngui.curlayer.bank_name == self.zyngui.curlayer.bank_list[i][2]:
-					self.zyngui.curlayer.bank_index = i
+		elif self.zynqtgui.curlayer != None:
+			for i in range(len(self.zynqtgui.curlayer.bank_list)):
+				if self.zynqtgui.curlayer.bank_name == self.zynqtgui.curlayer.bank_list[i][2]:
+					self.zynqtgui.curlayer.bank_index = i
 					break
-			self.select(self.zyngui.curlayer.get_bank_index())
+			self.select(self.zynqtgui.curlayer.get_bank_index())
 		logging.debug("BANK INDEX => %s" % self.index)
 		super().show()
 
@@ -135,35 +135,35 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		if i < 0 or i >= len(self.list_data):
 			return
 		if self.__show_top_sounds:
-			self.zyngui.screens['preset'].set_top_sounds_engine(self.list_data[i][0])
-			if self.zyngui.curlayer != None and self.zyngui.curlayer.engine.nickname == self.list_data[i][0]:
-				self.zyngui.screens['preset'].select_action(0) #TODO Enable /disable whether is wanted to switch on touch
+			self.zynqtgui.screens['preset'].set_top_sounds_engine(self.list_data[i][0])
+			if self.zynqtgui.curlayer != None and self.zynqtgui.curlayer.engine.nickname == self.list_data[i][0]:
+				self.zynqtgui.screens['preset'].select_action(0) #TODO Enable /disable whether is wanted to switch on touch
 				self.select(i)
-				self.zyngui.screens['preset'].select(0)
+				self.zynqtgui.screens['preset'].select(0)
 			else:
-				self.zyngui.screens['preset'].select(0)
-			self.zyngui.show_screen("bank")
+				self.zynqtgui.screens['preset'].select(0)
+			self.zynqtgui.show_screen("bank")
 			self.set_select_path()
 			return
 		else:
-			self.zyngui.screens['preset'].set_top_sounds_engine(None)
+			self.zynqtgui.screens['preset'].set_top_sounds_engine(None)
 
 		if self.list_data[i][0]=='*FAVS*':
-			self.zyngui.screens['preset'].set_show_only_favorites(True)
+			self.zynqtgui.screens['preset'].set_show_only_favorites(True)
 		else:
-			self.zyngui.screens['preset'].set_show_only_favorites(False)
+			self.zynqtgui.screens['preset'].set_show_only_favorites(False)
 
-		if self.zyngui.curlayer.set_bank(i):
-			#self.zyngui.screens['preset'].disable_only_favs()
-			self.zyngui.screens['preset'].update_list()
+		if self.zynqtgui.curlayer.set_bank(i):
+			#self.zynqtgui.screens['preset'].disable_only_favs()
+			self.zynqtgui.screens['preset'].update_list()
 			if self.auto_next_screen:
 				self.next_action
 			else:
-				self.zyngui.screens['preset'].show() #FIXME: this show should be renamed in "load" or some similar name
+				self.zynqtgui.screens['preset'].show() #FIXME: this show should be renamed in "load" or some similar name
 			# If there is only one preset, jump to instrument control
-			if len(self.zyngui.curlayer.preset_list)<=1:
-				self.zyngui.screens['preset'].select_action(0)
-			self.zyngui.screens['layer'].fill_list()
+			if len(self.zynqtgui.curlayer.preset_list)<=1:
+				self.zynqtgui.screens['preset'].select_action(0)
+			self.zynqtgui.screens['layer'].fill_list()
 		else:
 			self.show()
 		self.set_select_path()
@@ -175,13 +175,13 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		return True
 
 	def set_select_path(self):
-		if self.zyngui.curlayer:
-			self.select_path = self.zyngui.curlayer.get_basepath()
-			parts = str(self.zyngui.curlayer.engine.name).split("/")
+		if self.zynqtgui.curlayer:
+			self.select_path = self.zynqtgui.curlayer.get_basepath()
+			parts = str(self.zynqtgui.curlayer.engine.name).split("/")
 			if (len(parts) > 1):
 				self.select_path_element = parts[1]
 			else:
-				self.select_path_element = self.zyngui.curlayer.engine.name
+				self.select_path_element = self.zynqtgui.curlayer.engine.name
 		else:
 			self.select_path_element = "Sounds"
 			self.select_path = "Banks"

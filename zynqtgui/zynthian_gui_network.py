@@ -92,13 +92,13 @@ class zynthian_gui_network(zynthian_gui_selector):
         super().set_select_path()
 
     def execute_commands(self):
-        self.zyngui.start_loading()
+        self.zynqtgui.start_loading()
 
         error_counter = 0
         for cmd in self.commands:
             logging.info("Executing Command: %s" % cmd)
-            self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-            self.zyngui.add_info("{}\n".format(cmd))
+            self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+            self.zynqtgui.add_info("{}\n".format(cmd))
             try:
                 self.proc = Popen(
                     cmd,
@@ -107,7 +107,7 @@ class zynthian_gui_network(zynthian_gui_selector):
                     stderr=STDOUT,
                     universal_newlines=True,
                 )
-                self.zyngui.add_info("RESULT:\n", "EMPHASIS")
+                self.zynqtgui.add_info("RESULT:\n", "EMPHASIS")
                 for line in self.proc.stdout:
                     if re.search("ERROR", line, re.IGNORECASE):
                         error_counter += 1
@@ -117,25 +117,25 @@ class zynthian_gui_network(zynthian_gui_selector):
                     else:
                         tag = None
                     logging.info(line.rstrip())
-                    self.zyngui.add_info(line, tag)
-                self.zyngui.add_info("\n")
+                    self.zynqtgui.add_info(line, tag)
+                self.zynqtgui.add_info("\n")
             except Exception as e:
                 logging.error(e)
-                self.zyngui.add_info("ERROR: %s\n" % e, "ERROR")
+                self.zynqtgui.add_info("ERROR: %s\n" % e, "ERROR")
 
         if error_counter > 0:
             logging.info("COMPLETED WITH {} ERRORS!".format(error_counter))
-            self.zyngui.add_info(
+            self.zynqtgui.add_info(
                 "COMPLETED WITH {} ERRORS!".format(error_counter), "WARNING"
             )
         else:
             logging.info("COMPLETED OK!")
-            self.zyngui.add_info("COMPLETED OK!", "SUCCESS")
+            self.zynqtgui.add_info("COMPLETED OK!", "SUCCESS")
 
         self.commands = None
-        self.zyngui.add_info("\n\n")
-        self.zyngui.hide_info_timer(5000)
-        self.zyngui.stop_loading()
+        self.zynqtgui.add_info("\n\n")
+        self.zynqtgui.hide_info_timer(5000)
+        self.zynqtgui.stop_loading()
 
     def start_command(self, cmds):
         if not self.commands:
@@ -146,32 +146,32 @@ class zynthian_gui_network(zynthian_gui_selector):
             self.thread.start()
 
     def killable_execute_commands(self):
-        # self.zyngui.start_loading()
+        # self.zynqtgui.start_loading()
         for cmd in self.commands:
             logging.info("Executing Command: %s" % cmd)
-            self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-            self.zyngui.add_info("{}\n".format(cmd))
+            self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+            self.zynqtgui.add_info("{}\n".format(cmd))
             try:
                 proc = Popen(cmd.split(" "), stdout=PIPE, stderr=PIPE)
                 self.child_pid = proc.pid
-                self.zyngui.add_info("\nPID: %s" % self.child_pid)
+                self.zynqtgui.add_info("\nPID: %s" % self.child_pid)
                 (output, error) = proc.communicate()
                 self.child_pid = None
                 if error:
                     result = "ERROR: %s" % error
                     logging.error(result)
-                    self.zyngui.add_info(result, "ERROR")
+                    self.zynqtgui.add_info(result, "ERROR")
                 if output:
                     logging.info(output)
-                    self.zyngui.add_info(output)
+                    self.zynqtgui.add_info(output)
             except Exception as e:
                 result = "ERROR: %s" % e
                 logging.error(result)
-                self.zyngui.add_info(result, "ERROR")
+                self.zynqtgui.add_info(result, "ERROR")
 
         self.commands = None
-        self.zyngui.hide_info_timer(5000)
-        # self.zyngui.stop_loading()
+        self.zynqtgui.hide_info_timer(5000)
+        # self.zynqtgui.stop_loading()
 
     def killable_start_command(self, cmds):
         if not self.commands:
@@ -189,7 +189,7 @@ class zynthian_gui_network(zynthian_gui_selector):
             os.kill(self.child_pid, signal.SIGTERM)
             self.child_pid = None
             if self.last_action == self.test_midi:
-                self.zyngui.all_sounds_off()
+                self.zynqtgui.all_sounds_off()
 
     # ------------------------------------------------------------------------------
     # NETWORK FEATURES
@@ -197,35 +197,35 @@ class zynthian_gui_network(zynthian_gui_selector):
 
     def network(self):
         logging.info("Network")
-        self.zyngui.show_modal("network")
+        self.zynqtgui.show_modal("network")
 
     def network_info(self):
-        self.zyngui.show_modal("network_info")
+        self.zynqtgui.show_modal("network_info")
 
     def wifi_settings(self):
-        self.zyngui.show_modal("wifi_settings")
+        self.zynqtgui.show_modal("wifi_settings")
 
     def start_wifi(self):
         if not zynconf.start_wifi():
-            self.zyngui.show_info("STARTING WIFI ERROR\n")
-            self.zyngui.add_info("Can't start WIFI network!", "WARNING")
-            self.zyngui.hide_info_timer(2000)
+            self.zynqtgui.show_info("STARTING WIFI ERROR\n")
+            self.zynqtgui.add_info("Can't start WIFI network!", "WARNING")
+            self.zynqtgui.hide_info_timer(2000)
 
         self.fill_list()
 
     def start_wifi_hotspot(self):
         if not zynconf.start_wifi_hotspot():
-            self.zyngui.show_info("STARTING WIFI HOTSPOT ERROR\n")
-            self.zyngui.add_info("Can't start WIFI Hotspot!", "WARNING")
-            self.zyngui.hide_info_timer(2000)
+            self.zynqtgui.show_info("STARTING WIFI HOTSPOT ERROR\n")
+            self.zynqtgui.add_info("Can't start WIFI Hotspot!", "WARNING")
+            self.zynqtgui.hide_info_timer(2000)
 
         self.fill_list()
 
     def stop_wifi(self):
         if not zynconf.stop_wifi():
-            self.zyngui.show_info("STOPPING WIFI ERROR\n")
-            self.zyngui.add_info("Can't stop WIFI network!", "WARNING")
-            self.zyngui.hide_info_timer(2000)
+            self.zynqtgui.show_info("STOPPING WIFI ERROR\n")
+            self.zynqtgui.add_info("Can't stop WIFI network!", "WARNING")
+            self.zynqtgui.hide_info_timer(2000)
 
         self.fill_list()
 
@@ -233,9 +233,9 @@ class zynthian_gui_network(zynthian_gui_selector):
         logging.info("STARTING VNC SERVICES")
 
         # Save state and stop engines
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-            self.zyngui.screens["layer"].reset()
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
+            self.zynqtgui.screens["layer"].reset()
             restore_state = True
         else:
             restore_state = False
@@ -260,7 +260,7 @@ class zynthian_gui_network(zynthian_gui_selector):
 
         # Restore state
         if restore_state:
-            self.zyngui.screens["snapshot"].load_last_state_snapshot(True)
+            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
 
         self.fill_list()
 
@@ -268,9 +268,9 @@ class zynthian_gui_network(zynthian_gui_selector):
         logging.info("STOPPING VNC SERVICES")
 
         # Save state and stop engines
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-            self.zyngui.screens["layer"].reset()
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
+            self.zynqtgui.screens["layer"].reset()
             restore_state = True
         else:
             restore_state = False
@@ -294,7 +294,7 @@ class zynthian_gui_network(zynthian_gui_selector):
 
         # Restore state
         if restore_state:
-            self.zyngui.screens["snapshot"].load_last_state_snapshot(True)
+            self.zynqtgui.screens["snapshot"].load_last_state_snapshot(True)
 
         self.fill_list()
 
@@ -316,13 +316,13 @@ class zynthian_gui_network(zynthian_gui_selector):
     @Slot(str)
     def setHostname(self, hostname):
         self.update_system_hostname(hostname)
-        self.zyngui.show_confirm(
+        self.zynqtgui.show_confirm(
             "Device needs to reboot for the hostname change to take effect.\nDo you want to reboot?",
             self.reboot_confirmed)
     
     def reboot_confirmed(self, params=None):
         logging.info(f"Rebooting")
-        self.zyngui.screens["admin"].reboot_confirmed()
+        self.zynqtgui.screens["admin"].reboot_confirmed()
 
     # Derived from webconf security_config_handler.py
     def update_system_hostname(self, newHostname):

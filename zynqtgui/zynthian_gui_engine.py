@@ -196,7 +196,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 				for eng, info in infos.items():
 					metadata = {}
 					# For some engines, check if needed channels are free ...
-					if eng not in self.check_channels_engines or all(chan in self.zyngui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
+					if eng not in self.check_channels_engines or all(chan in self.zynqtgui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
 						cat_entries.append((eng,len(self.list_data),info[1],info[0]))
 
 						if eng in self.__engine_config__ and \
@@ -243,25 +243,25 @@ class zynthian_gui_engine(zynthian_gui_selector):
 			return
 		if i is not None and self.list_data[i][0]:
 			if self.midi_chan is None:
-				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], None)
+				self.zynqtgui.screens['layer'].add_layer_engine(self.list_data[i][0], None)
 			else:
-				self.zyngui.start_loading()
-				self.zyngui.screens['bank'].set_show_top_sounds(False)
-				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
-				self.zyngui.stop_loading()
+				self.zynqtgui.start_loading()
+				self.zynqtgui.screens['bank'].set_show_top_sounds(False)
+				self.zynqtgui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
+				self.zynqtgui.stop_loading()
 
 			# Try to set created synth engine's volume to max
 			try:
 				logging.info(f"Setting synth volume to max when initializing")
-				self.zyngui.fixed_layers.volumeControllers[self.midi_chan].value = \
-					self.zyngui.fixed_layers.volumeControllers[self.midi_chan].value_max
+				self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value = \
+					self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value_max
 			except:
 				logging.error(f"Error setting synth volume to max when initializing")
 
 			# Try to set created synth engine's preset to 0
 			try:
 				logging.info(f"Setting synth preset to 0 when initializing")
-				self.zyngui.layer.selectPreset(self.midi_chan, 0)
+				self.zynqtgui.layer.selectPreset(self.midi_chan, 0)
 			except:
 				logging.error(f"Error setting synth preset to 0 when initializing")
 
@@ -273,17 +273,17 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 	def start_engine(self, eng):
 		if eng not in self.zyngines:
-			self.zyngui.currentTaskMessage = f"Starting engine {eng}"
+			self.zynqtgui.currentTaskMessage = f"Starting engine {eng}"
 
 			info=self.engine_info[eng]
 			zynthian_engine_class=info[4]
 			if eng[0:3]=="JV/":
 				eng="JV/{}".format(self.zyngine_counter)
-				self.zyngines[eng]=zynthian_engine_class(info[0], info[2], self.zyngui)
+				self.zyngines[eng]=zynthian_engine_class(info[0], info[2], self.zynqtgui)
 			else:
 				if eng=="SF":
 					eng="SF/{}".format(self.zyngine_counter)
-				self.zyngines[eng]=zynthian_engine_class(self.zyngui)
+				self.zyngines[eng]=zynthian_engine_class(self.zynqtgui)
 
 		self.zyngine_counter+=1
 		return self.zyngines[eng]
@@ -291,7 +291,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 	def stop_engine(self, eng, wait=0):
 		if eng in self.zyngines:
-			self.zyngui.currentTaskMessage = f"Stopping engine {eng}"
+			self.zynqtgui.currentTaskMessage = f"Stopping engine {eng}"
 			self.zyngines[eng].stop()
 			del self.zyngines[eng]
 			if wait>0:
@@ -299,7 +299,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 
 	def stop_unused_engines(self):
-		global_fx_engines = [fx_engine for fx_engine, _ in self.zyngui.global_fx_engines]
+		global_fx_engines = [fx_engine for fx_engine, _ in self.zynqtgui.global_fx_engines]
 
 		for eng in list(self.zyngines.keys()):
 			if len(self.zyngines[eng].layers) == 0 and self.zyngines[eng] not in global_fx_engines:
@@ -309,7 +309,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 
 	def stop_unused_jalv_engines(self):
-		global_fx_engines = [fx_engine for fx_engine, _ in self.zyngui.global_fx_engines]
+		global_fx_engines = [fx_engine for fx_engine, _ in self.zynqtgui.global_fx_engines]
 
 		for eng in list(self.zyngines.keys()):
 			if len(self.zyngines[eng].layers) == 0 and self.zyngines[eng] not in global_fx_engines and eng[0:3] == "JV/":

@@ -127,7 +127,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             # Snapshot Management
             # self.list_data.append((None, 0, ""))
 
-            # if len(self.zyngui.screens["layer"].layers) > 0:
+            # if len(self.zynqtgui.screens["layer"].layers) > 0:
                 # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
                 # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
@@ -165,12 +165,12 @@ class zynthian_gui_main(zynthian_gui_selector):
                         logging.error(e)
 
         if self.visibleCategory == "sessions":
-            for sketchpad in self.zyngui.sketchpad.get_sketchpad_folders():
+            for sketchpad in self.zynqtgui.sketchpad.get_sketchpad_folders():
                 self.list_data.append(("sketchpad", str(sketchpad), sketchpad.stem))
                 self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/folder.svg"})
 
         if self.visibleCategory == "sessions-versions":
-            for version in self.zyngui.sketchpad.get_sketchpad_versions(self.__selected_sketchpad_folder__):
+            for version in self.zynqtgui.sketchpad.get_sketchpad_versions(self.__selected_sketchpad_folder__):
                 self.list_data.append(("sketchpad-version", str(version), version.name.replace(".sketchpad.json", "")))
                 self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/file.svg"})
 
@@ -178,7 +178,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":
-            self.song_recordings_dir = self.zyngui.screens["sketchpad"].song.sketchpad_folder + "wav"
+            self.song_recordings_dir = self.zynqtgui.screens["sketchpad"].song.sketchpad_folder + "wav"
             self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             self.__current_module_name__ = self.list_data[i][2]
@@ -189,13 +189,13 @@ class zynthian_gui_main(zynthian_gui_selector):
             Popen([self.list_data[i][1]])
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
-            QTimer.singleShot(5000, lambda: self.zyngui.show_modal("sketchpad"))
+            QTimer.singleShot(5000, lambda: self.zynqtgui.show_modal("sketchpad"))
         elif self.list_data[i][0] and self.list_data[i][0] == "sketchpad":
             self.__selected_sketchpad_folder__ = self.list_data[i][1]
             self.visibleCategory = "sessions-versions"
         elif self.list_data[i][0] and self.list_data[i][0] == "sketchpad-version":
-            self.zyngui.sketchpad.loadSketchpad(self.list_data[i][1], False)
-            self.zyngui.show_modal("sketchpad")
+            self.zynqtgui.sketchpad.loadSketchpad(self.list_data[i][1], False)
+            self.zynqtgui.show_modal("sketchpad")
         elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
             self.last_action()
@@ -207,7 +207,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
             self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
 
-            audioDeviceName = self.zyngui.audio_settings.zynthian_mixer.zynapi_get_device_name()
+            audioDeviceName = self.zynqtgui.audio_settings.zynthian_mixer.zynapi_get_device_name()
             self.recorder_process = Popen(("/usr/bin/arecord", "-f", "dat", "-D", f"hw:{audioDeviceName}", self.__recording_file__))
             logging.info("Started recording using arecord into the file " + self.__recording_file__)
             self.__is_recording__ = True
@@ -343,84 +343,84 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def layers(self):
         logging.info("Layers")
-        self.zyngui.show_screen("layer")
+        self.zynqtgui.show_screen("layer")
 
     def load_snapshot(self):
         logging.info("Load Snapshot")
-        self.zyngui.load_snapshot()
+        self.zynqtgui.load_snapshot()
 
     def save_snapshot(self):
         logging.info("Save Snapshot")
-        self.zyngui.save_snapshot()
+        self.zynqtgui.save_snapshot()
 
     def snapshots_menu(self):
         logging.info("Snapshots")
-        self.zyngui.show_modal("snapshots_menu")
+        self.zynqtgui.show_modal("snapshots_menu")
 
     def clean_all(self):
-        self.zyngui.show_confirm(
+        self.zynqtgui.show_confirm(
             "Do you really want to clean all?", self.clean_all_confirmed
         )
 
     def clean_all_confirmed(self, params=None):
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-        self.zyngui.screens["layer"].reset()
+        if len(self.zynqtgui.screens["layer"].layers) > 0:
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
+        self.zynqtgui.screens["layer"].reset()
         if zynseq.libseq:
             zynseq.load("")
-        self.zyngui.show_screen("layer")
+        self.zynqtgui.show_screen("layer")
 
     def audio_recorder(self):
         logging.info("Audio Recorder")
-        self.zyngui.show_modal("audio_recorder")
+        self.zynqtgui.show_modal("audio_recorder")
 
     def midi_recorder(self):
         logging.info("MIDI Recorder")
-        self.zyngui.show_modal("midi_recorder")
+        self.zynqtgui.show_modal("midi_recorder")
 
     def playgrid(self):
         logging.info("Play Grid")
-        self.zyngui.show_modal("playgrid")
+        self.zynqtgui.show_modal("playgrid")
 
     def channel(self):
         logging.info("Channel")
-        self.zyngui.show_modal("channel")
+        self.zynqtgui.show_modal("channel")
 
     def session_dashboard(self):
         logging.info("Session")
-        self.zyngui.show_modal("session_dashboard")
+        self.zynqtgui.show_modal("session_dashboard")
 
     def sketchpad(self):
         logging.info("Sketchpad")
-        self.zyngui.show_modal("sketchpad")
+        self.zynqtgui.show_modal("sketchpad")
 
     def alsa_mixer(self):
         logging.info("ALSA Mixer")
-        self.zyngui.show_modal("alsa_mixer")
+        self.zynqtgui.show_modal("alsa_mixer")
 
     def auto_eq(self):
         logging.info("Auto EQ")
-        self.zyngui.show_modal("autoeq")
+        self.zynqtgui.show_modal("autoeq")
 
     def step_sequencer(self):
         logging.info("Step Sequencer")
-        self.zyngui.show_modal("stepseq")
+        self.zynqtgui.show_modal("stepseq")
 
     def song_player(self):
         logging.info("Song Player")
-        self.zyngui.show_modal("song_player")
+        self.zynqtgui.show_modal("song_player")
 
     def song_manager(self):
         logging.info("Song Manager")
-        self.zyngui.show_modal("song_manager")
+        self.zynqtgui.show_modal("song_manager")
 
     def sketchpad_copier(self):
         logging.info("Sketchpad Copier")
-        self.zyngui.show_modal("sketchpad_copier")
+        self.zynqtgui.show_modal("sketchpad_copier")
 
     def admin(self):
         logging.info("Admin")
-        self.zyngui.show_modal("admin")
+        self.zynqtgui.show_modal("admin")
 
     def set_select_path(self):
         self.select_path = "Main"

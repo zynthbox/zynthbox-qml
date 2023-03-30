@@ -32,9 +32,9 @@ import org.kde.kirigami 2.4 as Kirigami
 import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
-    readonly property QtObject copier: zynthian.sketchpad_copier
-    readonly property QtObject session: zynthian.session_dashboard
-    readonly property QtObject curSketchpad: zynthian.sketchpad.song
+    readonly property QtObject copier: zynqtgui.sketchpad_copier
+    readonly property QtObject session: zynqtgui.session_dashboard
+    readonly property QtObject curSketchpad: zynqtgui.sketchpad.song
 
     id: root
 
@@ -144,7 +144,7 @@ Zynthian.ScreenPage {
         parent: root
 
         headerText: qsTr("Pick a session")
-        rootFolder: "/zynthian/zynthian-my-data/sessions"
+        rootFolder: "/zynqtgui/zynqtgui-my-data/sessions"
         folderModel {
             nameFilters: ["*.json"]
         }
@@ -158,7 +158,7 @@ Zynthian.ScreenPage {
         parent: root
 
         headerText: qsTr("Pick a sketchpad")
-        rootFolder: "/zynthian/zynthian-my-data/sketchpads"
+        rootFolder: "/zynqtgui/zynqtgui-my-data/sketchpads"
         folderModel {
             nameFilters: ["*.json"]
         }

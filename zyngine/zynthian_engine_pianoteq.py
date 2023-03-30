@@ -362,8 +362,8 @@ class zynthian_engine_pianoteq(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None, update_presets_cache=False):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None, update_presets_cache=False):
+		super().__init__(zynqtgui)
 		self.name = PIANOTEQ_NAME
 		self.nickname = "PT"
 		self.jackname = PIANOTEQ_JACK_PORT_NAME
@@ -398,7 +398,7 @@ class zynthian_engine_pianoteq(zynthian_engine):
 				shutil.copy(self.data_dir + "/pianoteq6/Pianoteq6.prefs", PIANOTEQ_CONFIG_FILE)
 
 		try:
-			sr = self.zyngui.get_jackd_samplerate()
+			sr = self.zynqtgui.get_jackd_samplerate()
 		except:
 			sr = 44100
 		fix_pianoteq_config(sr)
@@ -652,8 +652,8 @@ class zynthian_engine_pianoteq(zynthian_engine):
 			self.command += " --preset \"{}\"".format(preset[0])
 			self.stop()
 			self.start()
-			self.zyngui.zynautoconnect_midi(True)
-			self.zyngui.zynautoconnect_audio(False)
+			self.zynqtgui.zynautoconnect_midi(True)
+			self.zynqtgui.zynautoconnect_audio(False)
 
 		layer.send_ctrl_midi_cc()
 		return True

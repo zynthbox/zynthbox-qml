@@ -159,10 +159,10 @@ class zynthian_engine(zynthian_basic_engine):
 	# Initialization
 	# ---------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
+	def __init__(self, zynqtgui=None):
 		super().__init__()
 
-		self.zyngui=zyngui
+		self.zynqtgui=zynqtgui
 
 		self.type = "MIDI Synth"
 		self.nickname = ""
@@ -219,7 +219,7 @@ class zynthian_engine(zynthian_basic_engine):
 			# So, for avoiding problems, jack names shouldn't contain regex characters.
 			if sanitize:
 				jname = re.sub("[\_]{2,}","_",re.sub("[\'\*\(\)\[\]\s]","_",jname))
-			jname_count = self.zyngui.screens['layer'].get_jackname_count(jname)
+			jname_count = self.zynqtgui.screens['layer'].get_jackname_count(jname)
 		except Exception as e:
 			jname_count = 0
 
@@ -233,19 +233,19 @@ class zynthian_engine(zynthian_basic_engine):
 	def start_loading(self):
 		self.loading=self.loading+1
 		if self.loading<1: self.loading=1
-		if self.zyngui:
-			self.zyngui.start_loading()
+		if self.zynqtgui:
+			self.zynqtgui.start_loading()
 
 	def stop_loading(self):
 		self.loading=self.loading-1
 		if self.loading<0: self.loading=0
-		if self.zyngui:
-			self.zyngui.stop_loading()
+		if self.zynqtgui:
+			self.zynqtgui.stop_loading()
 
 	def reset_loading(self):
 		self.loading=0
-		if self.zyngui:
-			self.zyngui.stop_loading()
+		if self.zynqtgui:
+			self.zynqtgui.stop_loading()
 
 	# ---------------------------------------------------------------------------
 	# Refresh Management
@@ -407,7 +407,7 @@ class zynthian_engine(zynthian_basic_engine):
 
 
 	def set_bank(self, layer, bank):
-		self.zyngui.zynmidi.set_midi_bank_msb(layer.get_midi_chan(), bank[1])
+		self.zynqtgui.zynmidi.set_midi_bank_msb(layer.get_midi_chan(), bank[1])
 		return True
 
 
@@ -421,9 +421,9 @@ class zynthian_engine(zynthian_basic_engine):
 
 	def set_preset(self, layer, preset, preload=False):
 		if isinstance(preset[1],int):
-			self.zyngui.zynmidi.set_midi_prg(layer.get_midi_chan(), preset[1])
+			self.zynqtgui.zynmidi.set_midi_prg(layer.get_midi_chan(), preset[1])
 		else:
-			self.zyngui.zynmidi.set_midi_preset(layer.get_midi_chan(), preset[1][0], preset[1][1], preset[1][2])
+			self.zynqtgui.zynmidi.set_midi_preset(layer.get_midi_chan(), preset[1][0], preset[1][1], preset[1][2])
 		return True
 
 
@@ -665,8 +665,8 @@ class zynthian_engine(zynthian_basic_engine):
 				#logging.debug("MIDI CC {} -> '{}' = {}".format(zctrl.midi_cc, zctrl.name, val))
 
 				#Refresh GUI controller in screen when needed ...
-				if (self.zyngui.active_screen=='control' and not self.zyngui.modal_screen) or self.zyngui.modal_screen=='alsa_mixer':
-					self.zyngui.screens['control'].set_controller_value(zctrl)
+				if (self.zynqtgui.active_screen=='control' and not self.zynqtgui.modal_screen) or self.zynqtgui.modal_screen=='alsa_mixer':
+					self.zynqtgui.screens['control'].set_controller_value(zctrl)
 
 		except Exception as e:
 			logging.debug(e)

@@ -34,7 +34,7 @@ Kirigami.ScrollablePage {
 
     property Kirigami.Action backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: zynthian.go_back()
+        onTriggered: zynqtgui.go_back()
     }
     property string previousScreen
 

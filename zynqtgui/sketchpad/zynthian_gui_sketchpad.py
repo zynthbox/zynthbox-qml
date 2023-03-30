@@ -69,7 +69,7 @@ def libzlCb(beat):
         zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate128th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision6)
 
 
-class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     __instance__ = None
 
     def __init__(self, parent=None):
@@ -138,7 +138,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer = QTimer()
         self.master_audio_level_timer.setInterval(50)
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
-        self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
+        self.zynqtgui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
 
         self.set_selector_timer = QTimer()
         self.set_selector_timer.setSingleShot(True)
@@ -172,14 +172,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.__jack_client_init_timer__.start()
 
     def connect_control_objects(self):
-        selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
 
-        if self.__volume_control_obj == self.zyngui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]:
+        if self.__volume_control_obj == self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]:
             return
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.disconnect(self.set_selector)
 
-        self.__volume_control_obj = self.zyngui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]
+        self.__volume_control_obj = self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]
 
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.connect(self.set_selector)
@@ -193,21 +193,21 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             libzl.registerTimerCallback(libzlCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
-            self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
+            self.zynqtgui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
 
-            self.zyngui.fixed_layers.volumeControllersChanged.connect(self.set_selector_timer.start)
+            self.zynqtgui.fixed_layers.volumeControllersChanged.connect(self.set_selector_timer.start)
 
             if cb is not None:
                 cb()
 
-            self.zyngui.layers_for_channel.fill_list()
-            self.zyngui.sketchpad.set_selector()
-            self.zyngui.session_dashboard.set_selected_channel(0, True)
+            self.zynqtgui.layers_for_channel.fill_list()
+            self.zynqtgui.sketchpad.set_selector()
+            self.zynqtgui.session_dashboard.set_selected_channel(0, True)
             self.__is_init_in_progress__ = False
             logging.info(f"Sketchpad Initialization Complete")
 
-            self.zyngui.zynautoconnect(True)
+            self.zynqtgui.zynautoconnect(True)
 
             for i in range(0, self.__song__.channelsModel.count):
                 channel = self.__song__.channelsModel.getChannel(i)
@@ -231,7 +231,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_segment(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         if self.__big_knob_mode__ == "segment" and self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex != int(self.__zselector[0].value):
@@ -241,32 +241,32 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_channel(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        if self.__big_knob_mode__ == "channel" and self.zyngui.session_dashboard.get_selected_channel() != int(self.__zselector[0].value):
+        if self.__big_knob_mode__ == "channel" and self.zynqtgui.session_dashboard.get_selected_channel() != int(self.__zselector[0].value):
             logging.debug(f"Setting channel from zyncoder {int(self.__zselector[0].value)}")
-            self.zyngui.session_dashboard.set_selected_channel(int(self.__zselector[0].value))
+            self.zynqtgui.session_dashboard.set_selected_channel(int(self.__zselector[0].value))
             self.set_selector()
 
     @Slot(None)
     def zyncoder_set_preset(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
         selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
 
-        if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
-            layer = self.zyngui.layer.layer_midi_map[selected_channel]
+        if self.__big_knob_mode__ == "preset" and selected_channel in self.zynqtgui.layer.layer_midi_map:
+            layer = self.zynqtgui.layer.layer_midi_map[selected_channel]
             preset_index = min(round(self.__zselector[0].value / 1000), len(layer.preset_list) - 1)
             self.set_preset_actual(preset_index)
 
     def set_preset_actual(self, preset_index):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
         selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
         preset_index = int(preset_index)
         try:
@@ -274,13 +274,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         except:
             preset_name = ""
 
-        if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
-            layer = self.zyngui.layer.layer_midi_map[selected_channel]
+        if self.__big_knob_mode__ == "preset" and selected_channel in self.zynqtgui.layer.layer_midi_map:
+            layer = self.zynqtgui.layer.layer_midi_map[selected_channel]
 
             if channel.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
                 prev_volume = None
                 try:
-                    prev_volume = self.zyngui.fixed_layers.volumeControllers[selected_channel].value
+                    prev_volume = self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value
                     logging.debug(f"### Volume Previous : {prev_volume}")
                 except Exception as e:
                     logging.debug(f"Error resetting volume : {str(e)}")
@@ -290,26 +290,26 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 if prev_volume is not None:
                     try:
-                        logging.debug(f"### Volume after preset change : {self.zyngui.fixed_layers.volumeControllers[selected_channel].value}")
-                        self.zyngui.fixed_layers.volumeControllers[selected_channel].value = prev_volume
-                        logging.debug(f"### Volume after reset : {self.zyngui.fixed_layers.volumeControllers[selected_channel].value}")
+                        logging.debug(f"### Volume after preset change : {self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value}")
+                        self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value = prev_volume
+                        logging.debug(f"### Volume after reset : {self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value}")
                     except Exception as e:
                         logging.debug(f"Error resetting volume : {str(e)}")
 
                 channel.chainedSoundsInfoChanged.emit()
                 self.set_selector()
-                self.zyngui.fixed_layers.fill_list()
-                self.zyngui.osd.updateOsd(
+                self.zynqtgui.fixed_layers.fill_list()
+                self.zynqtgui.osd.updateOsd(
                     parameterName="selected_preset",
-                    description=f"Preset({preset_index+1}/{len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list)})",
+                    description=f"Preset({preset_index+1}/{len(self.zynqtgui.layer.layer_midi_map[selected_channel].preset_list)})",
                     start=0,
-                    stop=len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) - 1,
+                    stop=len(self.zynqtgui.layer.layer_midi_map[selected_channel].preset_list) - 1,
                     step=1,
                     defaultValue=None,
                     currentValue=preset_index,
                     setValueFunction=self.set_preset_actual,
                     startLabel="1",
-                    stopLabel=f"{len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list)}",
+                    stopLabel=f"{len(self.zynqtgui.layer.layer_midi_map[selected_channel].preset_list)}",
                     valueLabel=preset_name,
                     showValueLabel=True,
                     visualZero=None,
@@ -319,28 +319,28 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         self.set_layer_volume_actual(self.__zselector[1].value)
 
     def set_layer_volume_actual(self, volume):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
         try:
             synth_name = selected_channel.getLayerNameByMidiChannel(selected_channel.chainedSounds[selected_channel.selectedSlotRow]).split('>')[0]
         except:
             synth_name = ""
 
         try:
-            if ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
+            if ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and \
                         selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
-            elif self.zyngui.sound_combinator_active and \
+                volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+            elif self.zynqtgui.sound_combinator_active and \
                     selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
             else:
                 volume_control_obj = None
         except:
@@ -353,7 +353,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
             self.set_selector()
 
-            self.zyngui.osd.updateOsd(
+            self.zynqtgui.osd.updateOsd(
                 parameterName="layer_volume",
                 description=f"{synth_name} Volume",
                 start=volume_control_obj.value_min,
@@ -372,17 +372,17 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_channel_volume(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         volume = np.interp(self.__zselector[1].value, (0, 60), (-40, 20))
         self.set_channel_volume_actual(volume)
 
     def set_channel_volume_actual(self, volume):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
 
         if selected_channel.volume != volume:
             # zselector doesnt support negetive mimimum value. Need to interoporale zyncoder value from range(0 to 60) to actual range(-40 to 20)
@@ -392,15 +392,15 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
         selected_clip = None
 
-        if self.zyngui.channelWaveEditorBarActive:
+        if self.zynqtgui.channelWaveEditorBarActive:
             selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
-        elif self.zyngui.clipWaveEditorBarActive:
+        elif self.zynqtgui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedTrackIndex)
 
         if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 1000):
@@ -410,15 +410,15 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
         selected_clip = None
 
-        if self.zyngui.channelWaveEditorBarActive:
+        if self.zynqtgui.channelWaveEditorBarActive:
             selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
-        elif self.zyngui.clipWaveEditorBarActive:
+        elif self.zynqtgui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedTrackIndex)
 
         if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/1000:
@@ -427,10 +427,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.set_selector()
 
     def update_channel_pan_actual(self, pan):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
 
         # Do not set pan value if change is less than step size of 0.1
         if selected_channel_obj is not None and selected_channel_obj.pan != pan:
@@ -439,14 +439,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.set_selector()
 
     def set_selected_channel_pan(self, pan):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         self.update_channel_pan_actual(min(max(-1, round(pan, 2)), 1))
 
     @Slot(None)
     def zyncoder_update_channel_pan(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
         pan = round(np.interp(self.__zselector[2].value, (0, 1000), (-1.0, 1.0)), 2)
@@ -454,15 +454,15 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
-        if self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
 
-        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
         selected_clip = None
 
-        if self.zyngui.channelWaveEditorBarActive:
+        if self.zynqtgui.channelWaveEditorBarActive:
             selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
-        elif self.zyngui.clipWaveEditorBarActive:
+        elif self.zynqtgui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedTrackIndex)
 
         if selected_clip is not None and selected_clip.snapLengthToBeat:
@@ -477,7 +477,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.set_selector()
 
     def zyncoder_read(self):
-        if self.zyngui.knobTouchUpdateInProgress or self.zyngui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+        if self.zynqtgui.knobTouchUpdateInProgress or self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
             return
         if self.is_set_selector_running:
             # Set selector in progress. Not setting value with encoder
@@ -496,9 +496,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         # Update clip startposition/layer volume when required with small knob 1
         if self.__zselector[1] and self.__song__:
             self.__zselector[1].read_zyncoder()
-            if self.zyngui.sound_combinator_active or self.zyngui.slotsBarChannelActive or self.zyngui.slotsBarSynthsActive:
+            if self.zynqtgui.sound_combinator_active or self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
-            elif self.zyngui.slotsBarMixerActive:
+            elif self.zynqtgui.slotsBarMixerActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_channel_volume", Qt.QueuedConnection)
             else:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
@@ -506,7 +506,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         # Update clip length when required with small knob 2
         if self.__zselector[2] and self.__song__:
             self.__zselector[2].read_zyncoder()
-            if self.zyngui.slotsBarMixerActive:
+            if self.zynqtgui.slotsBarMixerActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_channel_pan", Qt.QueuedConnection)
             else:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.QueuedConnection)
@@ -515,7 +515,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[3] and self.__song__:
             self.__zselector[3].read_zyncoder()
 
-            if self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive:
+            if self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
 
         return [0, 1, 2, 3]
@@ -526,21 +526,21 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             if self.__zselector[0] is not None:
                 self.__zselector[0].show()
 
-            if self.zyngui.sound_combinator_active:
+            if self.zynqtgui.sound_combinator_active:
                 # If sound combinator is active, Use Big knob to control preset
 
                 self.__big_knob_mode__ = "preset"
 
                 logging.debug(f"### set_selector : Configuring big knob, sound combinator is active.")
-                channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+                channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
                 selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
-                logging.debug(f"### selectedChannel : channel{self.zyngui.session_dashboard.selectedChannel}({channel}), slot({channel.selectedSlotRow}), channel({selected_channel})")
+                logging.debug(f"### selectedChannel : channel{self.zynqtgui.session_dashboard.selectedChannel}({channel}), slot({channel.selectedSlotRow}), channel({selected_channel})")
                 preset_index = 0
                 max_value = 0
 
                 try:
-                    preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
-                    max_value = len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) * 1000
+                    preset_index = self.zynqtgui.layer.layer_midi_map[selected_channel].preset_index * 1000
+                    max_value = len(self.zynqtgui.layer.layer_midi_map[selected_channel].preset_list) * 1000
                 except:
                     pass
 
@@ -595,7 +595,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.__big_knob_mode__ = "channel"
 
                 try:
-                    selected_channel = self.zyngui.session_dashboard.get_selected_channel()
+                    selected_channel = self.zynqtgui.session_dashboard.get_selected_channel()
                 except:
                     selected_channel = 0
 
@@ -630,23 +630,23 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
                                                             self)
             self.__zselector[1].index = 0
-        if self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen() == self and \
+        if self.zynqtgui.get_current_screen_id() is not None and \
+                self.zynqtgui.get_current_screen() == self and \
                 (
-                    (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and
+                    (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and
                     selected_clip is not None and
                     selected_clip.path is not None and
                     len(selected_clip.path) > 0
                 ) or (
-                    self.zyngui.sound_combinator_active and
+                    self.zynqtgui.sound_combinator_active and
                     selected_channel is not None and
                     selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
                 ) or (
-                    ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and
+                    ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
                     selected_channel is not None and
                     selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
                 ) or (
-                    self.zyngui.slotsBarMixerActive and
+                    self.zynqtgui.slotsBarMixerActive and
                     selected_channel is not None
                 ):
             logging.debug(
@@ -660,7 +660,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             if self.__zselector[1]:
                 self.__zselector[1].hide()
 
-        if self.zyngui.sound_combinator_active or self.zyngui.slotsBarChannelActive or self.zyngui.slotsBarSynthsActive:
+        if self.zynqtgui.sound_combinator_active or self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
             volume = 0
             min_value = 0
             max_value = 0
@@ -668,16 +668,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             try:
                 # logging.error(f"layer({selected_channel.chainedSounds[selected_channel.selectedSlotRow]}), layerExists({selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])})")
 
-                if self.zyngui.sound_combinator_active and \
+                if self.zynqtgui.sound_combinator_active and \
                         selected_channel.checkIfLayerExists(
                             selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                    volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
                     volume = volume_control_obj.value
                     min_value = volume_control_obj.value_min
                     max_value = volume_control_obj.value_max
-                elif ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
+                elif ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and \
                         selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                    volume_control_obj = self.zyngui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
                     volume = volume_control_obj.value
                     min_value = volume_control_obj.value_min
                     max_value = volume_control_obj.value_max
@@ -694,7 +694,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
             self.__zselector[1].config(self.__zselector_ctrl[1])
             self.__zselector[1].custom_encoder_speed = 0
-        elif self.zyngui.slotsBarMixerActive:
+        elif self.zynqtgui.slotsBarMixerActive:
             # zselector doesnt negetive minimum value. need to interpolate actual range (-40 to 20) to range (0 to 60)
             volume = np.interp(selected_channel.volume, (-40, 20), (0, 60))
 
@@ -755,14 +755,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.__zselector[2] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[2], self)
             self.__zselector[2].index = 1
 
-        if (self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen() == self and \
-                (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+        if (self.zynqtgui.get_current_screen_id() is not None and \
+                self.zynqtgui.get_current_screen() == self and \
+                (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0) or (
             selected_channel is not None and \
-                self.zyngui.slotsBarMixerActive
+                self.zynqtgui.slotsBarMixerActive
         ):
             logging.debug(
                 f"### set_selector : Configuring small knob 2, showing")
@@ -773,7 +773,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 f"### set_selector : Configuring small knob 2, hiding")
             self.__zselector[2].hide()
 
-        if self.zyngui.slotsBarMixerActive:
+        if self.zynqtgui.slotsBarMixerActive:
             pan_interped = 0
 
             try:
@@ -819,9 +819,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         max_value = 0
 
         try:
-            if self.zyngui.get_current_screen_id() is not None and \
-                    self.zyngui.get_current_screen() == self and \
-                    (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+            if self.zynqtgui.get_current_screen_id() is not None and \
+                    self.zynqtgui.get_current_screen() == self and \
+                    (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
                     selected_clip is not None and \
                     selected_clip.path is not None and \
                     len(selected_clip.path) > 0:
@@ -840,9 +840,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                                                           self)
             self.__zselector[3].index = 2
 
-        if self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen() == self and \
-                (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+        if self.zynqtgui.get_current_screen_id() is not None and \
+                self.zynqtgui.get_current_screen() == self and \
+                (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
@@ -874,8 +874,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True, force=False):
         # Hide selectors and return if dependent variables is None or a long operation is in progress
         if (self.__song__ is None or \
-                (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) or \
-                (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
+                (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) or \
+                (self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self) or \
                 self.longOperation) and not force:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
@@ -892,12 +892,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
         ### Common vars for small knobs
         selected_clip = None
-        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
 
-        if self.zyngui.channelWaveEditorBarActive:
+        if self.zynqtgui.channelWaveEditorBarActive:
             logging.debug(f"### set_selector : channelWaveEditorBarActive is active.")
             selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
-        elif self.zyngui.clipWaveEditorBarActive:
+        elif self.zynqtgui.clipWaveEditorBarActive:
             logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
             selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedTrackIndex)
         ###
@@ -1131,7 +1131,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         pass
 
     def get_master_volume(self):
-        return self.zyngui.master_alsa_mixer.volume
+        return self.zynqtgui.master_alsa_mixer.volume
 
     @Signal
     def click_channel_enabled_changed(self):
@@ -1159,8 +1159,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def channel_layers_snapshot(self):
         snapshot = []
         for i in range(5, 10):
-            if i in self.zyngui.screens['layer'].layer_midi_map:
-                layer_to_copy = self.zyngui.screens['layer'].layer_midi_map[i]
+            if i in self.zynqtgui.screens['layer'].layer_midi_map:
+                layer_to_copy = self.zynqtgui.screens['layer'].layer_midi_map[i]
                 snapshot.append(layer_to_copy.get_snapshot())
         return snapshot
 
@@ -1178,9 +1178,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if tid < 0 or tid >= self.__song__.channelsModel.count:
             return
         for i in range(5, 10):
-            if i in self.zyngui.screens['layer'].layer_midi_map:
-                self.zyngui.screens['layer'].remove_root_layer(self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[i]), True)
-        self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.channelsModel.getChannel(tid).get_layers_snapshot(), 5, 9)
+            if i in self.zynqtgui.screens['layer'].layer_midi_map:
+                self.zynqtgui.screens['layer'].remove_root_layer(self.zynqtgui.screens['layer'].root_layers.index(self.zynqtgui.screens['layer'].layer_midi_map[i]), True)
+        self.zynqtgui.screens['layer'].load_channels_snapshot(self.__song__.channelsModel.getChannel(tid).get_layers_snapshot(), 5, 9)
 
     @Signal
     def ongoingCountInChanged(self):
@@ -1196,7 +1196,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     ongoingCountIn = Property(int, get_ongoingCountIn, set_ongoingCountIn, notify=ongoingCountInChanged)
 
     def show(self):
-        if self.zyngui.isBootingComplete:
+        if self.zynqtgui.isBootingComplete:
             self.set_selector(force=True)
 
     @Signal
@@ -1238,12 +1238,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             except Exception as e:
                 logging.error(f"Already disconnected : {str(e)}")
 
-            self.zyngui.currentTaskMessage = "Stopping playback"
+            self.zynqtgui.currentTaskMessage = "Stopping playback"
 
             try:
                 self.stopAllPlayback()
-                self.zyngui.screens["playgrid"].stopMetronomeRequest()
-                self.zyngui.screens["song_arranger"].stop()
+                self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
+                self.zynqtgui.screens["song_arranger"].stop()
                 self.resetMetronome()
             except:
                 pass
@@ -1252,12 +1252,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.__song__.to_be_deleted()
 
             if (self.__sketchpad_basepath__ / 'temp').exists():
-                self.zyngui.currentTaskMessage = "Removing existing temp sketchpad"
+                self.zynqtgui.currentTaskMessage = "Removing existing temp sketchpad"
                 shutil.rmtree(self.__sketchpad_basepath__ / 'temp')
 
             if base_sketchpad is not None:
                 logging.info(f"Creating New Sketchpad from community sketchpad : {base_sketchpad}")
-                self.zyngui.currentTaskMessage = "Copying community sketchpad to my sketchpads"
+                self.zynqtgui.currentTaskMessage = "Copying community sketchpad to my sketchpads"
 
                 base_sketchpad_path = Path(base_sketchpad)
 
@@ -1271,37 +1271,37 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 # Load sketchpad snapshot if available or else load default snapshot
                 snapshot_path = f"{str(self.__sketchpad_basepath__ / new_sketchpad_name / 'soundsets')}/{base_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
                 if Path(snapshot_path).exists():
-                    self.zyngui.currentTaskMessage = "Loading snapshot"
+                    self.zynqtgui.currentTaskMessage = "Loading snapshot"
                     logging.info(f"Loading snapshot : {snapshot_path}")
-                    self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+                    self.zynqtgui.screens["layer"].load_snapshot(snapshot_path)
                 elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                     logging.info(f"Loading default snapshot")
-                    self.zyngui.currentTaskMessage = "Loading snapshot"
-                    self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+                    self.zynqtgui.currentTaskMessage = "Loading snapshot"
+                    self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/",
                                                                   base_sketchpad_path.stem.replace(".sketchpad", ""), self)
-                self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
+                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                     str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
-                self.zyngui.screens["session_dashboard"].set_selected_channel(0, True)
+                self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
             else:
                 logging.info(f"Creating New Sketchpad")
-                self.zyngui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
+                self.zynqtgui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
 
-                # When zyngui is starting, it will load last_state or default snapshot
+                # When zynqtgui is starting, it will load last_state or default snapshot
                 # based on the value of self.init_should_load_last_state
                 # Do not load snapshot again otherwise it will create multiple processes for same synths
                 if load_snapshot:
                     if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                         logging.info(f"Loading default snapshot")
-                        self.zyngui.currentTaskMessage = "Loading snapshot"
-                        self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+                        self.zynqtgui.currentTaskMessage = "Loading snapshot"
+                        self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
-                self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
+                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                     str(self.__sketchpad_basepath__ / 'temp' / 'Sketchpad-1.sketchpad.json'))
 
                 # Connect all jack ports of respective channel after jack client initialization is done.
@@ -1311,45 +1311,45 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
-                self.zyngui.screens["session_dashboard"].set_selected_channel(0, True)
+                self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
                 self.newSketchpadLoaded.emit()
 
             # Set ALSA Mixer volume to 100% when creating new sketchpad
-            self.zyngui.screens["master_alsa_mixer"].volume = 100
+            self.zynqtgui.screens["master_alsa_mixer"].volume = 100
 
             # Update volume controls
-            self.zyngui.fixed_layers.fill_list()
+            self.zynqtgui.fixed_layers.fill_list()
             self.set_selector()
 
             if cb is not None:
                 cb()
 
-            if self.zyngui.isBootingComplete:
-                self.zyngui.currentTaskMessage = "Finalizing"
+            if self.zynqtgui.isBootingComplete:
+                self.zynqtgui.currentTaskMessage = "Finalizing"
 
             self.longOperationDecrement()
-            QTimer.singleShot(3000, self.zyngui.end_long_task)
+            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Creating New Sketchpad"
+        self.zynqtgui.currentTaskMessage = "Creating New Sketchpad"
         self.longOperationIncrement()
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     @Slot(None)
     def saveSketchpad(self):
         def task():
             self.__song__.save(False)
-            QTimer.singleShot(3000, self.zyngui.end_long_task)
+            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Saving sketchpad"
-        self.zyngui.showCurrentTaskMessage = False
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.currentTaskMessage = "Saving sketchpad"
+        self.zynqtgui.showCurrentTaskMessage = False
+        self.zynqtgui.do_long_task(task)
 
     @Slot(str)
     def createSketchpad(self, name):
         def task():
             self.stopAllPlayback()
-            self.zyngui.screens["playgrid"].stopMetronomeRequest()
-            self.zyngui.screens["song_arranger"].stop()
+            self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
+            self.zynqtgui.screens["song_arranger"].stop()
             self.resetMetronome()
 
             # Rename temp sketchpad folder to the user defined name
@@ -1379,7 +1379,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 logging.error(e)
 
             self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / name) + "/", name, self)
-            self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
+            self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                 str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
             self.__song__.save(False)
 
@@ -1387,12 +1387,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
             self.song_changed.emit()
             self.longOperationDecrement()
-            QTimer.singleShot(3000, self.zyngui.end_long_task)
+            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zyngui.currentTaskMessage = f"Saving Sketchpad : {name}"
-        self.zyngui.showCurrentTaskMessage = False
+        self.zynqtgui.currentTaskMessage = f"Saving Sketchpad : {name}"
+        self.zynqtgui.showCurrentTaskMessage = False
         self.longOperationIncrement()
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     @Slot(str)
     def saveCopy(self, name):
@@ -1400,11 +1400,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             old_folder = self.__song__.sketchpad_folder
             shutil.copytree(old_folder, self.__sketchpad_basepath__ / name)
 
-            QTimer.singleShot(3000, self.zyngui.end_long_task)
+            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Saving a copy of the sketchpad"
-        self.zyngui.showCurrentTaskMessage = False
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.currentTaskMessage = "Saving a copy of the sketchpad"
+        self.zynqtgui.showCurrentTaskMessage = False
+        self.zynqtgui.do_long_task(task)
 
     @Slot(str, bool)
     def loadSketchpad(self, sketchpad, load_history, load_snapshot=True, cb=None):
@@ -1418,11 +1418,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
             sketchpad_path = Path(sketchpad)
 
-            self.zyngui.currentTaskMessage = "Stopping playback"
+            self.zynqtgui.currentTaskMessage = "Stopping playback"
             try:
                 self.stopAllPlayback()
-                self.zyngui.screens["playgrid"].stopMetronomeRequest()
-                self.zyngui.screens["song_arranger"].stop()
+                self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
+                self.zynqtgui.screens["song_arranger"].stop()
                 self.resetMetronome()
             except:
                 pass
@@ -1437,31 +1437,31 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                     if cb is not None:
                         cb()
 
-                    if self.zyngui.isBootingComplete:
-                        self.zyngui.currentTaskMessage = "Finalizing"
+                    if self.zynqtgui.isBootingComplete:
+                        self.zynqtgui.currentTaskMessage = "Finalizing"
                     self.longOperationDecrement()
-                    QTimer.singleShot(3000, self.zyngui.end_long_task)
+                    QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-                self.zyngui.currentTaskMessage = "Creating new sketchpad from community sketchpad"
+                self.zynqtgui.currentTaskMessage = "Creating new sketchpad from community sketchpad"
                 # newSketchpad will handle loading snapshot based on the value of load_snapshot
                 self.newSketchpad(sketchpad, _cb, load_snapshot=load_snapshot)
             else:
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
-                self.zyngui.currentTaskMessage = "Loading sketchpad"
+                self.zynqtgui.currentTaskMessage = "Loading sketchpad"
                 self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_history)
-                self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(str(sketchpad_path))
+                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(str(sketchpad_path))
 
                 if load_snapshot:
                     snapshot_path = str(sketchpad_path.parent.absolute()) + '/soundsets/' + str(sketchpad_path.stem.replace('.sketchpad', '')) + '.zss'
                     # Load snapshot
                     if Path(snapshot_path).exists():
                         logging.info(f"Loading snapshot : {snapshot_path}")
-                        self.zyngui.currentTaskMessage = "Loading snapshot"
-                        self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+                        self.zynqtgui.currentTaskMessage = "Loading snapshot"
+                        self.zynqtgui.screens["layer"].load_snapshot(snapshot_path)
                     elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                         logging.info(f"Loading default snapshot")
-                        self.zyngui.currentTaskMessage = "Loading snapshot"
-                        self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+                        self.zynqtgui.currentTaskMessage = "Loading snapshot"
+                        self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
@@ -1474,14 +1474,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 if cb is not None:
                     cb()
 
-                if self.zyngui.isBootingComplete:
-                    self.zyngui.currentTaskMessage = "Finalizing"
+                if self.zynqtgui.isBootingComplete:
+                    self.zynqtgui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
-                QTimer.singleShot(3000, self.zyngui.end_long_task)
+                QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Loading Sketchpad"
+        self.zynqtgui.currentTaskMessage = "Loading Sketchpad"
         self.longOperationIncrement()
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     @Slot(str)
     def loadSketchpadVersion(self, version):
@@ -1493,8 +1493,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Already disconnected : {str(e)}")
 
         self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest()
-        self.zyngui.screens["song_arranger"].stop()
+        self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
+        self.zynqtgui.screens["song_arranger"].stop()
         self.resetMetronome()
 
         self.__song__ = sketchpad_song.sketchpad_song(sketchpad_folder, version, self)
@@ -1536,13 +1536,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         # When sketchpad is open, curLayer is not updated when changing channels as it is a considerably heavy task
         # but not necessary to change to selected channel's synth.
         # Hence make sure to update curLayer before doing operations depending upon curLayer
-        self.zyngui.screens["layers_for_channel"].do_activate_midich_layer()
+        self.zynqtgui.screens["layers_for_channel"].do_activate_midich_layer()
         layers_snapshot = None
 
-        if self.zyngui.curlayer is not None:
-            layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
+        if self.zynqtgui.curlayer is not None:
+            layers_snapshot = self.zynqtgui.screens["layer"].export_multichannel_snapshot(self.zynqtgui.curlayer.midi_chan)
 
-        channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
         self.set_clip_to_record(clip)
 
         if clip.isChannelSample:
@@ -1553,7 +1553,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         if self.recordingSource == 'internal':
             # If source is internal and there are no layers, show error and return.
             if layers_snapshot is None:
-                self.zyngui.passiveNotification = "Cannot record channel with no synth"
+                self.zynqtgui.passiveNotification = "Cannot record channel with no synth"
                 return
 
             try:
@@ -1714,8 +1714,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 
             try:
-                layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-                logging.debug(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
+                layer = self.zynqtgui.screens["layer"].export_multichannel_snapshot(self.zynqtgui.curlayer.midi_chan)
+                logging.debug(f"### Channel({self.zynqtgui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
             except:
                 layer = None
 
@@ -1741,12 +1741,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
             if self.clip_to_record.isChannelSample:
                 logging.info(f"Recorded clip is a sample")
-                channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+                channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
                 channel.samples_changed.emit()
         # self.__song__.save()
 
     def get_next_free_layer(self):
-        logging.debug(self.zyngui.screens["layers"].layers)
+        logging.debug(self.zynqtgui.screens["layers"].layers)
 
     def get_sketchpad_folders(self):
         sketchpad_folders = []

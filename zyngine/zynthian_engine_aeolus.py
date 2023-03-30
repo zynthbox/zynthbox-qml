@@ -169,8 +169,8 @@ class zynthian_engine_aeolus(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 		self.name = "Aeolus"
 		self.nickname = "AE"
 		self.jackname = "aeolus"
@@ -229,7 +229,7 @@ class zynthian_engine_aeolus(zynthian_engine):
 	def fix_config(self):
 		regenerate = False
 		# Generate tuning line
-		tuning_line = "/tuning {:.1f} {:d}\n".format(self.zyngui.fine_tuning_freq, self.tuning_temp)
+		tuning_line = "/tuning {:.1f} {:d}\n".format(self.zynqtgui.fine_tuning_freq, self.tuning_temp)
 		# Get current config ...
 		for i,line in enumerate(self.config_lines):
 			if line.startswith("/tuning"):
@@ -292,7 +292,7 @@ class zynthian_engine_aeolus(zynthian_engine):
 		if not self.tuning_temp:
 			for title, i in self.tuning_temp_dict.items():
 				res.append((title, i, title))
-			self.zyngui.screens['bank'].index = self.current_tuning_temp-1
+			self.zynqtgui.screens['bank'].index = self.current_tuning_temp-1
 		else:
 			i=-1
 			for gc in self.presets_data['group_config']:
@@ -313,15 +313,15 @@ class zynthian_engine_aeolus(zynthian_engine):
 		if self.fix_config() or not self.proc:
 			self.stop()
 			self.start()
-			self.zyngui.zynautoconnect_midi(True)
-			self.zyngui.zynautoconnect_audio()
+			self.zynqtgui.zynautoconnect_midi(True)
+			self.zynqtgui.zynautoconnect_audio()
 			self.layers[0].load_bank_list()
 			self.layers[0].reset_bank()
 			
 			if not res:
 				return False
 
-		self.zyngui.zynmidi.set_midi_bank_lsb(layer.get_midi_chan(), bank[1])
+		self.zynqtgui.zynmidi.set_midi_bank_lsb(layer.get_midi_chan(), bank[1])
 		#Change Bank for all Layers
 		for l in self.layers:
 			if l!=layer:
@@ -348,7 +348,7 @@ class zynthian_engine_aeolus(zynthian_engine):
 
 	def set_preset(self, layer, preset, preload=False):
 		#Send Program Change
-		self.zyngui.zynmidi.set_midi_preset(layer.get_midi_chan(), preset[1][0], preset[1][1], preset[1][2])
+		self.zynqtgui.zynmidi.set_midi_preset(layer.get_midi_chan(), preset[1][0], preset[1][1], preset[1][2])
 
 		if not preload:
 			#Update Controller Values
@@ -444,8 +444,8 @@ class zynthian_engine_aeolus(zynthian_engine):
 
 				v1="01{0}0{1:03b}".format(mm,zctrl.graph_path[0])
 				v2="000{0:05b}".format(zctrl.graph_path[1])
-				self.zyngui.zynmidi.set_midi_control(zctrl.midi_chan,self.stop_cc_num,int(v1,2))
-				self.zyngui.zynmidi.set_midi_control(zctrl.midi_chan,self.stop_cc_num,int(v2,2))
+				self.zynqtgui.zynmidi.set_midi_control(zctrl.midi_chan,self.stop_cc_num,int(v1,2))
+				self.zynqtgui.zynmidi.set_midi_control(zctrl.midi_chan,self.stop_cc_num,int(v2,2))
 
 				#logging.debug("Aeolus Stop ({}) => mm={}, group={}, button={})".format(val,mm,zctrl.graph_path[0],zctrl.graph_path[1]))
 

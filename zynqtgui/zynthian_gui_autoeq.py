@@ -42,7 +42,7 @@ class zynthian_gui_autoeq():
 	def __init__(self):
 		self.canvas = None
 		self.shown = False
-		self.zyngui = zynthian_gui_config.zyngui
+		self.zynqtgui = zynthian_gui_config.zynqtgui
 
 		# Auto-EQ vars
 		self.n_bands = 30
@@ -110,14 +110,14 @@ class zynthian_gui_autoeq():
 
 
 	def autoeq_thread_task(self):
-		while not self.zyngui.exit_flag:
+		while not self.zynqtgui.exit_flag:
 			if self.shown:
 				self.refresh_bars()
 			sleep(0.04)
 
 
 	def refresh_bars(self):
-		self.mon_layer = self.zyngui.screens['layer'].get_layer_by_jackname('1/3')
+		self.mon_layer = self.zynqtgui.screens['layer'].get_layer_by_jackname('1/3')
 		x0 = 0
 		if self.mon_layer:
 			i = 0
@@ -134,7 +134,7 @@ class zynthian_gui_autoeq():
 				self.canvas.coords(self.mon_bars[i], x0, self.height, x0 + self.bar_width, self.height)
 				x0 += self.bar_width
 
-		self.eq_layer = self.zyngui.screens['layer'].get_layer_by_jackname('ZamGEQ31-01')
+		self.eq_layer = self.zynqtgui.screens['layer'].get_layer_by_jackname('ZamGEQ31-01')
 		x0 = 0
 		if self.eq_layer:
 			#TODO: To implement!!

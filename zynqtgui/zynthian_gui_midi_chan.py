@@ -107,22 +107,22 @@ class zynthian_gui_midi_chan(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
-		self.zyngui.start_loading()
+		self.zynqtgui.start_loading()
 		selchan = self.list_data[i][1]
 		self.midi_chan_sel = selchan
 
 		if self.mode=='ADD':
-			self.zyngui.screens['layer'].add_layer_midich(selchan)
+			self.zynqtgui.screens['layer'].add_layer_midich(selchan)
 
 		elif self.mode=='SET':
-			root_layer=self.zyngui.screens['layer_options'].layer
-			sublayers = self.zyngui.screens['layer'].get_fxchain_layers(root_layer) + self.zyngui.screens['layer'].get_midichain_layers(root_layer)
+			root_layer=self.zynqtgui.screens['layer_options'].layer
+			sublayers = self.zynqtgui.screens['layer'].get_fxchain_layers(root_layer) + self.zynqtgui.screens['layer'].get_midichain_layers(root_layer)
 			for layer in sublayers:
 				layer.set_midi_chan(selchan)
 				logging.info("LAYER {} -> MIDI CHANNEL = {}".format(layer.get_path(), selchan))
 
-			self.zyngui.zynautoconnect_midi()
-			self.zyngui.show_modal('layer_options')
+			self.zynqtgui.zynautoconnect_midi()
+			self.zynqtgui.show_modal('layer_options')
 
 		elif self.mode=='CLONE':
 
@@ -139,12 +139,12 @@ class zynthian_gui_midi_chan(zynthian_gui_selector):
 
 				elif t=='B':
 					self.clone_config_cc()
-		self.zyngui.stop_loading()
+		self.zynqtgui.stop_loading()
 
 
 	def clone_config_cc(self):
-		self.zyngui.screens['midi_cc'].config(self.midi_chan, self.midi_chan_sel)
-		self.zyngui.show_modal('midi_cc')
+		self.zynqtgui.screens['midi_cc'].config(self.midi_chan, self.midi_chan_sel)
+		self.zynqtgui.show_modal('midi_cc')
 
 
 	def midi_chan_activity(self, chan):

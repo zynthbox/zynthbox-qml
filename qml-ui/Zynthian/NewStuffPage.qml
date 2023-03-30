@@ -57,7 +57,7 @@ Zynthian.SelectorPage {
      * The configuration file path - this requires the full path, which usually means
      * something like the following, if the file is in the same directory as the calling
      * component:
-     * Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
+     * Qt.resolvedUrl("zynqtgui-themes.knsrc").toString().slice(7)
      * (that is, we need it fully resolved, but not as a url, so without the file:// part)
      */
     property alias configFile: newStuffEngine.configFile
@@ -89,7 +89,7 @@ Zynthian.SelectorPage {
             newStuffEngine.message = "";
         }
         onErrorMessage: {
-            zynthian.comfirm.show(message)
+            zynqtgui.comfirm.show(message)
         }
     }
     NewStuff.ItemsModel {

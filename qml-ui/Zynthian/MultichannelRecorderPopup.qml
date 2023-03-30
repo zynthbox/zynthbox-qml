@@ -218,7 +218,7 @@ Zynthian.Popup {
             Timer {
                 id: recordingPlaybackStarter
                 repeat: false; running: false;
-                interval: ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(zynthian.sketchpad.song.bpm, _private.leadinDurationInTicks) * 1000
+                interval: ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(zynqtgui.sketchpad.song.bpm, _private.leadinDurationInTicks) * 1000
                 onTriggered: {
                     console.log("Starting playback after", interval);
                     Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -227,7 +227,7 @@ Zynthian.Popup {
             Timer {
                 id: recordingStopper
                 repeat: false; running: false;
-                interval: ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(zynthian.sketchpad.song.bpm, _private.fadeoutDurationInTicks) * 1000
+                interval: ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(zynqtgui.sketchpad.song.bpm, _private.fadeoutDurationInTicks) * 1000
                 onTriggered: {
                     console.log("Stopping the recording after", interval);
                     _private.stopRecording();

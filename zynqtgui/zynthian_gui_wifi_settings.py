@@ -40,7 +40,7 @@ from . import zynthian_qt_gui_base
 from zyncoder import *
 
 
-class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_wifi_settings, self).__init__(parent)
         self.wpa_supplicant_config_fpath = os.environ.get('ZYNTHIAN_CONFIG_DIR', "/zynthian/config") + "/wpa_supplicant.conf"
@@ -63,9 +63,9 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
             self.update_saved_wifi_networks_list()
             self.update_available_wifi_networks_list()
             self.wifiModeChanged.emit()
-            self.zyngui.end_long_task()
+            self.zynqtgui.end_long_task()
 
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     ### BELOW METHODS ARE DERIVED FROM WEBCONF wifi_config_handler.py
     def update_available_wifi_networks_list(self):
@@ -289,9 +289,9 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
                 logging.error(f"Error setting wifi mode : {str(e)}")
 
             self.wifiModeChanged.emit()
-            self.zyngui.end_long_task()
+            self.zynqtgui.end_long_task()
 
-        self.zyngui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     wifiModeChanged = Signal()
 

@@ -41,7 +41,7 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 # Zynthian MIDI key-range GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_midi_key_range(zynthian_qt_gui_base.zynqtgui):
 
 	black_keys_pattern = (1,0,1,1,0,1,1)
 
@@ -64,23 +64,23 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		self.replot = True
 
 		self.__was_current_page = False
-		self.zyngui.current_screen_id_changed.connect(self.check_current_screen, Qt.QueuedConnection)
+		self.zynqtgui.current_screen_id_changed.connect(self.check_current_screen, Qt.QueuedConnection)
 
 		## TODO: Heuristics to automatically split keyboard
 		#if self.note_high < 127:
 			#zynthian_gui_config.midi_filter_rules = "MAP CH#{ch} NON#0:{high} => CH#{ch2} NON#0:{high}\nMAP CH#{ch} NOFF#0:{high} => CH#{ch2} NOFF#0:{high}\n".format(ch = self.chan, high = self.note_high, ch2 = self.chan+1)
 		#else:
 			#zynthian_gui_config.midi_filter_rules = None
-		#if self.zyngui.midi_filter_script:
-			#self.zyngui.midi_filter_script.clean()
-		#self.zyngui.midi_filter_script = zynthian_midi_filter.MidiFilterScript(
+		#if self.zynqtgui.midi_filter_script:
+			#self.zynqtgui.midi_filter_script.clean()
+		#self.zynqtgui.midi_filter_script = zynthian_midi_filter.MidiFilterScript(
 			#zynthian_gui_config.midi_filter_rules
 		#)
 
 	def check_current_screen(self):
 		if self.__was_current_page:
-			self.zyngui.screens["fixed_layers"].fill_list()
-		self.__was_current_page = (self.zyngui.current_screen_id == "midi_key_range")
+			self.zynqtgui.screens["fixed_layers"].fill_list()
+		self.__was_current_page = (self.zynqtgui.current_screen_id == "midi_key_range")
 
 	def config(self, chan):
 		self.chan = chan
@@ -129,7 +129,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 				self.halftone_zctrl=zynthian_gui_controller(0, self.halftone_ctrl, self)
 			self.halftone_zctrl.val0 = -12
 
-			if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
+			if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() == self:
 
 				self.nlow_zctrl.set_value(self.note_low, True)
 				self.nlow_zctrl.show()
@@ -178,7 +178,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 
 	def show(self):
 		super().show()
-		self.zyngui.screens["control"].unlock_controllers()
+		self.zynqtgui.screens["control"].unlock_controllers()
 		self.set_zctrls()
 		#Disable automatic learning for now
 		#zyncoder.lib_zyncoder.set_midi_learning_mode(1)
@@ -190,7 +190,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		#zyncoder.lib_zyncoder.set_midi_learning_mode(0)
 
 	def zyncoder_read(self, zcnums=None):
-		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
+		if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() == self:
 			self.nlow_zctrl.read_zyncoder()
 			if self.note_low!=self.nlow_zctrl.value:
 				if self.nlow_zctrl.value>self.note_high:
@@ -244,7 +244,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 
 	def set_select_path(self):
 		try:
-			self.select_path = ("{} > Note Range & Transpose...".format(self.zyngui.screens['layer_options'].layer.get_basepath()))
+			self.select_path = ("{} > Note Range & Transpose...".format(self.zynqtgui.screens['layer_options'].layer.get_basepath()))
 		except:
 			self.select_path = ("Note Range & Transpose...")
 		super().set_select_path()

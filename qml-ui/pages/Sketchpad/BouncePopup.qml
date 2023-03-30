@@ -102,7 +102,7 @@ Zynthian.Popup {
                             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                             _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
                             var beatMultiplier = ZynQuick.PlayGridManager.syncTimer.getMultiplier();
-                            var beatsPerMinute = zynthian.sketchpad.song.bpm;
+                            var beatsPerMinute = zynqtgui.sketchpad.song.bpm;
                             _private.patternDurationInMS = ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, _private.patternDurationInBeats) * 1000;
                             _private.recordingDurationInMS = _private.patternDurationInMS;
                             _private.recordingDurationInBeats = _private.patternDurationInBeats;
@@ -127,8 +127,8 @@ Zynthian.Popup {
                             _private.isRecording = true;
                             var sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
                             var clip = _private.selectedChannel.clipsModel.getClip(sceneIndices[_private.trackName]);
-                            zynthian.sketchpad.recordingSource = "internal"
-                            zynthian.sketchpad.recordingChannel = ""
+                            zynqtgui.sketchpad.recordingSource = "internal"
+                            zynqtgui.sketchpad.recordingChannel = ""
                             clip.queueRecording();
                             ZynQuick.MidiRecorder.startRecording(_private.pattern.midiChannel, true);
                             _private.sequence.startSequencePlayback();
@@ -157,17 +157,17 @@ Zynthian.Popup {
                     } else {
                         _private.isRecording = false;
                         _private.bounceProgress = 0;
-                        var clip = zynthian.sketchpad.clipToRecord;
+                        var clip = zynqtgui.sketchpad.clipToRecord;
                         if (clip) {
                             ZynQuick.MidiRecorder.stopRecording();
                             clip.stopRecording();
                             clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi();
                         }
-                        zynthian.sketchpad.stopAllPlayback();
+                        zynqtgui.sketchpad.stopAllPlayback();
                         _private.sequence.stopSequencePlayback();
                         ZynQuick.PlayGridManager.stopMetronome();
-                        zynthian.song_arranger.stop();
-                        zynthian.sketchpad.resetMetronome();
+                        zynqtgui.song_arranger.stop();
+                        zynqtgui.sketchpad.resetMetronome();
                         // Reset solo to whatever it was before we started working
                         _private.sequence.soloPattern = _private.previousSolo;
                         // Work out where the start and end points should be for the loop

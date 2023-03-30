@@ -62,7 +62,7 @@ class zynthian_gui_hardware(zynthian_gui_selector):
         self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
         self.list_data.append((self.test_knobs, 0, "Test Knobs"))
         self.list_data.append(
-            (self.zyngui.calibrate_touchscreen, 0, "Calibrate Touchscreen")
+            (self.zynqtgui.calibrate_touchscreen, 0, "Calibrate Touchscreen")
         )
         super().fill_list()
 
@@ -77,13 +77,13 @@ class zynthian_gui_hardware(zynthian_gui_selector):
         super().set_select_path()
 
     def execute_commands(self):
-        # self.zyngui.start_loading()
+        # self.zynqtgui.start_loading()
 
         error_counter = 0
         for cmd in self.commands:
             logging.info("Executing Command: %s" % cmd)
-            # self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-            # self.zyngui.add_info("{}\n".format(cmd))
+            # self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+            # self.zynqtgui.add_info("{}\n".format(cmd))
             try:
                 self.proc = Popen(
                     cmd,
@@ -92,7 +92,7 @@ class zynthian_gui_hardware(zynthian_gui_selector):
                     stderr=STDOUT,
                     universal_newlines=True,
                 )
-                # self.zyngui.add_info("RESULT:\n", "EMPHASIS")
+                # self.zynqtgui.add_info("RESULT:\n", "EMPHASIS")
                 for line in self.proc.stdout:
                     if re.search("ERROR", line, re.IGNORECASE):
                         error_counter += 1
@@ -102,25 +102,25 @@ class zynthian_gui_hardware(zynthian_gui_selector):
                     else:
                         tag = None
                     logging.info(line.rstrip())
-                    # self.zyngui.add_info(line, tag)
-                # self.zyngui.add_info("\n")
+                    # self.zynqtgui.add_info(line, tag)
+                # self.zynqtgui.add_info("\n")
             except Exception as e:
                 logging.error(e)
-                # self.zyngui.add_info("ERROR: %s\n" % e, "ERROR")
+                # self.zynqtgui.add_info("ERROR: %s\n" % e, "ERROR")
 
         if error_counter > 0:
             logging.info("COMPLETED WITH {} ERRORS!".format(error_counter))
-            # self.zyngui.add_info(
+            # self.zynqtgui.add_info(
             #     "COMPLETED WITH {} ERRORS!".format(error_counter), "WARNING"
             # )
         else:
             logging.info("COMPLETED OK!")
-            # self.zyngui.add_info("COMPLETED OK!", "SUCCESS")
+            # self.zynqtgui.add_info("COMPLETED OK!", "SUCCESS")
 
         self.commands = None
-        # self.zyngui.add_info("\n\n")
-        # self.zyngui.hide_info_timer(5000)
-        # self.zyngui.stop_loading()
+        # self.zynqtgui.add_info("\n\n")
+        # self.zynqtgui.hide_info_timer(5000)
+        # self.zynqtgui.stop_loading()
 
     def start_command(self, cmds):
         if not self.commands:
@@ -131,32 +131,32 @@ class zynthian_gui_hardware(zynthian_gui_selector):
             self.thread.start()
 
     def killable_execute_commands(self):
-        # self.zyngui.start_loading()
+        # self.zynqtgui.start_loading()
         for cmd in self.commands:
             logging.info("Executing Command: %s" % cmd)
-            # self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-            # self.zyngui.add_info("{}\n".format(cmd))
+            # self.zynqtgui.add_info("EXECUTING:\n", "EMPHASIS")
+            # self.zynqtgui.add_info("{}\n".format(cmd))
             try:
                 proc = Popen(cmd.split(" "), stdout=PIPE, stderr=PIPE)
                 self.child_pid = proc.pid
-                # self.zyngui.add_info("\nPID: %s" % self.child_pid)
+                # self.zynqtgui.add_info("\nPID: %s" % self.child_pid)
                 (output, error) = proc.communicate()
                 self.child_pid = None
                 if error:
                     result = "ERROR: %s" % error
                     logging.error(result)
-                    # self.zyngui.add_info(result, "ERROR")
+                    # self.zynqtgui.add_info(result, "ERROR")
                 if output:
                     logging.info(output)
-                    # self.zyngui.add_info(output)
+                    # self.zynqtgui.add_info(output)
             except Exception as e:
                 result = "ERROR: %s" % e
                 logging.error(result)
-                # self.zyngui.add_info(result, "ERROR")
+                # self.zynqtgui.add_info(result, "ERROR")
 
         self.commands = None
-        # self.zyngui.hide_info_timer(5000)
-        # self.zyngui.stop_loading()
+        # self.zynqtgui.hide_info_timer(5000)
+        # self.zynqtgui.stop_loading()
 
     def killable_start_command(self, cmds):
         if not self.commands:
@@ -174,7 +174,7 @@ class zynthian_gui_hardware(zynthian_gui_selector):
             os.kill(self.child_pid, signal.SIGTERM)
             self.child_pid = None
             if self.last_action == self.test_midi:
-                self.zyngui.all_sounds_off()
+                self.zynqtgui.all_sounds_off()
 
     # ------------------------------------------------------------------------------
     # CONFIG OPTIONS
@@ -186,7 +186,7 @@ class zynthian_gui_hardware(zynthian_gui_selector):
 
     def test_audio(self):
         logging.info("TESTING AUDIO")
-        # self.zyngui.show_info("TEST AUDIO")
+        # self.zynqtgui.show_info("TEST AUDIO")
         # self.killable_start_command(["mpg123 {}/audio/test.mp3".format(self.data_dir)])
         self.killable_start_command(
             [
@@ -196,34 +196,34 @@ class zynthian_gui_hardware(zynthian_gui_selector):
             ]
         )
         sleep(0.5)
-        self.zyngui.zynautoconnect_audio()
+        self.zynqtgui.zynautoconnect_audio()
 
     def test_midi(self):
         logging.info("TESTING MIDI")
-        # self.zyngui.show_info("TEST MIDI")
+        # self.zynqtgui.show_info("TEST MIDI")
         self.killable_start_command(
             ["aplaymidi -p 14 {}/mid/test.mid".format(self.data_dir)]
         )
 
     def test_touchpoints(self):
         logging.info("Testing Touchpoints")
-        self.zyngui.show_modal("test_touchpoints")
+        self.zynqtgui.show_modal("test_touchpoints")
 
     def test_knobs(self):
         logging.info("Testing Knobs")
-        self.zyngui.show_modal("test_knobs")
+        self.zynqtgui.show_modal("test_knobs")
 
     def last_state_action(self):
         if (
             zynthian_gui_config.restore_last_state
-            and len(self.zyngui.screens["layer"].layers) > 0
+            and len(self.zynqtgui.screens["layer"].layers) > 0
         ):
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
+            self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
         else:
-            self.zyngui.screens["snapshot"].delete_last_state_snapshot()
+            self.zynqtgui.screens["snapshot"].delete_last_state_snapshot()
 
     # def back_action(self):
-    # 	self.zyngui.show_screen("main")
+    # 	self.zynqtgui.show_screen("main")
     # 	return ''
 
 

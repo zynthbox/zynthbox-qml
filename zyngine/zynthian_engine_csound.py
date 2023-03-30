@@ -69,8 +69,8 @@ class zynthian_engine_csound(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 
 		self.type = "Special"
 		self.name = "CSound"
@@ -126,7 +126,7 @@ class zynthian_engine_csound(zynthian_engine):
 		self.start()
 		self.refresh_all()
 		sleep(0.3)
-		self.zyngui.zynautoconnect()
+		self.zynqtgui.zynautoconnect()
 		layer.send_ctrl_midi_cc()
 		return True
 

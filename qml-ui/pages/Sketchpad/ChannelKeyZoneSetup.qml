@@ -138,9 +138,9 @@ Item {
                     property QtObject clipObj: channelSample ? ZynQuick.PlayGridManager.getClipById(channelSample.cppObjId) : null;
                     Connections {
                         target: clipObj
-                        onKeyZoneStartChanged: zynthian.sketchpad.song.schedule_save()
-                        onKeyZoneEndChanged: zynthian.sketchpad.song.schedule_save()
-                        onRootNoteChanged: zynthian.sketchpad.song.schedule_save()
+                        onKeyZoneStartChanged: zynqtgui.sketchpad.song.schedule_save()
+                        onKeyZoneEndChanged: zynqtgui.sketchpad.song.schedule_save()
+                        onRootNoteChanged: zynqtgui.sketchpad.song.schedule_save()
                     }
                     height: parent.height;
                     width: 1

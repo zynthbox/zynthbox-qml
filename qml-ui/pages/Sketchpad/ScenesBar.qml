@@ -33,7 +33,7 @@ import '../../Zynthian' 1.0 as Zynthian
 //import Zynthian 1.0 as Zynthian
 
 Rectangle {
-    readonly property QtObject song: zynthian.sketchpad.song
+    readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property QtObject scenesModel: song.scenesModel
 
     function cuiaCallback(cuia) {

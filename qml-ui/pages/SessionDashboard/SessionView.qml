@@ -56,7 +56,7 @@ ColumnLayout {
                 text: qsTr("Scenes")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: zynthian.current_modal_screen_id = "sketchpad_copier"
+                    onClicked: zynqtgui.current_modal_screen_id = "sketchpad_copier"
                 }
             }
             QQC2.ScrollView {
@@ -65,16 +65,16 @@ ColumnLayout {
                 Layout.preferredWidth: 1
                 ListView {
                     id: scenesView
-                    model: zynthian.sketchpad.song.scenesModel
+                    model: zynqtgui.sketchpad.song.scenesModel
                     delegate: Kirigami.AbstractListItem {
                         separatorVisible: false
                         width: scenesView.width
                         height: root.itemHeight
-                        highlighted: index === zynthian.sketchpad.song.scenesModel.selectedTrackIndex
+                        highlighted: index === zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex
                         contentItem: QQC2.Label {
                             text: model.scene.name
                         }
-                        onClicked: zynthian.sketchpad.song.scenesModel.selectedTrackIndex = index
+                        onClicked: zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex = index
                     }
                 }
             }
@@ -90,12 +90,12 @@ ColumnLayout {
                 text: qsTr("Channels")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: zynthian.current_modal_screen_id = "sketchpad"
+                    onClicked: zynqtgui.current_modal_screen_id = "sketchpad"
                 }
             }
 
             Repeater {
-                model: zynthian.sketchpad.song.channelsModel
+                model: zynqtgui.sketchpad.song.channelsModel
                 delegate: DashboardListItem {
                     width: parent.width
                     patternConnections: index < 6 ? channelSoundConnections : channelPatternConnections
@@ -210,7 +210,7 @@ ColumnLayout {
                 text: qsTr("Patterns")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: zynthian.current_modal_screen_id = "playgrid"
+                    onClicked: zynqtgui.current_modal_screen_id = "playgrid"
                 }
             }
 
@@ -246,7 +246,7 @@ ColumnLayout {
                                 }
                                 var channel = chan
                                 if (channel === 0) {
-                                    channel = zynthian.active_midi_channel
+                                    channel = zynqtgui.active_midi_channel
                                 }
                                 patternSoundsConnections.addConnection(index, channel)
                             }
@@ -255,15 +255,15 @@ ColumnLayout {
                                 print("Updated Pattern Layer: " + chan)
                                 var channel = chan
                                 if (channel === 0) {
-                                    channel = zynthian.active_midi_channel
+                                    channel = zynqtgui.active_midi_channel
                                 }
                                 patternSoundsConnections.addConnection(index, channel)
                             }
                             data: [Connections {
-                                target: zynthian
+                                target: zynqtgui
                                 onActive_midi_channelChanged: {
                                     if (delegate.chan === 0) {
-                                        patternSoundsConnections.addConnection(index, zynthian.active_midi_channel);
+                                        patternSoundsConnections.addConnection(index, zynqtgui.active_midi_channel);
                                     }
                                 }
                             }]
@@ -300,7 +300,7 @@ ColumnLayout {
                             patternConnections: patternSoundsConnections
                             secondColumn: layersLayout
                             onClicked: {
-                                zynthian.current_modal_screen_id = "playgrid";
+                                zynqtgui.current_modal_screen_id = "playgrid";
                                 var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
                                 //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
@@ -356,7 +356,7 @@ ColumnLayout {
                 text: qsTr("Sounds")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: zynthian.current_screen_id = "main_layers_view"
+                    onClicked: zynqtgui.current_screen_id = "main_layers_view"
                 }
             }
             QQC2.ScrollView {
@@ -375,19 +375,19 @@ ColumnLayout {
                         width: parent.width
                         spacing: 0
                         Repeater {
-                            model: zynthian.fixed_layers.selector_list
+                            model: zynqtgui.fixed_layers.selector_list
                             delegate: Kirigami.AbstractListItem {
                                 width: layersLayout.width
                                 implicitHeight: root.itemHeight
-                                highlighted: zynthian.active_midi_channel === index
+                                highlighted: zynqtgui.active_midi_channel === index
                                 separatorVisible: false
                                 topPadding: 0
                                 bottomPadding: 0
                                 property int row: index
                                 readonly property int channel: model.metadata.midi_channel
                                 onClicked: {
-                                    //zynthian.current_screen_id = "main_layers_view";
-                                    zynthian.fixed_layers.activate_index(index);
+                                    //zynqtgui.current_screen_id = "main_layers_view";
+                                    zynqtgui.fixed_layers.activate_index(index);
                                 }
                                 contentItem: RowLayout {
                                     QQC2.Label {

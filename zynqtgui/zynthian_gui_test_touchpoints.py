@@ -26,7 +26,7 @@
 from . import zynthian_qt_gui_base
 
 
-class zynthian_gui_test_touchpoints(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_test_touchpoints(zynthian_qt_gui_base.zynqtgui):
   def __init__(self, parent = None):
     super(zynthian_gui_test_touchpoints, self).__init__(parent)
 

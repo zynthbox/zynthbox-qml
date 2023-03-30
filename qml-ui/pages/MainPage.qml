@@ -40,15 +40,15 @@ Zynthian.ScreenPage {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_LONG":
             case "SWITCH_BACK_BOLD":
-                if (zynthian.main.visibleCategory === "sessions-versions") {
+                if (zynqtgui.main.visibleCategory === "sessions-versions") {
                     // Mimic back to return to sketchpad folder view when versions are being displayed
-                    zynthian.main.visibleCategory = "sessions"
+                    zynqtgui.main.visibleCategory = "sessions"
                     return true
                 }
                 return false
 
             case "SWITCH_SELECT_BOLD":
-                zynthian.admin.power_off()
+                zynqtgui.admin.power_off()
                 return true
             case "SELECT_UP":
                 mainviewGridId.moveCurrentIndexUp();
@@ -69,27 +69,27 @@ Zynthian.ScreenPage {
 
             case "CHANNEL_1":
             case "CHANNEL_6":
-                zynthian.main.visibleCategory = "modules"
+                zynqtgui.main.visibleCategory = "modules"
                 return true
 
             case "CHANNEL_2":
             case "CHANNEL_7":
-                zynthian.main.visibleCategory = "appimages"
+                zynqtgui.main.visibleCategory = "appimages"
                 return true
 
             case "CHANNEL_3":
             case "CHANNEL_8":
-                zynthian.main.visibleCategory = "sessions"
+                zynqtgui.main.visibleCategory = "sessions"
                 return true
 
             case "CHANNEL_4":
             case "CHANNEL_9":
-                zynthian.main.visibleCategory = "templates"
+                zynqtgui.main.visibleCategory = "templates"
                 return true
 
             case "CHANNEL_5":
             case "CHANNEL_10":
-                zynthian.main.visibleCategory = "discover"
+                zynqtgui.main.visibleCategory = "discover"
                 return true
 
             default:
@@ -115,42 +115,42 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 checkable: true
-                checked: zynthian.main.visibleCategory === "modules"
+                checked: zynqtgui.main.visibleCategory === "modules"
                 text: qsTr("Modules")
-                onClicked: zynthian.main.visibleCategory = "modules"
+                onClicked: zynqtgui.main.visibleCategory = "modules"
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 checkable: true
-                checked: zynthian.main.visibleCategory === "appimages"
+                checked: zynqtgui.main.visibleCategory === "appimages"
                 text: qsTr("Apps")
-                onClicked: zynthian.main.visibleCategory = "appimages"
+                onClicked: zynqtgui.main.visibleCategory = "appimages"
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 checkable: true
-                checked: zynthian.main.visibleCategory === "sessions" ||
-                         zynthian.main.visibleCategory === "sessions-versions"
+                checked: zynqtgui.main.visibleCategory === "sessions" ||
+                         zynqtgui.main.visibleCategory === "sessions-versions"
                 text: qsTr("Sessions")
-                onClicked: zynthian.main.visibleCategory = "sessions"
+                onClicked: zynqtgui.main.visibleCategory = "sessions"
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 checkable: true
-                checked: zynthian.main.visibleCategory === "templates"
+                checked: zynqtgui.main.visibleCategory === "templates"
                 text: qsTr("Templates")
-                onClicked: zynthian.main.visibleCategory = "templates"
+                onClicked: zynqtgui.main.visibleCategory = "templates"
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 checkable: true
-                checked: zynthian.main.visibleCategory === "discover"
+                checked: zynqtgui.main.visibleCategory === "discover"
                 text: qsTr("Discover")
-                onClicked: zynthian.main.visibleCategory = "discover"
+                onClicked: zynqtgui.main.visibleCategory = "discover"
             }
         }
 
@@ -166,7 +166,7 @@ Zynthian.ScreenPage {
                 drag.filterChildren: true
                 onClicked: {
                     if (!gridMouseArea.blocked) {
-                        zynthian.show_modal("sketchpad")
+                        zynqtgui.show_modal("sketchpad")
                     }
                 }
 
@@ -180,8 +180,8 @@ Zynthian.ScreenPage {
                     anchors.fill: parent
                     cellWidth:iconWidth
                     cellHeight:iconHeight
-                    currentIndex: zynthian.main.current_index
-                    model:zynthian.main.selector_list
+                    currentIndex: zynqtgui.main.current_index
+                    model:zynqtgui.main.selector_list
                     delegate: MouseArea {
                         width: mainviewGridId.iconWidth
                         height: mainviewGridId.iconHeight
@@ -194,10 +194,10 @@ Zynthian.ScreenPage {
                         onClicked: {
                             // activate_index will start the appimage process and open sketchpad after 5 seconds
                             // to mimic closing of menu after opening an app like other modules in main page
-                            zynthian.main.activate_index(model.index);
+                            zynqtgui.main.activate_index(model.index);
 
                             if (model.action_id === "appimage") {
-                                zynthian.start_loading();
+                                zynqtgui.start_loading();
                                 stopLoadingTimer.restart();
                             }
                         }
@@ -211,7 +211,7 @@ Zynthian.ScreenPage {
                             highlighted: isCurrent
                             onIsCurrentChanged: {
                                 if (isCurrent) {
-                                    zynthian.main.current_index = index;
+                                    zynqtgui.main.current_index = index;
                                 }
                             }
 
@@ -226,34 +226,34 @@ Zynthian.ScreenPage {
     Timer {
         id: stopLoadingTimer
         interval: 30000
-        onTriggered: zynthian.stop_loading()
+        onTriggered: zynqtgui.stop_loading()
     }
 
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Close")
-            onTriggered: Qt.callLater(function() { zynthian.show_modal("sketchpad") })
+            onTriggered: Qt.callLater(function() { zynqtgui.show_modal("sketchpad") })
         },
         Kirigami.Action {
             enabled: false
         },
         Kirigami.Action {
             text: qsTr("Get New Modules")
-            onTriggered: zynthian.show_modal("module_downloader")
+            onTriggered: zynqtgui.show_modal("module_downloader")
         },
         Kirigami.Action {
             text: qsTr("Power")
             Kirigami.Action {
                 text: qsTr("Restart UI")
-                onTriggered: zynthian.admin.restart_gui()
+                onTriggered: zynqtgui.admin.restart_gui()
             }
             Kirigami.Action {
                 text: qsTr("Reboot")
-                onTriggered: zynthian.admin.reboot()
+                onTriggered: zynqtgui.admin.reboot()
             }
             Kirigami.Action {
                 text: qsTr("Power Off")
-                onTriggered: zynthian.admin.power_off()
+                onTriggered: zynqtgui.admin.power_off()
             }
         }
     ]

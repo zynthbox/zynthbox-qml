@@ -38,7 +38,7 @@ MouseArea {
     Layout.minimumWidth: Kirigami.Units.gridUnit * 10
     Layout.fillHeight: true
 
-    onClicked: zynthian.globalPopupOpened = true
+    onClicked: zynqtgui.globalPopupOpened = true
 
     ColumnLayout {
         anchors {
@@ -58,7 +58,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackAHold / zynthian.status_information.rangedB), 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackAHold / zynqtgui.status_information.rangedB), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -85,7 +85,7 @@ MouseArea {
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
                 width: highSignalARect.peakSignalA * root.width
-                property double peakSignalA: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackA / zynthian.status_information.rangedB), 1)
+                property double peakSignalA: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackA / zynqtgui.status_information.rangedB), 1)
             }
             Rectangle {
                 id: mediumSignalARect
@@ -96,7 +96,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.neutralTextColor
-                width: Math.min(highSignalARect.peakSignalA, zynthian.status_information.over) * root.width
+                width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.over) * root.width
             }
             Rectangle {
                 id: lowSignalARect
@@ -107,7 +107,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.positiveTextColor
-                width: Math.min(highSignalARect.peakSignalA, zynthian.status_information.high) * root.width
+                width: Math.min(highSignalARect.peakSignalA, zynqtgui.status_information.high) * root.width
             }
         }
 
@@ -122,7 +122,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackBHold / zynthian.status_information.rangedB), 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackBHold / zynqtgui.status_information.rangedB), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -149,7 +149,7 @@ MouseArea {
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
                 width: Math.min(highSignalBRect.peakSignalB, 1) * root.width
-                property double peakSignalB: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackB / zynthian.status_information.rangedB), 1)
+                property double peakSignalB: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackB / zynqtgui.status_information.rangedB), 1)
             }
             Rectangle {
                 id: mediumSignalBRect
@@ -160,7 +160,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.neutralTextColor
-                width: Math.min(highSignalBRect.peakSignalB, zynthian.status_information.over) * root.width
+                width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.over) * root.width
             }
             Rectangle {
                 id: lowSignalBRect
@@ -171,7 +171,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.positiveTextColor
-                width: Math.min(highSignalBRect.peakSignalB, zynthian.status_information.high) * root.width
+                width: Math.min(highSignalBRect.peakSignalB, zynqtgui.status_information.high) * root.width
             }
         }
     }
@@ -189,7 +189,7 @@ MouseArea {
             color: Kirigami.Theme.textColor
             font.pixelSize: Math.floor(statusIconsLayout.height / 2)
             text: "ALT"
-            visible: zynthian.altButtonPressed
+            visible: zynqtgui.altButtonPressed
             Rectangle {
                 anchors {
                     fill: parent
@@ -208,13 +208,13 @@ MouseArea {
             Layout.preferredWidth: height
             source: "dialog-warning-symbolic"
             color: Kirigami.Theme.negativeTextColor
-            visible: zynthian.status_information.xrun
+            visible: zynqtgui.status_information.xrun
         }
         Kirigami.Icon {
             Layout.fillHeight: true
             Layout.preferredWidth: height
             source: "preferences-system-power"
-            visible: zynthian.status_information.undervoltage
+            visible: zynqtgui.status_information.undervoltage
         }
         Kirigami.Icon {
             id: audioRecorderIcon
@@ -224,7 +224,7 @@ MouseArea {
             source: "media-playback-start-symbolic";
             function updateIcon() {
                 if (audioRecorderIcon.visible) {
-                    switch(zynthian.status_information.audio_recorder) {
+                    switch(zynqtgui.status_information.audio_recorder) {
                     case "PLAY":
                         if (audioRecorderIcon.source !== "media-playback-start-symbolic") {
                             audioRecorderIcon.source = "media-playback-start-symbolic";
@@ -240,7 +240,7 @@ MouseArea {
                 }
             }
             Connections {
-                target: zynthian.status_information
+                target: zynqtgui.status_information
                 onAudio_recorderChanged: audioRecorderIcon.updateIcon();
             }
             onVisibleChanged: audioRecorderIcon.updateIcon();
@@ -252,7 +252,7 @@ MouseArea {
                 font.pointSize: 6
                 text: qsTr("Audio")
             }
-            visible: zynthian.status_information.audio_recorder.length > 0
+            visible: zynqtgui.status_information.audio_recorder.length > 0
         }
         Kirigami.Icon {
             id: midiRecorderIcon
@@ -262,7 +262,7 @@ MouseArea {
             source: "media-playback-start-symbolic"
             function updateIcon() {
                 if (midiRecorderIcon.visible) {
-                    switch(zynthian.status_information.midi_recorder) {
+                    switch(zynqtgui.status_information.midi_recorder) {
                     case "PLAY":
                         if (midiRecorderIcon.source !== "media-playback-start-symbolic") {
                             midiRecorderIcon.source = "media-playback-start-symbolic";
@@ -278,7 +278,7 @@ MouseArea {
                 }
             }
             Connections {
-                target: zynthian.status_information
+                target: zynqtgui.status_information
                 onMidi_recorderChanged: midiRecorderIcon.updateIcon()
             }
             onVisibleChanged: midiRecorderIcon.updateIcon()
@@ -290,7 +290,7 @@ MouseArea {
                 font.pointSize: 6
                 text: "Midi"
             }
-            visible: zynthian.status_information.midi_recorder.length > 0
+            visible: zynqtgui.status_information.midi_recorder.length > 0
         }
         QQC2.Label {
             visible: ZynQuick.PlayGridManager.hardwareInActiveNotes.length > 0
@@ -316,8 +316,8 @@ MouseArea {
         QQC2.Label {
             id: metronomeLabel
             text: {
-                if (zynthian.sketchpad.isMetronomeRunning && zynthian.sketchpad.currentBeat >= 0 && zynthian.sketchpad.currentBar >= 0) {
-                    return (zynthian.sketchpad.currentBar+1) + "." + (zynthian.sketchpad.currentBeat+1)
+                if (zynqtgui.sketchpad.isMetronomeRunning && zynqtgui.sketchpad.currentBeat >= 0 && zynqtgui.sketchpad.currentBar >= 0) {
+                    return (zynqtgui.sketchpad.currentBar+1) + "." + (zynqtgui.sketchpad.currentBeat+1)
                 } else {
                     return "1.1"
                 }
@@ -329,8 +329,8 @@ MouseArea {
             QQC2.Label {
                 id: bpmLabel
                 // Hide scale info for now
-                // text: zynthian.sketchpad.song.selectedScale +" "+ zynthian.sketchpad.song.bpm
-                text: zynthian.sketchpad.song.bpm
+                // text: zynqtgui.sketchpad.song.selectedScale +" "+ zynqtgui.sketchpad.song.bpm
+                text: zynqtgui.sketchpad.song.bpm
                 font.pointSize: 9
             }
             Kirigami.Icon {
@@ -338,7 +338,7 @@ MouseArea {
                 Layout.preferredHeight: 24
                 source: Qt.resolvedUrl("../../img/metronome.svg")
                 color: "#ffffff"
-                opacity: zynthian.sketchpad.clickChannelEnabled ? 1.0 : 0.0
+                opacity: zynqtgui.sketchpad.clickChannelEnabled ? 1.0 : 0.0
             }
         }
     }
@@ -355,12 +355,12 @@ MouseArea {
             }
         }
 
-        visible: zynthian.globalPopupOpened
+        visible: zynqtgui.globalPopupOpened
         y: parent.height
         x: parent.width - width
         width: Kirigami.Units.gridUnit * 20
         height: Kirigami.Units.gridUnit * 25
-        onClosed: zynthian.globalPopupOpened = false
+        onClosed: zynqtgui.globalPopupOpened = false
         contentItem: Item {
             GridLayout {
                 anchors.fill: parent;
@@ -372,7 +372,7 @@ MouseArea {
                     contentItem: SketchpadDial {
                         id: bpmDial
                         text: qsTr("BPM")
-                        controlObj: zynthian.sketchpad.song
+                        controlObj: zynqtgui.sketchpad.song
                         controlProperty: "bpm"
 
                         dial {
@@ -403,7 +403,7 @@ MouseArea {
                                 }
                                 var average = sum / differences.length;
                                 bpmDial.bpm = 60000 / average;
-                                zynthian.sketchpad.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
+                                zynqtgui.sketchpad.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
                             }
                         }
                     }
@@ -417,11 +417,11 @@ MouseArea {
                         SketchpadMultiSwitch {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            controlObj: zynthian.sketchpad.song
+                            controlObj: zynqtgui.sketchpad.song
                             controlProperty: "selectedScaleIndex"
                             from: 0
                             to: 11
-                            text: zynthian.sketchpad.song.selectedScale
+                            text: zynqtgui.sketchpad.song.selectedScale
                         }
                         QQC2.Label {
                             text: qsTr("Scale")
@@ -437,7 +437,7 @@ MouseArea {
                     contentItem: SketchpadDial {
                         id: volumeDial
                         text: qsTr("Volume")
-                        controlObj: zynthian.master_alsa_mixer
+                        controlObj: zynqtgui.master_alsa_mixer
                         controlProperty: "volume"
                         valueString: qsTr("%1%").arg(dial.value)
 
@@ -455,7 +455,7 @@ MouseArea {
                     Layout.preferredWidth: 1
                     contentItem: SketchpadDial {
                         text: qsTr("Delay")
-                        controlObj: zynthian
+                        controlObj: zynqtgui
                         controlProperty: "delayKnobValue"
                         valueString: qsTr("%1%").arg(dial.value)
 
@@ -504,7 +504,7 @@ MouseArea {
                     Layout.preferredWidth: 1
                     contentItem: SketchpadDial {
                         text: qsTr("Reverb")
-                        controlObj: zynthian
+                        controlObj: zynqtgui
                         controlProperty: "reverbKnobValue"
                         valueString: qsTr("%1%").arg(dial.value)
 
@@ -530,9 +530,9 @@ MouseArea {
                             implicitWidth: Kirigami.Units.gridUnit * 3
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            checked: zynthian.sketchpad.clickChannelEnabled
+                            checked: zynqtgui.sketchpad.clickChannelEnabled
                             onToggled: {
-                                zynthian.sketchpad.clickChannelEnabled = checked
+                                zynqtgui.sketchpad.clickChannelEnabled = checked
                             }
                         }
                         Item {
@@ -545,7 +545,7 @@ MouseArea {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
                     text: qsTr("Stop All Notes")
-                    onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
+                    onClicked: zynqtgui.callable_ui_action("ALL_NOTES_OFF")
                 }
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -563,9 +563,9 @@ MouseArea {
             visible: false
             anchors.fill: parent
             Connections {
-                target: zynthian
+                target: zynqtgui
                 onGlobalPopupOpenedChanged: {
-                    if (zynthian.globalPopupOpened === false) {
+                    if (zynqtgui.globalPopupOpened === false) {
                         bluetoothSetup.hide();
                     }
                 }

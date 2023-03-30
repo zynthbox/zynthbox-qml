@@ -51,7 +51,7 @@ RowLayout {
             text: qsTr("WIP Discover")
             MouseArea {
                 anchors.fill: parent
-                //onClicked: zynthian.current_modal_screen_id = "sketchpad_copier"
+                //onClicked: zynqtgui.current_modal_screen_id = "sketchpad_copier"
             }
         }
         QQC2.ScrollView {

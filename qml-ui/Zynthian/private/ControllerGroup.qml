@@ -46,15 +46,15 @@ QtObject {
                 return;
             }
             if (category.length > 0 && category.indexOf("amixer_") === 0) {
-                root.ctrl = zynthian.control.amixer_controller_by_category(root.category.substring(7), root.index);
+                root.ctrl = zynqtgui.control.amixer_controller_by_category(root.category.substring(7), root.index);
                 print(root.ctrl)
             } else if (category.length > 0) {
-                root.ctrl = zynthian.control.controller_by_category(root.category, root.index);
+                root.ctrl = zynqtgui.control.controller_by_category(root.category, root.index);
             } else {
-                root.ctrl = zynthian.control.controller(root.index);
+                root.ctrl = zynqtgui.control.controller(root.index);
             }
         }
-        target: zynthian.control
+        target: zynqtgui.control
         onControllers_changed: syncCtrl()
     }
 }

@@ -32,7 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
-    readonly property QtObject arranger: zynthian.song_arranger
+    readonly property QtObject arranger: zynqtgui.song_arranger
 
     id: root
 

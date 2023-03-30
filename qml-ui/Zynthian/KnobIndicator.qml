@@ -146,16 +146,16 @@ Item {
         }
     }
     Connections {
-        target: zynthian.playgrid
+        target: zynqtgui.playgrid
         enabled: component.enabled && component.knobId > -1 && component.knobId < 4
         onBigKnobValueChanged: {
             if (component.knobId === 0) {
-                if (zynthian.playgrid.bigKnobValue < 0) {
-                    for (var i = zynthian.playgrid.bigKnobValue; i < 0; ++i) {
+                if (zynqtgui.playgrid.bigKnobValue < 0) {
+                    for (var i = zynqtgui.playgrid.bigKnobValue; i < 0; ++i) {
                         component.knobDown();
                     }
-                } else if (zynthian.playgrid.bigKnobValue > 0) {
-                    for (var i = zynthian.playgrid.bigKnobValue; i > 0; --i) {
+                } else if (zynqtgui.playgrid.bigKnobValue > 0) {
+                    for (var i = zynqtgui.playgrid.bigKnobValue; i > 0; --i) {
                         component.knobUp();
                     }
                 } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
@@ -163,12 +163,12 @@ Item {
         }
         onKnob1ValueChanged: {
             if (component.knobId === 1) {
-                if (zynthian.playgrid.knob1Value < 0) {
-                    for (var i = zynthian.playgrid.knob1Value; i < 0; ++i) {
+                if (zynqtgui.playgrid.knob1Value < 0) {
+                    for (var i = zynqtgui.playgrid.knob1Value; i < 0; ++i) {
                         component.knobDown();
                     }
-                } else if (zynthian.playgrid.knob1Value > 0) {
-                    for (var i = zynthian.playgrid.knob1Value; i > 0; --i) {
+                } else if (zynqtgui.playgrid.knob1Value > 0) {
+                    for (var i = zynqtgui.playgrid.knob1Value; i > 0; --i) {
                         component.knobUp();
                     }
                 } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
@@ -176,12 +176,12 @@ Item {
         }
         onKnob2ValueChanged: {
             if (component.knobId === 2) {
-                if (zynthian.playgrid.knob2Value < 0) {
-                    for (var i = zynthian.playgrid.knob2Value; i < 0; ++i) {
+                if (zynqtgui.playgrid.knob2Value < 0) {
+                    for (var i = zynqtgui.playgrid.knob2Value; i < 0; ++i) {
                         component.knobDown();
                     }
-                } else if (zynthian.playgrid.knob2Value > 0) {
-                    for (var i = zynthian.playgrid.knob2Value; i > 0; --i) {
+                } else if (zynqtgui.playgrid.knob2Value > 0) {
+                    for (var i = zynqtgui.playgrid.knob2Value; i > 0; --i) {
                         component.knobUp();
                     }
                 } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
@@ -189,12 +189,12 @@ Item {
         }
         onKnob3ValueChanged: {
             if (component.knobId === 3 && component.visible) {
-                if (zynthian.playgrid.knob3Value < 0) {
-                    for (var i = zynthian.playgrid.knob3Value; i < 0; ++i) {
+                if (zynqtgui.playgrid.knob3Value < 0) {
+                    for (var i = zynqtgui.playgrid.knob3Value; i < 0; ++i) {
                         component.knobDown();
                     }
-                } else if (zynthian.playgrid.knob3Value > 0) {
-                    for (var i = zynthian.playgrid.knob3Value; i > 0; --i) {
+                } else if (zynqtgui.playgrid.knob3Value > 0) {
+                    for (var i = zynqtgui.playgrid.knob3Value; i > 0; --i) {
                         component.knobUp();
                     }
                 } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out

@@ -33,10 +33,10 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    title: zynthian.control.selector_path_element
+    title: zynqtgui.control.selector_path_element
 
     screenId: "control"
-    property bool isVisible:zynthian.current_screen_id === "control"
+    property bool isVisible:zynqtgui.current_screen_id === "control"
     property var cuiaCallback: function(cuia) {
         if (!stack.currentItem
             || !stack.currentItem.hasOwnProperty("cuiaCallback")
@@ -56,7 +56,7 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             id: viewAction
             text: qsTr("Select Mod")
-            enabled: zynthian.control.control_pages_model.count > 1
+            enabled: zynqtgui.control.control_pages_model.count > 1
             property QQC2.Menu menuDelegate: customControlsMenu
         },
         Kirigami.Action {
@@ -64,7 +64,7 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Get New Mods...")
-            onTriggered: zynthian.control.single_effect_engine === "" ? zynthian.show_modal("control_downloader") : zynthian.show_modal("fx_control_downloader")
+            onTriggered: zynqtgui.control.single_effect_engine === "" ? zynqtgui.show_modal("control_downloader") : zynqtgui.show_modal("fx_control_downloader")
         }
     ]
 
@@ -79,9 +79,9 @@ Zynthian.ScreenPage {
                 candidate = candidate.parent
             }
             if (candidate) {
-                zynthian.control.active_custom_controller = candidate.controller.ctrl
+                zynqtgui.control.active_custom_controller = candidate.controller.ctrl
             } else {
-                zynthian.control.active_custom_controller = null
+                zynqtgui.control.active_custom_controller = null
             }
         }
     }
@@ -91,9 +91,9 @@ Zynthian.ScreenPage {
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
                 if (applicationWindow().selectedChannel.channelAudioType === "external") {
-                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 } else if (applicationWindow().selectedChannel.channelAudioType.startsWith("sample-")) {
-                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 }
             }
         }
@@ -102,19 +102,19 @@ Zynthian.ScreenPage {
         id: customControlsMenu
         y: -height
         Repeater {
-            model: zynthian.control.control_pages_model
+            model: zynqtgui.control.control_pages_model
             delegate: QQC2.MenuItem {
                 id: menuItem
                 text: model.display
                 checkable: true
                 autoExclusive: true
                 checked: model.path == ""
-                    ? (zynthian.control.custom_control_page == "")
-                    : (zynthian.control.custom_control_page.indexOf(model.path) == 0)
+                    ? (zynqtgui.control.custom_control_page == "")
+                    : (zynqtgui.control.custom_control_page.indexOf(model.path) == 0)
 
                 onClicked: {
-                    zynthian.control.refresh_values()
-                    zynthian.control.custom_control_page = model.path
+                    zynqtgui.control.refresh_values()
+                    zynqtgui.control.custom_control_page = model.path
                 }
             }
         }
@@ -126,9 +126,9 @@ Zynthian.ScreenPage {
         if (!root.visible) {
             return;
         }
-        if (zynthian.control.custom_control_page.length > 0) {
-            stack.replace(zynthian.control.custom_control_page);
-            root.currentControlPage = zynthian.control.custom_control_page;
+        if (zynqtgui.control.custom_control_page.length > 0) {
+            stack.replace(zynqtgui.control.custom_control_page);
+            root.currentControlPage = zynqtgui.control.custom_control_page;
         } else {
             stack.replace(defaultPage);
             root.currentControlPage = "defaultPage";
@@ -136,10 +136,10 @@ Zynthian.ScreenPage {
     }
 
     onVisibleChanged: {
-        if (zynthian.control.custom_control_page.length > 0) {
-            if (root.currentControlPage !== zynthian.control.custom_control_page) {
-                stack.replace(zynthian.control.custom_control_page);
-                root.currentControlPage = zynthian.control.custom_control_page;
+        if (zynqtgui.control.custom_control_page.length > 0) {
+            if (root.currentControlPage !== zynqtgui.control.custom_control_page) {
+                stack.replace(zynqtgui.control.custom_control_page);
+                root.currentControlPage = zynqtgui.control.custom_control_page;
             }
         } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
             stack.replace(defaultPage);
@@ -148,15 +148,15 @@ Zynthian.ScreenPage {
     }
     property string currentControlPage
     Connections {
-        target: zynthian.control
+        target: zynqtgui.control
         onCustom_control_pageChanged: {
             if (!root.visible) {
                 return;
             }
-            if (zynthian.control.custom_control_page.length > 0) {
-                if (root.currentControlPage !== zynthian.control.custom_control_page) {
-                    stack.replace(zynthian.control.custom_control_page);
-                    root.currentControlPage = zynthian.control.custom_control_page;
+            if (zynqtgui.control.custom_control_page.length > 0) {
+                if (root.currentControlPage !== zynqtgui.control.custom_control_page) {
+                    stack.replace(zynqtgui.control.custom_control_page);
+                    root.currentControlPage = zynqtgui.control.custom_control_page;
                 }
             } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
                 stack.replace(defaultPage);
@@ -166,9 +166,9 @@ Zynthian.ScreenPage {
     }
     Connections {
         id: currentConnection
-        target: zynthian
+        target: zynqtgui
         onCurrent_screen_idChanged: {
-            root.visible = zynthian.current_screen_id === "control";
+            root.visible = zynqtgui.current_screen_id === "control";
         }
     }
 

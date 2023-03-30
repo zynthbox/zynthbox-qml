@@ -37,7 +37,7 @@ Zynthian.ScreenPage {
     id: component
     screenId: "channel_external_setup"
     title: qsTr("Channel External Setup")
-    property bool isVisible:zynthian.current_screen_id === "channel_external_setup"
+    property bool isVisible:zynqtgui.current_screen_id === "channel_external_setup"
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
@@ -57,47 +57,47 @@ Zynthian.ScreenPage {
         return returnValue;
     }
     Connections {
-        target: zynthian.channel_external_setup
+        target: zynqtgui.channel_external_setup
         onBigKnobValueChanged: {
-            if (zynthian.channel_external_setup.bigKnobValue < 0) {
-                for (var i = zynthian.channel_external_setup.bigKnobValue; i < 0; ++i) {
+            if (zynqtgui.channel_external_setup.bigKnobValue < 0) {
+                for (var i = zynqtgui.channel_external_setup.bigKnobValue; i < 0; ++i) {
                     _private.goLeft();
                 }
-            } else if (zynthian.channel_external_setup.bigKnobValue > 0) {
-                for (var i = zynthian.channel_external_setup.bigKnobValue; i > 0; --i) {
+            } else if (zynqtgui.channel_external_setup.bigKnobValue > 0) {
+                for (var i = zynqtgui.channel_external_setup.bigKnobValue; i > 0; --i) {
                     _private.goRight();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
         }
         onKnob1ValueChanged: {
-            if (zynthian.channel_external_setup.knob1Value < 0) {
-                for (var i = zynthian.channel_external_setup.knob1Value; i < 0; ++i) {
+            if (zynqtgui.channel_external_setup.knob1Value < 0) {
+                for (var i = zynqtgui.channel_external_setup.knob1Value; i < 0; ++i) {
                     _private.knob1Down();
                 }
-            } else if (zynthian.channel_external_setup.knob1Value > 0) {
-                for (var i = zynthian.channel_external_setup.knob1Value; i > 0; --i) {
+            } else if (zynqtgui.channel_external_setup.knob1Value > 0) {
+                for (var i = zynqtgui.channel_external_setup.knob1Value; i > 0; --i) {
                     _private.knob1Up();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
         }
         onKnob2ValueChanged: {
-            if (zynthian.channel_external_setup.knob2Value < 0) {
-                for (var i = zynthian.channel_external_setup.knob2Value; i < 0; ++i) {
+            if (zynqtgui.channel_external_setup.knob2Value < 0) {
+                for (var i = zynqtgui.channel_external_setup.knob2Value; i < 0; ++i) {
                     _private.knob2Down();
                 }
-            } else if (zynthian.channel_external_setup.knob2Value > 0) {
-                for (var i = zynthian.channel_external_setup.knob2Value; i > 0; --i) {
+            } else if (zynqtgui.channel_external_setup.knob2Value > 0) {
+                for (var i = zynqtgui.channel_external_setup.knob2Value; i > 0; --i) {
                     _private.knob2Up();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
         }
         onKnob3ValueChanged: {
-            if (zynthian.channel_external_setup.knob3Value < 0) {
-                for (var i = zynthian.channel_external_setup.knob3Value; i < 0; ++i) {
+            if (zynqtgui.channel_external_setup.knob3Value < 0) {
+                for (var i = zynqtgui.channel_external_setup.knob3Value; i < 0; ++i) {
                     _private.knob3Down();
                 }
-            } else if (zynthian.channel_external_setup.knob3Value > 0) {
-                for (var i = zynthian.channel_external_setup.knob3Value; i > 0; --i) {
+            } else if (zynqtgui.channel_external_setup.knob3Value > 0) {
+                for (var i = zynqtgui.channel_external_setup.knob3Value; i > 0; --i) {
                     _private.knob3Up();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
@@ -135,9 +135,9 @@ Zynthian.ScreenPage {
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
                 if (applicationWindow().selectedChannel.channelAudioType === "synth") {
-                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 } else if (applicationWindow().selectedChannel.channelAudioType.startsWith("sample-")) {
-                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 }
             }
         }

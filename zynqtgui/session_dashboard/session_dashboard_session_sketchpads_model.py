@@ -90,7 +90,7 @@ class session_dashboard_session_sketchpads_model(QAbstractListModel):
             self.__sketchpads__[slot] = sketchpad
         else:
             sketchpad_path = Path(sketchpad)
-            self.__sketchpads__[slot] = sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem), self.__session_dashboard__.zyngui.sketchpad)
+            self.__sketchpads__[slot] = sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem), self.__session_dashboard__.zynqtgui.sketchpad)
             logging.debug(f"Session add sketchpad : {slot}, {sketchpad_path}, {self.__sketchpads__[slot]}")
 
         self.endInsertRows()

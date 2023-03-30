@@ -30,7 +30,7 @@ from .. import zynthian_qt_gui_base
 from zynqtgui.sketchpad.sketchpad_channel import sketchpad_channel
 
 
-class zynthian_gui_sketchpad_copier(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_sketchpad_copier(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_sketchpad_copier, self).__init__(parent)
         self.__channel_copy_cache__ = None
@@ -93,6 +93,6 @@ class zynthian_gui_sketchpad_copier(zynthian_qt_gui_base.ZynGui):
 
     @Slot(int)
     def setSketchpadSlot(self, slot):
-        self.zyngui.session_dashboard.setSketchpadSlot(slot, self.__add_sketchpad_path__)
+        self.zynqtgui.session_dashboard.setSketchpadSlot(slot, self.__add_sketchpad_path__)
         self.__add_sketchpad_path__ = ""
         self.add_sketchpad_path_changed.emit()

@@ -42,13 +42,13 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            readonly property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+            readonly property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
 
             text: qsTr("Clear Slot")
-            enabled: selectedChannel.checkIfLayerExists(zynthian.active_midi_channel)
+            enabled: selectedChannel.checkIfLayerExists(zynqtgui.active_midi_channel)
             onTriggered: {
-                selectedChannel.remove_and_unchain_sound(zynthian.active_midi_channel)
-                zynthian.show_modal("sketchpad")
+                selectedChannel.remove_and_unchain_sound(zynqtgui.active_midi_channel)
+                zynqtgui.show_modal("sketchpad")
             }
         }
     ]
@@ -104,32 +104,32 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checkable: true
-                checked: zynthian.engine.shown_category == "Instrument"
+                checked: zynqtgui.engine.shown_category == "Instrument"
                 autoExclusive: true
                 text: qsTr("LV2 Instruments")
                 onToggled: {
                     if (checked) {
-                        zynthian.engine.shown_category = "Instrument";
+                        zynqtgui.engine.shown_category = "Instrument";
                     }
                 }
                 Component.onCompleted: {
-                    if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
-                        zynthian.engine.synth_engine_type !== "MIDI Tool") {
-                        zynthian.engine.shown_category = "Instrument";
+                    if (zynqtgui.engine.synth_engine_type !== "Audio Effect" &&
+                        zynqtgui.engine.synth_engine_type !== "MIDI Tool") {
+                        zynqtgui.engine.shown_category = "Instrument";
                     } else {
-                        zynthian.engine.shown_category = null;
+                        zynqtgui.engine.shown_category = null;
                     }
-                    zynthian.engine.current_index = -1;
+                    zynqtgui.engine.current_index = -1;
                     view.contentY = 0;
                 }
                 Connections {
-                    target: zynthian.engine
+                    target: zynqtgui.engine
                     onSynth_engine_typeChanged: {
-                        if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
-                            zynthian.engine.synth_engine_type !== "MIDI Tool") {
-                            zynthian.engine.shown_category = "Instrument";
+                        if (zynqtgui.engine.synth_engine_type !== "Audio Effect" &&
+                            zynqtgui.engine.synth_engine_type !== "MIDI Tool") {
+                            zynqtgui.engine.shown_category = "Instrument";
                         } else {
-                            zynthian.engine.shown_category = null;
+                            zynqtgui.engine.shown_category = null;
                         }
                     }
                 }
@@ -139,12 +139,12 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checkable: true
-                checked: zynthian.engine.shown_category == "None"
+                checked: zynqtgui.engine.shown_category == "None"
                 autoExclusive: true
                 text: qsTr("Other Synths")
                 onToggled: {
                     if (checked) {
-                        zynthian.engine.shown_category = "None";
+                        zynqtgui.engine.shown_category = "None";
                     }
                 }
             }
@@ -177,14 +177,14 @@ Zynthian.ScreenPage {
                     clip: true
                     cellWidth: width / 3
                     cellHeight: height / 2.2
-                    currentIndex: zynthian.engine.current_index
+                    currentIndex: zynqtgui.engine.current_index
                     onCurrentIndexChanged: {
-                        if (zynthian.engine.current_index != currentIndex) {
-                            zynthian.engine.current_index = currentIndex;
+                        if (zynqtgui.engine.current_index != currentIndex) {
+                            zynqtgui.engine.current_index = currentIndex;
                         }
                     }
 
-                    model: zynthian.engine.selector_list
+                    model: zynqtgui.engine.selector_list
 
                     delegate: QQC2.AbstractButton {
                         width: view.cellWidth - Kirigami.Units.gridUnit
@@ -195,8 +195,8 @@ Zynthian.ScreenPage {
                         rightPadding: Kirigami.Units.largeSpacing
                         bottomPadding: Kirigami.Units.largeSpacing
                         onClicked: {
-                            zynthian.engine.current_index = index;
-                            zynthian.engine.activate_index(index);
+                            zynqtgui.engine.current_index = index;
+                            zynqtgui.engine.activate_index(index);
                             delegate.itemActivated(delegate.screenId, index);
                         }
 

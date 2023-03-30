@@ -103,8 +103,8 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 	# Initialization
 	#----------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 		self.name = "ZynAddSubFX"
 		self.nickname = "ZY"
 		self.jackname = "zynaddsubfx"
@@ -114,13 +114,13 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 		self.osc_target_port = 6693
 
 		try:
-			self.sr = int(self.zyngui.get_jackd_samplerate())
+			self.sr = int(self.zynqtgui.get_jackd_samplerate())
 		except Exception as e:
 			logging.error(e)
 			self.sr = 44100
 
 		try:
-			self.bs = int(self.zyngui.get_jackd_blocksize())
+			self.bs = int(self.zynqtgui.get_jackd_blocksize())
 		except Exception as e:
 			logging.error(e)
 			self.bs = 256
@@ -290,7 +290,7 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 		#self.osc_server.add_method("/automate/active-slot", 'i', self.cb_osc_automate_active_slot)
 		#for i in range(0,16):
 			#self.osc_server.add_method("/automate/slot%d/midi-cc" % i, 'i', self.cb_osc_automate_slot_midi_cc)
-		#self.osc_server.add_method(None, 'i', self.zyngui.cb_osc_ctrl)
+		#self.osc_server.add_method(None, 'i', self.zynqtgui.cb_osc_ctrl)
 		#super().osc_add_methods()
 
 
@@ -398,8 +398,8 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 				zctrl.set_value(args[0])
 
 				#Refresh GUI controller in screen when needed ...
-				if self.zyngui.active_screen=='control' and not self.zyngui.modal_screen:
-					self.zyngui.screens['control'].set_controller_value(zctrl)
+				if self.zynqtgui.active_screen=='control' and not self.zynqtgui.modal_screen:
+					self.zynqtgui.screens['control'].set_controller_value(zctrl)
 			except:
 				pass
 
@@ -429,8 +429,8 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 
 	def cb_osc_paths(self, path, args, types, src):
 		self.get_cb_osc_paths(path, args, types, src)
-		self.zyngui.screens['control'].list_data=self.osc_paths_data
-		self.zyngui.screens['control'].fill_list()
+		self.zynqtgui.screens['control'].list_data=self.osc_paths_data
+		self.zynqtgui.screens['control'].fill_list()
 
 
 	def get_cb_osc_paths(self, path, args, types, src):

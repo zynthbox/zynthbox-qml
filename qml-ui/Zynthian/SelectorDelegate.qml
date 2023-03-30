@@ -69,21 +69,21 @@ QQC2.ItemDelegate {
     }
 
     onClicked: {
-        let oldCurrent_screen_id = zynthian.current_screen_id;
+        let oldCurrent_screen_id = zynqtgui.current_screen_id;
         delegate.selector.current_index = index;
         delegate.selector.activate_index(index);
         delegate.itemActivated(delegate.screenId, index);
         // if the activation didn't explicitly ask for a new screen, set the current as this
-        if (zynthian.current_screen_id === oldCurrent_screen_id) {
+        if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
             delegate.currentScreenIdRequested(screenId);
         }
     }
     onPressAndHold: {
-        let oldCurrent_screen_id = zynthian.current_screen_id;
+        let oldCurrent_screen_id = zynqtgui.current_screen_id;
         delegate.selector.current_index = index;
         delegate.selector.activate_index_secondary(index);
         delegate.itemActivatedSecondary(delegate.screenId, index);
-        if (zynthian.current_screen_id === oldCurrent_screen_id) {
+        if (zynqtgui.current_screen_id === oldCurrent_screen_id) {
             delegate.currentScreenIdRequested(screenId);
         }
     }

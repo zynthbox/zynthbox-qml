@@ -57,8 +57,8 @@ class zynthian_engine_modui(zynthian_engine):
 	# Initialization
 	# ---------------------------------------------------------------------------
 
-	def __init__(self, zyngui=None):
-		super().__init__(zyngui)
+	def __init__(self, zynqtgui=None):
+		super().__init__(zynqtgui)
 
 		self.type = "Special"
 		self.name = "MOD-UI"
@@ -475,7 +475,7 @@ class zynthian_engine_modui(zynthian_engine):
 					bank_name=layer.bank_list[i][2]
 					#Set Bank in GUI, layer and engine without reloading the bundle
 					logging.info('Bank Selected from Bundlepath: ' + bank_name + ' (' + str(i)+')')
-					self.zyngui.screens['bank'].select(i)
+					self.zynqtgui.screens['bank'].select(i)
 					layer.set_bank(i,False)
 					break
 
@@ -695,8 +695,8 @@ class zynthian_engine_modui(zynthian_engine):
 			zctrl.value=float(val)
 
 			#Refresh GUI controller in screen when needed ...
-			if self.zyngui.active_screen=='control' and not self.zyngui.modal_screen:
-				self.zyngui.screens['control'].set_controller_value(zctrl)
+			if self.zynqtgui.active_screen=='control' and not self.zynqtgui.modal_screen:
+				self.zynqtgui.screens['control'].set_controller_value(zctrl)
 
 		except Exception as err:
 			logging.error("Parameter Not Found: "+pgraph+"/"+symbol+" => "+str(err))
@@ -707,7 +707,7 @@ class zynthian_engine_modui(zynthian_engine):
 		try:
 			i=self.plugin_info[pgraph]['presets_dict'][uri]
 			self.layers[0].set_preset(i, False)
-			self.zyngui.screens['control'].set_select_path()
+			self.zynqtgui.screens['control'].set_select_path()
 
 		except Exception as e:
 			logging.error("Preset Not Found: {}/{} => {}".format(pgraph, uri, e))
@@ -721,7 +721,7 @@ class zynthian_engine_modui(zynthian_engine):
 			preset_entries = list(self.pedal_presets.values())
 			i = preset_entries.index(preset_entry)
 			self.layers[0].set_preset(i, False)
-			self.zyngui.screens['control'].set_select_path()
+			self.zynqtgui.screens['control'].set_select_path()
 
 		except Exception as e:
 			logging.error("Preset Not Found: {}".format(preset))

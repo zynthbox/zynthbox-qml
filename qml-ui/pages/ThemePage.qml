@@ -35,7 +35,7 @@ Zynthian.SelectorPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Get New Themes")
-            onTriggered: zynthian.show_modal("theme_downloader")
+            onTriggered: zynqtgui.show_modal("theme_downloader")
         }
     ]
 }

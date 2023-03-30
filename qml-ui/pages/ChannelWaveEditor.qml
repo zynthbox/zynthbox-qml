@@ -40,10 +40,10 @@ Zynthian.ScreenPage {
     screenId: "channel_wave_editor"
     title: qsTr("Channel Wave Editor")
 
-    property bool isVisible:zynthian.current_screen_id === "channel_wave_editor"
+    property bool isVisible:zynqtgui.current_screen_id === "channel_wave_editor"
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property QtObject selectedClip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
-                                        ? component.selectedChannel.getClipsModelByPart(selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+                                        ? component.selectedChannel.getClipsModelByPart(selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
                                         : component.selectedChannel.samples[selectedChannel.selectedSlotRow]
     property bool selectedClipHasWav: selectedClip && selectedClip.path && selectedClip.path.length > 0
 
@@ -66,47 +66,47 @@ Zynthian.ScreenPage {
         return returnValue;
     }
     Connections {
-        target: zynthian.channel_wave_editor
+        target: zynqtgui.channel_wave_editor
         onBigKnobValueChanged: {
-            if (zynthian.channel_wave_editor.bigKnobValue < 0) {
-                for (var i = zynthian.channel_wave_editor.bigKnobValue; i < 0; ++i) {
+            if (zynqtgui.channel_wave_editor.bigKnobValue < 0) {
+                for (var i = zynqtgui.channel_wave_editor.bigKnobValue; i < 0; ++i) {
                     _private.goLeft();
                 }
-            } else if (zynthian.channel_wave_editor.bigKnobValue > 0) {
-                for (var i = zynthian.channel_wave_editor.bigKnobValue; i > 0; --i) {
+            } else if (zynqtgui.channel_wave_editor.bigKnobValue > 0) {
+                for (var i = zynqtgui.channel_wave_editor.bigKnobValue; i > 0; --i) {
                     _private.goRight();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
         }
         onKnob1ValueChanged: {
-            if (zynthian.channel_wave_editor.knob1Value < 0) {
-                for (var i = zynthian.channel_wave_editor.knob1Value; i < 0; ++i) {
+            if (zynqtgui.channel_wave_editor.knob1Value < 0) {
+                for (var i = zynqtgui.channel_wave_editor.knob1Value; i < 0; ++i) {
                     _private.knob1Down();
                 }
-            } else if (zynthian.channel_wave_editor.knob1Value > 0) {
-                for (var i = zynthian.channel_wave_editor.knob1Value; i > 0; --i) {
+            } else if (zynqtgui.channel_wave_editor.knob1Value > 0) {
+                for (var i = zynqtgui.channel_wave_editor.knob1Value; i > 0; --i) {
                     _private.knob1Up();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
         }
         onKnob2ValueChanged: {
-            if (zynthian.channel_wave_editor.knob2Value < 0) {
-                for (var i = zynthian.channel_wave_editor.knob2Value; i < 0; ++i) {
+            if (zynqtgui.channel_wave_editor.knob2Value < 0) {
+                for (var i = zynqtgui.channel_wave_editor.knob2Value; i < 0; ++i) {
                     _private.knob2Down();
                 }
-            } else if (zynthian.channel_wave_editor.knob2Value > 0) {
-                for (var i = zynthian.channel_wave_editor.knob2Value; i > 0; --i) {
+            } else if (zynqtgui.channel_wave_editor.knob2Value > 0) {
+                for (var i = zynqtgui.channel_wave_editor.knob2Value; i > 0; --i) {
                     _private.knob2Up();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
         }
         onKnob3ValueChanged: {
-            if (zynthian.channel_wave_editor.knob3Value < 0) {
-                for (var i = zynthian.channel_wave_editor.knob3Value; i < 0; ++i) {
+            if (zynqtgui.channel_wave_editor.knob3Value < 0) {
+                for (var i = zynqtgui.channel_wave_editor.knob3Value; i < 0; ++i) {
                     _private.knob3Down();
                 }
-            } else if (zynthian.channel_wave_editor.knob3Value > 0) {
-                for (var i = zynthian.channel_wave_editor.knob3Value; i > 0; --i) {
+            } else if (zynqtgui.channel_wave_editor.knob3Value > 0) {
+                for (var i = zynqtgui.channel_wave_editor.knob3Value; i > 0; --i) {
                     _private.knob3Up();
                 }
             } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
@@ -167,9 +167,9 @@ Zynthian.ScreenPage {
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
                 if (applicationWindow().selectedChannel.channelAudioType === "synth") {
-                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 } else if (applicationWindow().selectedChannel.channelAudioType === "external") {
-                    zynthian.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 }
             }
         }
@@ -265,7 +265,7 @@ Zynthian.ScreenPage {
                         id: partDelegate
 
                         property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
-                                                            ? component.selectedChannel.getClipsModelByPart(index).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+                                                            ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
                                                             : component.selectedChannel.samples[index]
                         property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
 

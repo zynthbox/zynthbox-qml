@@ -37,7 +37,7 @@ Kirigami.Page {
 
     property Kirigami.Action backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: zynthian.go_back()
+        onTriggered: zynqtgui.go_back()
     }
     property string previousScreen
 
@@ -46,7 +46,7 @@ Kirigami.Page {
     Kirigami.Action {
         id: backAction
         text: qsTr("Back")
-        onTriggered: zynthian.go_back()
+        onTriggered: zynqtgui.go_back()
     }
 
     // This can be a function taking the cuia action name as paramenter. if returns

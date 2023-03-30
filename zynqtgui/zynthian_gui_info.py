@@ -44,7 +44,7 @@ class zynthian_gui_info(QObject):
 	def __init__(self, parent=None):
 		super(zynthian_gui_info, self).__init__(parent)
 		self.shown=False
-		self.zyngui=zynthian_gui_config.zyngui
+		self.zynqtgui=zynthian_gui_config.zynqtgui
 
 		self.prop_text = ''
 
@@ -89,14 +89,14 @@ class zynthian_gui_info(QObject):
 
 	@Slot('void')
 	def back_action(self):
-		self.zyngui.cancel_modal_timer()
-		self.zyngui.screens['admin'].kill_command()
-		self.zyngui.show_modal('admin')
+		self.zynqtgui.cancel_modal_timer()
+		self.zynqtgui.screens['admin'].kill_command()
+		self.zynqtgui.show_modal('admin')
 		return None
 
 
 	def cb_push(self,event):
-		self.zyngui.zynswitch_defered('S',1)
+		self.zynqtgui.zynswitch_defered('S',1)
 
 	def get_text(self):
 		return self.prop_text

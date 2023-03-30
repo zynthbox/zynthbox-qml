@@ -69,7 +69,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
                     horizontalAlignment: TextInput.AlignHCenter
                     readOnly: true
-                    text: zynthian.audio_settings.soundcardName
+                    text: zynqtgui.audio_settings.soundcardName
                 }
             }
 
@@ -86,7 +86,7 @@ Zynthian.ScreenPage {
                 Layout.rightMargin: Kirigami.Units.gridUnit * 2
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 16
                 Repeater {
-                    model: zynthian.audio_settings.channels
+                    model: zynqtgui.audio_settings.channels
                     delegate: ColumnLayout {
                         Sketchpad.VolumeControl {
                             id: volumeDelegate
@@ -106,7 +106,7 @@ Zynthian.ScreenPage {
                                 stepSize: 1
                             }
                             onValueChanged: {
-                                zynthian.audio_settings.setChannelValue(modelData.name, volumeDelegate.slider.value);
+                                zynqtgui.audio_settings.setChannelValue(modelData.name, volumeDelegate.slider.value);
                             }
                         }
                     }

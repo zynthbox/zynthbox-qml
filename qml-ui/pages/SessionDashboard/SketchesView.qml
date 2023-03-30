@@ -51,7 +51,7 @@ RowLayout {
             text: qsTr("Sketchpads")
             MouseArea {
                 anchors.fill: parent
-                onClicked: zynthian.current_modal_screen_id = "sketchpad_copier"
+                onClicked: zynqtgui.current_modal_screen_id = "sketchpad_copier"
             }
         }
         QQC2.ScrollView {
@@ -60,13 +60,13 @@ RowLayout {
             Layout.preferredWidth: 1
             ListView {
                 id: projectView
-                model: zynthian.session_dashboard.sessionSketchpadsModel
+                model: zynqtgui.session_dashboard.sessionSketchpadsModel
                 header: QQC2.Control {
                     width: parent.width
                     height: root.itemHeight
                     contentItem: RowLayout {
                         QQC2.Label {
-                            text: "1. " + zynthian.sketchpad.song.name
+                            text: "1. " + zynqtgui.sketchpad.song.name
                         }
                     }
                     background: Rectangle {

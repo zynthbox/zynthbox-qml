@@ -55,11 +55,11 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Record Song")
-            enabled: zynthian.sketchpad.song.sketchesModel.songMode
-                ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0
+            enabled: zynqtgui.sketchpad.song.sketchesModel.songMode
+                ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0
                 : true
             onTriggered: {
-                multichannelRecorderPopup.recordSong(zynthian.sketchpad.song)
+                multichannelRecorderPopup.recordSong(zynqtgui.sketchpad.song)
             }
         }
     ]
@@ -78,9 +78,9 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.preferredWidth: component.width * 2 / 12
                 text: qsTr("Song Mode")
-                checked: zynthian.sketchpad.song.sketchesModel.songMode
+                checked: zynqtgui.sketchpad.song.sketchesModel.songMode
                 onClicked: {
-                    zynthian.sketchpad.song.sketchesModel.songMode = !zynthian.sketchpad.song.sketchesModel.songMode;
+                    zynqtgui.sketchpad.song.sketchesModel.songMode = !zynqtgui.sketchpad.song.sketchesModel.songMode;
                 }
             }
             Repeater {
@@ -88,11 +88,11 @@ Zynthian.ScreenPage {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: component.width / 12
-                    property QtObject sketchObject: zynthian.sketchpad.song.sketchesModel.getSketch(model.index)
+                    property QtObject sketchObject: zynqtgui.sketchpad.song.sketchesModel.getSketch(model.index)
                     text: sketchObject.name
-                    checked: zynthian.sketchpad.song.sketchesModel.selectedSketchIndex == model.index
+                    checked: zynqtgui.sketchpad.song.sketchesModel.selectedSketchIndex == model.index
                     onClicked: {
-                        zynthian.sketchpad.song.sketchesModel.selectedSketchIndex = model.index;
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketchIndex = model.index;
                     }
                 }
             }
@@ -105,7 +105,7 @@ Zynthian.ScreenPage {
 /// BEGIN Not-song-mode playbackery stuff
         RowLayout {
             Layout.fillWidth: true
-            visible: !zynthian.sketchpad.song.sketchesModel.songMode
+            visible: !zynqtgui.sketchpad.song.sketchesModel.songMode
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
@@ -117,7 +117,7 @@ Zynthian.ScreenPage {
 /// BEGIN Song-mode playbackery stuff
         RowLayout {
             Layout.fillWidth: true
-            visible: zynthian.sketchpad.song.sketchesModel.songMode && segmentsRepeater.count === 0
+            visible: zynqtgui.sketchpad.song.sketchesModel.songMode && segmentsRepeater.count === 0
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
@@ -127,14 +127,14 @@ Zynthian.ScreenPage {
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-            visible: zynthian.sketchpad.song.sketchesModel.songMode && segmentsRepeater.count > 0
+            visible: zynqtgui.sketchpad.song.sketchesModel.songMode && segmentsRepeater.count > 0
             spacing: 0
             Kirigami.Theme.inherit: false
             Kirigami.Theme.colorSet: Kirigami.Theme.Button
             Repeater {
                 id: segmentsRepeater
-                property int totalDuration: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
-                model: component.visible && totalDuration > 0 ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel : 0
+                property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                model: component.visible && totalDuration > 0 ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel : 0
                 delegate: Item {
                     id: segmentDelegate
                     property QtObject segment: model.segment
@@ -181,7 +181,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.minimumHeight: 1
             Layout.maximumHeight: 1
-            visible: zynthian.sketchpad.song.sketchesModel.songMode && segmentsRepeater.totalDuration > 0
+            visible: zynqtgui.sketchpad.song.sketchesModel.songMode && segmentsRepeater.totalDuration > 0
             Item {
                 height: 1
                 width: 1

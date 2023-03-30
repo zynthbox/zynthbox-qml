@@ -32,12 +32,12 @@ Zynthian.NewStuffPage {
     screenId: "playgrid_downloader"
     title: qsTr("Playgrid Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-playgrids.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynqtgui-playgrids.knsrc").toString().slice(7)
 
     Connections {
         target: component.backAction
         onTriggered: {
-            zynthian.playgrid.updatePlayGrids();
+            zynqtgui.playgrid.updatePlayGrids();
         }
     }
 }

@@ -30,8 +30,7 @@ from threading import Thread
 from subprocess import check_output, Popen, PIPE, STDOUT
 
 # Zynthian specific modules
-from . import zynthian_gui_selector
-from zyngui import zynthian_gui_config
+from . import zynthian_gui_selector, zynthian_gui_config
 from zynlibs.zynseq import zynseq
 # -------------------------------------------------------------------------------
 # Zynthian Snapshots Menu GUI Class

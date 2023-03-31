@@ -704,7 +704,7 @@ class sketchpad_clip(QObject):
         self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
 
         try:
-            logging.info(f"Setting bpm from metadata : {self.audio_metadata}")
+            logging.info(f"Setting bpm from metadata")
             self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
         except Exception as e:
             logging.debug(f"Error setting bpm from metadata : {str(e)}")

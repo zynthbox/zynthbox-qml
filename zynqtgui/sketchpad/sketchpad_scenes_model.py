@@ -248,7 +248,8 @@ class sketchpad_scenes_model(QAbstractListModel):
         try:
             self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
         except Exception as e:
-            logging.debug(f"Error removing clip from scene : {str(e)}")
+            # logging.debug(f"Error removing clip from scene : {str(e)}")
+            pass
 
         if self.__song__.get_metronome_manager().isMetronomeRunning:
             clip.stop()

@@ -42,7 +42,7 @@ import traceback
 #------------------------------------------------------------------------------
 
 class zynthian_gui_property_controller(QObject):
-	def __init__(self, index, property_name, property_getter, property_changed_notifier, min_value, max_value, step_size, property_is_integer, property_is_float, property_is_bool, parent=None):
+	def __init__(self, index, property_name, property_getter, property_changed_notifier, min_value, max_value, step_size, min_value_getter=None, min_value_changed_notifier=None, max_value_getter=None, max_value_changed_notifier=None, property_is_integer=False, property_is_float=False, property_is_bool=False, parent=None):
 		"""
 		This is an alternative to zynthian_gui_controller which controls zynthian_controller objects.		
 		With Qt, we now have properties that needs to be controller with knobs. This class allows properties to be
@@ -61,10 +61,9 @@ class zynthian_gui_property_controller(QObject):
 		"""
 		super(zynthian_gui_property_controller, self).__init__(parent)
 		self.zynqtgui = zynthian_gui_config.zynqtgui
-		self.zctrl = zynthian_controller(None, property_name, property_name, {'midi_cc': 0, 'value': property_getter(), 'step': step_size, 'value_min': min_value, 'value_max': max_value})
 		self.property_getter = property_getter
-		self.n_values=property_getter()
-		self.ctrl_max_value=property_getter()
+		self.min_value_getter = min_value_getter
+		self.max_value_getter = max_value_getter
 		self.inverted=False
 		self.selmode = False
 		self.logarithmic = False
@@ -84,7 +83,6 @@ class zynthian_gui_property_controller(QObject):
 		self.property_is_bool = property_is_bool
 
 		self.ctrl_midi_bind=None
-
 		self.index=index
 		self.old_index = index
 
@@ -92,6 +90,35 @@ class zynthian_gui_property_controller(QObject):
 		property_value_changed_timer.setInterval(1000)
 		property_value_changed_timer.setSingleShot(True)
 		property_value_changed_timer.timeout.connect(self.property_value_changed_handler)
+
+		max_value_changed_timer = QTimer(self)
+		max_value_changed_timer.setInterval(1000)
+		max_value_changed_timer.setSingleShot(True)
+		max_value_changed_timer.timeout.connect(self.max_value_changed_handler)
+
+		min_value_changed_timer = QTimer(self)
+		min_value_changed_timer.setInterval(1000)
+		min_value_changed_timer.setSingleShot(True)
+		min_value_changed_timer.timeout.connect(self.min_value_changed_handler)
+
+		if min_value_getter is not None:
+			minimum = min_value_getter()
+			min_value_changed_notifier.connect(min_value_changed_timer.start)
+		else:
+			minimum = min_value
+
+		if max_value_getter is not None:
+			maximum = max_value_getter()
+			max_value_changed_notifier.connect(max_value_changed_timer.start)
+		else:
+			maximum = max_value
+
+
+		self.zctrl = zynthian_controller(None, property_name, property_name,
+										 {'midi_cc': 0, 'value': property_getter(), 'step': step_size,
+										  'value_min': minimum, 'value_max': maximum})
+		self.n_values = maximum
+		self.ctrl_max_value = maximum
 
 		# Setup Controller and Zyncoder
 		self.config()
@@ -103,6 +130,19 @@ class zynthian_gui_property_controller(QObject):
 	def property_value_changed_handler(self):
 		logging.debug(f"Property {self.title} value changed to {self.property_getter()}")
 		self.set_value(self.property_getter(), True)
+
+	@Slot()
+	def min_value_changed_handler(self):
+		logging.debug(f"Property {self.title} min_value changed to {self.min_value_getter()}")
+		self.zctrl.set_options({'value_min': self.min_value_getter()})
+
+	@Slot()
+	def max_value_changed_handler(self):
+		logging.debug(f"Property {self.title} max_value changed to {self.max_value_getter()}")
+		self.zctrl.set_options({'value_max': self.max_value_getter()})
+		self.n_values = self.max_value_getter()
+		self.ctrl_max_value = self.max_value_getter()
+		self.max_value_changed.emit()
 
 	def show(self):
 		self.__visible = True

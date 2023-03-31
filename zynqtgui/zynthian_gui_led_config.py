@@ -266,10 +266,13 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             self.set_button_color(i, led_color_inactive)
 
         wsleds.show()
+        self.connect_dependent_property_signals()
 
+    @Slot()
+    def connect_dependent_property_signals(self):
         # Connect to required signals for updating led
         self.zynqtgui.isExternalAppActiveChanged.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.song_changed.connect(self.update_button_colors)
+        self.zynqtgui.sketchpad.song_changed.connect(self.connect_dependent_property_signals)
         self.zynqtgui.session_dashboard.selected_channel_changed.connect(self.selected_channel_changed_handler)
         self.zynqtgui.current_screen_id_changed.connect(self.update_button_colors)
         self.zynqtgui.current_modal_screen_id_changed.connect(self.update_button_colors)
@@ -282,7 +285,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
 
         for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
-            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).channel_audio_type_changed.connect(self.update_button_colors)
+            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).channel_audio_type_changed.connect(
+                self.update_button_colors)
 
         self.update_button_colors()
 

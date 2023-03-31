@@ -281,6 +281,9 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.sketchpad.click_channel_enabled_changed.connect(self.update_button_colors)
         self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
 
+        for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
+            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).channel_audio_type_changed.connect(self.update_button_colors)
+
         self.update_button_colors()
 
     @Slot()

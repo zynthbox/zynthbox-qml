@@ -179,7 +179,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		try:
 			with open(fpath, "r") as fh:
 				json = fh.read()
-				logging.debug("Loading control config %s => \n%s" % (fpath, json))
+				# logging.debug("Loading control config %s => \n%s" % (fpath, json))
 
 		except Exception as e:
 			logging.error("Can't load control config '%s': %s" % (fpath, e))

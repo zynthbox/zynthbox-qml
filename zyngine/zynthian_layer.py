@@ -134,7 +134,7 @@ class zynthian_layer:
 		self.bank_list = self.engine.get_bank_list(self)
 		if len(self.engine.get_preset_favs(self)) > 0:
 			self.bank_list = [["*FAVS*",0,"Favorites (%d)" % len(self.engine.get_preset_favs(self))]] + self.bank_list
-		logging.debug("BANK LIST => \n%s" % str(self.bank_list))
+		# logging.debug("BANK LIST => \n%s" % str(self.bank_list))
 
 
 	def reset_bank(self):
@@ -208,7 +208,7 @@ class zynthian_layer:
 			return
 
 		self.preset_list = preset_list
-		logging.debug("PRESET LIST => \n%s" % str(self.preset_list))
+		# logging.debug("PRESET LIST => \n%s" % str(self.preset_list))
 
 
 	def reset_preset(self):

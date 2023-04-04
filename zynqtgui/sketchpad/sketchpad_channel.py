@@ -404,40 +404,14 @@ class sketchpad_channel(QObject):
                         except Exception as e:
                             logging.error(f"### update_jack_port Error : {str(e)}")
 
-            try:
-                for port in zip([f"SamplerSynth-channel_{self.id + 1}:left_out", f"SamplerSynth-channel_{self.id + 1}:right_out"], [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
-                    try:
-                        if channelHasEffects or self.get_channel_audio_type().startswith("sample-") is False:
-                            sketchpad_channel.jclient.disconnect(port[1], port[0])
-                        else:
-                            sketchpad_channel.jclient.connect(port[1], port[0])
-                    except jack.JackErrorCode as e:
-                        if (abs(e.code) == 1):
-                            # In this case, we can usually assume it's because there's either nothing to disconnect (the ports are already disconnected) or nothing to connect (they're already connected)
-                            logging.debug(f"Expected error processing SamplerSynth jack ports for Ch{self.id + 1} : {port}({str(e)})")
-                        else:
-                            logging.error(f"Error processing SamplerSynth jack port for Ch{self.id + 1} : {port}({str(e)})")
-            except Exception as e:
-                logging.error(f"Error processing SamplerSynth jack ports for Ch{self.id + 1}: {str(e)}")
-
             synth_ports = []
 
             for port_name in jack_basenames:
                 port_names = []
-                try:
-                    ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
+                ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
 
-                    # Map first port from jack.Client.get_ports to channel A and second port to channel B
-                    for port in zip(ports, [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
-                        logging.debug(f"Connecting port {port[0]} -> {port[1]}")
-                        port_names.append(port[0])
-                        sketchpad_channel.jclient.connect(port[0], port[1])
-                except jack.JackErrorCode as e:
-                    if (abs(e.code) == 1):
-                        # In this case, we can usually assume it's because there's either nothing to disconnect (the ports are already disconnected) or nothing to connect (they're already connected)
-                        logging.debug(f"Expected error processing jack ports for Ch{self.id + 1} : {port}({str(e)})")
-                    else:
-                        logging.error(f"Error processing jack port for Ch{self.id + 1} : {port}({str(e)})")
+                for port in zip(ports, [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
+                    port_names.append(port[0])
 
                 synth_ports.append(port_names)
 

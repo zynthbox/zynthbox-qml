@@ -526,18 +526,6 @@ def audio_autoconnect(force=False):
 				force_next_autoconnect = True;
 				release_lock()
 				return
-	# Connect the global effects passthrough dry output to system out
-	try:
-		for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), playback_ports):
-			try:
-				jclient.connect(port[0], port[1])
-			except: pass
-	except Exception as e:
-		logging.error(f"Failed to connect global fx passthrough to system playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-		# Logic below the return statement will be eventually evaluated when called again after the timeout
-		force_next_autoconnect = True;
-		release_lock()
-		return
 
 	### Bluetooth ports connection
 	bluealsa_ports = jclient.get_ports("bluealsa", is_audio=True, is_input=True)
@@ -599,7 +587,7 @@ def audio_autoconnect(force=False):
 		for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
 			try:
 				engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True);
-				for port in zip(engineOutPorts, playback_ports):
+				for port in zip(engineOutPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
 					try:
 						jclient.connect(port[0], port[1])
 					except: pass
@@ -660,7 +648,7 @@ def audio_autoconnect(force=False):
 									try:
 										jclient.disconnect(port[0], port[1])
 									except: pass
-								for port in zip(channelPorts, globalFxPassthroughInput):
+								for port in zip(channelPorts, jclient.get_ports(name_pattern=f"FXPassthrough-Channel{channel.id + 1}", is_audio=True, is_input=True)):
 									try:
 										jclient.connect(port[0], port[1])
 									except: pass
@@ -793,7 +781,7 @@ def audio_autoconnect(force=False):
 										pass
 
 							# Connect synth engine to global fx passthrough ports
-							for port in zip(synth_engine_output_ports, globalFxPassthroughInput):
+							for port in zip(synth_engine_output_ports, jclient.get_ports(name_pattern=f"FXPassthrough-Channel{channel_index + 1}")):
 								try:
 									logging.info(f"Connecting {port[0]} to global effect {port[1]}")
 									jclient.connect(port[0], port[1])
@@ -810,6 +798,66 @@ def audio_autoconnect(force=False):
 		release_lock()
 		return
 	### END Connect synth engines to global effects
+
+	### Connect FXPassthrough-ChannelX dry and wet outputs to designated ports
+	for channel_index in range(song.channelsModel.count):
+		channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels-Channel{channel_index+1}", is_audio=True, is_input=True)
+		globalPlaybackInputPorts = jclient.get_ports(f"GlobalPlayback", is_audio=True, is_input=True)
+
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOut", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+			try:
+				jclient.connect(port[0], port[1])
+			except: pass
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOut", is_audio=True, is_output=True), globalFxPassthroughInput):
+			try:
+				jclient.connect(port[0], port[1])
+			except: pass
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index + 1}:dryOut", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+			try:
+				jclient.connect(port[0], port[1])
+			except: pass
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:dryOut", is_audio=True, is_output=True), globalPlaybackInputPorts):
+			try:
+				jclient.connect(port[0], port[1])
+			except: pass
+	### END Connect FXPassthrough-ChannelX dry and wet outputs to designated ports
+
+	### Connect Samplersynth uneffected ports to globalPlayback client and disconnect from system playback
+	for port in zip(jclient.get_ports(f"SamplerSynth-global-uneffected", is_audio=True, is_output=True), playback_ports):
+		try:
+			jclient.disconnect(port[0], port[1])
+		except: pass
+	for port in zip(jclient.get_ports(f"SamplerSynth-global-uneffected", is_audio=True, is_output=True), globalPlaybackInputPorts):
+		try:
+			jclient.connect(port[0], port[1])
+		except: pass
+	### END Connect Samplersynth uneffected ports to globalPlayback client
+
+	### Connect globalPlayback ports
+	globalPlaybackDryInputPorts = jclient.get_ports(f"GlobalPlayback", is_audio=True, is_input=True)
+	globalPlaybackDryOutputPorts = jclient.get_ports(f"GlobalPlayback:dryOut", is_audio=True, is_output=True)
+	for port in zip(globalPlaybackDryOutputPorts, playback_ports):
+		try:
+			jclient.connect(port[0], port[1])
+		except:
+			logging.exception("Error connecting ports")
+
+	for port in zip(globalPlaybackDryOutputPorts, jclient.get_ports("AudioLevels-SystemPlayback:", is_input=True, is_audio=True)):
+		try:
+			jclient.connect(port[0], port[1])
+		except:
+			logging.exception("Error connecting ports")
+
+	for port in zip(jclient.get_ports(f"GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), globalPlaybackDryInputPorts):
+		try:
+			jclient.connect(port[0], port[1])
+		except Exception as e:
+			logging.error(f"Failed to connect global fx passthrough to system playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+			# Logic below the return statement will be eventually evaluated when called again after the timeout
+			force_next_autoconnect = True;
+			release_lock()
+			return
+	### END Connect globalPlayback ports
 
 	headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)
 
@@ -881,44 +929,6 @@ def audio_autoconnect(force=False):
 					jclient.connect(cp,dpmeter_out[1])
 				except:
 					pass
-
-	# Connect to AudioLevels client
-	audiolevels_out = jclient.get_ports("AudioLevels-SystemPlayback:", is_input=True, is_audio=True)
-	audiolevels_connected_ports_1 = jclient.get_all_connections("AudioLevels-SystemPlayback:left_in")
-	audiolevels_connected_ports_2 = jclient.get_all_connections("AudioLevels-SystemPlayback:right_in")
-	sysout_conports_1 = jclient.get_all_connections("system:playback_1")
-	sysout_conports_2 = jclient.get_all_connections("system:playback_2")
-	# Disconnect ports (that is, any that aren't connected to the system playback ports)
-	for connected_port in audiolevels_connected_ports_1:
-		if connected_port not in sysout_conports_1:
-			try:
-				logging.info(f"Disconnecting port {connected_port} from audiolevels")
-				jclient.disconnect(connected_port, audiolevels_out[0])
-			except:
-				pass
-	for connected_port in audiolevels_connected_ports_2:
-		if connected_port not in sysout_conports_2:
-			try:
-				logging.info(f"Disconnecting port {connected_port} from audiolevels")
-				jclient.disconnect(connected_port, audiolevels_out[1])
-			except:
-				pass
-	# Connect anything that is connected to the system playback ports to the audiolevels client, except for the global uneffected
-	# SamplerSynth port (which is used for system sound type stuff that shouldn't go in recordings and the like)
-	for port_to_connect in sysout_conports_1:
-		if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
-			try:
-				logging.info(f"Connecting port {port_to_connect} to audiolevels")
-				jclient.connect(port_to_connect, audiolevels_out[0])
-			except:
-				pass
-	for port_to_connect in sysout_conports_2:
-		if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
-			try:
-				logging.info(f"Connecting port {port_to_connect} to audiolevels")
-				jclient.connect(port_to_connect, audiolevels_out[1])
-			except:
-			    pass
 
 	#Get System Capture ports => jack output ports!!
 	capture_ports = get_audio_capture_ports()

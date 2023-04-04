@@ -415,22 +415,22 @@ ColumnLayout {
                                     Layout.fillWidth: false
                                     Layout.minimumWidth: height * 0.8
                                     Layout.maximumWidth: height * 0.8
-                                    text: "+"
-                                    // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote < 127
-                                    enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote < 127 : false
+                                    text: "-"
+                                    // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote > 0
+                                    enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote > 0 : false
                                     onClicked: {
-                                        component.changeSubnotePitch(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, 1);
+                                        component.changeSubnotePitch(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, -1);
                                     }
                                 }
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: false
                                     Layout.minimumWidth: height * 0.8
                                     Layout.maximumWidth: height * 0.8
-                                    text: "-"
-                                    // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote > 0
-                                    enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote > 0 : false
+                                    text: "+"
+                                    // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote < 127
+                                    enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote < 127 : false
                                     onClicked: {
-                                        component.changeSubnotePitch(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, -1);
+                                        component.changeSubnotePitch(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, 1);
                                     }
                                 }
                                 Zynthian.PlayGridButton {

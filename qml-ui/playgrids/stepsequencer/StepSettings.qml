@@ -266,91 +266,72 @@ ColumnLayout {
                         }
                     ]
                 }
-                Rectangle {
+                RowLayout {
                     anchors {
-                        top: parent.top
-                        left: parent.left
-                        bottom: parent.bottom
+                        fill: parent
                         margins: 1
                     }
-                    width: Kirigami.Units.largeSpacing
-                    color: Kirigami.Theme.highlightColor
-                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote
-                }
-                Rectangle {
-                    anchors {
-                        top: parent.top
-                        right: parent.right
-                        rightMargin: 1
-                        bottom: parent.bottom
-                        margins: 1
+                    Rectangle {
+                        Layout.fillHeight: true
+                        Layout.minimumWidth: Kirigami.Units.largeSpacing
+                        Layout.maximumWidth: Kirigami.Units.largeSpacing
+                        color: subnoteDelegate.subnoteIndex === component.currentSubNote ? Kirigami.Theme.highlightColor : "transparent"
                     }
-                    width: height
-                    radius: height / 2
-                    color: subnoteDelegate.subnote ? zynqtgui.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
-                }
-                QQC2.Label {
-                    id: subnoteDelegateLabel
-                    anchors.fill: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    font.bold: true
-                    text: subnoteDelegate.subnote ? subnoteDelegate.subnote.name + (subnoteDelegate.subnote.octave - 1) : ""
-                }
-                Zynthian.PlayGridButton {
-                    anchors {
-                        top: parent.top
-                        left: parent.left
-                        leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
-                        bottom: parent.bottom
-                        margins: 1
-                    }
-                    width: height
-                    icon.name: "edit-delete"
-                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote
-                    onClicked: {
-                        // This is a workaround for "this element disappeared for some reason"
-                        var rootComponent = component;
-                        if (rootComponent.currentSubNote >= subnoteDelegate.subnoteIndex) {
-                            rootComponent.changeSubnote(rootComponent.currentSubNote - 1);
-                        }
-                        rootComponent.model.removeSubnote(rootComponent.row, rootComponent.column, subnoteDelegate.subnoteIndex);
-                        // Now refetch the note we're displaying
-                        var theColumn = rootComponent.column;
-                        rootComponent.column = -1;
-                        rootComponent.column = theColumn;
-                        if (rootComponent.note.subnotes.count === 0) {
-                            rootComponent.close();
+                    Zynthian.PlayGridButton {
+                        Layout.fillWidth: false
+                        Layout.minimumWidth: height * 0.8
+                        Layout.maximumWidth: height * 0.8
+                        icon.name: "edit-delete"
+                        onClicked: {
+                            // This is a workaround for "this element disappeared for some reason"
+                            var rootComponent = component;
+                            if (rootComponent.currentSubNote >= subnoteDelegate.subnoteIndex) {
+                                rootComponent.changeSubnote(rootComponent.currentSubNote - 1);
+                            }
+                            rootComponent.model.removeSubnote(rootComponent.row, rootComponent.column, subnoteDelegate.subnoteIndex);
+                            // Now refetch the note we're displaying
+                            var theColumn = rootComponent.column;
+                            rootComponent.column = -1;
+                            rootComponent.column = theColumn;
+                            if (rootComponent.note.subnotes.count === 0) {
+                                rootComponent.close();
+                            }
                         }
                     }
-                }
-                Zynthian.PlayGridButton {
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                        left: parent.horizontalCenter
-                        leftMargin: height / 2
-                        margins: 1
+                    Rectangle {
+                        Layout.fillHeight: true
+                        Layout.minimumWidth: height
+                        Layout.maximumWidth: height
+                        radius: height / 2
+                        color: subnoteDelegate.subnote ? zynqtgui.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
                     }
-                    width: height
-                    text: "+"
-                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote < 127
-                    onClicked: {
-                        component.changeSubnotePitch(subnoteDelegate.subnoteIndex, 1);
+                    QQC2.Label {
+                        id: subnoteDelegateLabel
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        horizontalAlignment: Text.AlignHCenter
+                        font.bold: true
+                        text: subnoteDelegate.subnote ? subnoteDelegate.subnote.name + (subnoteDelegate.subnote.octave - 1) : ""
                     }
-                }
-                Zynthian.PlayGridButton {
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                        right: parent.horizontalCenter
-                        rightMargin: height / 2
-                        margins: 1
+                    Zynthian.PlayGridButton {
+                        Layout.fillWidth: false
+                        Layout.minimumWidth: height * 0.8
+                        Layout.maximumWidth: height * 0.8
+                        text: "-"
+                        enabled: subnoteDelegate.subnote.midiNote > 0
+                        onClicked: {
+                            component.changeSubnotePitch(subnoteDelegate.subnoteIndex, -1);
+                        }
                     }
-                    width: height
-                    text: "-"
-                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote > 0
-                    onClicked: {
-                        component.changeSubnotePitch(subnoteDelegate.subnoteIndex, -1);
+                    Zynthian.PlayGridButton {
+                        Layout.fillWidth: false
+                        Layout.minimumWidth: height * 0.8
+                        Layout.maximumWidth: height * 0.8
+                        text: "+"
+                        enabled: subnoteDelegate.subnote.midiNote < 127
+                        onClicked: {
+                            component.changeSubnotePitch(subnoteDelegate.subnoteIndex, 1);
+                        }
                     }
                 }
             }

@@ -2182,12 +2182,42 @@ Zynthian.BasePlayGrid {
                     }
                 }
                 Zynthian.PlayGridButton {
+                    id: defaultNoteSettingsButton
                     text: "%1\n%2".arg(noteLength).arg(velocity)
-                    enabled: component.mostRecentlyPlayedNote !== undefined
-                    property string noteLength: component.mostRecentlyPlayedNote === undefined ? "no" : _private.noteLengthNames[_private.noteLength]
-                    property string velocity: component.mostRecentlyPlayedNote === undefined ? "note" : "Vel " + component.mostRecentNoteVelocity
+                    // enabled: component.mostRecentlyPlayedNote !== undefined
+                    property var stepNames: {
+                        0: component.stepDurationName,
+                        1: "1/128th",
+                        2: "1/64th",
+                        4: "1/32nd",
+                        8: "1/16th",
+                        16: "1/8th",
+                        32: "1/4th",
+                        64: "1/2nd",
+                        96: "3/4th",
+                        128: "1",
+                        256: "2",
+                        384: "3",
+                        512: "4",
+                        640: "5",
+                        768: "6",
+                        896: "7",
+                        1024: "8"
+                    }
+                    property string noteLength:  _private.activePatternModel.defaultNoteDuration === 0
+                        ? _private.noteLengthNames[_private.noteLength]
+                        : defaultNoteSettingsButton.stepNames.hasOwnProperty(_private.activePatternModel.defaultNoteDuration)
+                            ? defaultNoteSettingsButton.stepNames[_private.activePatternModel.defaultNoteDuration]
+                            : _private.activePatternModel.defaultNoteDuration + "/128th"
+                    property string velocity: component.mostRecentlyPlayedNote === undefined ? "" : "Vel " + component.mostRecentNoteVelocity
                     onClicked: {
-                        component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote]);
+                        if (component.heardNotes.length > 0) {
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, component.heardNotes);
+                        } else if (component.mostRecentlyPlayedNote !== undefined) {
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote]);
+                        } else {
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, []);
+                        }
                     }
                 }
 

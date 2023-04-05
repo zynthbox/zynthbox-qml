@@ -258,6 +258,16 @@ def AudioLevels_clearRecordPorts():
         libzl.AudioLevels_clearRecordPorts()
 
 
+def setPanAmount(channel, amount):
+    if libzl:
+        libzl.JackPassthrough_setPanAmount(channel, amount)
+
+def getPanAmount(channel):
+    if libzl:
+        return libzl.JackPassthrough_getPanAmount(channel)
+    else:
+        return 0
+
 class ClipAudioSource(QObject):
     audioLevelChanged = Signal(float)
     progressChanged = Signal(float)
@@ -386,16 +396,6 @@ class ClipAudioSource(QObject):
     def setRootNote(self, rootNote):
         if libzl:
             libzl.ClipAudioSource_setRootNote(self.obj, rootNote)
-
-    def setPanAmount(self, channel, amount):
-        if libzl:
-            libzl.JackPassthrough_setPanAmount(channel, amount)
-
-    def getPanAmount(self, channel):
-        if libzl:
-            return libzl.JackPassthrough_getPanAmount(channel)
-        else:
-            return 0
 
     def destroy(self):
         if libzl:

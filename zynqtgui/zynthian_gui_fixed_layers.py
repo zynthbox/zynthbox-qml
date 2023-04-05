@@ -37,92 +37,8 @@ from zyncoder import *
 
 from PySide2.QtCore import Qt, QObject, QTimer, Slot, Signal, Property
 
+from .zynthian_gui_multi_controller import MultiController
 
-#------------------------------------------------------------------------------
-# Volume controller proxy for controlling layer volume
-#
-# This provides an abstraction to all the volume controllers of a synth layer
-# and allows to control all of them by percentage. Setting value of this
-# controller will interpolate the value to the respective volume controller
-# value and set it accordingly
-#------------------------------------------------------------------------------
-class LayerVolumeController(QObject):
-    def __init__(self, name, parent=None):
-        super(LayerVolumeController, self).__init__(parent)
-        self.__controls = []
-        self.__value = 100
-        self.__value_min = 0
-        self.__value_max = 100
-        self.__step_size = 1
-        self.__name = name
-
-    def add_control(self, control):
-        if control not in self.__controls:
-            self.__controls.append(control)
-            # Interpolate controller's value to percentage
-            self.set_value(np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max)))
-
-            self.controllable_changed.emit()
-            self.value_changed.emit()
-
-    ### Property controllable
-    def get_controllable(self):
-        return len(self.__controls) > 0
-
-    controllable_changed = Signal()
-
-    controllable = Property(bool, get_controllable, notify=controllable_changed)
-    ### END Property controllable
-
-    ### Property value
-    def get_value(self):
-        return self.__value
-
-    def set_value(self, value_percent: int):
-        value = int(np.clip(value_percent, 0, 100))
-
-        if self.__value != value:
-            self.__value = value
-
-            for control in self.__controls:
-                # Interpolate volume percentage to controller's value range
-                control.set_value(
-                    np.interp(value, (self.value_min, self.value_max), (control.value_min, control.value_max)), True)
-
-            self.value_changed.emit()
-
-    value_changed = Signal()
-
-    value = Property(int, get_value, set_value, notify=value_changed)
-    ### END Property value
-
-    ### Property value_min
-    def get_value_min(self):
-        return self.__value_min
-
-    value_min = Property(int, get_value_min, constant=True)
-    ### END Property value_min
-
-    ### Property value_max
-    def get_value_max(self):
-        return self.__value_max
-
-    value_max = Property(int, get_value_max, constant=True)
-    ### END Property value_max
-
-    ### Property step_size
-    def get_step_size(self):
-        return self.__step_size
-
-    step_size = Property(int, get_step_size, constant=True)
-    ### END Property step_size
-
-    ### Property name
-    def get_name(self):
-        return self.__name
-
-    name = Property(str, get_name, constant=True)
-    ### END Property step_size
 
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
@@ -137,9 +53,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__start_midi_chan = 0
 
         # List of LayerVolumeController (one per midi channel)
-        self.__volume_controllers: list[LayerVolumeController] = []
+        self.__volume_controllers: list[MultiController] = []
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
-            self.__volume_controllers.append(LayerVolumeController(self))
+            self.__volume_controllers.append(MultiController(self))
 
         self.__mixer_timer = QTimer()
         self.__mixer_timer.setInterval(250)

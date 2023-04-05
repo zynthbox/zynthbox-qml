@@ -4576,7 +4576,9 @@ class zynthian_gui(QObject):
     displayRecordingPopup = Signal()
     openLeftSidebar = Signal()
     closeLeftSidebar = Signal()
-    showMessageDialog = Signal(str)
+    # Arg 1 : Message to display
+    # Arg 2 : If non zero, then hide dialog after timeout seconds otherwise show until closed
+    showMessageDialog = Signal(str, int)
 
     about = Property(QObject, about, constant=True)
     audio_out = Property(QObject, audio_out, constant=True)

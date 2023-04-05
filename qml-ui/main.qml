@@ -81,7 +81,7 @@ Kirigami.AbstractApplicationWindow {
     signal layerSetupDialogPickSoundClicked()
     signal soundsDialogAccepted()
     signal soundsDialogRejected()
-    signal showMessageDialog(string message)
+    signal showMessageDialog(string message, int hideDelay)
 
     function showConfirmationDialog() { confirmDialog.open() }
     function hideConfirmationDialog() { confirmDialog.close() }
@@ -548,6 +548,9 @@ Kirigami.AbstractApplicationWindow {
     onShowMessageDialog: {
         messageDialog.text = message
         messageDialog.open()
+        if (hideDelay != null && hideDelay > 0) {
+            messageDialog.closeAfter(hideDelay)
+        }
     }
 
     // Listen to selected_channel_changed signal to
@@ -1159,6 +1162,11 @@ Kirigami.AbstractApplicationWindow {
 
         property alias text: messageLabel.text
 
+        function closeAfter(hideDelay) {
+            closeTimer.interval = hideDelay
+            closeTimer.start()
+        }
+
         parent: QQC2.Overlay.overlay
         x: Math.round(parent.width/2 - width/2)
         y: Math.round(parent.height/2 - height/2)
@@ -1171,6 +1179,12 @@ Kirigami.AbstractApplicationWindow {
             anchors.margins: Kirigami.Units.gridUnit
             horizontalAlignment: QQC2.Label.AlignHCenter
             verticalAlignment: QQC2.Label.AlignVCenter
+        }
+
+        Timer {
+            id: closeTimer
+            repeat: false
+            onTriggered: messageDialog.close()
         }
     }
 

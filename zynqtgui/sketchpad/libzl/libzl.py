@@ -56,7 +56,7 @@ def init():
 
             libzl.SyncTimer_setBpm.argtypes = [ctypes.c_uint]
 
-            libzl.SyncTimer_getMultiplier.restypes = ctypes.c_int
+            libzl.SyncTimer_getMultiplier.restype = ctypes.c_int
 
             libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
 
@@ -108,20 +108,20 @@ def init():
             libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
 
             libzl.ClipAudioSource_id.argtypes = [ctypes.c_void_p]
-            libzl.ClipAudioSource_id.restypes = ctypes.c_int
+            libzl.ClipAudioSource_id.restype = ctypes.c_int
 
             libzl.ClipAudioSource_setSlices.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             libzl.ClipAudioSource_keyZoneStart.argtypes = [ctypes.c_void_p]
-            libzl.ClipAudioSource_keyZoneStart.restypes = ctypes.c_int
+            libzl.ClipAudioSource_keyZoneStart.restype = ctypes.c_int
             libzl.ClipAudioSource_setKeyZoneStart.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             libzl.ClipAudioSource_keyZoneEnd.argtypes = [ctypes.c_void_p]
-            libzl.ClipAudioSource_keyZoneEndrestypes = ctypes.c_int
+            libzl.ClipAudioSource_keyZoneEnd.restype = ctypes.c_int
             libzl.ClipAudioSource_setKeyZoneEnd.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             libzl.ClipAudioSource_rootNote.argtypes = [ctypes.c_void_p]
-            libzl.ClipAudioSource_rootNote.restypes = ctypes.c_int
+            libzl.ClipAudioSource_rootNote.restype = ctypes.c_int
             libzl.ClipAudioSource_setRootNote.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
@@ -134,7 +134,11 @@ def init():
             libzl.AudioLevels_removeRecordPort.argtypes = [ctypes.c_char_p, ctypes.c_int]
             libzl.AudioLevels_setShouldRecordPorts.argtypes = [ctypes.c_bool]
 
-            libzl.AudioLevels_isRecording.restypes = ctypes.c_bool
+            libzl.AudioLevels_isRecording.restype = ctypes.c_bool
+
+            libzl.JackPassthrough_setPanAmount.argtypes = [ctypes.c_int, ctypes.c_float]
+            libzl.JackPassthrough_getPanAmount.argtypes = [ctypes.c_int]
+            libzl.JackPassthrough_getPanAmount.restype = ctypes.c_float
             ### END Type Definition
 
             # Start juce event loop
@@ -382,6 +386,16 @@ class ClipAudioSource(QObject):
     def setRootNote(self, rootNote):
         if libzl:
             libzl.ClipAudioSource_setRootNote(self.obj, rootNote)
+
+    def setPanAmount(self, channel, amount):
+        if libzl:
+            libzl.JackPassthrough_setPanAmount(channel, amount)
+
+    def getPanAmount(self, channel):
+        if libzl:
+            return libzl.JackPassthrough_getPanAmount(channel)
+        else:
+            return 0
 
     def destroy(self):
         if libzl:

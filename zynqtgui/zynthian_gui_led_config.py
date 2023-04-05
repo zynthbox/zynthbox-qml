@@ -270,6 +270,12 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
     @Slot()
     def connect_dependent_property_signals(self):
+        logging.debug("### Connecting dependant property signals")
+
+        # Reset channel as it would change when song changes
+        if self.zynqtgui.sketchpad.song is not None:
+            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+
         # Connect to required signals for updating led
         self.zynqtgui.isExternalAppActiveChanged.connect(self.update_button_colors)
         self.zynqtgui.sketchpad.song_changed.connect(self.connect_dependent_property_signals)

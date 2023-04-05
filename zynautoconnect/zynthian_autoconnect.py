@@ -745,59 +745,59 @@ def audio_autoconnect(force=False):
 				except:
 					pass
 
-	### Connect synth engines to global effects
+	### BEGIN Connect the synth layer leafs up to the channel passthrough clients
 	try:
-		if zynthian_gui_config.zynqtgui.sketchpad.song:
-			for midi_channel in zynthian_gui_config.zynqtgui.layer.layer_midi_map:
-				synth_engine = zynthian_gui_config.zynqtgui.layer.layer_midi_map[midi_channel]
-				for channel_index in range(0, 10):
-					channel = zynthian_gui_config.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_index)
+		for channelId in range(0, 10):
+			channel = song.channelsModel.getChannel(channelId)
+			channel_playback_ports = [f"FXPassthrough-Channel{channelId + 1}:inputLeft", f"FXPassthrough-Channel{channelId + 1}:inputRight"]
+			if channel is not None:
+				for sound in channel.chainedSounds:
+					if sound > -1:
+						sound_layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[sound]
+						layer_leafs = [sound_layer]
+						effect_leafs = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_ends(sound_layer)
+						if len(effect_leafs) > 0:
+							layer_leafs = effect_leafs
+						for layer in layer_leafs:
+							# If connected to system_playback, disconnect that client and connect it to the passthrough client instead
+							is_engine_connected_to_system = False
+							engine_output_ports = jclient.get_ports(layer.jackname, is_output=True, is_audio=True)
 
-					# Find which channel midichannel belongs to
-					if channel is not None and midi_channel in channel.chainedSounds:
-						# Check if channel wants to route through global FX
-						if channel.routeThroughGlobalFX:
-							is_synth_engine_connected_to_system = False
-							synth_engine_output_ports = jclient.get_ports(synth_engine.jackname, is_output=True, is_audio=True)
+							if len(engine_output_ports) < 2:
+								engine_output_ports.append(engine_output_ports[0])
 
-							if len(synth_engine_output_ports) < 2:
-								synth_engine_output_ports[1] = synth_engine_output_ports[0]
-
-							for audio_output_port in synth_engine.get_audio_out():
+							for audio_output_port in layer.get_audio_out():
 								if audio_output_port.startswith("system"):
-									is_synth_engine_connected_to_system = True
+									is_engine_connected_to_system = True
 									break
 
-							if is_synth_engine_connected_to_system:
-								# Synth engine is connected to system playback, disconnect from system playback and
+							if is_engine_connected_to_system:
+								# Audio engine is connected to system playback, disconnect from system playback and
 								# connect synth engine output to global effects
 
 								# Disconnect synth engine from playback port
-								for port in zip(synth_engine_output_ports, playback_ports):
+								for port in zip(engine_output_ports, playback_ports):
 									try:
-										logging.info(f"Disconnecting {port[0]} from {port[1]} in favour of global effects")
+										logging.info(f"Disconnecting {port[0]} from {port[1]} in favour of the channel's passthrough client")
 										jclient.disconnect(port[0], port[1])
 									except:
 										pass
 
 							# Connect synth engine to global fx passthrough ports
-							for port in zip(synth_engine_output_ports, jclient.get_ports(name_pattern=f"FXPassthrough-Channel{channel_index + 1}")):
+							for port in zip(engine_output_ports, channel_playback_ports):
 								try:
-									logging.info(f"Connecting {port[0]} to global effect {port[1]}")
+									logging.info(f"Connecting {port[0]} to channel passthrough client {port[1]}")
 									jclient.connect(port[0], port[1])
 								except:
 									pass
-						else:
-							# Channel does not want to route through Global FX. Break out of loop carry on with next midi channel
-							break
 	except Exception as e:
-		logging.error(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+		logging.error(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during synth layer leaf handling. Reported error: {e}")
 		# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
 		# Logic below the return statement will be eventually evaluated when called again after the timeout
 		force_next_autoconnect = True;
 		release_lock()
 		return
-	### END Connect synth engines to global effects
+	### END Connect the synth layer leafs up to the channel passthrough clients
 
 	### Connect FXPassthrough-ChannelX dry and wet outputs to designated ports
 	for channel_index in range(song.channelsModel.count):

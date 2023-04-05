@@ -502,6 +502,7 @@ class sketchpad_channel(QObject):
             self.__pan__ = pan
 
             self.panChanged.emit()
+            libzl.setPanAmount(self.id, self.__pan__)
             self.zynqtgui.sketchpad.set_selector()
             if force_set is False:
                 self.__song__.schedule_save()

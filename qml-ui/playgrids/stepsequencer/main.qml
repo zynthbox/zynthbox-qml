@@ -253,6 +253,8 @@ Zynthian.BasePlayGrid {
     property var heardNotes: []
     property var heardVelocities: []
     property var currentRowUniqueNotes: []
+    property var currentBarNotes: []
+    property var currentBankNotes: []
 
     function setActiveBar(activeBar) {
         _private.sequence.activePatternObject.activeBar = activeBar;
@@ -497,6 +499,25 @@ Zynthian.BasePlayGrid {
         }
         function updateUniqueCurrentRowNotes() {
             component.currentRowUniqueNotes = activePatternModel.uniqueRowNotes(activeBar + bankOffset);
+            var currentBarNotes = [];
+            var currentBankNotes = [];
+            for (var bar = 0; bar < _private.activePatternModel.availableBars; ++bar) {
+                var barNotes = _private.activePatternModel.getRow(_private.bankOffset + bar);
+                for (var positionIndex = 0; positionIndex < barNotes.length; ++positionIndex) {
+                    var positionNote = barNotes[positionIndex];
+                    if (positionNote) {
+                        for (var subNoteIndex = 0; subNoteIndex < positionNote.subnotes.length; ++subNoteIndex) {
+                            var subNote = positionNote.subnotes[subNoteIndex];
+                            if (bar === _private.activeBar) {
+                                currentBarNotes.push(subNote);
+                            }
+                            currentBankNotes.push(subNote);
+                        }
+                    }
+                }
+            }
+            component.currentBarNotes = currentBarNotes;
+            component.currentBankNotes = currentBankNotes;
         }
     }
     Connections {
@@ -2183,7 +2204,9 @@ Zynthian.BasePlayGrid {
                 }
                 Zynthian.PlayGridButton {
                     id: defaultNoteSettingsButton
-                    text: "%1\n%2".arg(noteLength).arg(velocity)
+                    text: component.mostRecentlyPlayedNote === undefined && component.heardNotes.length === 0
+                        ? (component.currentBarNotes.length === 0 ? "-" : component.currentBarNotes.length) + " in\nBar"
+                        : "%1\n%2".arg(noteLength).arg(velocity)
                     // enabled: component.mostRecentlyPlayedNote !== undefined
                     property var stepNames: {
                         0: component.stepDurationName,

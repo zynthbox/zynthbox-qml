@@ -666,7 +666,7 @@ class sketchpad_channel(QObject):
         return channel in self.__song__.get_metronome_manager().zynqtgui.screens["layer"].layer_midi_map.keys()
 
     @Slot(int, result='QVariantList')
-    def chainForLayer(chan):
+    def chainForLayer(self,chan):
         chain = []
         for i in range (16):
             if zynqtgui.screens['layer'].is_midi_cloned(chan, i) or zynqtgui.screens['layer'].is_midi_cloned(i, chan):
@@ -674,7 +674,7 @@ class sketchpad_channel(QObject):
         return chain
 
     @Slot(int, result='QVariantList')
-    def printableChainForLayer(chan):
+    def printableChainForLayer(self,chan):
         chain = ""
         for i in range (16):
             if zynqtgui.screens['layer'].is_midi_cloned(chan, i) or zynqtgui.screens['layer'].is_midi_cloned(i, chan):

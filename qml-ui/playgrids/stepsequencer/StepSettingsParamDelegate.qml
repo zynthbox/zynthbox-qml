@@ -51,6 +51,9 @@ RowLayout {
     property bool currentlySelected: false
     property int knobId: 0
 
+    // True when the user is holding a finger and dragging the slider
+    readonly property bool pressed: slidePoint.pressed
+
     // Set to an ordered list of values, which the -/+ buttons should flick
     // through in place of just switching numbers (that is still possible using
     // the tap-and-slide functionality)

@@ -31,6 +31,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 ColumnLayout {
     id: component
@@ -53,21 +54,21 @@ ColumnLayout {
                     text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
                     property color noteColor: note ? zynqtgui.theme_chooser.noteColors[note.midiNote] : ""
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
-                    property bool weAreChosen: (component.playgrid.mostRecentlyPlayedNote && note && component.playgrid.mostRecentlyPlayedNote.midiNote === note.midiNote)
-                        || component.playgrid.heardNotes.indexOf(note) > -1
+                    property bool weAreChosen: component.playgrid.heardNotes.indexOf(note) > -1
+                        || (component.playgrid.mostRecentlyPlayedNote && note && component.playgrid.mostRecentlyPlayedNote.midiNote === note.midiNote)
                         || (typeof(component.playgrid.mostRecentlyPlayedNote) === "undefined" && component.playgrid.heardNotes.length === 0 && component.playgrid.currentRowUniqueNotes.indexOf(note) > -1)
                     backgroundColor: weAreChosen ? noteColor : Kirigami.Theme.textColor
                     playingBackgroundColor: weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false
                     visualPressAndHold: note !== null
-                   onPressAndHold: {
+                    onPressAndHold: {
                         component.notePressAndHold(note);
                     }
                     onNotePlayed: {
                         if (!component.playgrid.listenForNotes) {
                             if (zynqtgui.backButtonPressed) {
                                 component.removeNote(note);
-                            } else {
+                            } else if (ZynQuick.PlayGridManager.metronomeActive) {
                                 component.playgrid.heardNotes = [];
                                 component.playgrid.heardVelocities = [];
                                 component.playgrid.mostRecentNoteVelocity = velocity;

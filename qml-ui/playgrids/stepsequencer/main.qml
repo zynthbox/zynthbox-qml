@@ -29,7 +29,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
@@ -1868,8 +1868,10 @@ Zynthian.BasePlayGrid {
             }
             Zynthian.Popup {
                 id: stepSettingsPopup
-                y: drumPad.y - height - Kirigami.Units.largeSpacing
-                x: Kirigami.Units.largeSpacing
+                parent: QQC2.Overlay.overlay
+                y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
+                x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+                closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
                 function showStepSettings(model, row, column) {
                     stepSettings.model = model;
                     stepSettings.row = row;
@@ -1897,8 +1899,10 @@ Zynthian.BasePlayGrid {
             }
             Zynthian.Popup {
                 id: noteSettingsPopup
-                y: drumPad.y - height - Kirigami.Units.largeSpacing
-                x: Kirigami.Units.largeSpacing
+                parent: QQC2.Overlay.overlay
+                y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
+                x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+                closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
                 function showSettings(patternModel, firstBar, lastBar, midiNoteFilter) {
                     noteSettings.midiNoteFilter = midiNoteFilter;
                     noteSettings.firstBar = firstBar;
@@ -2235,9 +2239,13 @@ Zynthian.BasePlayGrid {
                     property string velocity: component.mostRecentlyPlayedNote === undefined ? "" : "Vel " + component.mostRecentNoteVelocity
                     onClicked: {
                         if (component.heardNotes.length > 0) {
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, component.heardNotes);
+                            var filter = []
+                            for (var i = 0; i < component.heardNotes.length; ++i) {
+                                filter.push(component.heardNotes[i].midiNote);
+                            }
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter);
                         } else if (component.mostRecentlyPlayedNote !== undefined) {
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote]);
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote.midiNote]);
                         } else {
                             component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, []);
                         }

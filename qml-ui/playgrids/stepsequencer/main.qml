@@ -590,6 +590,47 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+    Connections {
+        target: ZynQuick.MidiRouter
+        enabled: component.isVisible && !ZynQuick.PlayGridManager.metronomeActive
+        onNoteChanged: {
+            if (port == 0 && midiChannel === _private.activePatternModel.midiChannel) {
+                if (setOn == true) {
+                    // Count up one tick for a note on message
+                    component.noteListeningActivations = component.noteListeningActivations + 1;
+                    // Create a new note based on the new thing that just arrived, but only if it's an on note
+                    var newNote = component.getNote(midiNote, midiChannel);
+                    var existingIndex = component.heardNotes.indexOf(newNote);
+                    if (existingIndex > -1) {
+                        component.noteListeningNotes.splice(existingIndex, 1);
+                        component.noteListeningVelocities.splice(existingIndex, 1);
+                    }
+                    component.noteListeningNotes.push(newNote);
+                    component.noteListeningVelocities.push(velocity);
+                } else if (setOn == false) {
+                    // Count down one for a note off message
+                    component.noteListeningActivations = component.noteListeningActivations - 1;
+                }
+                if (component.noteListeningActivations === 0) {
+                    // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
+                    component.heardNotes = component.noteListeningNotes;
+                    component.heardVelocities = component.noteListeningVelocities;
+                    component.mostRecentlyPlayedNote = undefined;
+                    component.noteListeningNotes = [];
+                    component.noteListeningVelocities = [];
+                } else if (component.noteListeningActivations < 0) {
+                    console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                    component.noteListeningActivations = 0;
+                    component.noteListeningNotes = [];
+                    component.noteListeningVelocities = [];
+                    component.mostRecentlyPlayedNote = undefined;
+                }
+            }
+        }
+    }
+    property int noteListeningActivations: 0
+    property var noteListeningNotes: []
+    property var noteListeningVelocities: []
 
     onMostRecentlyPlayedNoteChanged:{
         updateActivePatternMPN.restart();
@@ -2172,7 +2213,9 @@ Zynthian.BasePlayGrid {
                             ? (component.mostRecentlyPlayedNote == undefined
                                 ? "(all)"
                                 : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
-                            : component.heardNotes.length + " ♫")
+                            : (component.heardNotes.length == 1
+                                ? component.heardNotes[0].name + (component.heardNotes[0].octave - 1)
+                                : component.heardNotes.length + " ♫"))
                     visualPressAndHold: true
                     onClicked: {
                         if (!pressingAndHolding) {

@@ -178,7 +178,7 @@ QQC2.Button {
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
                     Layout.maximumHeight: Layout.minimumHeight
-                    property bool currentGlobalPick: typeof(component.mostRecentlyPlayedNote) === "undefined" || (component.mostRecentlyPlayedNote && subNote && component.mostRecentlyPlayedNote.midiNote === subNote.midiNote) || (component.playgrid.heardNotes.length > 0 && component.playgrid.heardNotes.indexOf(subNote) > 0)
+                    property bool currentGlobalPick: (component.playgrid.heardNotes.length > 0 && component.playgrid.heardNotes.indexOf(subNote) > 0) || typeof(component.mostRecentlyPlayedNote) === "undefined" || (component.mostRecentlyPlayedNote && subNote && component.mostRecentlyPlayedNote.midiNote === subNote.midiNote)
                     opacity: currentGlobalPick ? 1 : 0.3
                     MultiPointTouchArea {
                         enabled: !padNoteRect.shouldChange

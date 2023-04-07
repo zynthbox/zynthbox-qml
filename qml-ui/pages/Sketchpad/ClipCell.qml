@@ -136,6 +136,7 @@ QQC2.AbstractButton {
             anchors.fill: parent
             anchors.topMargin: spacing
             anchors.bottomMargin: spacing
+            anchors.leftMargin: 2
 
             Binding {
                 target: partNamesRepeater
@@ -147,6 +148,8 @@ QQC2.AbstractButton {
             Repeater {
                 id: partNamesRepeater
                 delegate: RowLayout {
+                    property QtObject partPattern: root.sequence && channel ? root.sequence.getByPart(channel.id, index) : null
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
@@ -154,7 +157,7 @@ QQC2.AbstractButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: modelData.length > 0
-                                ? Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.2)
+                                ? Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, partPattern.hasNotes ? 1 : 0.2)
                                 : "transparent"
                     }
 

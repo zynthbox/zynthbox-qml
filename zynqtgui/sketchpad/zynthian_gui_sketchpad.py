@@ -866,11 +866,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__zselector[2].custom_encoder_speed = 0
         elif self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
             self.__filter_cutoff_controller.clear_controls()
-            synth_controllers_dict = self.zynqtgui.layer.layer_midi_map[selected_channel.chainedSounds[selected_channel.selectedSlotRow]].controllers_dict
-            if "cutoff" in synth_controllers_dict:
-                self.__filter_cutoff_controller.add_control(synth_controllers_dict["cutoff"])
-            elif "filter_cutoff" in synth_controllers_dict:
-                self.__filter_cutoff_controller.add_control(synth_controllers_dict["filter_cutoff"])
+            midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
+            if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
+                synth_controllers_dict = self.zynqtgui.layer.layer_midi_map[midi_channel].controllers_dict
+                if "cutoff" in synth_controllers_dict:
+                    self.__filter_cutoff_controller.add_control(synth_controllers_dict["cutoff"])
+                elif "filter_cutoff" in synth_controllers_dict:
+                    self.__filter_cutoff_controller.add_control(synth_controllers_dict["filter_cutoff"])
 
             self.__zselector_ctrl[2].set_options(
                 {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
@@ -955,12 +957,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__zselector[3].config(self.__zselector_ctrl[3])
         elif self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
             self.__filter_resonance_controller.clear_controls()
-            synth_controllers_dict = self.zynqtgui.layer.layer_midi_map[
-                selected_channel.chainedSounds[selected_channel.selectedSlotRow]].controllers_dict
-            if "resonance" in synth_controllers_dict:
-                self.__filter_resonance_controller.add_control(synth_controllers_dict["resonance"])
-            elif "filter_resonance" in synth_controllers_dict:
-                self.__filter_resonance_controller.add_control(synth_controllers_dict["filter_resonance"])
+            midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
+            if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
+                synth_controllers_dict = self.zynqtgui.layer.layer_midi_map[midi_channel].controllers_dict
+                if "resonance" in synth_controllers_dict:
+                    self.__filter_resonance_controller.add_control(synth_controllers_dict["resonance"])
+                elif "filter_resonance" in synth_controllers_dict:
+                    self.__filter_resonance_controller.add_control(synth_controllers_dict["filter_resonance"])
 
             self.__zselector_ctrl[3].set_options(
                 {'symbol': 'sketchpad_knob3', 'name': 'sketchpad_knob3',

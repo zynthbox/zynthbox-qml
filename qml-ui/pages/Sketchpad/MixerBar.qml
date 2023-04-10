@@ -320,8 +320,8 @@ Rectangle {
                                             Layout.fillHeight: false
                                             Layout.preferredHeight: Kirigami.Units.gridUnit
                                             orientation: Qt.Horizontal
-                                            from: 1.0
-                                            to: -1.0
+                                            from: -1.0
+                                            to: 1.0
                                             controlObj: model.channel
                                             controlProp: "pan"
                                             initialValue: model.channel.initialPan

@@ -139,6 +139,14 @@ def init():
             libzl.JackPassthrough_setPanAmount.argtypes = [ctypes.c_int, ctypes.c_float]
             libzl.JackPassthrough_getPanAmount.argtypes = [ctypes.c_int]
             libzl.JackPassthrough_getPanAmount.restype = ctypes.c_float
+
+            libzl.JackPassthrough_setWetFx1Amount.argtypes = [ctypes.c_int, ctypes.c_float]
+            libzl.JackPassthrough_getWetFx1Amount.argtypes = [ctypes.c_int]
+            libzl.JackPassthrough_getWetFx1Amount.restype = ctypes.c_float
+
+            libzl.JackPassthrough_setWetFx2Amount.argtypes = [ctypes.c_int, ctypes.c_float]
+            libzl.JackPassthrough_getWetFx2Amount.argtypes = [ctypes.c_int]
+            libzl.JackPassthrough_getWetFx2Amount.restype = ctypes.c_float
             ### END Type Definition
 
             # Start juce event loop
@@ -265,6 +273,28 @@ def setPanAmount(channel, amount):
 def getPanAmount(channel):
     if libzl:
         return libzl.JackPassthrough_getPanAmount(channel)
+    else:
+        return 0
+
+
+def setWetFx1Amount(channel, amount):
+    if libzl:
+        libzl.JackPassthrough_setWetFx1Amount(channel, amount)
+
+def getWetFx1Amount(channel):
+    if libzl:
+        return libzl.JackPassthrough_getWetFx1Amount(channel)
+    else:
+        return 0
+
+
+def setWetFx2Amount(channel, amount):
+    if libzl:
+        libzl.JackPassthrough_setWetFx2Amount(channel, amount)
+
+def getWetFx2Amount(channel):
+    if libzl:
+        return libzl.JackPassthrough_getWetFx2Amount(channel)
     else:
         return 0
 

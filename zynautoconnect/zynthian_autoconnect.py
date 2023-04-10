@@ -496,6 +496,20 @@ def audio_autoconnect(force=False):
 	except:
 		pass
 
+	try:
+		# This assumes FX input and output ports to have left and right channel stereo input and output respectively
+		globalFx1InputPorts = jclient.get_ports(zynthian_gui_config.zynqtgui.global_fx_engines[0][0].jackname, is_audio=True, is_input=True)
+		globalFx2InputPorts = jclient.get_ports(zynthian_gui_config.zynqtgui.global_fx_engines[1][0].jackname, is_audio=True, is_input=True)
+		globalFx1OutputPorts = jclient.get_ports(zynthian_gui_config.zynqtgui.global_fx_engines[0][0].jackname, is_audio=True, is_output=True)
+		globalFx2OutputPorts = jclient.get_ports(zynthian_gui_config.zynqtgui.global_fx_engines[1][0].jackname, is_audio=True, is_output=True)
+	except Exception as e:
+		global force_next_autoconnect
+		logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+		# Logic below the return statement will be eventually evaluated when called again after the timeout
+		force_next_autoconnect = True
+		release_lock()
+		return
+
 	###
 	# Handle SamplerSynth ports:
 	# - Always leave the global uneffected port alone (as that should just
@@ -506,70 +520,53 @@ def audio_autoconnect(force=False):
 	#   the SamplerSynth output for that channel to system playback, otherwise connect
 	#   to the effects
 
-	# Connect the global effects passthrough wet output to the global effects
-	hasGlobalEffects = False
-	if len(zynthian_gui_config.zynqtgui.global_fx_engines) > 0:
-		for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
-			try:
-				engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
-				# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
-				if len(engineInPorts) == 1:
-					engineInPorts[1] = engineInPorts[0];
-				for port in zip(jclient.get_ports("GlobalFXPassthrough:wetOut", is_audio=True, is_output=True), engineInPorts):
-					hasGlobalEffects = True
-					try:
-						jclient.connect(port[0], port[1])
-					except: pass
-			except Exception as e:
-				logging.error(f"Failed to connect global fx passthrough to one of the effect engines. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-				# Logic below the return statement will be eventually evaluated when called again after the timeout
-				force_next_autoconnect = True;
-				release_lock()
-				return
+	# Disable bluetooth ports connection for now
+	# Re-enable when bluetooth functionality is enabled
+	###################################
+	# ### Bluetooth ports connection
+	# bluealsa_ports = jclient.get_ports("bluealsa", is_audio=True, is_input=True)
+	#
+	# # Connect to bluealsa ports only if bluealsa ports are available
+	# if len(bluealsa_ports) > 0:
+	# 	# Connect GlobalFXPassthrough dry ports to bluealsa (if available)
+	# 	try:
+	# 		for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), bluealsa_ports):
+	# 			try:
+	# 				jclient.connect(port[0], port[1])
+	# 			except: pass
+	# 	except Exception as e:
+	# 		logging.error(f"Failed to connect global fx passthrough to bluealsa playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+	# 		# Logic below the return statement will be eventually evaluated when called again after the timeout
+	# 		force_next_autoconnect = True
+	# 		release_lock()
+	# 		return
+	#
+	# 	# Connect Global effects output to bluealsa (if available)
+	# 	if len(zynthian_gui_config.zynqtgui.global_fx_engines) > 0:
+	# 		for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
+	# 			try:
+	# 				engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True)
+	# 				# Some engines only take mono output, but we want them to receive both our left and right outputs, so connect l and r both to that one output
+	# 				if len(engineOutPorts) == 1:
+	# 					engineOutPorts[1] = engineOutPorts[0]
+	# 				for port in zip(engineOutPorts, bluealsa_ports):
+	# 					try:
+	# 						jclient.connect(port[0], port[1])
+	# 					except: pass
+	# 			except Exception as e:
+	# 				logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+	# 				# Logic below the return statement will be eventually evaluated when called again after the timeout
+	# 				force_next_autoconnect = True
+	# 				release_lock()
+	# 				return
+	# ### END Bluetooth ports connection
 
-	### Bluetooth ports connection
-	bluealsa_ports = jclient.get_ports("bluealsa", is_audio=True, is_input=True)
-
-	# Connect to bluealsa ports only if bluealsa ports are available
-	if len(bluealsa_ports) > 0:
-		# Connect GlobalFXPassthrough dry ports to bluealsa (if available)
-		try:
-			for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), bluealsa_ports):
-				try:
-					jclient.connect(port[0], port[1])
-				except: pass
-		except Exception as e:
-			logging.error(f"Failed to connect global fx passthrough to bluealsa playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-			# Logic below the return statement will be eventually evaluated when called again after the timeout
-			force_next_autoconnect = True
-			release_lock()
-			return
-
-		# Connect Global effects output to bluealsa (if available)
-		if len(zynthian_gui_config.zynqtgui.global_fx_engines) > 0:
-			for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
-				try:
-					engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True)
-					# Some engines only take mono output, but we want them to receive both our left and right outputs, so connect l and r both to that one output
-					if len(engineOutPorts) == 1:
-						engineOutPorts[1] = engineOutPorts[0]
-					for port in zip(engineOutPorts, bluealsa_ports):
-						try:
-							jclient.connect(port[0], port[1])
-						except: pass
-				except Exception as e:
-					logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-					# Logic below the return statement will be eventually evaluated when called again after the timeout
-					force_next_autoconnect = True
-					release_lock()
-					return
-	### END Bluetooth ports connection
-
-	globalFxPassthroughInput = jclient.get_ports("GlobalFXPassthrough:input", is_audio=True, is_input=True)
-	logging.error(f"Global FX Inputs are {globalFxPassthroughInput}")
-	
 	# Connect SamplerSynth's global effected to the global effects passthrough
-	for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), globalFxPassthroughInput):
+	for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), globalFx1InputPorts):
+		try:
+			jclient.connect(port[0], port[1])
+		except: pass
+	for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), globalFx2InputPorts):
 		try:
 			jclient.connect(port[0], port[1])
 		except: pass
@@ -583,22 +580,14 @@ def audio_autoconnect(force=False):
 			pass
 
 	# Connect global FX ports to system playback
-	try:
-		for engine, _ in zynthian_gui_config.zynqtgui.global_fx_engines:
-			try:
-				engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True);
-				for port in zip(engineOutPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
-					try:
-						jclient.connect(port[0], port[1])
-					except: pass
-			except Exception as e:
-				logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-				# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
-				# Logic below the return statement will be eventually evaluated when called again after the timeout
-				force_next_autoconnect = True;
-				release_lock()
-				return
-	except: pass
+	for port in zip(globalFx1OutputPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
+		try:
+			jclient.connect(port[0], port[1])
+		except: pass
+	for port in zip(globalFx2OutputPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
+		try:
+			jclient.connect(port[0], port[1])
+		except: pass
 
 	# Connect each channel's ports to either that channel's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the channel
 	# If there's no song yet, we can't do a lot...
@@ -804,11 +793,19 @@ def audio_autoconnect(force=False):
 		channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels-Channel{channel_index+1}", is_audio=True, is_input=True)
 		globalPlaybackInputPorts = jclient.get_ports(f"GlobalPlayback", is_audio=True, is_input=True)
 
-		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOut", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
 			try:
 				jclient.connect(port[0], port[1])
 			except: pass
-		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOut", is_audio=True, is_output=True), globalFxPassthroughInput):
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOutFx2", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+			try:
+				jclient.connect(port[0], port[1])
+			except: pass
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOutFx1", is_audio=True, is_output=True), globalFx1InputPorts):
+			try:
+				jclient.connect(port[0], port[1])
+			except: pass
+		for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOutFx2", is_audio=True, is_output=True), globalFx2InputPorts):
 			try:
 				jclient.connect(port[0], port[1])
 			except: pass
@@ -847,16 +844,6 @@ def audio_autoconnect(force=False):
 			jclient.connect(port[0], port[1])
 		except:
 			logging.exception("Error connecting ports")
-
-	for port in zip(jclient.get_ports(f"GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), globalPlaybackDryInputPorts):
-		try:
-			jclient.connect(port[0], port[1])
-		except Exception as e:
-			logging.error(f"Failed to connect global fx passthrough to system playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-			# Logic below the return statement will be eventually evaluated when called again after the timeout
-			force_next_autoconnect = True;
-			release_lock()
-			return
 	### END Connect globalPlayback ports
 
 	headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)

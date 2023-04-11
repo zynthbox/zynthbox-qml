@@ -79,6 +79,8 @@ class sketchpad_channel(QObject):
         self.__sound_json_snapshot__ = ""
         self.route_through_global_fx = True
         self.__channel_synth_ports = []
+        self.__wet_fx_1_amount = 100
+        self.__wet_fx_2_amount = 100
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -1237,6 +1239,40 @@ class sketchpad_channel(QObject):
 
     channelHasSynth = Property(bool, get_channelHasSynth, notify=chained_sounds_changed)
     ### END Property channelSynthPorts
+
+    ### Property wetFx1Amount
+    def get_wetFx1Amount(self):
+        return self.__wet_fx_1_amount
+
+    def set_wetFx1Amount(self, value):
+        if self.__wet_fx_1_amount != value:
+            self.__wet_fx_1_amount = value
+            libzl.setWetFx1Amount(self.id, np.interp(self.__wet_fx_1_amount, (0, 100), (0, 1)))
+            self.wetFx1AmountChanged.emit()
+
+    wetFx1AmountChanged = Signal()
+
+    wetFx1Amount = Property(int, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
+    ### END Property wetFx1Amount
+
+    ### Property wetFx2Amount
+    def get_wetFx2Amount(self):
+        return self.__wet_fx_2_amount
+
+    def set_wetFx2Amount(self, value):
+        if self.__wet_fx_2_amount != value:
+            self.__wet_fx_2_amount = value
+            libzl.setWetFx2Amount(self.id, np.interp(self.__wet_fx_2_amount, (0, 100), (0, 1)))
+            self.wetFx2AmountChanged.emit()
+
+    wetFx2AmountChanged = Signal()
+
+    """
+    Store wetFx1Amount for current channel as a property and set it to JackPassthrough via libzl when value changes
+    Stored value ranges from 0-100 and accepted range in libzl.setWetFx1Amount is 0-1
+    """
+    wetFx2Amount = Property(float, get_wetFx2Amount, set_wetFx2Amount, notify=wetFx2AmountChanged)
+    ### END Property wetFx2Amount
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):

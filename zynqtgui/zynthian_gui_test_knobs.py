@@ -51,7 +51,7 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.zynqtgui):
     def set_selector(self, zs_hiden=True):
         for i in range(4):
             if self.__zselector[i] is not None:
-                if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+                if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) and \
                         self.zynqtgui.get_current_screen_id() is not None and \
                         self.zynqtgui.get_current_screen() == self:
                     self.__zselector[i].show()
@@ -65,7 +65,7 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.zynqtgui):
                      'value_max': 100,
                      'value': 0})
                 self.__zselector[i].config(self.__zselector_ctrl[i])
-            elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+            elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) and \
                     self.zynqtgui.get_current_screen_id() is not None and \
                     self.zynqtgui.get_current_screen() == self:
                 self.__zselector_ctrl[i] = zynthian_controller(None, 'test knob {}'.format(i), 'test knob {}'.format(i),

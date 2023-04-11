@@ -243,7 +243,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
 
 	def set_selector(self, zs_hiden=False):
 		if self.zselector is not None:
-			if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+			if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) and \
 					self.zynqtgui.get_current_screen_id() is not None and \
 					self.zynqtgui.get_current_screen() == self:
 				self.zselector.show()
@@ -253,7 +253,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
 		if self.zselector:
 			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
 			self.zselector.config(self.zselector_ctrl)
-		elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed) and \
+		elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) and \
 			self.zynqtgui.get_current_screen_id() is not None and \
 			self.zynqtgui.get_current_screen() == self:
 			self.zselector_ctrl = zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })

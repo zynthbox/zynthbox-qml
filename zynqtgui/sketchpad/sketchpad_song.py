@@ -668,15 +668,16 @@ class sketchpad_song(QObject):
 
     def set_playChannelSolo(self, value):
         if self.__play_channel_solo != value:
-            logging.debug(f"set_playChannelSolo: {value}")
             self.__play_channel_solo = value
 
             for channel_index in range(self.channelsModel.count):
                 channel = self.channelsModel.getChannel(channel_index)
-                if (value == -1 or channel.id == value) and not channel.muted:
-                    channel.unmute_all_clips_in_channel()
+                if value == -1:
+                    libzl.setMuted(channel.id, channel.muted)
+                elif value == channel.id:
+                    libzl.setMuted(channel.id, False)
                 else:
-                    channel.mute_all_clips_in_channel()
+                    libzl.setMuted(channel.id, True)
 
             self.playChannelSoloChanged.emit()
 

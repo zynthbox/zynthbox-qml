@@ -62,8 +62,8 @@ class sketchpad_channel(QObject):
         self.__audio_level__ = -200
         self.__clips_model__ = [sketchpad_clips_model(song, self, 0), sketchpad_clips_model(song, self, 1), sketchpad_clips_model(song, self, 2), sketchpad_clips_model(song, self, 3), sketchpad_clips_model(song, self, 4)]
         self.__layers_snapshot = []
-        self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
-        self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
+        self.master_volume = libzl.dbFromVolume(self.zynqtgui.masterVolume/100)
+        self.zynqtgui.masterVolumeChanged.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
@@ -190,7 +190,7 @@ class sketchpad_channel(QObject):
             logging.info("### select_correct_layer : Do not Reselect channel sound since it is not removing current selected channel")
 
     def master_volume_changed(self):
-        self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
+        self.master_volume = libzl.dbFromVolume(self.zynqtgui.masterVolume/100)
         logging.debug(f"Master Volume : {self.master_volume} dB")
 
     def stopAllClips(self):

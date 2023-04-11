@@ -437,8 +437,8 @@ MouseArea {
                     contentItem: SketchpadDial {
                         id: volumeDial
                         text: qsTr("Volume")
-                        controlObj: zynqtgui.master_alsa_mixer
-                        controlProperty: "volume"
+                        controlObj: zynqtgui
+                        controlProperty: "masterVolume"
                         valueString: qsTr("%1%").arg(dial.value)
 
                         dial {

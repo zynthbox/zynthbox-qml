@@ -31,7 +31,7 @@ from PySide2.QtCore import Property, QTimer, Signal, Slot
 import logging
 import re
 import zyngine
-from . import zynthian_qt_gui_base,zynthian_gui_master_alsa_mixer
+from . import zynthian_qt_gui_base
 
 from zyncoder import *
 

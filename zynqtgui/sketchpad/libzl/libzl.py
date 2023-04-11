@@ -147,6 +147,10 @@ def init():
             libzl.JackPassthrough_setWetFx2Amount.argtypes = [ctypes.c_int, ctypes.c_float]
             libzl.JackPassthrough_getWetFx2Amount.argtypes = [ctypes.c_int]
             libzl.JackPassthrough_getWetFx2Amount.restype = ctypes.c_float
+
+            libzl.JackPassthrough_setDryAmount.argtypes = [ctypes.c_int, ctypes.c_float]
+            libzl.JackPassthrough_getDryAmount.argtypes = [ctypes.c_int]
+            libzl.JackPassthrough_getDryAmount.restype = ctypes.c_float
             ### END Type Definition
 
             # Start juce event loop
@@ -297,6 +301,18 @@ def getWetFx2Amount(channel):
         return libzl.JackPassthrough_getWetFx2Amount(channel)
     else:
         return 0
+
+
+def setDryAmount(channel, amount):
+    if libzl:
+        libzl.JackPassthrough_setDryAmount(channel, amount)
+
+def getDryAmount(channel):
+    if libzl:
+        return libzl.JackPassthrough_getDryAmount(channel)
+    else:
+        return 0
+
 
 class ClipAudioSource(QObject):
     audioLevelChanged = Signal(float)

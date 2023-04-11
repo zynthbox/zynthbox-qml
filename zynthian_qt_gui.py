@@ -23,8 +23,11 @@
 #
 # ******************************************************************************
 import os
+import re
 import sys
 import copy
+
+import alsaaudio
 import liblo
 import queue
 import signal
@@ -162,7 +165,6 @@ from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 
 from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
-from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
 
 from zynqtgui.zynthian_osd import zynthian_osd
 
@@ -459,6 +461,7 @@ class zynthian_gui(QObject):
         self.__show_current_task_message = True
         self.currentTaskMessageChanged.connect(self.save_currentTaskMessage, Qt.QueuedConnection)
         self.currentTaskMessage = f"Starting Zynthbox QML"
+        self.__master_volume = self.get_initialMasterVolume()
 
         self.zynmidi = None
         self.screens = {}
@@ -781,15 +784,6 @@ class zynthian_gui(QObject):
             if takeControlOfSelector is True:
                 self.set_selector()
 
-    def get_volume(self):
-        value = 0
-        if self.master_alsa_mixer is not None:
-            value = self.master_alsa_mixer.volume
-        return value
-
-    def set_volume(self, value):
-        self.set_volume_actual(value, False)
-
     @Slot(None)
     def zyncoder_set_volume(self):
         if self.globalPopupOpened or self.metronomeButtonPressed:
@@ -801,9 +795,8 @@ class zynthian_gui(QObject):
         """
 
         volume = int(volume)
-        if self.master_alsa_mixer is not None and \
-                self.master_alsa_mixer.volume != volume:
-            self.master_alsa_mixer.set_volume(volume, takeControlOfSelector)
+        if self.masterVolume != volume:
+            self.masterVolume = volume
 
             if not self.globalPopupOpened:
                 self.osd.updateOsd(
@@ -812,11 +805,11 @@ class zynthian_gui(QObject):
                     start=0,
                     stop=100,
                     step=1,
-                    defaultValue=self.master_alsa_mixer.initialVolume,
+                    defaultValue=None,
                     currentValue=volume,
                     setValueFunction=self.set_volume_actual,
                     showValueLabel=True,
-                    showResetToDefault=True,
+                    showResetToDefault=False,
                     showVisualZero=True
                 )
 
@@ -1109,8 +1102,8 @@ class zynthian_gui(QObject):
                 min_value = 0
                 max_value = 0
 
-                if self.master_alsa_mixer is not None:
-                    value = self.master_alsa_mixer.volume
+                if self.sketchpad is not None:
+                    value = self.masterVolume
                     min_value = 0
                     max_value = 100 + 1
 
@@ -1656,13 +1649,6 @@ class zynthian_gui(QObject):
         self.screens["audio_recorder"] = zynthian_gui_audio_recorder(self)
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
-
-        ###
-        # Sketchpad depends on master_alsa_mixer screen for master volume related functionalities
-        # and hence needs to be initialized before ZL page has been initialized
-        ###
-        self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
-
         self.screens["sketchpad"] = zynthian_gui_sketchpad(self)
 
         ###
@@ -2641,7 +2627,7 @@ class zynthian_gui(QObject):
                     self.playButtonPressed = True
                 elif i == 20:
                     self.bpmBeforePressingMetronome = self.sketchpad.song.bpm
-                    self.volumeBeforePressingMetronome = self.master_alsa_mixer.volume
+                    self.volumeBeforePressingMetronome = self.masterVolume
                     self.delayBeforePressingMetronome = self.global_fx_engines[0][1].value
                     self.reverbBeforePressingMetronome = self.global_fx_engines[1][1].value
                     self.metronomeButtonPressed = True
@@ -2677,7 +2663,7 @@ class zynthian_gui(QObject):
                 elif i == 20:
                     # Toggle metronome only if metronome+BK is not used to change bpm or volume or delay or reverb
                     bpmAfterPressingMetronome = self.sketchpad.song.bpm
-                    volumeAfterPressingMetronome = self.master_alsa_mixer.volume
+                    volumeAfterPressingMetronome = self.masterVolume
                     delayAfterPressingMetronome = self.global_fx_engines[0][1].value
                     reverbAfterPressingMetronome = self.global_fx_engines[1][1].value
                     if bpmAfterPressingMetronome == self.bpmBeforePressingMetronome and \
@@ -3172,7 +3158,7 @@ class zynthian_gui(QObject):
                                 QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
 
                         # When global popup is open, set volume with small knob 1
-                        if self.__zselector[1] and self.master_alsa_mixer is not None:
+                        if self.__zselector[1]:
                             self.__zselector[1].read_zyncoder()
                             if self.altButtonPressed:
                                 QMetaObject.invokeMethod(self, "zyncoder_set_channel_volume", Qt.QueuedConnection)
@@ -3941,8 +3927,7 @@ class zynthian_gui(QObject):
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
-
-        
+        self.setMaxAlsaVolume()
 
         # Display sketchpad page and run set_selector at last before hiding splash
         # to ensure knobs work fine
@@ -4165,9 +4150,6 @@ class zynthian_gui(QObject):
     def hardware(self):
         return self.screens["hardware"]
 
-    def master_alsa_mixer(self):
-        return self.screens["master_alsa_mixer"]
-
     def session_dashboard(self):
         return self.screens["session_dashboard"]
 
@@ -4194,6 +4176,36 @@ class zynthian_gui(QObject):
 
     def osd(self):
         return self.__osd
+
+    def setMaxAlsaVolume(self):
+        # Read jack2.service file to find selected card name
+        with open("/etc/systemd/system/jack2.service", "r") as f:
+            data = f.read()
+
+            # Get jackd command line args
+            args = re.search("\nExecStart=(.*)", data).group(1).split(" ")
+
+            # Discard everything before first occurrence of -d
+            while args.pop(0) != "-d":
+                continue
+
+            # Find next -d or -P
+            while True:
+                option = args.pop(0)
+                if option == "-d" or option == "-P":
+                    raw_dev = args.pop(0)
+                    audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
+                    break
+
+        try:
+            accepted_mixer_names = ["Master", "Headphone", "HDMI", "Digital"];
+            card = alsaaudio.cards().index(audio_device)
+            for mixer_name in alsaaudio.mixers(card):
+                if mixer_name in accepted_mixer_names:
+                    alsaaudio.Mixer(mixer_name, 0, card).setvolume(100)
+                    break
+        except Exception as e:
+            logging.error(f"Error setting ALSA volume to maximum : {str(e)}")
     
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):
@@ -4705,6 +4717,29 @@ class zynthian_gui(QObject):
     isExternalAppActive = Property(bool, get_isExternalAppActive, notify=isExternalAppActiveChanged)
     ### END Property isExternalAppActive
 
+    ### Property masterVolume
+    def get_masterVolume(self):
+        return self.__master_volume
+
+    def set_masterVolume(self, value):
+        if self.__master_volume != value:
+            self.__master_volume = value
+            # libzl expects dryAmount to be ranging from 0-1
+            libzl.setDryAmount(-1, np.interp(value, (0, 100), (0, 1)))
+            self.masterVolumeChanged.emit()
+
+    masterVolumeChanged = Signal()
+
+    masterVolume = Property(int, get_masterVolume, set_masterVolume, notify=masterVolumeChanged)
+    ### END Property masterVolume
+
+    ### Property initialMasterVolume
+    def get_initialMasterVolume(self):
+        return 35
+
+    initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
+    ### END Property initialMasterVolume
+
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
     deferred_loading_timer_start = Signal()
@@ -4742,7 +4777,6 @@ class zynthian_gui(QObject):
     snapshots_menu = Property(QObject, snapshots_menu, constant=True)
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
-    master_alsa_mixer = Property(QObject, master_alsa_mixer, constant=True)
     session_dashboard = Property(QObject, session_dashboard, constant=True)
     song_arranger = Property(QObject, song_arranger, constant=True)
     song_player = Property(QObject, song_player, constant=True)

@@ -196,7 +196,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             libzl.registerTimerCallback(libzlCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
-            self.zynqtgui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
 
             self.zynqtgui.fixed_layers.volumeControllersChanged.connect(self.set_selector_timer.start)
@@ -1236,13 +1235,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     ### END Property lastRecordingMidi
 
     @Signal
-    def master_volume_changed(self):
-        pass
-
-    def get_master_volume(self):
-        return self.zynqtgui.master_alsa_mixer.volume
-
-    @Signal
     def click_channel_enabled_changed(self):
         pass
 
@@ -1422,9 +1414,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.song_changed.emit()
                 self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
                 self.newSketchpadLoaded.emit()
-
-            # Set ALSA Mixer volume to 100% when creating new sketchpad
-            self.zynqtgui.screens["master_alsa_mixer"].volume = 100
 
             # Update volume controls
             self.zynqtgui.fixed_layers.fill_list()

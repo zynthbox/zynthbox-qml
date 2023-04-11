@@ -328,9 +328,6 @@ class sketchpad_song(QObject):
                 if "volume" in sketchpad:
                     self.__volume__ = sketchpad["volume"]
                     self.set_volume(self.__volume__, True)
-
-                    # Restore ALSA Mixer volume from sketchpad
-                    # self.__metronome_manager__.zynqtgui.screens["master_alsa_mixer"].volume = self.__volume__
                 if "selectedScaleIndex" in sketchpad:
                     self.set_selected_scale_index(sketchpad["selectedScaleIndex"], True)
                 if "octave" in sketchpad:

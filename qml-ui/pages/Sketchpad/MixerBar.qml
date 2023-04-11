@@ -429,21 +429,21 @@ Rectangle {
                             Binding {
                                 target: masterVolume.slider
                                 property: "value"
-                                value: zynqtgui.master_alsa_mixer.volume
+                                value: zynqtgui.masterVolume
                             }
 
                             slider {
-                                value: zynqtgui.master_alsa_mixer.volume
+                                value: zynqtgui.masterVolume
                                 from: 0
                                 to: 100
                                 stepSize: 1
                             }
                             onValueChanged: {
-                                zynqtgui.master_alsa_mixer.volume = masterVolume.slider.value;
+                                zynqtgui.masterVolume = masterVolume.slider.value;
                                 zynqtgui.sketchpad.song.volume = masterVolume.slider.value;
                             }
                             onDoubleClicked: {
-                                zynqtgui.master_alsa_mixer.volume = zynqtgui.master_alsa_mixer.initialVolume
+                                zynqtgui.masterVolume = zynqtgui.initialMasterVolume
                             }
                         }
                     }

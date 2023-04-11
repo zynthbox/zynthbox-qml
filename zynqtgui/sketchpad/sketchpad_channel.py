@@ -79,6 +79,7 @@ class sketchpad_channel(QObject):
         self.__sound_json_snapshot__ = ""
         self.route_through_global_fx = True
         self.__channel_synth_ports = []
+        self.__dry_amount = 100
         self.__wet_fx_1_amount = 100
         self.__wet_fx_2_amount = 100
 
@@ -469,19 +470,11 @@ class sketchpad_channel(QObject):
         return self.__volume__
 
     def set_volume(self, volume:int, force_set=False):
-        if self.__volume__ != math.floor(volume) or force_set is True:
-            self.__volume__ = math.floor(volume)
-            logging.debug(f"Channel : Setting volume {self.__volume__}")
-
-            # Update synth volume when channel volume changes
-            for sound in self.chainedSounds:
-                if sound >= 0 and self.checkIfLayerExists(sound):
-                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[sound]
-
-                    # Interpolate channel volume (-40 -> 20) to volume control object's range
-                    if volume_control_obj is not None and \
-                            volume_control_obj.value != np.interp(self.__volume__, [-40, 20], [volume_control_obj.value_min, volume_control_obj.value_max]):
-                        volume_control_obj.value = np.interp(self.__volume__, [-40, 20], [volume_control_obj.value_min, volume_control_obj.value_max])
+        if self.__volume__ != round(volume) or force_set is True:
+            self.__volume__ = round(volume)
+            self.set_dryAmount(self.dryAmount, True)
+            self.set_wetFx1Amount(self.wetFx1Amount, True)
+            self.set_wetFx2Amount(self.wetFx2Amount, True)
 
             self.volume_changed.emit()
             self.__song__.schedule_save()
@@ -1240,14 +1233,33 @@ class sketchpad_channel(QObject):
     channelHasSynth = Property(bool, get_channelHasSynth, notify=chained_sounds_changed)
     ### END Property channelSynthPorts
 
+    ### Property dryAmount
+    def get_dryAmount(self):
+        return self.__dry_amount
+
+    def set_dryAmount(self, value, force_set=False):
+        if self.__dry_amount != value or force_set is True:
+            self.__dry_amount = value
+            volume = np.interp(self.__volume__, (-40, 20), (0, 1))
+            # Calculate dry amount as per volume
+            libzl.setDryAmount(self.id, np.interp(self.__dry_amount * volume, (0, 100), (0, 1)))
+            self.dryAmountChanged.emit()
+
+    dryAmountChanged = Signal()
+
+    dryAmount = Property(float, get_dryAmount, set_dryAmount, notify=dryAmountChanged)
+    ### END Property wetFx2Amount
+
     ### Property wetFx1Amount
     def get_wetFx1Amount(self):
         return self.__wet_fx_1_amount
 
-    def set_wetFx1Amount(self, value):
-        if self.__wet_fx_1_amount != value:
+    def set_wetFx1Amount(self, value, force_set=False):
+        if self.__wet_fx_1_amount != value or force_set is True:
             self.__wet_fx_1_amount = value
-            libzl.setWetFx1Amount(self.id, np.interp(self.__wet_fx_1_amount, (0, 100), (0, 1)))
+            volume = np.interp(self.__volume__, (-40, 20), (0, 1))
+            # Calculate wet amount as per volume
+            libzl.setWetFx1Amount(self.id, np.interp(self.__wet_fx_1_amount * volume, (0, 100), (0, 1)))
             self.wetFx1AmountChanged.emit()
 
     wetFx1AmountChanged = Signal()
@@ -1259,10 +1271,12 @@ class sketchpad_channel(QObject):
     def get_wetFx2Amount(self):
         return self.__wet_fx_2_amount
 
-    def set_wetFx2Amount(self, value):
-        if self.__wet_fx_2_amount != value:
+    def set_wetFx2Amount(self, value, force_set=False):
+        if self.__wet_fx_2_amount != value or force_set is True:
             self.__wet_fx_2_amount = value
-            libzl.setWetFx2Amount(self.id, np.interp(self.__wet_fx_2_amount, (0, 100), (0, 1)))
+            volume = np.interp(self.__volume__, (-40, 20), (0, 1))
+            # Calculate wet amount as per volume
+            libzl.setWetFx2Amount(self.id, np.interp(self.__wet_fx_2_amount * volume, (0, 100), (0, 1)))
             self.wetFx2AmountChanged.emit()
 
     wetFx2AmountChanged = Signal()

@@ -172,28 +172,17 @@ Rectangle {
                                             VolumeControl {
                                                 id: volumeControl
 
-                                                property var audioLevelText: model.channel.audioLevel.toFixed(2)
                                                 property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.channel.samples[model.channel.selectedSlotRow].cppObjId);
-                                                property real synthAudioLevel
 
                                                 anchors.fill: parent
 
                                                 enabled: !model.channel.muted
-                                                headerText: model.channel.muted || model.channel.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
+                                                headerText: model.channel.muted || ZL.AudioLevels.channels[model.channel.id] <= -40
+                                                                ? ""
+                                                                : (Math.round(ZL.AudioLevels.channels[model.channel.id]) + " (dB)")
             //                                    footerText: model.channel.name
-                                                audioLeveldB: visible
-                                                                ? !model.channel.muted
-                                                                    ? model.channel.channelAudioType === "sample-loop"
-                                                                        ? ZL.AudioLevels.add(model.channel.audioLevel, synthAudioLevel)
-                                                                        : model.channel.channelAudioType === "synth"
-                                                                            ? synthAudioLevel
-                                                                            : model.channel.channelAudioType === "sample-trig" ||
-                                                                                model.channel.channelAudioType === "sample-slice"
-                                                                                ? sampleClipObject
-                                                                                    ? sampleClipObject.audioLevel
-                                                                                    : -400
-                                                                                : -400
-                                                                    : -400
+                                                audioLeveldB: visible && !model.channel.muted
+                                                                ? ZL.AudioLevels.channels[model.channel.id]
                                                                 : -400
                                                 inputAudioLevelVisible: false
 
@@ -212,11 +201,6 @@ Rectangle {
                                                     target: volumeControl.slider
                                                     property: "value"
                                                     value: model.channel.volume
-                                                }
-                                                Binding {
-                                                    target: volumeControl
-                                                    property: "synthAudioLevel"
-                                                    value: root.visible ? ZL.AudioLevels.channels[model.channel.id] : -400
                                                 }
                                             }
 
@@ -417,11 +401,9 @@ Rectangle {
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
-                            headerText: root.visible
-                                            ? ZL.AudioLevels.playback <= -40
-                                                ? ""
-                                                : (ZL.AudioLevels.playback.toFixed(2) + " (dB)")
-                                            : ""
+                            headerText: root.visible || ZL.AudioLevels.playback <= -40
+                                            ? ""
+                                            : (Math.round(ZL.AudioLevels.playback) + " (dB)")
                             footerText: "Master"
                             audioLeveldB: visible ? ZL.AudioLevels.playback :  -400
                             inputAudioLevelVisible: false

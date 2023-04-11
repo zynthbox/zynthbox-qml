@@ -418,12 +418,12 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
                             headerText: root.visible
-                                            ? zynqtgui.sketchpad.masterAudioLevel <= -40
+                                            ? ZL.AudioLevels.playback <= -40
                                                 ? ""
-                                                : (zynqtgui.sketchpad.masterAudioLevel.toFixed(2) + " (dB)")
+                                                : (ZL.AudioLevels.playback.toFixed(2) + " (dB)")
                                             : ""
                             footerText: "Master"
-                            audioLeveldB: visible ? zynqtgui.sketchpad.masterAudioLevel :  -400
+                            audioLeveldB: visible ? ZL.AudioLevels.playback :  -400
                             inputAudioLevelVisible: false
 
                             Binding {

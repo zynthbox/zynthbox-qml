@@ -137,10 +137,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
 
-        self.__master_audio_level__ = -200
-        self.master_audio_level_timer = QTimer()
-        self.master_audio_level_timer.setInterval(50)
-        self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zynqtgui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
 
         self.set_selector_timer = QTimer()
@@ -214,8 +210,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             for i in range(0, self.__song__.channelsModel.count):
                 channel = self.__song__.channelsModel.getChannel(i)
                 channel.update_jack_port()
-
-        self.master_audio_level_timer.start()
 
         if sketchpad is not None:
             logging.debug(f"### Checking Sketchpad : {sketchpad} : exists({Path(sketchpad).exists()}) ")
@@ -1034,25 +1028,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def back_action(self):
         return "sketchpad"
 
-    @Slot(None)
-    def startMonitorMasterAudioLevels(self):
-        self.master_audio_level_timer.start()
-
-    @Slot(None)
-    def stopMonitorMasterAudioLevels(self):
-        self.master_audio_level_timer.stop()
-
-    def master_volume_level_timer_timeout(self):
-        try:
-            added_db = 0
-            for i in range(0, self.__song__.channelsModel.count):
-                channel = self.__song__.channelsModel.getChannel(i)
-                added_db += pow(10, channel.get_audioLevel()/10)
-
-            self.set_master_audio_level(10*math.log10(added_db))
-        except:
-            self.set_master_audio_level(0)
-
     ### Property countInBars
     def get_countInBars(self):
         return self.__count_in_bars__
@@ -1091,16 +1066,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     recordSolo = Property(bool, get_recordSolo, set_recordSolo, notify=recordSoloChanged)
     ### END Property recordSolo
-
-    ### Property masterAudioLevel
-    def get_master_audio_level(self):
-        return self.__master_audio_level__
-    def set_master_audio_level(self, level):
-        self.__master_audio_level__ = level
-        self.master_audio_level_changed.emit()
-    master_audio_level_changed = Signal()
-    masterAudioLevel = Property(float, get_master_audio_level, notify=master_audio_level_changed)
-    ### END Property masterAudioLevelLeft
 
     ### Property clipToRecord
     def get_clip_to_record(self):

@@ -46,6 +46,12 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                bottomStack.slotsBar.channelButton.checked = true
+                return true
+
             case "SWITCH_SELECT_SHORT":
                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                 zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);

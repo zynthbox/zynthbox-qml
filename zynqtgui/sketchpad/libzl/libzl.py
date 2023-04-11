@@ -314,6 +314,17 @@ def getDryAmount(channel):
         return 0
 
 
+def setMuted(channel, value):
+    if libzl:
+        libzl.JackPassthrough_setMuted(channel, value)
+
+def getMuted(channel):
+    if libzl:
+        return libzl.JackPassthrough_getMuted(channel)
+    else:
+        return 0
+
+
 class ClipAudioSource(QObject):
     audioLevelChanged = Signal(float)
     progressChanged = Signal(float)

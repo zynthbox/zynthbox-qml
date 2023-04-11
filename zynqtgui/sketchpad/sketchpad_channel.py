@@ -880,15 +880,16 @@ class sketchpad_channel(QObject):
     ### Property muted
     def get_muted(self):
         return self.__muted__
+
     def set_muted(self, muted):
-        self.__muted__ = muted
-        if muted:
-            self.mute_all_clips_in_channel()
-        elif self.__song__.playChannelSolo == -1 or (self.__song__.playChannelSolo == self.id):
-            self.unmute_all_clips_in_channel()
-        self.isMutedChanged.emit()
-    isMutedChanged = Signal()
-    muted = Property(bool, get_muted, set_muted, notify=isMutedChanged)
+        if self.__muted__ != muted:
+            self.__muted__ = muted
+            libzl.setMuted(self.id, muted)
+            self.mutedChanged.emit()
+
+    mutedChanged = Signal()
+
+    muted = Property(bool, get_muted, set_muted, notify=mutedChanged)
     ### End Property muted
 
     ### Property channelAudioType
@@ -1303,22 +1304,6 @@ class sketchpad_channel(QObject):
     @Slot(str, result=None)
     def setChannelSoundFromSnapshotJson(self, snapshot):
         self.zynqtgui.sound_categories.loadChannelSoundFromJson(self.id, snapshot)
-
-    def mute_all_clips_in_channel(self):
-        for clip_model_index in range(5):
-            clips_model = self.__clips_model__[clip_model_index]
-            for clip_index in range(0, clips_model.count):
-                clip = clips_model.getClip(clip_index)
-                if clip is not None:
-                    clip.setVolume(-40)
-
-    def unmute_all_clips_in_channel(self):
-        for clip_model_index in range(5):
-            clips_model = self.__clips_model__[clip_model_index]
-            for clip_index in range(0, clips_model.count):
-                clip = clips_model.getClip(clip_index)
-                if clip is not None:
-                    clip.setVolume(self.volume)
 
     def update_sound_snapshot_json(self):
         if self.connectedSound == -1:

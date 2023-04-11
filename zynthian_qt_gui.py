@@ -972,11 +972,11 @@ class zynthian_gui(QObject):
         """
         Set channel delay send amount when altButton is pressed
         """
-        
-        value = round(np.interp(round(delay), (0, 100), (0, 1)), 1)
 
-        if round(libzl.getWetFx1Amount(self.session_dashboard.selectedChannel), 1) != value:
-            libzl.setWetFx1Amount(self.session_dashboard.selectedChannel, value)
+        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+
+        if selected_channel.wetFx1Amount != delay:
+            selected_channel.wetFx1Amount = delay
 
             if takeControlOfSelector is True:
                 self.set_selector()
@@ -988,7 +988,7 @@ class zynthian_gui(QObject):
                 stop=100,
                 step=1,
                 defaultValue=100,
-                currentValue=round(delay),
+                currentValue=delay,
                 setValueFunction=self.zyncoder_set_channel_delay_send_amount_actual,
                 showValueLabel=True,
                 showResetToDefault=True,
@@ -1005,10 +1005,10 @@ class zynthian_gui(QObject):
         Set channel reverb send amount when altButton is pressed
         """
 
-        value = round(np.interp(round(reverb), (0, 100), (0, 1)), 1)
+        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
 
-        if round(libzl.getWetFx2Amount(self.session_dashboard.selectedChannel), 1) != value:
-            libzl.setWetFx2Amount(self.session_dashboard.selectedChannel, value)
+        if selected_channel.wetFx2Amount != reverb:
+            selected_channel.wetFx2Amount = reverb
 
             if takeControlOfSelector is True:
                 self.set_selector()
@@ -1020,7 +1020,7 @@ class zynthian_gui(QObject):
                 stop=100,
                 step=1,
                 defaultValue=100,
-                currentValue=round(reverb),
+                currentValue=reverb,
                 setValueFunction=self.zyncoder_set_channel_reverb_send_amount_actual,
                 showValueLabel=True,
                 showResetToDefault=True,
@@ -1140,14 +1140,14 @@ class zynthian_gui(QObject):
 
             if self.altButtonPressed:
                 logging.debug(f"### set_selector : Configuring small knob 2 to set channel delay send amount")
+                selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
 
                 if self.__zselector[2] is None:
                     self.__zselector_ctrl[2] = zynthian_controller(None, 'global_small_knob_2', 'global_small_knob_2', {'midi_cc': 0})
                     self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
                     self.__zselector[2].show()
 
-                value = round(np.interp(libzl.getWetFx1Amount(self.session_dashboard.selectedChannel), (0, 1), (0, 100)))
-                self.__zselector_ctrl[2].set_options({'value_max': 101, 'value': value, 'value_min': 0, 'step': 1})
+                self.__zselector_ctrl[2].set_options({'value_max': 101, 'value': selected_channel.wetFx1Amount, 'value_min': 0, 'step': 1})
                 self.__zselector[2].config(self.__zselector_ctrl[2])
             else:
                 logging.debug(f"### set_selector : Configuring small knob 2 to set delay")
@@ -1189,14 +1189,14 @@ class zynthian_gui(QObject):
 
             if self.altButtonPressed:
                 logging.debug(f"### set_selector : Configuring small knob 3 to set channel reverb send amount")
+                selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
 
                 if self.__zselector[3] is None:
                     self.__zselector_ctrl[3] = zynthian_controller(None, 'global_small_knob_3', 'global_small_knob_3', {'midi_cc': 0})
                     self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
                     self.__zselector[3].show()
 
-                value = round(np.interp(libzl.getWetFx2Amount(self.session_dashboard.selectedChannel), (0, 1), (0, 100)))
-                self.__zselector_ctrl[3].set_options({'value_max': 101, 'value': value, 'value_min': 0, 'step': 1})
+                self.__zselector_ctrl[3].set_options({'value_max': 101, 'value': selected_channel.wetFx2Amount, 'value_min': 0, 'step': 1})
                 self.__zselector[3].config(self.__zselector_ctrl[3])
             else:
                 logging.debug(f"### set_selector : Configuring small knob 3 to set reverb")

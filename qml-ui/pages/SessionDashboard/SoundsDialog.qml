@@ -30,10 +30,9 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import JuceGraphics 1.0
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 import "../Sketchpad" as Sketchpad
 
 
@@ -126,7 +125,7 @@ Zynthian.Dialog {
 //                soundsDialog.selectedChannel.chainedSounds = [-1,-1,-1,-1, -1]
                 soundsDialog.selectedChannel.clearChainedSoundsWithoutCloning();
 //                if (soundsDialog.selectedChannel.connectedPattern >= 0) {
-//                    var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+//                    var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
 //                    seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
 //                }
                 soundsDialog.accept();
@@ -314,7 +313,7 @@ Zynthian.Dialog {
                         soundsDialog.selectedChannel.selectSound(index);
 
                         if (soundsDialog.selectedChannel.connectedPattern >= 0) {
-                            var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+                            var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
                             seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
                         }
 

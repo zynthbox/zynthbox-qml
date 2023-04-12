@@ -30,7 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.BasePlayGrid {
     id: component
@@ -52,13 +52,13 @@ Zynthian.BasePlayGrid {
 
     QtObject {
         id: _private
-        property QtObject currentSequence: ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
-        property QtObject alternativeModel: currentSequence && currentSequence.activePatternObject && currentSequence.activePatternObject.noteDestination == ZynQuick.PatternModel.SampleSlicedDestination
+        property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+        property QtObject alternativeModel: currentSequence && currentSequence.activePatternObject && currentSequence.activePatternObject.noteDestination == Zynthbox.PatternModel.SampleSlicedDestination
             ? currentSequence.activePatternObject.clipSliceNotes
             : null
         property QtObject model
         property QtObject miniGridModel
-        property int channel: ZynQuick.PlayGridManager.currentMidiChannel
+        property int channel: Zynthbox.PlayGridManager.currentMidiChannel
         property int startingNote: component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]
         property int transposeAmount: 0
         property string scale: "chromatic"
@@ -219,13 +219,13 @@ Zynthian.BasePlayGrid {
     }
 
     Connections {
-        target: ZynQuick.PlayGridManager
+        target: Zynthbox.PlayGridManager
         onCurrentMidiChannelChanged: {
             if (_private.model) {
-                Qt.callLater(_private.model.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+                Qt.callLater(_private.model.changeMidiChannel, Zynthbox.PlayGridManager.currentMidiChannel);
             }
             if (_private.miniGridModel) {
-                Qt.callLater(_private.miniGridModel.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+                Qt.callLater(_private.miniGridModel.changeMidiChannel, Zynthbox.PlayGridManager.currentMidiChannel);
             }
         }
     }

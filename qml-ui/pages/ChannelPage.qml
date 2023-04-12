@@ -29,7 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.ScreenPage {
     id: root
@@ -373,7 +373,7 @@ Zynthian.ScreenPage {
         }
 
 
-        WaveFormItem {
+        Zynthbox.WaveFormItem {
             id: wav
             Layout.fillWidth: true
             Layout.fillHeight: true

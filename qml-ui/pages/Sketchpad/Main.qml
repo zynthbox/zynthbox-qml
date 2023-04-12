@@ -29,7 +29,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 import '../../Zynthian' 1.0 as Zynthian
 import '../SessionDashboard'
@@ -803,7 +803,7 @@ Zynthian.ScreenPage {
                                             if (sampleSettings.length > 0) {
                                                 for (var i = 0; i < channelHeaderDelegate.channel.samples.length; ++i) {
                                                     var sample = channelHeaderDelegate.channel.samples[i];
-                                                    var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
+                                                    var clip = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
                                                     if (clip && i < sampleSettings.length) {
                                                         clip.keyZoneStart = sampleSettings[i][0];
                                                         clip.keyZoneEnd = sampleSettings[i][1];
@@ -1141,7 +1141,7 @@ Zynthian.ScreenPage {
                                     }
 
                                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                    sequence: zynqtgui.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+                                    sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
@@ -1308,8 +1308,8 @@ Zynthian.ScreenPage {
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
                                 // Copy pattern
-                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
+                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
                                 destPattern.cloneOther(sourcePattern)
 
                                 root.copySourceObj = null
@@ -1325,8 +1325,8 @@ Zynthian.ScreenPage {
                                     for (var i=0; i<sourceChannel.clipsModel.count; i++) {
                                         var sourceClip = sourceChannel.parts[part].getClip(i)
                                         var destClip = destChannel.parts[part].getClip(i)
-                                        var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, part)
-                                        var destPattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, part)
+                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, part)
+                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, part)
 
                                         destPattern.cloneOther(sourcePattern)
                                     }
@@ -1343,8 +1343,8 @@ Zynthian.ScreenPage {
 
                                 for (var i=0; i<root.song.channelsModel.count; i++) {
                                     var channel = root.song.channelsModel.getChannel(i)
-                                    var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(root.copySourceObj.value + 1)).getByPart(channel.id, channel.selectedPart)
-                                    var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedTrackName).getByPart(channel.id, channel.selectedPart)
+                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(root.copySourceObj.value + 1)).getByPart(channel.id, channel.selectedPart)
+                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedTrackName).getByPart(channel.id, channel.selectedPart)
 
                                     destPattern.cloneOther(sourcePattern)
                                 }
@@ -1359,8 +1359,8 @@ Zynthian.ScreenPage {
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
                                 // Copy pattern
-                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
+                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
                                 destPattern.cloneOther(sourcePattern)
 
                                 root.copySourceObj = null
@@ -1394,7 +1394,7 @@ Zynthian.ScreenPage {
                                 // Try clearing pattern if exists.
                                 try {
                                     if (root.lastSelectedObj.value.connectedPattern >= 0) {
-                                        ZynQuick.PlayGridManager.getSequenceModel("T"+(root.song.scenesModel.selectedTrackIndex + 1)).getByPart(root.lastSelectedObj.value.id, root.lastSelectedObj.value.selectedPart).clear()
+                                        Zynthbox.PlayGridManager.getSequenceModel("T"+(root.song.scenesModel.selectedTrackIndex + 1)).getByPart(root.lastSelectedObj.value.id, root.lastSelectedObj.value.selectedPart).clear()
                                     }
                                 } catch(e) {}
                             }

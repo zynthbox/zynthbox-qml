@@ -1,4 +1,4 @@
-.import org.zynthian.quick 1.0 as ZynQuick
+.import io.zynthbox.components 1.0 as Zynthbox
 
 function startMetronomeAndPlayback() {
     // Contextually work out whether we should start in song mode or not
@@ -17,12 +17,12 @@ function startMetronomeAndPlayback() {
 
     if (zynqtgui.sketchpad.song.sketchesModel.songMode) {
         if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0) {
-            ZynQuick.SegmentHandler.startPlayback(0, 0);
+            Zynthbox.SegmentHandler.startPlayback(0, 0);
         }
     } else {
         console.log("Starting Metronome and Playback");
         for (var i = 0; i < 10; ++i) {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("T" + (i+1));
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel("T" + (i+1));
             if (sequence) {
                 sequence.prepareSequencePlayback();
             } else {
@@ -30,7 +30,7 @@ function startMetronomeAndPlayback() {
             }
         }
         if (zynqtgui.sketchpad.clipToRecord) {
-            ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
+            Zynthbox.MidiRecorder.startRecording(Zynthbox.PlayGridManager.currentMidiChannel, true);
         }
         zynqtgui.sketchpad.startPlayback();
         console.log("Metronome and Playback Started");
@@ -41,12 +41,12 @@ function stopMetronomeAndPlayback() {
     if (zynqtgui.sketchpad.song.sketchesModel.songMode) {
         zynqtgui.sketchpad.stopAllPlayback();
         zynqtgui.callable_ui_action("ALL_NOTES_OFF")
-        ZynQuick.SegmentHandler.stopPlayback();
+        Zynthbox.SegmentHandler.stopPlayback();
         zynqtgui.sketchpad.resetMetronome();
     } else {
         console.log("Stopping Metronome and Playback");
         for (var i = 0; i < 10; ++i) {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("T" + (i+1));
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel("T" + (i+1));
             if (sequence) {
                 sequence.stopSequencePlayback();
             } else {
@@ -55,8 +55,8 @@ function stopMetronomeAndPlayback() {
         }
 
         if (zynqtgui.sketchpad.isRecording) {
-            ZynQuick.MidiRecorder.stopRecording()
-            zynqtgui.sketchpad.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
+            Zynthbox.MidiRecorder.stopRecording()
+            zynqtgui.sketchpad.lastRecordingMidi = Zynthbox.MidiRecorder.base64Midi()
 
             if (zynqtgui.sketchpad.recordingType === "audio") {
                 zynqtgui.sketchpad.stopAudioRecording()
@@ -65,11 +65,11 @@ function stopMetronomeAndPlayback() {
                     var clip = zynqtgui.sketchpad.clipsToRecord[clipIndex]
 
                     if (!clip.isChannelSample) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
                         var pattern = sequence.getByPart(clip.row, clip.part)
 
                         console.log("Applying pattern to", pattern, " for ", clip, clip.row, clip.col, clip.part)
-                        ZynQuick.MidiRecorder.applyToPattern(pattern)
+                        Zynthbox.MidiRecorder.applyToPattern(pattern)
                     }
                 }
             }

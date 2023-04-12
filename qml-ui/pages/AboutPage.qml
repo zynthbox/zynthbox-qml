@@ -54,12 +54,8 @@ Zynthian.ScreenPage {
                 text: zynqtgui.about.kirigami_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Libzl:"
-                text: zynqtgui.about.libzl_version
-            }
-            QQC2.Label {
-                Kirigami.FormData.label: "Zynthian Quick Components:"
-                text: zynqtgui.about.zynthiancomponents_version
+                Kirigami.FormData.label: "Libzynthbox:"
+                text: zynqtgui.about.libzynthbox_version
             }
             QQC2.Label {
                 Kirigami.FormData.label: "Distribution:"

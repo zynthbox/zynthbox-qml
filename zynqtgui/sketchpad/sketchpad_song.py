@@ -31,7 +31,7 @@ import uuid
 from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
 import zynautoconnect
-from zynqtgui.sketchpad.libzl import libzl
+import libzynthbox
 from .sketchpad_sketch import sketchpad_sketch
 from .sketchpad_sketches_model import sketchpad_sketches_model
 from .sketchpad_scenes_model import sketchpad_scenes_model
@@ -542,7 +542,7 @@ class sketchpad_song(QObject):
         if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != math.floor(bpm) or force_set is True:
             self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
 
-            libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
+            libzynthbox.setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
             # Call zynqtgui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened
             self.zynqtgui.set_selector()
@@ -673,11 +673,11 @@ class sketchpad_song(QObject):
             for channel_index in range(self.channelsModel.count):
                 channel = self.channelsModel.getChannel(channel_index)
                 if value == -1:
-                    libzl.setMuted(channel.id, channel.muted)
+                    libzynthbox.setMuted(channel.id, channel.muted)
                 elif value == channel.id:
-                    libzl.setMuted(channel.id, False)
+                    libzynthbox.setMuted(channel.id, False)
                 else:
-                    libzl.setMuted(channel.id, True)
+                    libzynthbox.setMuted(channel.id, True)
 
             self.playChannelSoloChanged.emit()
 

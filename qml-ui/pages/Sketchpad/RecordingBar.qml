@@ -33,7 +33,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
@@ -180,8 +180,8 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                            ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? ZL.AudioLevels.channels[zynqtgui.bottomBarControlObj.clipChannel.id]
-                              : ZL.AudioLevels.captureA
+                              ? Zynthbox.AudioLevels.channels[zynqtgui.bottomBarControlObj.clipChannel.id]
+                              : Zynthbox.AudioLevels.captureA
                            : -100
 
                     font.pointSize: 8
@@ -204,8 +204,8 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                             ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                               ? ZL.AudioLevels.channels[zynqtgui.bottomBarControlObj.clipChannel.id]
-                               : ZL.AudioLevels.captureB
+                               ? Zynthbox.AudioLevels.channels[zynqtgui.bottomBarControlObj.clipChannel.id]
+                               : Zynthbox.AudioLevels.captureB
                             : -100
 
                     font.pointSize: 8
@@ -260,23 +260,23 @@ GridLayout {
         Layout.fillWidth: true
 
 //        QQC2.Label {
-//            text: "Synth A : " + ZL.AudioLevels.synthA.toFixed(2)
+//            text: "Synth A : " + Zynthbox.AudioLevels.synthA.toFixed(2)
 //        }
 
 //        QQC2.Label {
-//            text: "Synth B : " + ZL.AudioLevels.synthB.toFixed(2)
+//            text: "Synth B : " + Zynthbox.AudioLevels.synthB.toFixed(2)
 //        }
 
 //        QQC2.Label {
-//            text: "Synth : " + ZL.AudioLevels.add(ZL.AudioLevels.synthA, ZL.AudioLevels.synthB).toFixed(2)
+//            text: "Synth : " + Zynthbox.AudioLevels.add(Zynthbox.AudioLevels.synthA, Zynthbox.AudioLevels.synthB).toFixed(2)
 //        }
 
 //        QQC2.Label {
-//            text: "Capture A : " + ZL.AudioLevels.captureA.toFixed(2)
+//            text: "Capture A : " + Zynthbox.AudioLevels.captureA.toFixed(2)
 //        }
 
 //        QQC2.Label {
-//            text: "Capture B : " + ZL.AudioLevels.captureB.toFixed(2)
+//            text: "Capture B : " + Zynthbox.AudioLevels.captureB.toFixed(2)
 //        }
     }
 

@@ -31,7 +31,7 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 import "pages" as Pages
 
 RowLayout {
@@ -181,8 +181,8 @@ RowLayout {
                                     break;
                             }
                         } else if (yChoice === 0 && xChoice !== 0) {
-                            if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && ZynQuick.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
-                                ZynQuick.PlayGridManager.setCurrentPlaygrid("minigrid", xChoice - 1);
+                            if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
+                                Zynthbox.PlayGridManager.setCurrentPlaygrid("minigrid", xChoice - 1);
                             }
                         }
                     }
@@ -245,7 +245,7 @@ RowLayout {
         pushEnter: Transition {}
         pushExit: Transition {}
         initialItem: currentPlayGridItem.miniGrid
-        property Item currentPlayGridItem: applicationWindow().playGrids.count === 0 ? null : applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
+        property Item currentPlayGridItem: applicationWindow().playGrids.count === 0 ? null : applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["minigrid"]).item
         property int currentPlaygrid: -1
         function updatePlaygrid() {
             updatePlaygridTimer.restart();
@@ -254,16 +254,16 @@ RowLayout {
             id: updatePlaygridTimer
             interval: 1; repeat: false; running: false;
             onTriggered: {
-                if (applicationWindow().playGrids.count > 0 && playGridStack.currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]) {
-                    var playgrid = applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
+                if (applicationWindow().playGrids.count > 0 && playGridStack.currentPlaygrid != Zynthbox.PlayGridManager.currentPlaygrids["minigrid"]) {
+                    var playgrid = applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["minigrid"]).item
                     playGridStack.replace(playgrid.miniGrid);
                     //settingsStack.replace(playgrid.settings);
-                    playGridStack.currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["minigrid"];
+                    playGridStack.currentPlaygrid = Zynthbox.PlayGridManager.currentPlaygrids["minigrid"];
                 }
             }
         }
         Connections {
-            target: ZynQuick.PlayGridManager
+            target: Zynthbox.PlayGridManager
             Component.onCompleted: playGridStack.updatePlaygrid();
             onPlaygridsChanged: playGridStack.updatePlaygrid();
             onCurrentPlaygridsChanged: playGridStack.updatePlaygrid();

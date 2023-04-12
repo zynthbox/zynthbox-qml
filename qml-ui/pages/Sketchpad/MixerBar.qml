@@ -31,9 +31,8 @@ import org.kde.kirigami 2.4 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
     id: root
@@ -178,17 +177,17 @@ Rectangle {
                                             VolumeControl {
                                                 id: volumeControl
 
-                                                property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.channel.samples[model.channel.selectedSlotRow].cppObjId);
+                                                property QtObject sampleClipObject: Zynthbox.PlayGridManager.getClipById(model.channel.samples[model.channel.selectedSlotRow].cppObjId);
 
                                                 anchors.fill: parent
 
                                                 enabled: !model.channel.muted
-                                                headerText: model.channel.muted || ZL.AudioLevels.channels[model.channel.id] <= -40
+                                                headerText: model.channel.muted || Zynthbox.AudioLevels.channels[model.channel.id] <= -40
                                                                 ? ""
-                                                                : (Math.round(ZL.AudioLevels.channels[model.channel.id]) + " (dB)")
+                                                                : (Math.round(Zynthbox.AudioLevels.channels[model.channel.id]) + " (dB)")
             //                                    footerText: model.channel.name
                                                 audioLeveldB: visible && !model.channel.muted
-                                                                ? ZL.AudioLevels.channels[model.channel.id]
+                                                                ? Zynthbox.AudioLevels.channels[model.channel.id]
                                                                 : -400
                                                 inputAudioLevelVisible: false
 
@@ -407,11 +406,11 @@ Rectangle {
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
-                            headerText: root.visible || ZL.AudioLevels.playback <= -40
+                            headerText: root.visible || Zynthbox.AudioLevels.playback <= -40
                                             ? ""
-                                            : (Math.round(ZL.AudioLevels.playback) + " (dB)")
+                                            : (Math.round(Zynthbox.AudioLevels.playback) + " (dB)")
                             footerText: "Master"
-                            audioLeveldB: visible ? ZL.AudioLevels.playback :  -400
+                            audioLeveldB: visible ? Zynthbox.AudioLevels.playback :  -400
                             inputAudioLevelVisible: false
 
                             Binding {

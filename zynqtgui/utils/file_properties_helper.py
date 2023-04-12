@@ -7,7 +7,7 @@ from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QStyle
 from soundfile import SoundFile
 
-from zynqtgui.sketchpad.libzl.libzl import ClipAudioSource
+from libzynthbox import ClipAudioSource
 
 
 class file_properties_helper(QObject):

@@ -31,7 +31,7 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.ScreenPage {
     id: component
@@ -63,9 +63,9 @@ Zynthian.ScreenPage {
         }
 
         if (!returnValue) {
-            if (applicationWindow().playGrids.count > 0 && applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback != null) {
+            if (applicationWindow().playGrids.count > 0 && applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback != null) {
                 try {
-                    returnValue = applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback(cuia);
+                    returnValue = applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback(cuia);
                 }
                 catch(error) {
                     console.log("Error in the current playgrid's cuia callback:", error);
@@ -81,7 +81,7 @@ Zynthian.ScreenPage {
             id: placeholderAction
             text: children.length > 0 ? qsTr("%1 Actions").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ") : "       "
             enabled: children.length > 0
-            children: applicationWindow().playGrids.count === 0 ? [] : applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.additionalActions
+            children: applicationWindow().playGrids.count === 0 ? [] : applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.additionalActions
         }
     ]
 
@@ -103,12 +103,12 @@ don't want to have to dig too far...
     property var thePlayGridActions: []
     Instantiator {
         id: playGridActionInstantiator
-        model: ZynQuick.PlayGridManager.playgrids
+        model: Zynthbox.PlayGridManager.playgrids
         delegate: Kirigami.Action {
             property Item relevantPlaygrid: applicationWindow().playGrids.itemAt(index) ? applicationWindow().playGrids.itemAt(index).item : null
             text: relevantPlaygrid ? relevantPlaygrid.name : ""
             onTriggered: {
-                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
+                Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", index);
             }
         }
         onObjectAdded: {
@@ -328,7 +328,7 @@ don't want to have to dig too far...
                                 spacing: 0
                                 Repeater {
                                     id: playGridSwitcherRepeater
-                                    model: ZynQuick.PlayGridManager.playgrids
+                                    model: Zynthbox.PlayGridManager.playgrids
                                     delegate: QQC2.Button {
                                         Layout.fillWidth: true
                                         Layout.minimumHeight: settingsButton.width
@@ -339,7 +339,7 @@ don't want to have to dig too far...
                                         display: QQC2.AbstractButton.TextBesideIcon
                                         onClicked: {
                                             settingsPopup.visible = false;
-                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
+                                            Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", index);
                                         }
                                     }
                                 }
@@ -475,8 +475,8 @@ don't want to have to dig too far...
                                             break;
                                     }
                                 } else if (yChoice === 0 && xChoice !== 0) {
-                                    if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
-                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", xChoice - 1);
+                                    if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
+                                        Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", xChoice - 1);
                                     }
                                 }
                             }
@@ -509,7 +509,7 @@ don't want to have to dig too far...
                 pushEnter: Transition {}
                 pushExit: Transition {}
                 initialItem: currentPlayGridItem.grid
-                property Item currentPlayGridItem: applicationWindow().playGrids.count === 0 ? null : applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
+                property Item currentPlayGridItem: applicationWindow().playGrids.count === 0 ? null : applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item
                 property int currentPlaygrid: -1
                 function updatePlaygrid() {
                     updatePlaygridTimer.restart();
@@ -518,19 +518,19 @@ don't want to have to dig too far...
                     id: updatePlaygridTimer
                     interval: 1; repeat: false; running: false;
                     onTriggered: {
-                        if (applicationWindow().playGrids.count > 0 && playGridStack.currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]){
-                            var playgrid = applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
+                        if (applicationWindow().playGrids.count > 0 && playGridStack.currentPlaygrid != Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]){
+                            var playgrid = applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item
                             playGridStack.replace(playgrid.grid);
-                            playGridStack.currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["playgrid"];
+                            playGridStack.currentPlaygrid = Zynthbox.PlayGridManager.currentPlaygrids["playgrid"];
                             placeholderAction.children = playgrid.additionalActions;
                             if (playgrid.isSequencer) {
-                                ZynQuick.PlayGridManager.setPreferredSequencer(ZynQuick.PlayGridManager.playgrids[ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]]);
+                                Zynthbox.PlayGridManager.setPreferredSequencer(Zynthbox.PlayGridManager.playgrids[Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]]);
                             }
                         }
                     }
                 }
                 Connections {
-                    target: ZynQuick.PlayGridManager
+                    target: Zynthbox.PlayGridManager
                     Component.onCompleted: playGridStack.updatePlaygrid();
                     onPlaygridsChanged: playGridStack.updatePlaygrid();
                     onCurrentPlaygridsChanged: playGridStack.updatePlaygrid();
@@ -577,7 +577,7 @@ don't want to have to dig too far...
                     anchors.fill: parent
                     property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
                     onModulationValueChanged: {
-                        ZynQuick.PlayGridManager.modulation = modulationValue;
+                        Zynthbox.PlayGridManager.modulation = modulationValue;
                     }
                     touchPoints: [ TouchPoint { id: modulationPoint; } ]
                     onPressed: {
@@ -587,7 +587,7 @@ don't want to have to dig too far...
                     onReleased: {
                         parent.down = false;
                         focus = false;
-                        ZynQuick.PlayGridManager.modulation = 0;
+                        Zynthbox.PlayGridManager.modulation = 0;
                     }
                 }
             }
@@ -597,10 +597,10 @@ don't want to have to dig too far...
             Zynthian.PlayGridButton {
                 icon.name: "arrow-up"
                 onPressed: {
-                    ZynQuick.PlayGridManager.pitch = 8191;
+                    Zynthbox.PlayGridManager.pitch = 8191;
                 }
                 onReleased: {
-                    ZynQuick.PlayGridManager.pitch = 0;
+                    Zynthbox.PlayGridManager.pitch = 0;
                 }
             }
             QQC2.Label {
@@ -610,10 +610,10 @@ don't want to have to dig too far...
             Zynthian.PlayGridButton {
                 icon.name: "arrow-down"
                 onPressed: {
-                    ZynQuick.PlayGridManager.pitch = -8192;
+                    Zynthbox.PlayGridManager.pitch = -8192;
                 }
                 onReleased: {
-                    ZynQuick.PlayGridManager.pitch = 0;
+                    Zynthbox.PlayGridManager.pitch = 0;
                 }
             }
         }
@@ -627,7 +627,7 @@ don't want to have to dig too far...
      */
 
     Connections {
-        target: ZynQuick.PlayGridManager.syncTimer
+        target: Zynthbox.PlayGridManager.syncTimer
         onAddedHardwareInputDevice: {
             applicationWindow().showPassiveNotification("New Midi Input Detected: " + humanReadableName);
         }
@@ -648,12 +648,12 @@ don't want to have to dig too far...
         }
     }
     Binding {
-        target: ZynQuick.PlayGridManager
+        target: Zynthbox.PlayGridManager
         property: "zlDashboard"
         value: zynqtgui.session_dashboard
     }
     Binding {
-        target: ZynQuick.SegmentHandler
+        target: Zynthbox.SegmentHandler
         property: "song"
         value: zynqtgui.sketchpad.song
     }
@@ -714,7 +714,7 @@ don't want to have to dig too far...
                     Binding {
                         target: channelPartSceneDelegate
                         property: "sequence"
-                        value: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
+                        value: Zynthbox.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
                         delayed: true
                     }
                 }

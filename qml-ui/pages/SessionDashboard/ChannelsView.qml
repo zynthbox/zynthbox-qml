@@ -30,10 +30,9 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import JuceGraphics 1.0
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 import "../Sketchpad" as Sketchpad
 
 ColumnLayout {
@@ -252,7 +251,7 @@ ColumnLayout {
                                     Layout.alignment: Qt.AlignVCenter
                                     radius: 2
                                     highlighted: channelDelegate.selectedClip === channel.sceneClip && channel.sceneClip.inCurrentScene
-                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
                                     property QtObject pattern: sequence ? sequence.getByPart(channelIndex, channel.selectedPart) : null
                                     Connections {
                                         target: control.pattern
@@ -330,8 +329,8 @@ ColumnLayout {
                                         } else {
                                             if (channelDelegate.channelHasConnectedPattern) {
                                                 zynqtgui.current_modal_screen_id = "playgrid";
-                                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+                                                Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", Zynthbox.PlayGridManager.sequenceEditorIndex);
+                                                var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
                                                 sequence.setActiveChannel(channel.id, channel.selectedPart);
                                             } else if (channelDelegate.hasWavLoaded) {
                                                 console.log("Opening bottom drawer");
@@ -345,7 +344,7 @@ ColumnLayout {
                                     }
                                 }
 
-                                WaveFormItem {
+                                Zynthbox.WaveFormItem {
                                     anchors.fill: parent
 
                                     color: Kirigami.Theme.textColor
@@ -400,7 +399,7 @@ ColumnLayout {
                                     id: patternVisualiser
                                     anchors.fill: parent
                                     visible: channelDelegate.channelHasConnectedPattern
-                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+                                    property QtObject sequence: channelDelegate.channelHasConnectedPattern ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
                                     property QtObject pattern: sequence ? sequence.getByPart(channelIndex, channelDelegate.channel.selectedPart) : null
                                     source: pattern ? pattern.thumbnailUrl : ""
                                     Rectangle { // Progress
@@ -482,7 +481,7 @@ ColumnLayout {
                                             zynqtgui.session_dashboard.selectedChannel = index;
                                         } else {
                                             if (channelDelegate.channelHasConnectedPattern) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(channelDelegate.channelIndex, channelDelegate.channel.selectedPart);
+                                                var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(channelDelegate.channelIndex, channelDelegate.channel.selectedPart);
                                                 seq.enabled = false;
                                                 channelDelegate.channel.connectedPattern = -1;
                                             } else {
@@ -607,7 +606,7 @@ ColumnLayout {
 
         onVisibleChanged: {
             if (visible) {
-                patternsViewMainRepeater.model = Object.keys(ZynQuick.PlayGridManager.dashboardModels);
+                patternsViewMainRepeater.model = Object.keys(Zynthbox.PlayGridManager.dashboardModels);
             } else {
                 patternsViewMainRepeater.model = [];
             }
@@ -618,10 +617,10 @@ ColumnLayout {
 
             Repeater {
                 id: patternsViewMainRepeater
-                model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+                model: Object.keys(Zynthbox.PlayGridManager.dashboardModels)
                 delegate: Repeater {
                     id: patternsViewPlaygridRepeater
-                    model: ZynQuick.PlayGridManager.dashboardModels[modelData]
+                    model: Zynthbox.PlayGridManager.dashboardModels[modelData]
                     property string playgridId: modelData
 
                     QQC2.Button {
@@ -639,7 +638,7 @@ ColumnLayout {
                                 playgridPickerPopup.channelObj.clipsModel.getClip(1).clear();
                                 playgridPickerPopup.channelObj.connectedPattern = index;
 
-                                var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(playgridPickerPopup.channelIndex, playgridPickerPopup.channelObj.selectedPart);
+                                var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(playgridPickerPopup.channelIndex, playgridPickerPopup.channelObj.selectedPart);
                                 seq.midiChannel = playgridPickerPopup.channelObj.connectedSound;
                                 seq.bank = "A"
                                 seq.enabled = true;

@@ -31,7 +31,7 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
     id: component
@@ -77,7 +77,7 @@ Item {
      */
     function savePatternToFile(patternName) {
         if (patternName == undefined || patternName == "") {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
             if (sequence.activePattern > -1) {
                 sequenceFilePicker.patternName = sequence.activePatternObject.objectName;
             }
@@ -171,11 +171,11 @@ Item {
             // Should we be deleting the sequences and patterns we're getting here?
             if (sequenceFilePicker.currentFileInfo) {
                 if (sequenceFilePicker.currentFileInfo.fileName.endsWith(".sequence.json")) {
-                    sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.currentFileInfo.filePath);
+                    sequenceFilePicker.currentFileObject = Zynthbox.PlayGridManager.getSequenceModel(sequenceFilePicker.currentFileInfo.filePath);
                     sequenceFilePicker.currentFileObject.load(sequenceFilePicker.currentFileInfo.filePath);
                 } else if (sequenceFilePicker.currentFileInfo.fileName.endsWith(".pattern.json")) {
-                    sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.currentFileInfo.filePath);
-                    ZynQuick.PlayGridManager.setModelFromJsonFile(sequenceFilePicker.currentFileObject, sequenceFilePicker.currentFileInfo.filePath);
+                    sequenceFilePicker.currentFileObject = Zynthbox.PlayGridManager.getPatternModel(sequenceFilePicker.currentFileInfo.filePath);
+                    Zynthbox.PlayGridManager.setModelFromJsonFile(sequenceFilePicker.currentFileObject, sequenceFilePicker.currentFileInfo.filePath);
                 } else {
                     sequenceFilePicker.currentFileObject = null;
                 }
@@ -245,14 +245,14 @@ Item {
             if (saveMode) {
                 if (mostRecentlyPicked) {
                     if (sequenceName != "") {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.sequenceName);
+                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(sequenceFilePicker.sequenceName);
                         sequence.save(mostRecentlyPicked + "/metadata.sequence.json", true); // Explicitly export-only to this location
                     } else if (patternName != "") {
                         var saveFileName = mostRecentlyPicked;
                         if (!saveFileName.endsWith(".pattern.json")) {
                             saveFileName = saveFileName + ".pattern.json";
                         }
-                        var pattern = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.patternName);
+                        var pattern = Zynthbox.PlayGridManager.getPatternModel(sequenceFilePicker.patternName);
                         if (pattern) {
                             pattern.exportToFile(saveFileName);
                         }
@@ -386,7 +386,7 @@ Item {
     }
 
     function applyLoadedSequence(repeaterObject) {
-        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+        var globalSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
         if (repeaterObject.model.hasOwnProperty("patterns")) {
             // Then it's a sequence, and we should apply all the options from the sequence as well (even if it's not much)
             var sequenceModel = repeaterObject.model;

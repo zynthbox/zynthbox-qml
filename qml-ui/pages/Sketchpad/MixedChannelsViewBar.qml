@@ -33,8 +33,7 @@ import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 Rectangle {
     id: root
@@ -42,7 +41,7 @@ Rectangle {
     readonly property QtObject song: zynqtgui.sketchpad.song
     readonly property QtObject selectedChannel: applicationWindow().selectedChannel
 
-    property QtObject sequence: root.selectedChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+    property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
 
 
@@ -510,7 +509,7 @@ Rectangle {
                                         radius: 4
                                         opacity: waveformContainer.showWaveform ? 1 : 0
 
-                                        WaveFormItem {
+                                        Zynthbox.WaveFormItem {
                                             anchors.fill: parent
                                             color: Kirigami.Theme.textColor
                                             source: waveformContainer.clip ? waveformContainer.clip.path : ""
@@ -579,7 +578,7 @@ Rectangle {
 
                                             // SamplerSynth progress dots
                                             Repeater {
-                                                property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
+                                                property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
                                                 model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
                                                     ? cppClipObject.playbackPositions
                                                     : 0
@@ -725,8 +724,8 @@ Rectangle {
                                                         var screenBack = zynqtgui.current_screen_id;
                                                         zynqtgui.current_modal_screen_id = "playgrid";
                                                         zynqtgui.forced_screen_back = "sketchpad";
-                                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+                                                        Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", Zynthbox.PlayGridManager.sequenceEditorIndex);
+                                                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
                                                         sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
                                                     }
                                                 }

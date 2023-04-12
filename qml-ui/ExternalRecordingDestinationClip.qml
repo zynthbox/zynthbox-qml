@@ -30,15 +30,13 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import libzl 1.0 as ZL
-import org.zynthian.quick 1.0 as ZynQuick
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
     id: component
     objectName: "clipPickerClip"
 
-    property bool isRecording: ZL.AudioLevels.isRecording
+    property bool isRecording: Zynthbox.AudioLevels.isRecording
     property QtObject recordingSample: null
     property string recordingFilename: ""
     function startRecording() {
@@ -49,28 +47,28 @@ ColumnLayout {
         var recordingTimestamp = date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
         var fileNameFriendlyModuleName = zynqtgui.main.currentModuleName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         component.recordingFilename = baseFolder + "/" + recordingTimestamp + "_" + fileNameFriendlyModuleName + "_" + zynqtgui.sketchpad.song.bpm + "-BPM.clip.wav";
-        ZL.AudioLevels.clearRecordPorts();
+        Zynthbox.AudioLevels.clearRecordPorts();
         // If the current module is an alsa thing, don't use jack to record it and instead record using alsa
         if (zynqtgui.main.currentModuleRecordAlsa === true) {
             zynqtgui.main.start_recording_alsa();
         } else {
             // If the current module's recording ports are empty, record the system output
             if (zynqtgui.main.currentModuleRecordingPortsLeft === "" && zynqtgui.main.currentModuleRecordingPortsRight === "") {
-                ZL.AudioLevels.addRecordPort("system:playback_1", 0);
-                ZL.AudioLevels.addRecordPort("system:playback_2", 1);
+                Zynthbox.AudioLevels.addRecordPort("system:playback_1", 0);
+                Zynthbox.AudioLevels.addRecordPort("system:playback_2", 1);
             } else {
                 var splitLeftPorts = zynqtgui.main.currentModuleRecordingPortsLeft.split(",");
                 for (var i = 0; i < splitLeftPorts.length; ++i) {
-                    ZL.AudioLevels.addRecordPort(splitLeftPorts[i], 0);
+                    Zynthbox.AudioLevels.addRecordPort(splitLeftPorts[i], 0);
                 }
                 var splitRightPorts = zynqtgui.main.currentModuleRecordingPortsRight.split(",");
                 for (var i = 0; i < splitRightPorts.length; ++i) {
-                    ZL.AudioLevels.addRecordPort(splitRightPorts[i], 1);
+                    Zynthbox.AudioLevels.addRecordPort(splitRightPorts[i], 1);
                 }
             }
-            ZL.AudioLevels.setRecordPortsFilenamePrefix(component.recordingFilename);
-            ZL.AudioLevels.shouldRecordPorts = true;
-            ZL.AudioLevels.startRecording();
+            Zynthbox.AudioLevels.setRecordPortsFilenamePrefix(component.recordingFilename);
+            Zynthbox.AudioLevels.shouldRecordPorts = true;
+            Zynthbox.AudioLevels.startRecording();
         }
     }
     function stopRecording() {
@@ -79,14 +77,14 @@ ColumnLayout {
             // If we've recorded using alsa, we'll need to move that file into its proper home before we attempt to set it on the clip
             zynqtgui.main.stop_recording_and_move(component.recordingFilename);
         } else {
-            ZL.AudioLevels.shouldRecordPorts = false;
-            ZL.AudioLevels.stopRecording();
+            Zynthbox.AudioLevels.shouldRecordPorts = false;
+            Zynthbox.AudioLevels.stopRecording();
         }
         component.recordingSample.set_path(component.recordingFilename, false);
         component.recordingSample = null;
     }
     property QtObject selectedSample: channelsList.currentItem && channelsList.currentItem.selectedSample ? channelsList.currentItem.selectedSample : null
-    property QtObject selectedSampleCppObject: selectedSample === null ? null : ZynQuick.PlayGridManager.getClipById(selectedSample.cppObjId)
+    property QtObject selectedSampleCppObject: selectedSample === null ? null : Zynthbox.PlayGridManager.getClipById(selectedSample.cppObjId)
 
     Kirigami.Heading {
         Layout.fillWidth: true
@@ -124,7 +122,7 @@ ColumnLayout {
                 }
                 property int selectedSampleIndex: 0
                 property QtObject selectedSample: channel && channel.samples ? channel.samples[selectedSampleIndex] : null
-                property QtObject selectedSampleCppObject: selectedSample === null ? null : ZynQuick.PlayGridManager.getClipById(selectedSample.cppObjId)
+                property QtObject selectedSampleCppObject: selectedSample === null ? null : Zynthbox.PlayGridManager.getClipById(selectedSample.cppObjId)
                 property int thisIndex: index
                 QQC2.Label {
                     Layout.fillHeight: true
@@ -136,7 +134,7 @@ ColumnLayout {
                     model: 5
                     Zynthian.PlayGridButton {
                         property QtObject sample: delegate.channel && delegate.channel.samples ? delegate.channel.samples[index] : null
-                        property QtObject sampleCppObject: sample === null ? null : ZynQuick.PlayGridManager.getClipById(sample.cppObjId)
+                        property QtObject sampleCppObject: sample === null ? null : Zynthbox.PlayGridManager.getClipById(sample.cppObjId)
                         Layout.preferredWidth: index === 0 ? Kirigami.Units.gridUnit * 5 : Kirigami.Units.gridUnit * 2
                         text: index === 0 ? "Sample " + (index+1) : (index+1)
                         icon.name: (sampleCppObject === null ? "empty" : "audio-x-generic")

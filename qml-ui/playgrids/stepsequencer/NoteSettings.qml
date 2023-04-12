@@ -29,7 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
     id: component
@@ -161,9 +161,9 @@ ColumnLayout {
                     var newSubnotes = [];
                     for (var subnoteIndex = 0; subnoteIndex < oldNote.subnotes.length; ++subnoteIndex) {
                         var oldSubnote = oldNote.subnotes[subnoteIndex];
-                        newSubnotes.push(ZynQuick.PlayGridManager.getNote(Math.min(Math.max(oldSubnote.midiNote + pitchChange, 0), 127), oldSubnote.midiChannel));
+                        newSubnotes.push(Zynthbox.PlayGridManager.getNote(Math.min(Math.max(oldSubnote.midiNote + pitchChange, 0), 127), oldSubnote.midiChannel));
                     }
-                    component.patternModel.setNote(row, column, ZynQuick.PlayGridManager.getCompoundNote(newSubnotes));
+                    component.patternModel.setNote(row, column, Zynthbox.PlayGridManager.getCompoundNote(newSubnotes));
                     for (var subnoteIndex = 0; subnoteIndex < newSubnotes.length; ++subnoteIndex) {
                         component.refreshSubnote(row, column, subnoteIndex);
                     }
@@ -181,7 +181,7 @@ ColumnLayout {
         var metadata = component.patternModel.subnoteMetadata(row, column, subnoteIndex, "");
         component.patternModel.removeSubnote(row, column, subnoteIndex);
         // Now insert the replacement note and set the metadata again
-        subnote = ZynQuick.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + pitchChange, 0), 127), subnote.midiChannel)
+        subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + pitchChange, 0), 127), subnote.midiChannel)
         var subnotePosition = component.patternModel.insertSubnoteSorted(row, column, subnote);
         for (var key in metadata) {
             component.patternModel.setSubnoteMetadata(row, column, subnotePosition, key, metadata[key]);
@@ -470,7 +470,7 @@ ColumnLayout {
                                                 if (typeof(delay) === "undefined") {
                                                     delay = 0;
                                                 }
-                                                ZynQuick.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, subnoteDelegate.subnote.midiChannel, true, velocity, duration, delay);
+                                                Zynthbox.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, subnoteDelegate.subnote.midiChannel, true, velocity, duration, delay);
                                             }
                                         }
                                     }

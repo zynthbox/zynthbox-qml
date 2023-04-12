@@ -36,7 +36,7 @@ import jack
 import numpy as np
 from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QThread, QTimer, Qt, Signal, Slot
 
-from zynqtgui.sketchpad.libzl import libzl
+import libzynthbox
 from .sketchpad_clips_model import sketchpad_clips_model
 from .sketchpad_clip import sketchpad_clip
 from zynqtgui import zynthian_gui_config
@@ -62,7 +62,7 @@ class sketchpad_channel(QObject):
         self.__audio_level__ = -200
         self.__clips_model__ = [sketchpad_clips_model(song, self, 0), sketchpad_clips_model(song, self, 1), sketchpad_clips_model(song, self, 2), sketchpad_clips_model(song, self, 3), sketchpad_clips_model(song, self, 4)]
         self.__layers_snapshot = []
-        self.master_volume = libzl.dbFromVolume(self.zynqtgui.masterVolume/100)
+        self.master_volume = libzynthbox.dbFromVolume(self.zynqtgui.masterVolume/100)
         self.zynqtgui.masterVolumeChanged.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
         # self.__connected_sound__ = -1
@@ -191,7 +191,7 @@ class sketchpad_channel(QObject):
             logging.info("### select_correct_layer : Do not Reselect channel sound since it is not removing current selected channel")
 
     def master_volume_changed(self):
-        self.master_volume = libzl.dbFromVolume(self.zynqtgui.masterVolume/100)
+        self.master_volume = libzynthbox.dbFromVolume(self.zynqtgui.masterVolume/100)
         logging.debug(f"Master Volume : {self.master_volume} dB")
 
     def stopAllClips(self):
@@ -497,7 +497,7 @@ class sketchpad_channel(QObject):
             self.__pan__ = pan
 
             self.panChanged.emit()
-            libzl.setPanAmount(self.id, self.__pan__)
+            libzynthbox.setPanAmount(self.id, self.__pan__)
             self.zynqtgui.sketchpad.set_selector()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -884,7 +884,7 @@ class sketchpad_channel(QObject):
     def set_muted(self, muted):
         if self.__muted__ != muted:
             self.__muted__ = muted
-            libzl.setMuted(self.id, muted)
+            libzynthbox.setMuted(self.id, muted)
             self.mutedChanged.emit()
 
     mutedChanged = Signal()
@@ -1243,7 +1243,7 @@ class sketchpad_channel(QObject):
             self.__dry_amount = value
             volume = np.interp(self.__volume__, (-40, 20), (0, 1))
             # Calculate dry amount as per volume
-            libzl.setDryAmount(self.id, np.interp(self.__dry_amount * volume, (0, 100), (0, 1)))
+            libzynthbox.setDryAmount(self.id, np.interp(self.__dry_amount * volume, (0, 100), (0, 1)))
             self.dryAmountChanged.emit()
 
     dryAmountChanged = Signal()
@@ -1260,7 +1260,7 @@ class sketchpad_channel(QObject):
             self.__wet_fx_1_amount = value
             volume = np.interp(self.__volume__, (-40, 20), (0, 1))
             # Calculate wet amount as per volume
-            libzl.setWetFx1Amount(self.id, np.interp(self.__wet_fx_1_amount * volume, (0, 100), (0, 1)))
+            libzynthbox.setWetFx1Amount(self.id, np.interp(self.__wet_fx_1_amount * volume, (0, 100), (0, 1)))
             self.wetFx1AmountChanged.emit()
 
     wetFx1AmountChanged = Signal()
@@ -1277,14 +1277,14 @@ class sketchpad_channel(QObject):
             self.__wet_fx_2_amount = value
             volume = np.interp(self.__volume__, (-40, 20), (0, 1))
             # Calculate wet amount as per volume
-            libzl.setWetFx2Amount(self.id, np.interp(self.__wet_fx_2_amount * volume, (0, 100), (0, 1)))
+            libzynthbox.setWetFx2Amount(self.id, np.interp(self.__wet_fx_2_amount * volume, (0, 100), (0, 1)))
             self.wetFx2AmountChanged.emit()
 
     wetFx2AmountChanged = Signal()
 
     """
-    Store wetFx1Amount for current channel as a property and set it to JackPassthrough via libzl when value changes
-    Stored value ranges from 0-100 and accepted range in libzl.setWetFx1Amount is 0-1
+    Store wetFx1Amount for current channel as a property and set it to JackPassthrough via libzynthbox when value changes
+    Stored value ranges from 0-100 and accepted range in libzynthbox.setWetFx1Amount is 0-1
     """
     wetFx2Amount = Property(float, get_wetFx2Amount, set_wetFx2Amount, notify=wetFx2AmountChanged)
     ### END Property wetFx2Amount

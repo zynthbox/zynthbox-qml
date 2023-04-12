@@ -29,7 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
     id: component
@@ -97,9 +97,9 @@ ColumnLayout {
         var newSubnotes = [];
         for (var i = 0; i < oldNote.subnotes.length; ++i) {
             var oldSubnote = oldNote.subnotes[i];
-            newSubnotes.push(ZynQuick.PlayGridManager.getNote(Math.min(Math.max(oldSubnote.midiNote + pitchChange, 0), 127), oldSubnote.midiChannel));
+            newSubnotes.push(Zynthbox.PlayGridManager.getNote(Math.min(Math.max(oldSubnote.midiNote + pitchChange, 0), 127), oldSubnote.midiChannel));
         }
-        component.model.setNote(component.row, component.column, ZynQuick.PlayGridManager.getCompoundNote(newSubnotes));
+        component.model.setNote(component.row, component.column, Zynthbox.PlayGridManager.getCompoundNote(newSubnotes));
 
         // Now refetch the note we're displaying
         var theColumn = component.column;
@@ -112,7 +112,7 @@ ColumnLayout {
         var metadata = component.model.subnoteMetadata(component.row, component.column, subnoteIndex, "");
         component.model.removeSubnote(component.row, component.column, subnoteIndex);
         // Now insert the replacement note and set the metadata again
-        subnote = ZynQuick.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + pitchChange, 0), 127), subnote.midiChannel)
+        subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + pitchChange, 0), 127), subnote.midiChannel)
         var subnotePosition = component.model.insertSubnoteSorted(component.row, component.column, subnote);
         for (var key in metadata) {
             component.model.setSubnoteMetadata(component.row, component.column, subnotePosition, key, metadata[key]);
@@ -177,7 +177,7 @@ ColumnLayout {
                         if (typeof(delay) === "undefined") {
                             delay = 0;
                         }
-                        ZynQuick.PlayGridManager.scheduleNote(note.midiNote, note.midiChannel, true, velocity, duration, delay);
+                        Zynthbox.PlayGridManager.scheduleNote(note.midiNote, note.midiChannel, true, velocity, duration, delay);
                     }
                 }
             }

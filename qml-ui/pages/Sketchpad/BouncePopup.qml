@@ -30,7 +30,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.Popup {
     id: root
@@ -90,7 +90,7 @@ Zynthian.Popup {
                 function performBounce() {
                     _private.bounceProgress = 0;
                     // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
-                    _private.sequence = ZynQuick.PlayGridManager.getSequenceModel(_private.trackName);
+                    _private.sequence = Zynthbox.PlayGridManager.getSequenceModel(_private.trackName);
                     if (_private.sequence) {
                         _private.pattern = sequence.getByPart(_private.selectedChannel.connectedPattern, _private.selectedChannel.selectedPart);
                         if (_private.pattern) {
@@ -101,9 +101,9 @@ Zynthian.Popup {
                             // Assemble the duration of time we want to be recording for
                             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                             _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
-                            var beatMultiplier = ZynQuick.PlayGridManager.syncTimer.getMultiplier();
+                            var beatMultiplier = Zynthbox.PlayGridManager.syncTimer.getMultiplier();
                             var beatsPerMinute = zynqtgui.sketchpad.song.bpm;
-                            _private.patternDurationInMS = ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, _private.patternDurationInBeats) * 1000;
+                            _private.patternDurationInMS = Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, _private.patternDurationInBeats) * 1000;
                             _private.recordingDurationInMS = _private.patternDurationInMS;
                             _private.recordingDurationInBeats = _private.patternDurationInBeats;
                             if (_private.includeLeadin) {
@@ -111,9 +111,9 @@ Zynthian.Popup {
                                 _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
                             }
                             if (_private.selectedChannel.channelAudioType === "synth") {
-                                _private.playbackStopDurationInBeats = _private.recordingDurationInBeats - ZynQuick.PlayGridManager.syncTimer.scheduleAheadAmount;
-                                //_private.playbackStopDurationInMS = _private.recordingDurationInMS - (ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, ZynQuick.PlayGridManager.syncTimer.scheduleAheadAmount) * 1000);
-                                _private.playbackStopDurationInMS = _private.recordingDurationInMS - (ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, 6) * 1000);
+                                _private.playbackStopDurationInBeats = _private.recordingDurationInBeats - Zynthbox.PlayGridManager.syncTimer.scheduleAheadAmount;
+                                //_private.playbackStopDurationInMS = _private.recordingDurationInMS - (Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, Zynthbox.PlayGridManager.syncTimer.scheduleAheadAmount) * 1000);
+                                _private.playbackStopDurationInMS = _private.recordingDurationInMS - (Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, 6) * 1000);
                             } else {
                                 _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
                                 _private.playbackStopDurationInMS = _private.recordingDurationInMS;
@@ -130,7 +130,7 @@ Zynthian.Popup {
                             zynqtgui.sketchpad.recordingSource = "internal"
                             zynqtgui.sketchpad.recordingChannel = ""
                             clip.queueRecording();
-                            ZynQuick.MidiRecorder.startRecording(_private.pattern.midiChannel, true);
+                            Zynthbox.MidiRecorder.startRecording(_private.pattern.midiChannel, true);
                             _private.sequence.startSequencePlayback();
                         }
                     }
@@ -142,7 +142,7 @@ Zynthian.Popup {
             }
             Connections {
                 enabled: _private.isRecording
-                target: ZynQuick.PlayGridManager
+                target: Zynthbox.PlayGridManager
                 onMetronomeBeat128thChanged: {
                     _private.cumulativeBeats = _private.cumulativeBeats + 1;
                     if (_private.recordingDurationInBeats > _private.cumulativeBeats) {
@@ -159,13 +159,13 @@ Zynthian.Popup {
                         _private.bounceProgress = 0;
                         var clip = zynqtgui.sketchpad.clipToRecord;
                         if (clip) {
-                            ZynQuick.MidiRecorder.stopRecording();
+                            Zynthbox.MidiRecorder.stopRecording();
                             clip.stopRecording();
-                            clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi();
+                            clip.metadataMidiRecording = Zynthbox.MidiRecorder.base64Midi();
                         }
                         zynqtgui.sketchpad.stopAllPlayback();
                         _private.sequence.stopSequencePlayback();
-                        ZynQuick.PlayGridManager.stopMetronome();
+                        Zynthbox.PlayGridManager.stopMetronome();
                         zynqtgui.song_arranger.stop();
                         zynqtgui.sketchpad.resetMetronome();
                         // Reset solo to whatever it was before we started working
@@ -192,14 +192,14 @@ Zynthian.Popup {
                         }
                         console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long, and the clip says it is", clip.duration, "seconds long");
                         // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
-                        if (loopLength % ZynQuick.PlayGridManager.syncTimer.getMultiplier() === 0) {
+                        if (loopLength % Zynthbox.PlayGridManager.syncTimer.getMultiplier() === 0) {
                             clip.snapLengthToBeat = true;
                         } else {
                             clip.snapLengthToBeat = false;
                         }
                         // Set the new sample's start and end points
                         clip.startPosition = (startTime / 1000) + Math.max(0, clip.duration - (_private.recordingDurationInMS / 1000));
-                        clip.length = loopLength / ZynQuick.PlayGridManager.syncTimer.getMultiplier();
+                        clip.length = loopLength / Zynthbox.PlayGridManager.syncTimer.getMultiplier();
                         // Set channel mode to loop
                         _private.selectedChannel.channelAudioType = "sample-loop";
                         // Close out and we're done

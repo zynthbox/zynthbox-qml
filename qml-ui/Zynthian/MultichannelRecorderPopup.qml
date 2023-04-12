@@ -29,9 +29,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.Popup {
     id: component
@@ -69,14 +68,14 @@ Zynthian.Popup {
             } else {
                 // Assume external channels shouldn't be recorded, as they are not going to make internal noises
             }
-            ZL.AudioLevels.setChannelToRecord(channelIndex, shouldRecord);
+            Zynthbox.AudioLevels.setChannelToRecord(channelIndex, shouldRecord);
         }
         if (song.sketchesModel.songMode) {
             leadinSpin.value = 0;
             fadeoutSpin.value = 8;
         } else {
             // No song mode, just play the current scene, with the longest pattern duration as the duration
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(song.scenesModel.selectedTrackName)
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel(song.scenesModel.selectedTrackName)
             var longestPatternDuration = 0;
             // Assemble the duration of time we want to be recording for
             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
@@ -130,10 +129,10 @@ Zynthian.Popup {
                 property QtObject song
 
                 property int songDurationInTicks: song && song.sketchesModel.songMode
-                    ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
-                    : ZynQuick.PlayGridManager.syncTimer.getMultiplier() * songDurationSpin.value
-                property int leadinDurationInTicks: leadinSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
-                property int fadeoutDurationInTicks: fadeoutSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
+                    ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
+                    : Zynthbox.PlayGridManager.syncTimer.getMultiplier() * songDurationSpin.value
+                property int leadinDurationInTicks: leadinSpin.value * Zynthbox.PlayGridManager.syncTimer.getMultiplier()
+                property int fadeoutDurationInTicks: fadeoutSpin.value * Zynthbox.PlayGridManager.syncTimer.getMultiplier()
 
                 property bool isRecording: false
                 property int cumulativeBeats
@@ -142,7 +141,7 @@ Zynthian.Popup {
                     // Set the filenames for each channel (never mind whether they're being recorded or not, it doesn't hurt)
                     var date = new Date();
                     var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
-                    ZL.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-");
+                    Zynthbox.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-");
                     baseRecordingLocation = baseRecordingLocation + "/channel-";
                     for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                         var channel = _private.song.channelsModel.getChannel(channelIndex);
@@ -184,10 +183,10 @@ Zynthian.Popup {
                             soundIndication = "external";
                         }
                         console.log("Setting channel", channelIndex, "filename prefix to", baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
-                        ZL.AudioLevels.setChannelFilenamePrefix(channelIndex, baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
+                        Zynthbox.AudioLevels.setChannelFilenamePrefix(channelIndex, baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
                     }
                     // Start the recording
-                    ZL.AudioLevels.startRecording();
+                    Zynthbox.AudioLevels.startRecording();
                     _private.cumulativeBeats = 0;
                     if (_private.leadinDurationInTicks > 0) {
                         // If we've got a lead-in, start the playback starter
@@ -207,9 +206,9 @@ Zynthian.Popup {
                     recordingPlaybackStarter.stop();
                     recordingStopper.stop();
                     // Actually stop recording
-                    ZL.AudioLevels.stopRecording();
+                    Zynthbox.AudioLevels.stopRecording();
                     _private.isRecording = false;
-                    if (ZynQuick.PlayGridManager.metronomeActive) {
+                    if (Zynthbox.PlayGridManager.metronomeActive) {
                         // Stop the playback, again, in case this was called by someone else (like the close button)
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
                     }
@@ -218,7 +217,7 @@ Zynthian.Popup {
             Timer {
                 id: recordingPlaybackStarter
                 repeat: false; running: false;
-                interval: ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(zynqtgui.sketchpad.song.bpm, _private.leadinDurationInTicks) * 1000
+                interval: Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(zynqtgui.sketchpad.song.bpm, _private.leadinDurationInTicks) * 1000
                 onTriggered: {
                     console.log("Starting playback after", interval);
                     Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -227,7 +226,7 @@ Zynthian.Popup {
             Timer {
                 id: recordingStopper
                 repeat: false; running: false;
-                interval: ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(zynqtgui.sketchpad.song.bpm, _private.fadeoutDurationInTicks) * 1000
+                interval: Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(zynqtgui.sketchpad.song.bpm, _private.fadeoutDurationInTicks) * 1000
                 onTriggered: {
                     console.log("Stopping the recording after", interval);
                     _private.stopRecording();
@@ -235,7 +234,7 @@ Zynthian.Popup {
             }
             Connections {
                 enabled: _private.isRecording
-                target: ZynQuick.PlayGridManager
+                target: Zynthbox.PlayGridManager
                 onMetronomeBeat128thChanged: {
                     _private.cumulativeBeats = _private.cumulativeBeats + 1;
                     if (_private.songDurationInTicks > _private.cumulativeBeats) {
@@ -258,7 +257,7 @@ Zynthian.Popup {
                             root.close();
                         }
                     } else {
-                        if (ZynQuick.PlayGridManager.metronomeBeat128th > 0) {
+                        if (Zynthbox.PlayGridManager.metronomeBeat128th > 0) {
                             // we're in fade-out, and for some reason we're still going...
                             console.log("Stopped playback already, but apparently we're still going?");
                         }
@@ -272,7 +271,7 @@ Zynthian.Popup {
                         _private.song = null;
                         for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                             // Disable recording for all channels, otherwise we'll just end up recording things when we don't want to
-                            ZL.AudioLevels.setChannelToRecord(channelIndex, false);
+                            Zynthbox.AudioLevels.setChannelToRecord(channelIndex, false);
                         }
                     }
                 }
@@ -307,8 +306,8 @@ Zynthian.Popup {
                 QQC2.CheckBox {
                     Layout.fillWidth: true
                     enabled: !_private.isRecording
-                    checked: ZL.AudioLevels.recordGlobalPlayback
-                    onClicked: ZL.AudioLevels.recordGlobalPlayback = !ZL.AudioLevels.recordGlobalPlayback
+                    checked: Zynthbox.AudioLevels.recordGlobalPlayback
+                    onClicked: Zynthbox.AudioLevels.recordGlobalPlayback = !Zynthbox.AudioLevels.recordGlobalPlayback
                 }
             }
             Repeater {
@@ -325,8 +324,8 @@ Zynthian.Popup {
                     QQC2.CheckBox {
                         Layout.fillWidth: true
                         enabled: !_private.isRecording
-                        checked: ZL.AudioLevels.channelsToRecord[channelDelegate.channelIndex]
-                        onClicked: ZL.AudioLevels.setChannelToRecord(channelDelegate.channelIndex, !ZL.AudioLevels.channelsToRecord[channelDelegate.channelIndex])
+                        checked: Zynthbox.AudioLevels.channelsToRecord[channelDelegate.channelIndex]
+                        onClicked: Zynthbox.AudioLevels.setChannelToRecord(channelDelegate.channelIndex, !Zynthbox.AudioLevels.channelsToRecord[channelDelegate.channelIndex])
                     }
                 }
             }
@@ -411,12 +410,12 @@ Zynthian.Popup {
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 Repeater {
                     id: segmentsRepeater
-                    property double totalDuration: _private.song ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * _private.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                    property double totalDuration: _private.song ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * _private.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
                     model: component.visible && totalDuration > 0 ? _private.song.sketchesModel.selectedSketch.segmentsModel : 0
                     delegate: Item {
                         id: segmentDelegate
                         property QtObject segment: model.segment
-                        property double duration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDelegate.segment.barLength * 4 + segmentDelegate.segment.beatLength)
+                        property double duration: Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segmentDelegate.segment.barLength * 4 + segmentDelegate.segment.beatLength)
                         width: parent.width * (segmentDelegate.duration / segmentsRepeater.totalDuration)
                         height: parent.height
                         Rectangle {
@@ -440,7 +439,7 @@ Zynthian.Popup {
                     bottom: parent.bottom
                     bottomMargin: -2
                     left: parent.left
-                    leftMargin: component.visible ? songProgressRow.width * (ZynQuick.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                    leftMargin: component.visible ? songProgressRow.width * (Zynthbox.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
                 }
                 width: 1
                 Rectangle {

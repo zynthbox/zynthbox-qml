@@ -2,8 +2,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import org.kde.kirigami 2.4 as Kirigami
 
-import org.zynthian.quick 1.0 as ZynQuick
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 /**
  * \brief Visualiser for samples, including progress information either for single progress (e.g. preview purposes), or for all playback positions
@@ -50,7 +49,7 @@ Item {
                 ? 2
                 : 0
     }
-    WaveFormItem {
+    Zynthbox.WaveFormItem {
         id: waveForm
         anchors.fill: parent
         color: Kirigami.Theme.textColor
@@ -126,7 +125,7 @@ Item {
 
         // SamplerSynth progress dots
         Repeater {
-            property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(_private.sample.cppObjId) : null;
+            property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId) : null;
             model: component.visible && _private.progressStyle === 2 && cppClipObject
                 ? cppClipObject.playbackPositions
                 : 0

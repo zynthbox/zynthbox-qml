@@ -31,7 +31,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
     id: component
@@ -68,7 +68,7 @@ ColumnLayout {
                         if (!component.playgrid.listenForNotes) {
                             if (zynqtgui.backButtonPressed) {
                                 component.removeNote(note);
-                            } else if (ZynQuick.PlayGridManager.metronomeActive) {
+                            } else if (Zynthbox.PlayGridManager.metronomeActive) {
                                 component.playgrid.heardNotes = [];
                                 component.playgrid.heardVelocities = [];
                                 component.playgrid.mostRecentNoteVelocity = velocity;

@@ -29,9 +29,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
 
 import "Sketchpad" as Sketchpad
 
@@ -321,11 +320,11 @@ Zynthian.ScreenPage {
             Kirigami.Theme.colorSet: Kirigami.Theme.Button
             Repeater {
                 id: segmentsRepeater
-                property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
                 model: component.isVisible && totalDuration > 0 ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel : 0
                 delegate: Item {
                     property QtObject segment: model.segment
-                    property int duration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segment.barLength * 4 + segment.beatLength)
+                    property int duration: Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segment.barLength * 4 + segment.beatLength)
                     Layout.fillWidth: true
                     Layout.preferredWidth: component.width * (duration / segmentsRepeater.totalDuration)
                     Layout.preferredHeight: Kirigami.Units.gridUnit
@@ -352,7 +351,7 @@ Zynthian.ScreenPage {
                 height: 1
                 width: 1
                 y: 0
-                x: component.visible && segmentsRepeater.totalDuration > 0 ? parent.width * (ZynQuick.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                x: component.visible && segmentsRepeater.totalDuration > 0 ? parent.width * (Zynthbox.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
                 Rectangle {
                     anchors {
                         bottom: parent.top
@@ -522,12 +521,12 @@ Zynthian.ScreenPage {
                             ", durationInBeats",
                             (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength),
                             ", durationInTicks",
-                            ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
+                            Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
                         )
 
-                        ZynQuick.SegmentHandler.startPlayback(
-                            ZynQuick.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
-                            ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
+                        Zynthbox.SegmentHandler.startPlayback(
+                            Zynthbox.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
+                            Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
                         )
                     }
                 }

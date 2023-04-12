@@ -32,7 +32,7 @@ import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Rectangle {
     id: root
@@ -133,7 +133,7 @@ Rectangle {
             zynqtgui.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
 
             if (root.selectedSlotRowItem.channel.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
+                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
                 pattern.midiChannel = root.selectedSlotRowItem.channel.connectedSound;
             }
         }

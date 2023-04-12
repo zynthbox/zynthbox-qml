@@ -28,9 +28,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
 
 MouseArea {
     id: root
@@ -58,7 +57,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackAHold / zynqtgui.status_information.rangedB), 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackAHold / zynqtgui.status_information.rangedB), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -85,7 +84,7 @@ MouseArea {
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
                 width: highSignalARect.peakSignalA * root.width
-                property double peakSignalA: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackA / zynqtgui.status_information.rangedB), 1)
+                property double peakSignalA: Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackA / zynqtgui.status_information.rangedB), 1)
             }
             Rectangle {
                 id: mediumSignalARect
@@ -122,7 +121,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackBHold / zynqtgui.status_information.rangedB), 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackBHold / zynqtgui.status_information.rangedB), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -149,7 +148,7 @@ MouseArea {
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
                 width: Math.min(highSignalBRect.peakSignalB, 1) * root.width
-                property double peakSignalB: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackB / zynqtgui.status_information.rangedB), 1)
+                property double peakSignalB: Math.min(Math.max(0, 1 + Zynthbox.AudioLevels.playbackB / zynqtgui.status_information.rangedB), 1)
             }
             Rectangle {
                 id: mediumSignalBRect
@@ -293,23 +292,23 @@ MouseArea {
             visible: zynqtgui.status_information.midi_recorder.length > 0
         }
         QQC2.Label {
-            visible: ZynQuick.PlayGridManager.hardwareInActiveNotes.length > 0
+            visible: Zynthbox.PlayGridManager.hardwareInActiveNotes.length > 0
             text: visible
-                ? "<font size=\"1\">I:</font>" + ZynQuick.PlayGridManager.hardwareInActiveNotes[0] + (ZynQuick.PlayGridManager.hardwareInActiveNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.hardwareInActiveNotes.length - 1) : "")
+                ? "<font size=\"1\">I:</font>" + Zynthbox.PlayGridManager.hardwareInActiveNotes[0] + (Zynthbox.PlayGridManager.hardwareInActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.hardwareInActiveNotes.length - 1) : "")
                 : ""
             font.pointSize: 9
         }
         QQC2.Label {
-            visible: ZynQuick.PlayGridManager.internalPassthroughActiveNotes.length > 0
+            visible: Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 0
             text: visible
-                ? ZynQuick.PlayGridManager.internalPassthroughActiveNotes[0] + (ZynQuick.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
+                ? Zynthbox.PlayGridManager.internalPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
                 : ""
             font.pointSize: 9
         }
 //        QQC2.Label {
-//            visible: ZynQuick.PlayGridManager.hardwareOutActiveNotes.length > 0
+//            visible: Zynthbox.PlayGridManager.hardwareOutActiveNotes.length > 0
 //            text: visible
-//                ? "<font size=\"1\">O:</font>" + ZynQuick.PlayGridManager.hardwareOutActiveNotes[0] + (ZynQuick.PlayGridManager.hardwareOutActiveNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.hardwareOutActiveNotes.length - 1) : "")
+//                ? "<font size=\"1\">O:</font>" + Zynthbox.PlayGridManager.hardwareOutActiveNotes[0] + (Zynthbox.PlayGridManager.hardwareOutActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.hardwareOutActiveNotes.length - 1) : "")
 //                : ""
 //            font.pointSize: 9
 //        }

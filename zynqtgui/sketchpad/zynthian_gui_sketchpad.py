@@ -36,11 +36,10 @@ import json
 import numpy as np
 from PySide2.QtCore import QMetaObject, Qt, Property, QObject, QTimer, Signal, Slot
 
-from .libzl.libzl import ClipAudioSource
+from libzynthbox import ClipAudioSource
 from ..zynthian_gui_multi_controller import MultiController
 
-sys.path.insert(1, "./libzl")
-from .libzl import libzl
+import libzynthbox
 from . import sketchpad_clip, sketchpad_song
 
 from .. import zynthian_qt_gui_base
@@ -50,7 +49,7 @@ from zyngine import zynthian_controller
 import jack
 
 @ctypes.CFUNCTYPE(None, ctypes.c_int)
-def libzlCb(beat):
+def libzynthboxCb(beat):
     if beat % zynthian_gui_sketchpad.__instance__.beatSubdivision == 0:
         zynthian_gui_sketchpad.__instance__.metronomeBeatUpdate4th.emit(beat / zynthian_gui_sketchpad.__instance__.beatSubdivision)
 
@@ -79,9 +78,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         logging.info(f"Initializing Sketchpad")
 
         zynthian_gui_sketchpad.__instance__ = self
-        libzl.registerGraphicTypes()
 
-        self.beatSubdivision = libzl.getMultiplier()
+        self.beatSubdivision = libzynthbox.getMultiplier()
         self.beatSubdivision2 = self.beatSubdivision / 2
         self.beatSubdivision3 = self.beatSubdivision2 / 2
         self.beatSubdivision4 = self.beatSubdivision3 / 2
@@ -189,7 +187,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     def init_sketchpad(self, sketchpad, cb=None):
         def _cb():
-            libzl.registerTimerCallback(libzlCb)
+            libzynthbox.registerTimerCallback(libzynthboxCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
             self.update_timer_bpm()
@@ -1591,7 +1589,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.click_channel_click.set_length(4, self.__song__.bpm)
         self.click_channel_clack.set_length(1, self.__song__.bpm)
 
-        libzl.setBpm(self.__song__.bpm)
+        libzynthbox.setBpm(self.__song__.bpm)
         if self.metronome_running_refcount > 0:
             self.set_clickChannelEnabled(self.click_channel_enabled)
 
@@ -1667,16 +1665,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
 
-            libzl.AudioLevels_setShouldRecordPorts(True)
-            libzl.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
-            libzl.AudioLevels_clearRecordPorts()
+            libzynthbox.AudioLevels_setShouldRecordPorts(True)
+            libzynthbox.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
+            libzynthbox.AudioLevels_clearRecordPorts()
 
             for ports in recording_ports:
                 for port in zip(ports, (0, 1)):
                     logging.debug(f"Adding record port : {port}")
-                    libzl.AudioLevels_addRecordPort(port[0], port[1])
+                    libzynthbox.AudioLevels_addRecordPort(port[0], port[1])
 
-            libzl.AudioLevels_startRecording()
+            libzynthbox.AudioLevels_startRecording()
 
         self.isRecording = True
 
@@ -1696,9 +1694,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     @Slot()
     def stopAudioRecording(self):
-        if libzl.AudioLevels_isRecording():
-            libzl.AudioLevels_stopRecording()
-            libzl.AudioLevels_clearRecordPorts()
+        if libzynthbox.AudioLevels_isRecording():
+            libzynthbox.AudioLevels_stopRecording()
+            libzynthbox.AudioLevels_clearRecordPorts()
 
     @Slot(None)
     def startPlayback(self):
@@ -1725,7 +1723,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     self.click_channel_click.queueClipToStartOnChannel(-2)
                     self.click_channel_clack.queueClipToStartOnChannel(-2)
 
-                libzl.startTimer(self.__song__.bpm)
+                libzynthbox.startTimer(self.__song__.bpm)
 
                 self.metronome_running_changed.emit()
 
@@ -1750,7 +1748,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # Immediately stop clips when scheduled to stop
         if self.metronome_schedule_stop:
             logging.debug(f"Stopping timer as it was scheduled to stop.")
-            libzl.stopTimer()
+            libzynthbox.stopTimer()
 
             self.click_channel_click.stopOnChannel(-2)
             self.click_channel_clack.stopOnChannel(-2)

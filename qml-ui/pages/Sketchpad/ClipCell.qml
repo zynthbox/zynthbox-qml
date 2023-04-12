@@ -30,7 +30,7 @@ import QtQml.Models 2.10
 import QtGraphicalEffects 1.0
 
 import org.kde.kirigami 2.4 as Kirigami
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 
 QQC2.AbstractButton {

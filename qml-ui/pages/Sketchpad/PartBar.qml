@@ -32,8 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 // GridLayout so TabbedControlView knows how to navigate it
 Rectangle {

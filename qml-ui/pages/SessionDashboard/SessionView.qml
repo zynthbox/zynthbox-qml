@@ -30,7 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
     id: root
@@ -225,10 +225,10 @@ ColumnLayout {
                 }
                 Repeater {
                     id: patternsViewMainRepeater
-                    model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+                    model: Object.keys(Zynthbox.PlayGridManager.dashboardModels)
                     delegate: Repeater {
                         id: patternsViewPlaygridRepeater
-                        model: ZynQuick.PlayGridManager.dashboardModels[modelData]
+                        model: Zynthbox.PlayGridManager.dashboardModels[modelData]
                         property string playgridId: modelData
                         delegate: DashboardListItem {
                             id: delegate
@@ -301,10 +301,10 @@ ColumnLayout {
                             secondColumn: layersLayout
                             onClicked: {
                                 zynqtgui.current_modal_screen_id = "playgrid";
-                                var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
+                                var playgridIndex = Zynthbox.PlayGridManager.playgrids.indexOf(playgridId);
                                 //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
-                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
-                                ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
+                                Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
+                                Zynthbox.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
                             }
                             onRequestConnect: {
                                 if (child.channel < 10) {

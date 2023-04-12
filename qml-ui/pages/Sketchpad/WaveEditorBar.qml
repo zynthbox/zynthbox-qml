@@ -33,8 +33,7 @@ import Qt.labs.folderlistmodel 2.11
 import Qt.labs.handlers 1.0
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
@@ -60,7 +59,7 @@ GridLayout {
         return false;
     }
 
-    WaveFormItem {
+    Zynthbox.WaveFormItem {
         id: wav
 
         // Calculate amount of pixels represented by 1 second
@@ -366,7 +365,7 @@ GridLayout {
             // Slice progress lines
             Repeater {
                 property QtObject cppClipObject: waveBar.controlObj
-                                                    ? ZynQuick.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
+                                                    ? Zynthbox.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
                                                     : null
                 model: (waveBar.visible && waveBar.channel.channelAudioType === "sample-slice" || waveBar.channel.channelAudioType === "sample-trig") && cppClipObject
                         ? cppClipObject.playbackPositions
@@ -453,14 +452,14 @@ GridLayout {
             // base64 encoding of a midi file, it'll be at least the header size of that if
             // it's useful, so... just check for bigger than 10, that'll do
             visible: waveBar.controlObj != null && waveBar.controlObj.metadataMidiRecording != null && waveBar.controlObj.metadataMidiRecording.length > 10
-            text: ZynQuick.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
+            text: Zynthbox.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
             onClicked: {
-                if (ZynQuick.MidiRecorder.isPlaying) {
-                    ZynQuick.MidiRecorder.stopPlayback();
+                if (Zynthbox.MidiRecorder.isPlaying) {
+                    Zynthbox.MidiRecorder.stopPlayback();
                 } else {
-                    if (ZynQuick.MidiRecorder.loadFromBase64Midi(waveBar.controlObj.metadataMidiRecording)) {
-                        ZynQuick.MidiRecorder.forceToChannel(ZynQuick.PlayGridManager.currentMidiChannel);
-                        ZynQuick.MidiRecorder.playRecording();
+                    if (Zynthbox.MidiRecorder.loadFromBase64Midi(waveBar.controlObj.metadataMidiRecording)) {
+                        Zynthbox.MidiRecorder.forceToChannel(Zynthbox.PlayGridManager.currentMidiChannel);
+                        Zynthbox.MidiRecorder.playRecording();
                     } else {
                         console.log("Failed to load recording from clip data, which is:\n", waveBar.controlObj.metadataMidiRecording);
                     }

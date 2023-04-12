@@ -168,7 +168,7 @@ from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_g
 
 from zynqtgui.zynthian_osd import zynthian_osd
 
-from zynqtgui.sketchpad.libzl import libzl
+import libzynthbox
 
 from pathlib import Path
 
@@ -675,8 +675,8 @@ class zynthian_gui(QObject):
             #)
             #self.libseq.init(True)
 
-        # Initialise libzl (which requires things found in zyncoder, specifically the zynthian midi router)
-        libzl.init()
+        # Initialise libzynthbox (which requires things found in zyncoder, specifically the zynthian midi router)
+        libzynthbox.init()
 
     @Slot()
     def channelsModTimerHandler(self):
@@ -1486,7 +1486,7 @@ class zynthian_gui(QObject):
             self.init_midi()
             self.init_midi_services()
             self.zynautoconnect()
-            libzl.reloadZynthianConfiguration()
+            libzynthbox.reloadZynthianConfiguration()
 
     """
     Initialize Global FX Engines
@@ -4721,8 +4721,8 @@ class zynthian_gui(QObject):
     def set_masterVolume(self, value):
         if self.__master_volume != value:
             self.__master_volume = value
-            # libzl expects dryAmount to be ranging from 0-1
-            libzl.setDryAmount(-1, np.interp(value, (0, 100), (0, 1)))
+            # libzynthbox expects dryAmount to be ranging from 0-1
+            libzynthbox.setDryAmount(-1, np.interp(value, (0, 100), (0, 1)))
             self.masterVolumeChanged.emit()
 
     masterVolumeChanged = Signal()
@@ -5000,17 +5000,17 @@ if __name__ == "__main__":
     if os.environ.get("ZYNTHBOX_DEBUG"):
         debug = QQmlDebuggingEnabler()
 
-    ### Tracktion config file `/root/.config/libzl/Settings.xml` sometimes reconfigures and sets
+    ### Tracktion config file `/root/.config/libzynthbox/Settings.xml` sometimes reconfigures and sets
     ### the value <VALUE name="audiosettings_JACK"><AUDIODEVICE outEnabled="0" inEnabled="0" monoChansOut="0" stereoChansIn="0"/></VALUE>
-    ### which causes no audio output from libzl. To circumvent this isssue, always remove the following
+    ### which causes no audio output from libzynthbox. To circumvent this isssue, always remove the following
     ### three tags from the xml : <VALUE name="audiosettings_JACK">, <VALUE name="defaultWaveDevice_JACK">
     ### and <VALUE name="defaultWaveInDevice_JACK"
-    ### Remove these above 3 tags from xml before initializing libzl
+    ### Remove these above 3 tags from xml before initializing libzynthbox
     ### FIXME : Find the root cause of the issue instead of this workaround
     try:
-        if Path("/root/.config/libzl/Settings.xml").exists():
-            logging.debug(f"libzl settings file found. Removing elements")
-            tree = ET.parse('/root/.config/libzl/Settings.xml')
+        if Path("/root/.config/libzynthbox/Settings.xml").exists():
+            logging.debug(f"libzynthbox settings file found. Removing elements")
+            tree = ET.parse('/root/.config/libzynthbox/Settings.xml')
             root = tree.getroot()
 
             e1 = root.find(".//VALUE[@name='audiosettings_JACK']")
@@ -5026,9 +5026,9 @@ if __name__ == "__main__":
                 logging.debug(f"Removing element defaultWaveInDevice_JACK")
                 root.remove(e3)
 
-            tree.write("/root/.config/libzl/Settings.xml")
+            tree.write("/root/.config/libzynthbox/Settings.xml")
     except Exception as e:
-        logging.error(f"Error updating libzl Settings.xml : {str(e)}")
+        logging.error(f"Error updating libzynthbox Settings.xml : {str(e)}")
 
     ###
 

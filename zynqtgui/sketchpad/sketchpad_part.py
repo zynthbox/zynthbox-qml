@@ -26,7 +26,7 @@ import logging
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
-from zynqtgui.sketchpad.libzl import libzl
+import libzynthbox
 from .sketchpad_clip import sketchpad_clip
 
 class sketchpad_part(QObject):
@@ -189,7 +189,7 @@ class sketchpad_part(QObject):
 
         # logging.error(f"Clips to Stop for Part {self.__part_index__} : f{clips_to_stop}")
 
-        # libzl.stopClips(clips_to_stop)
+        # libzynthbox.stopClips(clips_to_stop)
 
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()

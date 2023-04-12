@@ -30,7 +30,7 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 import "pages" as Pages
 import "pages/SessionDashboard" as SessionDashboard
 import "pages/Sketchpad" as Sketchpad
@@ -69,7 +69,7 @@ Kirigami.AbstractApplicationWindow {
         return result
     }
 
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+    property QtObject sequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -479,7 +479,7 @@ Kirigami.AbstractApplicationWindow {
             id: globalRecordButton
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            property QtObject currentSequence: ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+            property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
             onClicked: {
                 if (zynqtgui.current_screen_id === "playgrid") {
                     zynqtgui.callable_ui_action("START_RECORD");
@@ -489,7 +489,7 @@ Kirigami.AbstractApplicationWindow {
                     // opens the recording popup, which isn't what you'd be after
                     if (globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive) {
                         globalRecordButton.currentSequence.activePatternObject.recordLive = false;
-                        if (ZynQuick.PlayGridManager.metronomeActive) {
+                        if (Zynthbox.PlayGridManager.metronomeActive) {
                             Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         }
                     } else {
@@ -691,7 +691,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     Connections {
-        target: ZynQuick.PlayGridManager
+        target: Zynthbox.PlayGridManager
         onTaskMessage: {
             Qt.callLater(function() {
                 zynqtgui.playgrid.setCurrentTaskMessage(message);
@@ -700,7 +700,7 @@ Kirigami.AbstractApplicationWindow {
     }
     Repeater {
         id: playGridsRepeater
-        model: ZynQuick.PlayGridManager.playgrids
+        model: Zynthbox.PlayGridManager.playgrids
         Loader {
             id:playGridLoader
             source: modelData + "/main.qml"

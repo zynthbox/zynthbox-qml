@@ -29,9 +29,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.ScreenPage {
     id: component

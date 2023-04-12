@@ -30,7 +30,7 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 Item {
     id: component
     property QtObject selectedChannel: null
@@ -59,7 +59,7 @@ Item {
                 model: 5
                 QQC2.Button {
                     property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
-                    property QtObject clipObj: channelSample ? ZynQuick.PlayGridManager.getClipById(channelSample.cppObjId) : null;
+                    property QtObject clipObj: channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null;
                     enabled: clipObj !== null
                     text: (index === 0 ? "Assign full width to sample " : "") + (index + 1)
                     onClicked: {
@@ -69,7 +69,7 @@ Item {
                             for (var i = 0; i < component.selectedChannel.samples.length; ++i) {
                                 var sample = component.selectedChannel.samples[i];
                                 if (sample) {
-                                    var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
+                                    var clip = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
                                     if (clip) {
                                         // -1 is not a true midi key, but as this is "just" data storage,
                                         // we can use it to effectively disable a sample entirely
@@ -135,7 +135,7 @@ Item {
                 delegate: Item {
                     id: sampleKeyzoneDelegate
                     property var channelSample: component.selectedChannel.samples && component.selectedChannel.samples[index]
-                    property QtObject clipObj: channelSample ? ZynQuick.PlayGridManager.getClipById(channelSample.cppObjId) : null;
+                    property QtObject clipObj: channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null;
                     Connections {
                         target: clipObj
                         onKeyZoneStartChanged: zynqtgui.sketchpad.song.schedule_save()

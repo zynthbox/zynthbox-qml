@@ -6,14 +6,13 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
-import JuceGraphics 1.0
+import io.zynthbox.components 1.0 as Zynthbox
 
 ColumnLayout {
     id: root
     property QtObject channel
     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
-    property QtObject sequence: zynqtgui.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+    property QtObject sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
     property QtObject selectedComponent
@@ -46,7 +45,7 @@ ColumnLayout {
                             ? 1
                             : 0
             }
-            WaveFormItem {
+            Zynthbox.WaveFormItem {
                 anchors.fill: parent
                 color: Kirigami.Theme.textColor
                 source: partDelegate.clip ? partDelegate.clip.path : ""

@@ -65,9 +65,9 @@ class zynthian_gui_about(zynthian_qt_gui_base.zynqtgui):
         return self.get_version_from_apt("libqt5core5a")
     qt_version = Property(str, get_qt_version, constant = True)
 
-    def get_libzl_version(self):
-        return self.get_version_from_apt("libzl")
-    libzl_version = Property(str, get_libzl_version, constant = True)
+    def get_libzynthbox_version(self):
+        return self.get_version_from_apt("libzynthbox")
+    libzynthbox_version = Property(str, get_libzynthbox_version, constant = True)
 
     def get_kirigami_version(self):
         return self.get_version_from_apt("qml-module-org-kde-kirigami2")

@@ -32,7 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Rectangle {
     id: root
@@ -132,7 +132,7 @@ Rectangle {
                         case "bottombar-controltype-part":
                             return qsTr("PART: %1").arg(text);
     //                    case "bottombar-controltype-pattern":
-    //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+    //                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
     //                        var pattern = sequence.getByPart(zynqtgui.bottomBarControlObj.clipChannel.connectedPattern, 0)
     //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:
@@ -318,7 +318,7 @@ Rectangle {
                     }
     //                QQC2.Label {
     //                    visible: zynqtgui.bottomBarControlObj.connectedPattern >= 0
-    //                    property QtObject sequence: zynqtgui.bottomBarControlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+    //                    property QtObject sequence: zynqtgui.bottomBarControlObj.connectedPattern >= 0 ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     //                    property QtObject pattern: sequence ? sequence.getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart) : null
     //                    text: qsTr("Pattern %1").arg(zynqtgui.bottomBarControlObj.connectedPattern+1)
     //                }
@@ -341,7 +341,7 @@ Rectangle {
     //                    onClicked: {
     //                        zynqtgui.bottomBarControlObj.clear()
 
-    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart);
+    //                        var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart);
     //                        seq.enabled = false;
     //                        zynqtgui.bottomBarControlObj.connectedPattern = -1;
     //                    }

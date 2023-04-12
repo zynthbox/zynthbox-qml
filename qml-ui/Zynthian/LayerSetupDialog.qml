@@ -31,7 +31,7 @@ import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 
 Zynthian.Dialog {
@@ -123,7 +123,7 @@ Zynthian.Dialog {
                 interval: 200
                 onTriggered: {
                     if (root.selectedChannel.connectedPattern >= 0) {
-                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                        var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
                         pattern.midiChannel = root.selectedChannel.connectedSound;
                     }
                 }

@@ -30,7 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 /**
  * \brief This is the base component for all PlayGrids
@@ -131,9 +131,9 @@ import org.zynthian.quick 1.0 as ZynQuick
  *
  * \include[lineno]{BasePlayGrid-example.qml}
  */
-ZynQuick.PlayGrid {
+Zynthbox.PlayGrid {
     id: component
-    playGridManager: ZynQuick.PlayGridManager
+    playGridManager: Zynthbox.PlayGridManager
 
     /**
      * \brief An icon used to represent the playgrid in the UI (in places where an icon makes sense)
@@ -290,7 +290,7 @@ ZynQuick.PlayGrid {
     }
 
     Component.onCompleted: {
-        zynqtgui.playgrid.zynquickPgmanager = ZynQuick.PlayGridManager;
+        zynqtgui.playgrid.zynquickPgmanager = Zynthbox.PlayGridManager;
         _private.loadSettings();
         initialisationTimer.restart();
     }
@@ -312,7 +312,7 @@ ZynQuick.PlayGrid {
         function ensureContainer()
         {
             if (settingsContainer == null) {
-                settingsContainer = ZynQuick.PlayGridManager.getSettingsStore(component.name);
+                settingsContainer = Zynthbox.PlayGridManager.getSettingsStore(component.name);
             }
         }
         function listsEqual(list1, list2) {

@@ -36,7 +36,7 @@ from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal, Slot
 import taglib
 import json
 
-from zynqtgui.sketchpad.libzl.libzl import ClipAudioSource
+from libzynthbox import ClipAudioSource
 
 import logging
 

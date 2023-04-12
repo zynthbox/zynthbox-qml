@@ -33,9 +33,8 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 
-import libzl 1.0 as ZL
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.Popup {
     id: root
@@ -394,8 +393,8 @@ Zynthian.Popup {
                                 font.pointSize: 8
                                 value: visible
                                        ? zynqtgui.sketchpad.recordingSource === "internal"
-                                          ? ZL.AudioLevels.channels[root.selectedChannel.id]
-                                          : ZL.AudioLevels.captureA
+                                          ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                          : Zynthbox.AudioLevels.captureA
                                        : -100
                                 style: GaugeStyle {
                                     valueBar: Rectangle {
@@ -425,8 +424,8 @@ Zynthian.Popup {
                                 font.pointSize: 8
                                 value: visible
                                         ? zynqtgui.sketchpad.recordingSource === "internal"
-                                           ? ZL.AudioLevels.channels[root.selectedChannel.id]
-                                           : ZL.AudioLevels.captureB
+                                           ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                           : Zynthbox.AudioLevels.captureB
                                         : -100
                                 style: GaugeStyle {
                                     valueBar: Rectangle {

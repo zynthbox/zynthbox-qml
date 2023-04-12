@@ -29,7 +29,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
     id: component
@@ -41,9 +41,9 @@ Item {
 
     // Pitch is -8192 to 8191 inclusive
     property int pitchValue: Math.max(-8192, Math.min(slidePoint.slideX * 8192 / width, 8191))
-    onPitchValueChanged: ZynQuick.PlayGridManager.pitch = pitchValue
+    onPitchValueChanged: Zynthbox.PlayGridManager.pitch = pitchValue
     property int modulationValue: Math.max(-127, Math.min(slidePoint.slideY * 127 / width, 127))
-    onModulationValueChanged: ZynQuick.PlayGridManager.modulation = modulationValue;
+    onModulationValueChanged: Zynthbox.PlayGridManager.modulation = modulationValue;
 
     // Whether or not pressing and holding the button should be visualised
     property bool visualPressAndHold: false
@@ -203,7 +203,7 @@ Item {
                         }
                         playingNote = component.note;
                         if (component.note.midiChannel < 15) {
-                            ZynQuick.PlayGridManager.setNoteOn(playingNote, velocityValue)
+                            Zynthbox.PlayGridManager.setNoteOn(playingNote, velocityValue)
                         }
                         component.notePlayed(playingNote, velocityValue);
                         component.focus = true;
@@ -211,10 +211,10 @@ Item {
                         longPressTimer.restart();
                     } else {
                         if (component.note.midiChannel < 15) {
-                            ZynQuick.PlayGridManager.setNoteOff(playingNote)
+                            Zynthbox.PlayGridManager.setNoteOff(playingNote)
                         }
-                        ZynQuick.PlayGridManager.pitch = 0;
-                        ZynQuick.PlayGridManager.modulation = 0;
+                        Zynthbox.PlayGridManager.pitch = 0;
+                        Zynthbox.PlayGridManager.modulation = 0;
                         component.pressingAndHolding = false;
                         longPressTimer.stop();
                     }

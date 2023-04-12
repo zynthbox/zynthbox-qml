@@ -32,7 +32,7 @@ import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import org.zynthian.quick 1.0 as ZynQuick
+import io.zynthbox.components 1.0 as Zynthbox
 import "../../pages/SessionDashboard/" as SessionDashboard
 
 Zynthian.BasePlayGrid {
@@ -104,12 +104,12 @@ Zynthian.BasePlayGrid {
                 case "START_RECORD":
                     if (_private.activePatternModel.recordLive) {
                         _private.activePatternModel.recordLive = false;
-                        if (ZynQuick.PlayGridManager.metronomeActive) {
+                        if (Zynthbox.PlayGridManager.metronomeActive) {
                             Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         }
                     } else {
                         _private.activePatternModel.recordLive = true;
-                        if (!ZynQuick.PlayGridManager.metronomeActive) {
+                        if (!Zynthbox.PlayGridManager.metronomeActive) {
                             Zynthian.CommonUtils.startMetronomeAndPlayback();
                         }
                     }
@@ -372,7 +372,7 @@ Zynthian.BasePlayGrid {
             }
             return text;
         }
-        //property QtObject activeBarModel: ZynQuick.FilterProxy {
+        //property QtObject activeBarModel: Zynthbox.FilterProxy {
             //sourceModel: patternModel
             //filterRowStart: activeBar
             //filterRowEnd: activeBar
@@ -491,7 +491,7 @@ Zynthian.BasePlayGrid {
         }
         function adoptSequence() {
             console.log("Adopting the scene sequence");
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
             if (_private.sequence != sequence) {
                 console.log("Scene has changed, switch places!");
                 _private.sequence = sequence;
@@ -552,7 +552,7 @@ Zynthian.BasePlayGrid {
         }
     }
     Connections {
-        target: ZynQuick.PlayGridManager
+        target: Zynthbox.PlayGridManager
         onDashboardItemPicked: {
             adoptSequence(); // just to be safe...
             if (component.dashboardModel === model) {
@@ -572,7 +572,7 @@ Zynthian.BasePlayGrid {
         }
         onMostRecentlyChangedNotesChanged: {
             if (component.listenForNotes && _private.activePatternModel) {
-                var mostRecentNoteData = ZynQuick.PlayGridManager.mostRecentlyChangedNotes[ZynQuick.PlayGridManager.mostRecentlyChangedNotes.length - 1];
+                var mostRecentNoteData = Zynthbox.PlayGridManager.mostRecentlyChangedNotes[Zynthbox.PlayGridManager.mostRecentlyChangedNotes.length - 1];
                 if (mostRecentNoteData.channel == _private.activePatternModel.midiChannel) {
                     // Same channel, that makes us friends!
                     // Create a new note based on the new thing that just arrived, but only if it's an on note
@@ -591,8 +591,8 @@ Zynthian.BasePlayGrid {
         }
     }
     Connections {
-        target: ZynQuick.MidiRouter
-        enabled: component.isVisible && !ZynQuick.PlayGridManager.metronomeActive
+        target: Zynthbox.MidiRouter
+        enabled: component.isVisible && !Zynthbox.PlayGridManager.metronomeActive
         onNoteChanged: {
             if (port == 0 && midiChannel === _private.activePatternModel.midiChannel) {
                 if (setOn == true) {
@@ -662,7 +662,7 @@ Zynthian.BasePlayGrid {
 
                 DrumsGrid {
                     id: drumsGridItem
-                    model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
+                    model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
                     onRemoveNote: {
@@ -694,7 +694,7 @@ Zynthian.BasePlayGrid {
                 // drum pad & sequencer
                 Rectangle {
                     id:drumPad
-                    property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+                    property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
                     Layout.fillWidth: true; 
                     Layout.minimumHeight: parent.height / 5; 
                     Layout.maximumHeight: parent.height / 5;
@@ -1212,7 +1212,7 @@ Zynthian.BasePlayGrid {
                                     onLastModifiedChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
-                                    target: ZynQuick.PlayGridManager
+                                    target: Zynthbox.PlayGridManager
                                     onCurrentMidiChannelChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
@@ -1249,7 +1249,7 @@ Zynthian.BasePlayGrid {
 //                                     Layout.fillHeight: true
 //                                     Zynthian.PlayGridButton {
 //                                         text: "TRIG"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination
 //                                         onClicked: {
 //                                             if (checked) {
 //                                                 _private.associatedChannel.channelAudioType = "external";
@@ -1260,7 +1260,7 @@ Zynthian.BasePlayGrid {
 //                                     }
 //                                     Zynthian.PlayGridButton {
 //                                         text: "SYNTH"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SynthDestination
 //                                         onClicked: {
 //                                             if (checked) {
 //                                                 _private.associatedChannel.channelAudioType = "external";
@@ -1274,7 +1274,7 @@ Zynthian.BasePlayGrid {
 //                                     Layout.fillHeight: true
 //                                     Zynthian.PlayGridButton {
 //                                         text: "SLICE"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination
 //                                         onClicked: {
 //                                             if (checked) {
 //                                                 _private.associatedChannel.channelAudioType = "external";
@@ -1285,7 +1285,7 @@ Zynthian.BasePlayGrid {
 //                                     }
 //                                     Zynthian.PlayGridButton {
 //                                         text: "LOOP"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
 //                                         onClicked: {
 //                                             if (checked) {
 //                                                 _private.associatedChannel.channelAudioType = "external";
@@ -1422,7 +1422,7 @@ Zynthian.BasePlayGrid {
                             id: patternBarsLayout
                             Layout.preferredWidth: parent.width / 2
                             Layout.fillHeight: true
-                            property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+                            property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
                             Item {
                                 visible: padSettings.visible && patternBarsLayout.channelIsLoopType
                                 Layout.fillWidth: true
@@ -1620,7 +1620,7 @@ Zynthian.BasePlayGrid {
                                                     id: soundButton
                                                     Layout.fillWidth: true
                                                     Layout.preferredHeight: patternsMenuItem.height / 2
-                                                    enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedChannel && patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                                    enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedChannel && patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SynthDestination
                                                     opacity: enabled ? 1 : 0.7
                                                     property string soundName
                                                     background: Rectangle {
@@ -1631,7 +1631,7 @@ Zynthian.BasePlayGrid {
                                                             color: soundButton.borderColor
                                                         }
                                                         color: soundButton.backgroundColor
-                                                        property bool sampleVisible: parent.visible && (patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination || patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination)
+                                                        property bool sampleVisible: parent.visible && (patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination || patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination)
                                                         property QtObject channel: null
                                                         Binding {
                                                             target: patternPopupSampleVisualiser
@@ -1701,11 +1701,11 @@ Zynthian.BasePlayGrid {
                                                         return "(no sample)";
                                                     }
                                                     text: visible
-                                                        ? patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
+                                                        ? patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination
                                                             ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
-                                                            : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+                                                            : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination
                                                                 ? "Sample Slice Mode"
-                                                                : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.ExternalDestination
+                                                                : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.ExternalDestination
                                                                     ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
                                                                     : patternsMenuItem.associatedChannel
                                                                         ? patternsMenuItem.associatedChannel.connectedSound > -1 && soundName.length > 2
@@ -1728,7 +1728,7 @@ Zynthian.BasePlayGrid {
                                                         id: patternPopupLoopVisualiser
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
-                                                        visible: parent.visible && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+                                                        visible: parent.visible && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
                                                         property QtObject channel: null
                                                         Binding {
                                                             target: patternPopupLoopVisualiser
@@ -1747,7 +1747,7 @@ Zynthian.BasePlayGrid {
                                                     Image {
                                                         Layout.fillHeight: true
                                                         Layout.fillWidth: true
-                                                        visible: parent.visible && patternsMenuItem.thisPattern.noteDestination !== ZynQuick.PatternModel.SampleLoopedDestination
+                                                        visible: parent.visible && patternsMenuItem.thisPattern.noteDestination !== Zynthbox.PatternModel.SampleLoopedDestination
                                                         source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
                                                         Rectangle {
                                                             anchors {
@@ -1797,7 +1797,7 @@ Zynthian.BasePlayGrid {
                                                 //Zynthian.PlayGridButton {
                                                     //text: "TRIG"
                                                     //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
+                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
                                                             //patternsMenuItem.associatedChannel.channelAudioType = "external";
@@ -1809,7 +1809,7 @@ Zynthian.BasePlayGrid {
                                                 //Zynthian.PlayGridButton {
                                                     //text: "SYNTH"
                                                     //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
+                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SynthDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
                                                             //patternsMenuItem.associatedChannel.channelAudioType = "external";
@@ -1824,7 +1824,7 @@ Zynthian.BasePlayGrid {
                                                 //Zynthian.PlayGridButton {
                                                     //text: "SLICE"
                                                     //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
+                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
                                                             //patternsMenuItem.associatedChannel.channelAudioType = "external";
@@ -1836,7 +1836,7 @@ Zynthian.BasePlayGrid {
                                                 //Zynthian.PlayGridButton {
                                                     //text: "LOOP"
                                                     //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
+                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
                                                             //patternsMenuItem.associatedChannel.channelAudioType = "external";

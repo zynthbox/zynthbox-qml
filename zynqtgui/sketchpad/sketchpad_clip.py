@@ -664,6 +664,10 @@ class sketchpad_clip(QObject):
         self.__progress__ = 0.0
         self.__audio_level__ = -200
         self.__snap_length_to_beat__ = (self.__get_metadata_prop__("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", 'True').lower() == "true")
+        self.audioSource.set_adsrAttack(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_ATTACK", 0)))
+        self.audioSource.set_adsrDecay(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_DECAY", 0)))
+        self.audioSource.set_adsrSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
+        self.audioSource.set_adsrRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
 
         self.reset_beat_count()
         self.channel_volume_changed()
@@ -962,7 +966,8 @@ class sketchpad_clip(QObject):
 
     @Slot(None)
     def saveMetadata(self):
-        self.saveMetadataTimer.start()
+        if self.__song__.isLoading == False:
+            self.saveMetadataTimer.start()
 
     def doSaveMetadata(self):
         self.write_metadata("ZYNTHBOX_STARTPOSITION", [str(self.__start_position__)])
@@ -972,6 +977,10 @@ class sketchpad_clip(QObject):
         self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
         self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
         self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
+        self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.get_adsrAttack())])
+        self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.get_adsrDecay())])
+        self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.get_adsrSustain())])
+        self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.get_adsrRelease())])
 
     @Slot(QObject)
     def copyFrom(self, clip):

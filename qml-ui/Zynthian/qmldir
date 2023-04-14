@@ -50,3 +50,4 @@ Drawer 1.0 Drawer.qml
 Menu 1.0 Menu.qml
 SegmentModelPicker 1.0 SegmentModelPicker.qml
 DialogQuestion 1.0 DialogQuestion.qml
+AbstractADSRView 1.0 AbstractADSRView.qml

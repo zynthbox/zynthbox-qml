@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Main Class and Program for Zynthian GUI
+Controller based UI for handling ADSR envelopes
 
 Copyright (C) 2021 Marco Martin <mart@kde.org>
 
@@ -37,48 +37,22 @@ GridLayout {
     property alias sustainController: sustainSlider.controller
     property alias releaseController: releaseSlider.controller
 
-    Card {
+    AbstractADSRView {
+        id: canvas
         Layout.columnSpan: 4
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        contentItem: Canvas {
-            id: canvas
-            onPaint: {
-                var ctx = getContext("2d");
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = Kirigami.Theme.highlightColor
-                var grd = ctx.createLinearGradient(0, 0, 0, height)
-                grd.addColorStop(0, Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                            Kirigami.Theme.highlightColor.g,
-                                            Kirigami.Theme.highlightColor.b,
-                                            0.4))
-                grd.addColorStop(0.8, Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                            Kirigami.Theme.highlightColor.g,
-                                            Kirigami.Theme.highlightColor.b,
-                                            0))
-                ctx.fillStyle = grd;
-                let piece = width / 4;
-                let top = Kirigami.Units.gridUnit
-                let bottom = height - Kirigami.Units.gridUnit * 2
 
-                ctx.clearRect(0, 0, width, height);
-                ctx.beginPath();
-                ctx.moveTo(piece * (1 - attackSlider.slider.value/attackSlider.slider.to), top + bottom);
-                ctx.lineTo(piece, top);
-
-                ctx.lineTo(piece + piece * (decaySlider.slider.value/decaySlider.slider.to),
-                           top + bottom * (1 - sustainSlider.slider.value/sustainSlider.slider.to));
-                ctx.lineTo(piece * 3,
-                           top + bottom * (1 - sustainSlider.slider.value/sustainSlider.slider.to));
-                ctx.lineTo(piece * 3 + piece * (releaseSlider.slider.value/releaseSlider.slider.to),
-                           top + bottom);
-                //ctx.closePath();
-                ctx.stroke();
-                ctx.fill();
-            }
-        }
+        attackValue: attackSlider.slider.value
+        attackMax: attackSlider.slider.to
+        decayValue: decaySlider.slider.value
+        decayMax: decaySlider.slider.to
+        sustainValue: sustainSlider.slider.value
+        sustainMax: sustainSlider.slider.to
+        releaseValue: releaseSlider.slider.value
+        releaseMax: releaseSlider.slider.to
     }
 
     SliderController {
@@ -110,4 +84,3 @@ GridLayout {
         encoderIndex: 3
     }
 }
-

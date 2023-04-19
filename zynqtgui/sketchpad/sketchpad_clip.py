@@ -639,7 +639,7 @@ class sketchpad_clip(QObject):
         self.stop()
 
         if self.audioSource is not None:
-            self.audioSource.destroy()
+            self.audioSource.deleteLater()
 
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
         if self.clipChannel is not None:
@@ -725,7 +725,7 @@ class sketchpad_clip(QObject):
         self.stop()
 
         if self.audioSource is not None:
-            self.audioSource.destroy()
+            self.audioSource.deleteLater()
             self.audioSource = None
             self.cppObjIdChanged.emit()
 
@@ -793,7 +793,7 @@ class sketchpad_clip(QObject):
 
     def destroy(self):
         if self.audioSource is not None:
-            self.audioSource.destroy()
+            self.audioSource.deleteLater()
 
     @Slot()
     def queueRecording(self):

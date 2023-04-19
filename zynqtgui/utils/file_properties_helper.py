@@ -78,7 +78,6 @@ class file_properties_helper(QObject):
         if self.file_metadata is not None and self.file_metadata["isWav"]:
             if self.preview_clip is not None:
                 self.preview_clip.stop()
-                self.preview_clip.destroy()
                 self.preview_clip.deleteLater()
             self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), False, self)
 

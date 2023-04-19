@@ -644,7 +644,7 @@ class sketchpad_clip(QObject):
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
         if self.clipChannel is not None:
             self.clipChannel.channelAudioType = "sample-loop"
-        self.cpp_obj_changed.emit()
+        self.cppObjIdChanged.emit()
 
         self.__read_metadata__()
 
@@ -673,7 +673,6 @@ class sketchpad_clip(QObject):
         except Exception as e:
             logging.debug(f"Not connected : {str(e)}")
 
-        self.audioSource.audioLevelChanged.connect(self.audio_level_changed_cb, Qt.QueuedConnection)
         self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
 
         try:
@@ -705,12 +704,6 @@ class sketchpad_clip(QObject):
 
     path = Property(str, path, set_path, notify=path_changed)
 
-    def audio_level_changed_cb(self):
-        self.__audio_level__ = self.audioSource.audioLevel()
-        self.audioLevelChanged.emit()
-        if self.channel is not None:
-            self.channel.audioLevel = leveldB
-
     def progress_changed_cb(self):
         self.__progress__ = self.audioSource.progress()
         self.progressChanged.emit()
@@ -734,7 +727,7 @@ class sketchpad_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
             self.audioSource = None
-            self.cpp_obj_changed.emit()
+            self.cppObjIdChanged.emit()
 
         self.__path__ = None
         self.path_changed.emit()

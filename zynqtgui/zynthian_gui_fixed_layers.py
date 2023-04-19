@@ -152,20 +152,21 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                             "volumeControl" in self.__engine_config__[layer.engine.nickname] and \
                             name in self.__engine_config__[layer.engine.nickname]['volumeControl']:
                         # Check if config has engine specific volume controller name
-                        logging.debug(f"### VOLUME : Found volume control for engine '{layer.engine.nickname}'")
+                        # logging.debug(f"### VOLUME : Found volume control for engine '{layer.engine.nickname}'")
                         ctrl = layer.controllers_dict[name]
                     elif "default" in self.__engine_config__ and \
                             "volumeControl" in self.__engine_config__['default'] and \
                             name in self.__engine_config__['default']['volumeControl']:
                         # Check if config has global volume controller name
-                        logging.debug(f"### VOLUME : Volume control for engine '{layer.engine.nickname}' not found. Using default config")
+                        # logging.debug(f"### VOLUME : Volume control for engine '{layer.engine.nickname}' not found. Using default config")
                         ctrl = layer.controllers_dict[name]
                     elif name in ['volume', 'Volume']:
-                        logging.debug(f"### VOLUME : Default config not found. Using fallback config for '{layer.engine.nickname}'")
+                        # logging.debug(f"### VOLUME : Default config not found. Using fallback config for '{layer.engine.nickname}'")
                         # Fallback when config does not have global volume controller name
                         ctrl = layer.controllers_dict[name]
                     else:
-                        logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
+                        # logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
+                        pass
 
                     if ctrl is not None:
                         # Add found volume controller

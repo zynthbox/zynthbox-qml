@@ -25,8 +25,6 @@
 import logging
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
-
-import libzynthbox
 from .sketchpad_clip import sketchpad_clip
 
 class sketchpad_part(QObject):
@@ -173,8 +171,6 @@ class sketchpad_part(QObject):
 
     @Slot(None)
     def stop(self):
-        clips_to_stop = []
-
         for i in range(0, self.__song__.channelsModel.count):
             clipsModel = self.__song__.channelsModel.getChannel(i).clipsModel
 
@@ -184,12 +180,6 @@ class sketchpad_part(QObject):
                 if clip.col == self.partIndex:
                     logging.debug(f"Stopping clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
                     clip.stop()
-                    # if clip.audioSource is not None:
-                    #     clips_to_stop.append(clip)
-
-        # logging.error(f"Clips to Stop for Part {self.__part_index__} : f{clips_to_stop}")
-
-        # libzynthbox.stopClips(clips_to_stop)
 
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()

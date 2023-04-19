@@ -1,13 +1,11 @@
 import logging
+import Zynthbox
 
 from PySide2.QtCore import Property, QMimeDatabase, QObject, Signal, Slot
 from pathlib import Path
-
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QStyle
 from soundfile import SoundFile
-
-from libzynthbox import ClipAudioSource
 
 
 class file_properties_helper(QObject):
@@ -15,7 +13,7 @@ class file_properties_helper(QObject):
         super(file_properties_helper, self).__init__(parent)
         self.file_path = None
         self.file_metadata = []
-        self.preview_clip: ClipAudioSource = None
+        self.preview_clip = None
         self.is_preview_playing = False
 
     ### Property filePath
@@ -82,7 +80,7 @@ class file_properties_helper(QObject):
                 self.preview_clip.stop()
                 self.preview_clip.destroy()
                 self.preview_clip.deleteLater()
-            self.preview_clip = ClipAudioSource(None, str(self.file_path).encode('utf-8'))
+            self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), False, self)
 
             self.preview_clip.play()
             self.is_preview_playing = True

@@ -28,6 +28,7 @@ import os
 import rpi_ws281x
 import sys
 import time
+import Zynthbox
 
 from PySide2.QtCore import Property, QTimer, Signal, Slot
 from PySide2.QtGui import QColor
@@ -200,10 +201,11 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.button_right = 23
         self.button_global = 24
 
-        self.zynqtgui.sketchpad.metronomeBeatUpdate32th.connect(self.metronomeBeatUpdate32thHandler)
+        Zynthbox.PlayGridManager.instance().metronomeBeat32ndChanged.connect(self.metronomeBeatUpdate32ndHandler)
 
     @Slot()
-    def metronomeBeatUpdate32thHandler(self, beat):
+    def metronomeBeatUpdate32ndHandler(self):
+        beat = Zynthbox.PlayGridManager.instance().metronomeBeat32nd()
         if beat == 0:
             self.blinkOff()
         elif beat == 2:

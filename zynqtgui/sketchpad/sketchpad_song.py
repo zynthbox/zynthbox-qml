@@ -27,11 +27,14 @@ import math
 import shutil
 import traceback
 import uuid
-
-from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
-
 import zynautoconnect
-import libzynthbox
+import Zynthbox
+import logging
+import json
+import os
+
+from pathlib import Path
+from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 from .sketchpad_sketch import sketchpad_sketch
 from .sketchpad_sketches_model import sketchpad_sketches_model
 from .sketchpad_scenes_model import sketchpad_scenes_model
@@ -41,12 +44,6 @@ from .sketchpad_part import sketchpad_part
 from .sketchpad_clip import sketchpad_clip
 from .sketchpad_parts_model import sketchpad_parts_model
 from .sketchpad_channels_model import sketchpad_channels_model
-
-import logging
-import json
-import os
-from pathlib import Path
-
 from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthian_gui_config import zynqtgui
 
@@ -542,7 +539,7 @@ class sketchpad_song(QObject):
         if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != math.floor(bpm) or force_set is True:
             self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
 
-            libzynthbox.setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
+            Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
             # Call zynqtgui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened
             self.zynqtgui.set_selector()
@@ -673,11 +670,11 @@ class sketchpad_song(QObject):
             for channel_index in range(self.channelsModel.count):
                 channel = self.channelsModel.getChannel(channel_index)
                 if value == -1:
-                    libzynthbox.setMuted(channel.id, channel.muted)
+                    Zynthbox.Plugin.instance().setMuted(channel.id, channel.muted)
                 elif value == channel.id:
-                    libzynthbox.setMuted(channel.id, False)
+                    Zynthbox.Plugin.instance().setMuted(channel.id, False)
                 else:
-                    libzynthbox.setMuted(channel.id, True)
+                    Zynthbox.Plugin.instance().setMuted(channel.id, True)
 
             self.playChannelSoloChanged.emit()
 

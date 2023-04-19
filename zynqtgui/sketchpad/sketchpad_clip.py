@@ -27,19 +27,15 @@ import re
 import shutil
 import tempfile
 import traceback
+import taglib
+import json
+import logging
+import Zynthbox
 
 from datetime import datetime
 from pathlib import Path
 from subprocess import check_output
-
 from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal, Slot
-import taglib
-import json
-
-from libzynthbox import ClipAudioSource
-
-import logging
-
 from zynqtgui import zynthian_gui_config
 
 
@@ -74,7 +70,7 @@ class sketchpad_clip(QObject):
         self.__should_sync__ = False
         self.__playing_started__ = False
         self.__arranger_bar_positions__ = []
-        self.audioSource: ClipAudioSource = None
+        self.audioSource = None
         self.audio_metadata = None
         self.recording_basepath = song.sketchpad_folder
         self.__started_solo__ = False
@@ -202,12 +198,12 @@ class sketchpad_clip(QObject):
             logging.info(f"Channel volume changed : {self.channel.volume}")
 
             if self.audioSource is not None:
-                self.audioSource.set_volume(self.channel.volume)
+                self.audioSource.setVolume(self.channel.volume)
 
     @Slot(int)
     def setVolume(self, vol):
         if self.audioSource is not None:
-            self.audioSource.set_volume(vol)
+            self.audioSource.setVolume(vol)
 
     @Signal
     def current_beat_changed(self):
@@ -420,7 +416,7 @@ class sketchpad_clip(QObject):
                 self.saveMetadata()
 
             if self.audioSource is not None:
-                self.audioSource.set_gain(gain)
+                self.audioSource.setGain(gain)
 
     gain = Property(float, get_gain, set_gain, notify=gain_changed)
 
@@ -442,7 +438,7 @@ class sketchpad_clip(QObject):
                 self.saveMetadata()
 
             if self.audioSource is not None:
-                self.audioSource.set_length(self.__length__, self.__song__.bpm)
+                self.audioSource.setLength(self.__length__, self.__song__.bpm)
             self.reset_beat_count()
     length = Property(float, length, set_length, notify=length_changed)
 
@@ -513,7 +509,7 @@ class sketchpad_clip(QObject):
 
             if self.audioSource is None:
                 return
-            self.audioSource.set_start_position(position)
+            self.audioSource.setStartPosition(position)
             self.reset_beat_count()
 
     startPosition = Property(float, startPosition, set_start_position, notify=start_position_changed)
@@ -521,7 +517,7 @@ class sketchpad_clip(QObject):
     def duration(self):
         if self.audioSource is None:
             return 0.0
-        return self.audioSource.get_duration()
+        return self.audioSource.getDuration()
 
     duration = Property(float, duration, notify=duration_changed)
 
@@ -540,7 +536,7 @@ class sketchpad_clip(QObject):
 
             if self.audioSource is None:
                 return
-            self.audioSource.set_pitch(pitch)
+            self.audioSource.setPitch(pitch)
             self.reset_beat_count()
 
     pitch = Property(int, pitch, set_pitch, notify=pitch_changed)
@@ -559,7 +555,7 @@ class sketchpad_clip(QObject):
 
             if self.audioSource is None:
                 return
-            self.audioSource.set_speed_ratio(time)
+            self.audioSource.setSpeedRatio(time)
             self.reset_beat_count()
 
     time = Property(float, time, set_time, notify=time_changed)
@@ -645,11 +641,10 @@ class sketchpad_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
 
-        self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
+        self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
         if self.clipChannel is not None:
             self.clipChannel.channelAudioType = "sample-loop"
         self.cpp_obj_changed.emit()
-        print(path)
 
         self.__read_metadata__()
 
@@ -664,10 +659,10 @@ class sketchpad_clip(QObject):
         self.__progress__ = 0.0
         self.__audio_level__ = -200
         self.__snap_length_to_beat__ = (self.__get_metadata_prop__("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", 'True').lower() == "true")
-        self.audioSource.set_adsrAttack(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_ATTACK", 0)))
-        self.audioSource.set_adsrDecay(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_DECAY", 0)))
-        self.audioSource.set_adsrSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
-        self.audioSource.set_adsrRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
+        self.audioSource.setADSRAttack(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_ATTACK", 0)))
+        self.audioSource.setADSRDecay(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_DECAY", 0)))
+        self.audioSource.setADSRSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
+        self.audioSource.setADSRRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
 
         self.reset_beat_count()
         self.channel_volume_changed()
@@ -710,14 +705,14 @@ class sketchpad_clip(QObject):
 
     path = Property(str, path, set_path, notify=path_changed)
 
-    def audio_level_changed_cb(self, leveldB):
-        self.__audio_level__ = leveldB
+    def audio_level_changed_cb(self):
+        self.__audio_level__ = self.audioSource.audioLevel()
         self.audioLevelChanged.emit()
         if self.channel is not None:
             self.channel.audioLevel = leveldB
 
-    def progress_changed_cb(self, progress):
-        self.__progress__ = progress
+    def progress_changed_cb(self):
+        self.__progress__ = self.audioSource.progress()
         self.progressChanged.emit()
 
     @Signal
@@ -770,7 +765,7 @@ class sketchpad_clip(QObject):
 
             if self.clipChannel is not None and self.clipChannel.channelAudioType == "sample-loop":
                 logging.info(f"Playing Clip {self}")
-                self.audioSource.queueClipToStartOnChannel(self.channel.id)
+                Zynthbox.SyncTimer.instance().queueClipToStartOnChannel(self.audioSource, self.channel.id)
 
     @Slot(None)
     def stop(self):
@@ -789,7 +784,7 @@ class sketchpad_clip(QObject):
 
             # self.audioSource.stop()
             logging.info(f"Stopping Clip {self}")
-            self.audioSource.queueClipToStopOnChannel(self.channel.id)
+            Zynthbox.SyncTimer.instance().queueClipToStopOnChannel(self.audioSource, self.channel.id)
 
             self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 
@@ -977,10 +972,10 @@ class sketchpad_clip(QObject):
         self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
         self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
         self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
-        self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.get_adsrAttack())])
-        self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.get_adsrDecay())])
-        self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.get_adsrSustain())])
-        self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.get_adsrRelease())])
+        self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.adsrAttack())])
+        self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.adsrDecay())])
+        self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.adsrSustain())])
+        self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.adsrRelease())])
 
     @Slot(QObject)
     def copyFrom(self, clip):
@@ -1021,26 +1016,16 @@ class sketchpad_clip(QObject):
     inCurrentScene = Property(bool, get_in_current_scene, notify=in_current_scene_changed)
     ### END Property inCurrentScene
 
-    ### Property cppObjAddress
-    def get_cpp_obj_address(self):
-        if self.audioSource is not None:
-            return str(int(self.audioSource.get_cpp_obj()))
-        else:
-            return "-1"
-
-    cpp_obj_changed = Signal()
-
-    cppObjAddress = Property(str, get_cpp_obj_address, notify=cpp_obj_changed)
-    ### END Property cppObjAddress
-
     ### Property cppObjId
     def get_cpp_obj_id(self):
         if self.audioSource is not None:
-            return self.audioSource.get_id()
+            return self.audioSource.id()
         else:
             return -1
 
-    cppObjId = Property(int, get_cpp_obj_id, notify=cpp_obj_changed)
+    cppObjIdChanged = Signal()
+
+    cppObjId = Property(int, get_cpp_obj_id, notify=cppObjIdChanged)
     ### END Property cppObjId
 
     ### Property snapLengthToBeat

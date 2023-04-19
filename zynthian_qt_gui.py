@@ -168,7 +168,7 @@ from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_g
 
 from zynqtgui.zynthian_osd import zynthian_osd
 
-import libzynthbox
+import Zynthbox
 
 from pathlib import Path
 
@@ -675,8 +675,8 @@ class zynthian_gui(QObject):
             #)
             #self.libseq.init(True)
 
-        # Initialise libzynthbox (which requires things found in zyncoder, specifically the zynthian midi router)
-        libzynthbox.init()
+        # Initialise Zynthbox plugin (which requires things found in zyncoder, specifically the zynthian midi router)
+        Zynthbox.Plugin.instance().initialize()
 
     @Slot()
     def channelsModTimerHandler(self):
@@ -1486,7 +1486,7 @@ class zynthian_gui(QObject):
             self.init_midi()
             self.init_midi_services()
             self.zynautoconnect()
-            libzynthbox.reloadZynthianConfiguration()
+            Zynthbox.Plugin.instance().reloadZynthianConfiguration()
 
     """
     Initialize Global FX Engines
@@ -4721,8 +4721,8 @@ class zynthian_gui(QObject):
     def set_masterVolume(self, value):
         if self.__master_volume != value:
             self.__master_volume = value
-            # libzynthbox expects dryAmount to be ranging from 0-1
-            libzynthbox.setDryAmount(-1, np.interp(value, (0, 100), (0, 1)))
+            # JackPassthroughClient expects dryAmount to be ranging from 0-1
+            Zynthbox.Plugin.instance().setDryAmount(-1, np.interp(value, (0, 100), (0, 1)))
             self.masterVolumeChanged.emit()
 
     masterVolumeChanged = Signal()
@@ -5082,6 +5082,8 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty("zynqtgui", zynqtgui)
 
     def load_qml():
+        Zynthbox.Plugin.instance().registerTypes(engine, "io.zynthbox.components")
+
         zynqtgui.currentTaskMessage = f"Loading pages"
         engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
 

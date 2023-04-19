@@ -1170,8 +1170,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def set_clickChannelEnabled(self, enabled: bool):
         self.click_channel_enabled = enabled
 
-        self.click_channel_click.stopOnChannel(-2)
-        self.click_channel_clack.stopOnChannel(-2)
+        self.click_channel_click.stop(-2)
+        self.click_channel_clack.stop(-2)
         self.click_channel_click.setLength(4, self.__song__.bpm)
         self.click_channel_clack.setLength(1, self.__song__.bpm)
         # If the metronome is running, queue the click channels up to start (otherwise don't - for now at least)
@@ -1542,8 +1542,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def stopAllPlayback(self):
         # The click channel wants to not have any effects added at all, so use the magic channel -2, which is our uneffected global channel
-        self.click_channel_click.stopOnChannel(-2)
-        self.click_channel_clack.stopOnChannel(-2)
+        self.click_channel_click.stop(-2)
+        self.click_channel_clack.stop(-2)
 
         for channel_index in range(self.__song__.channelsModel.count):
             self.__song__.channelsModel.getChannel(channel_index).stopAllClips()
@@ -1712,10 +1712,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # Immediately stop clips when scheduled to stop
         if self.metronome_schedule_stop:
             logging.debug(f"Stopping timer as it was scheduled to stop.")
-            Zynthbox.SyncTimer.instance().stopTimer()
+            Zynthbox.SyncTimer.instance().stop()
 
-            self.click_channel_click.stopOnChannel(-2)
-            self.click_channel_clack.stopOnChannel(-2)
+            self.click_channel_click.stop(-2)
+            self.click_channel_clack.stop(-2)
 
             self.__current_beat__ = -1
             self.__current_bar__ = -1

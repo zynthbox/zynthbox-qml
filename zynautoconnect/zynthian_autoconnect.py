@@ -780,12 +780,12 @@ def audio_autoconnect(force=False):
 								except:
 									pass
 	except Exception as e:
-		logging.error(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during synth layer leaf handling. Reported error: {e}")
+                logging.exception(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during synth layer leaf handling. Reported error: {e}")
 		# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
 		# Logic below the return statement will be eventually evaluated when called again after the timeout
-		force_next_autoconnect = True;
-		release_lock()
-		return
+                force_next_autoconnect = True;
+                release_lock()
+                return
 	### END Connect the synth layer leafs up to the channel passthrough clients
 
 	### Connect FXPassthrough-ChannelX dry and wet outputs to designated ports

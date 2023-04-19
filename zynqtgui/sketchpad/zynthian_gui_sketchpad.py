@@ -1687,7 +1687,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     Zynthbox.SyncTimer.instance().queueClipToStartOnChannel(self.click_channel_clack, -2)
 
 
-                Zynthbox.SyncTimer.instance().startTimer(self.__song__.bpm)
+                Zynthbox.SyncTimer.instance().start(self.__song__.bpm)
 
                 self.metronome_running_changed.emit()
 

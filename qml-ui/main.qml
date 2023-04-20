@@ -88,6 +88,8 @@ Kirigami.AbstractApplicationWindow {
     function openSoundsDialog() { soundsDialog.open() }
     function openRecordingPopup() { recordingPopup.open() }
 
+    signal requestSamplePicker();
+
     visible: false
     flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
     minimumWidth: screen.width

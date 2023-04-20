@@ -197,7 +197,11 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            enabled: false
+            enabled: true
+            text: qsTr("Pick Sample")
+            onTriggered: {
+                applicationWindow().requestSamplePicker();
+            }
         },
         Kirigami.Action {
             enabled: false

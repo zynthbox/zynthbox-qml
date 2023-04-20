@@ -139,6 +139,13 @@ Rectangle {
         }
     }
 
+    Connections {
+        target: applicationWindow()
+        onRequestSamplePicker: {
+            samplePickerPopup.open();
+        }
+    }
+
     function handleItemClick(type) {
         // Type will be used to invoke the respective handler when
         // required from MixedChannelsViewBar or something else in future

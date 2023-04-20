@@ -262,18 +262,6 @@ def midi_autoconnect(force=False):
 	except:
 		pass
 
-	#Connect zynsmf output to ZynMidiRouter:seq_in
-	try:
-		jclient.connect("zynsmf:midi_out", zmr_in['seq_in'])
-	except:
-		pass
-
-	#Connect ZynMidiRouter:main_out to zynsmf input
-	try:
-		jclient.connect(zmr_out['main_out'], "zynsmf:midi_in")
-	except:
-		pass
-
 	#Connect Engine's Controller-FeedBack to ZynMidiRouter:ctrl_in
 	try:
 		for efbp in engines_fb:
@@ -884,39 +872,6 @@ def audio_autoconnect(force=False):
 				except:
 					pass
 
-		#Setup dpmeter connections if enabled ...
-		if False: #not zynthian_gui_config.show_cpu_status:
-			#Prepare for setup dpmeter connections
-			dpmeter_out = jclient.get_ports("jackpeak", is_input=True, is_audio=True)
-			dpmeter_conports_1=jclient.get_all_connections("jackpeak:input_a")
-			dpmeter_conports_2=jclient.get_all_connections("jackpeak:input_b")
-
-			#Disconnect ports from dpmeter (those that are not connected to System Out, if any ...)
-			for cp in dpmeter_conports_1:
-				if cp not in sysout_conports_1:
-					try:
-						jclient.disconnect(cp,dpmeter_out[0])
-					except:
-						pass
-			for cp in dpmeter_conports_2:
-				if cp not in sysout_conports_2:
-					try:
-						jclient.disconnect(cp,dpmeter_out[1])
-					except:
-						pass
-
-			#Connect ports to dpmeter (those currently connected to System Out)
-			for cp in sysout_conports_1:
-				try:
-					jclient.connect(cp,dpmeter_out[0])
-				except:
-					pass
-			for cp in sysout_conports_2:
-				try:
-					jclient.connect(cp,dpmeter_out[1])
-				except:
-					pass
-
 	#Get System Capture ports => jack output ports!!
 	capture_ports = get_audio_capture_ports()
 	if len(capture_ports)>0:
@@ -1003,7 +958,7 @@ def get_audio_input_ports(exclude_system_playback=False):
 		for aip in jclient.get_ports(is_input=True, is_audio=True, is_physical=False):
 			parts=aip.name.split(':')
 			client_name=parts[0]
-			if client_name=="jack_capture" or client_name=="jackpeak" or client_name[:7]=="effect_" or client_name.startswith("AudioLevels-"):
+			if client_name=="jack_capture" or client_name[:7]=="effect_" or client_name.startswith("AudioLevels-"):
 				continue
 			if client_name=="system":
 				if exclude_system_playback:

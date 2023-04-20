@@ -1471,12 +1471,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				}
 				snapshot['note_range'].append(info)
 
-			#Zynseq RIFF data
-			if 'stepseq' in self.zynqtgui.screens:
-				binary_riff_data = self.zynqtgui.screens['stepseq'].get_riff_data()
-				b64_data = base64_encoded_data = base64.b64encode(binary_riff_data)
-				snapshot['zynseq_riff_b64'] = b64_data.decode('utf-8')
-
 			#JSON Encode
 			json=JSONEncoder().encode(snapshot)
 			logging.info(f"Saving snapshot {fpath}")
@@ -1621,12 +1615,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			#BW compat.
 			elif 'transpose' in snapshot:
 				self.set_transpose(snapshot['transpose'])
-
-			#Zynseq RIFF data
-			if 'zynseq_riff_b64' in snapshot and 'stepseq' in self.zynqtgui.screens:
-				b64_bytes = snapshot['zynseq_riff_b64'].encode('utf-8')
-				binary_riff_data = base64.decodebytes(b64_bytes)
-				self.zynqtgui.screens['stepseq'].restore_riff_data(binary_riff_data)
 
 			# Forbid layers without any output
 			for layer in self.layers:

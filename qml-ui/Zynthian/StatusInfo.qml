@@ -253,44 +253,6 @@ MouseArea {
             }
             visible: zynqtgui.status_information.audio_recorder.length > 0
         }
-        Kirigami.Icon {
-            id: midiRecorderIcon
-            Layout.fillHeight: true
-            Layout.preferredWidth: height
-            color: Kirigami.Theme.textColor
-            source: "media-playback-start-symbolic"
-            function updateIcon() {
-                if (midiRecorderIcon.visible) {
-                    switch(zynqtgui.status_information.midi_recorder) {
-                    case "PLAY":
-                        if (midiRecorderIcon.source !== "media-playback-start-symbolic") {
-                            midiRecorderIcon.source = "media-playback-start-symbolic";
-                        }
-                        break;
-                    case "REC":
-                    default:
-                        if (midiRecorderIcon.source !== "media-record-symbolic") {
-                            midiRecorderIcon.source = "media-record-symbolic";
-                        }
-                        break;
-                    }
-                }
-            }
-            Connections {
-                target: zynqtgui.status_information
-                onMidi_recorderChanged: midiRecorderIcon.updateIcon()
-            }
-            onVisibleChanged: midiRecorderIcon.updateIcon()
-            QQC2.Label {
-                anchors {
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-                font.pointSize: 6
-                text: "Midi"
-            }
-            visible: zynqtgui.status_information.midi_recorder.length > 0
-        }
         QQC2.Label {
             visible: Zynthbox.PlayGridManager.hardwareInActiveNotes.length > 0
             text: visible

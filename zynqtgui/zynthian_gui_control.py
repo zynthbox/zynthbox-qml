@@ -263,10 +263,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 							continue
 
 			engine_folder_name = engine.replace("/", "_").replace(" ", "_")
-			path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
+			path = "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
 			if Path(path).exists():
 				entries.append({"display": f"{engine} Mod",
-								"path": "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name})
+								"path": "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name})
 			entries.append({"display": "Default",
 							"path": ""})
 			self.__control_pages_model.set_entries(entries)
@@ -544,7 +544,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 			return None
 		engine_folder_name = self.zynqtgui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
 		# TODO: also search for stuff installed in ~/.local
-		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
+		path = "/zynthian/zynthbox-qml/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
 		if Path(path).exists():
 			self.__last_custom_control_page = path
 			return path

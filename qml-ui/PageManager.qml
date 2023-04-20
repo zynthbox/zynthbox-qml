@@ -33,7 +33,6 @@ Zynthian.Stack {
         "audio_in": "AudioInPage.qml",
         "audio_out": "AudioOutPage.qml",
         "audio_recorder": "AudioRecorderPage.qml",
-        "midi_recorder": "MidiRecorderPage.qml",
         "admin": "AdminPage.qml",
         "about": "AboutPage.qml",
         "info": "InfoPage.qml",

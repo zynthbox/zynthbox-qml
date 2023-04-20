@@ -32,7 +32,6 @@ from subprocess import check_output, Popen, PIPE, STDOUT
 
 # Zynthian specific modules
 from . import zynthian_gui_selector, zynthian_gui_config
-from zynlibs.zynseq import zynseq
 from PySide2.QtCore import Property, QTimer, Signal, Slot
 
 from json import JSONDecoder
@@ -111,15 +110,10 @@ class zynthian_gui_main(zynthian_gui_selector):
             #self.list_data.append((self.session_dashboard, 0, "Channels"))
             #self.list_metadata.append({"icon":"../../img/channels.svg"})
 
-            #if "zynseq" in zynthian_gui_config.experimental_features:
-                # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
             # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
 
             #self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
             #self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
-
-            #self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
-            #self.list_metadata.append({"icon":"../../img/rec.svg"})
 
             # if "autoeq" in zynthian_gui_config.experimental_features:
             #    self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
@@ -167,12 +161,12 @@ class zynthian_gui_main(zynthian_gui_selector):
         if self.visibleCategory == "sessions":
             for sketchpad in self.zynqtgui.sketchpad.get_sketchpad_folders():
                 self.list_data.append(("sketchpad", str(sketchpad), sketchpad.stem))
-                self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/folder.svg"})
+                self.list_metadata.append({"icon": "/zynthian/zynthbox-qml/img/folder.svg"})
 
         if self.visibleCategory == "sessions-versions":
             for version in self.zynqtgui.sketchpad.get_sketchpad_versions(self.__selected_sketchpad_folder__):
                 self.list_data.append(("sketchpad-version", str(version), version.name.replace(".sketchpad.json", "")))
-                self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/file.svg"})
+                self.list_metadata.append({"icon": "/zynthian/zynthbox-qml/img/file.svg"})
 
         super().fill_list()
 
@@ -366,17 +360,11 @@ class zynthian_gui_main(zynthian_gui_selector):
         if len(self.zynqtgui.screens["layer"].layers) > 0:
             self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
         self.zynqtgui.screens["layer"].reset()
-        if zynseq.libseq:
-            zynseq.load("")
         self.zynqtgui.show_screen("layer")
 
     def audio_recorder(self):
         logging.info("Audio Recorder")
         self.zynqtgui.show_modal("audio_recorder")
-
-    def midi_recorder(self):
-        logging.info("MIDI Recorder")
-        self.zynqtgui.show_modal("midi_recorder")
 
     def playgrid(self):
         logging.info("Play Grid")

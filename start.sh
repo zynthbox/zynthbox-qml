@@ -1,10 +1,11 @@
 #!/bin/bash
 #******************************************************************************
-# ZYNTHIAN PROJECT: Zynthian Start Script
+# Zynthbox QML UI Startup Script
 # 
-# Start all services needed by zynthian and the zynthian UI
+# Startup script for zynthbox-qml
 # 
 # Copyright (C) 2015-2016 Fernando Moyano <jofemodo@zynthian.org>
+# Copyright (C) 2021-2023 Anupam Basak <anupam.basak27@gmail.com>
 #
 #******************************************************************************
 # 

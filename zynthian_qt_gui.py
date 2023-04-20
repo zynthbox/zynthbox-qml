@@ -81,13 +81,12 @@ from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
 
-sys.path.insert(1, "/zynthian/zynthian-ui/")
+sys.path.insert(1, "/zynthian/zynthbox-qml/")
 sys.path.insert(1, "./zynqtgui")
 
 # Zynthian specific modules
 import zynconf
 import zynautoconnect
-#from zynlibs.jackpeak import lib_jackpeak_init
 from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
 from zyngine import zynthian_controller, zynthian_zcmidi
@@ -136,7 +135,6 @@ from zynqtgui.zynthian_gui_confirm import zynthian_gui_confirm
 from zynqtgui.zynthian_gui_keybinding import zynthian_gui_keybinding
 from zynqtgui.zynthian_gui_main import zynthian_gui_main
 from zynqtgui.zynthian_gui_audio_recorder import zynthian_gui_audio_recorder
-from zynqtgui.zynthian_gui_midi_recorder import zynthian_gui_midi_recorder
 from zynqtgui.zynthian_gui_test_touchpoints import (
     zynthian_gui_test_touchpoints,
 )
@@ -147,8 +145,6 @@ from zynqtgui.sketchpad.zynthian_gui_sketchpad import (
 
 # if "autoeq" in zynthian_gui_config.experimental_features:
 # from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq
-# if "zynseq" in zynthian_gui_config.experimental_features:
-# from zynqtgui.zynthian_gui_stepsequencer import zynthian_gui_stepsequencer
 # from zynqtgui.zynthian_gui_touchscreen_calibration import zynthian_gui_touchscreen_calibration
 
 # from zynqtgui.zynthian_gui_control_osc_browser import zynthian_gui_osc_browser
@@ -197,7 +193,6 @@ class zynthian_gui_status_data(QObject):
         self.status_info["undervoltage"] = False
         self.status_info["overtemp"] = False
         self.status_info["audio_recorder"] = False
-        self.status_info["midi_recorder"] = False
 
         self.dpm_rangedB = 30  # Lowest meter reading in -dBFS
         self.dpm_highdB = 10  # Start of yellow zone in -dBFS
@@ -206,13 +201,6 @@ class zynthian_gui_status_data(QObject):
         self.dpm_over = 1 - self.dpm_overdB / self.dpm_rangedB
 
     def set_status(self, status):
-        midi_recorder_has_changed = False
-        if "midi_recorder" in status and "midi_recorder" in self.status_info and self.status_info["midi_recorder"] is not status["midi_recorder"]:
-            midi_recorder_has_changed = True
-        elif "midi_recorder" in status and "midi_recorder" not in self.status_info:
-            midi_recorder_has_changed = True
-        elif "midi_recorder" not in status and "midi_recorder" in self.status_info:
-            midi_recorder_has_changed = True
         audio_recorder_has_changed = False
         if "audio_recorder" in status and "audio_recorder" in self.status_info and self.status_info["audio_recorder"] is not status["audio_recorder"]:
             audio_recorder_has_changed = True
@@ -238,8 +226,6 @@ class zynthian_gui_status_data(QObject):
         #self.status_info["holdSignalB"] = min(max(0, 1 + status["holdB"] / self.dpm_rangedB), 1)
 
         self.status_changed.emit()
-        if midi_recorder_has_changed is True:
-            self.midi_recorder_changed.emit()
         if audio_recorder_has_changed is True:
             self.audio_recorder_changed.emit()
         if undervoltage_has_changed is True:
@@ -301,13 +287,6 @@ class zynthian_gui_status_data(QObject):
         else:
             return None
 
-    midi_recorder_changed = Signal()
-    def get_midi_recorder(self):
-        if "midi_recorder" in self.status_info:
-            return self.status_info["midi_recorder"]
-        else:
-            return None
-
     def get_rangedB(self):
         return self.dpm_rangedB
 
@@ -338,7 +317,6 @@ class zynthian_gui_status_data(QObject):
     undervoltage = Property(bool, get_undervoltage, notify=undervoltage_changed)
     overtemp = Property(bool, get_overtemp, notify=overtemp_changed)
     audio_recorder = Property(str, get_audio_recorder, notify=audio_recorder_changed)
-    midi_recorder = Property(str, get_midi_recorder, notify=midi_recorder_changed)
 
     rangedB = Property(float, get_rangedB, constant=True)
     highdB = Property(float, get_highdB, constant=True)
@@ -644,16 +622,6 @@ class zynthian_gui(QObject):
         self.__bk_fake_key = None
         self.__bk_last_turn_time = None
 
-        # Initialize peakmeter audio monitor if needed
-        #if not zynthian_gui_config.show_cpu_status:
-            #try:
-                #global lib_jackpeak
-                #lib_jackpeak = lib_jackpeak_init()
-                #lib_jackpeak.setDecay(c_float(0.2))
-                #lib_jackpeak.setHoldCount(10)
-            #except Exception as e:
-                #logging.error("ERROR initializing jackpeak: %s" % e)
-
         # Initialize Controllers (Rotary & Switches) & MIDI-router
         try:
             global lib_zyncoder
@@ -668,12 +636,6 @@ class zynthian_gui(QObject):
             logging.error(
                 "ERROR initializing Controllers & MIDI-router: %s" % e
             )
-
-        #if "zynseq" in zynthian_gui_config.experimental_features:
-            #self.libseq = CDLL(
-                #"/zynthian/zynthian-ui/zynlibs/zynseq/build/libzynseq.so"
-            #)
-            #self.libseq.init(True)
 
         # Initialise Zynthbox plugin (which requires things found in zyncoder, specifically the zynthian midi router)
         Zynthbox.Plugin.instance().initialize()
@@ -1647,7 +1609,6 @@ class zynthian_gui(QObject):
         # Create UI Apps Screens
         self.screens['alsa_mixer'] = self.screens['control']
         self.screens["audio_recorder"] = zynthian_gui_audio_recorder(self)
-        self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
         self.screens["sketchpad"] = zynthian_gui_sketchpad(self)
 
@@ -1665,7 +1626,6 @@ class zynthian_gui(QObject):
 
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
-        # if "zynseq" in zynthian_gui_config.experimental_features:
         # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
@@ -1751,9 +1711,6 @@ class zynthian_gui(QObject):
         self.osc_end()
         zynautoconnect.stop()
         self.screens["layer"].reset()
-        self.screens[
-            "midi_recorder"
-        ].stop_playing()  # Need to stop timing thread
         # self.zyntransport.stop()
 
     def hide_screens(self, exclude=None):
@@ -2209,22 +2166,22 @@ class zynthian_gui(QObject):
             self.screens["audio_recorder"].toggle_playing()
 
         elif cuia == "START_MIDI_RECORD":
-            self.screens["midi_recorder"].start_recording()
+            pass
 
         elif cuia == "STOP_MIDI_RECORD":
-            self.screens["midi_recorder"].stop_recording()
+            pass
 
         elif cuia == "TOGGLE_MIDI_RECORD":
-            self.screens["midi_recorder"].toggle_recording()
+            pass
 
         elif cuia == "START_MIDI_PLAY":
-            self.screens["midi_recorder"].start_playing()
+            pass
 
         elif cuia == "STOP_MIDI_PLAY":
-            self.screens["midi_recorder"].stop_playing()
+            pass
 
         elif cuia == "TOGGLE_MIDI_PLAY":
-            self.screens["midi_recorder"].toggle_playing()
+            pass
 
         elif cuia == "SELECT":
             try:
@@ -2399,16 +2356,15 @@ class zynthian_gui(QObject):
             self.toggle_modal("audio_recorder")
 
         elif cuia == "MODAL_MIDI_RECORDER":
-            self.toggle_modal("midi_recorder")
+            pass
 
         elif cuia == "MODAL_ALSA_MIXER":
             self.toggle_modal("alsa_mixer")
 
         elif (
             cuia == "MODAL_STEPSEQ"
-            and "zynseq" in zynthian_gui_config.experimental_features
         ):
-            self.toggle_modal("stepseq")
+            pass
 
         elif cuia == "CHANNEL_1":
             self.screens["session_dashboard"].selectedChannel = 0 + channelDelta
@@ -2817,8 +2773,8 @@ class zynthian_gui(QObject):
         #self.start_loading()
 
         # Standard 4 ZynSwitches
-        if i == 0 and "zynseq" in zynthian_gui_config.experimental_features:
-            self.toggle_modal("stepseq")
+        if i == 0:
+            pass
 
         elif i == 1:
             # self.callable_ui_action("ALL_OFF")
@@ -2994,13 +2950,6 @@ class zynthian_gui(QObject):
         elif i == 2:
             if self.modal_screen == "snapshot":
                 self.screens["snapshot"].next()
-
-            elif self.modal_screen == "audio_recorder":
-                self.show_modal("midi_recorder")
-
-            elif self.modal_screen == "midi_recorder":
-                self.show_modal("audio_recorder")
-
             elif (
                 self.active_screen == "control"
                 or self.modal_screen == "alsa_mixer"
@@ -3587,12 +3536,6 @@ class zynthian_gui(QObject):
                 self.status_info[
                     "cpu_load"
                 ] = zynautoconnect.get_jackd_cpu_load()
-            #else:
-                ## Get audio peak level
-                #self.status_info["peakA"] = lib_jackpeak.getPeak(0)
-                #self.status_info["peakB"] = lib_jackpeak.getPeak(1)
-                #self.status_info["holdA"] = lib_jackpeak.getHold(0)
-                #self.status_info["holdB"] = lib_jackpeak.getHold(1)
 
             # Get Status Flags (once each 5 refreshes)
             if self.status_counter > 5:
@@ -3611,9 +3554,6 @@ class zynthian_gui(QObject):
                     # Get Recorder Status
                     self.status_info["audio_recorder"] = self.screens[
                         "audio_recorder"
-                    ].get_status()
-                    self.status_info["midi_recorder"] = self.screens[
-                        "midi_recorder"
                     ].get_status()
 
                 except Exception as e:
@@ -4077,9 +4017,6 @@ class zynthian_gui(QObject):
 
     def get_audio_recorder(self):
         return self.screens["audio_recorder"]
-
-    def get_midi_recorder(self):
-        return self.screens["midi_recorder"]
 
     def get_play_grid(self):
         return self.screens["play_grid"]
@@ -4867,7 +4804,6 @@ class zynthian_gui(QObject):
     channel_external_setup = Property(QObject, get_channel_external_setup, constant=True)
     channel_wave_editor = Property(QObject, get_channel_wave_editor, constant=True)
     audio_recorder = Property(QObject, get_audio_recorder, constant=True)
-    midi_recorder = Property(QObject, get_midi_recorder, constant=True)
     playgrid_downloader = Property(QObject, get_playgrid_downloader, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)
     theme_downloader = Property(QObject, get_theme_downloader, constant=True)

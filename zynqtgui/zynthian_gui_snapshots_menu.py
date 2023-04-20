@@ -31,7 +31,6 @@ from subprocess import check_output, Popen, PIPE, STDOUT
 
 # Zynthian specific modules
 from . import zynthian_gui_selector, zynthian_gui_config
-from zynlibs.zynseq import zynseq
 # -------------------------------------------------------------------------------
 # Zynthian Snapshots Menu GUI Class
 # -------------------------------------------------------------------------------
@@ -187,8 +186,6 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
         if len(self.zynqtgui.screens["layer"].layers) > 0:
             self.zynqtgui.screens["snapshot"].save_last_state_snapshot()
         self.zynqtgui.screens["layer"].reset()
-        if zynseq.libseq:
-            zynseq.load("")
         self.zynqtgui.show_screen("layer")
 
 # ------------------------------------------------------------------------------

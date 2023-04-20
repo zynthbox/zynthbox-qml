@@ -104,10 +104,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 		# Load engine config
 		try:
-			with open("/zynthian/zynthian-ui/config/engine_config.json", "r") as f:
+			with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
 				self.__engine_config__ = json.load(f)
 		except Exception as e:
-			logging.error(f"Error loading engine config from /zynthian/zynthian-ui/config/engine_config.json : {str(e)}")
+			logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
 			self.__engine_config__ = {}
 
 

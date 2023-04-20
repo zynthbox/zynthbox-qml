@@ -261,15 +261,25 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             text: qsTr("General")
-                            onClicked: clipSettingsSectionView.currentItem = clipSettingsBar
+                            enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
+                            MouseArea {
+                                anchors.fill: parent;
+                                enabled: component.selectedClipHasWav
+                                onClicked: clipSettingsSectionView.currentItem = clipSettingsBar
+                            }
                         }
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            text: qsTr("ADSR")
-                            onClicked: clipSettingsSectionView.currentItem = clipSettingsADSR
+                            text: qsTr("ADSR Envelope")
+                            enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
+                            MouseArea {
+                                anchors.fill: parent;
+                                enabled: component.selectedClipHasWav
+                                onClicked: clipSettingsSectionView.currentItem = clipSettingsADSR
+                            }
                         }
                     }
                     Rectangle {
@@ -297,228 +307,13 @@ Zynthian.ScreenPage {
                             showCopyPasteButtons: false
                             enabled: component.selectedClipHasWav
                         }
-                        Item {
+                        Zynthian.ADSRClipView {
                             id: clipSettingsADSR
                             objectName: "clipSettingsADSR"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent
                             enabled: component.selectedClipHasWav
-                            property QtObject clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
-                            property int currentADSRElement: 0
-                            function nextADSRElement() {
-                                if (currentADSRElement === 3) {
-                                    currentADSRElement = 0;
-                                } else {
-                                    currentADSRElement = currentADSRElement + 1;
-                                }
-                            }
-                            function previousADSRElement() {
-                                if (currentADSRElement === 0) {
-                                    currentADSRElement = 3;
-                                } else {
-                                    currentADSRElement = currentADSRElement - 1;
-                                }
-                            }
-                            function increaseCurrentValue() {
-                                switch(currentADSRElement) {
-                                    case 0:
-                                        clip.adsrAttack = Math.min(2, clip.adsrAttack + 0.01);
-                                        break;
-                                    case 1:
-                                        clip.adsrDecay = Math.min(2, clip.adsrDecay + 0.01);
-                                        break;
-                                    case 2:
-                                        clip.adsrSustain = Math.min(1, clip.adsrSustain + 0.01);
-                                        break;
-                                    case 3:
-                                        clip.adsrRelease = Math.min(2, clip.adsrRelease + 0.01);
-                                        break;
-                                }
-                            }
-                            function decreaseCurrentValue() {
-                                switch(currentADSRElement) {
-                                    case 0:
-                                        clip.adsrAttack = Math.max(0, clip.adsrAttack - 0.01);
-                                        break;
-                                    case 1:
-                                        clip.adsrDecay = Math.max(0, clip.adsrDecay - 0.01);
-                                        break;
-                                    case 2:
-                                        clip.adsrSustain = Math.max(0, clip.adsrSustain - 0.01);
-                                        break;
-                                    case 3:
-                                        clip.adsrRelease = Math.max(0, clip.adsrRelease - 0.01);
-                                        break;
-                                }
-                            }
-                            RowLayout {
-                                anchors.fill: parent
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("Attack")
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    QQC2.Slider {
-                                        implicitWidth: 1
-                                        implicitHeight: 1
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        orientation: Qt.Vertical
-                                        stepSize: 0.01
-                                        value: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrAttack : 0
-                                        from: 0
-                                        to: 2
-                                        onMoved: clipSettingsADSR.clip.adsrAttack = value
-                                    }
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("%1\nseconds").arg((clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrAttack : 0).toFixed(2))
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    Rectangle {
-                                        Layout.fillWidth: true
-                                        Layout.minimumHeight: 2
-                                        Layout.maximumHeight: 2
-                                        color: clipSettingsADSR.currentADSRElement === 0 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                                    }
-                                }
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("Decay")
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    QQC2.Slider {
-                                        implicitWidth: 1
-                                        implicitHeight: 1
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        orientation: Qt.Vertical
-                                        stepSize: 0.01
-                                        value: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrDecay : 0
-                                        from: 0
-                                        to: 2
-                                        onMoved: clipSettingsADSR.clip.adsrDecay = value
-                                    }
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("%1\nseconds").arg((clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrDecay : 0).toFixed(2))
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    Rectangle {
-                                        Layout.fillWidth: true
-                                        Layout.minimumHeight: 2
-                                        Layout.maximumHeight: 2
-                                        color: clipSettingsADSR.currentADSRElement === 1 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                                    }
-                                }
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("Sustain")
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    QQC2.Slider {
-                                        implicitWidth: 1
-                                        implicitHeight: 1
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        orientation: Qt.Vertical
-                                        stepSize: 0.01
-                                        value: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrSustain : 0
-                                        from: 0
-                                        to: 1
-                                        onMoved: clipSettingsADSR.clip.adsrSustain = value
-                                    }
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("%1%\n").arg(clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrSustain.toFixed(2) * 100 : 0)
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    Rectangle {
-                                        Layout.fillWidth: true
-                                        Layout.minimumHeight: 2
-                                        Layout.maximumHeight: 2
-                                        color: clipSettingsADSR.currentADSRElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                                    }
-                                }
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("Release")
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    QQC2.Slider {
-                                        implicitWidth: 1
-                                        implicitHeight: 1
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        orientation: Qt.Vertical
-                                        stepSize: 0.01
-                                        value: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrRelease : 0
-                                        from: 0
-                                        to: 2
-                                        onMoved: clipSettingsADSR.clip.adsrRelease = value
-                                    }
-                                    Kirigami.Heading {
-                                        level: 2
-                                        text: qsTr("%1\nseconds").arg((clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrRelease : 0).toFixed(2))
-                                        Layout.fillWidth: true
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                    Rectangle {
-                                        Layout.fillWidth: true
-                                        Layout.minimumHeight: 2
-                                        Layout.maximumHeight: 2
-                                        color: clipSettingsADSR.currentADSRElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
-                                    }
-                                }
-                                Zynthian.AbstractADSRView {
-                                    id: adsrView
-                                    Layout.fillHeight: true
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-                                    attackValue: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrAttack : 0
-                                    attackMax: 2
-                                    decayValue: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrDecay : 0
-                                    decayMax: 2
-                                    sustainValue: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrSustain : 0
-                                    sustainMax: 1
-                                    releaseValue: clipSettingsADSR.clip ? clipSettingsADSR.clip.adsrRelease : 0
-                                    releaseMax: 2
-                                    Connections {
-                                        target: clipSettingsADSR
-                                        onClipChanged: adsrView.requestPaint()
-                                    }
-                                    Connections {
-                                        target: clipSettingsADSR.clip
-                                        onAdsrParametersChanged: {
-                                            adsrView.requestPaint()
-                                            component.selectedClip.saveMetadata();
-                                        }
-                                    }
-                                }
-                            }
+                            clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
                         }
                     }
                 }

@@ -4,7 +4,7 @@ import sys
 import time
 from pathlib import Path
 from threading import Thread
-from PySide2.QtCore import Property, QObject, Qt, Signal
+from PySide2.QtCore import Property, QObject, Qt, Signal, Slot
 from PySide2.QtGui import QCursor, QGuiApplication, QPixmap
 from PySide2.QtQml import QQmlApplicationEngine
 
@@ -41,6 +41,9 @@ class BootLogInterface(QObject):
                     self.bootLog = "Startup completed"
                     self.exit_flag = True
                     QGuiApplication.quit()
+                elif data == "play-extro":
+                    logging.debug("Received play-extro command. Playing extro video")
+                    self.playExtroAndExit.emit()
                 elif len(data) > 0:
                     self.bootLog = data
             time.sleep(0.05)
@@ -61,6 +64,8 @@ class BootLogInterface(QObject):
 
     bootLog = Property(str, get_bootLog, set_bootLog, notify=bootLogChanged)
     ### END Property bootLog
+
+    playExtroAndExit = Signal()
 
 
 if __name__ == "__main__":

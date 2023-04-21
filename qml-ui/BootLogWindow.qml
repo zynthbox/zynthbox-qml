@@ -8,6 +8,7 @@ QQC2.ApplicationWindow {
     id: root
 
     property int dotCount: 0
+    property bool displayLoadingText: true
 
     flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "#00000000"
@@ -28,16 +29,17 @@ QQC2.ApplicationWindow {
     }
 
     Video {
-        id: splash
+        id: videoPlayer
         anchors.fill: parent
         autoPlay: true
         loops: MediaPlayer.Infinite
         fillMode: VideoOutput.Stretch
-        flushMode: VideoOutput.FirstFrame
+        flushMode: VideoOutput.LastFrame
         source: "/usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mp4"
     }
 
     RowLayout {
+        visible: root.displayLoadingText
         anchors.centerIn: parent
 
         QQC2.Label {
@@ -54,6 +56,7 @@ QQC2.ApplicationWindow {
     }
 
     QQC2.Label {
+        visible: root.displayLoadingText
         width: parent.width
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 50
@@ -61,5 +64,19 @@ QQC2.ApplicationWindow {
         font.pointSize: 14
         color: "white"
         text: bootLogInterface.bootLog
+    }
+
+    Connections {
+        target: bootLogInterface
+        function onPlayExtroAndExit(test) {
+            videoPlayer.stop()
+            root.displayLoadingText = false
+            videoPlayer.source = "/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4"
+            videoPlayer.loops = 1
+            videoPlayer.stopped.connect(function() {
+                Qt.quit()
+            })
+            videoPlayer.play()
+        }
     }
 }

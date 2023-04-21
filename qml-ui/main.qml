@@ -637,27 +637,6 @@ Kirigami.AbstractApplicationWindow {
             }
         }
     }
-    
-    Rectangle {
-        id: splashOverlay
-        parent: root.contentItem.parent
-        anchors.fill: parent
-        color: "#ff000000"
-        z: 9999999
-        visible: !zynqtgui.splashStopped
-
-        // Display currentTaskMessage on splashOverlay as it overlaps bootlog
-        // window before main window is displayed before splash is hidden
-        QQC2.Label {
-            width: parent.width
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 50
-            horizontalAlignment: Qt.AlignHCenter
-            font.pointSize: 12
-            color: "white"
-            text: zynqtgui.currentTaskMessage
-        }
-    }
 
     Loader {
         id: virtualKeyboardLoader
@@ -676,7 +655,6 @@ Kirigami.AbstractApplicationWindow {
             root.minimumWidth = root.screen.width;
             root.minimumHeight = root.screen.height;
             root.showNormal();
-            root.visibility = Window.Windowed;
         }
         onDisplayRecordingPopup: recordingPopup.open()
         onOpenLeftSidebar: slotSelectionDrawer.open()

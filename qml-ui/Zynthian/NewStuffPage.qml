@@ -94,7 +94,7 @@ Zynthian.SelectorPage {
     }
     NewStuff.ItemsModel {
         id: newStuffModel
-        engine: newStuffEngine.engine
+        engine: newStuffEngine
     }
     contextualActions: [
         Kirigami.Action {

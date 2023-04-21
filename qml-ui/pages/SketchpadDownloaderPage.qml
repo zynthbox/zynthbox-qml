@@ -32,6 +32,6 @@ Zynthian.NewStuffPage {
     screenId: "sketchpad_downloader"
     title: qsTr("Sketchpad Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynqtgui-sketchpads.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynthbox-sketchpads.knsrc").toString().slice(7)
 }
 

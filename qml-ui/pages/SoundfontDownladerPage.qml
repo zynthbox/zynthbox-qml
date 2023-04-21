@@ -32,5 +32,5 @@ Zynthian.NewStuffPage {
     screenId: "soundfont_downloader"
     title: qsTr("Soundfont Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynqtgui-soundfonts.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynthbox-soundfonts.knsrc").toString().slice(7)
 }

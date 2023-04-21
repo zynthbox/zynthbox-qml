@@ -32,5 +32,5 @@ Zynthian.NewStuffPage {
     screenId: "sample_downloader"
     title: qsTr("Clip Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynqtgui-samples.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynthbox-samples.knsrc").toString().slice(7)
 }

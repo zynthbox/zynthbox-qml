@@ -77,13 +77,6 @@ else
     xrandr -o $XRANDR_ROTATE
 fi
 
-# Throw up a splash screen while we load up the UI proper
-if [ ! -p /tmp/mplayer-splash-control ]; then
-    mkfifo /tmp/mplayer-splash-control
-fi
-mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mp4 -loop 0 &> /dev/null &
-SPLASH_PID=$!
-
 # Start Zynthian GUI & Synth Engine
 export QT_QUICK_CONTROLS_MOBILE=1
 export QT_QUICK_CONTROLS_STYLE=Zynthian-Plasma
@@ -127,16 +120,13 @@ if command -v kwin_x11 &> /dev/null; then
         python3 -X faulthandler ./bootlog_window.py &
         python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
     fi
-    
-    kill -9 $SPLASH_PID
-    
+
     # If control reaches here it means the application exited.
     # Application should never exit by itself and should always be running.
     # Restart application
     systemctl restart jack2 zynthian
 else        
     echo "ERROR: kwin was not installed. Exiting."
-    kill -9 $SPLASH_PID
     exit 1
 fi
 

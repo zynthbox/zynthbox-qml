@@ -2,22 +2,26 @@ import QtQuick 2.11
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Window 2.1
+import QtMultimedia 5.15
 
 QQC2.ApplicationWindow {
     id: root
-
+    flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    color: "#00000000"
     visible: true
-     color: "#000000"
-
     width: Screen.width
     height: Screen.height
     maximumWidth: width
     maximumHeight: height
 
-    // Start window on bottom so that logo appears on top of this window.
-    flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint
+    Video {
+        id: splash
+        anchors.fill: parent
+        source: "/usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mp4"
+        autoPlay: true
+        loops: MediaPlayer.Infinite
+    }
 
-    // Display log on bottom as the window is fullscreen
     QQC2.Label {
         width: parent.width
         anchors.bottom: parent.bottom

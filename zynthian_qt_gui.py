@@ -3881,12 +3881,7 @@ class zynthian_gui(QObject):
             channel.update_jack_port(run_in_thread=False)
 
         extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
-
         process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
-
-        with open("/tmp/mplayer-splash-control", "w") as f:
-            f.write("quit\n")
-            f.close()
 
         if process is not None:
             process.wait()

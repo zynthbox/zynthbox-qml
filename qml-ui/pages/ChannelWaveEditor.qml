@@ -276,7 +276,7 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            text: qsTr("ADSR Envelope")
+                            text: qsTr("ADSR\nEnvelope")
                             enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
                             MouseArea {

@@ -81,7 +81,7 @@ fi
 if [ ! -p /tmp/mplayer-splash-control ]; then
     mkfifo /tmp/mplayer-splash-control
 fi
-mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mkv -loop 0 &> /dev/null &
+mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mp4 -loop 0 &> /dev/null &
 SPLASH_PID=$!
 
 # Start Zynthian GUI & Synth Engine

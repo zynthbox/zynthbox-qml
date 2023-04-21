@@ -25,7 +25,7 @@ T.Slider {
 
     }
     handle: Item {
-        property bool horizontal: control.orientation === Qt.Horizontal
+        readonly property bool horizontal: control.orientation === Qt.Horizontal
         x: Math.round(control.leftPadding + (horizontal ? control.visualPosition * (control.availableWidth - width) : (control.availableWidth - width) / 2))
         y: Math.round(control.topPadding + (horizontal ? (control.availableHeight - height) / 2 : control.visualPosition * (control.availableHeight) - height/2))
 
@@ -51,10 +51,10 @@ T.Slider {
     }
 
     background: PlasmaCore.FrameSvgItem {
-        imagePath: "widgets/slider"
-        prefix: parent.horizontal ? "groove" : ["groove-vertical", "groove"]
-        colorGroup: PlasmaCore.ColorScope.colorGroup
         readonly property bool horizontal: control.orientation === Qt.Horizontal
+        imagePath: "widgets/slider"
+        prefix: horizontal ? "groove" : ["groove-vertical", "groove"]
+        colorGroup: PlasmaCore.ColorScope.colorGroup
         implicitWidth: horizontal ? PlasmaCore.Units.gridUnit * 8 : margins.left + margins.right
         implicitHeight: horizontal ? margins.top + margins.bottom : PlasmaCore.Units.gridUnit * 8
         width: Math.min(control.width, horizontal ? control.availableWidth : implicitWidth)

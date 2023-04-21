@@ -188,6 +188,7 @@ class zynthian_engine_jalv(zynthian_engine):
 				self.command = ("jalv.gtk --jack-name {} {}".format(self.get_jalv_jackname(), self.plugin_url))
 			else:
 				self.command_env['DISPLAY'] = ":0"
+				self.command_env['QT_QPA_PLATFORM'] = "offscreen"
 				self.command = ("jalv -n {} {}".format(self.get_jalv_jackname(), self.plugin_url))
 
 			self.command_prompt = "\n> "

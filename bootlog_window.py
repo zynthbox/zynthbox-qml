@@ -1,8 +1,10 @@
 import logging
 import os
 import sys
+import time
 from pathlib import Path
-from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal
+from threading import Thread
+from PySide2.QtCore import Property, QObject, Qt, Signal
 from PySide2.QtGui import QCursor, QGuiApplication, QPixmap
 from PySide2.QtQml import QQmlApplicationEngine
 
@@ -14,30 +16,36 @@ class BootLogInterface(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        logging.error("Starting bootlog display")
         self.__boot_log = ""
         self.__boot_log_file = None
 
-        self.check_boot_log_timer = QTimer()
-        self.check_boot_log_timer.setInterval(10)
-        self.check_boot_log_timer.setSingleShot(True)
-        self.check_boot_log_timer.timeout.connect(self.check_boot_log_timer_timeout)
-        self.check_boot_log_timer.start()
+        self.exit_flag = False
+        logging.error("Setting thread")
+        self.check_boot_log_thread = Thread(target=self.check_boot_log_timeout, args=())
+        self.check_boot_log_thread.daemon = True # thread will exit with the program
+        logging.error("Starting thread")
+        self.check_boot_log_thread.start()
 
-    def check_boot_log_timer_timeout(self):
-        # Skip reading until bootlog.fifo file is found
-        if Path("/tmp/bootlog.fifo").exists():
-            if self.__boot_log_file is None:
-                self.__boot_log_file = open("/tmp/bootlog.fifo", "r")
+    def check_boot_log_timeout(self):
+        while not self.exit_flag:
+            # Skip reading until bootlog.fifo file is found
+            if Path("/tmp/bootlog.fifo").exists():
+                if self.__boot_log_file is None:
+                    self.__boot_log_file = open("/tmp/bootlog.fifo", "r")
 
-            data = self.__boot_log_file.readline()[:-1].strip()
+                data = self.__boot_log_file.readline()[:-1].strip()
 
-            if data == "exit":
-                logging.debug("Received exit command. Cleaning up and exiting")
-                sys.exit(0)
-            elif len(data) > 0:
-                self.bootLog = data
-
-        self.check_boot_log_timer.start()
+                if data == "exit":
+                    logging.debug("Received exit command. Cleaning up and exiting")
+                    self.bootLog = "Startup completed"
+                    self.exit_flag = True
+                    QGuiApplication.quit()
+                elif len(data) > 0:
+                    self.bootLog = data
+            time.sleep(0.05)
+        if self.__boot_log_file is not None:
+            self.__boot_log_file.close()
 
     ### Property bootLog
     def get_bootLog(self):
@@ -68,4 +76,3 @@ if __name__ == "__main__":
     engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/BootLogWindow.qml"))
 
     sys.exit(app.exec_())
-

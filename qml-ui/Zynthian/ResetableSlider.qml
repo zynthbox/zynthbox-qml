@@ -1,5 +1,5 @@
 import QtQuick 2.10
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.4 as QQC2
 
 QQC2.Slider {
     id: root

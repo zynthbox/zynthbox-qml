@@ -33,6 +33,7 @@ Item {
     id: component
     property QtObject clip
     property int currentADSRElement: 0
+    signal saveMetadata()
     function nextADSRElement() {
         if (currentADSRElement === 3) {
             currentADSRElement = 0;
@@ -242,7 +243,7 @@ Item {
                 target: component.clip
                 onAdsrParametersChanged: {
                     adsrView.requestPaint()
-                    component.selectedClip.saveMetadata();
+                    component.saveMetadata();
                 }
             }
         }

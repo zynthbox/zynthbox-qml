@@ -906,7 +906,7 @@ class sketchpad_channel(QObject):
             self.zynqtgui.sketchpad.set_selector()
             self.channel_audio_type_changed.emit()
 
-            # Set selectedSlotRow to 0 when type is changed to slice as slice mode always operatoes on slot 0
+            # Set selectedSlotRow to 0 when type is changed to slice as slice mode always operates on slot 0
             if type == "sample-slice":
                 self.selectedSlotRow = 0
 
@@ -917,7 +917,7 @@ class sketchpad_channel(QObject):
             for track in range(0, 10):
                 for part in range(0, 5):
                     self.onClipEnabledChanged(track, part)
-            if not force_set:
+            if force_set == False:
                 self.__song__.schedule_save()
             self.update_jack_port()
 

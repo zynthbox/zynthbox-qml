@@ -238,18 +238,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 prev_volume = None
                 try:
                     prev_volume = self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value
-                    logging.debug(f"### Volume Previous : {prev_volume}")
                 except Exception as e:
                     logging.debug(f"Error resetting volume : {str(e)}")
 
                 logging.debug(f"Selecting preset : {preset_index}")
                 layer.set_preset(preset_index, True)
+                self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
                 if prev_volume is not None:
                     try:
-                        logging.debug(f"### Volume after preset change : {self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value}")
                         self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value = prev_volume
-                        logging.debug(f"### Volume after reset : {self.zynqtgui.fixed_layers.volumeControllers[selected_channel].value}")
                     except Exception as e:
                         logging.debug(f"Error resetting volume : {str(e)}")
 
@@ -305,9 +303,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         if volume_control_obj is not None and \
            volume_control_obj.value != volume:
-            logging.debug(f"### zyncoder_update_layer_volume check : {volume_control_obj.value}, {volume}")
             volume_control_obj.value = volume
-            logging.debug(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
             self.set_selector()
 
             self.zynqtgui.osd.updateOsd(
@@ -344,7 +341,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         if selected_channel.volume != volume:
             # zselector doesnt support negetive mimimum value. Need to interoporale zyncoder value from range(0 to 60) to actual range(-40 to 20)
             selected_channel.volume = volume
-            logging.debug(f"### zyncoder_update_channel_volume {selected_channel.volume}")
             self.set_selector()
 
     @Slot(None)
@@ -362,7 +358,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 1000):
             selected_clip.startPosition = self.__zselector[1].value / 1000
-            logging.debug(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
             self.set_selector()
 
     @Slot(None)
@@ -380,7 +375,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/1000:
             selected_clip.loopDelta = self.__zselector[2].value/1000
-            logging.debug(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
             self.set_selector()
 
     def update_channel_pan_actual(self, pan):
@@ -391,7 +385,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         # Do not set pan value if change is less than step size of 0.1
         if selected_channel_obj is not None and selected_channel_obj.pan != pan:
-            logging.debug(f"### zyncoder_update_channel_pan from {selected_channel_obj.pan} to {pan}")
             selected_channel_obj.pan = pan
             self.set_selector()
 
@@ -425,12 +418,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         if selected_clip is not None and selected_clip.snapLengthToBeat:
             if selected_clip.length != self.__zselector[3].value//100:
                 selected_clip.length = self.__zselector[3].value//100
-                logging.debug(f"### zyncoder_update_clip_length {selected_clip.length}")
                 self.set_selector()
         elif selected_clip is not None and not selected_clip.snapLengthToBeat:
             if selected_clip.length != self.__zselector[3].value/100:
                 selected_clip.length = self.__zselector[3].value/100
-                logging.debug(f"### zyncoder_update_clip_length {selected_clip.length}")
                 self.set_selector()
 
     @Slot(None)
@@ -443,6 +434,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def set_synth_filter_cutoff_actual(self, value):
         if self.__filter_cutoff_controller.value != value:
             self.__filter_cutoff_controller.value = value
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
             self.set_selector()
 
             if self.__filter_cutoff_controller.controlsCount > 0:
@@ -475,6 +467,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def set_synth_filter_resonance_actual(self, value):
         if self.__filter_resonance_controller.value != value:
             self.__filter_resonance_controller.value = value
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
             self.set_selector()
 
             if self.__filter_resonance_controller.controlsCount > 0:

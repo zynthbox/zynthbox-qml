@@ -48,17 +48,81 @@ GridLayout {
     property bool showCopyPasteButtons: true
 
     function cuiaCallback(cuia) {
+        var returnValue = false;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
-                return true;
+                returnValue = true;
+                break;
+            case "SELECT_UP":
+            // case "SCENE_UP":
+                _private.goUp();
+                returnValue = true;
+                break;
+            case "SELECT_DOWN":
+            // case "SCENE_DOWN":
+                _private.goDown();
+                returnValue = true;
+                break;
+            case "NAVIGATE_LEFT":
+                _private.goLeft();
+                returnValue = true;
+                break;
+            case "NAVIGATE_RIGHT":
+                _private.goRight();
+                returnValue = true;
+                break;
         }
-        return false;
+        return returnValue;
+    }
+    QtObject {
+        id: _private
+        function goLeft() {
+            clipSettingsADSR.previousADSRElement();
+        }
+        function goRight() {
+            clipSettingsADSR.nextADSRElement();
+        }
+        function goUp() {
+            if (zynqtgui.altButtonPressed) {
+                for (var i = 0; i < 10; ++i) {
+                    clipSettingsADSR.increaseCurrentValue();
+                }
+            } else {
+                clipSettingsADSR.increaseCurrentValue();
+            }
+        }
+        function goDown() {
+            if (zynqtgui.altButtonPressed) {
+                for (var i = 0; i < 10; ++i) {
+                    clipSettingsADSR.decreaseCurrentValue();
+                }
+            } else {
+                clipSettingsADSR.decreaseCurrentValue();
+            }
+        }
+        function knob1Up() {
+            clipSettingsADSR.nextADSRElement();
+        }
+        function knob1Down() {
+            clipSettingsADSR.previousADSRElement();
+        }
+        function knob2Up() {
+            clipSettingsADSR.increaseCurrentValue();
+        }
+        function knob2Down() {
+        }
+        function knob3Up() {
+        }
+        function knob3Down() {
+        }
     }
 
     Zynthian.ADSRClipView {
+        id: clipSettingsADSR
         Layout.fillWidth: true
         Layout.fillHeight: true
+        Layout.margins: Kirigami.Units.largeSpacing
         clip: component.controlObj
             ? Zynthbox.PlayGridManager.getClipById(component.controlObj.cppObjId)
             : null

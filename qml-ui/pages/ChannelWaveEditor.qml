@@ -318,6 +318,7 @@ Zynthian.ScreenPage {
                             anchors.fill: parent
                             enabled: component.selectedClipHasWav
                             clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
+                            onSaveMetadata: component.selectedClip.saveMetadata();
                         }
                     }
                 }

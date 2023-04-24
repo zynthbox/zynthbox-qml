@@ -642,7 +642,7 @@ class sketchpad_clip(QObject):
             self.audioSource.deleteLater()
 
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
-        if self.clipChannel is not None:
+        if self.clipChannel is not None and self.__song__.isLoading == False:
             self.clipChannel.channelAudioType = "sample-loop"
         self.cppObjIdChanged.emit()
 

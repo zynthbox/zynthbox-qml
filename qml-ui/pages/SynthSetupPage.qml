@@ -23,12 +23,12 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import Qt.labs.folderlistmodel 2.11
+import Qt.labs.folderlistmodel 2.15
 
 import Zynthian 1.0 as Zynthian
 
@@ -223,14 +223,16 @@ Zynthian.ScreenPage {
 
     contentItem: RowLayout {
         id: layout
+
+        // FIXME : Find a way to correctly expand the columns equally with filLWidth property instead of using manually calculated width value
+        property real columnWidth: width / children.length - spacing/2
+
         spacing: Kirigami.Units.gridUnit
 
         ColumnLayout {
-            Layout.fillWidth: true
+            Layout.fillWidth: false
             Layout.fillHeight: true
-            // NOTE: this is to make fillWidth always partition the space in equal sizes
-            implicitWidth: 1
-            Layout.preferredWidth: 1
+            Layout.preferredWidth: layout.columnWidth
             RowLayout {
                 Layout.fillWidth: true
                 Kirigami.Heading {
@@ -413,10 +415,9 @@ Zynthian.ScreenPage {
         }
         StackLayout {
             id: middleColumnStack
-            Layout.fillWidth: true
+            Layout.fillWidth: false
             Layout.fillHeight: true
-            implicitWidth: 1
-            Layout.preferredWidth: 1
+            Layout.preferredWidth: layout.columnWidth
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -533,10 +534,9 @@ Zynthian.ScreenPage {
             }
         }
         ColumnLayout {
-            Layout.fillWidth: true
+            Layout.fillWidth: false
             Layout.fillHeight: true
-            implicitWidth: 1
-            Layout.preferredWidth: 1
+            Layout.preferredWidth: layout.columnWidth
             RowLayout {
                 Kirigami.Heading {
                     id: presetHeading

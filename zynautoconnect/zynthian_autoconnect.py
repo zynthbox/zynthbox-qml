@@ -729,7 +729,7 @@ def audio_autoconnect(force=False):
 			channel_playback_ports = [f"FXPassthrough-Channel{channelId + 1}:inputLeft", f"FXPassthrough-Channel{channelId + 1}:inputRight"]
 			if channel is not None:
 				for sound in channel.chainedSounds:
-					if sound > -1:
+					if sound > -1 and channel.checkIfLayerExists(sound):
 						sound_layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[sound]
 						layer_leafs = [sound_layer]
 						effect_leafs = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_ends(sound_layer)

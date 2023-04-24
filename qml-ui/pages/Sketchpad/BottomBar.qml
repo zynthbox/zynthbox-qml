@@ -451,6 +451,14 @@ Rectangle {
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
+                        id: sampleADSREditorAction
+                        text: qsTr("ADSR")
+                        page: Qt.resolvedUrl("SampleADSREditor.qml")
+                        preload: true
+                        visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") && zynqtgui.bottomBarControlObj.path !== undefined && zynqtgui.bottomBarControlObj.path.length > 0
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
                         id: waveEditorAction
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
@@ -488,6 +496,18 @@ Rectangle {
                         page: Qt.resolvedUrl("SamplesBar.qml")
                         preload: true
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
+                        initialProperties: {"bottomBar": root}
+                    },
+                    // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel
+                    Zynthian.TabbedControlViewAction {
+                        id: channelSampleADSREditorAction
+
+                        property QtObject clip: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.samples ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] : null
+
+                        text: qsTr("ADSR")
+                        page: Qt.resolvedUrl("SampleADSREditor.qml")
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel" &&
+                                 clip && clip.path && clip.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
                     // Duplicate tab instance but for different placement and zynqtgui.bottomBarControlObj for channel

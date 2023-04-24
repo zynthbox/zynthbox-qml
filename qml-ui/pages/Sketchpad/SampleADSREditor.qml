@@ -28,21 +28,22 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: root
+    id: component
     rows: 1
     Layout.fillWidth: true
     Layout.maximumWidth: parent.width
 
     property QtObject bottomBar: null
     property string controlType: zynqtgui.bottomBarControlType
-    property QtObject controlObj: (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
+    property QtObject controlObj: (component.controlType === "bottombar-controltype-clip" || component.controlType === "bottombar-controltype-pattern")
                                     ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
-                                    : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
-                                        ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
+                                    : zynqtgui.bottomBarControlObj != null && zynqtgui.bottomBarControlObj.samples != null
+                                        ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
                                         : null
     property bool showCopyPasteButtons: true
 
@@ -56,8 +57,11 @@ GridLayout {
     }
 
     Zynthian.ADSRClipView {
-        anchors.fill: parent
-        clip: root.controlObj
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        clip: component.controlObj
+            ? Zynthbox.PlayGridManager.getClipById(component.controlObj.cppObjId)
+            : null
+        onSaveMetadata: component.controlObj.saveMetadata();
     }
 }
-

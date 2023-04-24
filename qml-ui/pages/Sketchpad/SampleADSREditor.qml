@@ -55,12 +55,10 @@ GridLayout {
                 returnValue = true;
                 break;
             case "SELECT_UP":
-            // case "SCENE_UP":
                 _private.goUp();
                 returnValue = true;
                 break;
             case "SELECT_DOWN":
-            // case "SCENE_DOWN":
                 _private.goDown();
                 returnValue = true;
                 break;

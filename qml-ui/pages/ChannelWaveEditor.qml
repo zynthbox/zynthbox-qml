@@ -49,14 +49,20 @@ Zynthian.ScreenPage {
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
-            case "NAVIGATE_LEFT":
+            case "SELECT_UP":
+                _private.goUp();
+                returnValue = true;
+                break;
             case "SELECT_DOWN":
+                _private.goDown();
+                returnValue = true;
+                break;
+            case "NAVIGATE_LEFT":
                 _private.goLeft();
                 returnValue = true;
                 break;
 
             case "NAVIGATE_RIGHT":
-            case "SELECT_UP":
                 _private.goRight();
                 returnValue = true;
                 break;
@@ -113,8 +119,36 @@ Zynthian.ScreenPage {
     QtObject {
         id: _private
         function goLeft() {
+            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                clipSettingsADSR.previousADSRElement();
+            }
         }
         function goRight() {
+            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                clipSettingsADSR.nextADSRElement();
+            }
+        }
+        function goUp() {
+            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                if (zynqtgui.altButtonPressed) {
+                    for (var i = 0; i < 10; ++i) {
+                        clipSettingsADSR.increaseCurrentValue();
+                    }
+                } else {
+                    clipSettingsADSR.increaseCurrentValue();
+                }
+            }
+        }
+        function goDown() {
+            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                if (zynqtgui.altButtonPressed) {
+                    for (var i = 0; i < 10; ++i) {
+                        clipSettingsADSR.decreaseCurrentValue();
+                    }
+                } else {
+                    clipSettingsADSR.decreaseCurrentValue();
+                }
+            }
         }
         function knob1Up() {
             if (component.selectedClipHasWav) {

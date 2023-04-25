@@ -137,14 +137,17 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
 
     @Slot(None)
     def do_activate_midich_layer(self):
-        channel = self.zynqtgui.screens["sketchpad"].song.channelsModel.getChannel(
-            self.zynqtgui.screens['session_dashboard'].get_selected_channel())
-        if channel is not None:
-            logging.debug(f"Update Channel Sounds : {channel.connectedSound}")
-            if channel.connectedSound >= 0:
-                self.zynqtgui.screens["layer"].activate_midichan_layer(channel.connectedSound)
-            else:
-                self.select_action(0)
+        song = self.zynqtgui.screens["sketchpad"].song
+        if song is not None and song.channelsModel is not None:
+            channel = song.channelsModel.getChannel(self.zynqtgui.screens['session_dashboard'].get_selected_channel())
+            if channel is not None:
+                logging.debug(f"Update Channel Sounds : {channel.connectedSound}")
+                if channel.connectedSound >= 0:
+                    self.zynqtgui.screens["layer"].activate_midichan_layer(channel.connectedSound)
+                else:
+                    self.select_action(0)
+        else:
+            self.select_action(0)
 
     def select(self, index=None):
         super().select(index)

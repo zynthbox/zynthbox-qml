@@ -507,6 +507,7 @@ class zynthian_gui(QObject):
         self.modal_timer.setSingleShot(False)
         self.modal_timer.timeout.connect(self.close_modal)
         self.__booting_complete__ = False
+        self.__shutting_down = False
         self.rainbow_led_counter = 0
 
         # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
@@ -3501,6 +3502,7 @@ class zynthian_gui(QObject):
         try:
             # Capture exit event and finish
             if self.exit_flag:
+                self.isShuttingDown = True
                 self.stop()
                 self.wait_threads_end()
                 logging.info("EXITING ZYNTHIAN-UI ...")
@@ -4425,6 +4427,20 @@ class zynthian_gui(QObject):
 
     isBootingComplete = Property(bool, get_isBootingComplete, set_isBootingComplete, notify=isBootingCompleteChanged)
     ### END Property isBootingComplete
+
+    ### Property isShuttingDown
+    def get_isShuttingDown(self):
+        return self.__shutting_down
+
+    def set_isShuttingDown(self, value):
+        if self.__shutting_down != value:
+            self.__shutting_down = value
+            self.isShuttingDownChanged.emit()
+
+    isShuttingDownChanged = Signal()
+
+    isShuttingDown = Property(bool, get_isShuttingDown, set_isShuttingDown, notify=isShuttingDownChanged)
+    ### END Property isShuttingDown
 
     ### Property globalPopupOpened
     def get_globalPopupOpened(self):

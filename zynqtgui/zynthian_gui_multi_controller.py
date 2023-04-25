@@ -37,7 +37,7 @@ class MultiController(QObject):
     def __init__(self, name, parent=None):
         super(MultiController, self).__init__(parent)
         self.__controls = []
-        self.__value = 100
+        self.__value = 0
         self.__value_min = 0
         self.__value_max = 100
         self.__step_size = 1
@@ -47,7 +47,15 @@ class MultiController(QObject):
         if control not in self.__controls:
             self.__controls.append(control)
             # Interpolate controller's value to percentage
-            self.set_value(np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max)))
+            controller_current_interp_value = np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max))
+            if controller_current_interp_value < self.value:
+                # Current controller's value is less than set value
+                # force set value to update current controllers value
+                self.set_value(self.value, True)
+            else:
+                # Current controller's value is greater than set value
+                # update value to current controller
+                self.set_value(controller_current_interp_value, True)
 
             self.controlsCountChanged.emit()
             self.controllable_changed.emit()
@@ -71,10 +79,10 @@ class MultiController(QObject):
     def get_value(self):
         return self.__value
 
-    def set_value(self, value_percent: int):
+    def set_value(self, value_percent: int, force_set=False):
         value = int(np.clip(value_percent, 0, 100))
 
-        if self.__value != value:
+        if self.__value != value or force_set is True:
             self.__value = value
 
             for control in self.__controls:

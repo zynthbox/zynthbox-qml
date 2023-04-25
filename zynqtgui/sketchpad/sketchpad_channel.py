@@ -424,7 +424,6 @@ class sketchpad_channel(QObject):
                 synth_ports.append(port_names)
 
             self.set_channelSynthPorts(synth_ports)
-            QMetaObject.invokeMethod(self.__song__, "updateAutoconnectedSounds", Qt.QueuedConnection)
 
         # Do the task in a thread only if run_in_thread is set to True
         # This will allow startup process to wait till all ports are updated before displaying splash screen

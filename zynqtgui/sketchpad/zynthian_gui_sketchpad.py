@@ -1480,6 +1480,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                         self.zynqtgui.currentTaskMessage = "Loading snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
+                # Update volume controls
+                self.zynqtgui.fixed_layers.fill_list()
+                self.set_selector()
+
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
 

@@ -182,9 +182,11 @@ Rectangle {
                                                 anchors.fill: parent
 
                                                 enabled: !model.channel.muted
-                                                headerText: model.channel.muted || Zynthbox.AudioLevels.channels[model.channel.id] <= -40
-                                                                ? ""
-                                                                : (Math.round(Zynthbox.AudioLevels.channels[model.channel.id]) + " (dB)")
+                                                headerText: visible
+                                                                ? model.channel.muted || Zynthbox.AudioLevels.channels[model.channel.id] <= -40
+                                                                    ? ""
+                                                                    : (Math.round(Zynthbox.AudioLevels.channels[model.channel.id]) + " (dB)")
+                                                                : ""
             //                                    footerText: model.channel.name
                                                 audioLeveldB: visible && !model.channel.muted
                                                                 ? Zynthbox.AudioLevels.channels[model.channel.id]

@@ -3881,12 +3881,13 @@ class zynthian_gui(QObject):
 
         # Explicitly run update_jack_port after booting is complete
         # as any requests made while booting is ignored
-        # zynqtgui.zynautoconnect will run after channel ports are updated
         for i in range(0, self.sketchpad.song.channelsModel.count):
             channel = self.sketchpad.song.channelsModel.getChannel(i)
             # Allow jack ports connection to complete before showing UI
             # so do not update jack ports in a thread
             channel.update_jack_port(run_in_thread=False)
+
+        self.zynautoconnect(True)
 
         # Stop rainbow and initialize LED config and connect to required signals
         # to be able to update LEDs on value change instead

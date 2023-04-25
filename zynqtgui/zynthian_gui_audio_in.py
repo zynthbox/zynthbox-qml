@@ -38,39 +38,39 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_audio_in(zynthian_gui_selector):
 
-	def __init__(self, parent = None):
-		super(zynthian_gui_audio_in, self).__init__('Audio Capture', parent)
-		self.layer=None
+    def __init__(self, parent = None):
+        super(zynthian_gui_audio_in, self).__init__('Audio Capture', parent)
+        self.layer=None
 
 
-	def set_layer(self, layer):
-		self.layer = layer
+    def set_layer(self, layer):
+        self.layer = layer
 
 
-	def fill_list(self):
-		self.list_data = []
+    def fill_list(self):
+        self.list_data = []
 
-		for scp in zynautoconnect.get_audio_capture_ports():
-			if scp.name in self.layer.get_audio_in():
-				self.list_data.append((scp.name, scp.name, "[x] " + scp.name))
-			else:
-				self.list_data.append((scp.name, scp.name, "[  ] " + scp.name))
+        for scp in zynautoconnect.get_audio_capture_ports():
+            if scp.name in self.layer.get_audio_in():
+                self.list_data.append((scp.name, scp.name, "[x] " + scp.name))
+            else:
+                self.list_data.append((scp.name, scp.name, "[  ] " + scp.name))
 
-		super().fill_list()
-
-
-	def fill_listbox(self):
-		super().fill_listbox()
+        super().fill_list()
 
 
-	def select_action(self, i, t='S'):
-		self.layer.toggle_audio_in(self.list_data[i][1])
-		self.fill_list()
+    def fill_listbox(self):
+        super().fill_listbox()
 
 
-	def set_select_path(self):
-		self.select_path = ("Capture Audio from ...")
-		super().set_select_path()
+    def select_action(self, i, t='S'):
+        self.layer.toggle_audio_in(self.list_data[i][1])
+        self.fill_list()
+
+
+    def set_select_path(self):
+        self.select_path = ("Capture Audio from ...")
+        super().set_select_path()
 
 
 #------------------------------------------------------------------------------

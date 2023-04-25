@@ -223,8 +223,8 @@ class zynthian_gui_hardware(zynthian_gui_selector):
             self.zynqtgui.screens["snapshot"].delete_last_state_snapshot()
 
     # def back_action(self):
-    # 	self.zynqtgui.show_screen("main")
-    # 	return ''
+    #     self.zynqtgui.show_screen("main")
+    #     return ''
 
 
 # ------------------------------------------------------------------------------

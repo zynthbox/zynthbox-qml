@@ -42,64 +42,64 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 # TODO: properties to read/write from QML
 class zynthian_gui_confirm(QObject):
 
-	def __init__(self, parent=None):
-		super(zynthian_gui_confirm, self).__init__(parent)
-		self.shown = False
-		self.callback = None
-		self.callback_params = None
-		self.zynqtgui = zynthian_gui_config.zynqtgui
+    def __init__(self, parent=None):
+        super(zynthian_gui_confirm, self).__init__(parent)
+        self.shown = False
+        self.callback = None
+        self.callback_params = None
+        self.zynqtgui = zynthian_gui_config.zynqtgui
 
-		self.prop_text = ''
-
-
-	def hide(self):
-		if self.shown:
-			self.shown=False
+        self.prop_text = ''
 
 
-	def show(self, text, callback=None, cb_params=None):
-		self.prop_text = text
-		self.callback = callback
-		self.callback_params = cb_params
-		if not self.shown:
-			self.shown=True
-		self.text_changed.emit()
-
-	def get_text(self):
-		return self.prop_text
-
-	def zyncoder_read(self):
-		pass
+    def hide(self):
+        if self.shown:
+            self.shown=False
 
 
-	def refresh_loading(self):
-		pass
+    def show(self, text, callback=None, cb_params=None):
+        self.prop_text = text
+        self.callback = callback
+        self.callback_params = cb_params
+        if not self.shown:
+            self.shown=True
+        self.text_changed.emit()
+
+    def get_text(self):
+        return self.prop_text
+
+    def zyncoder_read(self):
+        pass
 
 
-	def switch_select(self, t='S'):
-		logging.info("callback %s" % self.callback_params)
-		print("TRYING TO CALL CALLBACK")
-		
-		try:
-			self.callback(self.callback_params)
-		except:
-			pass
-
-		self.zynqtgui.close_modal()
+    def refresh_loading(self):
+        pass
 
 
-	@Slot(None)
-	def accept(self):
-		self.switch_select() #FIXME need to call it directly otherwise calling it from another thread causes problems to Qt models
-		#self.zynqtgui.zynswitch_defered('S',3)
+    def switch_select(self, t='S'):
+        logging.info("callback %s" % self.callback_params)
+        print("TRYING TO CALL CALLBACK")
+        
+        try:
+            self.callback(self.callback_params)
+        except:
+            pass
 
-	@Slot(None)
-	def reject(self):
-		self.zynqtgui.zynswitch_defered('S',1)
+        self.zynqtgui.close_modal()
 
 
-	text_changed = Signal()
+    @Slot(None)
+    def accept(self):
+        self.switch_select() #FIXME need to call it directly otherwise calling it from another thread causes problems to Qt models
+        #self.zynqtgui.zynswitch_defered('S',3)
 
-	text = Property(str, get_text, notify = text_changed)
+    @Slot(None)
+    def reject(self):
+        self.zynqtgui.zynswitch_defered('S',1)
+
+
+    text_changed = Signal()
+
+    text = Property(str, get_text, notify = text_changed)
 
 #-------------------------------------------------------------------------------

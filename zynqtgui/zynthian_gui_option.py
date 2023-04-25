@@ -35,35 +35,35 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_option(zynthian_gui_selector):
 
-	def __init__(self, parent = None):
-		super(zynthian_gui_option, self).__init__('Option', parent)
-		self.title = ""
-		self.options = []
-		self.cb_select = None
+    def __init__(self, parent = None):
+        super(zynthian_gui_option, self).__init__('Option', parent)
+        self.title = ""
+        self.options = []
+        self.cb_select = None
 
 
-	def config(self, title, options, cb_select):
-		self.title = title
-		self.options = options
-		self.cb_select = cb_select
+    def config(self, title, options, cb_select):
+        self.title = title
+        self.options = options
+        self.cb_select = cb_select
 
 
-	def fill_list(self):
-		i=0
-		self.list_data=[]
-		for k,v in self.options.items():
-			self.list_data.append((v,i,k))
-			i += 1
-		super().fill_list()
+    def fill_list(self):
+        i=0
+        self.list_data=[]
+        for k,v in self.options.items():
+            self.list_data.append((v,i,k))
+            i += 1
+        super().fill_list()
 
 
-	def select_action(self, i, t='S'):
-		if self.cb_select:
-			self.cb_select(self.list_data[i][0])
+    def select_action(self, i, t='S'):
+        if self.cb_select:
+            self.cb_select(self.list_data[i][0])
 
 
-	def set_select_path(self):
-		self.select_path = self.title
-		super().set_select_path()
+    def set_select_path(self):
+        self.select_path = self.title
+        super().set_select_path()
 
 #------------------------------------------------------------------------------

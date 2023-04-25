@@ -41,68 +41,68 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 class zynthian_gui_info(QObject):
 
-	def __init__(self, parent=None):
-		super(zynthian_gui_info, self).__init__(parent)
-		self.shown=False
-		self.zynqtgui=zynthian_gui_config.zynqtgui
+    def __init__(self, parent=None):
+        super(zynthian_gui_info, self).__init__(parent)
+        self.shown=False
+        self.zynqtgui=zynthian_gui_config.zynqtgui
 
-		self.prop_text = ''
-
-
-	def clean(self):
-		self.prop_text = ''
-		self.text_changed.emit()
+        self.prop_text = ''
 
 
-	def add(self, text, tags=None):
-		self.prop_text += '\n' + text
-		self.text_changed.emit()
+    def clean(self):
+        self.prop_text = ''
+        self.text_changed.emit()
 
 
-	def set(self, text, tags=None):
-		self.clean()
-		self.add(text+"\n",tags)
-		self.text_changed.emit()
+    def add(self, text, tags=None):
+        self.prop_text += '\n' + text
+        self.text_changed.emit()
 
 
-	def hide(self):
-		if self.shown:
-			self.shown=False
+    def set(self, text, tags=None):
+        self.clean()
+        self.add(text+"\n",tags)
+        self.text_changed.emit()
 
 
-	def show(self, text = ''):
-		self.set(text)
-		if not self.shown:
-			self.shown=True
+    def hide(self):
+        if self.shown:
+            self.shown=False
 
 
-	def zyncoder_read(self):
-		pass
+    def show(self, text = ''):
+        self.set(text)
+        if not self.shown:
+            self.shown=True
 
 
-	def refresh_loading(self):
-		pass
+    def zyncoder_read(self):
+        pass
 
 
-	def switch_select(self, t='S'):
-		pass
-
-	@Slot('void')
-	def back_action(self):
-		self.zynqtgui.cancel_modal_timer()
-		self.zynqtgui.screens['admin'].kill_command()
-		self.zynqtgui.show_modal('admin')
-		return None
+    def refresh_loading(self):
+        pass
 
 
-	def cb_push(self,event):
-		self.zynqtgui.zynswitch_defered('S',1)
+    def switch_select(self, t='S'):
+        pass
 
-	def get_text(self):
-		return self.prop_text
+    @Slot('void')
+    def back_action(self):
+        self.zynqtgui.cancel_modal_timer()
+        self.zynqtgui.screens['admin'].kill_command()
+        self.zynqtgui.show_modal('admin')
+        return None
 
-	text_changed = Signal()
 
-	text = Property(str, get_text, notify = text_changed)
+    def cb_push(self,event):
+        self.zynqtgui.zynswitch_defered('S',1)
+
+    def get_text(self):
+        return self.prop_text
+
+    text_changed = Signal()
+
+    text = Property(str, get_text, notify = text_changed)
 
 #-------------------------------------------------------------------------------

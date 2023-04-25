@@ -35,73 +35,73 @@ from . import zynthian_gui_engine
 
 class zynthian_gui_effect_types(zynthian_gui_engine):
 
-	def __init__(self, parent = None):
-		super(zynthian_gui_effect_types, self).__init__(parent)
+    def __init__(self, parent = None):
+        super(zynthian_gui_effect_types, self).__init__(parent)
 
-		self.selector_caption = "FX Type"
-		self.midi_mode = False
-		self.effects_screen = "layer_effects"
-		self.effect_chooser_screen = "layer_effect_chooser"
+        self.selector_caption = "FX Type"
+        self.midi_mode = False
+        self.effects_screen = "layer_effects"
+        self.effect_chooser_screen = "layer_effect_chooser"
 
-		#if self.zynqtgui.curlayer:
-			#self.set_fxchain_mode(self.zynqtgui.curlayer.midi_chan)
-		self.only_categories = True
-
-
-	def show(self):
-		if self.midi_mode:
-			self.effects_screen = "layer_midi_effects"
-			self.effect_chooser_screen = "layer_midi_effect_chooser"
-		else:
-			self.effects_screen = "layer_effects"
-			self.effect_chooser_screen = "layer_effect_chooser"
-		if self.zynqtgui.curlayer:
-			if self.midi_mode:
-				self.set_midichain_mode(self.zynqtgui.curlayer.midi_chan)
-			else:
-				self.set_fxchain_mode(self.zynqtgui.curlayer.midi_chan)
-			self.reset_index = False
-		super().show()
-
-		if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.get_current_screen_id() != 'effect_types':
-			cat = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
-			for i, item in enumerate(self.list_data):
-				if item[2] == cat:
-					self.activate_index(i)
-					return
-		if self.zynqtgui.screens[self.effect_chooser_screen].single_category == "    ":
-			self.zynqtgui.screens[self.effect_chooser_screen].single_category == self.list_data[0][0]
-		self.zynqtgui.screens[self.effect_chooser_screen].show()
+        #if self.zynqtgui.curlayer:
+            #self.set_fxchain_mode(self.zynqtgui.curlayer.midi_chan)
+        self.only_categories = True
 
 
-	def select_action(self, i, t='S'):
-		if i is not None and self.list_data[i][0]:
-			self.zynqtgui.screens[self.effect_chooser_screen].single_category = self.list_data[i][0]
-			self.zynqtgui.screens[self.effect_chooser_screen].show()
-			#If first column is not pointing to a layer, preselect slot 0 of effect_chooser_screen
-		self.set_select_path()
+    def show(self):
+        if self.midi_mode:
+            self.effects_screen = "layer_midi_effects"
+            self.effect_chooser_screen = "layer_midi_effect_chooser"
+        else:
+            self.effects_screen = "layer_effects"
+            self.effect_chooser_screen = "layer_effect_chooser"
+        if self.zynqtgui.curlayer:
+            if self.midi_mode:
+                self.set_midichain_mode(self.zynqtgui.curlayer.midi_chan)
+            else:
+                self.set_fxchain_mode(self.zynqtgui.curlayer.midi_chan)
+            self.reset_index = False
+        super().show()
+
+        if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.get_current_screen_id() != 'effect_types':
+            cat = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
+            for i, item in enumerate(self.list_data):
+                if item[2] == cat:
+                    self.activate_index(i)
+                    return
+        if self.zynqtgui.screens[self.effect_chooser_screen].single_category == "    ":
+            self.zynqtgui.screens[self.effect_chooser_screen].single_category == self.list_data[0][0]
+        self.zynqtgui.screens[self.effect_chooser_screen].show()
 
 
-	def back_action(self):
-		return self.effects_screen
-
-	def next_action(self):
-		return self.effect_chooser_screen
-
-
-	def index_supports_immediate_activation(self, index=None):
-		return True
+    def select_action(self, i, t='S'):
+        if i is not None and self.list_data[i][0]:
+            self.zynqtgui.screens[self.effect_chooser_screen].single_category = self.list_data[i][0]
+            self.zynqtgui.screens[self.effect_chooser_screen].show()
+            #If first column is not pointing to a layer, preselect slot 0 of effect_chooser_screen
+        self.set_select_path()
 
 
-	def set_select_path(self):
-		self.select_path = ''
-		self.select_path_element = ''
+    def back_action(self):
+        return self.effects_screen
 
-		if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.curlayer != None:
-			self.select_path_element = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
-			self.select_path = self.zynqtgui.curlayer.get_basepath() + " Audio-FX > " + str(self.select_path_element)
+    def next_action(self):
+        return self.effect_chooser_screen
 
-		self.selector_path_changed.emit()
-		self.selector_path_element_changed.emit()
+
+    def index_supports_immediate_activation(self, index=None):
+        return True
+
+
+    def set_select_path(self):
+        self.select_path = ''
+        self.select_path_element = ''
+
+        if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.curlayer != None:
+            self.select_path_element = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
+            self.select_path = self.zynqtgui.curlayer.get_basepath() + " Audio-FX > " + str(self.select_path_element)
+
+        self.selector_path_changed.emit()
+        self.selector_path_element_changed.emit()
 
 #------------------------------------------------------------------------------

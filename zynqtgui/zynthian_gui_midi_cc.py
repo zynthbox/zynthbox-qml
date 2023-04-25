@@ -39,67 +39,67 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_midi_cc(zynthian_gui_selector):
 
-	def __init__(self, parent = None):
-		super(zynthian_gui_midi_cc, self).__init__('CC', parent)
-		self.chan_from = None
-		self.chan_to = None
-		self.cc = [0] * 16
+    def __init__(self, parent = None):
+        super(zynthian_gui_midi_cc, self).__init__('CC', parent)
+        self.chan_from = None
+        self.chan_to = None
+        self.cc = [0] * 16
 
 
-	def config(self, chan_from, chan_to):
-		self.chan_from = chan_from
-		self.chan_to = chan_to
-		self.cc = zyncoder.lib_zyncoder.get_midi_filter_clone_cc(chan_from, chan_to).tolist()
+    def config(self, chan_from, chan_to):
+        self.chan_from = chan_from
+        self.chan_to = chan_to
+        self.cc = zyncoder.lib_zyncoder.get_midi_filter_clone_cc(chan_from, chan_to).tolist()
 
 
-	@staticmethod
-	def set_clone_cc(chan_from, chan_to, cc):
-		cc_array = (c_ubyte*128)()
+    @staticmethod
+    def set_clone_cc(chan_from, chan_to, cc):
+        cc_array = (c_ubyte*128)()
 
-		if len(cc)==128:
-			for i in range(0, 128):
-				cc_array[i] = cc[i]
-		else:
-			for i in range(0, 128):
-				if i in cc:
-					cc_array[i] = 1
-				else:
-					cc_array[i] = 0
+        if len(cc)==128:
+            for i in range(0, 128):
+                cc_array[i] = cc[i]
+        else:
+            for i in range(0, 128):
+                if i in cc:
+                    cc_array[i] = 1
+                else:
+                    cc_array[i] = 0
 
-		zyncoder.lib_zyncoder.set_midi_filter_clone_cc(chan_from, chan_to, cc_array)
-
-
-	def fill_list(self):
-		self.list_data=[]
-		for i, ccnum in enumerate(self.cc):
-			if ccnum:
-				self.list_data.append((str(i),i,"[x] CC {}".format(str(i).zfill(2))))
-			else:
-				self.list_data.append((str(i),i,"[  ] CC {}".format(str(i).zfill(2))))
-		super().fill_list()
+        zyncoder.lib_zyncoder.set_midi_filter_clone_cc(chan_from, chan_to, cc_array)
 
 
-	def select_action(self, i, t='S'):
-		cc_num=self.list_data[i][1]
-
-		if self.cc[cc_num]:
-			self.cc[cc_num] = 0
-		else:
-			self.cc[cc_num] = 1
-			
-		self.set_clone_cc(self.chan_from, self.chan_to, self.cc)
-		
-		self.config(self.chan_from, self.chan_to)
-		self.update_list()
-
-		logging.info("MIDI CC {} CLONE CH#{}=>CH#{}: {}".format(cc_num, self.chan_from, self.chan_to, self.cc[cc_num]))
+    def fill_list(self):
+        self.list_data=[]
+        for i, ccnum in enumerate(self.cc):
+            if ccnum:
+                self.list_data.append((str(i),i,"[x] CC {}".format(str(i).zfill(2))))
+            else:
+                self.list_data.append((str(i),i,"[  ] CC {}".format(str(i).zfill(2))))
+        super().fill_list()
 
 
-	def set_select_path(self):
-		try:
-			self.select_path = ("Clone {} => {} / CC...".format(self.chan_from+1, self.chan_to+1))
-		except:
-			self.select_path = ("Clone CC...")
+    def select_action(self, i, t='S'):
+        cc_num=self.list_data[i][1]
+
+        if self.cc[cc_num]:
+            self.cc[cc_num] = 0
+        else:
+            self.cc[cc_num] = 1
+            
+        self.set_clone_cc(self.chan_from, self.chan_to, self.cc)
+        
+        self.config(self.chan_from, self.chan_to)
+        self.update_list()
+
+        logging.info("MIDI CC {} CLONE CH#{}=>CH#{}: {}".format(cc_num, self.chan_from, self.chan_to, self.cc[cc_num]))
+
+
+    def set_select_path(self):
+        try:
+            self.select_path = ("Clone {} => {} / CC...".format(self.chan_from+1, self.chan_to+1))
+        except:
+            self.select_path = ("Clone CC...")
 
 
 #------------------------------------------------------------------------------

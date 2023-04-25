@@ -31,54 +31,54 @@ from zyncoder import *
 
 class zynthian_zcmidi:
 
-	bank_msb_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	bank_lsb_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	prg_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    bank_msb_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    bank_lsb_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    prg_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-	def __init__(self):
-		self.lib_zyncoder=zyncoder.get_lib_zyncoder()
+    def __init__(self):
+        self.lib_zyncoder=zyncoder.get_lib_zyncoder()
 
-	def set_midi_control(self, chan, ctrl, val):
-		self.lib_zyncoder.ui_send_ccontrol_change(chan, ctrl, val)
+    def set_midi_control(self, chan, ctrl, val):
+        self.lib_zyncoder.ui_send_ccontrol_change(chan, ctrl, val)
 
-	def set_midi_bank_msb(self, chan, msb):
-		logging.debug("Set MIDI CH " + str(chan) + ", Bank MSB: " + str(msb))
-		self.bank_msb_selected[chan]=msb
-		self.set_midi_control(chan,0,msb)
+    def set_midi_bank_msb(self, chan, msb):
+        logging.debug("Set MIDI CH " + str(chan) + ", Bank MSB: " + str(msb))
+        self.bank_msb_selected[chan]=msb
+        self.set_midi_control(chan,0,msb)
 
-	def get_midi_bank_msb(self, chan):
-		return self.bank_msb_selected[chan]
+    def get_midi_bank_msb(self, chan):
+        return self.bank_msb_selected[chan]
 
-	def set_midi_bank_lsb(self, chan, lsb):
-		logging.debug("Set MIDI CH " + str(chan) + ", Bank LSB: " + str(lsb))
-		self.bank_lsb_selected[chan]=lsb
-		self.set_midi_control(chan,32,lsb)
+    def set_midi_bank_lsb(self, chan, lsb):
+        logging.debug("Set MIDI CH " + str(chan) + ", Bank LSB: " + str(lsb))
+        self.bank_lsb_selected[chan]=lsb
+        self.set_midi_control(chan,32,lsb)
 
-	def get_midi_bank_lsb(self, chan):
-		return self.bank_lsb_selected[chan]
+    def get_midi_bank_lsb(self, chan):
+        return self.bank_lsb_selected[chan]
 
-	def set_midi_prg(self, chan, prg):
-		logging.debug("Set MIDI CH " + str(chan) + ", Program: " + str(prg))
-		self.prg_selected[chan]=prg
-		self.lib_zyncoder.ui_send_program_change(chan, prg)
+    def set_midi_prg(self, chan, prg):
+        logging.debug("Set MIDI CH " + str(chan) + ", Program: " + str(prg))
+        self.prg_selected[chan]=prg
+        self.lib_zyncoder.ui_send_program_change(chan, prg)
 
-	def get_midi_prg(self, chan):
-		return self.prg_selected[chan]
+    def get_midi_prg(self, chan):
+        return self.prg_selected[chan]
 
-	def set_midi_preset(self, chan, msb, lsb, prg):
-		logging.debug("Set MIDI CH " + str(chan) + ", Bank MSB: " + str(msb) + ", Bank LSB: " + str(lsb) + ", Program: " + str(prg))
-		self.bank_msb_selected[chan]=msb
-		self.bank_lsb_selected[chan]=lsb
-		self.prg_selected[chan]=prg
-		self.set_midi_control(chan,0,msb)
-		self.set_midi_control(chan,32,lsb)
-		self.lib_zyncoder.ui_send_program_change(chan, prg)
+    def set_midi_preset(self, chan, msb, lsb, prg):
+        logging.debug("Set MIDI CH " + str(chan) + ", Bank MSB: " + str(msb) + ", Bank LSB: " + str(lsb) + ", Program: " + str(prg))
+        self.bank_msb_selected[chan]=msb
+        self.bank_lsb_selected[chan]=lsb
+        self.prg_selected[chan]=prg
+        self.set_midi_control(chan,0,msb)
+        self.set_midi_control(chan,32,lsb)
+        self.lib_zyncoder.ui_send_program_change(chan, prg)
 
-	def get_midi_preset(self, chan):
-		return [self.bank_msb_selected[chan],self.bank_lsb_selected[chan],self.prg_selected[chan]]
+    def get_midi_preset(self, chan):
+        return [self.bank_msb_selected[chan],self.bank_lsb_selected[chan],self.prg_selected[chan]]
 
-	def note_on(self, chan, note, vel):
-		self.lib_zyncoder.ui_send_note_on(chan, note, vel)
+    def note_on(self, chan, note, vel):
+        self.lib_zyncoder.ui_send_note_on(chan, note, vel)
 
-	def note_off(self, chan, note):
-		self.lib_zyncoder.ui_send_note_on(chan, note, 0)
+    def note_off(self, chan, note):
+        self.lib_zyncoder.ui_send_note_on(chan, note, 0)

@@ -34,47 +34,47 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_zs3_options(zynthian_gui_selector):
 
-	def __init__(self):
-		self.midi_chan = None
-		self.zs3_index = None
-		super().__init__('Option', True)
+    def __init__(self):
+        self.midi_chan = None
+        self.zs3_index = None
+        super().__init__('Option', True)
 
 
-	def config(self, midich, i):
-		self.midi_chan = midich
-		self.zs3_index = i
+    def config(self, midich, i):
+        self.midi_chan = midich
+        self.zs3_index = i
 
 
-	def fill_list(self):
-		self.list_data=[]
+    def fill_list(self):
+        self.list_data=[]
 
-		self.list_data.append((self.zs3_update,0,"Update"))
-		self.list_data.append((self.zs3_delete,0,"Delete"))
+        self.list_data.append((self.zs3_update,0,"Update"))
+        self.list_data.append((self.zs3_delete,0,"Delete"))
 
-		super().fill_list()
-
-
-	def select_action(self, i, t='S'):
-		if self.list_data[i][0]:
-			self.last_action=self.list_data[i][0]
-			self.last_action()
+        super().fill_list()
 
 
-	def zs3_update(self):
-		logging.info("Updating ZS3 CH#{}".format(self.midi_chan, self.zs3_index))
-		self.zynqtgui.screens['layer'].save_midi_chan_zs3(self.midi_chan, self.zs3_index)
-		self.zynqtgui.show_screen("control")
-		self.zynqtgui.exit_midi_learn_mode()
+    def select_action(self, i, t='S'):
+        if self.list_data[i][0]:
+            self.last_action=self.list_data[i][0]
+            self.last_action()
 
 
-	def zs3_delete(self):
-		logging.info("Deleting ZS3 CH#{} {}".format(self.midi_chan, self.zs3_index))
-		self.zynqtgui.screens['layer'].delete_midi_chan_zs3(self.midi_chan, self.zs3_index)
-		self.zynqtgui.show_modal("zs3_learn")
+    def zs3_update(self):
+        logging.info("Updating ZS3 CH#{}".format(self.midi_chan, self.zs3_index))
+        self.zynqtgui.screens['layer'].save_midi_chan_zs3(self.midi_chan, self.zs3_index)
+        self.zynqtgui.show_screen("control")
+        self.zynqtgui.exit_midi_learn_mode()
 
 
-	def set_select_path(self):
-		self.select_path = ("PROG Options")
+    def zs3_delete(self):
+        logging.info("Deleting ZS3 CH#{} {}".format(self.midi_chan, self.zs3_index))
+        self.zynqtgui.screens['layer'].delete_midi_chan_zs3(self.midi_chan, self.zs3_index)
+        self.zynqtgui.show_modal("zs3_learn")
+
+
+    def set_select_path(self):
+        self.select_path = ("PROG Options")
 
 
 #------------------------------------------------------------------------------

@@ -38,52 +38,52 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_audio_out(zynthian_gui_selector):
 
-	def __init__(self, parent=None):
-		super(zynthian_gui_audio_out, self).__init__("Audio Out", parent)
-		self.layer=None
-		self.end_layer = None
+    def __init__(self, parent=None):
+        super(zynthian_gui_audio_out, self).__init__("Audio Out", parent)
+        self.layer=None
+        self.end_layer = None
 
 
-	def set_layer(self, layer):
-		self.layer = layer
-		try:
-			self.end_layer = self.zynqtgui.screens['layer'].get_fxchain_ends(self.layer)[0]
-		except:
-			self.end_layer = None
+    def set_layer(self, layer):
+        self.layer = layer
+        try:
+            self.end_layer = self.zynqtgui.screens['layer'].get_fxchain_ends(self.layer)[0]
+        except:
+            self.end_layer = None
 
 
-	def fill_list(self):
-		self.list_data = []
+    def fill_list(self):
+        self.list_data = []
 
-		for k in zynautoconnect.get_audio_input_ports().keys():
-			try:
-				title = self.zynqtgui.screens['layer'].get_layer_by_jackname(k).get_basepath()
-			except:
-				title = k
+        for k in zynautoconnect.get_audio_input_ports().keys():
+            try:
+                title = self.zynqtgui.screens['layer'].get_layer_by_jackname(k).get_basepath()
+            except:
+                title = k
 
-			try:
-				ch = int(title.split('#')[0])-1
-				if ch==self.layer.midi_chan:
-					continue
-			except Exception as e:
-				#logging.debug("Can't get layer's midi chan => {}".format(e))
-				pass
+            try:
+                ch = int(title.split('#')[0])-1
+                if ch==self.layer.midi_chan:
+                    continue
+            except Exception as e:
+                #logging.debug("Can't get layer's midi chan => {}".format(e))
+                pass
 
-			if self.end_layer and k in self.end_layer.get_audio_out():
-				self.list_data.append((k, k, "[x] " + title))
-			else:
-				self.list_data.append((k, k, "[  ] " + title))
+            if self.end_layer and k in self.end_layer.get_audio_out():
+                self.list_data.append((k, k, "[x] " + title))
+            else:
+                self.list_data.append((k, k, "[  ] " + title))
 
-		super().fill_list()
-
-
-	def select_action(self, i, t='S'):
-		self.end_layer.toggle_audio_out(self.list_data[i][1])
-		self.fill_list()
+        super().fill_list()
 
 
-	def set_select_path(self):
-		self.select_path = ("Send Audio to ...")
-		super().set_select_path()
+    def select_action(self, i, t='S'):
+        self.end_layer.toggle_audio_out(self.list_data[i][1])
+        self.fill_list()
+
+
+    def set_select_path(self):
+        self.select_path = ("Send Audio to ...")
+        super().set_select_path()
 
 #------------------------------------------------------------------------------

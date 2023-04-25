@@ -39,58 +39,58 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_midi_out(zynthian_gui_selector):
 
-	def __init__(self):
-		self.layer=None
-		super().__init__('MIDI Out', True)
+    def __init__(self):
+        self.layer=None
+        super().__init__('MIDI Out', True)
 
 
-	def set_layer(self, layer):
-		self.layer = layer
+    def set_layer(self, layer):
+        self.layer = layer
 
 
-	def fill_list(self):
-		self.list_data = []
+    def fill_list(self):
+        self.list_data = []
 
-		midi_outs = OrderedDict([
-			["MIDI-OUT", "Hardware MIDI Out"],
-			["NET-OUT", "Network MIDI Out" ]
-		])
-		for layer in zynthian_gui_config.zynqtgui.screens["layer"].get_midichain_roots():
-			if layer.midi_chan!=self.layer.midi_chan:
-				midi_outs[layer.get_midi_jackname()] = layer.get_basepath()
-			
-		for jn, title in midi_outs.items():
-			if self.layer and jn in self.layer.get_midi_out():
-				self.list_data.append((jn, jn, "[x] " + title))
-			else:
-				self.list_data.append((jn, jn, "[  ] " + title))
+        midi_outs = OrderedDict([
+            ["MIDI-OUT", "Hardware MIDI Out"],
+            ["NET-OUT", "Network MIDI Out" ]
+        ])
+        for layer in zynthian_gui_config.zynqtgui.screens["layer"].get_midichain_roots():
+            if layer.midi_chan!=self.layer.midi_chan:
+                midi_outs[layer.get_midi_jackname()] = layer.get_basepath()
+            
+        for jn, title in midi_outs.items():
+            if self.layer and jn in self.layer.get_midi_out():
+                self.list_data.append((jn, jn, "[x] " + title))
+            else:
+                self.list_data.append((jn, jn, "[  ] " + title))
 
-		super().fill_list()
-
-
-	def fill_listbox(self):
-		super().fill_listbox()
-		#self.highlight()
+        super().fill_list()
 
 
-	# Highlight current engine assigned outputs ...
-	def highlight(self):
-		for i in range(len(self.list_data)):
-			if self.list_data[i][2][:2]=='[x':
-				self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_hl})
-			else:
-				self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_panel_tx})
+    def fill_listbox(self):
+        super().fill_listbox()
+        #self.highlight()
 
 
-	def select_action(self, i, t='S'):
-		self.layer.toggle_midi_out(self.list_data[i][1])
-		self.fill_list()
+    # Highlight current engine assigned outputs ...
+    def highlight(self):
+        for i in range(len(self.list_data)):
+            if self.list_data[i][2][:2]=='[x':
+                self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_hl})
+            else:
+                self.listbox.itemconfig(i, {'fg':zynthian_gui_config.color_panel_tx})
 
 
-	def set_select_path(self):
-		if self.layer and self.layer.get_basepath():
-			self.select_path = ("Send MIDI from {} to ...".format(self.layer.get_basepath()))
-		else:
-			self.select_path = ("MIDI Routing ...")
+    def select_action(self, i, t='S'):
+        self.layer.toggle_midi_out(self.list_data[i][1])
+        self.fill_list()
+
+
+    def set_select_path(self):
+        if self.layer and self.layer.get_basepath():
+            self.select_path = ("Send MIDI from {} to ...".format(self.layer.get_basepath()))
+        else:
+            self.select_path = ("MIDI Routing ...")
 
 #------------------------------------------------------------------------------

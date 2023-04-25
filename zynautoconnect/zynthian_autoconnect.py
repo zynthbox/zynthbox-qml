@@ -587,68 +587,58 @@ def audio_autoconnect(force=False):
             channel = song.channelsModel.getChannel(channelId)
             if channel is not None:
                 channelPorts = jclient.get_ports(f"SamplerSynth-channel_{channelId + 1}:", is_audio=True, is_output=True)
-                # Only connect the sampelersynth client for the channel to the outputs if this is a sample based channel, otherwise disconnect SamplerSynth
-                if channel.channelAudioType.startswith("sample-"):
-                    # Firstly, attempt to connect the channel to any effects attached to the channel
-                    channelHasEffects = False
-                    if len(channel.chainedSounds) > 0:
-                        for chainedSound in channel.chainedSounds:
-                            if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
-                                layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[chainedSound]
-                                effectsLayers = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_layers(layer)
-                                if effectsLayers != None and len(effectsLayers) > 0:
-                                    # As there are effects, connect the channel's outputs to their inputs
-                                    for sl in effectsLayers:
-                                        if sl.engine.type == "Audio Effect":
-                                            try:
-                                                engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
-                                                if len(engineInPorts) == 1:
-                                                    engineInPorts.append(engineInPorts[0]);
-                                                for port in zip(channelPorts, engineInPorts):
-                                                    channelHasEffects = True
-                                                    try:
-                                                        jclient.connect(port[0], port[1])
-                                                    except: pass
-                                            except Exception as e:
-                                                logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-                                                # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
-                                                # Logic below the return statement will be eventually evaluated when called again after the timeout
-                                                force_next_autoconnect = True;
-                                                release_lock()
-                                                return
-                                    pass
-                    # If the channel wants to route through global FX, connect its outputs to the global effects
-                    if not channelHasEffects:
-                        try:
-                            if channel.routeThroughGlobalFX:
-                                for port in zip(channelPorts, playback_ports):
-                                    try:
-                                        jclient.disconnect(port[0], port[1])
-                                    except: pass
-                                for port in zip(channelPorts, jclient.get_ports(name_pattern=f"FXPassthrough-Channel{channel.id + 1}", is_audio=True, is_input=True)):
-                                    try:
-                                        jclient.connect(port[0], port[1])
-                                    except: pass
-                            else:
-                                for port in zip(channelPorts, playback_ports):
-                                    try:
-                                        jclient.connect(port[0], port[1])
-                                    except: pass
-                        except Exception as e:
-                            logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
-                            # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
-                            # Logic below the return statement will be eventually evaluated when called again after the timeout
-                            force_next_autoconnect = True;
-                            release_lock()
-                            return
-                else:
-                    for port in channelPorts:
-                        try:
-                            portConnections = jclient.get_all_connections(port)
-                            for otherPort in portConnections:
-                                jclient.disconnect(port, otherPort)
-                        except Exception as e:
-                            logging.error(f"OUCH! {e}")
+                # Firstly, attempt to connect the channel to any effects attached to the channel
+                channelHasEffects = False
+                if len(channel.chainedSounds) > 0:
+                    for chainedSound in channel.chainedSounds:
+                        if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
+                            layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[chainedSound]
+                            effectsLayers = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_layers(layer)
+                            if effectsLayers != None and len(effectsLayers) > 0:
+                                # As there are effects, connect the channel's outputs to their inputs
+                                for sl in effectsLayers:
+                                    if sl.engine.type == "Audio Effect":
+                                        try:
+                                            engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
+                                            if len(engineInPorts) == 1:
+                                                engineInPorts.append(engineInPorts[0]);
+                                            for port in zip(channelPorts, engineInPorts):
+                                                channelHasEffects = True
+                                                try:
+                                                    jclient.connect(port[0], port[1])
+                                                except: pass
+                                        except Exception as e:
+                                            logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+                                            # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+                                            # Logic below the return statement will be eventually evaluated when called again after the timeout
+                                            force_next_autoconnect = True;
+                                            release_lock()
+                                            return
+                                pass
+                # If the channel wants to route through global FX, connect its outputs to the global effects
+                if not channelHasEffects:
+                    try:
+                        if channel.routeThroughGlobalFX:
+                            for port in zip(channelPorts, playback_ports):
+                                try:
+                                    jclient.disconnect(port[0], port[1])
+                                except: pass
+                            for port in zip(channelPorts, jclient.get_ports(name_pattern=f"FXPassthrough-Channel{channel.id + 1}", is_audio=True, is_input=True)):
+                                try:
+                                    jclient.connect(port[0], port[1])
+                                except: pass
+                        else:
+                            for port in zip(channelPorts, playback_ports):
+                                try:
+                                    jclient.connect(port[0], port[1])
+                                except: pass
+                    except Exception as e:
+                        logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+                        # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+                        # Logic below the return statement will be eventually evaluated when called again after the timeout
+                        force_next_autoconnect = True;
+                        release_lock()
+                        return
     ###
 
     #Get layers list from UI

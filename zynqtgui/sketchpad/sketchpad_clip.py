@@ -1095,10 +1095,10 @@ class sketchpad_clip(QObject):
             else:
                 self.__song__.scenesModel.removeClipFromCurrentScene(self)
 
-            self.enabled_changed.emit()
-    @Signal
-    def enabled_changed(self):
-        pass
+            self.enabled_changed.emit(self.col, self.part)
+
+    enabled_changed = Signal(int, int, arguments=["trackIndex", "partIndex"])
+
     enabled = Property(bool, get_enabled, set_enabled, notify=enabled_changed)
     ### END Property enabled
 

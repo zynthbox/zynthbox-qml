@@ -131,8 +131,14 @@ class sketchpad_channel(QObject):
         # Re-read sound snapshot json when a new snapshot is loaded
         self.zynqtgui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
 
-    # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
+    @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, partNum):
+        """
+        Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
+        """
+
+        logging.debug(f"@@@@@@@@@ {trackIndex}, {partNum}")
+
         clip = self.getClipsModelByPart(partNum).getClip(trackIndex)
 
         # if clip is not None and clip.enabled is not None:
@@ -916,7 +922,9 @@ class sketchpad_channel(QObject):
 
             for track in range(0, 10):
                 for part in range(0, 5):
-                    self.onClipEnabledChanged(track, part)
+                    clip = self.__song__.getClipByPart(self.id, track, part)
+                    if clip is not None:
+                        clip.enabled_changed.emit(clip.col, clip.part)
             if force_set == False:
                 self.__song__.schedule_save()
             self.update_jack_port()
@@ -957,7 +965,9 @@ class sketchpad_channel(QObject):
             self.keyZoneModeChanged.emit()
             for track in range(0, 10):
                 for part in range(0, 5):
-                    self.onClipEnabledChanged(track, part)
+                    clip = self.__song__.getClipByPart(self.id, track, part)
+                    if clip is not None:
+                        clip.enabled_changed.emit(clip.col, clip.part)
             self.__song__.schedule_save()
 
     keyZoneModeChanged = Signal()

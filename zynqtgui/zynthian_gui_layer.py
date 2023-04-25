@@ -621,6 +621,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     self.layer_created.emit(midich)
 
             self.zynqtgui.zynautoconnect()
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
             if select:
                 self.fill_list()
@@ -664,6 +665,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
             # Stop unused engines
             if stop_unused_engines:
                 self.zynqtgui.screens['engine'].stop_unused_engines()
+
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
 
     @Slot(int)
@@ -755,6 +758,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     #self.zynqtgui.set_curlayer(None)
 
             self.set_selector()
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
 
     def remove_all_layers(self, stop_engines=True):
@@ -1431,6 +1435,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
     #----------------------------------------------------------------------------
 
     def save_snapshot(self, fpath):
+        if self.zynqtgui.isShuttingDown:
+            logging.info("Not saving snapshot when shutting down")
+            return
+
         try:
             snapshot={
                 'index':self.index,

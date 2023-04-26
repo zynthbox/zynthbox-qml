@@ -49,12 +49,12 @@ AbstractController {
             margins: Kirigami.Units.largeSpacing
         }
         width: height
+        inputMode: QQC2.Dial.Vertical
         stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 1 : root.controller.ctrl.step_size) : 0
         value: root.controller.ctrl ? root.controller.ctrl.value : 0
         from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
         to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
         onMoved: root.controller.ctrl.value = value
-
 
         // HACK for default style
         Binding {
@@ -79,28 +79,6 @@ AbstractController {
                     return Math.round(100 * (value / 127));
                 }
                 return root.controller.ctrl.value_print;
-            }
-        }
-
-        //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
-        MouseArea {
-            id: dialMouse
-            anchors.fill: parent
-            preventStealing: true
-            property real startY
-            property real startValue
-            onPressed: {
-                startY = mouse.y;
-                startValue = dial.value
-                dial.forceActiveFocus()
-            }
-            onPositionChanged: {
-                let delta = mouse.y - startY;
-                let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
-                if (root.valueType === "int" || root.valueType === "bool") {
-                    value = Math.round(value);
-                }
-                root.controller.ctrl.value = value;
             }
         }
     }

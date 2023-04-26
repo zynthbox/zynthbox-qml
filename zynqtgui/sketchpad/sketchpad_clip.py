@@ -826,12 +826,13 @@ class sketchpad_clip(QObject):
                 self.metadata_audio_type_changed.emit()
                 self.metadata_midi_recording_changed.emit()
             except Exception as e:
-                logging.error(f"Cannot read metadata : {str(e)}")
+                # logging.error(f"Cannot read metadata : {str(e)}")
+                pass
 
     def __get_metadata_prop__(self, name, default):
         try:
             value = self.audio_metadata[name][0]
-            logging.debug(f"Restoring from metadata : {name}({value})")
+            # logging.debug(f"Restoring from metadata : {name}({value})")
             return value
         except:
             return default
@@ -865,7 +866,7 @@ class sketchpad_clip(QObject):
                 except Exception as e:
                     logging.error(f"Error creating new file and writing metadata : {str(e)}")
 
-            logging.debug(f"Writing metadata to {self.path} : {key} -> {value}")
+            # logging.debug(f"Writing metadata to {self.path} : {key} -> {value}")
 
         self.__read_metadata__()
 
@@ -879,7 +880,8 @@ class sketchpad_clip(QObject):
                 for layer in jsondata["layers"]:
                     data.append(f"{layer['engine_name']} > {layer['preset_name']}")
             except Exception as e:
-                logging.debug(f"Error retrieving from metadata : {str(e)}")
+                # logging.debug(f"Error retrieving from metadata : {str(e)}")
+                pass
 
         return data
 
@@ -958,17 +960,18 @@ class sketchpad_clip(QObject):
             self.saveMetadataTimer.start()
 
     def doSaveMetadata(self):
-        self.write_metadata("ZYNTHBOX_STARTPOSITION", [str(self.__start_position__)])
-        self.write_metadata("ZYNTHBOX_LENGTH", [str(self.__length__)])
-        self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
-        self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
-        self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
-        self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
-        self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
-        self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.adsrAttack())])
-        self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.adsrDecay())])
-        self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.adsrSustain())])
-        self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.adsrRelease())])
+        if self.audioSource is not None:
+            self.write_metadata("ZYNTHBOX_STARTPOSITION", [str(self.__start_position__)])
+            self.write_metadata("ZYNTHBOX_LENGTH", [str(self.__length__)])
+            self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
+            self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
+            self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
+            self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
+            self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
+            self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.adsrAttack())])
+            self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.adsrDecay())])
+            self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.adsrSustain())])
+            self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.adsrRelease())])
 
     @Slot(QObject)
     def copyFrom(self, clip):

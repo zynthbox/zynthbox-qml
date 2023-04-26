@@ -294,6 +294,7 @@ class zynthian_gui_control(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
         self.__all_controls = []
+        self.all_controls_changed.emit()
 
         if not self.zynqtgui.curlayer:
             logging.info("Can't fill control screen list for None layer!")
@@ -341,7 +342,11 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.all_controls_changed.emit()
         self.set_selectedColumn(0, True)
 
+        logging.debug("+++ Connecting control page to selected channel changed")
+        self.zynqtgui.session_dashboard.selected_channel_changed.connect(self.set_selector)
 
+
+    @Slot()
     def set_selector(self, zs_hiden=True):
         self.__set_selector_timer.start()
 

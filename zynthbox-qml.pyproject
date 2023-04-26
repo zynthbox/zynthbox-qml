@@ -1,4 +1,7 @@
 {
+    "qmlImportPaths": [
+        "./qml-ui"
+    ],
     "files": [
         "./zynautoconnect/zynthian_autoconnect.py",
         "./zynautoconnect/__init__.py",
@@ -239,6 +242,7 @@
         "./qml-ui/VirtualKeyboard.qml",
         "./qml-ui/ExternalRecordingDestinationClip.qml",
         "./qml-ui/ExternalRecordingDestinationFile.qml",
+        "./qml-ui/Zynthian/CommonUtils.js",
         "./qml-ui/Zynthian/TabbedControlViewAction.qml",
         "./qml-ui/Zynthian/OnScreenDisplay.qml",
         "./qml-ui/Zynthian/Popup.qml",

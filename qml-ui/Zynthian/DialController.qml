@@ -56,6 +56,10 @@ AbstractController {
         to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
         onMoved: root.controller.ctrl.value = value
 
+        onVisibleChanged: {
+            // Force bind value on visible change otherwise dial value doesn't seem to update
+            value = Qt.binding(function() { return root.controller.ctrl ? root.controller.ctrl.value : 0 })
+        }
         // HACK for default style
         Binding {
             target: dial.background

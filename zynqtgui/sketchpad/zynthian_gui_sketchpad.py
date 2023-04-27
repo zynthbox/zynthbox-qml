@@ -114,6 +114,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         self.__volume_control_obj = None
 
+        # Load engine config
+        try:
+            with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
+                self.__engine_config = json.load(f)
+        except Exception as e:
+            logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
+            self.__engine_config = {}
+
         Path('/zynthian/zynthian-my-data/samples/my-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/samples/community-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
@@ -815,8 +823,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__filter_cutoff_controller.clear_controls()
             midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
             if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
-                synth_controllers_dict = self.zynqtgui.layer.layer_midi_map[midi_channel].controllers_dict
-                if "cutoff" in synth_controllers_dict:
+                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+                synth_controllers_dict = layer.controllers_dict
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
+                    self.__filter_cutoff_controller.add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                elif "cutoff" in synth_controllers_dict:
                     self.__filter_cutoff_controller.add_control(synth_controllers_dict["cutoff"])
                 elif "filter_cutoff" in synth_controllers_dict:
                     self.__filter_cutoff_controller.add_control(synth_controllers_dict["filter_cutoff"])
@@ -906,8 +920,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__filter_resonance_controller.clear_controls()
             midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
             if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
-                synth_controllers_dict = self.zynqtgui.layer.layer_midi_map[midi_channel].controllers_dict
-                if "resonance" in synth_controllers_dict:
+                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+                synth_controllers_dict = layer.controllers_dict
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
+                    self.__filter_resonance_controller.add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                elif "resonance" in synth_controllers_dict:
                     self.__filter_resonance_controller.add_control(synth_controllers_dict["resonance"])
                 elif "filter_resonance" in synth_controllers_dict:
                     self.__filter_resonance_controller.add_control(synth_controllers_dict["filter_resonance"])

@@ -51,15 +51,10 @@ AbstractController {
         width: height
         inputMode: QQC2.Dial.Vertical
         stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 1 : root.controller.ctrl.step_size) : 0
-        value: root.controller.ctrl ? root.controller.ctrl.value : 0
         from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
         to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
         onMoved: root.controller.ctrl.value = value
 
-        onVisibleChanged: {
-            // Force bind value on visible change otherwise dial value doesn't seem to update
-            value = Qt.binding(function() { return root.controller.ctrl ? root.controller.ctrl.value : 0 })
-        }
         // HACK for default style
         Binding {
             target: dial.background
@@ -85,5 +80,11 @@ AbstractController {
                 return root.controller.ctrl.value_print;
             }
         }
+    }    
+
+    Binding {
+        target: dial
+        property: "value"
+        value: root.controller.ctrl ? root.controller.ctrl.value : 0
     }
 }

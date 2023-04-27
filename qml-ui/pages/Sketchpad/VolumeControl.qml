@@ -101,17 +101,17 @@ Rectangle {
                         radius: 2
                         anchors.bottom: parent.bottom
                     }
+
                     Rectangle {
-                        width: valueBox.width / 2
+                        width: parent.width + 6
                         height: width
-                        radius: width / 2
+                        radius: width
 
                         anchors.top: valueBox.top
                         anchors.topMargin: -height/2
                         anchors.horizontalCenter: valueBox.horizontalCenter
                         color: "white"
                     }
-
                     Extras.Gauge {
                         id: audioGauge
                         z: -1

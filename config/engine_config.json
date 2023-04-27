@@ -1,6 +1,8 @@
 {
     "JV/synthv1": {
         "volumeControl": ["OUT1_VOLUME", "OUT2_VOLUME"],
+        "cutoffControl": "DCF1_CUTOFF",
+        "resonanceControl": "DCF1_RESO",
         "description": "Synth V1 small description"
     },
     "JV/amsynth": {

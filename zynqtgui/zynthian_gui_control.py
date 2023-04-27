@@ -342,10 +342,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.all_controls_changed.emit()
         self.set_selectedColumn(0, True)
 
-        logging.debug("+++ Connecting control page to selected channel changed")
-        self.zynqtgui.session_dashboard.selected_channel_changed.connect(self.set_selector)
-
-
     @Slot()
     def set_selector(self, zs_hiden=True):
         self.__set_selector_timer.start()

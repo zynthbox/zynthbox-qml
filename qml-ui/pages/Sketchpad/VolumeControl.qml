@@ -64,7 +64,7 @@ Rectangle {
                     y: slider.topPadding + slider.availableHeight / 2 - height / 2
                     implicitWidth: 8
                     implicitHeight: parent.height
-                    width: implicitWidth
+                    width: 8
                     height: slider.availableHeight
                     radius: 2
                     color: "transparent"

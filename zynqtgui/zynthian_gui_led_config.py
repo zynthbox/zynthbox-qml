@@ -40,6 +40,7 @@ led_color_green = rpi_ws281x.Color(0, 255, 0)
 led_color_red = rpi_ws281x.Color(247, 124, 124)
 led_color_yellow = rpi_ws281x.Color(255, 235, 59)
 led_color_purple = rpi_ws281x.Color(142, 36, 170)
+led_color_lightblue= rpi_ws281x.Color(50, 100, 255)
 
 led_color_inactive = led_color_blue
 led_color_active = led_color_green
@@ -201,21 +202,24 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.button_right = 23
         self.button_global = 24
 
-        Zynthbox.PlayGridManager.instance().metronomeBeat32ndChanged.connect(self.metronomeBeatUpdate32ndHandler)
+        Zynthbox.PlayGridManager.instance().metronomeBeat128thChanged.connect(self.metronomeBeatUpdate128thHandler)
 
     @Slot()
-    def metronomeBeatUpdate32ndHandler(self):
-        beat = Zynthbox.PlayGridManager.instance().metronomeBeat32nd()
-        if beat == 0:
-            self.blinkOff()
-        elif beat == 2:
+    def metronomeBeatUpdate128thHandler(self):
+        if self.zynqtgui.sketchpad.isMetronomeRunning:
+            beat = Zynthbox.PlayGridManager.instance().metronomeBeat32nd()
+            if beat % 32 == 0:
+                self.blinkOff()
+            elif (beat - 2) % 32 == 0:
+                self.blinkOn()
+        else:
             self.blinkOn()
 
     @Slot()
     def blinkOff(self):
         for button_id, config in self.button_config.items():
             if config["blink"] is True:
-                wsleds.setPixelColor(button_id, led_color_off)
+                wsleds.setPixelColor(button_id, config['blinkColor'])
 
         wsleds.show()
 
@@ -255,7 +259,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
         self.button_config[buttonId] = {
             'color': buttonColor,
-            'blink': blink
+            'blink': blink,
+            'blinkColor': led_color_lightblue if buttonId == self.button_metronome else led_color_off
         }
 
         wsleds.setPixelColor(buttonId, buttonColor)

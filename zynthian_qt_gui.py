@@ -471,6 +471,7 @@ class zynthian_gui(QObject):
         self.__global_popup_opened__ = False
         self.__passive_notification = ""
         self.__splash_stopped = False
+        self.__start_playback_on_metronome_release = False
 
         # When true, 1-5 buttons selects channel 6-10
         self.channels_mod_active = False
@@ -2406,11 +2407,14 @@ class zynthian_gui(QObject):
         elif cuia == "ZL_PLAY":
             zl = self.screens["sketchpad"]
 
-            # Toggle play/stop with play CUIA action
-            if not zl.isMetronomeRunning:
-                self.run_start_metronome_and_playback.emit()
+            if self.metronomeButtonPressed:
+                self.__start_playback_on_metronome_release = True
             else:
-                self.run_stop_metronome_and_playback.emit()
+                # Toggle play/stop with play CUIA action
+                if not zl.isMetronomeRunning:
+                    self.run_start_metronome_and_playback.emit()
+                else:
+                    self.run_stop_metronome_and_playback.emit()
         elif cuia == "ZL_STOP":
             self.run_stop_metronome_and_playback.emit()
 
@@ -2615,17 +2619,21 @@ class zynthian_gui(QObject):
                 elif i == 19:
                     self.playButtonPressed = False
                 elif i == 20:
-                    # Toggle metronome only if metronome+BK is not used to change bpm or volume or delay or reverb
-                    bpmAfterPressingMetronome = self.sketchpad.song.bpm
-                    volumeAfterPressingMetronome = self.masterVolume
-                    delayAfterPressingMetronome = self.global_fx_engines[0][1].value
-                    reverbAfterPressingMetronome = self.global_fx_engines[1][1].value
-                    if bpmAfterPressingMetronome == self.bpmBeforePressingMetronome and \
-                            volumeAfterPressingMetronome == self.volumeBeforePressingMetronome and \
-                            delayAfterPressingMetronome == self.delayBeforePressingMetronome and \
-                            reverbAfterPressingMetronome == self.reverbBeforePressingMetronome:
-                        # BPM/Volume/Delay/Reverb did not change. Toggle metronome state
-                        self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
+                    if self.__start_playback_on_metronome_release:
+                        self.__start_playback_on_metronome_release = False
+                        Zynthbox.SyncTimer.instance().startWithCountin()
+                    else:
+                        # Toggle metronome only if metronome+BK is not used to change bpm or volume or delay or reverb
+                        bpmAfterPressingMetronome = self.sketchpad.song.bpm
+                        volumeAfterPressingMetronome = self.masterVolume
+                        delayAfterPressingMetronome = self.global_fx_engines[0][1].value
+                        reverbAfterPressingMetronome = self.global_fx_engines[1][1].value
+                        if bpmAfterPressingMetronome == self.bpmBeforePressingMetronome and \
+                                volumeAfterPressingMetronome == self.volumeBeforePressingMetronome and \
+                                delayAfterPressingMetronome == self.delayBeforePressingMetronome and \
+                                reverbAfterPressingMetronome == self.reverbBeforePressingMetronome:
+                            # BPM/Volume/Delay/Reverb did not change. Toggle metronome state
+                            self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
                     self.metronomeButtonPressed = False
                 elif i == 21:
                     self.stopButtonPressed = False

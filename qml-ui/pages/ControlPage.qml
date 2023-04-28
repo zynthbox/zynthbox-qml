@@ -127,9 +127,15 @@ Zynthian.ScreenPage {
             return;
         }
         if (zynqtgui.control.custom_control_page.length > 0) {
+            if (stack.currentItem != null) {
+                stack.currentItem.visible = false
+            }
             stack.replace(zynqtgui.control.custom_control_page);
             root.currentControlPage = zynqtgui.control.custom_control_page;
         } else {
+            if (stack.currentItem != null) {
+                stack.currentItem.visible = false
+            }
             stack.replace(defaultPage);
             root.currentControlPage = "defaultPage";
         }
@@ -138,10 +144,16 @@ Zynthian.ScreenPage {
     onVisibleChanged: {
         if (zynqtgui.control.custom_control_page.length > 0) {
             if (root.currentControlPage !== zynqtgui.control.custom_control_page) {
+                if (stack.currentItem != null) {
+                    stack.currentItem.visible = false
+                }
                 stack.replace(zynqtgui.control.custom_control_page);
                 root.currentControlPage = zynqtgui.control.custom_control_page;
             }
         } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
+            if (stack.currentItem != null) {
+                stack.currentItem.visible = false
+            }
             stack.replace(defaultPage);
             root.currentControlPage = "defaultPage";
         }
@@ -155,10 +167,16 @@ Zynthian.ScreenPage {
             }
             if (zynqtgui.control.custom_control_page.length > 0) {
                 if (root.currentControlPage !== zynqtgui.control.custom_control_page) {
+                    if (stack.currentItem != null) {
+                        stack.currentItem.visible = false
+                    }
                     stack.replace(zynqtgui.control.custom_control_page);
                     root.currentControlPage = zynqtgui.control.custom_control_page;
                 }
             } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
+                if (stack.currentItem != null) {
+                    stack.currentItem.visible = false
+                }
                 stack.replace(defaultPage);
                 root.currentControlPage = "defaultPage";
             }

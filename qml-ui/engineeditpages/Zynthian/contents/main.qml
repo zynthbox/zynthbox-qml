@@ -179,6 +179,13 @@ RowLayout {
         onCurrentScreenIdRequested: root.controlPageComponent.currentScreenIdRequested(root.controlPageComponent.screenId)
         onItemActivated: root.controlPageComponent.itemActivated(root.controlPageComponent.screenId, index)
         highlighted: root.topLevelFocusItem(Window.activeFocusItem) === mainView
+        onCurrentIndexChanged: {
+            if (visible) {
+                Qt.callLater(function() {
+                    zynqtgui.control.activate_index(currentIndex)
+                })
+            }
+        }
     }
     ColumnLayout {
         Layout.maximumWidth: Math.floor(root.controlPageComponent.width / 4)

@@ -186,7 +186,7 @@ Zynthian.ScreenPage {
     Component {
         id: defaultPage
 
-        NewDefaultEditPage {
+        DefaultEditPage {
             id: defaultPageRoot
             objectName: "defaultPage"
         }

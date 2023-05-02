@@ -1702,8 +1702,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.metronome_running_refcount = 0
             self.metronome_schedule_stop = True
 
-    def metronome_update(self):
-        self.__current_beat__ = Zynthbox.PlayGridManager.instance().metronomeBeat4th()
+    def metronome_update(self, beat):
+        self.__current_beat__ = beat
 
         # Immediately stop clips when scheduled to stop
         if self.metronome_schedule_stop:

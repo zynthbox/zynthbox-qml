@@ -205,9 +205,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         Zynthbox.PlayGridManager.instance().metronomeBeat128thChanged.connect(self.metronomeBeatUpdate128thHandler)
 
     @Slot()
-    def metronomeBeatUpdate128thHandler(self):
+    def metronomeBeatUpdate128thHandler(self, beat):
         if self.zynqtgui.sketchpad.isMetronomeRunning:
-            beat = Zynthbox.PlayGridManager.instance().metronomeBeat32nd()
             if beat % 32 == 0:
                 self.blinkOff()
             elif (beat - 2) % 32 == 0:
@@ -260,7 +259,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.button_config[buttonId] = {
             'color': buttonColor,
             'blink': blink,
-            'blinkColor': led_color_lightblue if buttonId == self.button_metronome else led_color_off
+            'blinkColor': led_color_off
         }
 
         wsleds.setPixelColor(buttonId, buttonColor)

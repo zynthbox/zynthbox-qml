@@ -209,7 +209,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         if self.zynqtgui.sketchpad.isMetronomeRunning:
             if beat % 32 == 0:
                 self.blinkOff()
-            elif (beat - 2) % 32 == 0:
+            elif (beat - 8) % 32 == 0:
                 self.blinkOn()
         else:
             self.blinkOn()

@@ -82,13 +82,32 @@ Kirigami.AbstractApplicationWindow {
     signal soundsDialogAccepted()
     signal soundsDialogRejected()
     signal showMessageDialog(string message, int hideDelay)
+    signal requestSamplePicker();
 
     function showConfirmationDialog() { confirmDialog.open() }
     function hideConfirmationDialog() { confirmDialog.close() }
     function openSoundsDialog() { soundsDialog.open() }
     function openRecordingPopup() { recordingPopup.open() }
-
-    signal requestSamplePicker();
+    /**
+     * Shows a little passive notification at the bottom of the app window
+     * lasting for few seconds, with an optional action button.
+     *
+     * @param message The text message to be shown to the user.
+     * @param timeout How long to show the message:
+     *            possible values: "short", "long" or the number of milliseconds
+     * @param actionText Text in the action button, if any.
+     * @param callBack A JavaScript function that will be executed when the
+     *            user clicks the button.
+     */
+    function showPassiveNotification(message, timeout, actionText, callBack) {
+        passiveNotificationComponent.showNotification(message, timeout, actionText, callBack);
+    }
+    /**
+     * Hide the passive notification, if any is shown
+     */
+    function hidePassiveNotification() {
+        passiveNotificationComponent.hideNotification();
+    }
 
     visible: false
     flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
@@ -583,6 +602,12 @@ Kirigami.AbstractApplicationWindow {
             onActivated: zynqtgui.process_keybinding_shortcut(model.display)
             onActivatedAmbiguously: zynqtgui.process_keybinding_shortcut(model.display)
         }
+    }
+
+    // FIXME : This is a workaround for current kirigami version.
+    //         Do remove this when kirigami version gets updated
+    PassiveNotification {
+        id: passiveNotificationComponent
     }
 
     Zynthian.DialogQuestion {

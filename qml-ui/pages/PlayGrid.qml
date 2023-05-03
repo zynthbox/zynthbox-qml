@@ -627,7 +627,7 @@ don't want to have to dig too far...
      */
 
     Connections {
-        target: Zynthbox.PlayGridManager.syncTimer
+        target: Zynthbox.SyncTimer
         onAddedHardwareInputDevice: {
             applicationWindow().showPassiveNotification("New Midi Input Detected: " + humanReadableName);
         }

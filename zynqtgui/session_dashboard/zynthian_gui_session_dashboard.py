@@ -81,6 +81,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
 
+        self.__update_channel_sounds_timer = None
+
         self.zynqtgui.screens["layer"].layer_created.connect(self.layer_created)
         self.zynqtgui.screens["layer_effects"].fx_layers_changed.connect(self.fx_layers_changed)
 
@@ -112,15 +114,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def set_selected_channel_complete(self):
         self.zynqtgui.fixed_layers.fill_list()
 
-        # Do make a call to switch sound (and eventually update bank and preset screens) when any page other than
-        # sketchpad is open. Otherwise sound change is already reactive to selectedChannel and calling
-        # change_o_channel_sound causes UI stutters as showing bank and preset screen is a bit time consuming.
-        if self.zynqtgui.get_current_screen_id() is not None and \
-                self.zynqtgui.get_current_screen_id() != "sketchpad":
-            self.curlayer_updated_on_channel_change = True
-            QMetaObject.invokeMethod(self, "change_to_channel_sound", Qt.QueuedConnection)
-        else:
-            self.curlayer_updated_on_channel_change = False
+        if self.__update_channel_sounds_timer is None:
+            self.__update_channel_sounds_timer = QTimer(self)
+            self.__update_channel_sounds_timer.setInterval(500)
+            self.__update_channel_sounds_timer.setSingleShot(True)
+            self.__update_channel_sounds_timer.timeout.connect(self.zynqtgui.screens["layers_for_channel"].update_channel_sounds, Qt.QueuedConnection)
+
+        self.__update_channel_sounds_timer.start()
 
         self.zynqtgui.sketchpad.set_selector()
         self.selected_channel_change_in_progress = False
@@ -325,10 +325,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     @Slot(str, result=bool)
     def exists(self, filename):
         return (Path(self.__sessions_base_dir__) / (filename + ".json")).exists()
-
-    @Slot()
-    def change_to_channel_sound(self):
-        self.zynqtgui.screens["layers_for_channel"].update_channel_sounds()
 
     def get_last_selected_sketchpad(self):
         return self.__last_selected_sketchpad__

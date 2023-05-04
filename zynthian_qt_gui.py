@@ -4645,7 +4645,11 @@ class zynthian_gui(QObject):
         if self.__master_volume != value:
             self.__master_volume = value
             # JackPassthroughClient expects dryAmount to be ranging from 0-1
-            Zynthbox.Plugin.instance().setDryAmount(-1, np.interp(value, (0, 100), (0, 1)))
+            # FIXME : Using globalPlaybackClient() getter like everywhere else is throwing an error : Internal C++ object is already deleted
+            #         Initially thought this to be an parenting issue as QThread is not supposed to be a parent of QObject. Looked like
+            #         setting parent of globalPlaybackClient to QCoreApplication::instance() would fix this but still throws the same error
+            #         For now using the property() method from shiboken does solve the issue but the actual problem needs to be investigated
+            Zynthbox.MidiRouter.instance().property("globalPlaybackClient").setDryAmount(np.interp(value, (0, 100), (0, 1)))
             self.masterVolumeChanged.emit()
 
     masterVolumeChanged = Signal()

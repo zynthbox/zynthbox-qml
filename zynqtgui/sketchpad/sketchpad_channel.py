@@ -501,7 +501,7 @@ class sketchpad_channel(QObject):
             self.__pan__ = pan
 
             self.panChanged.emit()
-            Zynthbox.Plugin.instance().setPanAmount(self.id, self.__pan__)
+            Zynthbox.MidiRouter.instance().channelPassthroughClients()[self.id].setPanAmount(self.__pan__)
             self.zynqtgui.sketchpad.set_selector()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -888,7 +888,7 @@ class sketchpad_channel(QObject):
     def set_muted(self, muted):
         if self.__muted__ != muted:
             self.__muted__ = muted
-            Zynthbox.Plugin.instance().setMuted(self.id, muted)
+            Zynthbox.MidiRouter.instance().channelPassthroughClients()[self.id].setMuted(muted)
             self.mutedChanged.emit()
 
     mutedChanged = Signal()
@@ -1251,7 +1251,7 @@ class sketchpad_channel(QObject):
             self.__dry_amount = value
             volume = np.interp(self.__volume__, (-40, 20), (0, 1))
             # Calculate dry amount as per volume
-            Zynthbox.Plugin.instance().setDryAmount(self.id, np.interp(self.__dry_amount * volume, (0, 100), (0, 1)))
+            Zynthbox.MidiRouter.instance().channelPassthroughClients()[self.id].setDryAmount(np.interp(self.__dry_amount * volume, (0, 100), (0, 1)))
             self.dryAmountChanged.emit()
 
     dryAmountChanged = Signal()
@@ -1268,7 +1268,7 @@ class sketchpad_channel(QObject):
             self.__wet_fx_1_amount = value
             volume = np.interp(self.__volume__, (-40, 20), (0, 1))
             # Calculate wet amount as per volume
-            Zynthbox.Plugin.instance().setWetFx1Amount(self.id, np.interp(self.__wet_fx_1_amount * volume, (0, 100), (0, 1)))
+            Zynthbox.MidiRouter.instance().channelPassthroughClients()[self.id].setWetFx1Amount(np.interp(self.__wet_fx_1_amount * volume, (0, 100), (0, 1)))
             self.wetFx1AmountChanged.emit()
 
     wetFx1AmountChanged = Signal()
@@ -1285,7 +1285,7 @@ class sketchpad_channel(QObject):
             self.__wet_fx_2_amount = value
             volume = np.interp(self.__volume__, (-40, 20), (0, 1))
             # Calculate wet amount as per volume
-            Zynthbox.Plugin.instance().setWetFx2Amount(self.id, np.interp(self.__wet_fx_2_amount * volume, (0, 100), (0, 1)))
+            Zynthbox.MidiRouter.instance().channelPassthroughClients()[self.id].setWetFx2Amount(np.interp(self.__wet_fx_2_amount * volume, (0, 100), (0, 1)))
             self.wetFx2AmountChanged.emit()
 
     wetFx2AmountChanged = Signal()

@@ -55,15 +55,15 @@ Zynthian.MultiSelectorPage {
         },
         Kirigami.Action {
             visible: false
-        },
-        Kirigami.Action {
-            text: qsTr("Edit")
-            enabled: zynqtgui.layer_effects.current_effect_engine.length > 0
-            onTriggered: {
-                zynqtgui.control.single_effect_engine = zynqtgui.layer_effects.current_effect_engine;
-                zynqtgui.current_screen_id = "control";
-            }
         }
+//        Kirigami.Action {
+//            text: qsTr("Edit")
+//            enabled: zynqtgui.layer_effects.current_effect_engine.length > 0
+//            onTriggered: {
+//                zynqtgui.control.single_effect_engine = zynqtgui.layer_effects.current_effect_engine;
+//                zynqtgui.current_screen_id = "control";
+//            }
+//        }
     ]
     onVisibleChanged: {
         if (visible) {

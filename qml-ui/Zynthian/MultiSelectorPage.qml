@@ -64,16 +64,18 @@ ScreenPage {
 
     contentItem: RowLayout {
         id: layout
+
+        // FIXME : Find a way to correctly expand the columns equally with fillWidth property instead of using manually calculated width value
+        property real columnWidth: width / root.screenIds.length - spacing / (root.screenIds.length - 1)
+
         spacing: Kirigami.Units.gridUnit
         Repeater {
             model: root.screenIds
             delegate: ColumnLayout {
                 property alias view: view
-                Layout.fillWidth: true
+                Layout.fillWidth: false
                 Layout.fillHeight: true
-                // NOTE: this is to make fillWidth always partition the space in equal sizes
-                implicitWidth: 1
-                Layout.preferredWidth: 1
+                Layout.preferredWidth: layout.columnWidth
                 Kirigami.Heading {
                     level: 2
                     text: root.screenTitles.length > index ? root.screenTitles[index] : view.selector.caption
@@ -89,6 +91,9 @@ ScreenPage {
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                    Component.onCompleted: {
+                        view.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                    }
                 }
             }
         }

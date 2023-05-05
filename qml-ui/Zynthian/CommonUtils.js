@@ -106,20 +106,16 @@ function switchToScene(index) {
 // Method to instantiate a component from URL
 // Returns the created object
 function instantiateComponent(url, params) {
-    console.log("Instantiating component :", url)
-
     var start = Date.now()
     var component = Qt.createComponent(url);
     var obj = component.createObject(applicationWindow(), params)
     var end = Date.now()
-
-    console.log("Time to load " + url + " : " + (end - start) + "ms")
-
-    if (component.errorString() != "") {
-        console.log("Error instantiating component", url, ":", component.errorString());
-    } else {
-        console.log("Component object created :", url)
-    }
     
-    return obj
+    return {
+        ttl: end - start,
+        url: url,
+        params: params,
+        errorString: component.errorString(),
+        pageObject: obj
+    }
 }

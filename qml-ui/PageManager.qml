@@ -135,11 +135,18 @@ Zynthian.Stack {
 
         if (root.pageCache[page] != null) {
             console.log("Page cache found for page :", pageResolvedUrl(page))
-            return root.pageCache[page]
+            return root.pageCache[page].pageObject
         } else {
             console.log("Page cache not found for page :", pageResolvedUrl(page))
-            root.pageCache[page] = Zynthian.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
-            return root.pageCache[page]
+            console.log("Instantiating page", page, ":", pageResolvedUrl(page))
+            var cache = Zynthian.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
+
+            if (cache.errorString != "") {
+                console.log("Error instantiating page", cache.url, ":", cache.errorString);
+            } else {
+                root.pageCache[page] = cache
+            }
+            return root.pageCache[page].pageObject
         }
     }
 
@@ -150,6 +157,15 @@ Zynthian.Stack {
             zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)
             root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
         }
+
+        console.log("------------------------------------------------------------------------")
+        console.log("PAGE CACHE SUMMARY")
+        console.log("------------------------------------------------------------------------")
+        for (var page in root.pageCache) {
+            var cache = root.pageCache[page]
+            console.log(`  - ${page.padStart(20)} ${("("+cache.url+")").padEnd(72)} ${cache.errorString == "" ? "SUCCESS" : "ERRORED " + cache.errorString} : ${(""+cache.ttl).padStart(4)} ms`)
+        }
+        console.log("------------------------------------------------------------------------")
 
         // Caching complete. Call stop_splash
         zynqtgui.stop_splash();

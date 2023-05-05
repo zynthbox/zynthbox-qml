@@ -154,8 +154,9 @@ Zynthian.Stack {
         // Cache all the main pages when starting up
         for (var pageIndex in root.pagesToCache) {
             var pageName = root.pagesToCache[pageIndex]
-            zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)
-            root.pageCache[pageName] = Zynthian.CommonUtils.instantiateComponent(root.pageResolvedUrl(pageName), {"width": root.width, "height": root.height, visible: false})
+            zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)            
+            // Call getPage explicitly to cache the page
+            root.getPage(pageName)
         }
 
         console.log("------------------------------------------------------------------------")
@@ -163,7 +164,7 @@ Zynthian.Stack {
         console.log("------------------------------------------------------------------------")
         for (var page in root.pageCache) {
             var cache = root.pageCache[page]
-            console.log(`  - ${page.padStart(20)} ${("("+cache.url+")").padEnd(72)} ${cache.errorString == "" ? "SUCCESS" : "ERRORED " + cache.errorString} : ${(""+cache.ttl).padStart(4)} ms`)
+            console.log(`${page.padEnd(20)} ${("("+cache.url+")").padEnd(70)} ${cache.errorString == "" ? "SUCCESS" : "ERRORED " + cache.errorString} : ${(""+cache.ttl).padStart(4)} ms`)
         }
         console.log("------------------------------------------------------------------------")
 

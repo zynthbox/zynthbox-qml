@@ -75,6 +75,7 @@ Zynthian.Stack {
         "control": "Synth Edit",
         "layers_for_channel": "Library",
         "layer_effects": "FX Library",
+        "layer_midi_effects": "MidiFX Library",
         "playgrid": "Playgrid",
         "sound_categories": "Sound Categories",
         "engine": "Synths",
@@ -89,6 +90,7 @@ Zynthian.Stack {
         "control",
         "layers_for_channel",
         "layer_effects",
+        "layer_midi_effects",
         "playgrid",
         "sound_categories",
         "engine",
@@ -119,10 +121,16 @@ Zynthian.Stack {
     // Get page instance
     // This method checks if page exists in cache. If not found in cache then the object is cached
     function getPage(page) {
-        // Point all library pages to layers_for_channel cache
+        // Point all multi selector pages to respective cache
         if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(page) >= 0) {
             console.log("Page", page, "is a library page. Using layers_for_channel cache")
             page = "layers_for_channel"
+        } else if (["layer_effects", "effect_types", "layer_effect_chooser"].indexOf(page) >= 0) {
+            console.log("Page", page, "is an FX page. Using layers_effects cache")
+            page = "layers_effects"
+        } else if (["layer_midi_effects", "midi_effect_types", "layer_midi_effect_chooser"].indexOf(page) >= 0) {
+            console.log("Page", page, "is an Midi FX page. Using layer_midi_effects cache")
+            page = "layer_midi_effects"
         }
 
         if (root.pageCache[page] != null) {

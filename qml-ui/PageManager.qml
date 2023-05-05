@@ -127,7 +127,7 @@ Zynthian.Stack {
             page = "layers_for_channel"
         } else if (["layer_effects", "effect_types", "layer_effect_chooser"].indexOf(page) >= 0) {
             console.log("Page", page, "is an FX page. Using layers_effects cache")
-            page = "layers_effects"
+            page = "layer_effects"
         } else if (["layer_midi_effects", "midi_effect_types", "layer_midi_effect_chooser"].indexOf(page) >= 0) {
             console.log("Page", page, "is an Midi FX page. Using layer_midi_effects cache")
             page = "layer_midi_effects"

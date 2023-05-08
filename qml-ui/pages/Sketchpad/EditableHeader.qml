@@ -50,6 +50,7 @@ Item {
             wrapMode: Text.NoWrap
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
+            level: 3
         }
         QQC2.Button {
             Layout.fillWidth: false

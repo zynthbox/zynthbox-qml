@@ -251,57 +251,51 @@ Rectangle {
                 orientation: Qt.Vertical
                 visibleFocusRects: false
 
-                initialHeaderItem: RowLayout {
+                initialHeaderItem: EditableHeader {
+                    id: tabbedViewHeader
+                    implicitWidth: Kirigami.Units.gridUnit * 10
                     visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
-                    EditableHeader {
-                        id: tabbedViewHeader
-                        controlObj: zynqtgui.bottomBarControlObj
-                        controlType: zynqtgui.bottomBarControlType
-                        Binding {
-                            target: tabbedViewHeader
-                            property: "text"
-                            delayed: true
-                            value: {
-                                let text = zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.name : "";
-                                switch (zynqtgui.bottomBarControlType) {
-                                case "bottombar-controltype-song":
-                                    return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
-                                case "bottombar-controltype-clip":
-                                case "bottombar-controltype-pattern":
-                                    return qsTr("CLIP: %1").arg(text);
-                                case "bottombar-controltype-channel":
-                                    return qsTr("CHANNEL: %1").arg(text);
-                                case "bottombar-controltype-part":
-                                    return qsTr("PART: %1").arg(text);
-        //                        case "bottombar-controltype-pattern":
-        //                            return qsTr("PATTERN: %1").arg(zynqtgui.bottomBarControlObj.col+1);
-                                default:
-                                    return text;
-                                }
+                    controlObj: zynqtgui.bottomBarControlObj
+                    controlType: zynqtgui.bottomBarControlType
+                    Binding {
+                        target: tabbedViewHeader
+                        property: "text"
+                        delayed: true
+                        value: {
+                            let text = zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.name : "";
+                            switch (zynqtgui.bottomBarControlType) {
+                            case "bottombar-controltype-song":
+                                return qsTr("Folder: %1  SKETCHPAD: %2").arg(zynqtgui.bottomBarControlObj.sketchpadFolderName).arg(text);
+                            case "bottombar-controltype-clip":
+                            case "bottombar-controltype-pattern":
+                                return qsTr("CLIP: %1").arg(text);
+                            case "bottombar-controltype-channel":
+                                return qsTr("CHANNEL: %1").arg(text);
+                            case "bottombar-controltype-part":
+                                return qsTr("PART: %1").arg(text);
+    //                        case "bottombar-controltype-pattern":
+    //                            return qsTr("PATTERN: %1").arg(zynqtgui.bottomBarControlObj.col+1);
+                            default:
+                                return text;
                             }
                         }
                     }
-                    Item {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                    }
                 }
-                finalHeaderItem: RowLayout {
-                    visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
-                    Item {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                    }
-                    QQC2.Button {
-                        visible: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.connectedPattern < 0
-                        Layout.fillHeight: true
+//                finalHeaderItem: RowLayout {
+//                    Layout.fillWidth: true
+//                    visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
+//                    QQC2.Button {
+//                        visible: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.connectedPattern < 0
+//                        Layout.fillHeight: true
 
-                        text: qsTr("Midi")
-                        //enabled: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
+//                        text: qsTr("Midi")
+//                        //enabled: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
 
-                        onClicked: {
-                            zynqtgui.session_dashboard.midiSelectionRequested();
-                        }
-                    }
-                }
+//                        onClicked: {
+//                            zynqtgui.session_dashboard.midiSelectionRequested();
+//                        }
+//                    }
+//                }
 
                 initialAction: {
                     switch (zynqtgui.bottomBarControlType) {

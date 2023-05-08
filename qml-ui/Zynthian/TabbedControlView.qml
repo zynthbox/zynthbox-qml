@@ -311,7 +311,8 @@ Item {
                 anchors.fill: parent
                 QQC2.Control {
                     id: initialItem
-                    visible: contentItem
+                    visible: contentItem                    
+                    Layout.fillHeight: true
                     Layout.maximumWidth: contentItem && contentItem.visible ? contentItem.implicitWidth : 0
                 }
 

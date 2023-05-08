@@ -172,7 +172,7 @@ class zynthian_gui_controller(QObject):
             if self.zctrl.midi_cc==0:
                 val = self.val0+self.ctrl_value
                 self.zctrl.set_value(val)
-                self.ctrl_value_print = str(val)
+                self.ctrl_value_print = str(round(val, 2))
             else:
                 if self.logarithmic:
                     val = self.zctrl.value_min*pow(self.scale_value, self.ctrl_value/self.n_values)
@@ -180,8 +180,10 @@ class zynthian_gui_controller(QObject):
                     val = self.zctrl.value_min+self.ctrl_value*self.scale_value
 
                 self.zctrl.set_value(val)
-                if self.format_print and val<1000 and val>-1000:
-                    self.ctrl_value_print = self.format_print.format(val)
+                # if self.format_print and val<1000 and val>-1000:
+                #     self.ctrl_value_print = self.format_print.format(val)
+                if val<1000 and val>-1000:
+                    self.ctrl_value_print = str(round(val, 2))
                 else:
                     self.ctrl_value_print = str(int(val))
 

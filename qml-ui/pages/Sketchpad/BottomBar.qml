@@ -117,6 +117,9 @@ Rectangle {
                 visible: zynqtgui.bottomBarControlType !== "bottombar-controltype-channel"
 
                 EditableHeader {
+                    Layout.fillWidth: false
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                     controlObj: zynqtgui.bottomBarControlObj
                     controlType: zynqtgui.bottomBarControlType
                     text: {

@@ -414,7 +414,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             return
 
         pan = round(np.interp(self.__zselector[2].value, (0, 1000), (-1.0, 1.0)), 2)
-        self.update_channel_pan_actual(-1 * pan)
+        self.update_channel_pan_actual(pan)
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
@@ -812,7 +812,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             try:
                 if selected_channel is not None:
-                    pan_interped = np.interp(-1 * selected_channel.pan, (-1.0, 1.0), (0, 1000))
+                    pan_interped = np.interp(selected_channel.pan, (-1.0, 1.0), (0, 1000))
             except Exception as e:
                 logging.error(f"Error configuring knob 2 : {str(e)}")
 

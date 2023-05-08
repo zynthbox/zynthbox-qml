@@ -148,10 +148,11 @@ Rectangle {
                             id: tabButtons
                             Layout.fillWidth: true
                             Layout.fillHeight: false
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                             EditableHeader {
-                                Layout.minimumWidth: parent.width / 4
-                                Layout.maximumWidth: parent.width / 4
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                                 controlObj: root.selectedChannel
                                 controlType: "bottombar-controltype-channel"
 
@@ -159,27 +160,27 @@ Rectangle {
                             }
 
                             QQC2.Button {
-                                Layout.fillWidth: true
+                                Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                Layout.fillHeight: false
+                                Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "synth"
                                 text: qsTr("Synth")
                                 onClicked: root.selectedChannel.channelAudioType = "synth"
                             }
                             QQC2.Button {
-                                Layout.fillWidth: true
+                                Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                Layout.fillHeight: false
+                                Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType.startsWith("sample-")
                                 text: qsTr("Samples")
                                 onClicked: root.selectedChannel.channelAudioType = "sample-trig"
                             }
                             QQC2.Button {
-                                Layout.fillWidth: true
+                                Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                Layout.fillHeight: false
+                                Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "external"
                                 text: qsTr("External")

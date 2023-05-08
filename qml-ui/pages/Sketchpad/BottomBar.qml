@@ -146,21 +146,6 @@ Rectangle {
                     Layout.fillWidth: true
                 }
 
-                // Selecting custom slices not required. Keeping the dropdown commented if later required for something else
-    //            QQC2.Label {
-    //                visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") &&
-    //                         zynqtgui.bottomBarControlObj.clipChannel.channelAudioType === "sample-slice"
-    //                text: qsTr("Slices")
-    //            }
-
-    //            QQC2.ComboBox {
-    //                visible: (zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern") &&
-    //                         zynqtgui.bottomBarControlObj.clipChannel.channelAudioType === "sample-slice"
-    //                model: [4, 8, 12, 16]
-    //                currentIndex: find(zynqtgui.bottomBarControlObj.slices)
-    //                onActivated: zynqtgui.bottomBarControlObj.slices = model[index]
-    //            }
-
                 QQC2.Label {
                     visible: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
                     text: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.path
@@ -255,17 +240,6 @@ Rectangle {
                         zynqtgui.bottomBarControlObj.stop();
                     }
                 }
-
-    //            SidebarButton {
-    //                icon.name: "media-record-symbolic"
-    //                icon.color: "#f44336"
-    //                active: (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.recordable && !zynqtgui.bottomBarControlObj.path
-    //                enabled: !zynqtgui.sketchpad.isRecording
-
-    //                onClicked: {
-    //                    zynqtgui.bottomBarControlObj.queueRecording();
-    //                }
-    //            }
             }
 
 
@@ -316,12 +290,6 @@ Rectangle {
                     Item {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                     }
-    //                QQC2.Label {
-    //                    visible: zynqtgui.bottomBarControlObj.connectedPattern >= 0
-    //                    property QtObject sequence: zynqtgui.bottomBarControlObj.connectedPattern >= 0 ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
-    //                    property QtObject pattern: sequence ? sequence.getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart) : null
-    //                    text: qsTr("Pattern %1").arg(zynqtgui.bottomBarControlObj.connectedPattern+1)
-    //                }
                     QQC2.Button {
                         visible: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.connectedPattern < 0
                         Layout.fillHeight: true
@@ -333,57 +301,6 @@ Rectangle {
                             zynqtgui.session_dashboard.midiSelectionRequested();
                         }
                     }
-    //                SidebarButton {
-    //                    icon.name: "edit-clear-all"
-    //                    active: (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.clearable
-    //                    enabled: zynqtgui.bottomBarControlObj ? !zynqtgui.bottomBarControlObj.isPlaying : false
-
-    //                    onClicked: {
-    //                        zynqtgui.bottomBarControlObj.clear()
-
-    //                        var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(zynqtgui.bottomBarControlObj.id, zynqtgui.bottomBarControlObj.selectedPart);
-    //                        seq.enabled = false;
-    //                        zynqtgui.bottomBarControlObj.connectedPattern = -1;
-    //                    }
-    //                }
-
-//                    Binding {
-//                        target: channelAudioTypeDropdown
-//                        property: "currentIndex"
-//                        delayed: true
-//                        value: zynqtgui.bottomBarControlObj &&
-//                               zynqtgui.bottomBarControlObj.channelAudioType
-//                                 ? channelAudioTypeDropdown.findCurrentIndex(zynqtgui.bottomBarControlObj.channelAudioType)
-//                                 : -1
-//                    }
-
-//                    QQC2.ComboBox {
-//                        id: channelAudioTypeDropdown
-
-//                        function findCurrentIndex(val) {
-//                            for (var i = 0; i < model.count; i++) {
-//                                if (model.get(i).value === val) {
-//                                    return i
-//                                }
-//                            }
-
-//                            return -1
-//                        }
-
-//                        // For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth"
-//                        model: ListModel {
-//                            ListElement { text: "Synth"; value: "synth" }
-//                            ListElement { text: "Audio"; value: "sample-loop" }
-//                            ListElement { text: "Smp: Trig"; value: "sample-trig" }
-//                            ListElement { text: "Smp: Slice"; value: "sample-slice" }
-//                            ListElement { text: "External"; value: "external" }
-//                        }
-//                        textRole: "text"
-//                        currentIndex:  -1
-//                        onActivated: {
-//                            zynqtgui.bottomBarControlObj.channelAudioType = channelAudioTypeDropdown.model.get(index).value;
-//                        }
-//                    }
                 }
 
                 initialAction: {

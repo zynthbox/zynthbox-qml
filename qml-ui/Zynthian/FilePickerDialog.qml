@@ -50,6 +50,59 @@ Zynthian.Dialog {
     property alias listCurrentIndex: filesListView.currentIndex
     property alias listCount: filesListView.count
 
+    property var cuiaCallback: function (cuia) {
+        switch (cuia) {
+            case "NAVIGATE_LEFT":
+            case "NAVIGATE_RIGHT":
+                return true;
+
+            case "SELECT_UP":
+                root.filesListView.currentIndex = root.filesListView.currentIndex > 0
+                                                            ? root.filesListView.currentIndex - 1
+                                                            : 0
+                return true;
+
+            case "SELECT_DOWN":
+                root.filesListView.currentIndex = root.filesListView.currentIndex < root.filesListView.count-1
+                                                            ? root.filesListView.currentIndex + 1
+                                                            : root.filesListView.count-1
+                return true;
+
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                if (root.filesListView.currentIndex >= 0 &&
+                    root.filesListView.currentIndex < root.filesListView.count) {
+                    console.log("ZL Filepicker SELECT :", root.filesListView.currentItem, root.filesListView.currentItem.selectItem)
+                    root.filesListView.currentItem.selectItem();
+                }
+
+                return true;
+
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                root.goBack();
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    function goBack() {
+        var newPath = String(folderModel.folder).replace("file://", "").split("/");
+        newPath.pop();
+        newPath = newPath.join("/");
+
+        if (newPath.includes(rootFolder)) {
+            folderModel.folder = newPath;
+        } else {
+            folderModel.folder = rootFolder;
+        }
+    }
+
     modal: true
     closePolicy: QQC2.Popup.CloseOnPressOutside
 
@@ -494,55 +547,6 @@ Zynthian.Dialog {
                     }
                 }
             }
-        }
-    }
-
-    property var cuiaCallback: function (cuia) {
-        switch (cuia) {
-            case "SELECT_UP":
-                root.filesListView.currentIndex = root.filesListView.currentIndex > 0
-                                                            ? root.filesListView.currentIndex - 1
-                                                            : 0
-                return true;
-
-            case "SELECT_DOWN":
-                root.filesListView.currentIndex = root.filesListView.currentIndex < root.filesListView.count-1
-                                                            ? root.filesListView.currentIndex + 1
-                                                            : root.filesListView.count-1
-                return true;
-
-            case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
-                if (root.filesListView.currentIndex >= 0 &&
-                    root.filesListView.currentIndex < root.filesListView.count) {
-                    console.log("ZL Filepicker SELECT :", root.filesListView.currentItem, root.filesListView.currentItem.selectItem)
-                    root.filesListView.currentItem.selectItem();
-                }
-
-                return true;
-
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
-                root.goBack();
-
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    function goBack() {
-        var newPath = String(folderModel.folder).replace("file://", "").split("/");
-        newPath.pop();
-        newPath = newPath.join("/");
-
-        if (newPath.includes(rootFolder)) {
-            folderModel.folder = newPath;
-        } else {
-            folderModel.folder = rootFolder;
         }
     }
 }

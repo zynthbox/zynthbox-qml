@@ -61,8 +61,7 @@ Item {
                         controlObj.nameEditable
             onClicked: {
                 editDialog.open()
-                objNameEdit.text = root.controlObj ? root.controlObj.name : "";
-                // objNameEdit.forceActiveFocus();
+                objNameEdit.text = titleStack.controlObj ? titleStack.controlObj.name : "";
             }
             Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
             Layout.preferredHeight: Layout.preferredWidth
@@ -114,7 +113,7 @@ Item {
             }
         }
         onAccepted: {
-            controlObj.name = text
+            controlObj.name = objNameEdit.text
             editDialog.close()
         }
     }

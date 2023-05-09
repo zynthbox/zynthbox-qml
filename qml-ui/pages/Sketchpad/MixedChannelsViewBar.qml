@@ -453,11 +453,34 @@ Rectangle {
                                                     }
                                                 }
                                                 onPressAndHold: {
-                                                    if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[index])) {
-                                                        zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
-                                                        zynqtgui.control.single_effect_engine = null;
-                                                        zynqtgui.current_screen_id = "control";
-                                                        zynqtgui.forced_screen_back = "sketchpad"
+                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                        // If channel type is sample-loop open clip wave editor
+                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
+                                                            zynqtgui.bottomBarControlObj = waveformContainer.clip;
+                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                            Qt.callLater(function() {
+                                                                bottomStack.bottomBar.waveEditorAction.trigger();
+                                                            })
+                                                        }
+                                                    } else if (root.selectedChannel.channelAudioType.startsWith("sample")) {
+                                                        // If channel type is sample then open channel wave editor
+                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                                            zynqtgui.bottomBarControlObj = root.selectedChannel;
+                                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                            Qt.callLater(function() {
+                                                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                                            })
+                                                        }
+                                                    } else if (root.selectedChannel.channelAudioType === "synth") {
+                                                        // If channel type is synth open synth edit page
+                                                        if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[index])) {
+                                                            zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
+                                                            zynqtgui.control.single_effect_engine = null;
+                                                            zynqtgui.current_screen_id = "control";
+                                                            zynqtgui.forced_screen_back = "sketchpad"
+                                                        }
                                                     }
                                                 }
                                             }

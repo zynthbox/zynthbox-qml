@@ -673,7 +673,7 @@ Rectangle {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
                                         font.pointSize: 9
-                                        text: qsTr("Pattern : %1").arg(root.pattern.objectName)
+                                        text: qsTr("Clip : %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(root.selectedChannel.selectedSlotRow + 97))
                                     }
 
                                     Rectangle {

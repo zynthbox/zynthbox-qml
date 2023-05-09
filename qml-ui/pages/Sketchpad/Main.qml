@@ -493,7 +493,7 @@ Zynthian.ScreenPage {
         parent: root
 
         headerText: qsTr("Pick a sketchpad")
-        rootFolder: "/zynqtgui/zynqtgui-my-data/sketchpads/"
+        rootFolder: "/zynthian/zynthian-my-data/sketchpads/"
         folderModel {
             nameFilters: ["*.sketchpad.json"]
         }

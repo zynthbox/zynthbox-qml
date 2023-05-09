@@ -21,9 +21,9 @@ import Zynthian 1.0 as Zynthian
   *      width: Math.round(parent.width * 0.8)
   *      height: Math.round(parent.height * 0.8)
   *
-  *      rootFolder: '/zynqtgui/zynqtgui-my-data'
+  *      rootFolder: '/zynthian/zynthian-my-data'
   *      folderModel {
-  *          folder: '/zynqtgui/zynqtgui-my-data/sketchpads'
+  *          folder: '/zynthian/zynthian-my-data/sketchpads'
   *          nameFilters: ["*.wav"]
   *      }
   *      onFileSelected: {

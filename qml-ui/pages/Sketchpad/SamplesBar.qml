@@ -161,7 +161,7 @@ Zynthian.Card {
         y: parent.y
 
         headerText: qsTr("%1 : Pick an audio file").arg(controlObj ? controlObj.name : "")
-        rootFolder: "/zynqtgui/zynqtgui-my-data"
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }

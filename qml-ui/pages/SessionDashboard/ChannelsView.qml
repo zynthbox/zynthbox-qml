@@ -572,7 +572,7 @@ ColumnLayout {
         id: clipFilePickerDialog
 
         headerText: qsTr("%1 : Pick an audio file").arg(clipObj ? clipObj.channelName : "")
-        rootFolder: "/zynqtgui/zynqtgui-my-data"
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }

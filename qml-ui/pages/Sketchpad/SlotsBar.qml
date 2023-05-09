@@ -660,7 +660,7 @@ Rectangle {
         headerText: qsTr("%1-S%2 : Pick a sample")
                         .arg(root.selectedChannel.name)
                         .arg(root.selectedChannel.selectedSlotRow + 1)
-        rootFolder: "/zynqtgui/zynqtgui-my-data"
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
@@ -681,7 +681,7 @@ Rectangle {
         headerText: qsTr("%1-S%2 : Pick a bank")
                         .arg(root.selectedSlotRowItem.channel.name)
                         .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
-        rootFolder: "/zynqtgui/zynqtgui-my-data"
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["sample-bank.json"]
         }
@@ -701,7 +701,7 @@ Rectangle {
 
         headerText: qsTr("%1 : Pick an audio file")
                         .arg(root.selectedChannel.name)
-        rootFolder: "/zynqtgui/zynqtgui-my-data"
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }

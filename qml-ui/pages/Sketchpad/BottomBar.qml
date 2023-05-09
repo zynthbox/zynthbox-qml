@@ -469,7 +469,7 @@ Rectangle {
         y: parent.y
 
         headerText: qsTr("%1 : Pick an audio file").arg(zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.channelName : "")
-        rootFolder: "/zynqtgui/zynqtgui-my-data"
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }

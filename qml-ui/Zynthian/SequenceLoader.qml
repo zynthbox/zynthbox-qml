@@ -150,7 +150,7 @@ Item {
                 return qsTr("Load Sequence or Pattern");
             }
         }
-        rootFolder: "/zynqtgui/zynqtgui-my-data/"
+        rootFolder: "/zynthian/zynthian-my-data/"
         onVisibleChanged: {
             if (saveMode) {
                 folderModel.folder = rootFolder + "sequences/my-sequences/";

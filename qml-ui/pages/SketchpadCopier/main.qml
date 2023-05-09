@@ -144,7 +144,7 @@ Zynthian.ScreenPage {
         parent: root
 
         headerText: qsTr("Pick a session")
-        rootFolder: "/zynqtgui/zynqtgui-my-data/sessions"
+        rootFolder: "/zynthian/zynthian-my-data/sessions"
         folderModel {
             nameFilters: ["*.json"]
         }
@@ -158,7 +158,7 @@ Zynthian.ScreenPage {
         parent: root
 
         headerText: qsTr("Pick a sketchpad")
-        rootFolder: "/zynqtgui/zynqtgui-my-data/sketchpads"
+        rootFolder: "/zynthian/zynthian-my-data/sketchpads"
         folderModel {
             nameFilters: ["*.json"]
         }

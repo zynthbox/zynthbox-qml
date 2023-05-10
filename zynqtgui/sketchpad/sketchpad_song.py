@@ -85,11 +85,6 @@ class sketchpad_song(QObject):
         self.__initial_name__ = name # To be used while storing cache details when name changes
         self.__to_be_deleted__ = False
 
-        self.updateAutoconnectedSoundsThrottle = QTimer()
-        self.updateAutoconnectedSoundsThrottle.setInterval(100)
-        self.updateAutoconnectedSoundsThrottle.setSingleShot(True)
-        self.updateAutoconnectedSoundsThrottle.timeout.connect(self.doUpdateAutoconnectedSounds)
-
         if not self.restore(load_history):
             self.__is_loading__ = True
             self.isLoadingChanged.emit()
@@ -143,16 +138,6 @@ class sketchpad_song(QObject):
 
         # Schedule a save after a sketchpad loads/restores to ensure sketchpad file is available after creating a new sketchpad
         self.schedule_save()
-
-    ###
-    # Sometimes you just need to force-update the graph layout. Call this function to make that happen kind of soonish
-    @Slot(None)
-    def updateAutoconnectedSounds(self):
-        self.updateAutoconnectedSoundsThrottle.start()
-
-    @Slot(None)
-    def doUpdateAutoconnectedSounds(self):
-        self.zynqtgui.zynautoconnect(True)
 
     def to_be_deleted(self):
         self.__to_be_deleted__ = True

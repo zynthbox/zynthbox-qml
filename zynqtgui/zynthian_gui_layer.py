@@ -655,17 +655,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 self.drop_from_fxchain(self.layers[i])
                 self.layers[i].mute_audio_out()
 
-            self.zynqtgui.zynautoconnect(True)
-
-            self.zynqtgui.zynautoconnect_acquire_lock()
             self.layers[i].reset()
             self.layers.pop(i)
-            self.zynqtgui.zynautoconnect_release_lock()
 
             # Stop unused engines
             if stop_unused_engines:
                 self.zynqtgui.screens['engine'].stop_unused_engines()
 
+            self.zynqtgui.zynautoconnect()
             self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
 
@@ -723,10 +720,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 midi_chans_to_delete.append(root_layer.midi_chan)
                 self.layer_deleted.emit(root_layer.midi_chan)
 
-            self.zynqtgui.zynautoconnect(True)
-
             # Remove layers
-            self.zynqtgui.zynautoconnect_acquire_lock()
             for layer in layers_to_delete:
                 try:
                     i = self.layers.index(layer)
@@ -734,7 +728,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     self.layers.pop(i)
                 except Exception as e:
                     logging.error("Can't delete layer {} => {}".format(i,e))
-            self.zynqtgui.zynautoconnect_release_lock()
 
             # Stop unused engines
             if stop_unused_engines:
@@ -757,6 +750,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 #except:
                     #self.zynqtgui.set_curlayer(None)
 
+            self.zynqtgui.zynautoconnect()
             self.set_selector()
             self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
@@ -772,17 +766,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
             self.drop_from_fxchain(self.layers[i])
             self.layers[i].mute_audio_out()
 
-        self.zynqtgui.zynautoconnect(True)
 
         # Remove all layers: Step 2 => Delete layers
         i = len(self.layers)
-        self.zynqtgui.zynautoconnect_acquire_lock()
         while i>0:
             i -= 1
             logging.debug("Remove layer {} => {} ...".format(i, self.layers[i].get_basepath()))
             self.layers[i].reset()
             self.layers.pop(i)
-        self.zynqtgui.zynautoconnect_release_lock()
 
         # Stop ALL engines
         if stop_engines:
@@ -790,6 +781,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
         self.index=0
         self.zynqtgui.set_curlayer(None)
+        self.zynqtgui.zynautoconnect()
 
         # Refresh UI
         self.fill_list()

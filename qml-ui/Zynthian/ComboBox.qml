@@ -23,19 +23,20 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 QQC2.Button {
     id: root
 
-    property alias model: popupRepeater.model
+    property var model
     property string textRole: ""
     property int currentIndex: -1
     property QtObject currentItem: null
+    property var comboBoxPopup: popupComponent.createObject(applicationWindow(), {"model": root.model})
 
     signal activated(int index)
 
@@ -48,40 +49,55 @@ QQC2.Button {
         color: Kirigami.Theme.textColor
     }
     onCurrentIndexChanged: {
-        root.currentItem = popupRepeater.itemAt(root.currentIndex)
+        root.currentItem = comboBoxPopup.popupRepeater.itemAt(root.currentIndex)
     }
     onClicked: {
         comboBoxPopup.open()
     }
 
-    Zynthian.Popup {
-        id: comboBoxPopup
-        parent: applicationWindow()
-        width: Kirigami.Units.gridUnit * 20
-        clip: true
+    Component {
+        id: popupComponent
 
-        QQC2.ScrollView {
-            anchors.fill: parent
-            contentWidth: parent.width
+        // If popup is not instantiated with createObject having parent set to applicationWindow(), qml reports an error
+        // saying it cannot find a window to open popup in. So set visual parent to Overlay and while instantiating set
+        // object parent to application window
 
-            ColumnLayout {
-                id: content
+        Zynthian.Popup {
+            id: popupRoot
+
+            property alias popupRepeater: popupRepeater
+            property alias model: popupRepeater.model
+
+            parent: QQC2.Overlay.overlay
+            x: parent.width / 2 - width / 2
+            y: parent.height / 2 - height / 2
+            width: Kirigami.Units.gridUnit * 20
+            height: Math.min(contentHeight, parent.height * 0.8)
+            clip: true
+
+            QQC2.ScrollView {
                 anchors.fill: parent
-                spacing: 0
+                contentWidth: parent.width
 
-                Repeater {
-                    id: popupRepeater
-                    delegate: Kirigami.BasicListItem {
-                        id: delegate
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        reserveSpaceForIcon: false
-                        highlighted: root.currentIndex === index
-                        label: model[root.textRole]
-                        onClicked: {
-                            root.currentIndex = index
-                            root.activated(index)
-                            comboBoxPopup.close()
+                ColumnLayout {
+                    id: content
+                    anchors.fill: parent
+                    spacing: 0
+
+                    Repeater {
+                        id: popupRepeater
+                        delegate: Kirigami.BasicListItem {
+                            id: delegate
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                            reserveSpaceForIcon: false
+                            highlighted: root.currentIndex === index
+                            label: model[root.textRole]
+                            onClicked: {
+                                root.currentIndex = index
+                                root.activated(index)
+                                popupRoot.close()
+                            }
                         }
                     }
                 }

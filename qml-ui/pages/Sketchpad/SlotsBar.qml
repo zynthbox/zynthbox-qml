@@ -622,7 +622,7 @@ Rectangle {
                         id: volumeSlider
 
                         property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
-                        property QtObject volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound]
+                        property var volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound]
 
                         orientation: Qt.Horizontal
 

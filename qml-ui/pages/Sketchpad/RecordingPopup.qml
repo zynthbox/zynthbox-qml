@@ -72,8 +72,6 @@ Zynthian.Popup {
     topPadding: 0
     bottomPadding: 0
     onSelectedChannelChanged: {
-        console.log("Recording popup selectedChannelChanged handler")
-
         if (root.selectedChannel.channelAudioType === "external") {
             zynqtgui.sketchpad.recordingSource = "external"
             zynqtgui.sketchpad.recordingChannel = "*"
@@ -95,8 +93,6 @@ Zynthian.Popup {
                 break
             }
         }
-
-        console.log(zynqtgui.sketchpad.recordingSource, zynqtgui.sketchpad.recordingChannel, sourceCombo.currentIndex, recordingChannelCombo.currentIndex)
     }
     onOpened: {
         zynqtgui.recordingPopupActive = true

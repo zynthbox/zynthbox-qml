@@ -74,7 +74,6 @@ Zynthian.MultiSelectorPage {
         id: currentConnection
         target: zynqtgui
         onCurrent_screen_idChanged: {
-            print(zynqtgui.current_screen_id +" "+ applicationWindow().pageStack.lastItem +" "+ root)
             if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
                 pageRemoveTimer.restart()
             }

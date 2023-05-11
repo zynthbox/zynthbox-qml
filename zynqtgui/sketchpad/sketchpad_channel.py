@@ -133,16 +133,7 @@ class sketchpad_channel(QObject):
 
     @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, partNum):
-        """
-        Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
-        """
-
-        logging.debug(f"@@@@@@@@@ {trackIndex}, {partNum}")
-
         clip = self.getClipsModelByPart(partNum).getClip(trackIndex)
-
-        # if clip is not None and clip.enabled is not None:
-            # logging.error(f"{clip} is enabled? {clip.enabled} for trackIndex {trackIndex} and part {partNum} for channel {self.id}")
 
         if clip is not None and clip.enabled is True:
             self.set_selected_part(partNum)

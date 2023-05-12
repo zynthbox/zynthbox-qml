@@ -588,6 +588,31 @@ class zynthian_gui(QObject):
         # Global zselectors
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
+        self.__bigknob_value = 10
+        self.__smallknob1_value = 10
+        self.__smallknob2_value = 10
+        self.__smallknob3_value = 10
+        # Setup timers to reset knob zyncoder values
+        # If value is reset immediately after reading then due to loss of precison when setting value,
+        # decerasing happens faster than increasing which causes knobs to not work as expected
+        # So instead of resetting on every read, set a timer to reset after 2 seconds of idle time
+        self.__bigknob_reset_timer = QTimer(self)
+        self.__bigknob_reset_timer.setSingleShot(True)
+        self.__bigknob_reset_timer.setInterval(2000)
+        self.__bigknob_reset_timer.timeout.connect(self.reset_bigknob)
+        self.__smallknob1_reset_timer = QTimer(self)
+        self.__smallknob1_reset_timer.setSingleShot(True)
+        self.__smallknob1_reset_timer.setInterval(2000)
+        self.__smallknob1_reset_timer.timeout.connect(self.reset_smallknob1)
+        self.__smallknob2_reset_timer = QTimer(self)
+        self.__smallknob2_reset_timer.setSingleShot(True)
+        self.__smallknob2_reset_timer.setInterval(2000)
+        self.__smallknob2_reset_timer.timeout.connect(self.reset_smallknob2)
+        self.__smallknob3_reset_timer = QTimer(self)
+        self.__smallknob3_reset_timer.setSingleShot(True)
+        self.__smallknob3_reset_timer.setInterval(2000)
+        self.__smallknob3_reset_timer.timeout.connect(self.reset_smallknob3)
+
         # This variable will decide if zyncoder_read should be called or not depending on whether
         # global set_selector is in progress or not
         self.is_global_set_selector_running = False
@@ -709,510 +734,410 @@ class zynthian_gui(QObject):
     ### END SHOW SCREEN QUEUE
 
     ### Global controller and selector
-    @Slot(None)
-    def zyncoder_set_bpm(self):
-        if self.globalPopupOpened or self.metronomeButtonPressed:
-            self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200))
+#    @Slot(None)
+#    def zyncoder_set_bpm(self):
+#        if self.globalPopupOpened or self.metronomeButtonPressed:
+#            self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200))
 
-    @Slot(None)
-    def set_bpm(self, bpm):
-        self.set_bpm_actual(bpm, False)
+#    @Slot(None)
+#    def set_bpm(self, bpm):
+#        self.set_bpm_actual(bpm, False)
 
-    def set_bpm_actual(self, bpm, takeControlOfSelector = True):
-        """
-            Set song bpm when global popup is active
-        """
+#    def set_bpm_actual(self, bpm, takeControlOfSelector = True):
+#        """
+#            Set song bpm when global popup is active
+#        """
 
-        # FIXME : Sometimes when this method is called, the value of zselector is 0
-        #         which is causing division by zero error.
+#        # FIXME : Sometimes when this method is called, the value of zselector is 0
+#        #         which is causing division by zero error.
 
-        song = self.sketchpad.song
-        bpm = int(bpm)
-        if song is not None and song.bpm != bpm:
-            song.bpm = bpm
-            # Show bpm osd when global popup is not open
-            # Since when global popup is open, bpm change can be visualized with dial value change
-            if not self.globalPopupOpened:
-                self.osd.updateOsd(
-                    parameterName="song_bpm",
-                    description=f"Song BPM",
-                    start=50,
-                    stop=200,
-                    step=1,
-                    defaultValue=120,
-                    currentValue=song.bpm,
-                    setValueFunction=self.set_bpm_actual,
-                    showValueLabel=True,
-                )
+#        song = self.sketchpad.song
+#        bpm = int(bpm)
+#        if song is not None and song.bpm != bpm:
+#            song.bpm = bpm
+#            # Show bpm osd when global popup is not open
+#            # Since when global popup is open, bpm change can be visualized with dial value change
+#            if not self.globalPopupOpened:
+#                self.osd.updateOsd(
+#                    parameterName="song_bpm",
+#                    description=f"Song BPM",
+#                    start=50,
+#                    stop=200,
+#                    step=1,
+#                    defaultValue=120,
+#                    currentValue=song.bpm,
+#                    setValueFunction=self.set_bpm_actual,
+#                    showValueLabel=True,
+#                )
 
-            if takeControlOfSelector is True:
-                self.set_selector()
+#            if takeControlOfSelector is True:
+#                self.set_selector()
 
-    @Slot(None)
-    def zyncoder_set_volume(self):
-        if self.globalPopupOpened or self.metronomeButtonPressed:
-            self.set_volume_actual(self.__zselector[1].value)
+#    @Slot(None)
+#    def zyncoder_set_volume(self):
+#        if self.globalPopupOpened or self.metronomeButtonPressed:
+#            self.set_volume_actual(self.__zselector[1].value)
 
-    def set_volume_actual(self, volume, takeControlOfSelector = True):
-        """
-        Set volume when global popup is active
-        """
+#    def set_volume_actual(self, volume, takeControlOfSelector = True):
+#        """
+#        Set volume when global popup is active
+#        """
 
-        volume = int(volume)
-        if self.masterVolume != volume:
-            self.masterVolume = volume
+#        volume = int(volume)
+#        if self.masterVolume != volume:
+#            self.masterVolume = volume
 
-            if not self.globalPopupOpened:
-                self.osd.updateOsd(
-                    parameterName="master_volume",
-                    description=f"Master Volume",
-                    start=0,
-                    stop=100,
-                    step=1,
-                    defaultValue=None,
-                    currentValue=volume,
-                    setValueFunction=self.set_volume_actual,
-                    showValueLabel=True,
-                    showResetToDefault=False,
-                    showVisualZero=True
-                )
+#            if not self.globalPopupOpened:
+#                self.osd.updateOsd(
+#                    parameterName="master_volume",
+#                    description=f"Master Volume",
+#                    start=0,
+#                    stop=100,
+#                    step=1,
+#                    defaultValue=None,
+#                    currentValue=volume,
+#                    setValueFunction=self.set_volume_actual,
+#                    showValueLabel=True,
+#                    showResetToDefault=False,
+#                    showVisualZero=True
+#                )
 
-            if takeControlOfSelector is True:
-                self.set_selector()
+#            if takeControlOfSelector is True:
+#                self.set_selector()
 
-    def get_global_fx1_amount(self):
-        value = 0
-        if self.global_fx_engines[0] is not None:
-            controller = self.global_fx_engines[0][1]
-            if controller is not None:
-                value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
-        return value
+#    def get_global_fx1_amount(self):
+#        value = 0
+#        if self.global_fx_engines[0] is not None:
+#            controller = self.global_fx_engines[0][1]
+#            if controller is not None:
+#                value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
+#        return value
 
-    def set_global_fx1_amount(self, value):
-        self.set_delay_actual(value, False)
+#    def set_global_fx1_amount(self, value):
+#        self.set_delay_actual(value, False)
 
-    @Slot(None)
-    def zyncoder_set_delay(self):
-        if self.globalPopupOpened or self.metronomeButtonPressed:
-            self.set_delay_actual(self.__zselector[2].value)
+#    @Slot(None)
+#    def zyncoder_set_delay(self):
+#        if self.globalPopupOpened or self.metronomeButtonPressed:
+#            self.set_delay_actual(self.__zselector[2].value)
 
-    def set_delay_actual(self, delay_percent, takeControlOfSelector = True):
-        """
-        Set global fx delay when global popup is active
-        """
+#    def set_delay_actual(self, delay_percent, takeControlOfSelector = True):
+#        """
+#        Set global fx delay when global popup is active
+#        """
 
-        if self.global_fx_engines[0] is not None:
-            controller = self.global_fx_engines[0][1]
-            delay_percent = int(delay_percent)
-            delay = np.interp(delay_percent, [0, 100], [controller.value_min, controller.value_max])
+#        if self.global_fx_engines[0] is not None:
+#            controller = self.global_fx_engines[0][1]
+#            delay_percent = int(delay_percent)
+#            delay = np.interp(delay_percent, [0, 100], [controller.value_min, controller.value_max])
 
-            if controller is not None and \
-                    controller.value != delay:
-                controller.set_value(delay, True)
+#            if controller is not None and \
+#                    controller.value != delay:
+#                controller.set_value(delay, True)
 
-                self.osd.updateOsd(
-                    parameterName="global_delay",
-                    description=f"Global Delay FX",
-                    start=0,
-                    stop=100,
-                    step=1,
-                    defaultValue=10,
-                    currentValue=delay_percent,
-                    setValueFunction=self.set_delay_actual,
-                    showValueLabel=True,
-                    showResetToDefault=True,
-                    showVisualZero=True
-                )
+#                self.osd.updateOsd(
+#                    parameterName="global_delay",
+#                    description=f"Global Delay FX",
+#                    start=0,
+#                    stop=100,
+#                    step=1,
+#                    defaultValue=10,
+#                    currentValue=delay_percent,
+#                    setValueFunction=self.set_delay_actual,
+#                    showValueLabel=True,
+#                    showResetToDefault=True,
+#                    showVisualZero=True
+#                )
 
-                if takeControlOfSelector is True:
-                    self.set_selector()
+#                if takeControlOfSelector is True:
+#                    self.set_selector()
 
-    def get_global_fx2_amount(self):
-        value = 0
-        if self.global_fx_engines[1] is not None:
-            controller = self.global_fx_engines[1][1]
-            if controller is not None:
-                value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
-        return value
+#    def get_global_fx2_amount(self):
+#        value = 0
+#        if self.global_fx_engines[1] is not None:
+#            controller = self.global_fx_engines[1][1]
+#            if controller is not None:
+#                value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
+#        return value
 
-    def set_global_fx2_amount(self, value):
-        self.set_reverb_actual(value, False)
+#    def set_global_fx2_amount(self, value):
+#        self.set_reverb_actual(value, False)
 
-    @Slot(None)
-    def zyncoder_set_reverb(self):
-        if self.globalPopupOpened or self.metronomeButtonPressed:
-            self.set_reverb_actual(self.__zselector[3].value)
+#    @Slot(None)
+#    def zyncoder_set_reverb(self):
+#        if self.globalPopupOpened or self.metronomeButtonPressed:
+#            self.set_reverb_actual(self.__zselector[3].value)
 
-    def set_reverb_actual(self, reverb_percent, takeControlOfSelector = True):
-        """
-        Set global fx reverb when global popup is active
-        """
+#    def set_reverb_actual(self, reverb_percent, takeControlOfSelector = True):
+#        """
+#        Set global fx reverb when global popup is active
+#        """
 
-        if self.global_fx_engines[1] is not None:
-            controller = self.global_fx_engines[1][1]
-            reverb_percent = int(reverb_percent)
-            reverb = np.interp(reverb_percent, [0, 100], [controller.value_min, controller.value_max])
+#        if self.global_fx_engines[1] is not None:
+#            controller = self.global_fx_engines[1][1]
+#            reverb_percent = int(reverb_percent)
+#            reverb = np.interp(reverb_percent, [0, 100], [controller.value_min, controller.value_max])
 
-            if controller is not None and \
-                    controller.value != reverb:
-                controller.set_value(reverb, True)
+#            if controller is not None and \
+#                    controller.value != reverb:
+#                controller.set_value(reverb, True)
 
-                self.osd.updateOsd(
-                    parameterName="global_reverb",
-                    description=f"Global Reverb FX",
-                    start=0,
-                    stop=100,
-                    step=1,
-                    defaultValue=10,
-                    currentValue=reverb_percent,
-                    setValueFunction=self.set_reverb_actual,
-                    showValueLabel=True,
-                    showResetToDefault=True,
-                    showVisualZero=True
-                )
+#                self.osd.updateOsd(
+#                    parameterName="global_reverb",
+#                    description=f"Global Reverb FX",
+#                    start=0,
+#                    stop=100,
+#                    step=1,
+#                    defaultValue=10,
+#                    currentValue=reverb_percent,
+#                    setValueFunction=self.set_reverb_actual,
+#                    showValueLabel=True,
+#                    showResetToDefault=True,
+#                    showVisualZero=True
+#                )
 
-                if takeControlOfSelector is True:
-                    self.set_selector()
+#                if takeControlOfSelector is True:
+#                    self.set_selector()
 
-    @Slot(None)
-    def zyncoder_set_current_index(self):
-        """
-        Set current index when there is an open file dialog
-        """
+#    @Slot(None)
+#    def zyncoder_set_current_index(self):
+#        """
+#        Set current index when there is an open file dialog
+#        """
 
-        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
-            if self.openedDialog.property("listCurrentIndex") != self.__zselector[0].value:
-                self.openedDialog.setProperty("listCurrentIndex", self.__zselector[0].value)
-                logging.debug(f"Setting listCurrentIndex of openedDialog({self.openedDialog}) to {self.__zselector[0].value}")
-                self.set_selector()
+#        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
+#            if self.openedDialog.property("listCurrentIndex") != self.__zselector[0].value:
+#                self.openedDialog.setProperty("listCurrentIndex", self.__zselector[0].value)
+#                logging.debug(f"Setting listCurrentIndex of openedDialog({self.openedDialog}) to {self.__zselector[0].value}")
+#                self.set_selector()
 
 
-    @Slot(None)
-    def zyncoder_set_channel_volume(self):
-        if self.altButtonPressed:
-            self.set_channel_volume_actual(self.__zselector[1].value)
+#    @Slot(None)
+#    def zyncoder_set_channel_volume(self):
+#        if self.altButtonPressed:
+#            self.set_channel_volume_actual(self.__zselector[1].value)
 
-    def set_channel_volume_actual(self, volume, takeControlOfSelector=True):
-        """
-        Set channel volume when altButton is pressed
-        """
+#    def set_channel_volume_actual(self, volume, takeControlOfSelector=True):
+#        """
+#        Set channel volume when altButton is pressed
+#        """
 
-        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
-        value = round(np.interp(round(volume), (0, 100), (-40, 20)))
+#        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+#        value = round(np.interp(round(volume), (0, 100), (-40, 20)))
 
-        if selected_channel.volume != value:
-            selected_channel.volume = value
+#        if selected_channel.volume != value:
+#            selected_channel.volume = value
 
-            if takeControlOfSelector is True:
-                self.set_selector()
+#            if takeControlOfSelector is True:
+#                self.set_selector()
 
-            self.osd.updateOsd(
-                parameterName="channel_volume",
-                description=f"Channel Volume",
-                start=0,
-                stop=100,
-                step=1,
-                defaultValue=None,
-                currentValue=volume,
-                setValueFunction=self.set_channel_volume_actual,
-                showValueLabel=True,
-                showResetToDefault=False,
-                showVisualZero=False,
-            )
+#            self.osd.updateOsd(
+#                parameterName="channel_volume",
+#                description=f"Channel Volume",
+#                start=0,
+#                stop=100,
+#                step=1,
+#                defaultValue=None,
+#                currentValue=volume,
+#                setValueFunction=self.set_channel_volume_actual,
+#                showValueLabel=True,
+#                showResetToDefault=False,
+#                showVisualZero=False,
+#            )
 
-    @Slot(None)
-    def zyncoder_set_channel_delay_send_amount(self):
-        if self.altButtonPressed:
-            self.zyncoder_set_channel_delay_send_amount_actual(self.__zselector[2].value)
+#    @Slot(None)
+#    def zyncoder_set_channel_delay_send_amount(self):
+#        if self.altButtonPressed:
+#            self.zyncoder_set_channel_delay_send_amount_actual(self.__zselector[2].value)
 
-    def zyncoder_set_channel_delay_send_amount_actual(self, delay, takeControlOfSelector=True):
-        """
-        Set channel delay send amount when altButton is pressed
-        """
+#    def zyncoder_set_channel_delay_send_amount_actual(self, delay, takeControlOfSelector=True):
+#        """
+#        Set channel delay send amount when altButton is pressed
+#        """
 
-        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+#        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
 
-        if selected_channel.wetFx1Amount != delay:
-            selected_channel.wetFx1Amount = delay
+#        if selected_channel.wetFx1Amount != delay:
+#            selected_channel.wetFx1Amount = delay
 
-            if takeControlOfSelector is True:
-                self.set_selector()
+#            if takeControlOfSelector is True:
+#                self.set_selector()
 
-            self.osd.updateOsd(
-                parameterName="channel_delay_send",
-                description=f"Delay FX Send amount for Channel {self.session_dashboard.selectedChannel + 1}",
-                start=0,
-                stop=100,
-                step=1,
-                defaultValue=100,
-                currentValue=delay,
-                setValueFunction=self.zyncoder_set_channel_delay_send_amount_actual,
-                showValueLabel=True,
-                showResetToDefault=True,
-                showVisualZero=True
-            )
+#            self.osd.updateOsd(
+#                parameterName="channel_delay_send",
+#                description=f"Delay FX Send amount for Channel {self.session_dashboard.selectedChannel + 1}",
+#                start=0,
+#                stop=100,
+#                step=1,
+#                defaultValue=100,
+#                currentValue=delay,
+#                setValueFunction=self.zyncoder_set_channel_delay_send_amount_actual,
+#                showValueLabel=True,
+#                showResetToDefault=True,
+#                showVisualZero=True
+#            )
 
-    @Slot(None)
-    def zyncoder_set_channel_reverb_send_amount(self):
-        if self.altButtonPressed:
-            self.zyncoder_set_channel_reverb_send_amount_actual(self.__zselector[3].value)
+#    @Slot(None)
+#    def zyncoder_set_channel_reverb_send_amount(self):
+#        if self.altButtonPressed:
+#            self.zyncoder_set_channel_reverb_send_amount_actual(self.__zselector[3].value)
 
-    def zyncoder_set_channel_reverb_send_amount_actual(self, reverb, takeControlOfSelector=True):
-        """
-        Set channel reverb send amount when altButton is pressed
-        """
+#    def zyncoder_set_channel_reverb_send_amount_actual(self, reverb, takeControlOfSelector=True):
+#        """
+#        Set channel reverb send amount when altButton is pressed
+#        """
 
-        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+#        selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
 
-        if selected_channel.wetFx2Amount != reverb:
-            selected_channel.wetFx2Amount = reverb
+#        if selected_channel.wetFx2Amount != reverb:
+#            selected_channel.wetFx2Amount = reverb
 
-            if takeControlOfSelector is True:
-                self.set_selector()
+#            if takeControlOfSelector is True:
+#                self.set_selector()
 
-            self.osd.updateOsd(
-                parameterName="channel_reverb_send",
-                description=f"Reverb FX Send amount for Channel {self.session_dashboard.selectedChannel + 1}",
-                start=0,
-                stop=100,
-                step=1,
-                defaultValue=100,
-                currentValue=reverb,
-                setValueFunction=self.zyncoder_set_channel_reverb_send_amount_actual,
-                showValueLabel=True,
-                showResetToDefault=True,
-                showVisualZero=True
-            )
+#            self.osd.updateOsd(
+#                parameterName="channel_reverb_send",
+#                description=f"Reverb FX Send amount for Channel {self.session_dashboard.selectedChannel + 1}",
+#                start=0,
+#                stop=100,
+#                step=1,
+#                defaultValue=100,
+#                currentValue=reverb,
+#                setValueFunction=self.zyncoder_set_channel_reverb_send_amount_actual,
+#                showValueLabel=True,
+#                showResetToDefault=True,
+#                showVisualZero=True
+#            )
 
-    def configure_big_knob(self):
-        # Configure Big Knob to set BPM
+    def reset_bigknob(self):
+        self.__zselector[0].set_value(10, True)
+        self.__bigknob_value = 10
+
+    def reset_smallknob1(self):
+        self.__zselector[1].set_value(10, True)
+        self.__smallknob1_value = 10
+
+    def reset_smallknob2(self):
+        self.__zselector[2].set_value(10, True)
+        self.__smallknob2_value = 10
+
+    def reset_smallknob3(self):
+        self.__zselector[3].set_value(10, True)
+        self.__smallknob3_value = 10
+
+    @Slot()
+    def zyncoder_bigknob(self):
+        if self.__bigknob_value != self.__zselector[0].value:
+            new_val = self.__zselector[0].value
+            self.bigKnobDelta.emit(new_val - self.__bigknob_value)
+            self.__bigknob_value = new_val
+            self.__bigknob_reset_timer.start()
+
+    @Slot()
+    def zyncoder_smallknob1(self):
+        if self.__smallknob1_value != self.__zselector[1].value:
+            new_val = self.__zselector[1].value
+            self.smallKnob1Delta.emit(new_val - self.__smallknob1_value)
+            self.__smallknob1_value = new_val
+            self.__smallknob1_reset_timer.start()
+
+    @Slot()
+    def zyncoder_smallknob2(self):
+        if self.__smallknob2_value != self.__zselector[2].value:
+            new_val = self.__zselector[2].value
+            self.smallKnob2Delta.emit(new_val - self.__smallknob2_value)
+            self.__smallknob2_value = new_val
+            self.__smallknob2_reset_timer.start()
+
+    @Slot()
+    def zyncoder_smallknob3(self):
+        if self.__smallknob3_value != self.__zselector[3].value:
+            new_val = self.__zselector[3].value
+            self.smallKnob3Delta.emit(new_val - self.__smallknob3_value)
+            self.__smallknob3_value = new_val
+            self.__smallknob3_reset_timer.start()
+
+    def configure_bigknob(self):
         try:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].show()
-
-            logging.debug(f"### set_selector : Configuring big knob to set bpm")
-
-            value = 0
-            min_value = 0
-            max_value = 0
-
-            # If openedDialog has listCurrentIndex and listCount property control currentIndex of that dialog with BK
-            if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None and self.openedDialog.property("listCount") is not None:
-                value = self.openedDialog.property("listCurrentIndex")
-                min_value = 0
-                max_value = self.openedDialog.property("listCount")
-
-                if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
-                                                                   {'midi_cc': 0, 'value': value,
-                                                                    'step': 1})
-
-                    self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
-                    self.__zselector[0].show()
-
-                self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'global_big_knob', 'name': 'global_big_knob', 'short_name': 'global_big_knob',
-                     'midi_cc': 0,
-                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
+            if self.__zselector[0] is None:
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'delta_bigknob', 'delta_bigknob', {'name': 'Big Knob Delta', 'short_name': 'Bigknob Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
                 self.__zselector[0].config(self.__zselector_ctrl[0])
-            else:
-                song = self.sketchpad.song
-                if song is not None:
-                    value = song.bpm
-                    min_value = 50
-                    max_value = 200 + 1
+                self.__zselector[0].set_value(10, True)
+                self.__zselector[0].step = 1
+                self.__zselector[0].mult = 1
 
-                if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
-                                                                   {'midi_cc': 0, 'value': value,
-                                                                    'step': 1})
-
-                    self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
-                    self.__zselector[0].show()
-
-                self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'global_big_knob', 'name': 'global_big_knob', 'short_name': 'global_big_knob',
-                     'midi_cc': 0,
-                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
-                self.__zselector[0].config(self.__zselector_ctrl[0])
+            self.__zselector[0].show()
+            self.__zselector_ctrl[0].set_options({"value": 10})
+            self.__zselector[0].config(self.__zselector_ctrl[0])
         except:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
 
-    def configure_small_knob1(self):
-        # Configure Small Knob 1 to set volume
+    def configure_smallknob1(self):
         try:
-            if self.__zselector[1] is not None:
-                self.__zselector[1].show()
-
-            if self.altButtonPressed:
-                logging.debug(f"### set_selector : Configuring small knob 1 to set channel volume")
-                selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
-
-                if self.__zselector[1] is None:
-                    self.__zselector_ctrl[1] = zynthian_controller(None, 'global_small_knob_1', 'global_small_knob_1', {'midi_cc': 0})
-                    self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
-                    self.__zselector[1].show()
-
-                value = round(np.interp(selected_channel.volume, (-40, 20), (0, 100)))
-                self.__zselector_ctrl[1].set_options({'value_max': 101, 'value': value, 'value_min': 0, 'step': 1})
+            if self.__zselector[1] is None:
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'delta_smallknob1', 'delta_smallknob1', {'name': 'Small Knob 1 Delta', 'short_name': 'Small Knob 1 Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
                 self.__zselector[1].config(self.__zselector_ctrl[1])
-            else:
-                logging.debug(f"### set_selector : Configuring small knob 1 to set volume")
+                self.__zselector[1].set_value(10, True)
+                self.__zselector[1].step = 1
+                self.__zselector[1].mult = 1
 
-                value = 0
-                min_value = 0
-                max_value = 0
-
-                if self.sketchpad is not None:
-                    value = self.masterVolume
-                    min_value = 0
-                    max_value = 100 + 1
-
-                if self.__zselector[1] is None:
-                    self.__zselector_ctrl[1] = zynthian_controller(None, 'global_small_knob_1', 'global_small_knob_1',
-                                                                   {'midi_cc': 0, 'value': value,
-                                                                    'step': 1})
-
-                    self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
-                    self.__zselector[1].show()
-
-                self.__zselector_ctrl[1].set_options(
-                    {'symbol': 'global_small_knob_1', 'name': 'global_small_knob_1', 'short_name': 'global_small_knob_1',
-                     'midi_cc': 0,
-                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
-                self.__zselector[1].config(self.__zselector_ctrl[1])
+            self.__zselector[1].show()
+            self.__zselector_ctrl[1].set_options({"value": 10})
+            self.__zselector[1].config(self.__zselector_ctrl[1])
         except:
             if self.__zselector[1] is not None:
                 self.__zselector[1].hide()
 
-    def configure_small_knob2(self):
-        # Configure Small Knob 2 to set delay
+    def configure_smallknob2(self):
         try:
-            if self.__zselector[2] is not None:
-                self.__zselector[2].show()
-
-            if self.altButtonPressed:
-                logging.debug(f"### set_selector : Configuring small knob 2 to set channel delay send amount")
-                selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
-
-                if self.__zselector[2] is None:
-                    self.__zselector_ctrl[2] = zynthian_controller(None, 'global_small_knob_2', 'global_small_knob_2', {'midi_cc': 0})
-                    self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
-                    self.__zselector[2].show()
-
-                self.__zselector_ctrl[2].set_options({'value_max': 101, 'value': selected_channel.wetFx1Amount, 'value_min': 0, 'step': 1})
+            if self.__zselector[2] is None:
+                self.__zselector_ctrl[2] = zynthian_controller(None, 'delta_smallknob2', 'delta_smallknob2', {'name': 'Small Knob 2 Delta', 'short_name': 'Small Knob 2 Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
                 self.__zselector[2].config(self.__zselector_ctrl[2])
-            else:
-                logging.debug(f"### set_selector : Configuring small knob 2 to set delay")
+                self.__zselector[2].set_value(10, True)
+                self.__zselector[2].step = 1
+                self.__zselector[2].mult = 1
 
-                value = 0
-                min_value = 0
-                max_value = 0
-
-                if self.global_fx_engines[0] is not None:
-                    controller = self.global_fx_engines[0][1]
-                    value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
-                    min_value = 0
-                    max_value = 100 + 1
-
-                if self.__zselector[2] is None:
-                    self.__zselector_ctrl[2] = zynthian_controller(None, 'global_small_knob_2', 'global_small_knob_2',
-                                                                   {'midi_cc': 0, 'value': value,
-                                                                    'step': 1})
-
-                    self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
-                    self.__zselector[2].show()
-
-                self.__zselector_ctrl[2].set_options(
-                    {'symbol': 'global_small_knob_2', 'name': 'global_small_knob_2', 'short_name': 'global_small_knob_2',
-                     'midi_cc': 0,
-                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
-                self.__zselector[2].config(self.__zselector_ctrl[2])
-                self.delayKnobValueChanged.emit()
+            self.__zselector[2].show()
+            self.__zselector_ctrl[2].set_options({"value": 10})
+            self.__zselector[2].config(self.__zselector_ctrl[2])
         except:
             if self.__zselector[2] is not None:
                 self.__zselector[2].hide()
 
-    def configure_small_knob3(self):
-        # Configure Small Knob 3 to set reverb
+    def configure_smallknob3(self):
         try:
-            if self.__zselector[3] is not None:
-                self.__zselector[3].show()
-
-            if self.altButtonPressed:
-                logging.debug(f"### set_selector : Configuring small knob 3 to set channel reverb send amount")
-                selected_channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
-
-                if self.__zselector[3] is None:
-                    self.__zselector_ctrl[3] = zynthian_controller(None, 'global_small_knob_3', 'global_small_knob_3', {'midi_cc': 0})
-                    self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
-                    self.__zselector[3].show()
-
-                self.__zselector_ctrl[3].set_options({'value_max': 101, 'value': selected_channel.wetFx2Amount, 'value_min': 0, 'step': 1})
+            if self.__zselector[3] is None:
+                self.__zselector_ctrl[3] = zynthian_controller(None, 'delta_smallknob3', 'delta_smallknob3', {'name': 'Small Knob 3 Delta', 'short_name': 'Small Knob 3 Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
                 self.__zselector[3].config(self.__zselector_ctrl[3])
-            else:
-                logging.debug(f"### set_selector : Configuring small knob 3 to set reverb")
+                self.__zselector[3].set_value(10, True)
+                self.__zselector[3].step = 1
+                self.__zselector[3].mult = 1
 
-                value = 0
-                min_value = 0
-                max_value = 0
-
-                if self.global_fx_engines[1] is not None:
-                    controller = self.global_fx_engines[1][1]
-                    value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
-                    min_value = 0
-                    max_value = 100 + 1
-
-                if self.__zselector[3] is None:
-                    self.__zselector_ctrl[3] = zynthian_controller(None, 'global_small_knob_3', 'global_small_knob_3',
-                                                                   {'midi_cc': 0, 'value': value,
-                                                                    'step': 1})
-
-                    self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
-                    self.__zselector[3].show()
-
-                self.__zselector_ctrl[3].set_options(
-                    {'symbol': 'global_small_knob_3', 'name': 'global_small_knob_3', 'short_name': 'global_small_knob_3',
-                     'midi_cc': 0,
-                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
-                self.__zselector[3].config(self.__zselector_ctrl[3])
-                self.reverbKnobValueChanged.emit()
+            self.__zselector[3].show()
+            self.__zselector_ctrl[3].set_options({"value": 10})
+            self.__zselector[3].config(self.__zselector_ctrl[3])
         except:
             if self.__zselector[3] is not None:
                 self.__zselector[3].hide()
 
     def set_selector(self):
-        if self.globalPopupOpened or self.metronomeButtonPressed or self.altButtonPressed:
-            self.configure_big_knob()
-            self.configure_small_knob1()
-            self.configure_small_knob2()
-            self.configure_small_knob3()
-        elif self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
-            # If openedDialog has listCurrentIndex and listCount property controll currentIndex of that dialog with BK.
-            # Hence configure big knob
-            self.configure_big_knob()
+        if not self.isBootingComplete:
+            return
 
-            if self.__zselector[1] is not None:
-                self.__zselector[1].hide()
-            if self.__zselector[2] is not None:
-                self.__zselector[2].hide()
-            if self.__zselector[3] is not None:
-                self.__zselector[3].hide()
-        else:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].hide()
-            if self.__zselector[1] is not None:
-                self.__zselector[1].hide()
-            if self.__zselector[2] is not None:
-                self.__zselector[2].hide()
-            if self.__zselector[3] is not None:
-                self.__zselector[3].hide()
+        self.configure_bigknob()
+        self.configure_smallknob1()
+        self.configure_smallknob2()
+        self.configure_smallknob3()
+
+    bigKnobDelta = Signal(int)
+    smallKnob1Delta = Signal(int)
+    smallKnob2Delta = Signal(int)
+    smallKnob3Delta = Signal(int)
     ### END Global controller and selector
 
     # ---------------------------------------------------------------------------
@@ -3088,62 +3013,79 @@ class zynthian_gui(QObject):
                 # Read Zyncoders
                 self.lock.acquire()
 
-                if self.is_global_set_selector_running:
-                    # If Global set_selector is in progress, do not call zyncoder_read methods
-                    # This will make sure none of the gui updates while set_selector is in progress
-                    logging.debug(f"Set selector in progress. Not setting value with encoder")
-                else:
-                    if self.globalPopupOpened or self.metronomeButtonPressed or self.altButtonPressed:
-                        # When global popup is open, set song bpm with big knob
-                        if self.__zselector[0] and self.sketchpad.song is not None:
-                            self.__zselector[0].read_zyncoder()
-                            if self.altButtonPressed:
-                                pass
-                            else:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
+#                if self.is_global_set_selector_running:
+#                    # If Global set_selector is in progress, do not call zyncoder_read methods
+#                    # This will make sure none of the gui updates while set_selector is in progress
+#                    logging.debug(f"Set selector in progress. Not setting value with encoder")
+#                else:
+#                    if self.globalPopupOpened or self.metronomeButtonPressed or self.altButtonPressed:
+#                        # When global popup is open, set song bpm with big knob
+#                        if self.__zselector[0] and self.sketchpad.song is not None:
+#                            self.__zselector[0].read_zyncoder()
+#                            if self.altButtonPressed:
+#                                pass
+#                            else:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
 
-                        # When global popup is open, set volume with small knob 1
-                        if self.__zselector[1]:
-                            self.__zselector[1].read_zyncoder()
-                            if self.altButtonPressed:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_volume", Qt.QueuedConnection)
-                            else:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_volume", Qt.QueuedConnection)
+#                        # When global popup is open, set volume with small knob 1
+#                        if self.__zselector[1]:
+#                            self.__zselector[1].read_zyncoder()
+#                            if self.altButtonPressed:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_volume", Qt.QueuedConnection)
+#                            else:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_volume", Qt.QueuedConnection)
 
-                        # When global popup is open, set delay with small knob 2
-                        if self.__zselector[2] and self.global_fx_engines[0] is not None:
-                            self.__zselector[2].read_zyncoder()
-                            if self.altButtonPressed:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_delay_send_amount", Qt.QueuedConnection)
-                            else:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_delay", Qt.QueuedConnection)
+#                        # When global popup is open, set delay with small knob 2
+#                        if self.__zselector[2] and self.global_fx_engines[0] is not None:
+#                            self.__zselector[2].read_zyncoder()
+#                            if self.altButtonPressed:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_delay_send_amount", Qt.QueuedConnection)
+#                            else:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_delay", Qt.QueuedConnection)
 
-                        # When global popup is open, set reverb with small knob 3
-                        if self.__zselector[3] and self.global_fx_engines[1] is not None:
-                            self.__zselector[3].read_zyncoder()
-                            if self.altButtonPressed:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_reverb_send_amount", Qt.QueuedConnection)
-                            else:
-                                QMetaObject.invokeMethod(self, "zyncoder_set_reverb", Qt.QueuedConnection)
-                    else:
-                        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
-                            # If openedDialog has listCurrentIndex and listCount property control currentIndex of that dialog with BK.
-                            if self.__zselector[0]:
-                                self.__zselector[0].read_zyncoder()
-                                QMetaObject.invokeMethod(self, "zyncoder_set_current_index", Qt.QueuedConnection)
-                        else:
-                            # When global popop is not open, call zyncoder_read of active screen/modal
-                            if self.modal_screen:
-                                free_zyncoders = self.screens[
-                                    self.modal_screen
-                                ].zyncoder_read()
-                            else:
-                                free_zyncoders = self.screens[
-                                    self.active_screen
-                                ].zyncoder_read()
+#                        # When global popup is open, set reverb with small knob 3
+#                        if self.__zselector[3] and self.global_fx_engines[1] is not None:
+#                            self.__zselector[3].read_zyncoder()
+#                            if self.altButtonPressed:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_reverb_send_amount", Qt.QueuedConnection)
+#                            else:
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_reverb", Qt.QueuedConnection)
+#                    else:
+#                        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
+#                            # If openedDialog has listCurrentIndex and listCount property control currentIndex of that dialog with BK.
+#                            if self.__zselector[0]:
+#                                self.__zselector[0].read_zyncoder()
+#                                QMetaObject.invokeMethod(self, "zyncoder_set_current_index", Qt.QueuedConnection)
+#                        else:
+#                            # When global popop is not open, call zyncoder_read of active screen/modal
 
-                            if free_zyncoders:
-                                self.screens["control"].zyncoder_read(free_zyncoders)
+#                            if self.modal_screen:
+#                                free_zyncoders = self.screens[
+#                                    self.modal_screen
+#                                ].zyncoder_read()
+#                            else:
+#                                free_zyncoders = self.screens[
+#                                    self.active_screen
+#                                ].zyncoder_read()
+
+#                            if free_zyncoders:
+#                                self.screens["control"].zyncoder_read(free_zyncoders)
+
+                if self.__zselector[0]:
+                    self.__zselector[0].read_zyncoder()
+                    QMetaObject.invokeMethod(self, "zyncoder_bigknob", Qt.QueuedConnection)
+
+                if self.__zselector[1]:
+                    self.__zselector[1].read_zyncoder()
+                    QMetaObject.invokeMethod(self, "zyncoder_smallknob1", Qt.QueuedConnection)
+
+                if self.__zselector[2]:
+                    self.__zselector[2].read_zyncoder()
+                    QMetaObject.invokeMethod(self, "zyncoder_smallknob2", Qt.QueuedConnection)
+
+                if self.__zselector[3]:
+                    self.__zselector[3].read_zyncoder()
+                    QMetaObject.invokeMethod(self, "zyncoder_smallknob3", Qt.QueuedConnection)
 
                 self.lock.release()
 
@@ -3875,7 +3817,8 @@ class zynthian_gui(QObject):
         # Display sketchpad page and run set_selector at last before hiding splash
         # to ensure knobs work fine
         self.show_modal("sketchpad")
-        self.sketchpad.set_selector()
+#        self.sketchpad.set_selector()
+        self.set_selector()
 
         # Explicitly run update_jack_port after booting is complete
         # as any requests made while booting is ignored

@@ -115,7 +115,7 @@ class zynqtgui(QObject):
             return
 
         self.is_set_selector_running = True
-        self.configure_big_knob()
+#        self.configure_big_knob()
         self.is_set_selector_running = False
 
     ### Begin property deltaKnobUpdates

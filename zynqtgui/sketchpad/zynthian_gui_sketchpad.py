@@ -128,6 +128,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
             self.__engine_config = {}
 
+        self.deltaKnobUpdates = True
+
         Path('/zynthian/zynthian-my-data/samples/my-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/samples/community-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
@@ -504,447 +506,447 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             else:
                 self.zynqtgui.showMessageDialog.emit("Synth does not have Filter Resonance controller", 2000)
 
-    def zyncoder_read(self):
-        if self.zynqtgui.knobTouchUpdateInProgress or self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
-            return
-        if self.is_set_selector_running:
-            # Set selector in progress. Not setting value with encoder
-            return
-
-        if self.__zselector[0] and self.__song__:
-            self.__zselector[0].read_zyncoder()
-
-            if self.__big_knob_mode__ == "preset":
-                QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
-            elif self.__big_knob_mode__ == "segment":
-                QMetaObject.invokeMethod(self, "zyncoder_set_selected_segment", Qt.QueuedConnection)
-            elif self.__big_knob_mode__ == "channel":
-                QMetaObject.invokeMethod(self, "zyncoder_set_selected_channel", Qt.QueuedConnection)
-
-        # Update clip startposition/layer volume when required with small knob 1
-        if self.__zselector[1] and self.__song__:
-            self.__zselector[1].read_zyncoder()
-            if self.zynqtgui.sound_combinator_active or self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
-            elif self.zynqtgui.slotsBarMixerActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_channel_volume", Qt.QueuedConnection)
-            else:
-                QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
-
-        # Update clip length when required with small knob 2
-        if self.__zselector[2] and self.__song__:
-            self.__zselector[2].read_zyncoder()
-            if self.zynqtgui.slotsBarMixerActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_channel_pan", Qt.QueuedConnection)
-            elif self.zynqtgui.slotsBarSynthsActive or self.zynqtgui.slotsBarChannelActive:
-                QMetaObject.invokeMethod(self, "zyncoder_set_synth_filter_cutoff", Qt.QueuedConnection)
-            else:
-                QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.QueuedConnection)
-
-        # Update clip length when required with small knob 3
-        if self.__zselector[3] and self.__song__:
-            self.__zselector[3].read_zyncoder()
-
-            if self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
-            elif self.zynqtgui.slotsBarSynthsActive or self.zynqtgui.slotsBarChannelActive:
-                QMetaObject.invokeMethod(self, "zyncoder_set_synth_filter_resonance", Qt.QueuedConnection)
-
-        return [0, 1, 2, 3]
-
-    @Slot(None)
-    def configure_big_knob(self):
-        try:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].show()
-
-            if self.zynqtgui.sound_combinator_active:
-                # If sound combinator is active, Use Big knob to control preset
-
-                self.__big_knob_mode__ = "preset"
-
-                logging.debug(f"### set_selector : Configuring big knob, sound combinator is active.")
-                channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
-                selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
-                logging.debug(f"### selectedChannel : channel{self.zynqtgui.session_dashboard.selectedChannel}({channel}), slot({channel.selectedSlotRow}), channel({selected_channel})")
-                preset_index = 0
-                max_value = 0
-
-                try:
-                    preset_index = self.zynqtgui.layer.layer_midi_map[selected_channel].preset_index * 1000
-                    max_value = len(self.zynqtgui.layer.layer_midi_map[selected_channel].preset_list) * 1000
-                except:
-                    pass
-
-                if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_preset', 'sketchpad_preset',
-                                                                {'midi_cc': 0, 'value': preset_index})
-
-                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                                  self.__zselector_ctrl[0], self)
-                    self.__zselector[0].show()
-
-                self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'sketchpad_preset', 'name': 'Sketchpad Preset', 'short_name': 'Preset', 'midi_cc': 0,
-                     'value_max': max_value, 'value_min': 0, 'value': preset_index})
-
-                self.__zselector[0].config(self.__zselector_ctrl[0])
-                self.__zselector[0].custom_encoder_speed = 0
-            elif self.song.sketchesModel.songMode:
-                # If sound combinator is not active and in song mode, Use Big knob to control selected segment
-
-                self.__big_knob_mode__ = "segment"
-
-                try:
-                    selected_segment = self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
-                except:
-                    selected_segment = 0
-
-                logging.debug(
-                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment})")
-
-                if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_segment', 'sketchpad_segment',
-                                                                   {'midi_cc': 0, 'value': selected_segment,
-                                                                    'step': 1})
-
-                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                                  self.__zselector_ctrl[0],
-                                                                  self)
-                    self.__zselector[0].show()
-
-                self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'sketchpad_segment', 'name': 'sketchpad_segment', 'short_name': 'sketchpad_segment', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': self.song.sketchesModel.selectedSketch.segmentsModel.count, 'value': selected_segment, 'step': 1})
-
-                self.__zselector[0].config(self.__zselector_ctrl[0])
-
-                if not self.isZ2V3:
-                    self.__zselector[0].custom_encoder_speed = 0
-            else:
-                # If sound combinator is not active and not song mode, Use Big knob to control selected channel
-
-                self.__big_knob_mode__ = "channel"
-
-                try:
-                    selected_channel = self.zynqtgui.session_dashboard.get_selected_channel()
-                except:
-                    selected_channel = 0
-
-                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_channel({selected_channel})")
-
-                if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_channel', 'sketchpad_channel',
-                                                                {'midi_cc': 0, 'value': selected_channel, 'step': 1})
-
-                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
-                                                                  self)
-                    self.__zselector[0].show()
-
-                self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'sketchpad_channel', 'name': 'sketchpad_channel', 'short_name': 'sketchpad_channel', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': 10, 'value': selected_channel, 'step': 1})
-
-                self.__zselector[0].config(self.__zselector_ctrl[0])
-
-                if not self.isZ2V3:
-                    self.__zselector[0].custom_encoder_speed = 0
-        except:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].hide()
-
-    def configure_small_knob_1(self, selected_channel, selected_clip):
-        if self.__zselector[1] is None:
-            self.__zselector_ctrl[1] = zynthian_controller(None, 'sketchpad_knob1',
-                                                            'sketchpad_knob1',
-                                                            {'midi_cc': 0, 'value': 0})
-
-            self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
-                                                            self)
-            self.__zselector[1].index = 0
-        if self.zynqtgui.get_current_screen_id() is not None and \
-                self.zynqtgui.get_current_screen() == self and \
-                (
-                    (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and
-                    selected_clip is not None and
-                    selected_clip.path is not None and
-                    len(selected_clip.path) > 0
-                ) or (
-                    self.zynqtgui.sound_combinator_active and
-                    selected_channel is not None and
-                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
-                ) or (
-                    ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
-                    selected_channel is not None and
-                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
-                ) or (
-                    self.zynqtgui.slotsBarMixerActive and
-                    selected_channel is not None
-                ):
-            logging.debug(
-                f"### set_selector : Configuring small knob 1, showing")
-
-            self.__zselector[1].show()
-        else:
-            logging.debug(
-                f"### set_selector : Configuring small knob 1, hiding")
-
-            if self.__zselector[1]:
-                self.__zselector[1].hide()
-
-        if self.zynqtgui.sound_combinator_active or self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
-            volume = 0
-            min_value = 0
-            max_value = 0
-
-            try:
-                # logging.error(f"layer({selected_channel.chainedSounds[selected_channel.selectedSlotRow]}), layerExists({selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])})")
-
-                if self.zynqtgui.sound_combinator_active and \
-                        selected_channel.checkIfLayerExists(
-                            selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
-                    volume = volume_control_obj.value
-                    min_value = volume_control_obj.value_min
-                    max_value = volume_control_obj.value_max
-                elif ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and \
-                        selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
-                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
-                    volume = volume_control_obj.value
-                    min_value = volume_control_obj.value_min
-                    max_value = volume_control_obj.value_max
-            except Exception as e:
-                logging.error(f"Error configuring knob 1 : {str(e)}")
-
-            logging.debug(
-                f"### set_selector : Configuring small knob 1, value({volume}), max_value({max_value}), min_value({min_value})")
-
-            self.__zselector_ctrl[1].set_options(
-                {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1',
-                 'short_name': 'Knob1',
-                 'midi_cc': 0, 'value_max': max_value + 1, 'value_min': min_value, 'value': volume})
-
-            self.__zselector[1].config(self.__zselector_ctrl[1])
-            self.__zselector[1].custom_encoder_speed = 0
-        elif self.zynqtgui.slotsBarMixerActive:
-            # zselector doesnt negetive minimum value. need to interpolate actual range (-40 to 20) to range (0 to 60)
-            volume = np.interp(selected_channel.volume, (-40, 20), (0, 60))
-
-            if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'sketchpad_knob1',
-                                                               'sketchpad_knob1',
-                                                               {'midi_cc': 0, 'value': volume})
-
-                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
-                                                              self)
-                self.__zselector[1].index = 0
-
-            logging.debug(f"### set_selector : Configuring small knob 1, value({volume})")
-
-
-            self.__zselector_ctrl[1].set_options(
-                {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1', 'short_name': 'Knob1',
-                 'midi_cc': 0, 'value_max': 60, 'value': volume})
-
-            self.__zselector[1].config(self.__zselector_ctrl[1])
-            self.__zselector[1].custom_encoder_speed = 0
-        else:
-            start_position = 0
-            max_value = 0
-
-            try:
-                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                    start_position = int(selected_clip.startPosition * 1000)
-                    max_value = int(selected_clip.duration * 1000)
-            except Exception as e:
-                logging.error(f"Error configuring knob 1 : {str(e)}")
-
-            if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'sketchpad_knob1',
-                                                               'sketchpad_knob1',
-                                                               {'midi_cc': 0, 'value': start_position})
-
-                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
-                                                              self)
-                self.__zselector[1].index = 0
-
-            logging.debug(f"### set_selector : Configuring small knob 1, value({start_position}), max_value({max_value})")
-
-            self.__zselector_ctrl[1].set_options(
-                {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1', 'short_name': 'Knob1',
-                 'midi_cc': 0, 'value_max': max_value, 'value': start_position})
-
-            self.__zselector[1].config(self.__zselector_ctrl[1])
-            self.__zselector[1].custom_encoder_speed = 0
-
-
-    def configure_small_knob_2(self, selected_channel, selected_clip):
-        if self.__zselector[2] is None:
-            self.__zselector_ctrl[2] = zynthian_controller(None, 'sketchpad_knob2',
-                                                           'sketchpad_knob2',
-                                                           {'midi_cc': 0, 'value': 0})
-
-            self.__zselector[2] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[2], self)
-            self.__zselector[2].index = 1
-
-        if (self.zynqtgui.get_current_screen_id() is not None and \
-            self.zynqtgui.get_current_screen() == self and \
-            (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
-            selected_clip is not None and \
-            selected_clip.path is not None and \
-            len(selected_clip.path) > 0) \
-                or (selected_channel is not None and self.zynqtgui.slotsBarMixerActive) \
-                or (((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
-                selected_channel is not None and
-                selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
-        ):
-            logging.debug(
-                f"### set_selector : Configuring small knob 2, showing")
-
-            self.__zselector[2].show()
-        else:
-            logging.debug(
-                f"### set_selector : Configuring small knob 2, hiding")
-            self.__zselector[2].hide()
-
-        if self.zynqtgui.slotsBarMixerActive:
-            pan_interped = 0
-
-            try:
-                if selected_channel is not None:
-                    pan_interped = np.interp(selected_channel.pan, (-1.0, 1.0), (0, 1000))
-            except Exception as e:
-                logging.error(f"Error configuring knob 2 : {str(e)}")
-
-            logging.debug(
-                f"### set_selector : Configuring small knob 2, value({pan_interped})")
-
-            self.__zselector_ctrl[2].set_options(
-                {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
-                 'short_name': 'sketchpad_knob2', 'midi_cc': 0, 'value_max': 1001, 'value': pan_interped})
-
-            self.__zselector[2].config(self.__zselector_ctrl[2])
-            self.__zselector[2].custom_encoder_speed = 0
-        elif self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
-            self.__filter_cutoff_controller.clear_controls()
-            midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
-            if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
-                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
-                synth_controllers_dict = layer.controllers_dict
-
-                if layer.engine.nickname in self.__engine_config and \
-                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
-                    self.__filter_cutoff_controller.add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
-                elif "cutoff" in synth_controllers_dict:
-                    self.__filter_cutoff_controller.add_control(synth_controllers_dict["cutoff"])
-                elif "filter_cutoff" in synth_controllers_dict:
-                    self.__filter_cutoff_controller.add_control(synth_controllers_dict["filter_cutoff"])
-
-            self.__zselector_ctrl[2].set_options(
-                {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
-                 'short_name': 'sketchpad_knob2', 'midi_cc': 0, 'value_max': 101, 'value': self.__filter_cutoff_controller.value})
-
-            self.__zselector[2].config(self.__zselector_ctrl[2])
-            self.__zselector[2].custom_encoder_speed = 0
-        else:
-            loop = 0
-            max_value = 0
-
-            try:
-                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                    loop = int(selected_clip.loopDelta * 1000)
-                    max_value = int(selected_clip.secPerBeat * selected_clip.length * 1000)
-            except Exception as e:
-                logging.error(f"Error configuring knob 2 : {str(e)}")
-
-            logging.debug(
-                f"### set_selector : Configuring small knob 2, value({loop}), max_value({max_value})")
-
-            self.__zselector_ctrl[2].set_options(
-                {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
-                 'short_name': 'sketchpad_knob2', 'midi_cc': 0, 'value_max': max_value, 'value': loop})
-
-            self.__zselector[2].config(self.__zselector_ctrl[2])
-            self.__zselector[2].custom_encoder_speed = 0
-
-
-    def configure_small_knob_3(self, selected_channel, selected_clip):
-        if self.__zselector[3] is None:
-            self.__zselector_ctrl[3] = zynthian_controller(None, 'sketchpad_knob3',
-                                                           'sketchpad_knob3',
-                                                           {'midi_cc': 0, 'value': 0})
-
-            self.__zselector[3] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[3],
-                                                          self)
-            self.__zselector[3].index = 2
-
-        if (self.zynqtgui.get_current_screen_id() is not None and \
-                self.zynqtgui.get_current_screen() == self and \
-                (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
-                selected_clip is not None and \
-                selected_clip.path is not None and \
-                len(selected_clip.path) > 0) or \
-                (((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
-                 selected_channel is not None and selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])):
-            logging.debug(
-                f"### set_selector : Configuring small knob 3, showing")
-            self.__zselector[3].show()
-        else:
-            logging.debug(
-                f"### set_selector : Configuring small knob 3, hiding")
-            self.__zselector[3].hide()
-
-        if self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive:
-            value = 0
-            min_value = 0
-            max_value = 0
-
-            try:
-                if self.zynqtgui.get_current_screen_id() is not None and \
-                        self.zynqtgui.get_current_screen() == self and \
-                        (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
-                        selected_clip is not None and \
-                        selected_clip.path is not None and \
-                        len(selected_clip.path) > 0:
-                    value = selected_clip.length * 100
-                    max_value = 64 * 100
-                    min_value = 0
-            except Exception as e:
-                logging.error(f"Error configuring knob 3 : {str(e)}")
-
-            logging.debug(
-                f"### set_selector : Configuring small knob 3, value({value}), max_value({max_value})")
-
-            self.__zselector_ctrl[3].set_options(
-                {'symbol': 'sketchpad_knob3', 'name': 'Sketchpad Knob3',
-                 'short_name': 'Knob3',
-                 'midi_cc': 0, 'value_max': max_value, 'value_min': min_value, 'value': value})
-
-            self.__zselector[3].config(self.__zselector_ctrl[3])
-        elif self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
-            self.__filter_resonance_controller.clear_controls()
-            midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
-            if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
-                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
-                synth_controllers_dict = layer.controllers_dict
-
-                if layer.engine.nickname in self.__engine_config and \
-                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
-                    self.__filter_resonance_controller.add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
-                elif "resonance" in synth_controllers_dict:
-                    self.__filter_resonance_controller.add_control(synth_controllers_dict["resonance"])
-                elif "filter_resonance" in synth_controllers_dict:
-                    self.__filter_resonance_controller.add_control(synth_controllers_dict["filter_resonance"])
-
-            self.__zselector_ctrl[3].set_options(
-                {'symbol': 'sketchpad_knob3', 'name': 'sketchpad_knob3',
-                 'short_name': 'sketchpad_knob3', 'midi_cc': 0, 'value_max': 101,
-                 'value': self.__filter_resonance_controller.value})
-
-            self.__zselector[3].config(self.__zselector_ctrl[3])
-            self.__zselector[3].custom_encoder_speed = 0
+#    def zyncoder_read(self):
+#        if self.zynqtgui.knobTouchUpdateInProgress or self.zynqtgui.session_dashboard.selected_channel_change_in_progress or self.is_set_selector_running:
+#            return
+#        if self.is_set_selector_running:
+#            # Set selector in progress. Not setting value with encoder
+#            return
+
+#        if self.__zselector[0] and self.__song__:
+#            self.__zselector[0].read_zyncoder()
+
+#            if self.__big_knob_mode__ == "preset":
+#                QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+#            elif self.__big_knob_mode__ == "segment":
+#                QMetaObject.invokeMethod(self, "zyncoder_set_selected_segment", Qt.QueuedConnection)
+#            elif self.__big_knob_mode__ == "channel":
+#                QMetaObject.invokeMethod(self, "zyncoder_set_selected_channel", Qt.QueuedConnection)
+
+#        # Update clip startposition/layer volume when required with small knob 1
+#        if self.__zselector[1] and self.__song__:
+#            self.__zselector[1].read_zyncoder()
+#            if self.zynqtgui.sound_combinator_active or self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
+#                QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
+#            elif self.zynqtgui.slotsBarMixerActive:
+#                QMetaObject.invokeMethod(self, "zyncoder_update_channel_volume", Qt.QueuedConnection)
+#            else:
+#                QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
+
+#        # Update clip length when required with small knob 2
+#        if self.__zselector[2] and self.__song__:
+#            self.__zselector[2].read_zyncoder()
+#            if self.zynqtgui.slotsBarMixerActive:
+#                QMetaObject.invokeMethod(self, "zyncoder_update_channel_pan", Qt.QueuedConnection)
+#            elif self.zynqtgui.slotsBarSynthsActive or self.zynqtgui.slotsBarChannelActive:
+#                QMetaObject.invokeMethod(self, "zyncoder_set_synth_filter_cutoff", Qt.QueuedConnection)
+#            else:
+#                QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.QueuedConnection)
+
+#        # Update clip length when required with small knob 3
+#        if self.__zselector[3] and self.__song__:
+#            self.__zselector[3].read_zyncoder()
+
+#            if self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive:
+#                QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
+#            elif self.zynqtgui.slotsBarSynthsActive or self.zynqtgui.slotsBarChannelActive:
+#                QMetaObject.invokeMethod(self, "zyncoder_set_synth_filter_resonance", Qt.QueuedConnection)
+
+#        return [0, 1, 2, 3]
+
+#    @Slot(None)
+#    def configure_big_knob(self):
+#        try:
+#            if self.__zselector[0] is not None:
+#                self.__zselector[0].show()
+
+#            if self.zynqtgui.sound_combinator_active:
+#                # If sound combinator is active, Use Big knob to control preset
+
+#                self.__big_knob_mode__ = "preset"
+
+#                logging.debug(f"### set_selector : Configuring big knob, sound combinator is active.")
+#                channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+#                selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
+#                logging.debug(f"### selectedChannel : channel{self.zynqtgui.session_dashboard.selectedChannel}({channel}), slot({channel.selectedSlotRow}), channel({selected_channel})")
+#                preset_index = 0
+#                max_value = 0
+
+#                try:
+#                    preset_index = self.zynqtgui.layer.layer_midi_map[selected_channel].preset_index * 1000
+#                    max_value = len(self.zynqtgui.layer.layer_midi_map[selected_channel].preset_list) * 1000
+#                except:
+#                    pass
+
+#                if self.__zselector[0] is None:
+#                    self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_preset', 'sketchpad_preset',
+#                                                                {'midi_cc': 0, 'value': preset_index})
+
+#                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
+#                                                                  self.__zselector_ctrl[0], self)
+#                    self.__zselector[0].show()
+
+#                self.__zselector_ctrl[0].set_options(
+#                    {'symbol': 'sketchpad_preset', 'name': 'Sketchpad Preset', 'short_name': 'Preset', 'midi_cc': 0,
+#                     'value_max': max_value, 'value_min': 0, 'value': preset_index})
+
+#                self.__zselector[0].config(self.__zselector_ctrl[0])
+#                self.__zselector[0].custom_encoder_speed = 0
+#            elif self.song.sketchesModel.songMode:
+#                # If sound combinator is not active and in song mode, Use Big knob to control selected segment
+
+#                self.__big_knob_mode__ = "segment"
+
+#                try:
+#                    selected_segment = self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
+#                except:
+#                    selected_segment = 0
+
+#                logging.debug(
+#                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment})")
+
+#                if self.__zselector[0] is None:
+#                    self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_segment', 'sketchpad_segment',
+#                                                                   {'midi_cc': 0, 'value': selected_segment,
+#                                                                    'step': 1})
+
+#                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
+#                                                                  self.__zselector_ctrl[0],
+#                                                                  self)
+#                    self.__zselector[0].show()
+
+#                self.__zselector_ctrl[0].set_options(
+#                    {'symbol': 'sketchpad_segment', 'name': 'sketchpad_segment', 'short_name': 'sketchpad_segment', 'midi_cc': 0,
+#                     'value_min': 0, 'value_max': self.song.sketchesModel.selectedSketch.segmentsModel.count, 'value': selected_segment, 'step': 1})
+
+#                self.__zselector[0].config(self.__zselector_ctrl[0])
+
+#                if not self.isZ2V3:
+#                    self.__zselector[0].custom_encoder_speed = 0
+#            else:
+#                # If sound combinator is not active and not song mode, Use Big knob to control selected channel
+
+#                self.__big_knob_mode__ = "channel"
+
+#                try:
+#                    selected_channel = self.zynqtgui.session_dashboard.get_selected_channel()
+#                except:
+#                    selected_channel = 0
+
+#                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_channel({selected_channel})")
+
+#                if self.__zselector[0] is None:
+#                    self.__zselector_ctrl[0] = zynthian_controller(None, 'sketchpad_channel', 'sketchpad_channel',
+#                                                                {'midi_cc': 0, 'value': selected_channel, 'step': 1})
+
+#                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
+#                                                                  self)
+#                    self.__zselector[0].show()
+
+#                self.__zselector_ctrl[0].set_options(
+#                    {'symbol': 'sketchpad_channel', 'name': 'sketchpad_channel', 'short_name': 'sketchpad_channel', 'midi_cc': 0,
+#                     'value_min': 0, 'value_max': 10, 'value': selected_channel, 'step': 1})
+
+#                self.__zselector[0].config(self.__zselector_ctrl[0])
+
+#                if not self.isZ2V3:
+#                    self.__zselector[0].custom_encoder_speed = 0
+#        except:
+#            if self.__zselector[0] is not None:
+#                self.__zselector[0].hide()
+
+#    def configure_small_knob_1(self, selected_channel, selected_clip):
+#        if self.__zselector[1] is None:
+#            self.__zselector_ctrl[1] = zynthian_controller(None, 'sketchpad_knob1',
+#                                                            'sketchpad_knob1',
+#                                                            {'midi_cc': 0, 'value': 0})
+
+#            self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+#                                                            self)
+#            self.__zselector[1].index = 0
+#        if self.zynqtgui.get_current_screen_id() is not None and \
+#                self.zynqtgui.get_current_screen() == self and \
+#                (
+#                    (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and
+#                    selected_clip is not None and
+#                    selected_clip.path is not None and
+#                    len(selected_clip.path) > 0
+#                ) or (
+#                    self.zynqtgui.sound_combinator_active and
+#                    selected_channel is not None and
+#                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
+#                ) or (
+#                    ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
+#                    selected_channel is not None and
+#                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
+#                ) or (
+#                    self.zynqtgui.slotsBarMixerActive and
+#                    selected_channel is not None
+#                ):
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 1, showing")
+
+#            self.__zselector[1].show()
+#        else:
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 1, hiding")
+
+#            if self.__zselector[1]:
+#                self.__zselector[1].hide()
+
+#        if self.zynqtgui.sound_combinator_active or self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
+#            volume = 0
+#            min_value = 0
+#            max_value = 0
+
+#            try:
+#                # logging.error(f"layer({selected_channel.chainedSounds[selected_channel.selectedSlotRow]}), layerExists({selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])})")
+
+#                if self.zynqtgui.sound_combinator_active and \
+#                        selected_channel.checkIfLayerExists(
+#                            selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
+#                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+#                    volume = volume_control_obj.value
+#                    min_value = volume_control_obj.value_min
+#                    max_value = volume_control_obj.value_max
+#                elif ((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and \
+#                        selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
+#                    volume_control_obj = self.zynqtgui.fixed_layers.volumeControllers[selected_channel.chainedSounds[selected_channel.selectedSlotRow]]
+#                    volume = volume_control_obj.value
+#                    min_value = volume_control_obj.value_min
+#                    max_value = volume_control_obj.value_max
+#            except Exception as e:
+#                logging.error(f"Error configuring knob 1 : {str(e)}")
+
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 1, value({volume}), max_value({max_value}), min_value({min_value})")
+
+#            self.__zselector_ctrl[1].set_options(
+#                {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1',
+#                 'short_name': 'Knob1',
+#                 'midi_cc': 0, 'value_max': max_value + 1, 'value_min': min_value, 'value': volume})
+
+#            self.__zselector[1].config(self.__zselector_ctrl[1])
+#            self.__zselector[1].custom_encoder_speed = 0
+#        elif self.zynqtgui.slotsBarMixerActive:
+#            # zselector doesnt negetive minimum value. need to interpolate actual range (-40 to 20) to range (0 to 60)
+#            volume = np.interp(selected_channel.volume, (-40, 20), (0, 60))
+
+#            if self.__zselector[1] is None:
+#                self.__zselector_ctrl[1] = zynthian_controller(None, 'sketchpad_knob1',
+#                                                               'sketchpad_knob1',
+#                                                               {'midi_cc': 0, 'value': volume})
+
+#                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+#                                                              self)
+#                self.__zselector[1].index = 0
+
+#            logging.debug(f"### set_selector : Configuring small knob 1, value({volume})")
+
+
+#            self.__zselector_ctrl[1].set_options(
+#                {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1', 'short_name': 'Knob1',
+#                 'midi_cc': 0, 'value_max': 60, 'value': volume})
+
+#            self.__zselector[1].config(self.__zselector_ctrl[1])
+#            self.__zselector[1].custom_encoder_speed = 0
+#        else:
+#            start_position = 0
+#            max_value = 0
+
+#            try:
+#                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+#                    start_position = int(selected_clip.startPosition * 1000)
+#                    max_value = int(selected_clip.duration * 1000)
+#            except Exception as e:
+#                logging.error(f"Error configuring knob 1 : {str(e)}")
+
+#            if self.__zselector[1] is None:
+#                self.__zselector_ctrl[1] = zynthian_controller(None, 'sketchpad_knob1',
+#                                                               'sketchpad_knob1',
+#                                                               {'midi_cc': 0, 'value': start_position})
+
+#                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+#                                                              self)
+#                self.__zselector[1].index = 0
+
+#            logging.debug(f"### set_selector : Configuring small knob 1, value({start_position}), max_value({max_value})")
+
+#            self.__zselector_ctrl[1].set_options(
+#                {'symbol': 'sketchpad_knob1', 'name': 'Sketchpad Knob 1', 'short_name': 'Knob1',
+#                 'midi_cc': 0, 'value_max': max_value, 'value': start_position})
+
+#            self.__zselector[1].config(self.__zselector_ctrl[1])
+#            self.__zselector[1].custom_encoder_speed = 0
+
+
+#    def configure_small_knob_2(self, selected_channel, selected_clip):
+#        if self.__zselector[2] is None:
+#            self.__zselector_ctrl[2] = zynthian_controller(None, 'sketchpad_knob2',
+#                                                           'sketchpad_knob2',
+#                                                           {'midi_cc': 0, 'value': 0})
+
+#            self.__zselector[2] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[2], self)
+#            self.__zselector[2].index = 1
+
+#        if (self.zynqtgui.get_current_screen_id() is not None and \
+#            self.zynqtgui.get_current_screen() == self and \
+#            (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
+#            selected_clip is not None and \
+#            selected_clip.path is not None and \
+#            len(selected_clip.path) > 0) \
+#                or (selected_channel is not None and self.zynqtgui.slotsBarMixerActive) \
+#                or (((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
+#                selected_channel is not None and
+#                selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
+#        ):
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 2, showing")
+
+#            self.__zselector[2].show()
+#        else:
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 2, hiding")
+#            self.__zselector[2].hide()
+
+#        if self.zynqtgui.slotsBarMixerActive:
+#            pan_interped = 0
+
+#            try:
+#                if selected_channel is not None:
+#                    pan_interped = np.interp(selected_channel.pan, (-1.0, 1.0), (0, 1000))
+#            except Exception as e:
+#                logging.error(f"Error configuring knob 2 : {str(e)}")
+
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 2, value({pan_interped})")
+
+#            self.__zselector_ctrl[2].set_options(
+#                {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
+#                 'short_name': 'sketchpad_knob2', 'midi_cc': 0, 'value_max': 1001, 'value': pan_interped})
+
+#            self.__zselector[2].config(self.__zselector_ctrl[2])
+#            self.__zselector[2].custom_encoder_speed = 0
+#        elif self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
+#            self.__filter_cutoff_controller.clear_controls()
+#            midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
+#            if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
+#                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+#                synth_controllers_dict = layer.controllers_dict
+
+#                if layer.engine.nickname in self.__engine_config and \
+#                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
+#                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
+#                    self.__filter_cutoff_controller.add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+#                elif "cutoff" in synth_controllers_dict:
+#                    self.__filter_cutoff_controller.add_control(synth_controllers_dict["cutoff"])
+#                elif "filter_cutoff" in synth_controllers_dict:
+#                    self.__filter_cutoff_controller.add_control(synth_controllers_dict["filter_cutoff"])
+
+#            self.__zselector_ctrl[2].set_options(
+#                {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
+#                 'short_name': 'sketchpad_knob2', 'midi_cc': 0, 'value_max': 101, 'value': self.__filter_cutoff_controller.value})
+
+#            self.__zselector[2].config(self.__zselector_ctrl[2])
+#            self.__zselector[2].custom_encoder_speed = 0
+#        else:
+#            loop = 0
+#            max_value = 0
+
+#            try:
+#                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+#                    loop = int(selected_clip.loopDelta * 1000)
+#                    max_value = int(selected_clip.secPerBeat * selected_clip.length * 1000)
+#            except Exception as e:
+#                logging.error(f"Error configuring knob 2 : {str(e)}")
+
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 2, value({loop}), max_value({max_value})")
+
+#            self.__zselector_ctrl[2].set_options(
+#                {'symbol': 'sketchpad_knob2', 'name': 'sketchpad_knob2',
+#                 'short_name': 'sketchpad_knob2', 'midi_cc': 0, 'value_max': max_value, 'value': loop})
+
+#            self.__zselector[2].config(self.__zselector_ctrl[2])
+#            self.__zselector[2].custom_encoder_speed = 0
+
+
+#    def configure_small_knob_3(self, selected_channel, selected_clip):
+#        if self.__zselector[3] is None:
+#            self.__zselector_ctrl[3] = zynthian_controller(None, 'sketchpad_knob3',
+#                                                           'sketchpad_knob3',
+#                                                           {'midi_cc': 0, 'value': 0})
+
+#            self.__zselector[3] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[3],
+#                                                          self)
+#            self.__zselector[3].index = 2
+
+#        if (self.zynqtgui.get_current_screen_id() is not None and \
+#                self.zynqtgui.get_current_screen() == self and \
+#                (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
+#                selected_clip is not None and \
+#                selected_clip.path is not None and \
+#                len(selected_clip.path) > 0) or \
+#                (((self.zynqtgui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zynqtgui.slotsBarSynthsActive) and
+#                 selected_channel is not None and selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])):
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 3, showing")
+#            self.__zselector[3].show()
+#        else:
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 3, hiding")
+#            self.__zselector[3].hide()
+
+#        if self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive:
+#            value = 0
+#            min_value = 0
+#            max_value = 0
+
+#            try:
+#                if self.zynqtgui.get_current_screen_id() is not None and \
+#                        self.zynqtgui.get_current_screen() == self and \
+#                        (self.zynqtgui.channelWaveEditorBarActive or self.zynqtgui.clipWaveEditorBarActive) and \
+#                        selected_clip is not None and \
+#                        selected_clip.path is not None and \
+#                        len(selected_clip.path) > 0:
+#                    value = selected_clip.length * 100
+#                    max_value = 64 * 100
+#                    min_value = 0
+#            except Exception as e:
+#                logging.error(f"Error configuring knob 3 : {str(e)}")
+
+#            logging.debug(
+#                f"### set_selector : Configuring small knob 3, value({value}), max_value({max_value})")
+
+#            self.__zselector_ctrl[3].set_options(
+#                {'symbol': 'sketchpad_knob3', 'name': 'Sketchpad Knob3',
+#                 'short_name': 'Knob3',
+#                 'midi_cc': 0, 'value_max': max_value, 'value_min': min_value, 'value': value})
+
+#            self.__zselector[3].config(self.__zselector_ctrl[3])
+#        elif self.zynqtgui.slotsBarChannelActive or self.zynqtgui.slotsBarSynthsActive:
+#            self.__filter_resonance_controller.clear_controls()
+#            midi_channel = selected_channel.chainedSounds[selected_channel.selectedSlotRow]
+#            if midi_channel >= 0 and selected_channel.checkIfLayerExists(midi_channel):
+#                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+#                synth_controllers_dict = layer.controllers_dict
+
+#                if layer.engine.nickname in self.__engine_config and \
+#                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
+#                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
+#                    self.__filter_resonance_controller.add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+#                elif "resonance" in synth_controllers_dict:
+#                    self.__filter_resonance_controller.add_control(synth_controllers_dict["resonance"])
+#                elif "filter_resonance" in synth_controllers_dict:
+#                    self.__filter_resonance_controller.add_control(synth_controllers_dict["filter_resonance"])
+
+#            self.__zselector_ctrl[3].set_options(
+#                {'symbol': 'sketchpad_knob3', 'name': 'sketchpad_knob3',
+#                 'short_name': 'sketchpad_knob3', 'midi_cc': 0, 'value_max': 101,
+#                 'value': self.__filter_resonance_controller.value})
+
+#            self.__zselector[3].config(self.__zselector_ctrl[3])
+#            self.__zselector[3].custom_encoder_speed = 0
 
     def set_selector_throttled(self):
         self.set_selector_timer.start()
@@ -952,55 +954,55 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def set_set_selector_active(self):
         self.is_set_selector_running = True
 
-    @Slot(None)
-    def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True, force=False):
-        # Hide selectors and return if dependent variables is None or a long operation is in progress
-        if (self.__song__ is None or \
-                (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) or \
-                (self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self) or \
-                self.longOperation) and not force:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].hide()
-            if self.__zselector[1] is not None:
-                self.__zselector[1].hide()
-            if self.__zselector[2] is not None:
-                self.__zselector[2].hide()
-            if self.__zselector[3] is not None:
-                self.__zselector[3].hide()
+#    @Slot(None)
+#    def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True, force=False):
+#        # Hide selectors and return if dependent variables is None or a long operation is in progress
+#        if (self.__song__ is None or \
+#                (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) or \
+#                (self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self) or \
+#                self.longOperation) and not force:
+#            if self.__zselector[0] is not None:
+#                self.__zselector[0].hide()
+#            if self.__zselector[1] is not None:
+#                self.__zselector[1].hide()
+#            if self.__zselector[2] is not None:
+#                self.__zselector[2].hide()
+#            if self.__zselector[3] is not None:
+#                self.__zselector[3].hide()
 
-            return
+#            return
 
-        self.is_set_selector_running = True
+#        self.is_set_selector_running = True
 
-        ### Common vars for small knobs
-        selected_clip = None
-        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
+#        ### Common vars for small knobs
+#        selected_clip = None
+#        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
 
-        if self.zynqtgui.channelWaveEditorBarActive:
-            logging.debug(f"### set_selector : channelWaveEditorBarActive is active.")
-            selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
-        elif self.zynqtgui.clipWaveEditorBarActive:
-            logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
-            selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedTrackIndex)
-        ###
+#        if self.zynqtgui.channelWaveEditorBarActive:
+#            logging.debug(f"### set_selector : channelWaveEditorBarActive is active.")
+#            selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
+#        elif self.zynqtgui.clipWaveEditorBarActive:
+#            logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
+#            selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedTrackIndex)
+#        ###
 
-        # Configure Big Knob
-        if big_knob:
-            self.configure_big_knob()
+#        # Configure Big Knob
+#        if big_knob:
+#            self.configure_big_knob()
 
-        # Configure small knob 1
-        if small_knob1:
-            self.configure_small_knob_1(selected_channel_obj, selected_clip)
+#        # Configure small knob 1
+#        if small_knob1:
+#            self.configure_small_knob_1(selected_channel_obj, selected_clip)
 
-        # Configure small knob 2
-        if small_knob2:
-            self.configure_small_knob_2(selected_channel_obj, selected_clip)
+#        # Configure small knob 2
+#        if small_knob2:
+#            self.configure_small_knob_2(selected_channel_obj, selected_clip)
 
-        # Configure small knob 3
-        if small_knob3:
-            self.configure_small_knob_3(selected_channel_obj, selected_clip)
+#        # Configure small knob 3
+#        if small_knob3:
+#            self.configure_small_knob_3(selected_channel_obj, selected_clip)
 
-        self.is_set_selector_running = False
+#        self.is_set_selector_running = False
 
     def switch_select(self, t):
         pass
@@ -1230,9 +1232,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     ongoingCountIn = Property(int, get_ongoingCountIn, set_ongoingCountIn, notify=ongoingCountInChanged)
 
-    def show(self):
-        if self.zynqtgui.isBootingComplete:
-            self.set_selector(force=True)
+#    def show(self):
+#        if self.zynqtgui.isBootingComplete:
+#            self.set_selector(force=True)
 
     @Signal
     def current_beat_changed(self):

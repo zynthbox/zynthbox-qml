@@ -408,14 +408,6 @@ Zynthian.ScreenPage {
         }
     }
 
-    Connections {
-        target: zynqtgui.sketchpad
-
-        function onBigKnobDelta(delta) {
-            console.log("On Big Knob Delta :", delta)
-        }
-    }
-
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
         zynqtgui.bottomBarControlType = "bottombar-controltype-song";

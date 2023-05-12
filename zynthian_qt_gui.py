@@ -588,10 +588,13 @@ class zynthian_gui(QObject):
         # Global zselectors
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
-        self.__bigknob_value = 10
-        self.__smallknob1_value = 10
-        self.__smallknob2_value = 10
-        self.__smallknob3_value = 10
+        self.__knob_delta_factor = 500
+        self.__knob_value_max = 20000
+        self.__knob_value_default = 10000
+        self.__bigknob_value = self.__knob_value_default
+        self.__smallknob1_value = self.__knob_value_default
+        self.__smallknob2_value = self.__knob_value_default
+        self.__smallknob3_value = self.__knob_value_default
         # Setup timers to reset knob zyncoder values
         # If value is reset immediately after reading then due to loss of precison when setting value,
         # decerasing happens faster than increasing which causes knobs to not work as expected
@@ -1010,65 +1013,64 @@ class zynthian_gui(QObject):
 #            )
 
     def reset_bigknob(self):
-        self.__zselector[0].set_value(10, True)
-        self.__bigknob_value = 10
+        self.__zselector[0].set_value(self.__knob_value_default, True)
+        self.__bigknob_value = self.__knob_value_default
 
     def reset_smallknob1(self):
-        self.__zselector[1].set_value(10, True)
-        self.__smallknob1_value = 10
+        self.__zselector[1].set_value(self.__knob_value_default, True)
+        self.__smallknob1_value = self.__knob_value_default
 
     def reset_smallknob2(self):
-        self.__zselector[2].set_value(10, True)
-        self.__smallknob2_value = 10
+        self.__zselector[2].set_value(self.__knob_value_default, True)
+        self.__smallknob2_value = self.__knob_value_default
 
     def reset_smallknob3(self):
-        self.__zselector[3].set_value(10, True)
-        self.__smallknob3_value = 10
+        self.__zselector[3].set_value(self.__knob_value_default, True)
+        self.__smallknob3_value = self.__knob_value_default
 
     @Slot()
     def zyncoder_bigknob(self):
         if self.__bigknob_value != self.__zselector[0].value:
-            new_val = self.__zselector[0].value
-            self.bigKnobDelta.emit(new_val - self.__bigknob_value)
-            self.__bigknob_value = new_val
+            self.bigKnobDelta.emit(self.__zselector[0].value - self.__bigknob_value)
+            self.__bigknob_value = self.__zselector[0].value
             self.__bigknob_reset_timer.start()
 
     @Slot()
     def zyncoder_smallknob1(self):
-        if self.__smallknob1_value != self.__zselector[1].value:
-            new_val = self.__zselector[1].value
-            self.smallKnob1Delta.emit(new_val - self.__smallknob1_value)
-            self.__smallknob1_value = new_val
+        delta = round((self.__zselector[1].value - self.__smallknob1_value) / self.__knob_delta_factor)
+        if delta != 0:
+            self.smallKnob1Delta.emit(delta)
+            self.__smallknob1_value = self.__zselector[1].value
             self.__smallknob1_reset_timer.start()
 
     @Slot()
     def zyncoder_smallknob2(self):
-        if self.__smallknob2_value != self.__zselector[2].value:
-            new_val = self.__zselector[2].value
-            self.smallKnob2Delta.emit(new_val - self.__smallknob2_value)
-            self.__smallknob2_value = new_val
+        delta = round((self.__zselector[2].value - self.__smallknob2_value) / self.__knob_delta_factor)
+        if delta != 0:
+            self.smallKnob2Delta.emit(delta)
+            self.__smallknob2_value = self.__zselector[2].value
             self.__smallknob2_reset_timer.start()
 
     @Slot()
     def zyncoder_smallknob3(self):
-        if self.__smallknob3_value != self.__zselector[3].value:
-            new_val = self.__zselector[3].value
-            self.smallKnob3Delta.emit(new_val - self.__smallknob3_value)
-            self.__smallknob3_value = new_val
+        delta = round((self.__zselector[3].value - self.__smallknob3_value) / self.__knob_delta_factor)
+        if delta != 0:
+            self.smallKnob3Delta.emit(delta)
+            self.__smallknob3_value = self.__zselector[3].value
             self.__smallknob3_reset_timer.start()
 
     def configure_bigknob(self):
         try:
             if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'delta_bigknob', 'delta_bigknob', {'name': 'Big Knob Delta', 'short_name': 'Bigknob Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'delta_bigknob', 'delta_bigknob', {'name': 'Big Knob Delta', 'short_name': 'Bigknob Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
                 self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
                 self.__zselector[0].config(self.__zselector_ctrl[0])
-                self.__zselector[0].set_value(10, True)
+                self.__zselector[0].set_value(self.__knob_value_default, True)
                 self.__zselector[0].step = 1
                 self.__zselector[0].mult = 1
 
             self.__zselector[0].show()
-            self.__zselector_ctrl[0].set_options({"value": 10})
+            self.__zselector_ctrl[0].set_options({"value": self.__knob_value_default})
             self.__zselector[0].config(self.__zselector_ctrl[0])
         except:
             if self.__zselector[0] is not None:
@@ -1077,15 +1079,15 @@ class zynthian_gui(QObject):
     def configure_smallknob1(self):
         try:
             if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'delta_smallknob1', 'delta_smallknob1', {'name': 'Small Knob 1 Delta', 'short_name': 'Small Knob 1 Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'delta_smallknob1', 'delta_smallknob1', {'name': 'Small Knob 1 Delta', 'short_name': 'Small Knob 1 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
                 self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
                 self.__zselector[1].config(self.__zselector_ctrl[1])
-                self.__zselector[1].set_value(10, True)
+                self.__zselector[1].set_value(self.__knob_value_default, True)
                 self.__zselector[1].step = 1
                 self.__zselector[1].mult = 1
 
             self.__zselector[1].show()
-            self.__zselector_ctrl[1].set_options({"value": 10})
+            self.__zselector_ctrl[1].set_options({"value": self.__knob_value_default})
             self.__zselector[1].config(self.__zselector_ctrl[1])
         except:
             if self.__zselector[1] is not None:
@@ -1094,15 +1096,15 @@ class zynthian_gui(QObject):
     def configure_smallknob2(self):
         try:
             if self.__zselector[2] is None:
-                self.__zselector_ctrl[2] = zynthian_controller(None, 'delta_smallknob2', 'delta_smallknob2', {'name': 'Small Knob 2 Delta', 'short_name': 'Small Knob 2 Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector_ctrl[2] = zynthian_controller(None, 'delta_smallknob2', 'delta_smallknob2', {'name': 'Small Knob 2 Delta', 'short_name': 'Small Knob 2 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
                 self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
                 self.__zselector[2].config(self.__zselector_ctrl[2])
-                self.__zselector[2].set_value(10, True)
+                self.__zselector[2].set_value(self.__knob_value_default, True)
                 self.__zselector[2].step = 1
                 self.__zselector[2].mult = 1
 
             self.__zselector[2].show()
-            self.__zselector_ctrl[2].set_options({"value": 10})
+            self.__zselector_ctrl[2].set_options({"value": self.__knob_value_default})
             self.__zselector[2].config(self.__zselector_ctrl[2])
         except:
             if self.__zselector[2] is not None:
@@ -1111,15 +1113,15 @@ class zynthian_gui(QObject):
     def configure_smallknob3(self):
         try:
             if self.__zselector[3] is None:
-                self.__zselector_ctrl[3] = zynthian_controller(None, 'delta_smallknob3', 'delta_smallknob3', {'name': 'Small Knob 3 Delta', 'short_name': 'Small Knob 3 Delta', 'midi_cc': 0, 'value_max': 20, 'value_min': 0, 'value': 10})
+                self.__zselector_ctrl[3] = zynthian_controller(None, 'delta_smallknob3', 'delta_smallknob3', {'name': 'Small Knob 3 Delta', 'short_name': 'Small Knob 3 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
                 self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
                 self.__zselector[3].config(self.__zselector_ctrl[3])
-                self.__zselector[3].set_value(10, True)
+                self.__zselector[3].set_value(self.__knob_value_default, True)
                 self.__zselector[3].step = 1
                 self.__zselector[3].mult = 1
 
             self.__zselector[3].show()
-            self.__zselector_ctrl[3].set_options({"value": 10})
+            self.__zselector_ctrl[3].set_options({"value": self.__knob_value_default})
             self.__zselector[3].config(self.__zselector_ctrl[3])
         except:
             if self.__zselector[3] is not None:

@@ -31,7 +31,7 @@ import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
 
-import '../../Zynthian' 1.0 as Zynthian
+import Zynthian 1.0 as Zynthian
 import '../SessionDashboard'
 
 Zynthian.ScreenPage {
@@ -258,6 +258,14 @@ Zynthian.ScreenPage {
                     return false
                 }
 
+                return true
+
+            case "KNOB3_UP":
+                zynqtgui.session_dashboard.selectedChannel = Zynthian.CommonUtils.clamp(zynqtgui.session_dashboard.selectedChannel + 1, 0, 9)
+                return true
+
+            case "KNOB3_DOWN":
+                zynqtgui.session_dashboard.selectedChannel = Zynthian.CommonUtils.clamp(zynqtgui.session_dashboard.selectedChannel - 1, 0, 9)
                 return true
         }
 

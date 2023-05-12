@@ -313,6 +313,34 @@ MouseArea {
                 case "SCREEN_AUDIO_SETTINGS":
                     popup.close()
                     return true
+
+                case "KNOB0_UP":
+                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
+                    return true
+                case "KNOB0_DOWN":
+                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
+                    return true
+
+                case "KNOB1_UP":
+                    zynqtgui.delayKnobValue = Zynthian.CommonUtils.clamp(zynqtgui.delayKnobValue + 1, 0, 100)
+                    return true
+                case "KNOB1_DOWN":
+                    zynqtgui.delayKnobValue = Zynthian.CommonUtils.clamp(zynqtgui.delayKnobValue - 1, 0, 100)
+                    return true
+
+                case "KNOB2_UP":
+                    zynqtgui.reverbKnobValue = Zynthian.CommonUtils.clamp(zynqtgui.reverbKnobValue + 1, 0, 100)
+                    return true
+                case "KNOB2_DOWN":
+                    zynqtgui.reverbKnobValue = Zynthian.CommonUtils.clamp(zynqtgui.reverbKnobValue - 1, 0, 100)
+                    return true
+
+                case "KNOB3_UP":
+                    zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.song.bpm + 1, 50, 200)
+                    return true
+                case "KNOB3_DOWN":
+                    zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.song.bpm - 1, 50, 200)
+                    return true
             }
         }
 

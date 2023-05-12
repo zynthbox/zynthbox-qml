@@ -696,23 +696,6 @@ Kirigami.AbstractApplicationWindow {
     }
 
     Connections {
-        target: zynqtgui
-
-        function onBigKnobDelta(delta) {
-            console.log("Big Knob Delta :", delta)
-        }
-        function onSmallKnob1Delta(delta) {
-            console.log("Small Knob 1 Delta :", delta)
-        }
-        function onSmallKnob2Delta(delta) {
-            console.log("Small Knob 2 Delta :", delta)
-        }
-        function onSmallKnob3Delta(delta) {
-            console.log("Small Knob 3 Delta :", delta)
-        }
-    }
-
-    Connections {
         target: Zynthbox.PlayGridManager
         onTaskMessage: {
             Qt.callLater(function() {

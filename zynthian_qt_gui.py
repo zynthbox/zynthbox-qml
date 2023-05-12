@@ -591,30 +591,32 @@ class zynthian_gui(QObject):
         self.__knob_delta_factor = 500
         self.__knob_value_max = 20000
         self.__knob_value_default = 10000
-        self.__bigknob_value = self.__knob_value_default
-        self.__smallknob1_value = self.__knob_value_default
-        self.__smallknob2_value = self.__knob_value_default
-        self.__smallknob3_value = self.__knob_value_default
+        self.__knob0_value = self.__knob_value_default
+        self.__knob1_value = self.__knob_value_default
+        self.__knob2_value = self.__knob_value_default
+        self.__knob3_value = self.__knob_value_default
         # Setup timers to reset knob zyncoder values
         # If value is reset immediately after reading then due to loss of precison when setting value,
         # decerasing happens faster than increasing which causes knobs to not work as expected
         # So instead of resetting on every read, set a timer to reset after 2 seconds of idle time
-        self.__bigknob_reset_timer = QTimer(self)
-        self.__bigknob_reset_timer.setSingleShot(True)
-        self.__bigknob_reset_timer.setInterval(2000)
-        self.__bigknob_reset_timer.timeout.connect(self.reset_bigknob)
-        self.__smallknob1_reset_timer = QTimer(self)
-        self.__smallknob1_reset_timer.setSingleShot(True)
-        self.__smallknob1_reset_timer.setInterval(2000)
-        self.__smallknob1_reset_timer.timeout.connect(self.reset_smallknob1)
-        self.__smallknob2_reset_timer = QTimer(self)
-        self.__smallknob2_reset_timer.setSingleShot(True)
-        self.__smallknob2_reset_timer.setInterval(2000)
-        self.__smallknob2_reset_timer.timeout.connect(self.reset_smallknob2)
-        self.__smallknob3_reset_timer = QTimer(self)
-        self.__smallknob3_reset_timer.setSingleShot(True)
-        self.__smallknob3_reset_timer.setInterval(2000)
-        self.__smallknob3_reset_timer.timeout.connect(self.reset_smallknob3)
+        self.__knob0_reset_timer = QTimer(self)
+        self.__knob0_reset_timer.setSingleShot(True)
+        self.__knob0_reset_timer.setInterval(2000)
+        self.__knob0_reset_timer.timeout.connect(self.reset_knob0)
+        self.__knob1_reset_timer = QTimer(self)
+        self.__knob1_reset_timer.setSingleShot(True)
+        self.__knob1_reset_timer.setInterval(2000)
+        self.__knob1_reset_timer.timeout.connect(self.reset_knob1)
+        self.__knob2_reset_timer = QTimer(self)
+        self.__knob2_reset_timer.setSingleShot(True)
+        self.__knob2_reset_timer.setInterval(2000)
+        self.__knob2_reset_timer.timeout.connect(self.reset_knob2)        
+        self.__knob3_reset_timer = QTimer(self)
+        self.__knob3_reset_timer.setSingleShot(True)
+        self.__knob3_reset_timer.setInterval(2000)
+        self.__knob3_reset_timer.timeout.connect(self.reset_knob3)
+
+        self.knobDeltaChanged.connect(self.knobDeltaCuiaEmitter, Qt.QueuedConnection)
 
         # This variable will decide if zyncoder_read should be called or not depending on whether
         # global set_selector is in progress or not
@@ -740,7 +742,7 @@ class zynthian_gui(QObject):
 #    @Slot(None)
 #    def zyncoder_set_bpm(self):
 #        if self.globalPopupOpened or self.metronomeButtonPressed:
-#            self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200))
+#            self.set_bpm_actual(np.clip(self.__zselector[3].value, 50, 200))
 
 #    @Slot(None)
 #    def set_bpm(self, bpm):
@@ -779,7 +781,7 @@ class zynthian_gui(QObject):
 #    @Slot(None)
 #    def zyncoder_set_volume(self):
 #        if self.globalPopupOpened or self.metronomeButtonPressed:
-#            self.set_volume_actual(self.__zselector[1].value)
+#            self.set_volume_actual(self.__zselector[0].value)
 
 #    def set_volume_actual(self, volume, takeControlOfSelector = True):
 #        """
@@ -822,7 +824,7 @@ class zynthian_gui(QObject):
 #    @Slot(None)
 #    def zyncoder_set_delay(self):
 #        if self.globalPopupOpened or self.metronomeButtonPressed:
-#            self.set_delay_actual(self.__zselector[2].value)
+#            self.set_delay_actual(self.__zselector[1].value)
 
 #    def set_delay_actual(self, delay_percent, takeControlOfSelector = True):
 #        """
@@ -869,7 +871,7 @@ class zynthian_gui(QObject):
 #    @Slot(None)
 #    def zyncoder_set_reverb(self):
 #        if self.globalPopupOpened or self.metronomeButtonPressed:
-#            self.set_reverb_actual(self.__zselector[3].value)
+#            self.set_reverb_actual(self.__zselector[2].value)
 
 #    def set_reverb_actual(self, reverb_percent, takeControlOfSelector = True):
 #        """
@@ -909,16 +911,16 @@ class zynthian_gui(QObject):
 #        """
 
 #        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
-#            if self.openedDialog.property("listCurrentIndex") != self.__zselector[0].value:
-#                self.openedDialog.setProperty("listCurrentIndex", self.__zselector[0].value)
-#                logging.debug(f"Setting listCurrentIndex of openedDialog({self.openedDialog}) to {self.__zselector[0].value}")
+#            if self.openedDialog.property("listCurrentIndex") != self.__zselector[3].value:
+#                self.openedDialog.setProperty("listCurrentIndex", self.__zselector[3].value)
+#                logging.debug(f"Setting listCurrentIndex of openedDialog({self.openedDialog}) to {self.__zselector[3].value}")
 #                self.set_selector()
 
 
 #    @Slot(None)
 #    def zyncoder_set_channel_volume(self):
 #        if self.altButtonPressed:
-#            self.set_channel_volume_actual(self.__zselector[1].value)
+#            self.set_channel_volume_actual(self.__zselector[0].value)
 
 #    def set_channel_volume_actual(self, volume, takeControlOfSelector=True):
 #        """
@@ -951,7 +953,7 @@ class zynthian_gui(QObject):
 #    @Slot(None)
 #    def zyncoder_set_channel_delay_send_amount(self):
 #        if self.altButtonPressed:
-#            self.zyncoder_set_channel_delay_send_amount_actual(self.__zselector[2].value)
+#            self.zyncoder_set_channel_delay_send_amount_actual(self.__zselector[1].value)
 
 #    def zyncoder_set_channel_delay_send_amount_actual(self, delay, takeControlOfSelector=True):
 #        """
@@ -983,7 +985,7 @@ class zynthian_gui(QObject):
 #    @Slot(None)
 #    def zyncoder_set_channel_reverb_send_amount(self):
 #        if self.altButtonPressed:
-#            self.zyncoder_set_channel_reverb_send_amount_actual(self.__zselector[3].value)
+#            self.zyncoder_set_channel_reverb_send_amount_actual(self.__zselector[2].value)
 
 #    def zyncoder_set_channel_reverb_send_amount_actual(self, reverb, takeControlOfSelector=True):
 #        """
@@ -1012,58 +1014,70 @@ class zynthian_gui(QObject):
 #                showVisualZero=True
 #            )
 
-    def reset_bigknob(self):
+    @Slot(int, int)
+    def knobDeltaCuiaEmitter(self, knob_index, delta):
+        """
+        Emit CUIA Actions when knob delta changes
+        """
+        for _ in range(abs(delta)):
+            if delta > 0:
+                self.callable_ui_action(f"KNOB{knob_index}_UP")
+            else:
+                self.callable_ui_action(f"KNOB{knob_index}_DOWN")
+
+    def reset_knob0(self):
         self.__zselector[0].set_value(self.__knob_value_default, True)
-        self.__bigknob_value = self.__knob_value_default
+        self.__knob0_value = self.__knob_value_default
 
-    def reset_smallknob1(self):
+    def reset_knob1(self):
         self.__zselector[1].set_value(self.__knob_value_default, True)
-        self.__smallknob1_value = self.__knob_value_default
+        self.__knob1_value = self.__knob_value_default
 
-    def reset_smallknob2(self):
+    def reset_knob2(self):
         self.__zselector[2].set_value(self.__knob_value_default, True)
-        self.__smallknob2_value = self.__knob_value_default
+        self.__knob2_value = self.__knob_value_default
 
-    def reset_smallknob3(self):
+    def reset_knob3(self):
         self.__zselector[3].set_value(self.__knob_value_default, True)
-        self.__smallknob3_value = self.__knob_value_default
+        self.__knob3_value = self.__knob_value_default
 
     @Slot()
-    def zyncoder_bigknob(self):
-        if self.__bigknob_value != self.__zselector[0].value:
-            self.bigKnobDelta.emit(self.__zselector[0].value - self.__bigknob_value)
-            self.__bigknob_value = self.__zselector[0].value
-            self.__bigknob_reset_timer.start()
-
-    @Slot()
-    def zyncoder_smallknob1(self):
-        delta = round((self.__zselector[1].value - self.__smallknob1_value) / self.__knob_delta_factor)
+    def zyncoder_knob0(self):
+        delta = round((self.__zselector[0].value - self.__knob0_value) / self.__knob_delta_factor)
         if delta != 0:
-            self.smallKnob1Delta.emit(delta)
-            self.__smallknob1_value = self.__zselector[1].value
-            self.__smallknob1_reset_timer.start()
+            self.knobDeltaChanged.emit(0, delta)
+            self.__knob0_value = self.__zselector[0].value
+            self.__knob0_reset_timer.start()
 
     @Slot()
-    def zyncoder_smallknob2(self):
-        delta = round((self.__zselector[2].value - self.__smallknob2_value) / self.__knob_delta_factor)
+    def zyncoder_knob1(self):
+        delta = round((self.__zselector[1].value - self.__knob1_value) / self.__knob_delta_factor)
         if delta != 0:
-            self.smallKnob2Delta.emit(delta)
-            self.__smallknob2_value = self.__zselector[2].value
-            self.__smallknob2_reset_timer.start()
+            self.knobDeltaChanged.emit(1, delta)
+            self.__knob1_value = self.__zselector[1].value
+            self.__knob1_reset_timer.start()
 
     @Slot()
-    def zyncoder_smallknob3(self):
-        delta = round((self.__zselector[3].value - self.__smallknob3_value) / self.__knob_delta_factor)
+    def zyncoder_knob2(self):
+        delta = round((self.__zselector[2].value - self.__knob2_value) / self.__knob_delta_factor)
         if delta != 0:
-            self.smallKnob3Delta.emit(delta)
-            self.__smallknob3_value = self.__zselector[3].value
-            self.__smallknob3_reset_timer.start()
+            self.knobDeltaChanged.emit(2, delta)
+            self.__knob2_value = self.__zselector[2].value
+            self.__knob2_reset_timer.start()
 
-    def configure_bigknob(self):
+    @Slot()
+    def zyncoder_knob3(self):
+        delta = self.__zselector[3].value - self.__knob3_value
+        if delta != 0:
+            self.knobDeltaChanged.emit(3, delta)
+            self.__knob3_value = self.__zselector[3].value
+            self.__knob3_reset_timer.start()
+
+    def configure_knob0(self):
         try:
             if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'delta_bigknob', 'delta_bigknob', {'name': 'Big Knob Delta', 'short_name': 'Bigknob Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'delta_knob0', 'delta_knob0', {'name': 'Knob0 Delta', 'short_name': 'Knob0 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
+                self.__zselector[0] = zynthian_gui_controller(0, self.__zselector_ctrl[0], self)
                 self.__zselector[0].config(self.__zselector_ctrl[0])
                 self.__zselector[0].set_value(self.__knob_value_default, True)
                 self.__zselector[0].step = 1
@@ -1076,11 +1090,11 @@ class zynthian_gui(QObject):
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
 
-    def configure_smallknob1(self):
+    def configure_knob1(self):
         try:
             if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'delta_smallknob1', 'delta_smallknob1', {'name': 'Small Knob 1 Delta', 'short_name': 'Small Knob 1 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'delta_knob1', 'delta_knob1', {'name': 'Knob1 Delta', 'short_name': 'Knob1 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
+                self.__zselector[1] = zynthian_gui_controller(1, self.__zselector_ctrl[1], self)
                 self.__zselector[1].config(self.__zselector_ctrl[1])
                 self.__zselector[1].set_value(self.__knob_value_default, True)
                 self.__zselector[1].step = 1
@@ -1093,11 +1107,11 @@ class zynthian_gui(QObject):
             if self.__zselector[1] is not None:
                 self.__zselector[1].hide()
 
-    def configure_smallknob2(self):
+    def configure_knob2(self):
         try:
             if self.__zselector[2] is None:
-                self.__zselector_ctrl[2] = zynthian_controller(None, 'delta_smallknob2', 'delta_smallknob2', {'name': 'Small Knob 2 Delta', 'short_name': 'Small Knob 2 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
+                self.__zselector_ctrl[2] = zynthian_controller(None, 'delta_knob2', 'delta_knob2', {'name': 'Knob2 Delta', 'short_name': 'Knob2 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
+                self.__zselector[2] = zynthian_gui_controller(2, self.__zselector_ctrl[2], self)
                 self.__zselector[2].config(self.__zselector_ctrl[2])
                 self.__zselector[2].set_value(self.__knob_value_default, True)
                 self.__zselector[2].step = 1
@@ -1110,11 +1124,11 @@ class zynthian_gui(QObject):
             if self.__zselector[2] is not None:
                 self.__zselector[2].hide()
 
-    def configure_smallknob3(self):
+    def configure_knob3(self):
         try:
             if self.__zselector[3] is None:
-                self.__zselector_ctrl[3] = zynthian_controller(None, 'delta_smallknob3', 'delta_smallknob3', {'name': 'Small Knob 3 Delta', 'short_name': 'Small Knob 3 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
+                self.__zselector_ctrl[3] = zynthian_controller(None, 'delta_knob3', 'delta_knob3', {'name': 'Knob3 Delta', 'short_name': 'Knob3 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
+                self.__zselector[3] = zynthian_gui_controller(3, self.__zselector_ctrl[3], self)
                 self.__zselector[3].config(self.__zselector_ctrl[3])
                 self.__zselector[3].set_value(self.__knob_value_default, True)
                 self.__zselector[3].step = 1
@@ -1131,15 +1145,12 @@ class zynthian_gui(QObject):
         if not self.isBootingComplete:
             return
 
-        self.configure_bigknob()
-        self.configure_smallknob1()
-        self.configure_smallknob2()
-        self.configure_smallknob3()
+        self.configure_knob0()
+        self.configure_knob1()
+        self.configure_knob2()
+        self.configure_knob3()
 
-    bigKnobDelta = Signal(int)
-    smallKnob1Delta = Signal(int)
-    smallKnob2Delta = Signal(int)
-    smallKnob3Delta = Signal(int)
+    knobDeltaChanged = Signal(int, int, arguments=["knobIndex", "delta"])
     ### END Global controller and selector
 
     # ---------------------------------------------------------------------------
@@ -3022,32 +3033,32 @@ class zynthian_gui(QObject):
 #                else:
 #                    if self.globalPopupOpened or self.metronomeButtonPressed or self.altButtonPressed:
 #                        # When global popup is open, set song bpm with big knob
-#                        if self.__zselector[0] and self.sketchpad.song is not None:
-#                            self.__zselector[0].read_zyncoder()
+#                        if self.__zselector[3] and self.sketchpad.song is not None:
+#                            self.__zselector[3].read_zyncoder()
 #                            if self.altButtonPressed:
 #                                pass
 #                            else:
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
 
 #                        # When global popup is open, set volume with small knob 1
-#                        if self.__zselector[1]:
-#                            self.__zselector[1].read_zyncoder()
+#                        if self.__zselector[0]:
+#                            self.__zselector[0].read_zyncoder()
 #                            if self.altButtonPressed:
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_volume", Qt.QueuedConnection)
 #                            else:
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_volume", Qt.QueuedConnection)
 
 #                        # When global popup is open, set delay with small knob 2
-#                        if self.__zselector[2] and self.global_fx_engines[0] is not None:
-#                            self.__zselector[2].read_zyncoder()
+#                        if self.__zselector[1] and self.global_fx_engines[0] is not None:
+#                            self.__zselector[1].read_zyncoder()
 #                            if self.altButtonPressed:
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_delay_send_amount", Qt.QueuedConnection)
 #                            else:
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_delay", Qt.QueuedConnection)
 
 #                        # When global popup is open, set reverb with small knob 3
-#                        if self.__zselector[3] and self.global_fx_engines[1] is not None:
-#                            self.__zselector[3].read_zyncoder()
+#                        if self.__zselector[2] and self.global_fx_engines[1] is not None:
+#                            self.__zselector[2].read_zyncoder()
 #                            if self.altButtonPressed:
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_channel_reverb_send_amount", Qt.QueuedConnection)
 #                            else:
@@ -3055,8 +3066,8 @@ class zynthian_gui(QObject):
 #                    else:
 #                        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
 #                            # If openedDialog has listCurrentIndex and listCount property control currentIndex of that dialog with BK.
-#                            if self.__zselector[0]:
-#                                self.__zselector[0].read_zyncoder()
+#                            if self.__zselector[3]:
+#                                self.__zselector[3].read_zyncoder()
 #                                QMetaObject.invokeMethod(self, "zyncoder_set_current_index", Qt.QueuedConnection)
 #                        else:
 #                            # When global popop is not open, call zyncoder_read of active screen/modal
@@ -3075,19 +3086,19 @@ class zynthian_gui(QObject):
 
                 if self.__zselector[0]:
                     self.__zselector[0].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_bigknob", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self, "zyncoder_knob0", Qt.QueuedConnection)
 
                 if self.__zselector[1]:
                     self.__zselector[1].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_smallknob1", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self, "zyncoder_knob1", Qt.QueuedConnection)
 
                 if self.__zselector[2]:
                     self.__zselector[2].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_smallknob2", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self, "zyncoder_knob2", Qt.QueuedConnection)
 
                 if self.__zselector[3]:
                     self.__zselector[3].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_smallknob3", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self, "zyncoder_knob3", Qt.QueuedConnection)
 
                 self.lock.release()
 

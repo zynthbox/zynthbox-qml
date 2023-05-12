@@ -487,7 +487,7 @@ class zynthian_gui_controller(QObject):
             v=self.ctrl_max_value
         elif v<0:
             v=0
-        if self.ctrl_value is None or self.ctrl_value!=v or True:
+        if self.ctrl_value is None or self.ctrl_value!=v:
             self.ctrl_value=v
             #logging.error("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
             if self.__visible:

@@ -1571,7 +1571,7 @@ class zynthian_gui(QObject):
 
     @Slot(str)
     def callable_ui_action(self, cuia, params=None):
-        # logging.debug("CUIA '{}' => {}".format(cuia, params))
+        # logging.debug(f"CUIA : {cuia}")
 
         channelDelta = 5 if self.channelsModActive else 0
 

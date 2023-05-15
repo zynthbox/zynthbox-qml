@@ -187,58 +187,35 @@ Zynthian.BasePlayGrid {
                 case "CHANNEL_5":
                     returnValue = backButtonClearPatternHelper(4 + channelDelta);
                     break;
+                case "KNOB0_UP":
+                    _private.knob0Up();
+                    return true
+                case "KNOB0_DOWN":
+                    _private.knob0Down();
+                    return true
+                case "KNOB1_UP":
+                    _private.knob1Up();
+                    return true
+                case "KNOB1_DOWN":
+                    _private.knob1Down();
+                    return true
+                case "KNOB2_UP":
+                    _private.knob2Up();
+                    return true
+                case "KNOB2_DOWN":
+                    _private.knob2Down();
+                    return true
+                case "KNOB3_UP":
+                    _private.goRight();
+                    return true
+                case "KNOB3_DOWN":
+                    _private.goLeft();
+                    return true
                 default:
                     break;
             }
         }
         return returnValue;
-    }
-    Connections {
-        target: zynqtgui.playgrid
-        onBigKnobValueChanged: {
-            if (zynqtgui.playgrid.bigKnobValue < 0) {
-                for (var i = zynqtgui.playgrid.bigKnobValue; i < 0; ++i) {
-                    _private.goLeft();
-                }
-            } else if (zynqtgui.playgrid.bigKnobValue > 0) {
-                for (var i = zynqtgui.playgrid.bigKnobValue; i > 0; --i) {
-                    _private.goRight();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob1ValueChanged: {
-            if (zynqtgui.playgrid.knob1Value < 0) {
-                for (var i = zynqtgui.playgrid.knob1Value; i < 0; ++i) {
-                    _private.knob1Down();
-                }
-            } else if (zynqtgui.playgrid.knob1Value > 0) {
-                for (var i = zynqtgui.playgrid.knob1Value; i > 0; --i) {
-                    _private.knob1Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob2ValueChanged: {
-            if (zynqtgui.playgrid.knob2Value < 0) {
-                for (var i = zynqtgui.playgrid.knob2Value; i < 0; ++i) {
-                    _private.knob2Down();
-                }
-            } else if (zynqtgui.playgrid.knob2Value > 0) {
-                for (var i = zynqtgui.playgrid.knob2Value; i > 0; --i) {
-                    _private.knob2Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob3ValueChanged: {
-            if (zynqtgui.playgrid.knob3Value < 0) {
-                for (var i = zynqtgui.playgrid.knob3Value; i < 0; ++i) {
-                    _private.knob3Down();
-                }
-            } else if (zynqtgui.playgrid.knob3Value > 0) {
-                for (var i = zynqtgui.playgrid.knob3Value; i > 0; --i) {
-                    _private.knob3Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
     }
 
     property bool patternsMenuVisible: false
@@ -389,12 +366,12 @@ Zynthian.BasePlayGrid {
             updateChannel();
         }
 
+        signal knob0Up();
+        signal knob0Down();
         signal knob1Up();
         signal knob1Down();
         signal knob2Up();
         signal knob2Down();
-        signal knob3Up();
-        signal knob3Down();
         signal goLeft();
         signal goRight();
         signal deselectSelectedItem()
@@ -705,12 +682,12 @@ Zynthian.BasePlayGrid {
                         onGoRight: drumPadRepeater.goNext();
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
-                        onKnob1Up: drumPadRepeater.velocityUp();
-                        onKnob1Down: drumPadRepeater.velocityDown();
-                        onKnob2Up: drumPadRepeater.durationUp();
-                        onKnob2Down: drumPadRepeater.durationDown();
-                        onKnob3Up: drumPadRepeater.delayUp();
-                        onKnob3Down: drumPadRepeater.delayDown();
+                        onKnob0Up: drumPadRepeater.velocityUp();
+                        onKnob0Down: drumPadRepeater.velocityDown();
+                        onKnob1Up: drumPadRepeater.durationUp();
+                        onKnob1Down: drumPadRepeater.durationDown();
+                        onKnob2Up: drumPadRepeater.delayUp();
+                        onKnob2Down: drumPadRepeater.delayDown();
                     }
                     Connections {
                         target: stepSettings

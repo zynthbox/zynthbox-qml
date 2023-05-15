@@ -595,26 +595,6 @@ class zynthian_gui(QObject):
         self.__knob1_value = self.__knob_value_default
         self.__knob2_value = self.__knob_value_default
         self.__knob3_value = self.__knob_value_default
-        # Setup timers to reset knob zyncoder values
-        # If value is reset immediately after reading then due to loss of precison when setting value,
-        # decerasing happens faster than increasing which causes knobs to not work as expected
-        # So instead of resetting on every read, set a timer to reset after 2 seconds of idle time
-        self.__knob0_reset_timer = QTimer(self)
-        self.__knob0_reset_timer.setSingleShot(True)
-        self.__knob0_reset_timer.setInterval(2000)
-        self.__knob0_reset_timer.timeout.connect(self.reset_knob0)
-        self.__knob1_reset_timer = QTimer(self)
-        self.__knob1_reset_timer.setSingleShot(True)
-        self.__knob1_reset_timer.setInterval(2000)
-        self.__knob1_reset_timer.timeout.connect(self.reset_knob1)
-        self.__knob2_reset_timer = QTimer(self)
-        self.__knob2_reset_timer.setSingleShot(True)
-        self.__knob2_reset_timer.setInterval(2000)
-        self.__knob2_reset_timer.timeout.connect(self.reset_knob2)
-        self.__knob3_reset_timer = QTimer(self)
-        self.__knob3_reset_timer.setSingleShot(True)
-        self.__knob3_reset_timer.setInterval(2000)
-        self.__knob3_reset_timer.timeout.connect(self.reset_knob3)
 
         self.knobDeltaChanged.connect(self.knobDeltaCuiaEmitter, Qt.QueuedConnection)
 
@@ -750,53 +730,57 @@ class zynthian_gui(QObject):
             else:
                 self.callable_ui_action(f"KNOB{knob_index}_DOWN")
 
-    def reset_knob0(self):
-        self.__zselector[0].set_value(self.__knob_value_default, True)
-        self.__knob0_value = self.__knob_value_default
-
-    def reset_knob1(self):
-        self.__zselector[1].set_value(self.__knob_value_default, True)
-        self.__knob1_value = self.__knob_value_default
-
-    def reset_knob2(self):
-        self.__zselector[2].set_value(self.__knob_value_default, True)
-        self.__knob2_value = self.__knob_value_default
-
-    def reset_knob3(self):
-        self.__zselector[3].set_value(self.__knob_value_default, True)
-        self.__knob3_value = self.__knob_value_default
-
     @Slot()
     def zyncoder_knob0(self):
         delta = round((self.__zselector[0].value - self.__knob0_value) / self.__knob_delta_factor)
         if delta != 0:
             self.knobDeltaChanged.emit(0, delta)
-            self.__knob0_value = self.__zselector[0].value
-            self.__knob0_reset_timer.start()
+            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+            if self.__zselector[0].value - self.__knob_delta_factor < 0 or \
+                    self.__zselector[0].value + self.__knob_delta_factor > self.__knob_value_max:
+                self.__zselector[0].set_value(self.__knob_value_default, True)
+                self.__knob0_value = self.__knob_value_default
+            else:
+                self.__knob0_value = self.__zselector[0].value
 
     @Slot()
     def zyncoder_knob1(self):
         delta = round((self.__zselector[1].value - self.__knob1_value) / self.__knob_delta_factor)
         if delta != 0:
             self.knobDeltaChanged.emit(1, delta)
-            self.__knob1_value = self.__zselector[1].value
-            self.__knob1_reset_timer.start()
+            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+            if self.__zselector[1].value - self.__knob_delta_factor < 0 or \
+                    self.__zselector[1].value + self.__knob_delta_factor > self.__knob_value_max:
+                self.__zselector[1].set_value(self.__knob_value_default, True)
+                self.__knob1_value = self.__knob_value_default
+            else:
+                self.__knob1_value = self.__zselector[1].value
 
     @Slot()
     def zyncoder_knob2(self):
         delta = round((self.__zselector[2].value - self.__knob2_value) / self.__knob_delta_factor)
         if delta != 0:
             self.knobDeltaChanged.emit(2, delta)
-            self.__knob2_value = self.__zselector[2].value
-            self.__knob2_reset_timer.start()
+            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+            if self.__zselector[2].value - self.__knob_delta_factor < 0 or \
+                    self.__zselector[2].value + self.__knob_delta_factor > self.__knob_value_max:
+                self.__zselector[2].set_value(self.__knob_value_default, True)
+                self.__knob2_value = self.__knob_value_default
+            else:
+                self.__knob2_value = self.__zselector[2].value
 
     @Slot()
     def zyncoder_knob3(self):
         delta = self.__zselector[3].value - self.__knob3_value
         if delta != 0:
             self.knobDeltaChanged.emit(3, delta)
-            self.__knob3_value = self.__zselector[3].value
-            self.__knob3_reset_timer.start()
+            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+            if self.__zselector[3].value - self.__knob_delta_factor < 0 or \
+                    self.__zselector[3].value + self.__knob_delta_factor > self.__knob_value_max:
+                self.__zselector[3].set_value(self.__knob_value_default, True)
+                self.__knob3_value = self.__knob_value_default
+            else:
+                self.__knob3_value = self.__zselector[3].value
 
     def configure_knob0(self):
         try:

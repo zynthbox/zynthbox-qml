@@ -189,28 +189,36 @@ Zynthian.BasePlayGrid {
                     break;
                 case "KNOB0_UP":
                     _private.knob0Up();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB0_DOWN":
                     _private.knob0Down();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB1_UP":
                     _private.knob1Up();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB1_DOWN":
                     _private.knob1Down();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB2_UP":
                     _private.knob2Up();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB2_DOWN":
                     _private.knob2Down();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB3_UP":
                     _private.goRight();
-                    return true
+                    returnValue = true;
+                    break;
                 case "KNOB3_DOWN":
                     _private.goLeft();
-                    return true
+                    returnValue = true;
+                    break;
                 default:
                     break;
             }

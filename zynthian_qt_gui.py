@@ -610,7 +610,7 @@ class zynthian_gui(QObject):
         self.__knob2_reset_timer = QTimer(self)
         self.__knob2_reset_timer.setSingleShot(True)
         self.__knob2_reset_timer.setInterval(2000)
-        self.__knob2_reset_timer.timeout.connect(self.reset_knob2)        
+        self.__knob2_reset_timer.timeout.connect(self.reset_knob2)
         self.__knob3_reset_timer = QTimer(self)
         self.__knob3_reset_timer.setSingleShot(True)
         self.__knob3_reset_timer.setInterval(2000)
@@ -1708,7 +1708,7 @@ class zynthian_gui(QObject):
 
     @Slot(str)
     def callable_ui_action(self, cuia, params=None):
-        logging.debug("CUIA '{}' => {}".format(cuia, params))
+        # logging.debug("CUIA '{}' => {}".format(cuia, params))
 
         channelDelta = 5 if self.channelsModActive else 0
 

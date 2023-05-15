@@ -80,6 +80,7 @@ from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
+from zynqtgui.zynthian_gui_multi_controller import MultiController
 
 sys.path.insert(1, "/zynthian/zynthbox-qml/")
 sys.path.insert(1, "./zynqtgui")
@@ -586,15 +587,12 @@ class zynthian_gui(QObject):
         self.zynautoconnect_midi_flag = False
 
         # Global zselectors
-        self.__zselector = [None, None, None, None]
-        self.__zselector_ctrl = [None, None, None, None]
-        self.__knob_delta_factor = 500
-        self.__knob_value_max = 20000
-        self.__knob_value_default = 10000
-        self.__knob0_value = self.__knob_value_default
-        self.__knob1_value = self.__knob_value_default
-        self.__knob2_value = self.__knob_value_default
-        self.__knob3_value = self.__knob_value_default
+        self.__zselectors = [None, None, None, None]
+        self.__zselector_controllers = [None, None, None, None]
+        self.__knob_delta_factors = [500, 500, 500, 1]
+        self.__knob_values_max = [20000, 20000, 20000, 20000]
+        self.__knob_values_default = [10000, 10000, 10000, 10000]
+        self.__knob_values = [10000, 10000, 10000, 10000]
 
         self.knobDeltaChanged.connect(self.knobDeltaCuiaEmitter, Qt.QueuedConnection)
 
@@ -730,134 +728,26 @@ class zynthian_gui(QObject):
             else:
                 self.callable_ui_action(f"KNOB{knob_index}_DOWN")
 
-    @Slot()
-    def zyncoder_knob0(self):
-        delta = round((self.__zselector[0].value - self.__knob0_value) / self.__knob_delta_factor)
-        if delta != 0:
-            self.knobDeltaChanged.emit(0, delta)
-            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-            if self.__zselector[0].value - self.__knob_delta_factor < 0 or \
-                    self.__zselector[0].value + self.__knob_delta_factor > self.__knob_value_max:
-                self.__zselector[0].set_value(self.__knob_value_default, True)
-                self.__knob0_value = self.__knob_value_default
-            else:
-                self.__knob0_value = self.__zselector[0].value
-
-    @Slot()
-    def zyncoder_knob1(self):
-        delta = round((self.__zselector[1].value - self.__knob1_value) / self.__knob_delta_factor)
-        if delta != 0:
-            self.knobDeltaChanged.emit(1, delta)
-            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-            if self.__zselector[1].value - self.__knob_delta_factor < 0 or \
-                    self.__zselector[1].value + self.__knob_delta_factor > self.__knob_value_max:
-                self.__zselector[1].set_value(self.__knob_value_default, True)
-                self.__knob1_value = self.__knob_value_default
-            else:
-                self.__knob1_value = self.__zselector[1].value
-
-    @Slot()
-    def zyncoder_knob2(self):
-        delta = round((self.__zselector[2].value - self.__knob2_value) / self.__knob_delta_factor)
-        if delta != 0:
-            self.knobDeltaChanged.emit(2, delta)
-            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-            if self.__zselector[2].value - self.__knob_delta_factor < 0 or \
-                    self.__zselector[2].value + self.__knob_delta_factor > self.__knob_value_max:
-                self.__zselector[2].set_value(self.__knob_value_default, True)
-                self.__knob2_value = self.__knob_value_default
-            else:
-                self.__knob2_value = self.__zselector[2].value
-
-    @Slot()
-    def zyncoder_knob3(self):
-        delta = self.__zselector[3].value - self.__knob3_value
-        if delta != 0:
-            self.knobDeltaChanged.emit(3, delta)
-            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-            if self.__zselector[3].value - self.__knob_delta_factor < 0 or \
-                    self.__zselector[3].value + self.__knob_delta_factor > self.__knob_value_max:
-                self.__zselector[3].set_value(self.__knob_value_default, True)
-                self.__knob3_value = self.__knob_value_default
-            else:
-                self.__knob3_value = self.__zselector[3].value
-
-    def configure_knob0(self):
-        try:
-            if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'delta_knob0', 'delta_knob0', {'name': 'Knob0 Delta', 'short_name': 'Knob0 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[0] = zynthian_gui_controller(0, self.__zselector_ctrl[0], self)
-                self.__zselector[0].config(self.__zselector_ctrl[0])
-                self.__zselector[0].set_value(self.__knob_value_default, True)
-                self.__zselector[0].step = 1
-                self.__zselector[0].mult = 1
-
-            self.__zselector[0].show()
-            self.__zselector_ctrl[0].set_options({"value": self.__knob_value_default})
-            self.__zselector[0].config(self.__zselector_ctrl[0])
-        except:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].hide()
-
-    def configure_knob1(self):
-        try:
-            if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'delta_knob1', 'delta_knob1', {'name': 'Knob1 Delta', 'short_name': 'Knob1 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[1] = zynthian_gui_controller(1, self.__zselector_ctrl[1], self)
-                self.__zselector[1].config(self.__zselector_ctrl[1])
-                self.__zselector[1].set_value(self.__knob_value_default, True)
-                self.__zselector[1].step = 1
-                self.__zselector[1].mult = 1
-
-            self.__zselector[1].show()
-            self.__zselector_ctrl[1].set_options({"value": self.__knob_value_default})
-            self.__zselector[1].config(self.__zselector_ctrl[1])
-        except:
-            if self.__zselector[1] is not None:
-                self.__zselector[1].hide()
-
-    def configure_knob2(self):
-        try:
-            if self.__zselector[2] is None:
-                self.__zselector_ctrl[2] = zynthian_controller(None, 'delta_knob2', 'delta_knob2', {'name': 'Knob2 Delta', 'short_name': 'Knob2 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[2] = zynthian_gui_controller(2, self.__zselector_ctrl[2], self)
-                self.__zselector[2].config(self.__zselector_ctrl[2])
-                self.__zselector[2].set_value(self.__knob_value_default, True)
-                self.__zselector[2].step = 1
-                self.__zselector[2].mult = 1
-
-            self.__zselector[2].show()
-            self.__zselector_ctrl[2].set_options({"value": self.__knob_value_default})
-            self.__zselector[2].config(self.__zselector_ctrl[2])
-        except:
-            if self.__zselector[2] is not None:
-                self.__zselector[2].hide()
-
-    def configure_knob3(self):
-        try:
-            if self.__zselector[3] is None:
-                self.__zselector_ctrl[3] = zynthian_controller(None, 'delta_knob3', 'delta_knob3', {'name': 'Knob3 Delta', 'short_name': 'Knob3 Delta', 'midi_cc': 0, 'value_max': self.__knob_value_max, 'value_min': 0, 'value': self.__knob_value_default})
-                self.__zselector[3] = zynthian_gui_controller(3, self.__zselector_ctrl[3], self)
-                self.__zselector[3].config(self.__zselector_ctrl[3])
-                self.__zselector[3].set_value(self.__knob_value_default, True)
-                self.__zselector[3].step = 1
-                self.__zselector[3].mult = 1
-
-            self.__zselector[3].show()
-            self.__zselector_ctrl[3].set_options({"value": self.__knob_value_default})
-            self.__zselector[3].config(self.__zselector_ctrl[3])
-        except:
-            if self.__zselector[3] is not None:
-                self.__zselector[3].hide()
-
     def set_selector(self):
         if not self.isBootingComplete:
             return
 
-        self.configure_knob0()
-        self.configure_knob1()
-        self.configure_knob2()
-        self.configure_knob3()
+        for knob_index in [0, 1, 2, 3]:
+            try:
+                if self.__zselectors[knob_index] is None:
+                    self.__zselector_controllers[knob_index] = zynthian_controller(None, f'delta_knob{knob_index}', f'delta_knob{knob_index}', {'name': f'Knob{knob_index} Delta', 'short_name': f'Knob{knob_index} Delta', 'midi_cc': 0, 'value_max': self.__knob_values_max[knob_index], 'value_min': 0, 'value': self.__knob_values_default[knob_index]})
+                    self.__zselectors[knob_index] = zynthian_gui_controller(knob_index, self.__zselector_controllers[knob_index], self)
+                    self.__zselectors[knob_index].config(self.__zselector_controllers[knob_index])
+                    self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
+                    self.__zselectors[knob_index].step = 1
+                    self.__zselectors[knob_index].mult = 1
+
+                self.__zselectors[knob_index].show()
+                self.__zselector_controllers[knob_index].set_options({"value": self.__knob_values_default[knob_index]})
+                self.__zselectors[knob_index].config(self.__zselector_controllers[knob_index])
+            except:
+                if self.__zselectors[knob_index] is not None:
+                    self.__zselectors[knob_index].hide()
 
     knobDeltaChanged = Signal(int, int, arguments=["knobIndex", "delta"])
     ### END Global controller and selector
@@ -2722,21 +2612,21 @@ class zynthian_gui(QObject):
                 # Read Zyncoders
                 self.lock.acquire()
 
-                if self.__zselector[0]:
-                    self.__zselector[0].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_knob0", Qt.QueuedConnection)
-
-                if self.__zselector[1]:
-                    self.__zselector[1].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_knob1", Qt.QueuedConnection)
-
-                if self.__zselector[2]:
-                    self.__zselector[2].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_knob2", Qt.QueuedConnection)
-
-                if self.__zselector[3]:
-                    self.__zselector[3].read_zyncoder()
-                    QMetaObject.invokeMethod(self, "zyncoder_knob3", Qt.QueuedConnection)
+                # Calculate delta and emit
+                for knob_index in [0, 1, 2, 3]:
+                    if self.__zselectors[knob_index]:
+                        self.__zselectors[knob_index].read_zyncoder()
+                        delta = round((self.__zselectors[knob_index].value - self.__knob_values[knob_index]) / self.__knob_delta_factors[knob_index])
+                        if delta != 0:
+                            logging.debug(f"Knob{knob_index} : delta({delta}), value({self.__zselectors[knob_index].value})")
+                            self.knobDeltaChanged.emit(knob_index, delta)
+                            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+                            if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
+                                    self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
+                                self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
+                                self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
+                            else:
+                                self.__knob_values[knob_index] = self.__zselectors[knob_index].value
 
                 self.lock.release()
 

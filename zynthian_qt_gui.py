@@ -989,32 +989,21 @@ class zynthian_gui(QObject):
 
         delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
         reverb_engine = self.engine.start_engine("JV/Roomy")
+        delay_controller = MultiController(self)
+        delay_controller.add_control(delay_engine.get_lv2_controllers_dict()["LEVEL"])
+        reverb_controller = MultiController(self)
+        reverb_controller.add_control(reverb_engine.get_lv2_controllers_dict()["dry_wet"])
 
         # global_fx_engines is a list of a set of 2 elements.
         # 1st element of the set is the engine instance
         # 2nd element of the set is the zynthian controller to control fx
         self.global_fx_engines = [
-            (delay_engine, delay_engine.get_lv2_controllers_dict()["LEVEL"]),
-            (reverb_engine, reverb_engine.get_lv2_controllers_dict()["dry_wet"])
+            (delay_engine, delay_controller),
+            (reverb_engine, reverb_controller)
         ]
 
-        self.global_fx_engines[0][1].set_value(
-            np.interp(10, [0, 100], [self.global_fx_engines[0][1].value_min, self.global_fx_engines[0][1].value_max]),
-            True)
-
-        self.global_fx_engines[1][1].set_value(
-            np.interp(10, [0, 100], [self.global_fx_engines[1][1].value_min, self.global_fx_engines[1][1].value_max]),
-            True)
-
-        self.delayKnobValueChanged.emit()
-        self.reverbKnobValueChanged.emit()
-
-        self.zynautoconnect(True)
-
-        if self.sketchpad.song is not None:
-            for i in range(0, self.sketchpad.song.channelsModel.count):
-                channel = self.sketchpad.song.channelsModel.getChannel(i)
-                channel.update_jack_port()
+        self.global_fx_engines[0][1].value = 10
+        self.global_fx_engines[1][1].value = 10
 
     # ---------------------------------------------------------------------------
     # OSC Management
@@ -2614,19 +2603,21 @@ class zynthian_gui(QObject):
 
                 # Calculate delta and emit
                 for knob_index in [0, 1, 2, 3]:
-                    if self.__zselectors[knob_index]:
-                        self.__zselectors[knob_index].read_zyncoder()
-                        delta = round((self.__zselectors[knob_index].value - self.__knob_values[knob_index]) / self.__knob_delta_factors[knob_index])
-                        if delta != 0:
-                            logging.debug(f"Knob{knob_index} : delta({delta}), value({self.__zselectors[knob_index].value})")
-                            self.knobDeltaChanged.emit(knob_index, delta)
-                            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-                            if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
-                                    self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
-                                self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
-                                self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
-                            else:
-                                self.__knob_values[knob_index] = self.__zselectors[knob_index].value
+                    try:
+                        if self.__zselectors[knob_index]:
+                            self.__zselectors[knob_index].read_zyncoder()
+                            delta = round((self.__zselectors[knob_index].value - self.__knob_values[knob_index]) / self.__knob_delta_factors[knob_index])
+                            if delta != 0:
+                                self.knobDeltaChanged.emit(knob_index, delta)
+                                # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+                                if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
+                                        self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
+                                    self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
+                                    self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
+                                else:
+                                    self.__knob_values[knob_index] = self.__zselectors[knob_index].value
+                    except Exception as e:
+                        logging.exception(f"Error reading zyncoder value : {str(e)}")
 
                 self.lock.release()
 
@@ -3922,45 +3913,19 @@ class zynthian_gui(QObject):
     globalPopupOpened = Property(bool, get_globalPopupOpened, set_globalPopupOpened, notify=globalPopupOpenedChanged)
     ### END Property globalPopupOpened
 
-    ### Property delayKnobValue
-    def get_delayKnobValue(self):
-        controller = self.global_fx_engines[0][1]
-        if controller is not None:
-            return np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
-        else:
-            return 0
+    ### Property delayController
+    def get_delayController(self):
+        return self.global_fx_engines[0][1]
 
-    def set_delayKnobValue(self, percentage):
-        controller = self.global_fx_engines[0][1]
-        if controller is not None:
-            value = np.interp(percentage, [0, 100], [controller.value_min, controller.value_max])
-            self.global_fx_engines[0][1].set_value(value, True)
-            self.delayKnobValueChanged.emit()
+    delayController = Property(QObject, get_delayController, constant=True)
+    ### END Property delayController
 
-    delayKnobValueChanged = Signal()
+    ### Property reverbController
+    def get_reverbController(self):
+        return self.global_fx_engines[1][1]
 
-    delayKnobValue = Property(int, get_delayKnobValue, set_delayKnobValue, notify=delayKnobValueChanged)
-    ### END Property delayKnobValue
-
-    ### Property reverbKnobValue
-    def get_reverbKnobValue(self):
-        controller = self.global_fx_engines[1][1]
-        if controller is not None:
-            return np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
-        else:
-            return 0
-
-    def set_reverbKnobValue(self, percentage):
-        controller = self.global_fx_engines[1][1]
-        if controller is not None:
-            value = np.interp(percentage, [0, 100], [controller.value_min, controller.value_max])
-            self.global_fx_engines[1][1].set_value(value, True)
-            self.reverbKnobValueChanged.emit()
-
-    reverbKnobValueChanged = Signal()
-
-    reverbKnobValue = Property(int, get_reverbKnobValue, set_reverbKnobValue, notify=reverbKnobValueChanged)
-    ### END Property reverbKnobValue
+    reverbController = Property(QObject, get_reverbController, constant=True)
+    ### END Property reverbController
 
     ### Property currentTaskMessage
     def get_currentTaskMessage(self):

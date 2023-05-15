@@ -37,25 +37,20 @@ Zynthian.ScreenPage {
     GridLayout {
         anchors.fill: parent
         columns: 2
-        Zynthian.DialController {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.ctrl: zynqtgui.test_knobs.controller0
-        }
-        Zynthian.DialController {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.ctrl: zynqtgui.test_knobs.controller1
-        }
-        Zynthian.DialController {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.ctrl: zynqtgui.test_knobs.controller2
-        }
-        Zynthian.DialController {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.ctrl: zynqtgui.test_knobs.controller3
+
+        Repeater {
+            model: 4
+            delegate: Item{
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                Zynthian.KnobIndicator {
+                    knobId: index
+                    anchors.centerIn: parent
+                    width: Kirigami.Units.gridUnit * 6
+                    height: Kirigami.Units.gridUnit * 6
+                }
+            }
         }
     }
 }

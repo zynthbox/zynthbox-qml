@@ -25,19 +25,10 @@
 
 from . import zynthian_qt_gui_base
 
-from zyngine import zynthian_controller
-from . import zynthian_gui_config
-from . import zynthian_gui_controller
-
-# Qt modules
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 class zynthian_gui_test_knobs(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent = None):
         super(zynthian_gui_test_knobs, self).__init__(parent)
-
-        self.__zselector = [None, None, None, None]
-        self.__zselector_ctrl = [None, None, None, None]
 
     def show(self):
         self.set_selector()
@@ -47,50 +38,3 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.zynqtgui):
 
     def refresh_loading(self):
         pass
-
-    def set_selector(self, zs_hiden=True):
-        for i in range(4):
-            if self.__zselector[i] is not None:
-                if not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) and \
-                        self.zynqtgui.get_current_screen_id() is not None and \
-                        self.zynqtgui.get_current_screen() == self:
-                    self.__zselector[i].show()
-                else:
-                    self.__zselector[i].hide()
-
-            if self.__zselector[i]:
-                self.__zselector_ctrl[i].set_options(
-                    {'symbol': 'test knob {}'.format(i), 'name': 'Test Knob {}'.format(i),
-                     'short_name': 'Knob{}'.format(i), 'midi_cc': 0,
-                     'value_max': 100,
-                     'value': 0})
-                self.__zselector[i].config(self.__zselector_ctrl[i])
-            elif not (self.zynqtgui.globalPopupOpened or self.zynqtgui.metronomeButtonPressed or self.zynqtgui.altButtonPressed) and \
-                    self.zynqtgui.get_current_screen_id() is not None and \
-                    self.zynqtgui.get_current_screen() == self:
-                self.__zselector_ctrl[i] = zynthian_controller(None, 'test knob {}'.format(i), 'test knob {}'.format(i),
-                                                               {'midi_cc': 0, 'value': 0, 'value_max': 100})
-                self.__zselector[i] = zynthian_gui_controller(i, self.__zselector_ctrl[i], self)
-                self.__zselector[i].show()
-
-    def zyncoder_read(self):
-        for i in range(4):
-            self.__zselector[i].read_zyncoder()
-        return [0, 1, 2, 3]
-
-    def controller0(self):
-        return self.__zselector[0]
-
-    def controller1(self):
-        return self.__zselector[1]
-
-    def controller2(self):
-        return self.__zselector[2]
-
-    def controller3(self):
-        return self.__zselector[3]
-
-    controller0 = Property(QObject, controller0, constant=True)
-    controller1 = Property(QObject, controller1, constant=True)
-    controller2 = Property(QObject, controller2, constant=True)
-    controller3 = Property(QObject, controller3, constant=True)

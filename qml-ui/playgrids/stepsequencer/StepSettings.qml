@@ -198,7 +198,7 @@ ColumnLayout {
                 height: parent.height / 2
                 width: height
                 visible: component.currentSubNote === -1
-                knobId: 1
+                knobId: 0
             }
         }
         QQC2.Label {
@@ -217,7 +217,7 @@ ColumnLayout {
                 height: parent.height / 2
                 width: height
                 visible: component.currentSubNote === -1
-                knobId: 2
+                knobId: 1
             }
         }
         QQC2.Label {
@@ -236,7 +236,7 @@ ColumnLayout {
                 height: parent.height / 2
                 width: height
                 visible: component.currentSubNote === -1
-                knobId: 3
+                knobId: 2
             }
         }
     }

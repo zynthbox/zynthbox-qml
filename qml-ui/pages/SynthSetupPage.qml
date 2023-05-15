@@ -175,38 +175,57 @@ Zynthian.ScreenPage {
             return pickerDialog.cuiaCallback(cuia);
         }
 
-        switch (cuia) {
-        case "SWITCH_SELECT_SHORT":
-            if (zynqtgui.current_screen_id == "layers_for_channel" && !zynqtgui.fixed_layers.current_index_valid) {
-                layerSetupDialog.open();
-                return true
-            } else if (zynqtgui.fixed_layers.current_index_valid) {
-                zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+        // Call cuiaCallback of current selectorView
+        var selectorCuiaReturnVal = false
+        switch(zynqtgui.current_screen_id) {
+            case "layers_for_channel":
+                selectorCuiaReturnVal = layersView.cuiaCallback(cuia)
+                break
+            case "bank":
+                selectorCuiaReturnVal = bankView.cuiaCallback(cuia)
+                break
+            case "preset":
+                selectorCuiaReturnVal = presetView.cuiaCallback(cuia)
+                break
+        }
+        if (selectorCuiaReturnVal == true) {
+            // If selected view returns true, return from here as well since CUIA event is already handled
+            return true
+        } else {
+            // Since CUIA event is not handled by selector view, handle it here
+            switch (cuia) {
+                case "SWITCH_SELECT_SHORT":
+                    if (zynqtgui.current_screen_id == "layers_for_channel" && !zynqtgui.fixed_layers.current_index_valid) {
+                        layerSetupDialog.open();
+                        return true
+                    } else if (zynqtgui.fixed_layers.current_index_valid) {
+                        zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+                    }
+                    return false
+                case "SWITCH_SELECT_BOLD":
+                    if (zynqtgui.fixed_layers.current_index_valid) {
+                        zynqtgui.control.single_effect_engine = null;
+                        zynqtgui.current_screen_id = "control";
+                        return true
+                    }
+                    return false
+                case "NAVIGATE_LEFT":
+                    var newIndex = Math.max(0, currentScreenIndex - 1);
+                    zynqtgui.current_screen_id = root.screenIds[newIndex];
+                    return true;
+                case "NAVIGATE_RIGHT":
+                    var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
+                    zynqtgui.current_screen_id = root.screenIds[newIndex];
+                    return true;
+                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_BOLD":
+                case "SWITCH_BACK_LONG":
+                    zynqtgui.current_screen_id = "layers_for_channel";
+                    zynqtgui.go_back();
+                    return true;
+                default:
+                    return false;
             }
-            return false
-        case "SWITCH_SELECT_BOLD":
-            if (zynqtgui.fixed_layers.current_index_valid) {
-                zynqtgui.control.single_effect_engine = null;
-                zynqtgui.current_screen_id = "control";
-                return true
-            }
-            return false
-        case "NAVIGATE_LEFT":
-            var newIndex = Math.max(0, currentScreenIndex - 1);
-            zynqtgui.current_screen_id = root.screenIds[newIndex];
-            return true;
-        case "NAVIGATE_RIGHT":
-            var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
-            zynqtgui.current_screen_id = root.screenIds[newIndex];
-            return true;
-        case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
-        case "SWITCH_BACK_LONG":
-            zynqtgui.current_screen_id = "layers_for_channel";
-            zynqtgui.go_back();
-            return true;
-        default:
-            return false;
         }
     }
 

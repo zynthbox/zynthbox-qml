@@ -98,13 +98,13 @@ Item {
             text: {
                 switch(component.knobId) {
                     case 0:
-                        return "BK";
-                    case 1:
                         return "K1";
-                    case 2:
+                    case 1:
                         return "K2";
-                    case 3:
+                    case 2:
                         return "K3";
+                    case 3:
+                        return "BK";
                 }
             }
             color: Kirigami.Theme.buttonTextColor
@@ -146,58 +146,17 @@ Item {
         }
     }
     Connections {
-        target: zynqtgui.playgrid
-        enabled: component.enabled && component.knobId > -1 && component.knobId < 4
-        onBigKnobValueChanged: {
-            if (component.knobId === 0) {
-                if (zynqtgui.playgrid.bigKnobValue < 0) {
-                    for (var i = zynqtgui.playgrid.bigKnobValue; i < 0; ++i) {
-                        component.knobDown();
+        target: zynqtgui
+        enabled: component.visible && component.enabled && component.knobId > -1 && component.knobId < 4
+        function onKnobDeltaChanged(knobIndex, delta) {
+            if (component.knobId === knobIndex) {
+                for (var i=0; i<Math.abs(delta); i++) {
+                    if (delta < 0) {
+                        component.knobDown()
+                    } else {
+                        component.knobUp()
                     }
-                } else if (zynqtgui.playgrid.bigKnobValue > 0) {
-                    for (var i = zynqtgui.playgrid.bigKnobValue; i > 0; --i) {
-                        component.knobUp();
-                    }
-                } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-            }
-        }
-        onKnob1ValueChanged: {
-            if (component.knobId === 1) {
-                if (zynqtgui.playgrid.knob1Value < 0) {
-                    for (var i = zynqtgui.playgrid.knob1Value; i < 0; ++i) {
-                        component.knobDown();
-                    }
-                } else if (zynqtgui.playgrid.knob1Value > 0) {
-                    for (var i = zynqtgui.playgrid.knob1Value; i > 0; --i) {
-                        component.knobUp();
-                    }
-                } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-            }
-        }
-        onKnob2ValueChanged: {
-            if (component.knobId === 2) {
-                if (zynqtgui.playgrid.knob2Value < 0) {
-                    for (var i = zynqtgui.playgrid.knob2Value; i < 0; ++i) {
-                        component.knobDown();
-                    }
-                } else if (zynqtgui.playgrid.knob2Value > 0) {
-                    for (var i = zynqtgui.playgrid.knob2Value; i > 0; --i) {
-                        component.knobUp();
-                    }
-                } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-            }
-        }
-        onKnob3ValueChanged: {
-            if (component.knobId === 3 && component.visible) {
-                if (zynqtgui.playgrid.knob3Value < 0) {
-                    for (var i = zynqtgui.playgrid.knob3Value; i < 0; ++i) {
-                        component.knobDown();
-                    }
-                } else if (zynqtgui.playgrid.knob3Value > 0) {
-                    for (var i = zynqtgui.playgrid.knob3Value; i > 0; --i) {
-                        component.knobUp();
-                    }
-                } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
+                }
             }
         }
     }

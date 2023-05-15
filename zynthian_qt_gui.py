@@ -2593,44 +2593,40 @@ class zynthian_gui(QObject):
             # self.zynread_wait_flag=False
 
     def zyncoder_read(self):
-        if self.knobTouchUpdateInProgress:
-            return
+        try:
+            # Read Zyncoders
+            self.lock.acquire()
 
-        if not self.loading:  # TODO Es necesario???
-            try:
-                # Read Zyncoders
-                self.lock.acquire()
+            # Calculate delta and emit
+            for knob_index in [0, 1, 2, 3]:
+                try:
+                    if self.__zselectors[knob_index]:
+                        self.__zselectors[knob_index].read_zyncoder()
+                        delta = round((self.__zselectors[knob_index].value - self.__knob_values[knob_index]) / self.__knob_delta_factors[knob_index])
+                        if delta != 0:
+                            self.knobDeltaChanged.emit(knob_index, delta)
+                            # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
+                            if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
+                                    self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
+                                self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
+                                self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
+                            else:
+                                self.__knob_values[knob_index] = self.__zselectors[knob_index].value
+                except Exception as e:
+                    logging.exception(f"Error reading zyncoder value : {str(e)}")
 
-                # Calculate delta and emit
-                for knob_index in [0, 1, 2, 3]:
-                    try:
-                        if self.__zselectors[knob_index]:
-                            self.__zselectors[knob_index].read_zyncoder()
-                            delta = round((self.__zselectors[knob_index].value - self.__knob_values[knob_index]) / self.__knob_delta_factors[knob_index])
-                            if delta != 0:
-                                self.knobDeltaChanged.emit(knob_index, delta)
-                                # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required
-                                if self.__zselectors[knob_index].value - self.__knob_delta_factors[knob_index] < 0 or \
-                                        self.__zselectors[knob_index].value + self.__knob_delta_factors[knob_index] > self.__knob_values_max[knob_index]:
-                                    self.__zselectors[knob_index].set_value(self.__knob_values_default[knob_index], True)
-                                    self.__knob_values[knob_index] = self.__knob_values_default[knob_index]
-                                else:
-                                    self.__knob_values[knob_index] = self.__zselectors[knob_index].value
-                    except Exception as e:
-                        logging.exception(f"Error reading zyncoder value : {str(e)}")
+            self.lock.release()
 
-                self.lock.release()
+            # Zynswitches
+            self.zynswitch_defered_exec()
+            self.zynswitches()
 
-                # Zynswitches
-                self.zynswitch_defered_exec()
-                self.zynswitches()
+        except Exception as err:
+            self.reset_loading()
+            logging.exception(err)
 
-            except Exception as err:
-                self.reset_loading()
-                logging.exception(err)
-
-            # Run autoconnect if needed
-            self.zynautoconnect_do()
+        # Run autoconnect if needed
+        self.zynautoconnect_do()
 
     def zynmidi_read(self):
         try:
@@ -3956,21 +3952,6 @@ class zynthian_gui(QObject):
 
     showCurrentTaskMessage = Property(bool, get_showCurrentTaskMessage, set_showCurrentTaskMessage, notify=showCurrentTaskMessageChanged)
     ### END Property showCurrentTaskMessage
-
-    ### Property knobTouchUpdateInProgress
-    def get_knob_touch_update_in_progress(self):
-        return self.__knob_touch_update_in_progress__
-
-    def set_knob_touch_update_in_progress(self, value):
-        if self.__knob_touch_update_in_progress__ != value:
-            self.__knob_touch_update_in_progress__ = value
-            self.knob_touch_update_in_progress_changed.emit()
-
-    knob_touch_update_in_progress_changed = Signal()
-
-    knobTouchUpdateInProgress = Property(bool, get_knob_touch_update_in_progress, set_knob_touch_update_in_progress,
-                                         notify=knob_touch_update_in_progress_changed)
-    ### END Property knobTouchUpdateInProgress
 
     ### Property passiveNotification
     def get_passiveNotification(self):

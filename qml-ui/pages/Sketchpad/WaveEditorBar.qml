@@ -137,9 +137,6 @@ GridLayout {
                         // Set startposition on swipe
                         waveBar.controlObj.startPosition += delta
                     }
-                    onPressedChanged: {
-                        zynqtgui.knobTouchUpdateInProgress = pressed
-                    }
                 }
             }
 
@@ -183,9 +180,6 @@ GridLayout {
                     }
 
                     yAxis.enabled: false
-                    onGrabChanged: {
-                        zynqtgui.knobTouchUpdateInProgress = startHandleDragHandler.active
-                    }
                 }
             }
 
@@ -226,9 +220,6 @@ GridLayout {
                     }
 
                     yAxis.enabled: false
-                    onGrabChanged: {
-                        zynqtgui.knobTouchUpdateInProgress = loopHandleDragHandler.active
-                    }
                 }
             }
 
@@ -287,8 +278,6 @@ GridLayout {
                         if (!active) {
                             endHandle.x = endLoopLine.x - endHandle.width
                         }
-
-                        zynqtgui.knobTouchUpdateInProgress = endHandleDragHandler.active
                     }
                 }
             }

@@ -188,7 +188,6 @@ class sketchpad_channel(QObject):
 
     def master_volume_changed(self):
         self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
-        logging.debug(f"Master Volume : {self.master_volume} dB")
 
     def stopAllClips(self):
         for part_index in range(0, 5):

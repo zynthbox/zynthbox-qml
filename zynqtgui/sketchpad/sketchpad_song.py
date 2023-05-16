@@ -525,10 +525,6 @@ class sketchpad_song(QObject):
             self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
 
             Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
-            # Call zynqtgui global set_selector when bpm changes as bpm is controlled by Big Knob
-            # when global popup is opened
-            self.zynqtgui.set_selector()
-
             self.bpm_changed.emit()
             self.schedule_save()
 

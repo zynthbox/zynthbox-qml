@@ -66,55 +66,40 @@ Zynthian.ScreenPage {
                 _private.goRight();
                 returnValue = true;
                 break;
+            case "KNOB0_UP":
+                _private.knob0Up();
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                _private.knob0Down();
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                _private.knob1Up();
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                _private.knob1Down();
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                _private.knob2Up();
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                _private.knob2Down();
+                returnValue = true;
+                break;
+            case "KNOB3_UP":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "KNOB3_DOWN":
+                _private.goLeft();
+                returnValue = true;
+                break;
         }
         return returnValue;
-    }
-    Connections {
-        target: zynqtgui.channel_wave_editor
-        onBigKnobValueChanged: {
-            if (zynqtgui.channel_wave_editor.bigKnobValue < 0) {
-                for (var i = zynqtgui.channel_wave_editor.bigKnobValue; i < 0; ++i) {
-                    _private.goLeft();
-                }
-            } else if (zynqtgui.channel_wave_editor.bigKnobValue > 0) {
-                for (var i = zynqtgui.channel_wave_editor.bigKnobValue; i > 0; --i) {
-                    _private.goRight();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob1ValueChanged: {
-            if (zynqtgui.channel_wave_editor.knob1Value < 0) {
-                for (var i = zynqtgui.channel_wave_editor.knob1Value; i < 0; ++i) {
-                    _private.knob1Down();
-                }
-            } else if (zynqtgui.channel_wave_editor.knob1Value > 0) {
-                for (var i = zynqtgui.channel_wave_editor.knob1Value; i > 0; --i) {
-                    _private.knob1Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob2ValueChanged: {
-            if (zynqtgui.channel_wave_editor.knob2Value < 0) {
-                for (var i = zynqtgui.channel_wave_editor.knob2Value; i < 0; ++i) {
-                    _private.knob2Down();
-                }
-            } else if (zynqtgui.channel_wave_editor.knob2Value > 0) {
-                for (var i = zynqtgui.channel_wave_editor.knob2Value; i > 0; --i) {
-                    _private.knob2Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob3ValueChanged: {
-            if (zynqtgui.channel_wave_editor.knob3Value < 0) {
-                for (var i = zynqtgui.channel_wave_editor.knob3Value; i < 0; ++i) {
-                    _private.knob3Down();
-                }
-            } else if (zynqtgui.channel_wave_editor.knob3Value > 0) {
-                for (var i = zynqtgui.channel_wave_editor.knob3Value; i > 0; --i) {
-                    _private.knob3Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
     }
     QtObject {
         id: _private

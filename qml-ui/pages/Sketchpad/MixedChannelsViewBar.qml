@@ -50,6 +50,8 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         var returnValue = false;
+        var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+
         switch (cuia) {
             case "NAVIGATE_LEFT":
                 if (zynqtgui.session_dashboard.selectedChannel > 0) {
@@ -81,6 +83,42 @@ Rectangle {
                     }
                     returnValue = true;
                 }
+                break;
+            case "KNOB0_UP":
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+                }
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+                }
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
+                }
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
+                }
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
+                }
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
+                }
+                returnValue = true;
                 break;
         }
         return returnValue;

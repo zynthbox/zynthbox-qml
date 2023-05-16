@@ -109,6 +109,71 @@ Kirigami.AbstractApplicationWindow {
         passiveNotificationComponent.hideNotification();
     }
 
+    /**
+     * Display an OSD with touch controls
+     * @param params An object with parameters to pass to zynqtgui.osd.updateOsd
+     *
+     * params needs to be an object with the following keys :
+     *   {
+     *       parameterName      : <required> string,
+     *       description        : <required> string,
+     *       start              : <required> float,
+     *       stop               : <required> float,
+     *       step               : <required> float,
+     *       defaultValue       : <required> float,
+     *       currentValue       : <required> float,
+     *       setValueFunction   : <required> function,
+     *       startLabel         : <default=""> string,
+     *       stopLabel          : <default=""> string,
+     *       valueLabel         : <default=""> string,
+     *       showValueLabel     : <default=true> bool,
+     *       visualZero         : <default=null> float,
+     *       showResetToDefault : <default=true> bool,
+     *       showVisualZero     : <default=true> bool,
+     *   }
+     **/
+    function showOsd(params) {
+        var defaults = {
+            startLabel: "",
+            stopLabel: "",
+            valueLabel: "",
+            showValueLabel: true,
+            visualZero: null,
+            showResetToDefault: true,
+            showVisualZero: true
+        };
+
+        // Check for required parameters
+        console.assert(params.hasOwnProperty("parameterName")       == true, "Required paramater parameterName")
+        console.assert(params.hasOwnProperty("description")         == true, "Required paramater description")
+        console.assert(params.hasOwnProperty("start")               == true, "Required paramater start")
+        console.assert(params.hasOwnProperty("stop")                == true, "Required paramater stop")
+        console.assert(params.hasOwnProperty("step")                == true, "Required paramater step")
+        console.assert(params.hasOwnProperty("defaultValue")        == true, "Required paramater defaultValue")
+        console.assert(params.hasOwnProperty("currentValue")        == true, "Required paramater currentValue")
+        console.assert(params.hasOwnProperty("setValueFunction")    == true, "Required paramater setValueFunction")
+
+        var _params = Object.assign({}, defaults, params)
+
+        zynqtgui.osd.updateOsd(
+            _params.parameterName,
+            _params.description,
+            _params.start,
+            _params.stop,
+            _params.step,
+            _params.defaultValue,
+            _params.currentValue,
+            _params.setValueFunction,
+            _params.startLabel,
+            _params.stopLabel,
+            _params.valueLabel,
+            _params.showValueLabel,
+            _params.visualZero,
+            _params.showResetToDefault,
+            _params.showVisualZero,
+        )
+    }
+
     visible: false
     flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
     minimumWidth: screen.width

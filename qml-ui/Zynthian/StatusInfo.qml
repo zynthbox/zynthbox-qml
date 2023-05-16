@@ -313,6 +313,34 @@ MouseArea {
                 case "SCREEN_AUDIO_SETTINGS":
                     popup.close()
                     return true
+
+                case "KNOB0_UP":
+                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
+                    return true
+                case "KNOB0_DOWN":
+                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
+                    return true
+
+                case "KNOB1_UP":
+                    zynqtgui.delayController.value = Zynthian.CommonUtils.clamp(zynqtgui.delayController.value + 1, 0, 100)
+                    return true
+                case "KNOB1_DOWN":
+                    zynqtgui.delayController.value = Zynthian.CommonUtils.clamp(zynqtgui.delayController.value - 1, 0, 100)
+                    return true
+
+                case "KNOB2_UP":
+                    zynqtgui.reverbController.value = Zynthian.CommonUtils.clamp(zynqtgui.reverbController.value + 1, 0, 100)
+                    return true
+                case "KNOB2_DOWN":
+                    zynqtgui.reverbController.value = Zynthian.CommonUtils.clamp(zynqtgui.reverbController.value - 1, 0, 100)
+                    return true
+
+                case "KNOB3_UP":
+                    zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.song.bpm + 1, 50, 200)
+                    return true
+                case "KNOB3_DOWN":
+                    zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.song.bpm - 1, 50, 200)
+                    return true
             }
         }
 
@@ -416,14 +444,14 @@ MouseArea {
                     Layout.preferredWidth: 1
                     contentItem: SketchpadDial {
                         text: qsTr("Delay")
-                        controlObj: zynqtgui
-                        controlProperty: "delayKnobValue"
+                        controlObj: zynqtgui.delayController
+                        controlProperty: "value"
                         valueString: qsTr("%1%").arg(dial.value)
 
                         dial {
-                            stepSize: 1
-                            from: 0
-                            to: 100
+                            stepSize: zynqtgui.delayController.step_size
+                            from: zynqtgui.delayController.value_min
+                            to: zynqtgui.delayController.value_max
                         }
                     }
                 }
@@ -465,14 +493,14 @@ MouseArea {
                     Layout.preferredWidth: 1
                     contentItem: SketchpadDial {
                         text: qsTr("Reverb")
-                        controlObj: zynqtgui
-                        controlProperty: "reverbKnobValue"
+                        controlObj: zynqtgui.reverbController
+                        controlProperty: "value"
                         valueString: qsTr("%1%").arg(dial.value)
 
                         dial {
-                            stepSize: 1
-                            from: 0
-                            to: 100
+                            stepSize: zynqtgui.reverbController.step_size
+                            from: zynqtgui.reverbController.value_min
+                            to: zynqtgui.reverbController.value_max
                         }
                     }
                 }

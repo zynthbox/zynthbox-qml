@@ -37,10 +37,10 @@ ScreenPage {
 
     //TODO: Bind the base selector type to qml?
     readonly property alias selector: view.selector
-
     readonly property alias view: view.view
     property alias delegate: view.delegate
     property alias currentIndex: view.currentIndex
+    property alias cuiaCallback: view.cuiaCallback
 
     bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: view.forceActiveFocus()

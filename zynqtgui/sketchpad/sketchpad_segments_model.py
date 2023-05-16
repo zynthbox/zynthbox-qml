@@ -170,7 +170,6 @@ class sketchpad_segments_model(QAbstractListModel):
         if self.__selected_segment_index != index and index > -1 and index < len(self.__segments):
             self.__selected_segment_index = index
             self.selectedSegmentIndexChanged.emit()
-            self.zynqtgui.sketchpad.set_selector()
 
     selectedSegmentIndexChanged = Signal()
 

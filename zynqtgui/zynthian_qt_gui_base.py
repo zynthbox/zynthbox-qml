@@ -23,11 +23,13 @@
 # 
 #******************************************************************************
 
+
 # Zynthian specific modules
 from . import zynthian_gui_config
 
 # Qt modules
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import QObject
+
 
 class zynqtgui(QObject):
     def __init__(self, parent=None):
@@ -39,9 +41,6 @@ class zynqtgui(QObject):
     def show(self):
         pass
 
-    def zyncoder_read(self):
-        pass
-
     def refresh_loading(self):
         pass
 
@@ -49,6 +48,9 @@ class zynqtgui(QObject):
         pass
 
     def refresh_status(self, status={}):
+        pass
+
+    def set_selector(self):
         pass
 
 #------------------------------------------------------------------------------

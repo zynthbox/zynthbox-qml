@@ -39,6 +39,7 @@ from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QTh
 from .sketchpad_clips_model import sketchpad_clips_model
 from .sketchpad_clip import sketchpad_clip
 from zynqtgui import zynthian_gui_config
+from ..zynthian_gui_multi_controller import MultiController
 
 
 class sketchpad_channel(QObject):
@@ -81,6 +82,8 @@ class sketchpad_channel(QObject):
         self.__dry_amount = 100
         self.__wet_fx_1_amount = 100
         self.__wet_fx_2_amount = 100
+        self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -91,6 +94,14 @@ class sketchpad_channel(QObject):
         self.fixed_layers_list_updated_handler_throttle.setInterval(100)
         self.fixed_layers_list_updated_handler_throttle.setSingleShot(True)
         self.fixed_layers_list_updated_handler_throttle.timeout.connect(self.fixed_layers_list_updated_handler)
+
+        # Load engine config
+        try:
+            with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
+                self.__engine_config = json.load(f)
+        except Exception as e:
+            logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
+            self.__engine_config = {}
 
         # Create 5 clip objects for 5 samples per channel
         for i in range(0, 5):
@@ -130,6 +141,8 @@ class sketchpad_channel(QObject):
 
         # Re-read sound snapshot json when a new snapshot is loaded
         self.zynqtgui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
+        # Update filter controllers when booting is complete
+        self.zynqtgui.isBootingCompleteChanged.connect(self.update_filter_controllers)
 
     @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, partNum):
@@ -155,6 +168,7 @@ class sketchpad_channel(QObject):
         self.selectedPartNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
+        self.update_filter_controllers()
         self.zynqtgui.zynautoconnect()
         self.occupiedSlotsChanged.emit()
         self.connectedSoundChanged.emit()
@@ -167,6 +181,35 @@ class sketchpad_channel(QObject):
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
+
+    def update_filter_controllers(self):
+        for index, midi_channel in enumerate(self.chainedSounds):
+            self.__filter_cutoff_controllers[index].clear_controls()
+            self.__filter_resonance_controllers[index].clear_controls()
+            if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
+                layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+                synth_controllers_dict = layer.controllers_dict
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
+                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                elif "cutoff" in synth_controllers_dict:
+                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
+                elif "filter_cutoff" in synth_controllers_dict:
+                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
+                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                elif "resonance" in synth_controllers_dict:
+                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
+                elif "filter_resonance" in synth_controllers_dict:
+                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
+
+        self.filterCutoffControllersChanged.emit()
+        self.filterResonanceControllersChanged.emit()
 
     def className(self):
         return "sketchpad_channel"
@@ -188,7 +231,6 @@ class sketchpad_channel(QObject):
 
     def master_volume_changed(self):
         self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
-        logging.debug(f"Master Volume : {self.master_volume} dB")
 
     def stopAllClips(self):
         for part_index in range(0, 5):
@@ -473,7 +515,6 @@ class sketchpad_channel(QObject):
 
             self.volume_changed.emit()
             self.__song__.schedule_save()
-            self.zynqtgui.sketchpad.set_selector()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 
@@ -493,7 +534,6 @@ class sketchpad_channel(QObject):
 
             self.panChanged.emit()
             Zynthbox.MidiRouter.instance().channelPassthroughClients()[self.id].setPanAmount(self.__pan__)
-            self.zynqtgui.sketchpad.set_selector()
             if force_set is False:
                 self.__song__.schedule_save()
 
@@ -899,7 +939,6 @@ class sketchpad_channel(QObject):
 
         if force_set or type != self.__channel_audio_type__:
             self.__channel_audio_type__ = type
-            self.zynqtgui.sketchpad.set_selector()
             self.channel_audio_type_changed.emit()
 
             # Set selectedSlotRow to 0 when type is changed to slice as slice mode always operates on slot 0
@@ -1056,7 +1095,6 @@ class sketchpad_channel(QObject):
     def set_selectedSlotRow(self, row):
         if self.__selected_slot_row__ != row:
             self.__selected_slot_row__ = row
-            self.zynqtgui.sketchpad.set_selector()
             self.selectedSlotRowChanged.emit()
 
     selectedSlotRowChanged = Signal()
@@ -1287,6 +1325,24 @@ class sketchpad_channel(QObject):
     """
     wetFx2Amount = Property(float, get_wetFx2Amount, set_wetFx2Amount, notify=wetFx2AmountChanged)
     ### END Property wetFx2Amount
+
+    ### Begin property filterCutoffControllers
+    def get_filterCutoffControllers(self):
+        return self.__filter_cutoff_controllers
+
+    filterCutoffControllersChanged = Signal()
+
+    filterCutoffControllers = Property("QVariantList", get_filterCutoffControllers, notify=filterCutoffControllersChanged)
+    ### End property filterCutoffControllers
+
+    ### Begin property filterResonanceControllers
+    def get_filterResonanceControllers(self):
+        return self.__filter_resonance_controllers
+
+    filterResonanceControllersChanged = Signal()
+
+    filterResonanceControllers = Property("QVariantList", get_filterResonanceControllers, notify=filterResonanceControllersChanged)
+    ### End property filterResonanceControllers
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):

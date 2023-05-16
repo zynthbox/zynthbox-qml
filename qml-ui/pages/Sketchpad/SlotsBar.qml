@@ -59,6 +59,8 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     function cuiaCallback(cuia) {
+        var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
                 handleItemClick()
@@ -123,6 +125,36 @@ Rectangle {
                 root.selectedSlotRowItem.channel.selectedSlotRow = 4
                 handleItemClick()
                 return true
+            case "KNOB0_UP":
+                if (root.synthsButton.checked) {
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+                }
+                return true;
+            case "KNOB0_DOWN":
+                if (root.synthsButton.checked) {
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+                }
+                return true;
+            case "KNOB1_UP":
+                if (root.synthsButton.checked) {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
+                }
+                return true;
+            case "KNOB1_DOWN":
+                if (root.synthsButton.checked) {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
+                }
+                return true;
+            case "KNOB2_UP":
+                if (root.synthsButton.checked) {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
+                }
+                return true;
+            case "KNOB2_DOWN":
+                if (root.synthsButton.checked) {
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
+                }
+                return true;
         }
 
         return false;

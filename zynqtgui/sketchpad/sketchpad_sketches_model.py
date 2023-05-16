@@ -130,7 +130,6 @@ class sketchpad_sketches_model(QAbstractListModel):
         if value != self.__song_mode:
             self.__song_mode = value
             self.songModeChanged.emit()
-            self.zynqtgui.sketchpad.set_selector()
 
     songModeChanged = Signal()
 

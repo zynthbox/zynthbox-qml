@@ -52,6 +52,18 @@ Zynthian.ScreenPage {
         }
     }
 
+    /**
+     * Update controller value of selected column
+     * @param rowIndex The rowIndex(0, 1, 2) of controller whose value needs to be updated
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateControllerValue(controller, sign) {
+        if (controller != null) {
+            var stepSize = controller.step_size === 0 ? 1 : controller.step_size
+            controller.value = Zynthian.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
+        }
+    }
+
     contextualActions: [
         Kirigami.Action {
             id: viewAction

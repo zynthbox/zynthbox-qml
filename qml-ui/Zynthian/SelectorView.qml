@@ -41,10 +41,34 @@ QQC2.ScrollView {
     property alias currentIndex: view.currentIndex
     property alias highlighted: background.highlighted
     property bool active: true
-
     property string screenId
     //TODO: Bind the base selector type to qml?
     readonly property QtObject selector: screenId.length > 0 ? zynqtgui[screenId] : null
+    property var cuiaCallback: function (cuia) {
+        var returnVal = false
+
+        switch(cuia) {
+            case "KNOB0_UP":
+            case "KNOB0_DOWN":
+            case "KNOB1_UP":
+            case "KNOB1_DOWN":
+            case "KNOB2_UP":
+            case "KNOB2_DOWN":
+                returnVal = true
+                break
+            case "KNOB3_UP":
+                root.selector.select_down()
+                returnVal = true
+                break
+            case "KNOB3_DOWN":
+                root.selector.select_up()
+                returnVal = true
+                break
+        }
+
+        return returnVal
+    }
+
     signal currentScreenIdRequested(string screenId)
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)

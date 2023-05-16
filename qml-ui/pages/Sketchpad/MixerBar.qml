@@ -72,6 +72,18 @@ Rectangle {
                 }
 
                 return true;
+            case "KNOB0_UP":
+                pageManager.getPage("sketchpad").updateSelectedChannelVolume(1)
+                return true;
+            case "KNOB0_DOWN":
+                pageManager.getPage("sketchpad").updateSelectedChannelVolume(-1)
+                return true;
+            case "KNOB1_UP":
+                pageManager.getPage("sketchpad").updateSelectedChannelPan(1)
+                return true;
+            case "KNOB1_DOWN":
+                pageManager.getPage("sketchpad").updateSelectedChannelPan(-1)
+                return true;
         }
         
         return false;

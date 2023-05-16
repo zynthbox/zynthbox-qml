@@ -103,6 +103,18 @@ function switchToScene(index) {
     zynqtgui.sketchpad.song.scenesModel.selectedSceneIndex = index
 }
 
+/**
+ * A helper method to clamp a value between a range
+ *
+ * @arg val Value to clamp
+ * @arg min Minumum value of the range
+ * @arg max Maximum value of the range
+ * @return Returns value clamped between min and max
+ */
+function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val))
+}
+
 // Method to instantiate a component from URL
 // Returns the created object
 function instantiateComponent(url, params) {

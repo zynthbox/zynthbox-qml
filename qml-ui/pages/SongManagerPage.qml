@@ -54,55 +54,40 @@ Zynthian.ScreenPage {
                 _private.goRight();
                 returnValue = true;
                 break;
+            case "KNOB0_UP":
+                _private.knob0Up();
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                _private.knob0Down();
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                _private.knob1Up();
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                _private.knob1Down();
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                _private.knob2Up();
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                _private.knob2Down();
+                returnValue = true;
+                break;
+            case "KNOB3_UP":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "KNOB3_DOWN":
+                _private.goLeft();
+                returnValue = true;
+                break;
         }
         return returnValue;
-    }
-    Connections {
-        target: zynqtgui.song_manager
-        onBigKnobValueChanged: {
-            if (zynqtgui.song_manager.bigKnobValue < 0) {
-                for (var i = zynqtgui.song_manager.bigKnobValue; i < 0; ++i) {
-                    _private.goLeft();
-                }
-            } else if (zynqtgui.song_manager.bigKnobValue > 0) {
-                for (var i = zynqtgui.song_manager.bigKnobValue; i > 0; --i) {
-                    _private.goRight();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob1ValueChanged: {
-            if (zynqtgui.song_manager.knob1Value < 0) {
-                for (var i = zynqtgui.song_manager.knob1Value; i < 0; ++i) {
-                    _private.knob1Down();
-                }
-            } else if (zynqtgui.song_manager.knob1Value > 0) {
-                for (var i = zynqtgui.song_manager.knob1Value; i > 0; --i) {
-                    _private.knob1Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob2ValueChanged: {
-            if (zynqtgui.song_manager.knob2Value < 0) {
-                for (var i = zynqtgui.song_manager.knob2Value; i < 0; ++i) {
-                    _private.knob2Down();
-                }
-            } else if (zynqtgui.song_manager.knob2Value > 0) {
-                for (var i = zynqtgui.song_manager.knob2Value; i > 0; --i) {
-                    _private.knob2Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
-        onKnob3ValueChanged: {
-            if (zynqtgui.song_manager.knob3Value < 0) {
-                for (var i = zynqtgui.song_manager.knob3Value; i < 0; ++i) {
-                    _private.knob3Down();
-                }
-            } else if (zynqtgui.song_manager.knob3Value > 0) {
-                for (var i = zynqtgui.song_manager.knob3Value; i > 0; --i) {
-                    _private.knob3Up();
-                }
-            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-        }
     }
     QtObject {
         id: _private
@@ -116,27 +101,27 @@ Zynthian.ScreenPage {
                 zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex += 1;
             }
         }
-        function knob1Up() {
+        function knob0Up() {
             segmentDetails.selectedSegment.barLength += 1;
         }
-        function knob1Down() {
+        function knob0Down() {
             if (segmentDetails.selectedSegment.barLength > 0) {
                 segmentDetails.selectedSegment.barLength -= 1;
             }
         }
-        function knob2Up() {
+        function knob1Up() {
             if (segmentDetails.selectedSegment.beatLength < 3) {
                 segmentDetails.selectedSegment.beatLength += 1;
             }
         }
-        function knob2Down() {
+        function knob1Down() {
             if (segmentDetails.selectedSegment.beatLength > 0) {
                 segmentDetails.selectedSegment.beatLength -= 1;
             }
         }
-        function knob3Up() {
+        function knob2Up() {
         }
-        function knob3Down() {
+        function knob2Down() {
         }
     }
 

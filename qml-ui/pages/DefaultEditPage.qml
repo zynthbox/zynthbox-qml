@@ -37,6 +37,8 @@ RowLayout {
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property QQC2.StackView stack
     property var cuiaCallback: function(cuia) {
+        var columnIndex = zynqtgui.control.selectedColumn - zynqtgui.control.selectedPage * 4
+
         switch (cuia) {
             case "SELECT_UP":
                 zynqtgui.control.selectPrevPage()
@@ -53,6 +55,30 @@ RowLayout {
             case "NAVIGATE_RIGHT":
                 zynqtgui.control.selectNextColumn()
                 return true
+            case "KNOB0_UP":
+                applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(0).controllerLoader.controller.ctrl, 1)
+                return true;
+            case "KNOB0_DOWN":
+                applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(0).controllerLoader.controller.ctrl, -1)
+                return true;
+            case "KNOB1_UP":
+                applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(1).controllerLoader.controller.ctrl, 1)
+                return true;
+            case "KNOB1_DOWN":
+                applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(1).controllerLoader.controller.ctrl, -1)
+                return true;
+            case "KNOB2_UP":
+                applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(2).controllerLoader.controller.ctrl, 1)
+                return true;
+            case "KNOB2_DOWN":
+                applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(2).controllerLoader.controller.ctrl, -1)
+                return true;
+            case "KNOB3_UP":
+                zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn + 1, 0, zynqtgui.control.totalColumns)
+                return true;
+            case "KNOB3_DOWN":
+                zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn - 1, 0, zynqtgui.control.totalColumns)
+                return true;
         }
 
         return false;
@@ -121,11 +147,13 @@ RowLayout {
     }
 
     Repeater {
+        id: columnsRepeater
         model: 4
         delegate: Rectangle {
             id: columnDelegate
 
             property int columnIndex: index
+            property alias rowsRepeater: rowsRepeater
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -140,12 +168,14 @@ RowLayout {
                 spacing: 4
 
                 Repeater {
+                    id: rowsRepeater
                     model: 3
                     delegate: Item {
                         id: controlDelegate
 
                         property int allControlsIndex: zynqtgui.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
                         property var control: null
+                        property alias controllerLoader: controllerLoader
 
                         function updateControl() {
                             controlDelegate.control = Qt.binding(function() {
@@ -168,6 +198,7 @@ RowLayout {
                         }
 
                         Zynthian.ControllerLoader {
+                            id: controllerLoader
                             visible: controlDelegate.control != null
                             anchors.fill: parent
                             controller {

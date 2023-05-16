@@ -130,7 +130,7 @@ Item {
                 ? cppClipObject.playbackPositions
                 : 0
             delegate: Item {
-                visible: model.positionGain > 0
+                visible: model.positionID > -1
                 Rectangle {
                     anchors.centerIn: parent
                     rotation: 45

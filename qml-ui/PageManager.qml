@@ -134,10 +134,10 @@ Zynthian.Stack {
         }
 
         if (root.pageCache[page] != null) {
-            console.log("Page cache found for page :", pageResolvedUrl(page))
+            // console.log("Page cache found for page :", pageResolvedUrl(page))
             return root.pageCache[page].pageObject
         } else {
-            console.log("Page cache not found for page :", pageResolvedUrl(page))
+            // console.log("Page cache not found for page :", pageResolvedUrl(page))
             console.log("Instantiating page", page, ":", pageResolvedUrl(page))
             var cache = Zynthian.CommonUtils.instantiateComponent(pageResolvedUrl(page), {"width": root.width, "height": root.height, visible: false})
 

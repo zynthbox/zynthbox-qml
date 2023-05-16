@@ -34,7 +34,7 @@ from PySide2.QtCore import Property, QObject, Signal
 
 
 class MultiController(QObject):
-    def __init__(self, name, parent=None):
+    def __init__(self, name="", parent=None):
         super(MultiController, self).__init__(parent)
         self.__controls = []
         self.__value = 0

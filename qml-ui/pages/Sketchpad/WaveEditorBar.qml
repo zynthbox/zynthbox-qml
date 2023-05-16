@@ -53,6 +53,24 @@ GridLayout {
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
+            case "KNOB0_UP":
+                pageManager.getPage("sketchpad").updateClipStartPosition(waveBar.controlObj, 1)
+                return true;
+            case "KNOB0_DOWN":
+                pageManager.getPage("sketchpad").updateClipStartPosition(waveBar.controlObj, -1)
+                return true;
+            case "KNOB1_UP":
+                pageManager.getPage("sketchpad").updateClipLoopPosition(waveBar.controlObj, 1)
+                return true;
+            case "KNOB1_DOWN":
+                pageManager.getPage("sketchpad").updateClipLoopPosition(waveBar.controlObj, -1)
+                return true;
+            case "KNOB2_UP":
+                pageManager.getPage("sketchpad").updateClipLength(waveBar.controlObj, 1)
+                return true;
+            case "KNOB2_DOWN":
+                pageManager.getPage("sketchpad").updateClipLength(waveBar.controlObj, -1)
+                return true;
         }
         
         return false;

@@ -100,10 +100,6 @@ class sketchpad_clip(QObject):
         except:
             pass
 
-        if self.channel is not None:
-            self.channel.volume_changed.connect(self.channel_volume_changed)
-            self.channel_volume_changed()
-
         self.__sync_in_current_scene_timer__ = QTimer()
         self.__sync_in_current_scene_timer__.setSingleShot(True)
         self.__sync_in_current_scene_timer__.setInterval(50)
@@ -191,14 +187,6 @@ class sketchpad_clip(QObject):
             else:
                 self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
             self.current_beat_changed.emit()
-
-    def channel_volume_changed(self):
-        if self.channel is not None and not self.zynqtgui.sketchpad.longOperation:
-            self.channel.volume = self.__song__.channelsModel.getChannel(self.__row_index__).volume
-            logging.info(f"Channel volume changed : {self.channel.volume}")
-
-            if self.audioSource is not None:
-                self.audioSource.setVolume(self.channel.volume)
 
     @Slot(int)
     def setVolume(self, vol):
@@ -290,13 +278,6 @@ class sketchpad_clip(QObject):
         except Exception as e:
             logging.error(f"Error during clip deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
-
-        try:
-            self.channel = self.__song__.channelsModel.getChannel(self.__row_index__)
-            self.channel.volume_changed.connect(self.channel_volume_changed, Qt.QueuedConnection)
-            self.channel_volume_changed()
-        except:
-            pass
 
     @Signal
     def length_changed(self):
@@ -427,11 +408,6 @@ class sketchpad_clip(QObject):
     def set_length(self, length: float, force_set=False):
         if self.__length__ != length or force_set is True:
             self.__length__ = length
-
-            # Make a call to set selector to update knob values so that on drag value doesn't
-            # flicker back to the knob values
-            self.zynqtgui.sketchpad.set_selector_throttled()
-
             self.length_changed.emit()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -497,11 +473,6 @@ class sketchpad_clip(QObject):
     def set_start_position(self, position: float, force_set=False):
         if self.__start_position__ != position or force_set is True:
             self.__start_position__ = position
-
-            # Make a call to set selector to update knob values so that on drag value doesn't
-            # flicker back to the knob values
-            self.__song__.get_metronome_manager().set_selector()
-
             self.start_position_changed.emit()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -665,7 +636,6 @@ class sketchpad_clip(QObject):
         self.audioSource.setADSRRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
 
         self.reset_beat_count()
-        self.channel_volume_changed()
 
         try:
             self.audioSource.audioLevelChanged.disconnect()
@@ -1048,11 +1018,6 @@ class sketchpad_clip(QObject):
     def set_loop_delta(self, val, force_set=False):
         if self.__loop_delta__ != val or force_set is True:
             self.__loop_delta__ = val
-
-            # Make a call to set selector to update knob values so that on drag value doesn't
-            # flicker back to the knob values
-            self.__song__.get_metronome_manager().set_selector()
-
             self.loop_delta_changed.emit()
             if force_set is False:
                 self.__song__.schedule_save()

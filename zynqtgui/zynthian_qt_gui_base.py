@@ -50,4 +50,7 @@ class zynqtgui(QObject):
     def refresh_status(self, status={}):
         pass
 
+    def set_selector(self):
+        pass
+
 #------------------------------------------------------------------------------

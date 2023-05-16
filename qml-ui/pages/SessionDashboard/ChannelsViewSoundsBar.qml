@@ -46,68 +46,40 @@ Zynthian.Card {
     }
 
     function cuiaCallback(cuia) {
+        var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow]
+
         switch (cuia) {
             case "SELECT_UP":
                 if (root.selectedChannel.selectedSlotRow > 0) {
                     root.selectedChannel.selectedSlotRow -= 1
                 }
                 return true;
-
             case "SELECT_DOWN":
                 if (root.selectedChannel.selectedSlotRow < 4) {
                     root.selectedChannel.selectedSlotRow += 1
                 }
                 return true;
-
-//            case "NAVIGATE_LEFT":
-//                var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow];
-//                if (selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
-//                    zynqtgui.layer.selectPrevPreset(selectedMidiChannel);
-//                    chainedSoundsRepeater.itemAt(selectedRowIndex).update();
-//                }
-//                return true;
-
-//            case "NAVIGATE_RIGHT":
-//                var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow];
-//                if (selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
-//                    zynqtgui.layer.selectNextPreset(selectedMidiChannel);
-//                    chainedSoundsRepeater.itemAt(root.selectedChannel.selectedSlotRow).update();
-//                }
-//                return true;
-
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
 
                 return true;
-
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
                 layerSetupDialog.open();
                 return true;
-
-            // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-            case "CHANNEL_1":
-            case "CHANNEL_6":
-                root.selectedChannel.selectedSlotRow = 0
+            case "KNOB0_UP":
+                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+                return true;
+            case "KNOB0_DOWN":
+                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+                return true;
+            case "KNOB3_UP":
+                zynqtgui.layer.selectNextPreset(selectedMidiChannel);
                 return true
-            case "CHANNEL_2":
-            case "CHANNEL_7":
-                root.selectedChannel.selectedSlotRow = 1
+            case "KNOB3_DOWN":
+                zynqtgui.layer.selectPrevPreset(selectedMidiChannel);
                 return true
-            case "CHANNEL_3":
-            case "CHANNEL_8":
-                root.selectedChannel.selectedSlotRow = 2
-                return true
-            case "CHANNEL_4":
-            case "CHANNEL_9":
-                root.selectedChannel.selectedSlotRow = 3
-                return true
-            case "CHANNEL_5":
-            case "CHANNEL_10":
-                root.selectedChannel.selectedSlotRow = 4
-                return true
-
             default:
                 return false;
         }

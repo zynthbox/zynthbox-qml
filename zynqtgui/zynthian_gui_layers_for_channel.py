@@ -89,7 +89,7 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
                         #self.__volume_controllers.append(self.zynqtgui.screens['fixed_layers'].volumeControllers[i])
                         #used_empty_channels += 1
                 self.volumeControllersChanged.emit()
-                self.zynqtgui.screens["sketchpad"].connect_control_objects()
+                # self.zynqtgui.screens["sketchpad"].connect_control_objects()
         except Exception as e:
             logging.error(e)
             pass

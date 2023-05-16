@@ -23,8 +23,10 @@
 #
 # ******************************************************************************
 
-from PySide2.QtCore import Property, QObject, Qt, Signal, Slot
+import logging
 
+from PySide2.QtCore import Property, QObject, Qt, Signal, Slot
+from PySide2.QtQml import QJSValue
 from . import zynthian_gui_config
 
 class zynthian_osd(QObject):
@@ -47,6 +49,7 @@ class zynthian_osd(QObject):
         self.__showResetToDefault = True
         self.__showVisualZero = True
 
+    @Slot(str, str, float, float, float, float, float, QJSValue, str, str, str, bool, float, bool, bool)
     def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction, startLabel = "", stopLabel = "", valueLabel = "", showValueLabel = True, visualZero = None, showResetToDefault = True, showVisualZero = True):
         self.__parameterName = parameterName
         self.__description = description
@@ -133,4 +136,14 @@ class zynthian_osd(QObject):
     @Slot(str, float)
     def setValue(self, parameterName, newValue):
         if self.__parameterName == parameterName and self.__setValueFunction is not None:
-            self.__setValueFunction(newValue);
+            # When updateOsd is invoked from python a python callable can be passed as a setter
+            # When updateOsd is invoked from qml as a Slot, a QJSValue callable can be passed as a setter
+            # Hence setValueFunction can either be python callable or a qt callable. Call the setter accordingly
+            python_callable = callable(self.__setValueFunction)
+            qt_callable = hasattr(self.__setValueFunction, 'isCallable') and self.__setValueFunction.isCallable()
+            if python_callable:
+                self.__setValueFunction(newValue);
+            elif qt_callable:
+                self.__setValueFunction.call([newValue])
+            else:
+                logging.error(f"Cannot call invalid setValueFunction : {self.__setValueFunction}. It is neither a python callable object or qt callable object.")

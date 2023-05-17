@@ -181,7 +181,7 @@ Zynthian.ScreenPage {
             if (clip.snapLengthToBeat) {
                 clip.length = Zynthian.CommonUtils.clamp(clip.length + sign * 1, 0, 64)
             } else {
-                clip.length = Zynthian.CommonUtils.clamp(clip.length + sign * 0.1, 0, 64)
+                clip.length = Zynthian.CommonUtils.clamp(clip.length + sign * 0.01, 0, 64)
             }
         }
     }

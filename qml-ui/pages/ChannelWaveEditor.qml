@@ -106,11 +106,15 @@ Zynthian.ScreenPage {
         function goLeft() {
             if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 clipSettingsADSR.previousADSRElement();
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                clipSettingsGranulator.previousElement();
             }
         }
         function goRight() {
             if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 clipSettingsADSR.nextADSRElement();
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                clipSettingsGranulator.nextElement();
             }
         }
         function goUp() {
@@ -121,6 +125,14 @@ Zynthian.ScreenPage {
                     }
                 } else {
                     clipSettingsADSR.increaseCurrentValue();
+                }
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                if (zynqtgui.altButtonPressed) {
+                    for (var i = 0; i < 10; ++i) {
+                        clipSettingsGranulator.increaseCurrentValue();
+                    }
+                } else {
+                    clipSettingsGranulator.increaseCurrentValue();
                 }
             }
         }
@@ -133,9 +145,17 @@ Zynthian.ScreenPage {
                 } else {
                     clipSettingsADSR.decreaseCurrentValue();
                 }
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                if (zynqtgui.altButtonPressed) {
+                    for (var i = 0; i < 10; ++i) {
+                        clipSettingsGranulator.decreaseCurrentValue();
+                    }
+                } else {
+                    clipSettingsGranulator.decreaseCurrentValue();
+                }
             }
         }
-        function knob1Up() {
+        function knob0Up() {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Increment startPosition by 0.01
@@ -143,10 +163,12 @@ Zynthian.ScreenPage {
                     component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition + 0.01, 0), component.selectedClip.duration)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.nextADSRElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                    clipSettingsGranulator.nextElement();
                 }
             }
         }
-        function knob1Down() {
+        function knob0Down() {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Decrement startPosition by 0.01
@@ -154,10 +176,12 @@ Zynthian.ScreenPage {
                     component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition - 0.01, 0), component.selectedClip.duration)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.previousADSRElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                    clipSettingsGranulator.previousElement();
                 }
             }
         }
-        function knob2Up() {
+        function knob1Up() {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Increment loopDelta by 0.01
@@ -165,10 +189,12 @@ Zynthian.ScreenPage {
                     component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta + 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.increaseCurrentValue();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                    clipSettingsGranulator.increaseCurrentValue();
                 }
             }
         }
-        function knob2Down() {
+        function knob1Down() {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Decrement loopDelta by 0.01
@@ -176,26 +202,30 @@ Zynthian.ScreenPage {
                     component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta - 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.decreaseCurrentValue();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                    clipSettingsGranulator.decreaseCurrentValue();
                 }
             }
         }
-        function knob3Up() {
+        function knob2Up() {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Increment length by.1
                     // Clamp values between 0 and 64
                     component.selectedClip.length = Math.min(Math.max(component.selectedClip.length + 1, 0), 64)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
                 }
             }
         }
-        function knob3Down() {
+        function knob2Down() {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Decrement length by.1
                     // Clamp values between 0 and 64
                     component.selectedClip.length = Math.min(Math.max(component.selectedClip.length - 1, 0), 64)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
                 }
             }
         }
@@ -304,6 +334,18 @@ Zynthian.ScreenPage {
                                 onClicked: clipSettingsSectionView.currentItem = clipSettingsADSR
                             }
                         }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            text: qsTr("Granular")
+                            enabled: component.selectedClipHasWav
+                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator"
+                            MouseArea {
+                                anchors.fill: parent;
+                                enabled: component.selectedClipHasWav
+                                onClicked: clipSettingsSectionView.currentItem = clipSettingsGranulator
+                            }
+                        }
                     }
                     Rectangle {
                         id: clipSettingsSectionView
@@ -335,6 +377,15 @@ Zynthian.ScreenPage {
                             objectName: "clipSettingsADSR"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent
+                            enabled: component.selectedClipHasWav
+                            clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
+                            onSaveMetadata: component.selectedClip.saveMetadata();
+                        }
+                        Zynthian.ClipGranulatorSettings {
+                            id: clipSettingsGranulator
+                            objectName: "clipSettingsGranulator"
+                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                            anchors.fill: parent;
                             enabled: component.selectedClipHasWav
                             clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
                             onSaveMetadata: component.selectedClip.saveMetadata();

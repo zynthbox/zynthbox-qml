@@ -59,6 +59,57 @@ Kirigami.AbstractApplicationWindow {
     }
     property var cuiaCallback: function(cuia) {
         var result = false;
+
+        switch (cuia) {
+            case "KNOB0_UP":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelVolume(1)
+                    result = true;
+                }
+                break;
+            case "KNOB0_DOWN":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelVolume(-1)
+                    result = true;
+                }
+                break;
+            case "KNOB1_UP":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelDelaySend(1)
+                    result = true;
+                }
+                break;
+            case "KNOB1_DOWN":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelDelaySend(-1)
+                    result = true;
+                }
+                break;
+            case "KNOB2_UP":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelReverbSend(1)
+                    result = true;
+                }
+                break;
+            case "KNOB2_DOWN":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelReverbSend(-1)
+                    result = true;
+                }
+                break;
+            case "KNOB3_UP":
+                if (zynqtgui.altButtonPressed) {
+                    // Do nothing with BK
+                    result = true;
+                }
+                break;
+            case "KNOB3_DOWN":
+                if (zynqtgui.altButtonPressed) {
+                    // Do nothing with BK
+                    result = true;
+                }
+                break;
+        }
         
         // Since VK is not a Zynthian Menu/Popup/Drawer, CUIA events are not sent implicitly
         // If the virtual keyboard is open, pass CUIA events explicitly
@@ -172,6 +223,84 @@ Kirigami.AbstractApplicationWindow {
             _params.showResetToDefault,
             _params.showVisualZero,
         )
+    }
+    /**
+     * Update volume of selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelVolume(sign) {
+        function valueSetter(value) {
+            root.selectedChannel.volume = Zynthian.CommonUtils.clamp(value - 40, -40, 20)
+            applicationWindow().showOsd({
+                parameterName: "channel_volume",
+                description: qsTr("%1 Volume").arg(root.selectedChannel.name),
+                start: 0,
+                stop: 60,
+                step: 1,
+                defaultValue: 40,
+                currentValue: root.selectedChannel.volume + 40,
+                startLabel: qsTr("%1 dB").arg(-40),
+                stopLabel: qsTr("%1 dB").arg(20),
+                valueLabel: qsTr("%1 dB").arg(root.selectedChannel.volume),
+                setValueFunction: valueSetter,
+                showValueLabel: true,
+                showResetToDefault: true,
+                showVisualZero: true
+            })
+        }
+
+        // Set OSD value from 0-60 and interpolate actual value to match the new range
+        valueSetter(root.selectedChannel.volume + 40 + sign)
+    }
+    /**
+     * Update delay send amount of selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelDelaySend(sign) {
+        function valueSetter(value) {
+            root.selectedChannel.wetFx1Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
+            applicationWindow().showOsd({
+                parameterName: "channel_delay_send",
+                description: qsTr("%1 Delay FX Send Amount").arg(root.selectedChannel.name),
+                start: 0,
+                stop: 100,
+                step: 1,
+                defaultValue: 100,
+                currentValue: root.selectedChannel.wetFx1Amount,
+                valueLabel: parseInt(root.selectedChannel.wetFx1Amount),
+                setValueFunction: valueSetter,
+                showValueLabel: true,
+                showResetToDefault: true,
+                showVisualZero: true
+            })
+        }
+
+        valueSetter(root.selectedChannel.wetFx1Amount + sign)
+    }
+    /**
+     * Update reverb send amount of selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelReverbSend(sign) {
+        function valueSetter(value) {
+            root.selectedChannel.wetFx2Amount = Zynthian.CommonUtils.clamp(value, 0, 100)
+            applicationWindow().showOsd({
+                parameterName: "channel_reverb_send",
+                description: qsTr("%1 Reverb FX Send Amount").arg(root.selectedChannel.name),
+                start: 0,
+                stop: 100,
+                step: 1,
+                defaultValue: 100,
+                currentValue: root.selectedChannel.wetFx2Amount,
+                valueLabel: parseInt(root.selectedChannel.wetFx2Amount),
+                setValueFunction: valueSetter,
+                showValueLabel: true,
+                showResetToDefault: true,
+                showVisualZero: true
+            })
+        }
+
+        valueSetter(root.selectedChannel.wetFx2Amount + sign)
     }
 
     visible: false

@@ -74,10 +74,10 @@ RowLayout {
                 applicationWindow().pageStack.getPage("control").updateControllerValue(columnsRepeater.itemAt(columnIndex).rowsRepeater.itemAt(2).controllerLoader.controller.ctrl, -1)
                 return true;
             case "KNOB3_UP":
-                zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn + 1, 0, zynqtgui.control.totalColumns)
+                zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn + 1, 0, zynqtgui.control.totalColumns - 1)
                 return true;
             case "KNOB3_DOWN":
-                zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn - 1, 0, zynqtgui.control.totalColumns)
+                zynqtgui.control.selectedColumn = Zynthian.CommonUtils.clamp(zynqtgui.control.selectedColumn - 1, 0, zynqtgui.control.totalColumns - 1)
                 return true;
         }
 

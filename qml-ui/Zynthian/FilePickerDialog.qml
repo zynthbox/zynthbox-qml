@@ -57,15 +57,11 @@ Zynthian.Dialog {
                 return true;
 
             case "SELECT_UP":
-                root.filesListView.currentIndex = root.filesListView.currentIndex > 0
-                                                            ? root.filesListView.currentIndex - 1
-                                                            : 0
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1)
                 return true;
 
             case "SELECT_DOWN":
-                root.filesListView.currentIndex = root.filesListView.currentIndex < root.filesListView.count-1
-                                                            ? root.filesListView.currentIndex + 1
-                                                            : root.filesListView.count-1
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1)
                 return true;
 
             case "SWITCH_SELECT_SHORT":
@@ -84,6 +80,25 @@ Zynthian.Dialog {
             case "SWITCH_BACK_LONG":
                 root.goBack();
 
+                return true;
+
+            case "KNOB0_UP":
+                return true;
+            case "KNOB0_DOWN":
+                return true;
+            case "KNOB1_UP":
+                return true;
+            case "KNOB1_DOWN":
+                return true;
+            case "KNOB2_UP":
+                return true;
+            case "KNOB2_DOWN":
+                return true;
+            case "KNOB3_UP":
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1)
+                return true;
+            case "KNOB3_DOWN":
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1)
                 return true;
 
             default:

@@ -38,6 +38,10 @@ Zynthian.ScreenPage {
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
 
+    onSelectedChannelChanged: {
+        zynqtgui.layers_for_channel.activate_index(0)
+    }
+
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: zynqtgui.current_screen_id = "sketchpad"

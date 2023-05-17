@@ -1874,15 +1874,30 @@ class zynthian_gui(QObject):
             pass
 
         elif cuia == "CHANNEL_1":
-            self.screens["session_dashboard"].selectedChannel = 0 + channelDelta
+            if self.screens["session_dashboard"].selectedChannel == 0 + channelDelta and not self.leftSidebarActive:
+                self.openLeftSidebar.emit()
+            else:
+                self.screens["session_dashboard"].selectedChannel = 0 + channelDelta
         elif cuia == "CHANNEL_2":
-            self.screens["session_dashboard"].selectedChannel = 1 + channelDelta
+            if self.screens["session_dashboard"].selectedChannel == 1 + channelDelta and not self.leftSidebarActive:
+                self.openLeftSidebar.emit()
+            else:
+                self.screens["session_dashboard"].selectedChannel = 1 + channelDelta
         elif cuia == "CHANNEL_3":
-            self.screens["session_dashboard"].selectedChannel = 2 + channelDelta
+            if self.screens["session_dashboard"].selectedChannel == 2 + channelDelta and not self.leftSidebarActive:
+                self.openLeftSidebar.emit()
+            else:
+                self.screens["session_dashboard"].selectedChannel = 2 + channelDelta
         elif cuia == "CHANNEL_4":
-            self.screens["session_dashboard"].selectedChannel = 3 + channelDelta
+            if self.screens["session_dashboard"].selectedChannel == 3 + channelDelta and not self.leftSidebarActive:
+                self.openLeftSidebar.emit()
+            else:
+                self.screens["session_dashboard"].selectedChannel = 3 + channelDelta
         elif cuia == "CHANNEL_5":
-            self.screens["session_dashboard"].selectedChannel = 4 + channelDelta
+            if self.screens["session_dashboard"].selectedChannel == 4 + channelDelta and not self.leftSidebarActive:
+                self.openLeftSidebar.emit()
+            else:
+                self.screens["session_dashboard"].selectedChannel = 4 + channelDelta
         # elif cuia == "CHANNEL_6":
         #     self.screens["session_dashboard"].selectedChannel = 5
         # elif cuia == "CHANNEL_7":

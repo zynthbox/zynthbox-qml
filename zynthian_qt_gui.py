@@ -2602,7 +2602,14 @@ class zynthian_gui(QObject):
                 try:
                     if self.__zselectors[knob_index]:
                         self.__zselectors[knob_index].read_zyncoder()
-                        delta = round((self.__zselectors[knob_index].value - self.__knob_values[knob_index]) / self.__knob_delta_factors[knob_index])
+
+                        value_change = self.__zselectors[knob_index].value - self.__knob_values[knob_index]
+                        # Use floor/ceil as per knob change direction to produce similar effect for both increasing and decreasing values with knobs
+                        if value_change > 0:
+                            delta = math.floor(value_change / self.__knob_delta_factors[knob_index])
+                        else:
+                            delta = math.ceil(value_change / self.__knob_delta_factors[knob_index])
+
                         if delta != 0:
                             self.knobDeltaChanged.emit(knob_index, delta)
                             # If knob value is close to extreme points then do reset immediately. Otherwise defer resetting until required

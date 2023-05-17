@@ -65,11 +65,17 @@ Kirigami.AbstractApplicationWindow {
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(1)
                     result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateMasterVolume(1)
+                    result = true;
                 }
                 break;
             case "KNOB0_DOWN":
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(-1)
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateMasterVolume(-1)
                     result = true;
                 }
                 break;
@@ -77,11 +83,17 @@ Kirigami.AbstractApplicationWindow {
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelDelaySend(1)
                     result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateGlobalDelayFXAmount(1)
+                    result = true;
                 }
                 break;
             case "KNOB1_DOWN":
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelDelaySend(-1)
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateGlobalDelayFXAmount(-1)
                     result = true;
                 }
                 break;
@@ -89,11 +101,17 @@ Kirigami.AbstractApplicationWindow {
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelReverbSend(1)
                     result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateGlobalReverbFXAmount(1)
+                    result = true;
                 }
                 break;
             case "KNOB2_DOWN":
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelReverbSend(-1)
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateGlobalReverbFXAmount(-1)
                     result = true;
                 }
                 break;
@@ -101,11 +119,17 @@ Kirigami.AbstractApplicationWindow {
                 if (zynqtgui.altButtonPressed) {
                     // Do nothing with BK
                     result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateSketchpadBpm(1)
+                    result = true;
                 }
                 break;
             case "KNOB3_DOWN":
                 if (zynqtgui.altButtonPressed) {
                     // Do nothing with BK
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    root.updateSketchpadBpm(-1)
                     result = true;
                 }
                 break;
@@ -223,6 +247,111 @@ Kirigami.AbstractApplicationWindow {
             _params.showResetToDefault,
             _params.showVisualZero,
         )
+    }
+
+    /**
+     * Update master volume
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateMasterVolume(sign) {
+        function valueSetter(value) {
+            zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(value, 0, 100)
+            if (!zynqtgui.globalPopupOpened) {
+                applicationWindow().showOsd({
+                    parameterName: "master_volume",
+                    description: qsTr("Master Volume"),
+                    start: 0,
+                    stop: 100,
+                    step: 1,
+                    defaultValue: null,
+                    currentValue: zynqtgui.masterVolume,
+                    valueLabel: parseInt(zynqtgui.masterVolume),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: false,
+                    showVisualZero: false
+                })
+            }
+        }
+        valueSetter(zynqtgui.masterVolume + sign)
+    }
+    /**
+     * Update global delay fx amount
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateGlobalDelayFXAmount(sign) {
+        function valueSetter(value) {
+            zynqtgui.delayController.value = Zynthian.CommonUtils.clamp(value, 0, 100)
+            if (!zynqtgui.globalPopupOpened) {
+                applicationWindow().showOsd({
+                    parameterName: "global_delay_fx_amount",
+                    description: qsTr("Global Delay FX Amount"),
+                    start: 0,
+                    stop: 100,
+                    step: 1,
+                    defaultValue: 10,
+                    currentValue: zynqtgui.delayController.value,
+                    valueLabel: parseInt(zynqtgui.delayController.value),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: true,
+                    showVisualZero: false
+                })
+            }
+        }
+        valueSetter(zynqtgui.delayController.value + sign)
+    }
+    /**
+     * Update global reverb fx amount
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateGlobalReverbFXAmount(sign) {
+        function valueSetter(value) {
+            zynqtgui.reverbController.value = Zynthian.CommonUtils.clamp(value, 0, 100)
+            if (!zynqtgui.globalPopupOpened) {
+                applicationWindow().showOsd({
+                    parameterName: "global_reverb_fx_amount",
+                    description: qsTr("Global ReverbFX Amount"),
+                    start: 0,
+                    stop: 100,
+                    step: 1,
+                    defaultValue: 10,
+                    currentValue: zynqtgui.reverbController.value,
+                    valueLabel: parseInt(zynqtgui.reverbController.value),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: true,
+                    showVisualZero: false
+                })
+            }
+        }
+        valueSetter(zynqtgui.reverbController.value + sign)
+    }
+    /**
+     * Update sketchpad bpm
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSketchpadBpm(sign) {
+        function valueSetter(value) {
+            zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(value, 50, 200)
+            if (!zynqtgui.globalPopupOpened) {
+                applicationWindow().showOsd({
+                    parameterName: "sketchpad_bpm",
+                    description: qsTr("%1 bpm").arg(zynqtgui.sketchpad.song.name),
+                    start: 50,
+                    stop: 200,
+                    step: 1,
+                    defaultValue: 120,
+                    currentValue: zynqtgui.sketchpad.song.bpm,
+                    valueLabel: parseInt(zynqtgui.sketchpad.song.bpm),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: false,
+                    showVisualZero: false
+                })
+            }
+        }
+        valueSetter(zynqtgui.sketchpad.song.bpm + sign)
     }
     /**
      * Update volume of selected channel

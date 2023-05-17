@@ -313,33 +313,37 @@ MouseArea {
                 case "SCREEN_AUDIO_SETTINGS":
                     popup.close()
                     return true
-
+                case "SELECT_UP":
+                    return true
+                case "SELECT_DOWN":
+                    return true
+                case "NAVIGATE_LEFT":
+                    return true
+                case "NAVIGATE_RIGHT":
+                    return true
                 case "KNOB0_UP":
-                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
+                    applicationWindow().updateMasterVolume(1)
                     return true
                 case "KNOB0_DOWN":
-                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
+                    applicationWindow().updateMasterVolume(-1)
                     return true
-
                 case "KNOB1_UP":
-                    zynqtgui.delayController.value = Zynthian.CommonUtils.clamp(zynqtgui.delayController.value + 1, 0, 100)
+                    applicationWindow().updateGlobalDelayFXAmount(1)
                     return true
                 case "KNOB1_DOWN":
-                    zynqtgui.delayController.value = Zynthian.CommonUtils.clamp(zynqtgui.delayController.value - 1, 0, 100)
+                    applicationWindow().updateGlobalDelayFXAmount(-1)
                     return true
-
                 case "KNOB2_UP":
-                    zynqtgui.reverbController.value = Zynthian.CommonUtils.clamp(zynqtgui.reverbController.value + 1, 0, 100)
+                    applicationWindow().updateGlobalReverbFXAmount(1)
                     return true
                 case "KNOB2_DOWN":
-                    zynqtgui.reverbController.value = Zynthian.CommonUtils.clamp(zynqtgui.reverbController.value - 1, 0, 100)
+                    applicationWindow().updateGlobalReverbFXAmount(-1)
                     return true
-
                 case "KNOB3_UP":
-                    zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.song.bpm + 1, 50, 200)
+                    applicationWindow().updateSketchpadBpm(1)
                     return true
                 case "KNOB3_DOWN":
-                    zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.song.bpm - 1, 50, 200)
+                    applicationWindow().updateSketchpadBpm(-1)
                     return true
             }
         }

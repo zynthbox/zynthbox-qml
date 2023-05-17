@@ -56,6 +56,31 @@ Zynthian.Popup {
                 root.close();
                 returnValue = true;
                 break;
+
+            case "KNOB0_UP":
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                returnValue = true;
+                break;
+            case "KNOB3_UP":
+                returnValue = true;
+                break;
+            case "KNOB3_DOWN":
+                returnValue = true;
+                break;
         }
 
         return returnValue;

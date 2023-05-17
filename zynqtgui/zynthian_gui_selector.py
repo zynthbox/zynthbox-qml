@@ -163,7 +163,6 @@ class selector_list_model(QAbstractListModel):
 #------------------------------------------------------------------------------
 
 class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
-
     def __init__(self, selcap='Select', parent = None):
         super(zynthian_gui_selector, self).__init__(parent)
 
@@ -177,6 +176,18 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         self.select_path_element = ''
         self.selector_caption=selcap
         self.list_model = None
+        self.__auto_activate_index_on_change = False
+        self.__auto_activation_timer = QTimer(self)
+        self.__auto_activation_timer.setSingleShot(True)
+        self.__auto_activation_timer.setInterval(50)
+        self.__auto_activation_timer.timeout.connect(self.auto_activate_selected_index)
+        self.__last_auto_activated_index = -1
+
+    def auto_activate_selected_index(self):
+        if self.__last_auto_activated_index != self.index:
+            self.select(self.index)
+            self.select_action(self.index, 'S')
+            self.__last_auto_activated_index = self.index
 
     def get_selector_list(self):
         if self.list_model == None:
@@ -211,7 +222,6 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     # TODO: remove?
     def plot_zctrls(self):
         self.zselector.plot_value()
-
 
     def fill_list(self):
         if self.list_model != None:
@@ -260,6 +270,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
 
     def set_current_index(self, index):
         self.select(index)
+        # Activate selected index automatically if autoActivateIndexOnChange is set to True
+        if self.__auto_activate_index_on_change:
+            self.__auto_activation_timer.start()
 
     def get_current_index(self):
         return self.index
@@ -279,12 +292,12 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     @Slot()
     def select_up(self, n=1):
         new_index = max(0, self.index - n)
-        self.select(new_index)
+        self.set_current_index(new_index)
 
     @Slot()
     def select_down(self, n=1):
         new_index = min(len(self.list_data) - 1, self.index + n)
-        self.select(new_index)
+        self.set_current_index(new_index)
 
     # TODO: remove
     def click_listbox(self, index=None, t='S'):
@@ -295,21 +308,17 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
 
         self.select_action(self.index, t)
 
-
     # TODO: remove
     def switch_select(self, t='S'):
         self.click_listbox(None, t)
 
-
     def select_action(self, index, t='S'):
         pass
-
 
     # TODO: remove
     def cb_listbox_push(self,event):
         self.listbox_push_ts=datetime.now()
         #logging.debug("LISTBOX PUSH => %s" % (self.listbox_push_ts))
-
 
     # TODO: remove
     def cb_listbox_release(self,event):
@@ -321,7 +330,6 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
             elif dts>=0.3 and dts<2:
                 self.zynqtgui.zynswitch_defered('B',3)
 
-
     # TODO: remove
     def cb_listbox_wheel(self,event):
         index = self.index
@@ -332,12 +340,10 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         if index!=self.index:
             self.zselector.set_value(index, True, False)
 
-
     # TODO: remove
     def cb_loading_push(self,event):
         self.loading_push_ts=datetime.now()
         #logging.debug("LOADING PUSH => %s" % self.canvas_push_ts)
-
 
     # TODO: remove
     def cb_loading_release(self,event):
@@ -351,12 +357,21 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
             elif dts>=2:
                 self.zynqtgui.zynswitch_defered('L',2)
 
+    def get_autoActivateIndexOnChange(self):
+        return self.__auto_activate_index_on_change
+
+    def set_autoActivateIndexOnChange(self, value):
+        if self.__auto_activate_index_on_change != value:
+            logging.debug(f"Setting autoActivateIndexOnChange : {value}")
+            self.__auto_activate_index_on_change = value
+            self.autoActivateIndexOnChangeChanged.emit()
 
     current_index_changed = Signal()
     selector_path_changed = Signal()
     selector_path_element_changed = Signal()
     effective_count_changed = Signal()
     list_updated = Signal()
+    autoActivateIndexOnChangeChanged = Signal()
 
     selector_list = Property(QObject, get_selector_list, constant = True)
     current_index = Property(int, get_current_index, set_current_index, notify = current_index_changed)
@@ -364,4 +379,5 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
     selector_path = Property(str, get_selector_path, notify = selector_path_changed)
     selector_path_element = Property(str, get_selector_path_element, notify = selector_path_element_changed)
     caption = Property(str, get_caption, constant = True)
+    autoActivateIndexOnChange = Property(bool, get_autoActivateIndexOnChange, set_autoActivateIndexOnChange, notify=autoActivateIndexOnChangeChanged)
 #------------------------------------------------------------------------------

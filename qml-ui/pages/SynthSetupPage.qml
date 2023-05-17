@@ -270,6 +270,7 @@ Zynthian.ScreenPage {
                 screenId: "layers_for_channel"
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 active: zynqtgui.isBootingComplete
+                autoActivateIndexOnChange: true
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
@@ -465,6 +466,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     screenId: "bank"
+                    autoActivateIndexOnChange: true
 
                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                     active: zynqtgui.isBootingComplete
@@ -597,6 +599,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "preset"
+                autoActivateIndexOnChange: true
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)

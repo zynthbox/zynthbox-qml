@@ -44,6 +44,7 @@ QQC2.ScrollView {
     property string screenId
     //TODO: Bind the base selector type to qml?
     readonly property QtObject selector: screenId.length > 0 ? zynqtgui[screenId] : null
+    property bool autoActivateIndexOnChange
     property var cuiaCallback: function (cuia) {
         var returnVal = false
 
@@ -77,6 +78,9 @@ QQC2.ScrollView {
         if (zynqtgui.current_screen_id === root.screenId) {
             view.forceActiveFocus();
         }
+        root.selector.autoActivateIndexOnChange = Qt.binding(function() {
+            return root.autoActivateIndexOnChange
+        })
     }
     onActiveFocusChanged: {
         if (activeFocus) {

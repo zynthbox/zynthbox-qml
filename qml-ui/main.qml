@@ -1005,6 +1005,18 @@ Kirigami.AbstractApplicationWindow {
 
                     break
 
+                case "SELECT_UP":
+                    returnVal = true
+                    break
+                case "SELECT_DOWN":
+                    returnVal = true
+                    break
+                case "NAVIGATE_LEFT":
+                    returnVal = true
+                    break
+                case "NAVIGATE_RIGHT":
+                    returnVal = true
+                    break
                 case "KNOB0_UP":
                     returnVal = true
                     break

@@ -224,6 +224,46 @@ Zynthian.ScreenPage {
 
         valueSetter(controller.value + sign * controller.step_size)
     }
+    /**
+     * Update clip gain
+     * @param clip The clip whose gain needs to be updated
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateClipGain(clip, sign) {
+        if (clip != null) {
+            clip.gain = Zynthian.CommonUtils.clamp(clip.gain + sign, -24, 8)
+        }
+    }
+    /**
+     * Update clip pitch
+     * @param clip The clip whose pitch needs to be updated
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateClipPitch(clip, sign) {
+        if (clip != null) {
+            clip.pitch = Zynthian.CommonUtils.clamp(clip.pitch + sign, -12, 12)
+        }
+    }
+    /**
+     * Update clip speed ratio
+     * @param clip The clip whose speed ratio needs to be updated
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateClipSpeedRatio(clip, sign) {
+        if (clip != null) {
+            clip.time = Zynthian.CommonUtils.clamp(clip.time + sign * 0.1, 0.5, 2)
+        }
+    }
+    /**
+     * Update clip bpm
+     * @param clip The clip whose bpm needs to be updated
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateClipBpm(clip, sign) {
+        if (clip != null) {
+            clip.bpm = Zynthian.CommonUtils.clamp(clip.bpm + sign, 50, 200)
+        }
+    }
 
     title: qsTr("Sketchpad")
     screenId: "sketchpad"

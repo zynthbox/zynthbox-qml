@@ -53,6 +53,30 @@ ColumnLayout {
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
+            case "KNOB0_UP":
+                pageManager.getPage("sketchpad").updateClipGain(root.controlObj, 1)
+                return true;
+            case "KNOB0_DOWN":
+                pageManager.getPage("sketchpad").updateClipGain(root.controlObj, -1)
+                return true;
+            case "KNOB1_UP":
+                pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, 1)
+                return true;
+            case "KNOB1_DOWN":
+                pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, -1)
+                return true;
+            case "KNOB2_UP":
+                pageManager.getPage("sketchpad").updateClipSpeedRatio(root.controlObj, 1)
+                return true;
+            case "KNOB2_DOWN":
+                pageManager.getPage("sketchpad").updateClipSpeedRatio(root.controlObj, -1)
+                return true;
+            case "KNOB3_UP":
+                pageManager.getPage("sketchpad").updateClipBpm(root.controlObj, 1)
+                return true;
+            case "KNOB3_DOWN":
+                pageManager.getPage("sketchpad").updateClipBpm(root.controlObj, -1)
+                return true;
         }
 
         return false;
@@ -191,7 +215,7 @@ ColumnLayout {
                 horizontalAlignment: TextInput.AlignHCenter
                 focus: false
                 text: enabled
-                        ? root.controlObj && root.controlObj.bpm ? (root.controlObj.bpm <= 0 ? "" : root.controlObj.bpm.toFixed(2)) : ""
+                        ? root.controlObj && root.controlObj.bpm ? (root.controlObj.bpm <= 0 ? "" : root.controlObj.bpm) : ""
                         : ""
                 // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 

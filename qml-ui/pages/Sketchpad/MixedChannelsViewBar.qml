@@ -654,7 +654,10 @@ Rectangle {
                                                         height:  Kirigami.Units.largeSpacing
                                                         scale: 0.5 + model.positionGain
                                                     }
-                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    anchors {
+                                                        top: parent.verticalCenter
+                                                        topMargin: model.positionPan * (parent.height / 2)
+                                                    }
                                                     x: Math.floor(model.positionProgress * parent.width)
                                                 }
                                             }

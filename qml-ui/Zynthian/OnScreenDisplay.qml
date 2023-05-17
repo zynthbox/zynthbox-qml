@@ -36,6 +36,12 @@ Zynthian.Popup {
     parent: QQC2.Overlay.overlay
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
+
+    property var cuiaCallback: function(cuia) {
+        // Do not handle any cuia callbacks in OSD
+        return false
+    }
+
     Timer {
         id: hideTimer
         running: false; repeat: false; interval: 1500;

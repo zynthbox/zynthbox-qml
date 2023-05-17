@@ -154,7 +154,7 @@ Zynthian.ScreenPage {
                     showResetToDefault: false,
                     showVisualZero: false
                 })
-            } else {
+            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
                 applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Cutoff controller").arg(synthName), 2000)
             }
         }
@@ -217,7 +217,7 @@ Zynthian.ScreenPage {
                     showResetToDefault: false,
                     showVisualZero: false
                 })
-            } else {
+            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
                 applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Resonance controller").arg(synthName), 2000)
             }
         }

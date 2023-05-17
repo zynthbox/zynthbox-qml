@@ -30,6 +30,29 @@ import org.kde.kirigami 2.4 as Kirigami
 QQC2.Drawer {
     id: root
 
+    property var cuiaCallback: function(cuia) {
+        switch (cuia) {
+            case "KNOB0_UP":
+                return true;
+            case "KNOB0_DOWN":
+                return true;
+            case "KNOB1_UP":
+                return true;
+            case "KNOB1_DOWN":
+                return true;
+            case "KNOB2_UP":
+                return true;
+            case "KNOB2_DOWN":
+                return true;
+            case "KNOB3_UP":
+                return true;
+            case "KNOB3_DOWN":
+                return true;
+        }
+
+        return false
+    }
+
     /** Handle opened changed to push/pop dialog to zynqtgui dialog stack
       * This will allow main program to pass CUIA events to the dialog stack
       *

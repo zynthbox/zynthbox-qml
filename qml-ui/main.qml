@@ -1004,6 +1004,31 @@ Kirigami.AbstractApplicationWindow {
                     }
 
                     break
+
+                case "KNOB0_UP":
+                    returnVal = true
+                    break
+                case "KNOB0_DOWN":
+                    returnVal = true
+                    break
+                case "KNOB1_UP":
+                    returnVal = true
+                    break
+                case "KNOB1_DOWN":
+                    returnVal = true
+                    break
+                case "KNOB2_UP":
+                    returnVal = true
+                    break
+                case "KNOB2_DOWN":
+                    returnVal = true
+                    break
+                case "KNOB3_UP":
+                    returnVal = true
+                    break
+                case "KNOB3_DOWN":
+                    returnVal = true
+                    break
             }
 
             return returnVal;

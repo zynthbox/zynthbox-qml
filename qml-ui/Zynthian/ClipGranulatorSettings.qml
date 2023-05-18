@@ -55,20 +55,25 @@ Item {
                 component.clip.granular = true;
                 break;
             case 1:
+                component.clip.grainPosition = Math.min(1, component.clip.grainPosition + 0.001);
+                break;
             case 2:
+                component.clip.grainSpray = Math.min(1, component.clip.grainSpray + 0.001);
+                break;
             case 3:
+                component.clip.grainScan = Math.min(100, component.clip.grainScan + 0.01);
                 break;
             case 4:
-                component.clip.grainInterval = component.clip.grainInterval + 1;
+                component.clip.grainInterval = component.clip.grainInterval + 0.1;
                 break;
             case 5:
-                component.clip.grainIntervalAdditional = component.clip.grainIntervalAdditional + 1;
+                component.clip.grainIntervalAdditional = component.clip.grainIntervalAdditional + 0.1;
                 break;
             case 6:
-                component.clip.grainSize = component.clip.grainSize + 1;
+                component.clip.grainSize = component.clip.grainSize + 0.1;
                 break;
             case 7:
-                component.clip.grainSizeAdditional = component.clip.grainSizeAdditional + 1;
+                component.clip.grainSizeAdditional = component.clip.grainSizeAdditional + 0.1;
                 break;
             case 8:
                 component.clip.grainPanMinimum = Math.min(1, component.clip.grainPanMinimum + 0.01);
@@ -86,20 +91,25 @@ Item {
                 component.clip.granular = false;
                 break;
             case 1:
+                component.clip.grainPosition = Math.max(0, component.clip.grainPosition - 0.001);
+                break;
             case 2:
+                component.clip.grainSpray = Math.max(0, component.clip.grainSpray - 0.001);
+                break;
             case 3:
+                component.clip.grainScan = Math.max(-100, component.clip.grainScan - 0.01);
                 break;
             case 4:
-                component.clip.grainInterval = Math.max(1, component.clip.grainInterval - 1);
+                component.clip.grainInterval = Math.max(1, component.clip.grainInterval - 0.1);
                 break;
             case 5:
-                component.clip.grainIntervalAdditional = Math.max(0, component.clip.grainIntervalAdditional - 1);
+                component.clip.grainIntervalAdditional = Math.max(0, component.clip.grainIntervalAdditional - 0.1);
                 break;
             case 6:
-                component.clip.grainSize = Math.max(1, component.clip.grainSize - 1);
+                component.clip.grainSize = Math.max(1, component.clip.grainSize - 0.1);
                 break;
             case 7:
-                component.clip.grainSizeAdditional = Math.max(0, component.clip.grainSizeAdditional - 1);
+                component.clip.grainSizeAdditional = Math.max(0, component.clip.grainSizeAdditional - 0.1);
                 break;
             case 8:
                 component.clip.grainPanMinimum = Math.max(-1, component.clip.grainPanMinimum - 0.01);
@@ -173,14 +183,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.001
-                // value: component.clip ? component.clip.adsrAttack : 0
+                value: component.clip ? component.clip.grainPosition : 0
                 from: 0
                 to: 1
-                // onMoved: component.clip.adsrAttack = value
+                onMoved: component.clip.grainPosition = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.clip ? component.clip.adsrAttack : 0).toFixed(3)
+                text: (component.clip ? component.clip.grainPosition : 0).toFixed(3)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -209,14 +219,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.001
-                // value: component.clip ? component.clip.adsrAttack : 0
+                value: component.clip ? component.clip.grainSpray : 0
                 from: 0
                 to: 1
-                // onMoved: component.clip.adsrAttack = value
+                onMoved: component.clip.grainSpray = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.clip ? component.clip.adsrAttack : 0).toFixed(3)
+                text: (component.clip ? component.clip.grainSpray : 0).toFixed(3)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -237,30 +247,27 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
-            QQC2.Slider {
+            Zynthian.InfinitySlider {
                 id: grainScanSlider
-                implicitWidth: 1
-                implicitHeight: 1
-                Layout.fillWidth: true
                 Layout.fillHeight: true
-                orientation: Qt.Vertical
-                stepSize: 1
-                // value: component.clip ? component.clip.adsrAttack : 0
-                from: 0
-                to: 1000
-                // onMoved: component.clip.adsrAttack = value
-            }
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("%1\nsmp/ms").arg((component.clip ? component.clip.adsrAttack : 0).toFixed(0))
                 Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.minimumHeight: 2
-                Layout.maximumHeight: 2
-                color: _private.currentElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                text: qsTr("Scan")
+                value: component.clip.grainScan
+                decimals: 2
+                increment: 0.1
+                slideIncrement: 0.01
+                applyLowerBound: true
+                lowerBound: -100
+                applyUpperBound: true
+                upperBound: 100
+                resetOnTap: true
+                resetValue: 0
+                selected: _private.currentElement === 3
+                Connections {
+                    target: component.clip
+                    onGrainScanChanged: grainScanSlider.value = component.clip.grainScan
+                }
             }
         }
         GridLayout {
@@ -273,7 +280,7 @@ Item {
             Kirigami.Heading {
                 Layout.columnSpan: 2
                 level: 2
-                text: qsTr("Interval")
+                text: qsTr("Interval (ms)")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -284,10 +291,9 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
                 value: component.clip.grainInterval
-                unitLabel: qsTr("ms")
-                decimals: 0
+                decimals: 1
                 increment: 1
-                slideIncrement: 1
+                slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 4
@@ -303,10 +309,9 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
                 value: component.clip.grainIntervalAdditional
-                unitLabel: qsTr("ms")
-                decimals: 0
+                decimals: 1
                 increment: 1
-                slideIncrement: 1
+                slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 5
@@ -326,7 +331,7 @@ Item {
             Kirigami.Heading {
                 Layout.columnSpan: 2
                 level: 2
-                text: qsTr("Size")
+                text: qsTr("Size (ms)")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -337,10 +342,9 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
                 value: component.clip.grainSize
-                unitLabel: qsTr("ms")
-                decimals: 0
+                decimals: 1
                 increment: 1
-                slideIncrement: 1
+                slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 6
@@ -356,8 +360,7 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
                 value: component.clip.grainSizeAdditional
-                unitLabel: qsTr("ms")
-                decimals: 0
+                decimals: 1
                 increment: 1
                 slideIncrement: 1
                 applyLowerBound: true

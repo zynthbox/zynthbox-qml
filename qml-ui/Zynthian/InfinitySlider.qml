@@ -42,9 +42,46 @@ Item {
     property double upperBound: 0
     property bool selected: false
     property int decimals: 2
-    MouseArea {
+    property bool resetOnTap: false
+    property double resetValue: 0
+    MultiPointTouchArea {
         anchors.fill: parent
-        // slidy control things, see stepsettingsparamdelegate
+        touchPoints: [
+            TouchPoint {
+                id: slidePoint;
+                property var currentValue: undefined
+                property var pressedTime: undefined
+                onPressedChanged: {
+                    if (pressed) {
+                        pressedTime = Date.now();
+                        currentValue = component.value;
+                    } else {
+                        // Only reset if we are asked to, have no meaningful changes to the value, and the timing was reasonably
+                        // a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                        if (component.resetOnTap && Math.abs(component.value - currentValue) < component.increment && (Date.now() - pressedTime) < 300) {
+                            component.value = component.resetValue;
+                        }
+                        currentValue = undefined;
+                    }
+                }
+                onYChanged: {
+                    if (pressed && currentValue !== undefined) {
+                        var delta = -(slidePoint.y - slidePoint.startY) * component.slideIncrement;
+                        if (component.applyLowerBound) {
+                            if (component.applyUpperBound) {
+                                component.value = Math.min(Math.max(currentValue + delta, component.lowerBound), component.upperBound);
+                            } else {
+                                component.value = Math.max(currentValue + delta, component.lowerBound);
+                            }
+                        } else if (component.applyUpperBound) {
+                                component.value = Math.min(currentValue + delta, component.upperBound);
+                        } else {
+                            component.value = currentValue + delta;
+                        }
+                    }
+                }
+            }
+        ]
     }
     ColumnLayout {
         anchors.fill: parent

@@ -71,6 +71,10 @@ GridLayout {
             case "KNOB2_DOWN":
                 pageManager.getPage("sketchpad").updateClipLength(waveBar.controlObj, -1)
                 return true;
+            case "KNOB3_UP":
+                return true;
+            case "KNOB3_DOWN":
+                return true;
         }
         
         return false;

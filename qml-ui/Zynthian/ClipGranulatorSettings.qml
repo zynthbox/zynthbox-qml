@@ -126,6 +126,19 @@ Item {
         property int currentElement: 0
         property int elementMax: 9
     }
+    Connections {
+        target: component.clip
+        onGranularChanged: component.saveMetadata()
+        onGrainPositionChanged: component.saveMetadata()
+        onGrainSprayChanged: component.saveMetadata()
+        onGrainScanChanged: component.saveMetadata()
+        onGrainIntervalChanged: component.saveMetadata()
+        onGrainIntervalAdditionalChanged: component.saveMetadata()
+        onGrainSizeChanged: component.saveMetadata()
+        onGrainSizeAdditionalChanged: component.saveMetadata()
+        onGrainPanMinimumChanged: component.saveMetadata()
+        onGrainPanMaximumChanged: component.saveMetadata()
+    }
     RowLayout {
         anchors.fill: parent
         ColumnLayout {

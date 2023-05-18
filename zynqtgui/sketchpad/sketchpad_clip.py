@@ -635,6 +635,17 @@ class sketchpad_clip(QObject):
         self.audioSource.setADSRSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
         self.audioSource.setADSRRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
 
+        self.audioSource.setGranular(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_ENABLED", 'False').lower() == "true")
+        self.audioSource.setGrainPosition(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_POSITION", 0)))
+        self.audioSource.setGrainSpray(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_SPRAY", 1)))
+        self.audioSource.setGrainScan(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_SCAN", 0)))
+        self.audioSource.setGrainInterval(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_INTERVAL", 10)))
+        self.audioSource.setGrainIntervalAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_INTERVAL_ADDITIONAL", 10)))
+        self.audioSource.setGrainSize(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_SIZE", 100)))
+        self.audioSource.setGrainSizeAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_SIZE_ADDITIONAL", 50)))
+        self.audioSource.setGrainPanMinimum(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_PAN_MINIMUM", -1)))
+        self.audioSource.setGrainPanMaximum(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_PAN_MAXIMUM", 1)))
+
         self.reset_beat_count()
 
         try:
@@ -942,6 +953,16 @@ class sketchpad_clip(QObject):
             self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.adsrDecay())])
             self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.adsrSustain())])
             self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.adsrRelease())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_ENABLED", [str(self.audioSource.granular())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_POSITION", [str(self.audioSource.grainPosition())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_SPRAY", [str(self.audioSource.grainSpray())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_SCAN", [str(self.audioSource.grainScan())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_INTERVAL", [str(self.audioSource.grainInterval())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_INTERVAL_ADDITIONAL", [str(self.audioSource.grainIntervalAdditional())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_SIZE", [str(self.audioSource.grainSize())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_SIZE_ADDITIONAL", [str(self.audioSource.grainSizeAdditional())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_PAN_MINIMUM", [str(self.audioSource.grainPanMinimum())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_PAN_MAXIMUM", [str(self.audioSource.grainPanMaximum())])
 
     @Slot(QObject)
     def copyFrom(self, clip):

@@ -304,9 +304,9 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
     @Slot()
     def selected_channel_changed_handler(self):
-        # Connect to part clips enabled changed when channel changes
-        for i in range(5):
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, i).enabled_changed.connect(self.update_button_colors)
+        self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        # Connect to part clips changed when channel changes
+        self.channel.selectedPartNamesChanged.connect(self.update_button_colors)
 
         self.update_button_colors()
 

@@ -20,10 +20,14 @@ ColumnLayout {
     property bool songMode: false
 
     signal clicked()
+    function handleItemClick(index) {
+        partRepeater.itemAt(index).handleItemClick()
+    }
 
     spacing: 1
 
     Repeater {
+        id: partRepeater
         model: root.channel && root.sequence ? 5 : 0
         delegate: Rectangle {
             id: partDelegate
@@ -31,6 +35,21 @@ ColumnLayout {
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
             property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
+            function handleItemClick() {
+                if (root.songMode) {
+                    zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
+                } else {
+                    partDelegate.clip.enabled = !partDelegate.clip.enabled;
+                    root.channel.selectedPart = index;
+                    root.channel.selectedSlotRow = index;
+
+                    root.selectedPartClip = partDelegate.clip
+                    root.selectedPartPattern = partDelegate.pattern
+                    root.selectedComponent = partDelegate
+                }
+
+                root.clicked()
+            }
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -105,22 +124,9 @@ ColumnLayout {
                 }
             }
             MouseArea {
+                id: mouseArea
                 anchors.fill: parent
-                onClicked: {
-                    if (root.songMode) {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
-                    } else {
-                        partDelegate.clip.enabled = !partDelegate.clip.enabled;
-                        root.channel.selectedPart = index;
-                        root.channel.selectedSlotRow = index;
-
-                        root.selectedPartClip = partDelegate.clip
-                        root.selectedPartPattern = partDelegate.pattern
-                        root.selectedComponent = partDelegate
-                    }
-
-                    root.clicked()
-                }
+                onClicked: partDelegate.handleItemClick()
                 onPressAndHold: {
                     partDelegate.clip.enabled = true;
                     root.channel.selectedPart = index;

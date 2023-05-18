@@ -1065,75 +1065,26 @@ Kirigami.AbstractApplicationWindow {
             var returnVal = false
 
             switch (cuia) {
-                // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-                // and invoke respective handler when channelAudioType is synth, trig or slice
-                // Otherwise, when in loop mode, do not handle button to allow falling back to channel
-                // selection
                 case "CHANNEL_1":
-                case "CHANNEL_6":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 0
-                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
+                    partBar.handleItemClick(0);
+                    returnVal = true;
                     break
-
                 case "CHANNEL_2":
-                case "CHANNEL_7":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 1
-                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
+                    partBar.handleItemClick(1);
+                    returnVal = true;
                     break
-
                 case "CHANNEL_3":
-                case "CHANNEL_8":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 2
-                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
+                    partBar.handleItemClick(2);
+                    returnVal = true;
                     break
-
                 case "CHANNEL_4":
-                case "CHANNEL_9":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 3
-                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
+                    partBar.handleItemClick(3);
+                    returnVal = true;
                     break
-
                 case "CHANNEL_5":
-                case "CHANNEL_10":
-                    if (root.selectedChannel.channelAudioType === "synth" ||
-                        root.selectedChannel.channelAudioType === "sample-loop" ||
-                        root.selectedChannel.channelAudioType === "sample-trig" ||
-                        root.selectedChannel.channelAudioType === "sample-slice") {
-                        root.selectedChannel.selectedSlotRow = 4
-                        pageManager.getPage("sketchpad").bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                        returnVal = true
-                    }
-
+                    partBar.handleItemClick(4);
+                    returnVal = true;
                     break
-
                 case "SELECT_UP":
                     returnVal = true
                     break
@@ -1399,6 +1350,7 @@ Kirigami.AbstractApplicationWindow {
                         }
 
                         Sketchpad.PartBarDelegate {
+                            id: partBar
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             channel: slotSelectionDelegate.visible ? root.selectedChannel : null

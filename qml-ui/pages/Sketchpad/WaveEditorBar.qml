@@ -273,7 +273,7 @@ GridLayout {
                 z: 100
 
                 onXChanged: {
-                    if (endHandleDragHandler.active) {
+                    if (endHandleDragHandler.drag.active) {
                         let calculatedLength
 
                         if (waveBar.controlObj.snapLengthToBeat) {
@@ -292,17 +292,19 @@ GridLayout {
                         }
                     }
                 }
-                DragHandler {
-                    id: endHandleDragHandler
-                    xAxis {
-                        minimum: startLoopLine.x - width
-                        maximum: parent.parent.width
-                    }
 
-                    yAxis.enabled: false
-                    onGrabChanged: {
-                        if (!active) {
-                            endHandle.x = endLoopLine.x - endHandle.width
+                MouseArea {
+                    id: endHandleDragHandler
+                    anchors.fill: parent
+                    drag {
+                        target: parent
+                        axis: Drag.XAxis
+                        minimumX: startLoopLine.x - width
+                        maximumX: parent.parent.width
+                        onActiveChanged: {
+                            if (!drag.active) {
+                                endHandle.x = endLoopLine.x - endHandle.width
+                            }
                         }
                     }
                 }
@@ -358,7 +360,7 @@ GridLayout {
                     ? ((((60/zynqtgui.sketchpad.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
                     : 0
                 onXChanged: {
-                    if (!endHandleDragHandler.active) {
+                    if (!endHandleDragHandler.drag.active) {
                        endHandle.x = endLoopLine.x - endHandle.width
                     }
                 }

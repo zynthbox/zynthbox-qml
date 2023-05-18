@@ -150,7 +150,7 @@ Item {
                     anchors.centerIn: parent
                     width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
                     height: Kirigami.Units.gridUnit * 3
-                    checked: component.clip.granular
+                    checked: component.clip ? component.clip.granular : false
                     onToggled: component.clip.granular = !component.clip.granular
                     Connections {
                         target: component.clip
@@ -253,7 +253,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Scan")
-                value: component.clip.grainScan
+                value: component.clip ? component.clip.grainScan : 0
                 decimals: 2
                 increment: 0.1
                 slideIncrement: 0.01
@@ -290,7 +290,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.clip.grainInterval
+                value: component.clip ? component.clip.grainInterval : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
@@ -308,7 +308,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
-                value: component.clip.grainIntervalAdditional
+                value: component.clip ? component.clip.grainIntervalAdditional : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
@@ -341,7 +341,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.clip.grainSize
+                value: component.clip ? component.clip.grainSize : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
@@ -359,7 +359,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
-                value: component.clip.grainSizeAdditional
+                value: component.clip ? component.clip.grainSizeAdditional : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 1
@@ -392,7 +392,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.clip.grainPanMinimum
+                value: component.clip ? component.clip.grainPanMinimum : 0
                 applyLowerBound: true
                 lowerBound: -1
                 applyUpperBound: true
@@ -409,7 +409,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max")
-                value: component.clip.grainPanMaximum
+                value: component.clip ? component.clip.grainPanMaximum : 0
                 applyLowerBound: true
                 lowerBound: -1
                 applyUpperBound: true

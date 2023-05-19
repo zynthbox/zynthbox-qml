@@ -34,6 +34,7 @@ Item {
     property QtObject clip
     property int currentADSRElement: 0
     signal saveMetadata()
+    property bool showGranularSettings: clip && clip.granular && _private.settingsCategory === 1
     function nextADSRElement() {
         if (currentADSRElement === 3) {
             currentADSRElement = 0;
@@ -49,36 +50,66 @@ Item {
         }
     }
     function increaseCurrentValue() {
-        switch(currentADSRElement) {
-            case 0:
-                clip.adsrAttack = Math.min(2, clip.adsrAttack + 0.01);
-                break;
-            case 1:
-                clip.adsrDecay = Math.min(2, clip.adsrDecay + 0.01);
-                break;
-            case 2:
-                clip.adsrSustain = Math.min(1, clip.adsrSustain + 0.01);
-                break;
-            case 3:
-                clip.adsrRelease = Math.min(2, clip.adsrRelease + 0.01);
-                break;
+        if (showGranularSettings) {
+            switch(currentADSRElement) {
+                case 0:
+                case 2:
+                    clip.grainSustain = Math.min(1, clip.grainSustain + 0.01);
+                    break;
+                case 1:
+                case 3:
+                    clip.grainTilt = Math.min(1, clip.grainTilt + 0.01);
+                    break;
+            }
+        } else {
+            switch(currentADSRElement) {
+                case 0:
+                    clip.adsrAttack = Math.min(2, clip.adsrAttack + 0.01);
+                    break;
+                case 1:
+                    clip.adsrDecay = Math.min(2, clip.adsrDecay + 0.01);
+                    break;
+                case 2:
+                    clip.adsrSustain = Math.min(1, clip.adsrSustain + 0.01);
+                    break;
+                case 3:
+                    clip.adsrRelease = Math.min(2, clip.adsrRelease + 0.01);
+                    break;
+            }
         }
     }
     function decreaseCurrentValue() {
-        switch(currentADSRElement) {
-            case 0:
-                clip.adsrAttack = Math.max(0, clip.adsrAttack - 0.01);
-                break;
-            case 1:
-                clip.adsrDecay = Math.max(0, clip.adsrDecay - 0.01);
-                break;
-            case 2:
-                clip.adsrSustain = Math.max(0, clip.adsrSustain - 0.01);
-                break;
-            case 3:
-                clip.adsrRelease = Math.max(0, clip.adsrRelease - 0.01);
-                break;
+        if (showGranularSettings) {
+            switch(currentADSRElement) {
+                case 0:
+                case 2:
+                    clip.grainSustain = Math.max(0, clip.grainSustain - 0.01);
+                    break;
+                case 1:
+                case 3:
+                    clip.grainTilt = Math.max(0, clip.grainTilt - 0.01);
+                    break;
+            }
+        } else {
+            switch(currentADSRElement) {
+                case 0:
+                    clip.adsrAttack = Math.max(0, clip.adsrAttack - 0.01);
+                    break;
+                case 1:
+                    clip.adsrDecay = Math.max(0, clip.adsrDecay - 0.01);
+                    break;
+                case 2:
+                    clip.adsrSustain = Math.max(0, clip.adsrSustain - 0.01);
+                    break;
+                case 3:
+                    clip.adsrRelease = Math.max(0, clip.adsrRelease - 0.01);
+                    break;
+            }
         }
+    }
+    QtObject {
+        id: _private
+        property int settingsCategory: 0
     }
     RowLayout {
         anchors.fill: parent
@@ -86,6 +117,33 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+            visible: component.clip && component.clip.granular
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                text: qsTr("ADSR")
+                checked: _private.settingsCategory === 0
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: _private.settingsCategory = 0
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                text: qsTr("Granular")
+                checked: _private.settingsCategory === 1
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: _private.settingsCategory = 1
+                }
+            }
+        }
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+            visible: component.showGranularSettings === false
             Kirigami.Heading {
                 level: 2
                 text: qsTr("Attack")
@@ -121,6 +179,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+            visible: component.showGranularSettings === false
             Kirigami.Heading {
                 level: 2
                 text: qsTr("Decay")
@@ -156,6 +215,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+            visible: component.showGranularSettings === false
             Kirigami.Heading {
                 level: 2
                 text: qsTr("Sustain")
@@ -191,6 +251,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+            visible: component.showGranularSettings === false
             Kirigami.Heading {
                 level: 2
                 text: qsTr("Release")
@@ -222,29 +283,116 @@ Item {
                 color: component.currentADSRElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
             }
         }
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+            visible: component.showGranularSettings
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Sustain")
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            QQC2.Slider {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                orientation: Qt.Vertical
+                stepSize: 0.01
+                value: component.clip ? component.clip.grainSustain : 0
+                from: 0
+                to: 1
+                onMoved: component.clip.grainSustain = value
+            }
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("%1").arg((component.clip ? component.clip.grainSustain : 0).toFixed(2))
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 2
+                Layout.maximumHeight: 2
+                color: component.currentADSRElement === 0 || component.currentADSRElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            }
+        }
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+            visible: component.showGranularSettings
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Tilt")
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            QQC2.Slider {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                orientation: Qt.Vertical
+                stepSize: 0.01
+                value: component.clip ? component.clip.grainTilt : 0
+                from: 0
+                to: 1
+                onMoved: component.clip.grainTilt = value
+            }
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("%1").arg((component.clip ? component.clip.grainTilt : 0).toFixed(2))
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 2
+                Layout.maximumHeight: 2
+                color: component.currentADSRElement === 1 || component.currentADSRElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            }
+        }
         AbstractADSRView {
             id: adsrView
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-            attackValue: component.clip ? component.clip.adsrAttack : 0
+            property double grainRemaining: 1 - component.clip.grainSustain;
+            attackValue: component.clip ? (component.clip.granular ? grainRemaining * component.clip.grainTilt : component.clip.adsrAttack) : 0
             attackMax: 2
-            decayValue: component.clip ? component.clip.adsrDecay : 0
+            decayValue: component.clip ? (component.clip.granular ? 0 : component.clip.adsrDecay) : 0
             decayMax: 2
-            sustainValue: component.clip ? component.clip.adsrSustain : 0
+            sustainValue: component.clip ? (component.clip.granular ? 1 : component.clip.adsrSustain) : 0
             sustainMax: 1
-            releaseValue: component.clip ? component.clip.adsrRelease : 0
+            releaseValue: component.clip ? (component.clip.granular ? grainRemaining * (1.0 - component.clip.grainTilt) : component.clip.adsrRelease) : 0
             releaseMax: 2
             Connections {
                 target: component
-                onClipChanged: adsrView.requestPaint()
+                onClipChanged: {
+                    if (component.visible) {
+                        adsrView.requestPaint()
+                    }
+                }
+                onVisibleChanged: {
+                    if (component.visible) {
+                        adsrView.requestPaint();
+                    }
+                }
             }
             Connections {
                 target: component.clip
-                onAdsrParametersChanged: {
-                    adsrView.requestPaint()
-                    component.saveMetadata();
+                function updateAndSave() {
+                    if (component.visible) {
+                        adsrView.requestPaint();
+                        component.saveMetadata();
+                    }
                 }
+                onGrainTiltChanged: updateAndSave()
+                onGrainSustainChanged: updateAndSave();
+                onAdsrParametersChanged: updateAndSave()
             }
         }
     }

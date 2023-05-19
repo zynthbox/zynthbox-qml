@@ -86,9 +86,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
-#        self.__filter_cutoff_controller = MultiController(name="Filter Cutoff", parent=self)
-#        self.__filter_resonance_controller = MultiController(name="Filter Resonance", parent=self)
-        # self.__volume_control_obj = None
         # This variable tells zynthian_qt_gui to load last state snapshot when booting when set to True
         # or load default snapshot when set to False
         self.init_should_load_last_state = False

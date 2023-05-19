@@ -35,6 +35,7 @@ Card {
     property double decayMax: 1
     property double sustainValue: 1
     property double sustainMax: 1
+    property double sustainWidth: 1
     property double releaseValue: 1
     property double releaseMax: 1
     function requestPaint() {
@@ -63,15 +64,17 @@ Card {
 
             ctx.clearRect(0, 0, width, height);
             ctx.beginPath();
-            ctx.moveTo(piece * (1 - component.attackValue/component.attackMax), top + bottom);
-            ctx.lineTo(piece, top);
 
-            ctx.lineTo(piece + piece * (component.decayValue/component.decayMax),
-                        top + bottom * (1 - component.sustainValue/component.sustainMax));
-            ctx.lineTo(piece * 3,
-                        top + bottom * (1 - component.sustainValue/component.sustainMax));
-            ctx.lineTo(piece * 3 + piece * (component.releaseValue/component.releaseMax),
-                        top + bottom);
+            let currentX = piece * (1 - component.attackValue/component.attackMax);
+            ctx.moveTo(currentX, top + bottom);
+            currentX = piece;
+            ctx.lineTo(currentX, top);
+            currentX += piece * (component.decayValue/component.decayMax);
+            ctx.lineTo(currentX, top + bottom * (1 - component.sustainValue/component.sustainMax));
+            currentX += (piece * component.sustainWidth);
+            ctx.lineTo(currentX, top + bottom * (1 - component.sustainValue/component.sustainMax));
+            currentX += piece * (component.releaseValue/component.releaseMax);
+            ctx.lineTo(currentX, top + bottom);
             //ctx.closePath();
             ctx.stroke();
             ctx.fill();

@@ -364,7 +364,8 @@ Item {
             attackValue: component.clip ? (component.showGranularSettings ? grainRemaining * component.clip.grainTilt : component.clip.adsrAttack) : 0
             attackMax: component.showGranularSettings ? 1 : 2
             decayValue: component.clip ? (component.showGranularSettings ? 0 : component.clip.adsrDecay) : 0
-            decayMax: component.showGranularSettings ? 0.00001 : 2 // decayMax cannot be 0 (because division thereby is bad)
+            decayMax: 2
+            decayWidth: component.showGranularSettings ? 0 : 1;
             sustainValue: component.clip ? (component.showGranularSettings ? 1 : component.clip.adsrSustain) : 0
             sustainMax: 1
             sustainWidth: component.showGranularSettings ? component.clip.grainSustain : 1

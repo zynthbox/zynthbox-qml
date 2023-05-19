@@ -33,6 +33,7 @@ Card {
     property double attackMax: 1
     property double decayValue: 1
     property double decayMax: 1
+    property double decayWidth: 1
     property double sustainValue: 1
     property double sustainMax: 1
     property double sustainWidth: 1
@@ -58,7 +59,7 @@ Card {
                                         Kirigami.Theme.highlightColor.b,
                                         0))
             ctx.fillStyle = grd;
-            let piece = width / 4;
+            let piece = width / (2 + component.decayWidth + component.sustainWidth);
             let top = Kirigami.Units.gridUnit
             let bottom = height - Kirigami.Units.gridUnit * 2
 
@@ -69,7 +70,7 @@ Card {
             ctx.moveTo(currentX, top + bottom);
             currentX = piece;
             ctx.lineTo(currentX, top);
-            currentX += piece * (component.decayValue/component.decayMax);
+            currentX += piece * (component.decayValue/component.decayMax) * component.decayWidth;
             ctx.lineTo(currentX, top + bottom * (1 - component.sustainValue/component.sustainMax));
             currentX += (piece * component.sustainWidth);
             ctx.lineTo(currentX, top + bottom * (1 - component.sustainValue/component.sustainMax));

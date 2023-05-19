@@ -99,11 +99,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.click_channel_click, self.click_channel_clack)
         Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.click_channel_enabled_changed)
 
-        self.update_timer_bpm_timer = QTimer()
-        self.update_timer_bpm_timer.setInterval(100)
-        self.update_timer_bpm_timer.setSingleShot(True)
-        self.update_timer_bpm_timer.timeout.connect(self.update_timer_bpm)
-
         Path('/zynthian/zynthian-my-data/samples/my-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/samples/community-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
@@ -140,7 +135,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def init_sketchpad(self, sketchpad, cb=None):
         def _cb():
             Zynthbox.PlayGridManager.instance().metronomeBeat4thChanged.connect(self.metronome_update)
-            self.update_timer_bpm()
 
             if cb is not None:
                 cb()
@@ -485,8 +479,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                                                                   base_sketchpad_path.stem.replace(".sketchpad", ""), self)
                 self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                     str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
-
-                self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
                 self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
             else:
@@ -511,7 +503,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     channel = self.__song__.channelsModel.getChannel(i)
                     channel.update_jack_port()
 
-                self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
                 self.newSketchpadLoaded.emit()
@@ -580,9 +571,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                 str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
             self.__song__.save(False)
-
-            self.__song__.bpm_changed.connect(self.update_timer_bpm)
-
             self.song_changed.emit()
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
@@ -663,8 +651,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
                 # Update volume controls
                 self.zynqtgui.fixed_layers.fill_list()
-
-                self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
 
                 # Connect all jack ports of respective channel after jack client initialization is done.
@@ -699,7 +685,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.resetMetronome()
 
         self.__song__ = sketchpad_song.sketchpad_song(sketchpad_folder, version, self)
-        self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
     @Slot(str, result=bool)
@@ -720,9 +705,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def stopAllPlayback(self):
         for channel_index in range(self.__song__.channelsModel.count):
             self.__song__.channelsModel.getChannel(channel_index).stopAllClips()
-
-    def update_timer_bpm(self):
-        Zynthbox.SyncTimer.instance().setBpm(self.__song__.bpm)
 
     def queue_clip_record(self, clip):
         # When sketchpad is open, curLayer is not updated when changing channels as it is a considerably heavy task

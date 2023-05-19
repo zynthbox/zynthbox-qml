@@ -645,6 +645,8 @@ class sketchpad_clip(QObject):
         self.audioSource.setGrainSizeAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_SIZE_ADDITIONAL", 50)))
         self.audioSource.setGrainPanMinimum(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_PAN_MINIMUM", -1)))
         self.audioSource.setGrainPanMaximum(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_PAN_MAXIMUM", 1)))
+        self.audioSource.setGrainSustain(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_SUSTAIN", 0.3)))
+        self.audioSource.setGrainTilt(float(self.__get_metadata_prop__("ZYNTHBOX_GRANULATOR_TILT", 0.5)))
 
         self.reset_beat_count()
 
@@ -963,6 +965,8 @@ class sketchpad_clip(QObject):
             self.write_metadata("ZYNTHBOX_GRANULATOR_SIZE_ADDITIONAL", [str(self.audioSource.grainSizeAdditional())])
             self.write_metadata("ZYNTHBOX_GRANULATOR_PAN_MINIMUM", [str(self.audioSource.grainPanMinimum())])
             self.write_metadata("ZYNTHBOX_GRANULATOR_PAN_MAXIMUM", [str(self.audioSource.grainPanMaximum())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_SUSTAIN", [str(self.audioSource.grainSustain())])
+            self.write_metadata("ZYNTHBOX_GRANULATOR_TILT", [str(self.audioSource.grainTilt())])
 
     @Slot(QObject)
     def copyFrom(self, clip):

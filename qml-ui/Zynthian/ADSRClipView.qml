@@ -361,14 +361,15 @@ Item {
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             property double grainRemaining: 1 - component.clip.grainSustain;
-            attackValue: component.clip ? (component.clip.granular ? grainRemaining * component.clip.grainTilt : component.clip.adsrAttack) : 0
-            attackMax: 2
-            decayValue: component.clip ? (component.clip.granular ? 0 : component.clip.adsrDecay) : 0
-            decayMax: 2
-            sustainValue: component.clip ? (component.clip.granular ? 1 : component.clip.adsrSustain) : 0
+            attackValue: component.clip ? (component.showGranularSettings ? grainRemaining * component.clip.grainTilt : component.clip.adsrAttack) : 0
+            attackMax: component.showGranularSettings ? 1 : 2
+            decayValue: component.clip ? (component.showGranularSettings ? 0 : component.clip.adsrDecay) : 0
+            decayMax: component.showGranularSettings ? 0.00001 : 2 // decayMax cannot be 0 (because division thereby is bad)
+            sustainValue: component.clip ? (component.showGranularSettings ? 1 : component.clip.adsrSustain) : 0
             sustainMax: 1
-            releaseValue: component.clip ? (component.clip.granular ? grainRemaining * (1.0 - component.clip.grainTilt) : component.clip.adsrRelease) : 0
-            releaseMax: 2
+            sustainWidth: component.showGranularSettings ? component.clip.grainSustain : 1
+            releaseValue: component.clip ? (component.showGranularSettings ? grainRemaining * (1.0 - component.clip.grainTilt) : component.clip.adsrRelease) : 0
+            releaseMax: component.showGranularSettings ? 1 : 2
             Connections {
                 target: component
                 onClipChanged: {

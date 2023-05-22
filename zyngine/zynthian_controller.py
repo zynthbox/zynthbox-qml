@@ -27,13 +27,15 @@ import liblo
 import ctypes
 import logging
 
+from PySide2.QtCore import QObject, Signal
 # Zynthian specific modules
 from zyncoder import *
 
 
-class zynthian_controller:
+class zynthian_controller(QObject):
+    def __init__(self, engine, symbol, name=None, options=None, parent=None):
+        super(zynthian_controller, self).__init__(parent)
 
-    def __init__(self, engine, symbol, name=None, options=None):
         self.engine=engine
         self.symbol=symbol
         if name:
@@ -268,7 +270,7 @@ class zynthian_controller:
             self.value=self.value_min
         else:
             self.value=val
-
+        self.value_changed.emit(self)
 
     def set_value(self, val, force_sending=False):
         self._set_value(val)
@@ -590,5 +592,7 @@ class zynthian_controller:
         except Exception as e:
             logging.debug(e)
 
+
+    value_changed = Signal(QObject)
 
 #******************************************************************************

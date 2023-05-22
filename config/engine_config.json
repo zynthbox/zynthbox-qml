@@ -13,6 +13,7 @@
         "volumeControls": ["level"]
     },
     "JV/Calf Monosynth": {
-        "volumeControls": ["master"]
+        "volumeControls": ["master"],
+        "resonanceControl": "res"
     }
 }

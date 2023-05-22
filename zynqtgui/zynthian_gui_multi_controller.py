@@ -30,7 +30,7 @@
 
 
 import numpy as np
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject, Signal, Qt
 
 
 class MultiController(QObject):
@@ -56,15 +56,28 @@ class MultiController(QObject):
                 # Current controller's value is greater than set value
                 # update value to current controller
                 self.set_value(controller_current_interp_value, True)
-
+            control.value_changed.connect(self.controls_value_changed_handler, Qt.QueuedConnection)
             self.controlsCountChanged.emit()
             self.controllable_changed.emit()
-            self.value_changed.emit()
 
     def clear_controls(self):
         self.__controls.clear()
         self.controlsCountChanged.emit()
         self.value = 0
+
+    def controls_value_changed_handler(self, changed_control):
+        # Interpolate changed controller's value to percentage
+        changed_controller_percentage_value = np.interp(changed_control.value, (changed_control.value_min, changed_control.value_max), (self.value_min, self.value_max))
+
+        for control in self.__controls:
+            # Set all other controllers value to changed controllers value
+            if not changed_control == control:
+                control_percentage_value = np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max))
+                if control_percentage_value != changed_controller_percentage_value:
+                    control.value = np.interp(changed_controller_percentage_value, (self.value_min, self.value_max), (control.value_min, control.value_max))
+
+        self.value = changed_controller_percentage_value
+        self.value_changed.emit()
 
     ### Property controllable
     def get_controllable(self):

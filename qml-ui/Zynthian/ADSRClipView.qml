@@ -360,7 +360,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-            property double grainRemaining: 1 - component.clip.grainSustain;
+            property double grainRemaining: component.clip ? (1 - component.clip.grainSustain) : 1;
             attackValue: component.clip ? (component.showGranularSettings ? grainRemaining * component.clip.grainTilt : component.clip.adsrAttack) : 0
             attackMax: component.showGranularSettings ? 1 : 2
             decayValue: component.clip ? (component.showGranularSettings ? 0 : component.clip.adsrDecay) : 0
@@ -368,7 +368,7 @@ Item {
             decayWidth: component.showGranularSettings ? 0 : 1;
             sustainValue: component.clip ? (component.showGranularSettings ? 1 : component.clip.adsrSustain) : 0
             sustainMax: 1
-            sustainWidth: component.showGranularSettings ? component.clip.grainSustain : 1
+            sustainWidth: component.clip ? (component.showGranularSettings ? component.clip.grainSustain : 1) : 1
             releaseValue: component.clip ? (component.showGranularSettings ? grainRemaining * (1.0 - component.clip.grainTilt) : component.clip.adsrRelease) : 0
             releaseMax: component.showGranularSettings ? 1 : 2
             Connections {

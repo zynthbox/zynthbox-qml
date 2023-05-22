@@ -124,10 +124,6 @@ class sketchpad_song(QObject):
 
                 self.__sketches_model__.add_sketch(sketch_index, sketch)
 
-        self.bpm_changed.emit()
-        # Emit bpm changed to get bpm of selectedSketch
-        self.__scenes_model__.selected_track_index_changed.connect(self.bpm_changed.emit)
-
         # Create wav dir for recording
         (Path(self.sketchpad_folder) / 'wav').mkdir(parents=True, exist_ok=True)
         # Create sampleset dir if not exists
@@ -331,7 +327,7 @@ class sketchpad_song(QObject):
                         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
                         self.__bpm__[self.__scenes_model__.selectedTrackIndex] = sketchpad["bpm"]
 
-                    self.set_bpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex], True)
+                    Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
 
                 self.__is_loading__ = False
                 self.isLoadingChanged.emit()
@@ -453,11 +449,6 @@ class sketchpad_song(QObject):
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 
-
-    @Signal
-    def bpm_changed(self):
-        pass
-
     @Signal
     def index_changed(self):
         pass
@@ -517,19 +508,14 @@ class sketchpad_song(QObject):
     #         #self.add_clip_to_part(clip, i)
     #     self.schedule_save()
 
-    def bpm(self):
-        return self.__bpm__[self.__scenes_model__.selectedTrackIndex]
+    def setBpmFromTrack(self):
+        Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
 
-    def set_bpm(self, bpm: int, force_set=False):
-        if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != math.floor(bpm) or force_set is True:
-            self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
-
-            Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
-            self.bpm_changed.emit()
+    def setTrackBpmFromCurrent(self):
+        bpm = math.floor(Zynthbox.SyncTimer.instance().getBpm())
+        if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != bpm:
+            self.__bpm__[self.__scenes_model__.selectedTrackIndex] = bpm
             self.schedule_save()
-
-    bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
-
 
     def index(self):
         return self.__index__

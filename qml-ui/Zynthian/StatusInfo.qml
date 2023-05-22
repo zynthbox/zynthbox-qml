@@ -290,8 +290,8 @@ MouseArea {
             QQC2.Label {
                 id: bpmLabel
                 // Hide scale info for now
-                // text: zynqtgui.sketchpad.song.selectedScale +" "+ zynqtgui.sketchpad.song.bpm
-                text: zynqtgui.sketchpad.song.bpm
+                // text: zynqtgui.sketchpad.song.selectedScale +" "+ Zynthbox.SyncTimer.bpm
+                text: Zynthbox.SyncTimer.bpm
                 font.pointSize: 9
             }
             Kirigami.Icon {
@@ -365,7 +365,7 @@ MouseArea {
                     contentItem: SketchpadDial {
                         id: bpmDial
                         text: qsTr("BPM")
-                        controlObj: zynqtgui.sketchpad.song
+                        controlObj: Zynthbox.SyncTimer
                         controlProperty: "bpm"
 
                         dial {
@@ -396,7 +396,7 @@ MouseArea {
                                 }
                                 var average = sum / differences.length;
                                 bpmDial.bpm = 60000 / average;
-                                zynqtgui.sketchpad.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
+                                Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                             }
                         }
                     }

@@ -245,7 +245,7 @@ QQC2.AbstractButton {
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: visible ? (channel.sceneClip.progress - channel.sceneClip.startPosition)/adjustment : 0
-            property double adjustment: visible ? (((60/zynqtgui.sketchpad.song.bpm) * channel.sceneClip.length) / parent.width) : 1
+            property double adjustment: visible ? (((60/Zynthbox.SyncTimer.bpm) * channel.sceneClip.length) / parent.width) : 1
         }
         Rectangle {
             id: patternProgressRect

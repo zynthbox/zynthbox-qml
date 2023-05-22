@@ -333,7 +333,17 @@ Kirigami.AbstractApplicationWindow {
      */
     function updateSketchpadBpm(sign) {
         function valueSetter(value) {
-            zynqtgui.sketchpad.song.bpm = Zynthian.CommonUtils.clamp(value, 50, 200)
+            if (value > 0) {
+                while (value > 0) {
+                    Zynthbox.SyncTimer.increaseBpm();
+                    value--;
+                }
+            } else {
+                while (value < 0) {
+                    Zynthbox.SyncTimer.decreaseBpm();
+                    value++;
+                }
+            }
             if (!zynqtgui.globalPopupOpened) {
                 applicationWindow().showOsd({
                     parameterName: "sketchpad_bpm",
@@ -342,8 +352,8 @@ Kirigami.AbstractApplicationWindow {
                     stop: 200,
                     step: 1,
                     defaultValue: 120,
-                    currentValue: zynqtgui.sketchpad.song.bpm,
-                    valueLabel: parseInt(zynqtgui.sketchpad.song.bpm),
+                    currentValue: Zynthbox.SyncTimer.bpm,
+                    valueLabel: parseInt(Zynthbox.SyncTimer.bpm),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: false,
@@ -351,7 +361,7 @@ Kirigami.AbstractApplicationWindow {
                 })
             }
         }
-        valueSetter(zynqtgui.sketchpad.song.bpm + sign)
+        valueSetter(sign)
     }
     /**
      * Update volume of selected channel

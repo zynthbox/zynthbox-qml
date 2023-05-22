@@ -92,7 +92,7 @@ class sketchpad_clip(QObject):
             bank_name = "sample-bank"
         self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
 
-        self.__song__.bpm_changed.connect(self.song_bpm_changed, Qt.QueuedConnection)
+        Zynthbox.SyncTimer.instance().bpmChanged.connect(self.song_bpm_changed, Qt.QueuedConnection)
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat, Qt.QueuedConnection)
 
         try:
@@ -207,8 +207,8 @@ class sketchpad_clip(QObject):
 
     def update_synced_values(self):
         if self.__should_sync__:
-            logging.debug(f"Song BPM : {self.__song__.bpm}")
-            new_ratio = self.__song__.bpm / self.__bpm__
+            logging.debug(f"Song BPM : {Zynthbox.SyncTimer.instance().getBpm()}")
+            new_ratio = Zynthbox.SyncTimer.instance().getBpm() / self.__bpm__
             logging.debug(f"Song New Ratio : {new_ratio}")
             self.set_time(new_ratio, True)
 
@@ -414,7 +414,7 @@ class sketchpad_clip(QObject):
                 self.saveMetadata()
 
             if self.audioSource is not None:
-                self.audioSource.setLength(self.__length__, self.__song__.bpm)
+                self.audioSource.setLength(self.__length__, Zynthbox.SyncTimer.instance().getBpm())
             self.reset_beat_count()
     length = Property(float, length, set_length, notify=length_changed)
 
@@ -875,7 +875,7 @@ class sketchpad_clip(QObject):
         pass
 
     def get_secPerBeat(self):
-        return 60.0/self.__song__.bpm
+        return 60.0/Zynthbox.SyncTimer.instance().getBpm()
 
     secPerBeat = Property(float, get_secPerBeat, notify=sec_per_beat_changed)
 

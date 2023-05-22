@@ -429,10 +429,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True):
         def task():
-            try:
-                self.__song__.bpm_changed.disconnect()
-            except Exception as e:
-                logging.error(f"Already disconnected : {str(e)}")
 
             self.zynqtgui.currentTaskMessage = "Stopping playback"
 
@@ -597,11 +593,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         def task():
             logging.info(f"Loading sketchpad : {sketchpad}")
 
-            try:
-                self.__song__.bpm_changed.disconnect()
-            except Exception as e:
-                logging.error(f"Already disconnected : {str(e)}")
-
             sketchpad_path = Path(sketchpad)
 
             self.zynqtgui.currentTaskMessage = "Stopping playback"
@@ -674,11 +665,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def loadSketchpadVersion(self, version):
         sketchpad_folder = self.__song__.sketchpad_folder
 
-        try:
-            self.__song__.bpm_changed.disconnect()
-        except Exception as e:
-            logging.error(f"Already disconnected : {str(e)}")
-
         self.stopAllPlayback()
         self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
         self.zynqtgui.screens["song_arranger"].stop()
@@ -744,7 +730,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         else:
             base_recording_dir = f"{clip.recording_basepath}/wav"
 
-        base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{self.__song__.bpm}-BPM"
+        base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
 
         # Check if file exists otherwise append count
 
@@ -831,7 +817,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 # Do not start timer again and remove stop schedule
                 self.metronome_schedule_stop = False
             else:
-                Zynthbox.SyncTimer.instance().start(self.__song__.bpm)
+                Zynthbox.SyncTimer.instance().start()
                 self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
@@ -888,7 +874,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.clip_to_record.set_path(self.clip_to_record_path, False)
             if layer is not None:
                 self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-            self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+            self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
             self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
             self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
 
@@ -901,7 +887,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     clip.set_path(self.clip_to_record_path, True)
                     if layer is not None:
                         clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-                    clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+                    clip.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
                     clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
                     clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
 

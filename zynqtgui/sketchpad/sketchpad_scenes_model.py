@@ -52,6 +52,8 @@ class sketchpad_scenes_model(QAbstractListModel):
             "9": {"name": "J", "clips": []},
         }
 
+        self.selected_track_index_changed.connect(self.__song__.setBpmFromTrack)
+
         self.__track_name_change_timer = QTimer(self)
         self.__track_name_change_timer.setInterval(10)
         self.__track_name_change_timer.setSingleShot(True)

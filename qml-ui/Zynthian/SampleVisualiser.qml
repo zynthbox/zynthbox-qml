@@ -108,7 +108,7 @@ Item {
             color: Kirigami.Theme.neutralTextColor
             opacity: 0.6
             width: Kirigami.Units.smallSpacing
-            x: _private.sample ? ((((60/zynqtgui.sketchpad.song.bpm) * _private.sample.length) / _private.sample.duration) * parent.width) + ((_private.sample.startPosition / _private.sample.duration) * parent.width) : 0
+            x: _private.sample ? ((((60/Zynthbox.SyncTimer.bpm) * _private.sample.length) / _private.sample.duration) * parent.width) + ((_private.sample.startPosition / _private.sample.duration) * parent.width) : 0
         }
 
         // Progress line

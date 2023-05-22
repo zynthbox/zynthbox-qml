@@ -102,7 +102,7 @@ Zynthian.Popup {
                             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                             _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
                             var beatMultiplier = Zynthbox.PlayGridManager.syncTimer.getMultiplier();
-                            var beatsPerMinute = zynqtgui.sketchpad.song.bpm;
+                            var beatsPerMinute = Zynthbox.SyncTimer.bpm;
                             _private.patternDurationInMS = Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, _private.patternDurationInBeats) * 1000;
                             _private.recordingDurationInMS = _private.patternDurationInMS;
                             _private.recordingDurationInBeats = _private.patternDurationInBeats;

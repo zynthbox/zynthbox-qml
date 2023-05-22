@@ -2104,7 +2104,7 @@ class zynthian_gui(QObject):
                 elif i == 19:
                     self.playButtonPressed = True
                 elif i == 20:
-                    self.bpmBeforePressingMetronome = self.sketchpad.song.bpm
+                    self.bpmBeforePressingMetronome = Zynthbox.SyncTimer.instance().getBpm()
                     self.volumeBeforePressingMetronome = self.masterVolume
                     self.delayBeforePressingMetronome = self.global_fx_engines[0][1].value
                     self.reverbBeforePressingMetronome = self.global_fx_engines[1][1].value
@@ -2144,7 +2144,7 @@ class zynthian_gui(QObject):
                         Zynthbox.SyncTimer.instance().startWithCountin()
                     else:
                         # Toggle metronome only if metronome+BK is not used to change bpm or volume or delay or reverb
-                        bpmAfterPressingMetronome = self.sketchpad.song.bpm
+                        bpmAfterPressingMetronome = Zynthbox.SyncTimer.instance().getBpm()
                         volumeAfterPressingMetronome = self.masterVolume
                         delayAfterPressingMetronome = self.global_fx_engines[0][1].value
                         reverbAfterPressingMetronome = self.global_fx_engines[1][1].value

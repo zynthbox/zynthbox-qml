@@ -58,8 +58,8 @@ Zynthian.ScreenPage {
                 font: topSoundHeading.font
                 from: 0
                 to: 999
-                value: root.song.bpm
-                onValueModified: root.song.bpm = value
+                value: Zynthbox.SyncTimer.bpm
+                onValueModified: Zynthbox.SyncTimer.bpm = value
                 textFromValue: function(value) {
                     return qsTr("%1 BPM").arg(value);
                 }

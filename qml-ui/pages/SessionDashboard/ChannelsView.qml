@@ -380,7 +380,7 @@ ColumnLayout {
                                         color: Kirigami.Theme.neutralTextColor
                                         opacity: 0.6
                                         width: Kirigami.Units.smallSpacing
-                                        x: ((((60/zynqtgui.sketchpad.song.bpm) * channelDelegate.selectedClip.length) / channelDelegate.selectedClip.duration) * parent.width) + ((channelDelegate.selectedClip.startPosition / channelDelegate.selectedClip.duration) * parent.width)
+                                        x: ((((60/Zynthbox.SyncTimer.bpm) * channelDelegate.selectedClip.length) / channelDelegate.selectedClip.duration) * parent.width) + ((channelDelegate.selectedClip.startPosition / channelDelegate.selectedClip.duration) * parent.width)
                                     }
 
                                     Rectangle { // Progress

@@ -76,7 +76,7 @@ class MultiController(QObject):
                 if control_percentage_value != changed_controller_percentage_value:
                     control.value = np.interp(changed_controller_percentage_value, (self.value_min, self.value_max), (control.value_min, control.value_max))
 
-        self.value = changed_controller_percentage_value
+        self.__value = changed_controller_percentage_value
         self.value_changed.emit()
 
     ### Property controllable

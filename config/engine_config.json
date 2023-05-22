@@ -1,21 +1,18 @@
 {
     "JV/synthv1": {
-        "volumeControl": ["OUT1_VOLUME", "OUT2_VOLUME"],
+        "volumeControls": ["OUT1_VOLUME", "OUT2_VOLUME"],
         "cutoffControl": "DCF1_CUTOFF",
         "resonanceControl": "DCF1_RESO",
         "description": "Synth V1 small description"
     },
     "JV/amsynth": {
-        "volumeControl": ["master_vol"],
+        "volumeControls": ["master_vol"],
         "description": "A tiny custom description for amsynth"
     },
     "JV/Red Zeppelin 5": {
-        "volumeControl": ["level"]
+        "volumeControls": ["level"]
     },
     "JV/Calf Monosynth": {
-        "volumeControl": ["master"]
-    },
-    "default": {
-        "volumeControl": ["volume", "Volume"]
+        "volumeControls": ["master"]
     }
 }

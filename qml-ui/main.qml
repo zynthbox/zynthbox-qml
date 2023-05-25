@@ -66,7 +66,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelVolume(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
-                    root.updateMasterVolume(1)
+                    root.updateMetronomeVolume(1)
                     result = true;
                 }
                 break;
@@ -75,7 +75,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelVolume(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
-                    root.updateMasterVolume(-1)
+                    root.updateMetronomeVolume(-1)
                     result = true;
                 }
                 break;
@@ -274,6 +274,30 @@ Kirigami.AbstractApplicationWindow {
             }
         }
         valueSetter(zynqtgui.masterVolume + sign)
+    }
+    /**
+     * Update metronome clip volume
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateMetronomeVolume(sign) {
+        function valueSetter(value) {
+            zynqtgui.sketchpad.metronomeVolume = Zynthian.CommonUtils.clamp(value, 0, 1)
+            applicationWindow().showOsd({
+                parameterName: "metronome_volume",
+                description: qsTr("Metronome Volume"),
+                start: 0,
+                stop: 1,
+                step: 0.01,
+                defaultValue: null,
+                currentValue: zynqtgui.sketchpad.metronomeVolume,
+                valueLabel: zynqtgui.sketchpad.metronomeVolume.toFixed(2),
+                setValueFunction: valueSetter,
+                showValueLabel: true,
+                showResetToDefault: false,
+                showVisualZero: false
+            })
+        }
+        valueSetter(zynqtgui.sketchpad.metronomeVolume + sign * 0.01)
     }
     /**
      * Update global delay fx amount

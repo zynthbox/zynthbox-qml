@@ -433,6 +433,7 @@ class zynthian_gui(QObject):
 
         self.bpmBeforePressingMetronome = 0
         self.volumeBeforePressingMetronome = 0
+        self.metronomeVolumeBeforePressingMetronome = 0
         self.delayBeforePressingMetronome = 0
         self.reverbBeforePressingMetronome = 0
         self.__current_task_message = ""
@@ -2106,6 +2107,7 @@ class zynthian_gui(QObject):
                 elif i == 20:
                     self.bpmBeforePressingMetronome = Zynthbox.SyncTimer.instance().getBpm()
                     self.volumeBeforePressingMetronome = self.masterVolume
+                    self.metronomeVolumeBeforePressingMetronome = self.sketchpad.metronomeVolume
                     self.delayBeforePressingMetronome = self.global_fx_engines[0][1].value
                     self.reverbBeforePressingMetronome = self.global_fx_engines[1][1].value
                     self.metronomeButtonPressed = True
@@ -2146,10 +2148,12 @@ class zynthian_gui(QObject):
                         # Toggle metronome only if metronome+BK is not used to change bpm or volume or delay or reverb
                         bpmAfterPressingMetronome = Zynthbox.SyncTimer.instance().getBpm()
                         volumeAfterPressingMetronome = self.masterVolume
+                        metronomeVolumeAfterPressingMetronome = self.sketchpad.metronomeVolume
                         delayAfterPressingMetronome = self.global_fx_engines[0][1].value
                         reverbAfterPressingMetronome = self.global_fx_engines[1][1].value
                         if bpmAfterPressingMetronome == self.bpmBeforePressingMetronome and \
                                 volumeAfterPressingMetronome == self.volumeBeforePressingMetronome and \
+                                metronomeVolumeAfterPressingMetronome == self.metronomeVolumeBeforePressingMetronome and \
                                 delayAfterPressingMetronome == self.delayBeforePressingMetronome and \
                                 reverbAfterPressingMetronome == self.reverbBeforePressingMetronome:
                             # BPM/Volume/Delay/Reverb did not change. Toggle metronome state

@@ -86,15 +86,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
+        self.__metronomeVolume = 1.0
         # This variable tells zynthian_qt_gui to load last state snapshot when booting when set to True
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
-        self.metronome_clip_tick.setVolumeAbsolute(1)
+        self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)
         self.metronome_clip_tick.setLength(1, 120);
         self.metronome_clip_tock = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tock.wav", False, self)
-        self.metronome_clip_tock.setVolumeAbsolute(1)
+        self.metronome_clip_tock.setVolumeAbsolute(self.__metronomeVolume)
         self.metronome_clip_tock.setLength(1, 120);
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)
         Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.metronomeEnabledChanged)
@@ -340,6 +341,22 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     lastRecordingMidi = Property(str, get_lastRecordingMidi, set_lastRecordingMidi, notify=lastRecordingMidiChanged)
     ### END Property lastRecordingMidi
+
+    ### Property metronomeVolume
+    def get_metronomeVolume(self):
+        return self.__metronomeVolume
+
+    def set_metronomeVolume(self, volume):
+        if self.__metronomeVolume != volume:
+            self.__metronomeVolume = volume
+            self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)
+            self.metronome_clip_tock.setVolumeAbsolute(self.__metronomeVolume)
+            self.metronomeVolumeChanged.emit()
+
+    metronomeVolumeChanged = Signal()
+
+    metronomeVolume = Property(float, get_metronomeVolume, set_metronomeVolume, notify=metronomeVolumeChanged)
+    ### END Property metronomeVolume
 
     @Signal
     def metronomeEnabledChanged(self):

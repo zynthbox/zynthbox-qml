@@ -293,7 +293,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.sketchpad.isRecordingChanged.connect(self.update_button_colors)
         self.zynqtgui.sketchpad.isRecordingChanged.connect(self.update_button_colors)
         self.zynqtgui.sketchpad.metronome_running_changed.connect(self.update_button_colors)
-        self.zynqtgui.sketchpad.click_channel_enabled_changed.connect(self.update_button_colors)
+        self.zynqtgui.sketchpad.metronomeEnabledChanged.connect(self.update_button_colors)
         self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
 
         for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
@@ -360,7 +360,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             self.set_button_color(self.button_alt, led_color_inactive)
             self.set_button_color(self.button_record, led_color_red if self.zynqtgui.sketchpad.isRecording else led_color_inactive)
             self.set_button_color(self.button_play, led_color_active if self.zynqtgui.sketchpad.isMetronomeRunning else led_color_inactive)
-            self.set_button_color(self.button_metronome, led_color_inactive if self.zynqtgui.sketchpad.clickChannelEnabled else led_color_off, blink=self.zynqtgui.sketchpad.clickChannelEnabled)
+            self.set_button_color(self.button_metronome, led_color_inactive if self.zynqtgui.sketchpad.metronomeEnabled else led_color_off, blink=self.zynqtgui.sketchpad.metronomeEnabled)
             self.set_button_color(self.button_stop, led_color_inactive)
             self.set_button_color(self.button_back, led_color_red)
             self.set_button_color(self.button_up, led_color_inactive)

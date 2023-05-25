@@ -90,14 +90,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
 
-        self.click_channel_click = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/click_channel_click.wav", False, self)
-        self.click_channel_click.setVolumeAbsolute(1)
-        self.click_channel_click.setLength(1, 120);
-        self.click_channel_clack = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/click_channel_clack.wav", False, self)
-        self.click_channel_clack.setVolumeAbsolute(1)
-        self.click_channel_clack.setLength(1, 120);
-        Zynthbox.SyncTimer.instance().setMetronomeTicks(self.click_channel_click, self.click_channel_clack)
-        Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.click_channel_enabled_changed)
+        self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
+        self.metronome_clip_tick.setVolumeAbsolute(1)
+        self.metronome_clip_tick.setLength(1, 120);
+        self.metronome_clip_tock = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tock.wav", False, self)
+        self.metronome_clip_tock.setVolumeAbsolute(1)
+        self.metronome_clip_tock.setLength(1, 120);
+        Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)
+        Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.metronomeEnabledChanged)
 
         Path('/zynthian/zynthian-my-data/samples/my-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/samples/community-samples').mkdir(exist_ok=True, parents=True)
@@ -342,16 +342,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     ### END Property lastRecordingMidi
 
     @Signal
-    def click_channel_enabled_changed(self):
+    def metronomeEnabledChanged(self):
         pass
 
-    def get_clickChannelEnabled(self):
+    def get_metronomeEnabled(self):
         return Zynthbox.SyncTimer.instance().audibleMetronome()
 
-    def set_clickChannelEnabled(self, enabled: bool):
+    def set_metronomeEnabled(self, enabled: bool):
         Zynthbox.SyncTimer.instance().setAudibleMetronome(enabled)
 
-    clickChannelEnabled = Property(bool, get_clickChannelEnabled, set_clickChannelEnabled, notify=click_channel_enabled_changed)
+    metronomeEnabled = Property(bool, get_metronomeEnabled, set_metronomeEnabled, notify=metronomeEnabledChanged)
 
     def channel_layers_snapshot(self):
         snapshot = []

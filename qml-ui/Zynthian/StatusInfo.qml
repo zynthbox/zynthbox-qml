@@ -299,7 +299,7 @@ MouseArea {
                 Layout.preferredHeight: 24
                 source: Qt.resolvedUrl("../../img/metronome.svg")
                 color: "#ffffff"
-                opacity: zynqtgui.sketchpad.clickChannelEnabled ? 1.0 : 0.0
+                opacity: zynqtgui.sketchpad.metronomeEnabled ? 1.0 : 0.0
             }
         }
     }
@@ -523,9 +523,9 @@ MouseArea {
                             implicitWidth: Kirigami.Units.gridUnit * 3
                             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            checked: zynqtgui.sketchpad.clickChannelEnabled
+                            checked: zynqtgui.sketchpad.metronomeEnabled
                             onToggled: {
-                                zynqtgui.sketchpad.clickChannelEnabled = checked
+                                zynqtgui.sketchpad.metronomeEnabled = checked
                             }
                         }
                         Item {

@@ -301,9 +301,9 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignCenter
                         checkable: true
-                        checked: zynqtgui.sketchpad.clickChannelEnabled
+                        checked: zynqtgui.sketchpad.metronomeEnabled
                         onToggled: {
-                            zynqtgui.sketchpad.clickChannelEnabled = checked
+                            zynqtgui.sketchpad.metronomeEnabled = checked
                         }
                         
                         Kirigami.Icon {

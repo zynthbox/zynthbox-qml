@@ -1980,7 +1980,7 @@ class zynthian_gui(QObject):
             logging.debug(f'self.channelsModActive({self.channelsModActive})')
 
         # elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
-        #     self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
+        #     self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -2153,7 +2153,7 @@ class zynthian_gui(QObject):
                                 delayAfterPressingMetronome == self.delayBeforePressingMetronome and \
                                 reverbAfterPressingMetronome == self.reverbBeforePressingMetronome:
                             # BPM/Volume/Delay/Reverb did not change. Toggle metronome state
-                            self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
+                            self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
                     self.metronomeButtonPressed = False
                 elif i == 21:
                     self.stopButtonPressed = False

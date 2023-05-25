@@ -374,9 +374,9 @@ Zynthian.Popup {
                         implicitWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynqtgui.sketchpad.clickChannelEnabled
+                        checked: zynqtgui.sketchpad.metronomeEnabled
                         onToggled: {
-                            zynqtgui.sketchpad.clickChannelEnabled = checked
+                            zynqtgui.sketchpad.metronomeEnabled = checked
                         }
                     }
                 }

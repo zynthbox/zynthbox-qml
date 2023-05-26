@@ -38,6 +38,7 @@ RowLayout {
     ? root.selectedChannel.selectedSlotRow
     : root.selectedChannel.selectedSlotRow
     property int selectedSoundSlotExists: clip.clipChannel.checkIfLayerExists(clip.clipChannel.chainedSounds[selectedSoundSlot])
+    property var soundInfo: clip ? clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot] : []
     
     spacing: Kirigami.Units.gridUnit    
     onClipChanged: updateSoundNameTimer.restart()
@@ -148,9 +149,9 @@ RowLayout {
         text: visible
                 ? infoBar.selectedSoundSlotExists
                     ? qsTr("Preset (%2/%3): %1")
-                        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
-                        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
-                        .arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
+                        .arg(infoBar.soundInfo.presetName)
+                        .arg(infoBar.soundInfo.presetIndex+1)
+                        .arg(infoBar.soundInfo.presetLength)
                     : qsTr("Preset: --")
                 : ""
     }
@@ -162,7 +163,7 @@ RowLayout {
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
-                    ? qsTr("Bank: %1").arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
+                    ? qsTr("Bank: %1").arg(infoBar.soundInfo.bankName)
                     : qsTr("Bank: --")
                 : ""
     }
@@ -174,7 +175,7 @@ RowLayout {
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
-                    ? qsTr("Synth: %1").arg(infoBar.clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
+                    ? qsTr("Synth: %1").arg(infoBar.soundInfo.synthName)
                     : qsTr("Synth: --")
                 : ""
     }
@@ -185,7 +186,7 @@ RowLayout {
         visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "sample-loop"
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-        text: zynqtgui.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
+        text: zynqtgui.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.filename && infoBar.clip.filename.length > 0 ? infoBar.clip.filename : "--") : ""
     }
     QQC2.Label {
         property QtObject sample: infoBar.clip && infoBar.clip.clipChannel.samples[infoBar.clip.clipChannel.selectedSlotRow]
@@ -196,7 +197,7 @@ RowLayout {
                  infoBar.clip.clipChannel.channelAudioType === "sample-slice")
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-        text: zynqtgui.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
+        text: zynqtgui.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.filename.length > 0 ? sample.filename : "--") : ""
     }
     
     Item {

@@ -38,7 +38,7 @@ from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
 # Qt modules
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer
 import traceback
 #-------------------------------------------------------------------------------
 # Zynthian Preset/Instrument Selection GUI Class
@@ -60,10 +60,17 @@ class zynthian_gui_preset(zynthian_gui_selector):
         self.__fav_root = "/zynthian/zynthian-my-data/preset-favorites/"
         self.reload_top_sounds()
         self.__select_in_progess = False
+        self.__list_timer = QTimer()
+        self.__list_timer.setInterval(100)
+        self.__list_timer.setSingleShot(True)
+        self.__list_timer.timeout.connect(self.fill_list_actual)
         self.show()
 
 
     def fill_list(self):
+        self.__list_timer.start()
+
+    def fill_list_actual(self):
         self.list_data = []
         self.list_metadata = []
 

@@ -885,7 +885,8 @@ class sketchpad_clip(QObject):
 
     def get_metadataBPM(self):
         try:
-            return int(self.audio_metadata["ZYNTHBOX_BPM"][0])
+            if self.audio_metadata is not None:
+                return int(self.audio_metadata["ZYNTHBOX_BPM"][0])
         except Exception as e:
             logging.debug(f"Error retrieving from metadata : {str(e)}")
 
@@ -899,7 +900,8 @@ class sketchpad_clip(QObject):
 
     def get_metadata_midi_recording(self):
         try:
-            return str(self.audio_metadata["ZYNTHBOX_MIDI_RECORDING"][0])
+            if self.audio_metadata is not None:
+                return str(self.audio_metadata["ZYNTHBOX_MIDI_RECORDING"][0])
         except Exception as e:
             logging.debug(f"Error retrieving from metadata : {str(e)}")
 
@@ -985,7 +987,8 @@ class sketchpad_clip(QObject):
     ### Property metadataAudioType
     def get_metadata_audio_type(self):
         try:
-            return self.audio_metadata["ZYNTHBOX_AUDIO_TYPE"][0]
+            if self.audio_metadata is not None:
+                return self.audio_metadata["ZYNTHBOX_AUDIO_TYPE"][0]
         except Exception as e:
             logging.debug(f"Error retrieving from metadata : {str(e)}")
         return None

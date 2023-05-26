@@ -281,16 +281,21 @@ Zynthian.BasePlayGrid {
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
+                    Timer {
+                        id: gridNoteFetcherThrottle
+                        interval: 1; repeat: false; running: false;
+                        onTriggered: gridDelegate.refetchNote()
+                    }
                     Connections {
                         target: mainGridRepeater.model;
                         onDataChanged: {
-                            gridDelegate.refetchNote();
+                            gridNoteFetcherThrottle.restart();
                         }
                         onModelReset: {
-                            gridDelegate.refetchNote();
+                            gridNoteFetcherThrottle.restart();
                         }
                         onRowsChanged: {
-                            gridDelegate.refetchNote();
+                            gridNoteFetcherThrottle.restart();
                         }
                     }
                 }
@@ -312,16 +317,21 @@ Zynthian.BasePlayGrid {
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
+                    Timer {
+                        id: miniGridNoteFetcherThrottle
+                        interval: 1; repeat: false; running: false;
+                        onTriggered: miniGridDelegate.refetchNote()
+                    }
                     Connections {
                         target: miniGridRepeater.model;
                         onDataChanged: {
-                            miniGridDelegate.refetchNote();
+                            miniGridNoteFetcherThrottle.restart();
                         }
                         onModelReset: {
-                            miniGridDelegate.refetchNote();
+                            miniGridNoteFetcherThrottle.restart();
                         }
                         onRowsChanged: {
-                            miniGridDelegate.refetchNote();
+                            miniGridNoteFetcherThrottle.restart();
                         }
                     }
                 }

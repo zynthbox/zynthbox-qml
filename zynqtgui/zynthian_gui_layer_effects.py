@@ -144,7 +144,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
         if self.fx_layers != None and i < len(self.fx_layers):
             self.fx_layer = self.fx_layers[i]
-            if t is 'B':
+            if t == 'B':
                 self.zynqtgui.show_confirm("Do you really want to remove This effect?", self.fx_remove_confirmed)
         else:
             self.fx_layer = None

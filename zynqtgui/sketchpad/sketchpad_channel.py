@@ -95,6 +95,11 @@ class sketchpad_channel(QObject):
         self.fixed_layers_list_updated_handler_throttle.setSingleShot(True)
         self.fixed_layers_list_updated_handler_throttle.timeout.connect(self.fixed_layers_list_updated_handler)
 
+        self.__chained_sounds_info_updater = QTimer()
+        self.__chained_sounds_info_updater.setInterval(1)
+        self.__chained_sounds_info_updater.setSingleShot(True)
+        self.__chained_sounds_info_updater.timeout.connect(self.chainedSoundsInfoChanged.emit)
+
         # Load engine config
         try:
             with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
@@ -1080,7 +1085,7 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def updateChainedSoundsInfo(self):
-        self.chainedSoundsInfoChanged.emit()
+        self.__chained_sounds_info_updater.start()
 
     chainedSoundsInfoChanged = Signal()
 

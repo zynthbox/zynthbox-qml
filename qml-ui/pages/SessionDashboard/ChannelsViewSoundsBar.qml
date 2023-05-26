@@ -123,9 +123,16 @@ Zynthian.Card {
                 enabled: true
 
                 function update() {
-                    soundLabelSynth.updateName();
-                    soundLabelPreset.updateName();
-                    fxLabel.updateName();
+                    chainedSoundsNameUpdater.restart();
+                }
+                Timer {
+                    id: chainedSoundsNameUpdater
+                    interval: 1; repeat: false; running: false;
+                    onTriggered: {
+                        soundLabelSynth.updateName();
+                        soundLabelPreset.updateName();
+                        fxLabel.updateName();
+                    }
                 }
 
                 MouseArea {

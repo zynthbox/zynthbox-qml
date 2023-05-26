@@ -23,7 +23,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
@@ -110,6 +110,7 @@ QQC2.ScrollView {
             when: root.active
             delayed: true
         }
+        reuseItems: true
         cacheBuffer: Kirigami.Units.gridUnit*2
         highlightMoveDuration: 0
         highlightMoveVelocity: -1

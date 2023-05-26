@@ -33,7 +33,17 @@ import "private"
 QQC2.ItemDelegate {
     id: delegate
     width: ListView.view.width
-    text: model.display
+    Binding {
+        property: "text"
+        value: model.display
+        delayed: true
+    }
+    property bool showNumbers: false
+    Binding {
+        property: "showNumbers"
+        value: model.showNumbers
+        delayed: true
+    }
 
     enabled: delegate.visible && model.action_id !== undefined
 
@@ -61,7 +71,7 @@ QQC2.ItemDelegate {
             elide: Text.ElideRight
         }
         Kirigami.Icon {
-            source: model.icon
+            source: visible ? model.icon : ""
             Layout.fillHeight: true
             Layout.preferredWidth: height
             visible: valid

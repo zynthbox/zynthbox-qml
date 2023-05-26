@@ -369,7 +369,7 @@ Rectangle {
 
                                 Binding { //Optimization
                                     target: synthRepeater
-                                    property: "model"
+                                    property: "synthData"
                                     delayed: true
                                     value: root.selectedChannel.channelAudioType === "synth"
                                                 ? root.selectedChannel.chainedSoundsNames
@@ -380,13 +380,15 @@ Rectangle {
                                                         ? [root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex), null, null, null, null]
                                                         : root.selectedChannel.channelAudioType === "external"
                                                             ? [qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""), null, null, null, null]
-                                                            : []
+                                                            : [null, null, null, null, null]
 
                                 }
 
                                 Repeater {
                                     id: synthRepeater
 
+                                    model: 5
+                                    property var synthData: [null, null, null, null, null]
                                     delegate: Rectangle {
                                         property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop" ||
                                                                    root.selectedChannel.channelAudioType === "sample-slice" ||
@@ -427,6 +429,7 @@ Rectangle {
                                                         ? index === 0
                                                         : true
                                             opacity: enabled ? 1 : 0
+                                            visible: enabled
 
                                             Rectangle {
                                                 width: parent.width * delegate.volume
@@ -451,17 +454,17 @@ Rectangle {
                                                     rightMargin: Kirigami.Units.gridUnit*0.5
                                                 }
                                                 horizontalAlignment: Text.AlignLeft
-                                                text: root.selectedChannel.channelAudioType === "synth" && modelData && modelData.className == null // Check if modelData is not a channel/clip object by checking if it has the className property
-                                                        ? modelData
+                                                text: root.selectedChannel.channelAudioType === "synth" && synthRepeater.synthData[index] && synthRepeater.synthData[index].className == null // Check if synthRepeater.synthData[index] is not a channel/clip object by checking if it has the className property
+                                                        ? synthRepeater.synthData[index]
                                                         : (root.selectedChannel.channelAudioType === "sample-trig" ||
                                                           root.selectedChannel.channelAudioType === "sample-slice" ||
                                                           root.selectedChannel.channelAudioType === "sample-loop") &&
-                                                          modelData
-                                                            ? modelData.path
-                                                              ? modelData.path.split("/").pop()
+                                                          synthRepeater.synthData[index]
+                                                            ? synthRepeater.synthData[index].path
+                                                              ? synthRepeater.synthData[index].path.split("/").pop()
                                                               : ""
                                                             : root.selectedChannel.channelAudioType === "external"
-                                                                ? modelData
+                                                                ? synthRepeater.synthData[index]
                                                                 : ""
 
                                                 elide: "ElideRight"

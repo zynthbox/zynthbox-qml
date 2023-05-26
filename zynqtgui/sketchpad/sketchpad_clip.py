@@ -56,6 +56,7 @@ class sketchpad_clip(QObject):
         self.__loop_delta__ = 0.0
         # self.__start_position_before_sync__ = None
         self.__path__ = None
+        self.__filename__ = ""
         self.__song__ = song
         self.__initial_pitch__ = 0
         self.__pitch__ = self.__initial_pitch__
@@ -572,6 +573,9 @@ class sketchpad_clip(QObject):
     shouldSync = Property(bool, shouldSync, set_shouldSync, notify=should_sync_changed)
 
 
+    def filename(self):
+        return self.__filename__
+
     def path(self):
         if self.__path__ is None:
             return None
@@ -607,6 +611,7 @@ class sketchpad_clip(QObject):
             self.__path__ = str(selected_path.name)
         else:
             self.__path__ = str(new_filename)
+        self.__filename__ = self.__path__.split("/")[-1]
         self.stop()
 
         if self.audioSource is not None:
@@ -686,6 +691,7 @@ class sketchpad_clip(QObject):
         self.__song__.schedule_save()
 
     path = Property(str, path, set_path, notify=path_changed)
+    filename = Property(str, filename, notify=path_changed)
 
     def progress_changed_cb(self):
         self.__progress__ = self.audioSource.progress()

@@ -39,7 +39,14 @@ Zynthian.ScreenPage {
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
 
     onSelectedChannelChanged: {
-        zynqtgui.layers_for_channel.activate_index(0)
+        layerChangeThrottle.restart();
+    }
+    Timer {
+        id: layerChangeThrottle
+        interval: 10; running: false; repeat: false;
+        onTriggered: {
+            zynqtgui.layers_for_channel.activate_index(0)
+        }
     }
 
     backAction: Kirigami.Action {
@@ -429,7 +436,11 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 Layout.fillWidth: true
                                 font.pointSize: mainLabel.font.pointSize * 0.9
-                                text: model.metadata && model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
+                                Binding {
+                                    property: "text"
+                                    value: model.metadata && model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
+                                    delayed: true
+                                }
                                 elide: Text.ElideRight
                             }
                         }

@@ -80,6 +80,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
 
+        self.__set_selected_channel_timer = None
         self.__update_channel_sounds_timer = None
 
         self.zynqtgui.screens["layer"].layer_created.connect(self.layer_created)
@@ -111,7 +112,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def set_selected_channel_complete(self):
-        self.zynqtgui.fixed_layers.fill_list()
+        # self.zynqtgui.fixed_layers.fill_list()
+        if self.__set_selected_channel_timer is None:
+            self.__set_selected_channel_timer = QTimer(self)
+            self.__set_selected_channel_timer.setInterval(100)
+            self.__set_selected_channel_timer.setSingleShot(True)
+            self.__set_selected_channel_timer.timeout.connect(self.zynqtgui.fixed_layers.fill_list, Qt.QueuedConnection)
+        self.__set_selected_channel_timer.start()
 
         if self.__update_channel_sounds_timer is None:
             self.__update_channel_sounds_timer = QTimer(self)

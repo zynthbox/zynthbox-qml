@@ -934,7 +934,14 @@ Kirigami.AbstractApplicationWindow {
     // Listen to selected_channel_changed signal to
     Connections {
         target: zynqtgui.session_dashboard
-        onSelected_channel_changed: root.selectedChannel = root.channels[zynqtgui.session_dashboard.selectedChannel]
+        onSelected_channel_changed: selectedChannelThrottle.restart()
+    }
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; repeat: false; running: false;
+        onTriggered: {
+            root.selectedChannel = root.channels[zynqtgui.session_dashboard.selectedChannel]
+        }
     }
 
     PageManager {

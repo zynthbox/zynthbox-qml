@@ -39,7 +39,21 @@ Zynthian.ScreenPage {
     title: qsTr("Channel Wave Editor")
 
     property bool isVisible:zynqtgui.current_screen_id === "channel_wave_editor"
-    property QtObject selectedChannel: applicationWindow().selectedChannel
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            component.selectedChannel = applicationWindow().selectedChannel;
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
+    Component.onCompleted: {
+        selectedChannelThrottle.restart()
+    }
     property QtObject selectedClip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                         ? component.selectedChannel.getClipsModelByPart(selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
                                         : component.selectedChannel.samples[selectedChannel.selectedSlotRow]
@@ -370,14 +384,12 @@ Zynthian.ScreenPage {
                                             ? "bottombar-controltype-clip"
                                             : "bottombar-controltype-channel"
                             showCopyPasteButtons: false
-                            enabled: component.selectedClipHasWav
                         }
                         Zynthian.ADSRClipView {
                             id: clipSettingsADSR
                             objectName: "clipSettingsADSR"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent
-                            enabled: component.selectedClipHasWav
                             clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
                             onSaveMetadata: component.selectedClip.saveMetadata();
                         }
@@ -386,7 +398,6 @@ Zynthian.ScreenPage {
                             objectName: "clipSettingsGranulator"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent;
-                            enabled: component.selectedClipHasWav
                             clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
                             onSaveMetadata: component.selectedClip.saveMetadata();
                         }

@@ -83,16 +83,33 @@ Item {
             }
         ]
     }
-    ColumnLayout {
-        anchors.fill: parent
-        Kirigami.Heading {
-            id: descriptionLabel
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            level: 2
+    Kirigami.Heading {
+        id: descriptionLabel
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            margins: Kirigami.Units.smallSpacing
+        }
+        height: contentHeight
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignTop
+        level: 2
+    }
+    Item {
+        anchors {
+            top: descriptionLabel.bottom
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+            margins: Kirigami.Units.smallSpacing
         }
         QQC2.Button {
-            Layout.fillWidth: true
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
             text: "+" + component.increment
             enabled: component.applyUpperBound === false || component.upperBound > component.value
             onClicked: {
@@ -104,14 +121,31 @@ Item {
             }
         }
         Kirigami.Heading {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            id: valueLabel
+            anchors.fill: parent
+            verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             level: 3
-            text: component.value.toFixed(component.decimals) + component.unitLabel
+            Timer {
+                id: valueLabelThrottle
+                interval: 0; running: false; repeat: false;
+                onTriggered: {
+                    valueLabel.text = component.value.toFixed(component.decimals) + component.unitLabel;
+                }
+            }
+            Connections {
+                target: component
+                onValueChanged: valueLabelThrottle.restart()
+                onDecimalsChanged: valueLabelThrottle.restart()
+                onUnitLabelChanged: valueLabelThrottle.restart()
+            }
         }
         QQC2.Button {
-            Layout.fillWidth: true
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
             text: "-" + component.increment
             enabled: component.applyLowerBound === false || component.lowerBound < component.value
             onClicked: {
@@ -122,11 +156,14 @@ Item {
                 }
             }
         }
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.minimumHeight: 2
-            Layout.maximumHeight: 2
-            color: component.selected === true ? Kirigami.Theme.highlightedTextColor : "transparent"
+    }
+    Rectangle {
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
         }
+        height: 2
+        color: component.selected === true ? Kirigami.Theme.highlightedTextColor : "transparent"
     }
 }

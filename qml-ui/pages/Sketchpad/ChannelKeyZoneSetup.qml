@@ -134,7 +134,7 @@ Item {
                 model: 5
                 delegate: Item {
                     id: sampleKeyzoneDelegate
-                    property var channelSample: component.selectedChannel.samples && component.selectedChannel.samples[index]
+                    property var channelSample: component.selectedChannel ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
                     property QtObject clipObj: channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null;
                     Connections {
                         target: clipObj
@@ -144,7 +144,7 @@ Item {
                     }
                     height: parent.height;
                     width: 1
-                    property bool isCurrent: component.selectedChannel.selectedSlotRow === index
+                    property bool isCurrent: component.selectedChannel ? component.selectedChannel.selectedSlotRow === index : false
                     z: isCurrent ? 99 : 0
                     property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null

@@ -265,7 +265,6 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
-                text: qsTr("Scan")
                 value: component.clip ? component.clip.grainScan : 0
                 decimals: 2
                 increment: 0.1

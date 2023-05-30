@@ -203,6 +203,8 @@ class sketchpad_channel(QObject):
 
         # Restore curlayer
         self.zynqtgui.curlayer = curlayer
+        self.zynqtgui.bank.fill_list()
+        self.zynqtgui.preset.fill_list()
 
     def update_filter_controllers(self):
         for index, midi_channel in enumerate(self.chainedSounds):

@@ -1733,6 +1733,7 @@ Zynthian.BasePlayGrid {
                                                         Layout.fillHeight: true
                                                         Layout.fillWidth: true
                                                         visible: parent.visible && patternsMenuItem.thisPattern.noteDestination !== Zynthbox.PatternModel.SampleLoopedDestination
+                                                        asynchronous: true
                                                         source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
                                                         Rectangle {
                                                             anchors {

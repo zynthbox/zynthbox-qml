@@ -39,7 +39,21 @@ Rectangle {
     id: root
 
     readonly property QtObject song: zynqtgui.sketchpad.song
-    readonly property QtObject selectedChannel: applicationWindow().selectedChannel
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 0; running: false; repeat: false;
+        onTriggered: {
+            root.selectedChannel = applicationWindow().selectedChannel;
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
+    Component.onCompleted: {
+        selectedChannelThrottle.restart()
+    }
 
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
@@ -133,8 +147,18 @@ Rectangle {
             anchors.fill: parent
             implicitWidth: root.width
             implicitHeight: root.height
-            readonly property QtObject song: zynqtgui.sketchpad.song
-            selectedChannel: song ? song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null
+            selectedChannel: null
+            Timer {
+                id: keyZoneSetupSelectedChannelThrottle
+                interval: 1; running: false; repeat: false;
+                onTriggered: {
+                    root.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null;
+                }
+            }
+            Connections {
+                target: zynqtgui.session_dashboard
+                onSelected_channel_changed: keyZoneSetupSelectedChannelThrottle.restart()
+            }
         }
     }
 
@@ -770,6 +794,7 @@ Rectangle {
                                                 bottomMargin: 2
                                             }
                                             smooth: false
+                                            asynchronous: true
                                             source: root.pattern ? root.pattern.thumbnailUrl : ""
                                             Rectangle { // Progress
                                                 anchors {

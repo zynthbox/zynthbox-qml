@@ -236,7 +236,7 @@ Item {
             }
             Kirigami.Heading {
                 level: 2
-                text: qsTr("%1%\n").arg(component.clip ? component.clip.adsrSustain.toFixed(2) * 100 : 0)
+                text: "%1%\n".arg(component.clip ? component.clip.adsrSustain.toFixed(2) * 100 : 0)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -308,7 +308,7 @@ Item {
             }
             Kirigami.Heading {
                 level: 2
-                text: qsTr("%1").arg((component.clip ? component.clip.grainSustain : 0).toFixed(2))
+                text: (component.clip ? component.clip.grainSustain : 0).toFixed(2)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -344,7 +344,7 @@ Item {
             }
             Kirigami.Heading {
                 level: 2
-                text: qsTr("%1").arg((component.clip ? component.clip.grainTilt : 0).toFixed(2))
+                text: (component.clip ? component.clip.grainTilt : 0).toFixed(2)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }

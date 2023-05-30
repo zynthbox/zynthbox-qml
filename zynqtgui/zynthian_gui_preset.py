@@ -79,19 +79,18 @@ class zynthian_gui_preset(zynthian_gui_selector):
             super().fill_list()
             return
 
-        # logging.debug(f">>>>> curlayer({self.zynqtgui.curlayer}), bank_index({self.zynqtgui.bank.current_index}), cached({self.zynqtgui.curlayer in self.__list_data_cache and self.zynqtgui.bank.current_index in self.__list_data_cache[self.zynqtgui.curlayer]})")
+        curlayer_bank_index = self.zynqtgui.curlayer.bank_info[1]
 
         # Filling preset list requires reading from quite some files.
         # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
         # Instead of reading files every run, cache the data.
         # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-        if self.zynqtgui.curlayer in self.__list_data_cache and self.zynqtgui.bank.current_index in self.__list_data_cache[self.zynqtgui.curlayer]:
-            logging.debug("Preset list cached")
-            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index]
-            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index]
-            # logging.debug(f">>>>>> Cached data : curlayer({self.zynqtgui.curlayer}), bank_index({self.zynqtgui.bank.current_index}), cache: {self.__list_data_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index]}")
+        if self.zynqtgui.curlayer in self.__list_data_cache and curlayer_bank_index in self.__list_data_cache[self.zynqtgui.curlayer]:
+            # Preset list already cached. Return cached data
+            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank_index]
+            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank_index]
         else:
-            logging.debug("Preset list not cached")
+            # Preset list not cached. Fetch data and cache
             if self.__top_sounds_engine != None:
                 self.reload_top_sounds()
                 if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
@@ -115,8 +114,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
             if self.zynqtgui.curlayer not in self.__list_data_cache:
                 self.__list_data_cache[self.zynqtgui.curlayer] = {}
                 self.__list_metadata_cache[self.zynqtgui.curlayer] = {}
-            self.__list_data_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index] = self.list_data
-            self.__list_metadata_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index] = self.list_metadata
+            self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank_index] = self.list_data
+            self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank_index] = self.list_metadata
 
         super().fill_list()
         self.set_select_path()

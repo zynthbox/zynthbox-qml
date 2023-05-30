@@ -629,6 +629,7 @@ Kirigami.AbstractApplicationWindow {
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("Channel %1 ˬ")
                     .arg(zynqtgui.session_dashboard.selectedChannel+1)
+
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
@@ -658,7 +659,22 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: samplesButton
 
-            property QtObject selectedSample: root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+            property QtObject selectedSample: null
+            Timer {
+                id: samplesButtonThrottle
+                interval: 1; running: false; repeat: false;
+                onTriggered: {
+                     root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                }
+            }
+            Connections {
+                target: root.selectedChannel
+                onSamples_changed: samplesButtonThrottle.restart()
+                onSelectedSlotRowChanged: samplesButtonThrottle.restart()
+            }
+            Component.onCompleted: {
+                samplesButtonThrottle.restart();
+            }
 
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("Sample %1 ˬ %2")
@@ -694,7 +710,7 @@ Kirigami.AbstractApplicationWindow {
             property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
 
             icon.color: customTheme.Kirigami.Theme.textColor
-            text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
+            text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
@@ -723,20 +739,27 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
 
-            function updateSoundName() {
-                var text = "";
+            Timer {
+                id: synthButtonSoundNameThrottle
+                interval: 1; repeat: false; running: false;
+                onTriggered: {
+                    var text = "";
 
-                if (root.selectedChannel) {
-                    for (var id in root.selectedChannel.chainedSounds) {
-                        if (root.selectedChannel.chainedSounds[id] >= 0 &&
-                            root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
-                            text = zynqtgui.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
-                            break;
+                    if (root.selectedChannel) {
+                        for (var id in root.selectedChannel.chainedSounds) {
+                            if (root.selectedChannel.chainedSounds[id] >= 0 &&
+                                root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
+                                text = zynqtgui.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
+                                break;
+                            }
                         }
                     }
-                }
 
-                synthButton.text = text == "" ? qsTr("Sounds") : text;
+                    synthButton.text = text == "" ? qsTr("Sounds") : text;
+                }
+            }
+            function updateSoundName() {
+                synthButtonSoundNameThrottle.restart();
             }
 
             SessionDashboard.SoundsDialog {
@@ -935,6 +958,14 @@ Kirigami.AbstractApplicationWindow {
     Connections {
         target: zynqtgui.session_dashboard
         onSelected_channel_changed: selectedChannelThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song
+        onIsLoadingChanged: {
+            if (zynqtgui.sketchpad.song.isLoading === false) {
+                selectedChannelThrottle.restart();
+            }
+        }
     }
     Timer {
         id: selectedChannelThrottle

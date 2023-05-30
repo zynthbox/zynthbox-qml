@@ -40,7 +40,7 @@ Zynthian.Dialog {
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
-        interval: 1; running: false; repeat: false;
+        interval: 10; running: false; repeat: false;
         onTriggered: {
             root.selectedChannel = applicationWindow().selectedChannel;
         }

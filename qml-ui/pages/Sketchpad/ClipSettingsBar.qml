@@ -172,6 +172,17 @@ ColumnLayout {
             id: timeDial
             text: qsTr("Speed Ratio")
             controlObj: root.controlObj
+            Timer {
+                id: timeDialThrottle
+                interval: 1; running: false; repeat: false;
+                onTriggered: {
+                    timeDial.controlObj = root.controlObj;
+                }
+            }
+            Connections {
+                target: root
+                onControlObjChanged: timeDialThrottle.restart()
+            }
             controlProperty: "time"
             valueString: dial.value.toFixed(2)
             enabled: root.controlObj ? !root.controlObj.shouldSync : false
@@ -201,10 +212,21 @@ ColumnLayout {
             }
 
             QQC2.Label {
+                id: bpmLabel
                 Layout.alignment: Qt.AlignCenter
                 visible: root.controlObj && root.controlObj.metadataBPM ? true : false
-                text: root.controlObj && root.controlObj.hasOwnProperty("metadataBPM") ? root.controlObj.metadataBPM : ""
                 font.pointSize: 9
+                Timer {
+                    id: bpmLabelThrottle
+                    interval: 1; repeat: false; running: false;
+                    onTriggered: {
+                        bpmLabel.text = root.controlObj && root.controlObj.hasOwnProperty("metadataBPM") ? root.controlObj.metadataBPM : "";
+                    }
+                }
+                Connections {
+                    target: root
+                    onControlObjChanged: bpmLabelThrottle.restart()
+                }
             }
 
             QQC2.TextField {

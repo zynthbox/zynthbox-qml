@@ -50,7 +50,12 @@ RowLayout {
             text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
             Connections {
                 target: component
-                onRefetchNote: {
+                onRefetchNote: gridNoteFetcherThrottle.restart()
+            }
+            Timer {
+                id: gridNoteFetcherThrottle
+                interval: 1; repeat: false; running: false;
+                onTriggered: {
                     noteDelegate.note = component.model.data(component.model.index(row, index), component.model.roles['note'])
                 }
             }

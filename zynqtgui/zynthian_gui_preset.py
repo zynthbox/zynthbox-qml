@@ -69,20 +69,27 @@ class zynthian_gui_preset(zynthian_gui_selector):
         self.list_data = []
         self.list_metadata = []
 
+        if not self.zynqtgui.isBootingComplete:
+            # Do not fill list if startup is not complete
+            return
+
         # Do not try to fill list for None layer
         if not self.zynqtgui.curlayer:
             logging.debug("Can't fill preset list for None layer!")
             super().fill_list()
             return
 
+        # logging.debug(f">>>>> curlayer({self.zynqtgui.curlayer}), bank_index({self.zynqtgui.bank.current_index}), cached({self.zynqtgui.curlayer in self.__list_data_cache and self.zynqtgui.bank.current_index in self.__list_data_cache[self.zynqtgui.curlayer]})")
+
         # Filling preset list requires reading from quite some files.
         # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
         # Instead of reading files every run, cache the data.
         # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-        if self.zynqtgui.curlayer in self.__list_data_cache:
+        if self.zynqtgui.curlayer in self.__list_data_cache and self.zynqtgui.bank.current_index in self.__list_data_cache[self.zynqtgui.curlayer]:
             logging.debug("Preset list cached")
-            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer]
-            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer]
+            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index]
+            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index]
+            # logging.debug(f">>>>>> Cached data : curlayer({self.zynqtgui.curlayer}), bank_index({self.zynqtgui.bank.current_index}), cache: {self.__list_data_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index]}")
         else:
             logging.debug("Preset list not cached")
             if self.__top_sounds_engine != None:
@@ -104,8 +111,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
                     self.list_data.append(item)
                     self.list_metadata.append({"icon": "starred-symbolic" if self.zynqtgui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
                                     "show_numbers": True})
-            self.__list_data_cache[self.zynqtgui.curlayer] = self.list_data
-            self.__list_metadata_cache[self.zynqtgui.curlayer] = self.list_metadata
+
+            if self.zynqtgui.curlayer not in self.__list_data_cache:
+                self.__list_data_cache[self.zynqtgui.curlayer] = {}
+                self.__list_metadata_cache[self.zynqtgui.curlayer] = {}
+            self.__list_data_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index] = self.list_data
+            self.__list_metadata_cache[self.zynqtgui.curlayer][self.zynqtgui.bank.current_index] = self.list_metadata
 
         super().fill_list()
         self.set_select_path()

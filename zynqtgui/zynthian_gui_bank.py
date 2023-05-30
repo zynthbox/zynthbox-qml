@@ -59,6 +59,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
         super(zynthian_gui_bank, self).__init__('Bank', parent)
         self.__show_top_sounds = False
         self.auto_next_screen = False
+        self.__list_data_cache = {}
         self.__list_timer = QTimer()
         self.__list_timer.setInterval(100)
         self.__list_timer.setSingleShot(True)
@@ -71,24 +72,37 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
     def fill_list_actual(self):
         self.list_data = []
-        if self.__show_top_sounds:
-            self.zynqtgui.screens['preset'].reload_top_sounds()
-            top_sounds = self.zynqtgui.screens['preset'].get_all_top_sounds()
-            for engine in top_sounds:
-                parts = engine.split("/")
-                readable_name = engine
-                if len(parts) > 1:
-                    readable_name = parts[1]
-                if len(top_sounds[engine]) > 0:
-                    self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
-            self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
+
+        if not self.zynqtgui.curlayer:
+            logging.debug("Can't fill bank list for None layer!")
+            super().fill_list()
+            return
+
+        # Filling bank list requires reading from quite some files.
+        # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
+        # Instead of reading files every run, cache the data.
+        # Since bank data of a synth should not change while the application is running, it should be fairly safe to cache the data
+        if self.zynqtgui.curlayer in self.__list_data_cache:
+            logging.debug("Bank list cached")
+            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer]
         else:
-            if not self.zynqtgui.curlayer:
-                logging.info("Can't fill bank list for None layer!")
-                super().fill_list()
-                return
-            self.zynqtgui.curlayer.load_bank_list()
-            self.list_data = self.zynqtgui.curlayer.bank_list
+            logging.debug("Bank list not cached")
+            if self.__show_top_sounds:
+                self.zynqtgui.screens['preset'].reload_top_sounds()
+                top_sounds = self.zynqtgui.screens['preset'].get_all_top_sounds()
+                for engine in top_sounds:
+                    parts = engine.split("/")
+                    readable_name = engine
+                    if len(parts) > 1:
+                        readable_name = parts[1]
+                    if len(top_sounds[engine]) > 0:
+                        self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
+                self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
+            else:
+                self.zynqtgui.curlayer.load_bank_list()
+                self.list_data = self.zynqtgui.curlayer.bank_list
+            self.__list_data_cache[self.zynqtgui.curlayer] = self.list_data
+
         self.zynqtgui.screens['preset'].set_select_path()
         super().fill_list()
 

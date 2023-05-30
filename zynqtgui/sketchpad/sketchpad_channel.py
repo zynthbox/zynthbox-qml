@@ -192,8 +192,6 @@ class sketchpad_channel(QObject):
         # Back up curlayer
         curlayer = self.zynqtgui.curlayer
 
-        logging.debug(f"curlayer before cache : curLayer({curlayer}), chainedSounds({self.chainedSounds}), layer_midi_map({self.zynqtgui.layer.layer_midi_map})")
-
         for midi_channel in self.chainedSounds:
             if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
                 # Change curlayer to synth's layer and fill back/preset list

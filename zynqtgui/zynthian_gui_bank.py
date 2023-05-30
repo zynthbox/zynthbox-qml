@@ -127,7 +127,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
             super().show()
             return
         if not self.zynqtgui.curlayer:
-            logging.info("Can't show bank list for None layer!")
+            logging.debug("Can't show bank list for None layer!")
             super().show()
             return
         if not self.zynqtgui.curlayer.get_bank_name():

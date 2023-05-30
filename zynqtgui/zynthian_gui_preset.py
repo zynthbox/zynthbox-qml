@@ -113,7 +113,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
     def show(self, show_fav_presets=None):
         if not self.zynqtgui.curlayer:
-            logging.info("Can't show preset list for None layer!")
+            logging.debug("Can't show preset list for None layer!")
             return
 
         if self.__top_sounds_engine != None:

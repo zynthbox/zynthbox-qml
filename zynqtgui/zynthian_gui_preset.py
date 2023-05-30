@@ -79,16 +79,18 @@ class zynthian_gui_preset(zynthian_gui_selector):
             super().fill_list()
             return
 
-        curlayer_bank_index = self.zynqtgui.curlayer.bank_info[1]
+        curlayer_bank = self.zynqtgui.curlayer.bank_info[2]
+
+        logging.debug(f">>> curlayer_bank_info({self.zynqtgui.curlayer.bank_info}), curlayer_bank({curlayer_bank})")
 
         # Filling preset list requires reading from quite some files.
         # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
         # Instead of reading files every run, cache the data.
         # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-        if self.zynqtgui.curlayer in self.__list_data_cache and curlayer_bank_index in self.__list_data_cache[self.zynqtgui.curlayer]:
+        if self.zynqtgui.curlayer in self.__list_data_cache and curlayer_bank in self.__list_data_cache[self.zynqtgui.curlayer]:
             # Preset list already cached. Return cached data
-            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank_index]
-            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank_index]
+            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank]
+            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank]
         else:
             # Preset list not cached. Fetch data and cache
             if self.__top_sounds_engine != None:
@@ -114,8 +116,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
             if self.zynqtgui.curlayer not in self.__list_data_cache:
                 self.__list_data_cache[self.zynqtgui.curlayer] = {}
                 self.__list_metadata_cache[self.zynqtgui.curlayer] = {}
-            self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank_index] = self.list_data
-            self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank_index] = self.list_metadata
+            self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank] = self.list_data
+            self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank] = self.list_metadata
 
         super().fill_list()
         self.set_select_path()

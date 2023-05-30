@@ -38,7 +38,18 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.Popup {
     id: root
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+        }
+    }
+    Connections {
+        target: zynqtgui.session_dashboard
+        onSelected_channel_changed: selectedChannelThrottle.restart()
+    }
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
@@ -148,7 +159,7 @@ Zynthian.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: false
-            text: qsTr("Record Channel %1 - Clip %2").arg(selectedChannel.name).arg(selectedChannel.selectedSlotRow + 1)
+            text: selectedChannel ? qsTr("Record Channel %1 - Clip %2").arg(selectedChannel.name).arg(selectedChannel.selectedSlotRow + 1) : ""
         }
         Rectangle {
             Layout.fillWidth: true

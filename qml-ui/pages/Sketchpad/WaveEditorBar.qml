@@ -93,7 +93,24 @@ GridLayout {
         Layout.fillHeight: true
         Layout.margins: Kirigami.Units.gridUnit
         color: Kirigami.Theme.textColor
-        source: waveBar.controlObj && waveBar.controlObj.path != null ? waveBar.controlObj.path : ""
+        Timer {
+            id: waveFormThrottle
+            interval: 1; running: false; repeat: false;
+            onTriggered: {
+                wav.source = waveBar.controlObj && waveBar.controlObj.path != null ? waveBar.controlObj.path : ""
+            }
+        }
+        Connections {
+            target: waveBar
+            onControlObjChanged: waveFormThrottle.restart()
+        }
+        Connections {
+            target: waveBar.controlObj
+            onPath_changed: waveFormThrottle.restart()
+        }
+        Component.onCompleted: {
+            waveFormThrottle.restart();
+        }
 //        clip: true
         PinchArea {
             anchors.fill: parent

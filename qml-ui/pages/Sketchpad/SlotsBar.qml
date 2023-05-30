@@ -452,7 +452,18 @@ Rectangle {
                         delegate: Rectangle {
                             id: channelDelegate
 
-                            property bool highlighted: index === zynqtgui.session_dashboard.selectedChannel
+                            property bool highlighted: false
+                            Timer {
+                                id: channelHighlightedThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    channelDelegate.highlighted = (index === zynqtgui.session_dashboard.selectedChannel);
+                                }
+                            }
+                            Connections {
+                                target: zynqtgui.session_dashboard
+                                onSelected_channel_changed: channelHighlightedThrottle.restart()
+                            }
     //                            property int selectedRow: 0
                             property int channelIndex: index
                             property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(index)
@@ -572,7 +583,7 @@ Rectangle {
                         font.pointSize: 14
                         text: qsTr("Ch%1-Slot%2")
                                 .arg(zynqtgui.session_dashboard.selectedChannel + 1)
-                                .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
+                                .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
@@ -653,7 +664,7 @@ Rectangle {
                     QQC2.Slider {
                         id: volumeSlider
 
-                        property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
+                        property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
                         property var volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound]
 
                         orientation: Qt.Horizontal
@@ -664,7 +675,7 @@ Rectangle {
 
                         visible: synthsButton.checked
                         enabled: chainedSound >= 0 &&
-                                 root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) &&
+                                 (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false) &&
                                  volumeControlObject &&
                                  volumeControlObject.controllable
                         value: volumeControlObject ? volumeControlObject.value : 0
@@ -710,9 +721,11 @@ Rectangle {
         x: parent.x
         y: parent.y
 
-        headerText: qsTr("%1-S%2 : Pick a bank")
+        headerText: root.selectedSlotRowItem
+                    ? qsTr("%1-S%2 : Pick a bank")
                         .arg(root.selectedSlotRowItem.channel.name)
                         .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
+                    : ""
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["sample-bank.json"]

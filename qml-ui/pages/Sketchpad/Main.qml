@@ -40,10 +40,21 @@ Zynthian.ScreenPage {
     property alias zlScreen: root
     property alias bottomStack: bottomStack
     readonly property QtObject song: zynqtgui.sketchpad.song
-    property QtObject selectedChannel: applicationWindow().selectedChannel
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
     property bool songMode: false;//zynqtgui.sketchpad.song.sketchesModel.songMode
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            root.selectedChannel = applicationWindow().selectedChannel;
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
 
     /*
     Used to temporarily store last clicked object by user
@@ -624,6 +635,7 @@ Zynthian.ScreenPage {
         zynqtgui.bottomBarControlType = "bottombar-controltype-song";
         zynqtgui.bottomBarControlObj = root.song;
         bottomStack.slotsBar.channelButton.checked = true
+        selectedChannelThrottle.restart()
     }
 
     Component.onDestruction: {

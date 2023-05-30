@@ -37,7 +37,21 @@ import io.zynthbox.components 1.0 as Zynthbox
 Zynthian.Dialog {
     id: root
 
-    property QtObject selectedChannel: applicationWindow().selectedChannel
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            root.selectedChannel = applicationWindow().selectedChannel;
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
+    Component.onCompleted: {
+        selectedChannelThrottle.restart()
+    }
 
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y

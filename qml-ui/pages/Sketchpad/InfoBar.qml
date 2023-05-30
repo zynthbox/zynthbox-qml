@@ -31,7 +31,25 @@ import org.kde.kirigami 2.4 as Kirigami
 RowLayout {
     id: infoBar
     
-    property var clip: root.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+    property var clip: null
+    Timer {
+        id: clipThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            infoBar.clip = root.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+        }
+    }
+    Connections {
+        target: zynqtgui.session_dashboard
+        onSelected_channel_changed: clipThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song.scenesModel
+        onSelected_track_index_changed: clipThrottle.restart()
+    }
+    Component.onCompleted: {
+        clipThrottle.restart();
+    }
     property int topLayerIndex: 0
     property int topLayer: -1
     property int selectedSoundSlot: zynqtgui.soundCombinatorActive

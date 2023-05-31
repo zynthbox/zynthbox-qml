@@ -21,8 +21,24 @@ Zynthian.Card {
     }
 
     property int selectedChannelIndex: zynqtgui.session_dashboard.selectedChannel;
-    property var chainedSounds: selectedChannel ? selectedChannel.chainedSounds : []
+    property var chainedSounds: [-1, -1, -1, -1, -1]
     property bool openBottomDrawerOnLoad: false
+
+    Timer {
+        id: chainedSoundsThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            root.chainedSounds = root.selectedChannel ? root.selectedChannel.chainedSounds : [-1, -1, -1, -1, -1]
+        }
+    }
+    Connections {
+        target: root
+        onSelectedChannelChanged: chainedSoundsThrottle.restart()
+    }
+    Connections {
+        target: root.selectedChannel
+        onChained_sounds_changed: chainedSoundsThrottle.restart()
+    }
 
     Connections {
         target: zynqtgui.fixed_layers
@@ -95,22 +111,19 @@ Zynthian.Card {
 
         Repeater {
             id: chainedSoundsRepeater
-            model: root.chainedSounds.length //performace optimization, this length never changes so we never recreate the items
+            model: 5
             delegate: Rectangle {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
-                property QtObject volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound] ? zynqtgui.fixed_layers.volumeControllers[chainedSound] : null
+                property QtObject volumeControlObject: null
                 property real volumePercent: volumeControlObject
                                                 ? (volumeControlObject.value - volumeControlObject.value_min)/(volumeControlObject.value_max - volumeControlObject.value_min)
                                                 : 0
 
                 Connections {
                     target: root
-                    onChainedSoundsChanged: {
-                        soundDelegate.chainedSound = root.chainedSounds[index]
-                        update()
-                    }
+                    onChainedSoundsChanged: update()
                 }
 
                 Layout.fillWidth: true
@@ -123,12 +136,14 @@ Zynthian.Card {
                 enabled: true
 
                 function update() {
-                    chainedSoundsNameUpdater.restart();
+                    chainedSoundsUpdater.restart();
                 }
                 Timer {
-                    id: chainedSoundsNameUpdater
+                    id: chainedSoundsUpdater
                     interval: 1; repeat: false; running: false;
                     onTriggered: {
+                        soundDelegate.chainedSound = root.chainedSounds[index];
+                        soundDelegate.volumeControlObject = zynqtgui.fixed_layers.volumeControllers[chainedSound] ? zynqtgui.fixed_layers.volumeControllers[chainedSound] : null;
                         soundLabelSynth.updateName();
                         soundLabelPreset.updateName();
                         fxLabel.updateName();

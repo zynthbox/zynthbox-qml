@@ -60,19 +60,25 @@ class zynthian_gui_preset(zynthian_gui_selector):
         self.__fav_root = "/zynthian/zynthian-my-data/preset-favorites/"
         self.reload_top_sounds()
         self.__select_in_progess = False
-        self.__list_timer = QTimer()
-        self.__list_timer.setInterval(100)
-        self.__list_timer.setSingleShot(True)
-        self.__list_timer.timeout.connect(self.fill_list_actual)
+        self.__list_data_cache = {}
+        self.__list_metadata_cache = {}
         self.show()
 
 
     def fill_list(self):
-        self.__list_timer.start()
-
-    def fill_list_actual(self):
         self.list_data = []
         self.list_metadata = []
+
+        if not self.zynqtgui.isBootingComplete:
+            # Do not fill list if startup is not complete
+            super().fill_list()
+            return
+
+        # Do not try to fill list for None layer
+        if not self.zynqtgui.curlayer:
+            logging.debug("Can't fill preset list for None layer!")
+            super().fill_list()
+            return
 
         if self.__top_sounds_engine != None:
             self.reload_top_sounds()
@@ -84,11 +90,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
                             self.list_metadata.append({"icon": "starred-symbolic", "show_numbers": True})
 
         else:
-            if not self.zynqtgui.curlayer:
-                logging.info("Can't fill preset list for None layer!")
-                super().fill_list()
-                return
-
             self.zynqtgui.curlayer.load_preset_list()
             if not self.zynqtgui.curlayer.preset_list:
                 self.set_select_path()
@@ -105,7 +106,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
     def show(self, show_fav_presets=None):
         if not self.zynqtgui.curlayer:
-            logging.info("Can't show preset list for None layer!")
+            logging.debug("Can't show preset list for None layer!")
             return
 
         if self.__top_sounds_engine != None:

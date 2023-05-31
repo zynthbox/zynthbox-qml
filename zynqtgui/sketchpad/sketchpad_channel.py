@@ -173,6 +173,7 @@ class sketchpad_channel(QObject):
         self.selectedPartNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
+        self.cache_bank_preset_lists()
         self.update_filter_controllers()
         self.zynqtgui.zynautoconnect()
         self.occupiedSlotsChanged.emit()
@@ -186,6 +187,24 @@ class sketchpad_channel(QObject):
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
+
+    def cache_bank_preset_lists(self):
+        # Back up curlayer
+        curlayer = self.zynqtgui.curlayer
+
+        for midi_channel in self.chainedSounds:
+            if midi_channel >= 0 and self.checkIfLayerExists(midi_channel):
+                # Change curlayer to synth's layer and fill back/preset list
+                self.zynqtgui.curlayer = self.zynqtgui.layer.layer_midi_map[midi_channel]
+                logging.debug(f"Caching midi channel : channel({midi_channel}), layer({self.zynqtgui.curlayer})")
+                self.zynqtgui.currentTaskMessage = f"Caching bank/preset lists for Channel {self.name}"
+                self.zynqtgui.bank.fill_list()
+                self.zynqtgui.preset.fill_list()
+
+        # Restore curlayer
+        self.zynqtgui.curlayer = curlayer
+        self.zynqtgui.bank.fill_list()
+        self.zynqtgui.preset.fill_list()
 
     def update_filter_controllers(self):
         for index, midi_channel in enumerate(self.chainedSounds):

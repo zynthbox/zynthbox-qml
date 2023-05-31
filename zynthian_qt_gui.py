@@ -3380,6 +3380,8 @@ class zynthian_gui(QObject):
             # Allow jack ports connection to complete before showing UI
             # so do not update jack ports in a thread
             channel.update_jack_port(run_in_thread=False)
+            # Cache back/preset of all selected synths of all channel
+            channel.cache_bank_preset_lists()
 
         self.zynautoconnect(True)
 

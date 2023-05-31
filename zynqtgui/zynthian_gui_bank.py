@@ -59,18 +59,18 @@ class zynthian_gui_bank(zynthian_gui_selector):
         super(zynthian_gui_bank, self).__init__('Bank', parent)
         self.__show_top_sounds = False
         self.auto_next_screen = False
-        self.__list_timer = QTimer()
-        self.__list_timer.setInterval(100)
-        self.__list_timer.setSingleShot(True)
-        self.__list_timer.timeout.connect(self.fill_list_actual)
+        self.__list_data_cache = {}
         self.show()
 
 
     def fill_list(self):
-        self.__list_timer.start()
-
-    def fill_list_actual(self):
         self.list_data = []
+
+        if not self.zynqtgui.curlayer:
+            logging.debug("Can't fill bank list for None layer!")
+            super().fill_list()
+            return
+
         if self.__show_top_sounds:
             self.zynqtgui.screens['preset'].reload_top_sounds()
             top_sounds = self.zynqtgui.screens['preset'].get_all_top_sounds()
@@ -83,12 +83,9 @@ class zynthian_gui_bank(zynthian_gui_selector):
                     self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
             self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
         else:
-            if not self.zynqtgui.curlayer:
-                logging.info("Can't fill bank list for None layer!")
-                super().fill_list()
-                return
             self.zynqtgui.curlayer.load_bank_list()
             self.list_data = self.zynqtgui.curlayer.bank_list
+
         self.zynqtgui.screens['preset'].set_select_path()
         super().fill_list()
 
@@ -120,7 +117,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
             super().show()
             return
         if not self.zynqtgui.curlayer:
-            logging.info("Can't show bank list for None layer!")
+            logging.debug("Can't show bank list for None layer!")
             super().show()
             return
         if not self.zynqtgui.curlayer.get_bank_name():

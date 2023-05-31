@@ -50,15 +50,20 @@ class MultiController(QObject):
             controller_current_interp_value = np.interp(control.value, (control.value_min, control.value_max), (self.value_min, self.value_max))
             if controller_current_interp_value < self.value:
                 # Current controller's value is less than set value
-                # force set value to update current controllers value
-                self.set_value(self.value, True)
+                # Update current controller's value
+                control.value = np.interp(self.value, (self.value_min, self.value_max), (control.value_min, control.value_max))
             else:
                 # Current controller's value is greater than set value
-                # update value to current controller
-                self.set_value(controller_current_interp_value, True)
+                # Update value of all other controllers
+                for _control in self.__controls:
+                    if _control != control:
+                        _control.value = np.interp(controller_current_interp_value, (self.value_min, self.value_max), (_control.value_min, _control.value_max))
+
+                self.__value = controller_current_interp_value
             control.value_changed.connect(self.controls_value_changed_handler, Qt.QueuedConnection)
             self.controlsCountChanged.emit()
             self.controllable_changed.emit()
+            self.value_changed.emit()
 
     def clear_controls(self):
         self.__controls.clear()

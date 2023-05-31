@@ -84,7 +84,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelDelaySend(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
-                    root.updateGlobalDelayFXAmount(1)
+                    // root.updateGlobalDelayFXAmount(1)
                     result = true;
                 }
                 break;
@@ -93,7 +93,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelDelaySend(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
-                    root.updateGlobalDelayFXAmount(-1)
+                    // root.updateGlobalDelayFXAmount(-1)
                     result = true;
                 }
                 break;
@@ -102,7 +102,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelReverbSend(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
-                    root.updateGlobalReverbFXAmount(1)
+                    // root.updateGlobalReverbFXAmount(1)
                     result = true;
                 }
                 break;
@@ -111,7 +111,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelReverbSend(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
-                    root.updateGlobalReverbFXAmount(-1)
+                    // root.updateGlobalReverbFXAmount(-1)
                     result = true;
                 }
                 break;

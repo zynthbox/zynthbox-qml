@@ -791,32 +791,34 @@ Kirigami.AbstractApplicationWindow {
 
             visible: root.selectedChannel.channelAudioType === "synth"
 
-            text: {
-                presetButton.updateSoundName();
-            }
-
             Connections {
                 target: zynqtgui.fixed_layers
-                onList_updated: {
-                    presetButton.updateSoundName();
-                }
+                onList_updated: presetButton.updateSoundName()
             }
+            Component.onCompleted: presetButton.updateSoundName()
 
             function updateSoundName() {
-                var text = "";
+                presetButtonTextThrottle.restart()
+            }
+            Timer {
+                id: presetButtonTextThrottle
+                interval: 1; running: false; repeat: false;
+                onTriggered: {
+                    var text = "";
 
-                if (root.selectedChannel) {
-                    for (var id in root.selectedChannel.chainedSounds) {
-                        if (root.selectedChannel.chainedSounds[id] >= 0 &&
-                            root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
-                            text = zynqtgui.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]);
-                            text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
-                            break;
+                    if (root.selectedChannel) {
+                        for (var id in root.selectedChannel.chainedSounds) {
+                            if (root.selectedChannel.chainedSounds[id] >= 0 &&
+                                root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
+                                text = zynqtgui.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]);
+                                text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
+                                break;
+                            }
                         }
                     }
-                }
 
-                presetButton.text = text == "" ? qsTr("Presets") : text;
+                    presetButton.text = text == "" ? qsTr("Presets") : text;
+                }
             }
         }
         Zynthian.BreadcrumbButton {

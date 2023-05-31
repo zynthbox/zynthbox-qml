@@ -71,6 +71,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
         if not self.zynqtgui.isBootingComplete:
             # Do not fill list if startup is not complete
+            super().fill_list()
             return
 
         # Do not try to fill list for None layer
@@ -79,45 +80,25 @@ class zynthian_gui_preset(zynthian_gui_selector):
             super().fill_list()
             return
 
-        curlayer_bank = self.zynqtgui.curlayer.bank_info[2]
+        if self.__top_sounds_engine != None:
+            self.reload_top_sounds()
+            if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
+                if isinstance(self.__top_sounds[self.__top_sounds_engine], list):
+                    for sound in self.__top_sounds[self.__top_sounds_engine]:
+                        if isinstance(sound, dict):
+                            self.list_data.append(sound["list_item"])
+                            self.list_metadata.append({"icon": "starred-symbolic", "show_numbers": True})
 
-        logging.debug(f">>> curlayer_bank_info({self.zynqtgui.curlayer.bank_info}), curlayer_bank({curlayer_bank})")
-
-        # Filling preset list requires reading from quite some files.
-        # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
-        # Instead of reading files every run, cache the data.
-        # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-        if self.zynqtgui.curlayer in self.__list_data_cache and curlayer_bank in self.__list_data_cache[self.zynqtgui.curlayer]:
-            # Preset list already cached. Return cached data
-            self.list_data = self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank]
-            self.list_metadata = self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank]
         else:
-            # Preset list not cached. Fetch data and cache
-            if self.__top_sounds_engine != None:
-                self.reload_top_sounds()
-                if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
-                    if isinstance(self.__top_sounds[self.__top_sounds_engine], list):
-                        for sound in self.__top_sounds[self.__top_sounds_engine]:
-                            if isinstance(sound, dict):
-                                self.list_data.append(sound["list_item"])
-                                self.list_metadata.append({"icon": "starred-symbolic", "show_numbers": True})
-
-            else:
+            self.zynqtgui.curlayer.load_preset_list()
+            if not self.zynqtgui.curlayer.preset_list:
+                self.set_select_path()
                 self.zynqtgui.curlayer.load_preset_list()
-                if not self.zynqtgui.curlayer.preset_list:
-                    self.set_select_path()
-                    self.zynqtgui.curlayer.load_preset_list()
 
-                for item in self.zynqtgui.curlayer.preset_list:
-                    self.list_data.append(item)
-                    self.list_metadata.append({"icon": "starred-symbolic" if self.zynqtgui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
-                                    "show_numbers": True})
-
-            if self.zynqtgui.curlayer not in self.__list_data_cache:
-                self.__list_data_cache[self.zynqtgui.curlayer] = {}
-                self.__list_metadata_cache[self.zynqtgui.curlayer] = {}
-            self.__list_data_cache[self.zynqtgui.curlayer][curlayer_bank] = self.list_data
-            self.__list_metadata_cache[self.zynqtgui.curlayer][curlayer_bank] = self.list_metadata
+            for item in self.zynqtgui.curlayer.preset_list:
+                self.list_data.append(item)
+                self.list_metadata.append({"icon": "starred-symbolic" if self.zynqtgui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
+                                "show_numbers": True})
 
         super().fill_list()
         self.set_select_path()

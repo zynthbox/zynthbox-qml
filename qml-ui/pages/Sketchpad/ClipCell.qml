@@ -41,19 +41,47 @@ QQC2.AbstractButton {
     property bool isPlaying
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property bool highlighted: channel.sceneClip.row === zynqtgui.session_dashboard.selectedChannel &&
-                               channel.sceneClip.col === zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex // zynqtgui.bottomBarControlObj === channel.sceneClip
+    property bool highlighted: false
     property color highlightColor: highlighted
                                        ? Kirigami.Theme.highlightColor
                                        : "transparent"
     property bool isInScene: channel.selectedPartNames
                                 ? channel.selectedPartNames.join("").length > 0
                                 : false
+    property QtObject channel: null
 
     property QtObject sequence
     property QtObject pattern
 
     onPressed: forceActiveFocus()
+
+    Timer {
+        id: highlightThrottle
+        interval: 0; running: false; repeat: false;
+        onTriggered: {
+            if (zynqtgui.sketchpad.song && zynqtgui.sketchpad.song.isLoading === false) {
+                root.highlighted = channel.sceneClip.row === zynqtgui.session_dashboard.selectedChannel &&
+                                channel.sceneClip.col === zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex // zynqtgui.bottomBarControlObj === channel.sceneClip
+            }
+        }
+    }
+    onChannelChanged: highlightThrottle.restart()
+    Connections {
+        target: zynqtgui.session_dashboard
+        onSelected_channel_changed: highlightThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad
+        onSong_changed: highlightThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song
+        onIsLoadingChanged: highlightThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song.scenesModel
+        onSelected_track_index_changed: highlightThrottle.restart()
+    }
 
     contentItem: Item {
 //        Connections {

@@ -1280,6 +1280,7 @@ Zynthian.ScreenPage {
                                     anchors.fill: parent
                                     visible: !root.songMode && !root.displaySceneButtons
 
+                                    channel: model.channel
                                     backgroundColor: "#000000"
                                     onHighlightedChanged: {
                                         Qt.callLater(function () {

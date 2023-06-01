@@ -57,7 +57,15 @@ Zynthian.ScreenPage {
     property QtObject selectedClip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                         ? component.selectedChannel.getClipsModelByPart(selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
                                         : component.selectedChannel.samples[selectedChannel.selectedSlotRow]
-    property bool selectedClipHasWav: selectedClip && selectedClip.path && selectedClip.path.length > 0
+    property bool selectedClipHasWav: false
+    Timer {
+        id: selectedClipHasWavThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            component.selectedClipHasWav = selectedClip && selectedClip.path && selectedClip.path.length > 0;
+        }
+    }
+    onSelectedClipChanged: selectedClipHasWavThrottle.restart()
 
 
     property var cuiaCallback: function(cuia) {
@@ -373,6 +381,14 @@ Zynthian.ScreenPage {
                         enabled: component.selectedClipHasWav
                         opacity: enabled ? 1 : 0.5
                         property Item currentItem: clipSettingsBar
+                        Connections {
+                            target: component
+                            onSelectedClipChanged: {
+                                clipSettingsBarControlObjThrottle.restart();
+                                clipSettingsADSRClipThrottle.restart();
+                                clipSettingsGranulatorClipThrottle.restart();
+                            }
+                        }
                         Sketchpad.ClipSettingsBar {
                             id: clipSettingsBar
                             objectName: "clipSettingsBar"
@@ -380,6 +396,13 @@ Zynthian.ScreenPage {
                             anchors.fill: parent
                             anchors.margins: Kirigami.Units.gridUnit
                             controlObj: component.selectedClip
+                            Timer {
+                                id: clipSettingsBarControlObjThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    clipSettingsBar.controlObj = component.selectedClip;
+                                }
+                            }
                             controlType: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                             ? "bottombar-controltype-clip"
                                             : "bottombar-controltype-channel"
@@ -390,7 +413,14 @@ Zynthian.ScreenPage {
                             objectName: "clipSettingsADSR"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent
-                            clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
+                            clip: null
+                            Timer {
+                                id: clipSettingsADSRClipThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    clipSettingsADSR.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
+                                }
+                            }
                             onSaveMetadata: component.selectedClip.saveMetadata();
                         }
                         Zynthian.ClipGranulatorSettings {
@@ -398,7 +428,14 @@ Zynthian.ScreenPage {
                             objectName: "clipSettingsGranulator"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent;
-                            clip: Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId)
+                            clip: null
+                            Timer {
+                                id: clipSettingsGranulatorClipThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    clipSettingsGranulator.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
+                                }
+                            }
                             onSaveMetadata: component.selectedClip.saveMetadata();
                         }
                     }

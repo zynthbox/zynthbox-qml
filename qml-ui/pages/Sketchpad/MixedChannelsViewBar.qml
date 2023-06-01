@@ -144,6 +144,7 @@ Rectangle {
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
         x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
         ChannelKeyZoneSetup {
+            id: channelKeyZoneSetupItem
             anchors.fill: parent
             implicitWidth: root.width
             implicitHeight: root.height
@@ -152,7 +153,7 @@ Rectangle {
                 id: keyZoneSetupSelectedChannelThrottle
                 interval: 1; running: false; repeat: false;
                 onTriggered: {
-                    root.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null;
+                    channelKeyZoneSetupItem.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null;
                 }
             }
             Connections {
@@ -431,8 +432,27 @@ Rectangle {
                                         Rectangle {
                                             id: delegate
 
-                                            property var volumeControlObj: zynqtgui.fixed_layers.volumeControllers[root.selectedChannel.chainedSounds[index]]
+                                            property var volumeControlObj: null
                                             property real volume: volumeControlObj != null ? volumeControlObj.value/100 : 0
+                                            Timer {
+                                                id: volumeControlObjThrottle
+                                                interval: 1; running: false; repeat: false;
+                                                onTriggered: {
+                                                    delegate.volumeControlObj = zynqtgui.fixed_layers.volumeControllers[root.selectedChannel.chainedSounds[index]];
+                                                }
+                                            }
+                                            Connections {
+                                                target: zynqtgui.fixed_layers
+                                                onVolumeControllersChanged: volumeControlObjThrottle.restart()
+                                            }
+                                            Connections {
+                                                target: root
+                                                onSelectedChannelChanged: volumeControlObjThrottle.restart()
+                                            }
+                                            Connections {
+                                                target: root.selectedChannel
+                                                onChained_sounds_changed: volumeControlObjThrottle.restart()
+                                            }
 
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -562,13 +582,37 @@ Rectangle {
                             RowLayout {
                                 id: waveformContainer
 
-                                property bool showWaveform: root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                            root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                            root.selectedChannel.channelAudioType === "sample-loop"
+                                property bool showWaveform: false
 
-                                property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
-                                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
-                                                            : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                                property QtObject clip: null
+                                Timer {
+                                    id: waveformThrottle
+                                    interval: 1; repeat: false; running: false;
+                                    onTriggered: {
+                                        waveformContainer.clip = root.selectedChannel.channelAudioType === "sample-loop"
+                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                                            : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                                        waveformContainer.showWaveform = root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                                         root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                                         root.selectedChannel.channelAudioType === "sample-loop"
+                                    }
+                                }
+                                Connections {
+                                    target: root
+                                    onSelectedChannelChanged: waveformThrottle.restart()
+                                }
+                                Connections {
+                                    target: root.selectedChannel
+                                    onChannel_audio_type_changed: waveformThrottle.restart()
+                                }
+                                Connections {
+                                    target: zynqtgui.sketchpad
+                                    onSong_changed: waveformThrottle.restart()
+                                }
+                                Connections {
+                                    target: zynqtgui.sketchpad.song.scenesModel
+                                    onSelected_track_index_changed: waveformThrottle.restart()
+                                }
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
@@ -586,7 +630,7 @@ Rectangle {
                                         Layout.fillHeight: false
                                         font.pointSize: 9
                                         opacity: waveformContainer.showWaveform ? 1 : 0
-                                        text: qsTr("Wave : %1").arg(waveformContainer.clip.path.split("/").pop())
+                                        text: waveformContainer.clip ? qsTr("Wave : %1").arg(waveformContainer.clip.filename) : ""
                                     }
 
                                     Rectangle {

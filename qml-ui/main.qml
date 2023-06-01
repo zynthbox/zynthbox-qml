@@ -741,7 +741,7 @@ Kirigami.AbstractApplicationWindow {
 
             Timer {
                 id: synthButtonSoundNameThrottle
-                interval: 1; repeat: false; running: false;
+                interval: 0; repeat: false; running: false;
                 onTriggered: {
                     var text = "";
 
@@ -802,7 +802,7 @@ Kirigami.AbstractApplicationWindow {
             }
             Timer {
                 id: presetButtonTextThrottle
-                interval: 1; running: false; repeat: false;
+                interval: 0; running: false; repeat: false;
                 onTriggered: {
                     var text = "";
 
@@ -971,7 +971,7 @@ Kirigami.AbstractApplicationWindow {
     }
     Timer {
         id: selectedChannelThrottle
-        interval: 1; repeat: false; running: false;
+        interval: 0; repeat: false; running: false;
         onTriggered: {
             root.selectedChannel = root.channels[zynqtgui.session_dashboard.selectedChannel]
         }

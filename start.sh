@@ -101,14 +101,14 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=0
 export QT_QPA_PLATFORMTHEME=generic
 
 if command -v kwin_x11 &> /dev/null; then
-    kwin_x11&
-    
+    kwin_x11 &
+
     # Enable qml debuuger if ZYNTHBOX_DEBUG env variable is set
-    if [ -z "$ZYNTHBOX_DEBUG" ]; then    
+    if [ -z "$ZYNTHBOX_DEBUG" ]; then
         export ZYNTHIAN_LOG_LEVEL=20
-        
+
         python3 -X faulthandler ./bootlog_window.py &
-        ./zynthian_qt_gui.py
+        taskset --cpu-list 0-3 ./zynthian_qt_gui.py
     else
         export ZYNTHIAN_LOG_LEVEL=10
         extra_args=""
@@ -118,14 +118,14 @@ if command -v kwin_x11 &> /dev/null; then
         fi
 
         python3 -X faulthandler ./bootlog_window.py &
-        python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
+        taskset --cpu-list 0-3 python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
     fi
 
     # If control reaches here it means the application exited.
     # Application should never exit by itself and should always be running.
     # Restart application
-    systemctl restart jack2 zynthian
-else        
+    systemctl restart jack2 mod-ttymidi zynthbox-qml
+else
     echo "ERROR: kwin was not installed. Exiting."
     exit 1
 fi

@@ -3363,6 +3363,8 @@ class zynthian_gui(QObject):
         self.displayMainWindow.emit()
         self.isBootingComplete = True
 
+        os.sched_setaffinity(os.getpid(), [3])
+
         if bootlog_fifo is not None:
             os.write(bootlog_fifo, "play-extro\n".encode())
 

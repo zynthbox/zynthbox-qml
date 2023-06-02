@@ -55,13 +55,15 @@ can just spend their time doing basically just that and not get interrupted by
 heavy things. So, we add the line `CPUAffinity=3` to the `[Service]` sections
 of the files:
 
-`/etc/systemd/system/dbus-org.bluez.service`
-`/etc/systemd/system/dbus-org.freedesktop.Avahi.service`
-`/etc/systemd/system/dbus-org.freedesktop.ModemManager1.service`
-`/etc/systemd/system/dbus-org.freedesktop.timesync1.service`
-`/etc/systemd/system/sshd.service`
-`/etc/systemd/system/zynthian-webconf.service`
-`/etc/systemd/system/zynthian-webconf-fmserver.service`
+```
+/etc/systemd/system/dbus-org.bluez.service
+/etc/systemd/system/dbus-org.freedesktop.Avahi.service
+/etc/systemd/system/dbus-org.freedesktop.ModemManager1.service
+/etc/systemd/system/dbus-org.freedesktop.timesync1.service
+/etc/systemd/system/sshd.service
+/etc/systemd/system/zynthian-webconf.service
+/etc/systemd/system/zynthian-webconf-fmserver.service
+```
 
 This might seem to contrast with our instructions to run everything on the
 first three cores during bootup, however the intention here is to allow kernel

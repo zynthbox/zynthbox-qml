@@ -550,16 +550,16 @@ def audio_autoconnect(force=False):
     # ### END Bluetooth ports connection
 
     # Connect SamplerSynth's global effected to the global effects passthrough
-    for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), globalFx1InputPorts):
+    for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), globalFx1InputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass
-    for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), globalFx2InputPorts):
+    for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), globalFx2InputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass
     # Disconnect global effected port from system playback
-    for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
+    for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
         try:
             #logging.info(f"Disconnecting global effected port from {port[1]}")
             jclient.disconnect(port[0], port[1])
@@ -586,7 +586,7 @@ def audio_autoconnect(force=False):
         for channelId in range(0, 10):
             channel = song.channelsModel.getChannel(channelId)
             if channel is not None:
-                channelPorts = jclient.get_ports(f"SamplerSynth-channel_{channelId + 1}:", is_audio=True, is_output=True)
+                channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}-", is_audio=True, is_output=True)
                 # Firstly, attempt to connect the channel to any effects attached to the channel
                 channelHasEffects = False
                 if len(channel.chainedSounds) > 0:
@@ -768,7 +768,7 @@ def audio_autoconnect(force=False):
 
     ### Connect FXPassthrough-ChannelX dry and wet outputs to designated ports
     for channel_index in range(song.channelsModel.count):
-        channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels-Channel{channel_index+1}", is_audio=True, is_input=True)
+        channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channel_index+1}", is_audio=True, is_input=True)
         globalPlaybackInputPorts = jclient.get_ports(f"GlobalPlayback", is_audio=True, is_input=True)
 
         for port in zip(jclient.get_ports(f"FXPassthrough-Channel{channel_index+1}:wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
@@ -798,11 +798,11 @@ def audio_autoconnect(force=False):
     ### END Connect FXPassthrough-ChannelX dry and wet outputs to designated ports
 
     ### Connect Samplersynth uneffected ports to globalPlayback client and disconnect from system playback
-    for port in zip(jclient.get_ports(f"SamplerSynth-global-uneffected", is_audio=True, is_output=True), playback_ports):
+    for port in zip(jclient.get_ports(f"SamplerSynth:global-uneffected", is_audio=True, is_output=True), playback_ports):
         try:
             jclient.disconnect(port[0], port[1])
         except: pass
-    for port in zip(jclient.get_ports(f"SamplerSynth-global-uneffected", is_audio=True, is_output=True), globalPlaybackInputPorts):
+    for port in zip(jclient.get_ports(f"SamplerSynth:global-uneffected", is_audio=True, is_output=True), globalPlaybackInputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass
@@ -817,7 +817,7 @@ def audio_autoconnect(force=False):
         except:
             logging.debug("Error connecting ports")
 
-    for port in zip(globalPlaybackDryOutputPorts, jclient.get_ports("AudioLevels-SystemPlayback:", is_input=True, is_audio=True)):
+    for port in zip(globalPlaybackDryOutputPorts, jclient.get_ports("AudioLevels:SystemPlayback-", is_input=True, is_audio=True)):
         try:
             jclient.connect(port[0], port[1])
         except:
@@ -948,7 +948,7 @@ def get_audio_input_ports(exclude_system_playback=False):
         for aip in jclient.get_ports(is_input=True, is_audio=True, is_physical=False):
             parts=aip.name.split(':')
             client_name=parts[0]
-            if client_name=="jack_capture" or client_name[:7]=="effect_" or client_name.startswith("AudioLevels-"):
+            if client_name=="jack_capture" or client_name[:7]=="effect_" or client_name.startswith("AudioLevels:"):
                 continue
             if client_name=="system":
                 if exclude_system_playback:

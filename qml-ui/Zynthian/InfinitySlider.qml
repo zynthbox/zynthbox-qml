@@ -150,7 +150,7 @@ Item {
             enabled: component.applyLowerBound === false || component.lowerBound < component.value
             onClicked: {
                 if (component.applyLowerBound) {
-                    component.value = Math.min(component.lowerBound, component.value - component.increment);
+                    component.value = Math.max(component.lowerBound, component.value - component.increment);
                 } else {
                     component.value = component.value - component.increment;
                 }

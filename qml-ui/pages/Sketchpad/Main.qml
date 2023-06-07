@@ -113,8 +113,31 @@ Zynthian.ScreenPage {
      * Update selected channel volume
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */
-    function updateSelectedChannelVolume(sign) {
-        root.selectedChannel.volume = Zynthian.CommonUtils.clamp(root.selectedChannel.volume + sign, -40, 20)
+    function updateSelectedChannelVolume(sign, showOsd=false) {
+        function valueSetter(value) {
+            root.selectedChannel.volume = Zynthian.CommonUtils.clamp(value - 40, -40, 20)
+            if (showOsd) {
+                applicationWindow().showOsd({
+                    parameterName: "channel_volume",
+                    description: qsTr("%1 Volume").arg(root.selectedChannel.name),
+                    start: 0,
+                    stop: 60,
+                    step: 1,
+                    defaultValue: 40,
+                    currentValue: root.selectedChannel.volume + 40,
+                    startLabel: qsTr("%1 dB").arg(-40),
+                    stopLabel: qsTr("%1 dB").arg(20),
+                    valueLabel: qsTr("%1 dB").arg(root.selectedChannel.volume),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: true,
+                    showVisualZero: true
+                })
+            }
+        }
+
+        // Set OSD value from 0-60 and interpolate actual value to match the new range
+        valueSetter(root.selectedChannel.volume + 40 + sign)
     }
     /**
      * Update clip start position

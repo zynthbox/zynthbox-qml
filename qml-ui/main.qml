@@ -59,11 +59,12 @@ Kirigami.AbstractApplicationWindow {
     }
     property var cuiaCallback: function(cuia) {
         var result = false;
+        var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
 
         switch (cuia) {
             case "KNOB0_UP":
                 if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelVolume(1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     root.updateMetronomeVolume(1)
@@ -72,7 +73,7 @@ Kirigami.AbstractApplicationWindow {
                 break;
             case "KNOB0_DOWN":
                 if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelVolume(-1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     root.updateMetronomeVolume(-1)

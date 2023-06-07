@@ -52,5 +52,5 @@ SegmentModelPicker 1.0 SegmentModelPicker.qml
 DialogQuestion 1.0 DialogQuestion.qml
 AbstractADSRView 1.0 AbstractADSRView.qml
 ADSRClipView 1.0 ADSRClipView.qml
-ClipGranulatorSettings 1.0 ClipGranulatorSettings.qml
+ClipGraineratorSettings 1.0 ClipGraineratorSettings.qml
 InfinitySlider 1.0 InfinitySlider.qml

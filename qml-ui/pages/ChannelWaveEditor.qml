@@ -128,15 +128,15 @@ Zynthian.ScreenPage {
         function goLeft() {
             if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 clipSettingsADSR.previousADSRElement();
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
-                clipSettingsGranulator.previousElement();
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                clipSettingsGrainerator.previousElement();
             }
         }
         function goRight() {
             if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 clipSettingsADSR.nextADSRElement();
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
-                clipSettingsGranulator.nextElement();
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                clipSettingsGrainerator.nextElement();
             }
         }
         function goUp() {
@@ -148,13 +148,13 @@ Zynthian.ScreenPage {
                 } else {
                     clipSettingsADSR.increaseCurrentValue();
                 }
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 if (zynqtgui.altButtonPressed) {
                     for (var i = 0; i < 10; ++i) {
-                        clipSettingsGranulator.increaseCurrentValue();
+                        clipSettingsGrainerator.increaseCurrentValue();
                     }
                 } else {
-                    clipSettingsGranulator.increaseCurrentValue();
+                    clipSettingsGrainerator.increaseCurrentValue();
                 }
             }
         }
@@ -167,13 +167,13 @@ Zynthian.ScreenPage {
                 } else {
                     clipSettingsADSR.decreaseCurrentValue();
                 }
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 if (zynqtgui.altButtonPressed) {
                     for (var i = 0; i < 10; ++i) {
-                        clipSettingsGranulator.decreaseCurrentValue();
+                        clipSettingsGrainerator.decreaseCurrentValue();
                     }
                 } else {
-                    clipSettingsGranulator.decreaseCurrentValue();
+                    clipSettingsGrainerator.decreaseCurrentValue();
                 }
             }
         }
@@ -185,8 +185,8 @@ Zynthian.ScreenPage {
                     component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition + 0.01, 0), component.selectedClip.duration)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.nextADSRElement();
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
-                    clipSettingsGranulator.nextElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.nextElement();
                 }
             }
         }
@@ -198,8 +198,8 @@ Zynthian.ScreenPage {
                     component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition - 0.01, 0), component.selectedClip.duration)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.previousADSRElement();
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
-                    clipSettingsGranulator.previousElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.previousElement();
                 }
             }
         }
@@ -211,8 +211,8 @@ Zynthian.ScreenPage {
                     component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta + 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.increaseCurrentValue();
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
-                    clipSettingsGranulator.increaseCurrentValue();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.increaseCurrentValue();
                 }
             }
         }
@@ -224,8 +224,8 @@ Zynthian.ScreenPage {
                     component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta - 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.decreaseCurrentValue();
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
-                    clipSettingsGranulator.decreaseCurrentValue();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.decreaseCurrentValue();
                 }
             }
         }
@@ -236,7 +236,7 @@ Zynthian.ScreenPage {
                     // Clamp values between 0 and 64
                     component.selectedClip.length = Math.min(Math.max(component.selectedClip.length + 1, 0), 64)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
         }
@@ -247,7 +247,7 @@ Zynthian.ScreenPage {
                     // Clamp values between 0 and 64
                     component.selectedClip.length = Math.min(Math.max(component.selectedClip.length - 1, 0), 64)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
         }
@@ -361,11 +361,11 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             text: qsTr("Granular")
                             enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsGranulator"
+                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
                             MouseArea {
                                 anchors.fill: parent;
                                 enabled: component.selectedClipHasWav
-                                onClicked: clipSettingsSectionView.currentItem = clipSettingsGranulator
+                                onClicked: clipSettingsSectionView.currentItem = clipSettingsGrainerator
                             }
                         }
                     }
@@ -386,7 +386,7 @@ Zynthian.ScreenPage {
                             onSelectedClipChanged: {
                                 clipSettingsBarControlObjThrottle.restart();
                                 clipSettingsADSRClipThrottle.restart();
-                                clipSettingsGranulatorClipThrottle.restart();
+                                clipSettingsGraineratorClipThrottle.restart();
                             }
                         }
                         Sketchpad.ClipSettingsBar {
@@ -423,17 +423,17 @@ Zynthian.ScreenPage {
                             }
                             onSaveMetadata: component.selectedClip.saveMetadata();
                         }
-                        Zynthian.ClipGranulatorSettings {
-                            id: clipSettingsGranulator
-                            objectName: "clipSettingsGranulator"
+                        Zynthian.ClipGraineratorSettings {
+                            id: clipSettingsGrainerator
+                            objectName: "clipSettingsGrainerator"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent;
                             clip: null
                             Timer {
-                                id: clipSettingsGranulatorClipThrottle
+                                id: clipSettingsGraineratorClipThrottle
                                 interval: 1; running: false; repeat: false;
                                 onTriggered: {
-                                    clipSettingsGranulator.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
+                                    clipSettingsGrainerator.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
                                 }
                             }
                             onSaveMetadata: component.selectedClip.saveMetadata();

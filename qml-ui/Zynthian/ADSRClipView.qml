@@ -34,7 +34,6 @@ Item {
     property QtObject clip
     property int currentADSRElement: 0
     signal saveMetadata()
-    property bool showGranularSettings: clip && clip.granular && _private.settingsCategory === 1
     function nextADSRElement() {
         if (currentADSRElement === 3) {
             currentADSRElement = 0;
@@ -111,6 +110,7 @@ Item {
         id: _private
         property int settingsCategory: 0
     }
+    property bool showGranularSettings: clip && clip.granular && _private.settingsCategory === 1
     RowLayout {
         anchors.fill: parent
         ColumnLayout {
@@ -121,7 +121,7 @@ Item {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: qsTr("ADSR")
+                text: qsTr("Notes")
                 checked: _private.settingsCategory === 0
                 MouseArea {
                     anchors.fill: parent;
@@ -131,7 +131,7 @@ Item {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: qsTr("Granular")
+                text: qsTr("Grains")
                 checked: _private.settingsCategory === 1
                 MouseArea {
                     anchors.fill: parent;

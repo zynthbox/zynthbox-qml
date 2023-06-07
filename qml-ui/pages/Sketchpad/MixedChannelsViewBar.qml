@@ -65,7 +65,7 @@ Rectangle {
     function cuiaCallback(cuia) {
         var returnValue = false;
         var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-
+        console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
                 if (zynqtgui.session_dashboard.selectedChannel > 0) {
@@ -99,15 +99,11 @@ Rectangle {
                 }
                 break;
             case "KNOB0_UP":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
-                }
+                pageManager.getPage("sketchpad").updateSelectedChannelVolume(1, true)
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
-                }
+                pageManager.getPage("sketchpad").updateSelectedChannelVolume(-1, true)
                 returnValue = true;
                 break;
             case "KNOB1_UP":

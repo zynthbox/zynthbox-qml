@@ -133,6 +133,11 @@ Zynthian.Popup {
     onOpened: {
         zynqtgui.recordingPopupActive = true
 
+        // Set selectedChannel if not already set
+        if (root.selectedChannel == null) {
+            selectedChannelThrottle.restart()
+        }
+
         // Reset recordingType combo model to selected value when dialog opens
         for (var i=0; i<recordingTypeComboModel.count; i++) {
             if (recordingTypeComboModel.get(i).value === zynqtgui.sketchpad.recordingType) {
@@ -425,7 +430,9 @@ Zynthian.Popup {
                                 font.pointSize: 8
                                 value: visible
                                        ? zynqtgui.sketchpad.recordingSource === "internal"
-                                          ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                          ? root.selectedChannel != null
+                                            ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                            : -100
                                           : Zynthbox.AudioLevels.captureA
                                        : -100
                                 style: GaugeStyle {
@@ -456,7 +463,9 @@ Zynthian.Popup {
                                 font.pointSize: 8
                                 value: visible
                                         ? zynqtgui.sketchpad.recordingSource === "internal"
-                                           ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                           ? root.selectedChannel != null
+                                             ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                             : -100
                                            : Zynthbox.AudioLevels.captureB
                                         : -100
                                 style: GaugeStyle {

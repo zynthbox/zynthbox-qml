@@ -3006,9 +3006,9 @@ class zynthian_gui(QObject):
                 elif self.exit_code == 101:
                     Popen(("reboot"))
                 elif self.exit_code == 102:
-                    Popen(("systemctl", "restart", "jack2", "zynthian", "mod-ttymidi"))
+                    Popen(("systemctl", "restart", "jack2", "zynthbox-qml", "mod-ttymidi"))
                 else:
-                    Popen(("systemctl", "restart", "jack2", "zynthian", "mod-ttymidi"))
+                    Popen(("systemctl", "restart", "jack2", "zynthbox-qml", "mod-ttymidi"))
             # Refresh Current Layer
             elif self.curlayer and not self.loading:
                 self.curlayer.refresh()

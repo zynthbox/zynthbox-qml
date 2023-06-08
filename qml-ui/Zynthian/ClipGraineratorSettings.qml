@@ -637,7 +637,7 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 Kirigami.Heading {
                     level: 2
-                    text: qsTr("%1 ▶").arg((component.clip ? 1 - component.clip.grainPitchPriority : 0).toFixed(2))
+                    text: qsTr("%1% ▶").arg(Math.round(component.clip ? 100 - (100 * component.clip.grainPitchPriority) : 0))
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -656,7 +656,7 @@ Item {
                 }
                 Kirigami.Heading {
                     level: 2
-                    text: qsTr("◀ %1").arg((component.clip ? component.clip.grainPitchPriority : 0).toFixed(2))
+                    text: qsTr("◀ %1%").arg(Math.round(component.clip ? 100 * component.clip.grainPitchPriority : 0))
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                 }

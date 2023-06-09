@@ -80,7 +80,7 @@ class zynthian_basic_engine:
             try:
                 logging.debug("Command: {}".format(self.command))
                 self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
-                os.sched_setaffinity(self.proc.pid, [0,1,2])
+                #os.sched_setaffinity(self.proc.pid, [0,1,2])
 
                 self.proc.delaybeforesend = 0
 

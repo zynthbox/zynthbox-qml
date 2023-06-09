@@ -33,7 +33,7 @@ from subprocess import check_output
 logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=logging.DEBUG)
 
 if __name__ == "__main__":
-    os.sched_setaffinity(os.getpid(), [3])
+    #os.sched_setaffinity(os.getpid(), [3])
     watchdog_data = ""
     watchdog_fifo = None
     lastOvertempState = False

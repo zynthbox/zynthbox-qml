@@ -108,7 +108,8 @@ if command -v kwin_x11 &> /dev/null; then
         export ZYNTHIAN_LOG_LEVEL=20
 
         python3 -X faulthandler ./bootlog_window.py &
-        taskset --cpu-list 0-3 ./zynthian_qt_gui.py
+        #taskset --cpu-list 0-3
+        ./zynthian_qt_gui.py
     else
         export ZYNTHIAN_LOG_LEVEL=10
         extra_args=""
@@ -118,7 +119,8 @@ if command -v kwin_x11 &> /dev/null; then
         fi
 
         python3 -X faulthandler ./bootlog_window.py &
-        taskset --cpu-list 0-3 python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
+        #taskset --cpu-list 0-3
+        python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
     fi
 
     # If control reaches here it means the application exited.

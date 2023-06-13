@@ -546,7 +546,7 @@ Rectangle {
                                                     delegateMouseArea.dragHappened = false
                                                 }
                                                 onMouseXChanged: {
-                                                    if (mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                    if (delegate.volumeControlObj != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         var newVal = (mouse.x / delegate.width) * 100
                                                         delegateMouseArea.dragHappened = true
                                                         delegate.volumeControlObj.value = newVal

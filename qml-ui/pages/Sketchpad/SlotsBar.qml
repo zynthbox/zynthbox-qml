@@ -45,7 +45,7 @@ Rectangle {
     property alias samplesButton: samplesButton
     property alias fxButton: fxButton
     property alias soundCombinatorButton: soundCombinatorButton
-    property bool songMode: false;//zynqtgui.sketchpad.song.sketchesModel.songMode
+    property bool songMode: false;//Zynthbox.SegmentHandler.songMode
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
     readonly property QtObject song: zynqtgui.sketchpad.song

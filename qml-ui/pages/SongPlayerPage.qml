@@ -54,7 +54,7 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Record Song")
-            enabled: zynqtgui.sketchpad.song.sketchesModel.songMode
+            enabled: Zynthbox.SegmentHandler.songMode
                 ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0
                 : true
             onTriggered: {
@@ -77,9 +77,9 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.preferredWidth: component.width * 2 / 12
                 text: qsTr("Song Mode")
-                checked: zynqtgui.sketchpad.song.sketchesModel.songMode
+                checked: Zynthbox.SegmentHandler.songMode
                 onClicked: {
-                    zynqtgui.sketchpad.song.sketchesModel.songMode = !zynqtgui.sketchpad.song.sketchesModel.songMode;
+                    Zynthbox.SegmentHandler.songMode = !Zynthbox.SegmentHandler.songMode;
                 }
             }
             Repeater {
@@ -104,7 +104,7 @@ Zynthian.ScreenPage {
 /// BEGIN Not-song-mode playbackery stuff
         RowLayout {
             Layout.fillWidth: true
-            visible: !zynqtgui.sketchpad.song.sketchesModel.songMode
+            visible: !Zynthbox.SegmentHandler.songMode
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
@@ -116,7 +116,7 @@ Zynthian.ScreenPage {
 /// BEGIN Song-mode playbackery stuff
         RowLayout {
             Layout.fillWidth: true
-            visible: zynqtgui.sketchpad.song.sketchesModel.songMode && segmentsRepeater.count === 0
+            visible: Zynthbox.SegmentHandler.songMode && segmentsRepeater.count === 0
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
@@ -126,7 +126,7 @@ Zynthian.ScreenPage {
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-            visible: zynqtgui.sketchpad.song.sketchesModel.songMode && segmentsRepeater.count > 0
+            visible: Zynthbox.SegmentHandler.songMode && segmentsRepeater.count > 0
             spacing: 0
             Kirigami.Theme.inherit: false
             Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -180,7 +180,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.minimumHeight: 1
             Layout.maximumHeight: 1
-            visible: zynqtgui.sketchpad.song.sketchesModel.songMode && segmentsRepeater.totalDuration > 0
+            visible: Zynthbox.SegmentHandler.songMode && segmentsRepeater.totalDuration > 0
             Item {
                 height: 1
                 width: 1

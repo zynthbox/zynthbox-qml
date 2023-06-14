@@ -42,7 +42,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynqtgui.sketchpad.song
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
-    property bool songMode: false;//zynqtgui.sketchpad.song.sketchesModel.songMode
+    property bool songMode: false;//Zynthbox.SegmentHandler.songMode
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -841,7 +841,7 @@ Zynthian.ScreenPage {
                         text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         onPressed: {
                             root.displayTrackButtons = !root.displayTrackButtons
-                            zynqtgui.sketchpad.song.sketchesModel.songMode = false
+                            Zynthbox.SegmentHandler.songMode = false
                             bottomStack.slotsBar.channelButton.checked = true
                             zynqtgui.sketchpad.displaySceneButtons = false
                         }
@@ -862,7 +862,7 @@ Zynthian.ScreenPage {
                             if (zynqtgui.sketchpad.isMetronomeRunning) {
                                 applicationWindow().showPassiveNotification("Cannot switch song mode when timer is running", 1500)
                             } else {
-                                zynqtgui.sketchpad.song.sketchesModel.songMode = !zynqtgui.sketchpad.song.sketchesModel.songMode
+                                Zynthbox.SegmentHandler.songMode = !Zynthbox.SegmentHandler.songMode
 
                                 if (root.songMode) {
                                     bottomStack.slotsBar.partButton.checked = true
@@ -892,7 +892,7 @@ Zynthian.ScreenPage {
                             } else {
                                 zynqtgui.sketchpad.displaySceneButtons = true
                                 bottomStack.slotsBar.partButton.checked = true
-                                zynqtgui.sketchpad.song.sketchesModel.songMode = false
+                                Zynthbox.SegmentHandler.songMode = false
                                 root.displayTrackButtons = false
                             }
                         }

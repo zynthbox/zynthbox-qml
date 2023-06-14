@@ -124,6 +124,9 @@ class sketchpad_song(QObject):
 
                 self.__sketches_model__.add_sketch(sketch_index, sketch)
 
+        # Save updated bpm value when it changes
+        Zynthbox.SyncTimer.instance().bpmChanged.connect(self.setTrackBpmFromCurrent)
+
         # Create wav dir for recording
         (Path(self.sketchpad_folder) / 'wav').mkdir(parents=True, exist_ok=True)
         # Create sampleset dir if not exists
@@ -511,6 +514,7 @@ class sketchpad_song(QObject):
     def setBpmFromTrack(self):
         Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
 
+    @Slot()
     def setTrackBpmFromCurrent(self):
         bpm = math.floor(Zynthbox.SyncTimer.instance().getBpm())
         if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != bpm:

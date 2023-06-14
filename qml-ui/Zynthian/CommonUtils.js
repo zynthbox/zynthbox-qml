@@ -13,9 +13,8 @@ function startMetronomeAndPlayback() {
     } else if (zynqtgui.altButtonPressed) {
         playInSongMode = true;
     }
-    zynqtgui.sketchpad.song.sketchesModel.songMode = playInSongMode;
 
-    if (zynqtgui.sketchpad.song.sketchesModel.songMode) {
+    if (playInSongMode) {
         if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0) {
             Zynthbox.SegmentHandler.startPlayback(0, 0);
         }
@@ -38,7 +37,7 @@ function startMetronomeAndPlayback() {
 }
 
 function stopMetronomeAndPlayback() {
-    if (zynqtgui.sketchpad.song.sketchesModel.songMode) {
+    if (Zynthbox.SegmentHandler.songMode) {
         zynqtgui.sketchpad.stopAllPlayback();
         zynqtgui.callable_ui_action("ALL_NOTES_OFF")
         Zynthbox.SegmentHandler.stopPlayback();
@@ -84,7 +83,6 @@ function stopMetronomeAndPlayback() {
         zynqtgui.sketchpad.resetMetronome();
         console.log("Metronome and Playback Stopped");
     }
-    zynqtgui.sketchpad.song.sketchesModel.songMode = false;
 }
 
 function toggleLayerChaining(layer) {

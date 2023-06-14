@@ -79,7 +79,6 @@ Zynthian.ScreenPage {
                 text: qsTr("Song Mode")
                 checked: Zynthbox.SegmentHandler.songMode
                 onClicked: {
-                    Zynthbox.SegmentHandler.songMode = !Zynthbox.SegmentHandler.songMode;
                 }
             }
             Repeater {

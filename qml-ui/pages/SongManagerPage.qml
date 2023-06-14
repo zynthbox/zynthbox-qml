@@ -137,9 +137,6 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Export Song")
-            enabled: Zynthbox.SegmentHandler.songMode
-                ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0
-                : true
             onTriggered: {
                 multichannelRecorderPopup.recordSong(zynqtgui.sketchpad.song)
             }

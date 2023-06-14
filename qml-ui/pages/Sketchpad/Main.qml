@@ -841,40 +841,10 @@ Zynthian.ScreenPage {
                         text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         onPressed: {
                             root.displayTrackButtons = !root.displayTrackButtons
-                            Zynthbox.SegmentHandler.songMode = false
                             bottomStack.slotsBar.channelButton.checked = true
                             zynqtgui.sketchpad.displaySceneButtons = false
                         }
                     }
-
-                    // Disable song mode button. This will be done in a new page
-                    /*TableHeader {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
-                        Layout.minimumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
-                        Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 4 - sketchpadSketchHeadersColumn.spacing
-
-                        text: qsTr("Song Mode")
-                        highlightOnFocus: false
-                        highlighted: root.songMode
-                        onPressed: {
-                            if (zynqtgui.sketchpad.isMetronomeRunning) {
-                                applicationWindow().showPassiveNotification("Cannot switch song mode when timer is running", 1500)
-                            } else {
-                                Zynthbox.SegmentHandler.songMode = !Zynthbox.SegmentHandler.songMode
-
-                                if (root.songMode) {
-                                    bottomStack.slotsBar.partButton.checked = true
-                                } else {
-                                    bottomStack.slotsBar.channelButton.checked = true
-                                }
-
-                                root.displayTrackButtons = false
-                                zynqtgui.sketchpad.displaySceneButtons = false
-                            }
-                        }
-                    }*/
 
                     TableHeader {
                         Layout.fillWidth: true

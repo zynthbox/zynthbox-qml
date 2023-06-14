@@ -464,6 +464,11 @@ Rectangle {
                                 target: zynqtgui.session_dashboard
                                 onSelected_channel_changed: channelHighlightedThrottle.restart()
                             }
+                            // Make sure to highlight first column correctly after booting is complete
+                            Connections {
+                                target: zynqtgui
+                                onIsBootingCompleteChanged: channelHighlightedThrottle.restart()
+                            }
     //                            property int selectedRow: 0
                             property int channelIndex: index
                             property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(index)

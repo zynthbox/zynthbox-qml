@@ -39,7 +39,6 @@ class sketchpad_sketches_model(QAbstractListModel):
         self.__song = song
         self.__selected_sketch_index = 0
         self.__sketches: dict[int, sketchpad_sketch] = {}
-        self.__song_mode = False
 
     def serialize(self):
         logging.debug("### Serializing Sketches Model")
@@ -121,20 +120,6 @@ class sketchpad_sketches_model(QAbstractListModel):
 
     selectedSketch = Property(QObject, get_selectedSketch, notify=selectedSketchIndexChanged)
     ### END Property selectedSketch
-
-    ### Property songMode
-    def get_songMode(self):
-        return self.__song_mode
-
-    def set_songMode(self, value):
-        if value != self.__song_mode:
-            self.__song_mode = value
-            self.songModeChanged.emit()
-
-    songModeChanged = Signal()
-
-    songMode = Property(bool, get_songMode, set_songMode, notify=songModeChanged)
-    ### END Property songMode
 
     @Slot(int, result=QObject)
     def getSketch(self, sketch_index):

@@ -424,7 +424,7 @@ Item {
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 0
-                onValueChanged: component.clip.grainInterval = value
+                onValueChanged: if (component.clip) { component.clip.grainInterval = value }
                 Connections {
                     target: component.clip
                     onGrainIntervalChanged: grainIntervalSlider.value = component.clip.grainInterval
@@ -443,7 +443,7 @@ Item {
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 1
-                onValueChanged: component.clip.grainIntervalAdditional = value
+                onValueChanged: if (component.clip) { component.clip.grainIntervalAdditional = value }
                 Connections {
                     target: component.clip
                     onGrainIntervalAdditionalChanged: grainIntervalAdditionalSlider.value = component.clip.grainIntervalAdditional
@@ -478,7 +478,7 @@ Item {
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 2
-                onValueChanged: component.clip.grainSize = value
+                onValueChanged: if (component.clip) { component.clip.grainSize = value }
                 Connections {
                     target: component.clip
                     onGrainSizeChanged: grainSizeSlider.value = component.clip.grainSize
@@ -497,7 +497,7 @@ Item {
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 3
-                onValueChanged: component.clip.grainSizeAdditional = value
+                onValueChanged: if (component.clip) { component.clip.grainSizeAdditional = value }
                 Connections {
                     target: component.clip
                     onGrainSizeAdditionalChanged: grainSizeAdditionalSlider.value = component.clip.grainSizeAdditional
@@ -555,7 +555,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 0
-                onValueChanged: component.clip.grainPanMinimum = value
+                onValueChanged: if (component.clip) { component.clip.grainPanMinimum = value }
                 Connections {
                     target: component.clip
                     onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.clip.grainPanMinimum
@@ -573,7 +573,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 1
-                onValueChanged: component.clip.grainPanMaximum = value
+                onValueChanged: if (component.clip) { component.clip.grainPanMaximum = value }
                 Connections {
                     target: component.clip
                     onGrainPanMaximumChanged: grainPanMaximumSlider.value = component.clip.grainPanMaximum
@@ -607,7 +607,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 2
-                onValueChanged: component.clip.grainPitchMinimum1 = value
+                onValueChanged: if (component.clip) { component.clip.grainPitchMinimum1 = value }
                 Connections {
                     target: component.clip
                     onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.clip.grainPitchMinimum1
@@ -625,7 +625,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 3
-                onValueChanged: component.clip.grainPitchMaximum1 = value
+                onValueChanged: if (component.clip) { component.clip.grainPitchMaximum1 = value }
                 Connections {
                     target: component.clip
                     onGrainPitchMaximum1Changed: grainPitchMaximum1Slider.value = component.clip.grainPitchMaximum1
@@ -679,7 +679,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 5
-                onValueChanged: component.clip.grainPitchMinimum2 = value
+                onValueChanged: if (component.clip) { component.clip.grainPitchMinimum2 = value }
                 Connections {
                     target: component.clip
                     onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.clip.grainPitchMinimum2
@@ -697,7 +697,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 6
-                onValueChanged: component.clip.grainPitchMaximum2 = value
+                onValueChanged: if (component.clip) { component.clip.grainPitchMaximum2 = value }
                 Connections {
                     target: component.clip
                     onGrainPitchMaximum2Changed: grainPitchMaximum2Slider.value = component.clip.grainPitchMaximum2

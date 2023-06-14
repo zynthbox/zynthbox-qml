@@ -70,7 +70,7 @@ Zynthian.Popup {
             }
             Zynthbox.AudioLevels.setChannelToRecord(channelIndex, shouldRecord);
         }
-        if (song.sketchesModel.songMode) {
+        if (_private.songMode) {
             leadinSpin.value = 0;
             fadeoutSpin.value = 8;
         } else {
@@ -127,8 +127,10 @@ Zynthian.Popup {
                 id: _private
                 property double recordingProgress: -1
                 property QtObject song
+                // This is a bit of a hackery type thing, but songMode in this context means "starting playback will be in song mode", so... this will do the trick
+                property bool songMode: zynqtgui.current_screen_id === "song_manager"
 
-                property int songDurationInTicks: song && song.sketchesModel.songMode
+                property int songDurationInTicks: song && _private.songMode
                     ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
                     : Zynthbox.PlayGridManager.syncTimer.getMultiplier() * songDurationSpin.value
                 property int leadinDurationInTicks: leadinSpin.value * Zynthbox.PlayGridManager.syncTimer.getMultiplier()
@@ -361,7 +363,7 @@ Zynthian.Popup {
             QQC2.SpinBox{
                 id: songDurationSpin
                 Layout.fillWidth: true
-                visible: _private.song && !_private.song.sketchesModel.songMode
+                visible: _private.song && !(zynqtgui.current_screen_id == "song_manager")
                 Kirigami.FormData.label: qsTr("Recording duration in beats:")
                 enabled: !_private.isRecording
                 value: 32
@@ -394,14 +396,14 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            visible: _private.song && !_private.song.sketchesModel.songMode
+            visible: _private.song && !_private.songMode
             opacity: _private.recordingProgress > -1 ? 1 : 0.3
             value: _private.recordingProgress
         }
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit
-            visible: _private.song && _private.song.sketchesModel.songMode && segmentsRepeater.count > 0
+            visible: _private.song && _private.songMode && segmentsRepeater.count > 0
             Row {
                 id: songProgressRow
                 anchors.fill: parent

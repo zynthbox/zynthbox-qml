@@ -550,6 +550,24 @@ Zynthian.ScreenPage {
                     }
                 }
 
+                QQC2.Button {
+                    text: qsTr("Play From Here")
+                    Layout.fillWidth: true
+                    onClicked: {
+                        console.log(
+                            "Playing From Segment",
+                            segmentDetails.selectedSegment.segmentId,
+                            " : Offset",
+                            segmentDetails.selectedSegment.getOffsetInBeats()
+                        )
+
+                        Zynthbox.SegmentHandler.startPlayback(
+                            Zynthbox.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
+                            0
+                        )
+                    }
+                }
+
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true

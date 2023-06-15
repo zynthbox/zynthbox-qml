@@ -42,7 +42,6 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynqtgui.sketchpad.song
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
-    property bool songMode: false;//Zynthbox.SegmentHandler.songMode
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -360,12 +359,10 @@ Zynthian.ScreenPage {
             text: qsTr("Mixer")
             checked: bottomStack.slotsBar.mixerButton.checked
             onTriggered: {
-                if (!root.songMode) {
-                    if (bottomStack.slotsBar.mixerButton.checked) {
-                        bottomStack.slotsBar.channelButton.checked = true
-                    } else {
-                        bottomStack.slotsBar.mixerButton.checked = true
-                    }
+                if (bottomStack.slotsBar.mixerButton.checked) {
+                    bottomStack.slotsBar.channelButton.checked = true
+                } else {
+                    bottomStack.slotsBar.mixerButton.checked = true
                 }
             }
         },
@@ -771,15 +768,15 @@ Zynthian.ScreenPage {
                         ? zynqtgui.slotsBarPartActive
                         : root.lastSelectedObj != null
                             ? ["sketchpad_segment", "sketchpad_sketch"].indexOf(root.lastSelectedObj.className) >= 0
-                                ? root.songMode
+                                ? false
                                 : root.lastSelectedObj.className === "sketchpad_channel"
-                                    ? !root.songMode && !root.displayTrackButtons
+                                    ? !root.displayTrackButtons
                                     : root.lastSelectedObj.className === "sketchpad_clip"
-                                        ? !root.songMode && !root.displaySceneButtons
+                                        ? !root.displaySceneButtons
                                         : root.lastSelectedObj.className === "sketchpad_scene"
-                                            ? !root.songMode && root.displaySceneButtons
+                                            ? root.displaySceneButtons
                                             : root.lastSelectedObj.className === "sketchpad_track"
-                                                ? !root.songMode && root.displayTrackButtons
+                                                ? root.displayTrackButtons
                                                 : false
                             : false
 
@@ -837,7 +834,7 @@ Zynthian.ScreenPage {
                         Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
 
                         highlightOnFocus: false
-                        highlighted: !root.songMode && root.displayTrackButtons
+                        highlighted: root.displayTrackButtons
                         text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         onPressed: {
                             root.displayTrackButtons = !root.displayTrackButtons
@@ -850,11 +847,10 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        text: root.songMode ? qsTr("Sketch") : qsTr("Scene")
-                        subText: root.songMode ? root.song.sketchesModel.selectedSketch.name : root.song.scenesModel.selectedSceneName
+                        text: qsTr("Scene")
+                        subText: root.song.scenesModel.selectedSceneName
                         highlightOnFocus: false
-                        highlighted: !root.songMode &&
-                                     root.displaySceneButtons
+                        highlighted: root.displaySceneButtons
                         onPressed: {
                             if (zynqtgui.sketchpad.displaySceneButtons) {
                                 zynqtgui.sketchpad.displaySceneButtons = false
@@ -862,7 +858,6 @@ Zynthian.ScreenPage {
                             } else {
                                 zynqtgui.sketchpad.displaySceneButtons = true
                                 bottomStack.slotsBar.partButton.checked = true
-                                Zynthbox.SegmentHandler.songMode = false
                                 root.displayTrackButtons = false
                             }
                         }
@@ -887,23 +882,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
                         spacing: 1
 
-                        Connections {
-                            target: root.song.sketchesModel.selectedSketch.segmentsModel
-                            onSelectedSegmentIndexChanged: {
-                                // When selectedSegmentIndex changes (i.e. being set with Big Knob), adjust visible segments so that selected segment is brought into view
-                                if (root.songMode) {
-                                    if (root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex > (sketchpadClipsColumn.segmentOffset+7)) {
-                                        console.log("selected segment is outside visible segments on the right :", root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, sketchpadClipsColumn.segmentOffset, Math.min(sketchpadClipsColumn.maximumSegmentOffset, root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7))
-                                        sketchpadClipsColumn.segmentOffset = Math.min(sketchpadClipsColumn.maximumSegmentOffset, root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7)
-                                    } else if (root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < sketchpadClipsColumn.segmentOffset) {
-                                        console.log("selected segment is outside visible segments on the left :", root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, sketchpadClipsColumn.segmentOffset, root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
-                                        sketchpadClipsColumn.segmentOffset = root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
-                                    }
-                                }
-                            }
-                        }
-
-                        // Display 10 header buttons which will show channel header buttons when song mode is not active and segment buttons when song mode is active
+                        // Display 10 header buttons which will show channel header buttons
                         Repeater {
                             id: channelsHeaderRepeater
 
@@ -922,7 +901,7 @@ Zynthian.ScreenPage {
                                     property QtObject channel: root.song.channelsModel.getChannel(index)
                                     property QtObject sketch: root.song.sketchesModel.getSketch(index)
 
-                                    visible: !root.songMode && root.displayTrackButtons
+                                    visible: root.displayTrackButtons
                                     anchors.fill: parent
                                     color: Kirigami.Theme.backgroundColor
                                     highlightOnFocus: false
@@ -947,37 +926,9 @@ Zynthian.ScreenPage {
                                     }
                                 }
 
-                                TableHeader {
-                                    id: sketchHeaderDelegate
-
-                                    property QtObject channel: root.song.channelsModel.getChannel(index)
-                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
-
-                                    visible: root.songMode
-                                    color: Kirigami.Theme.backgroundColor
-                                    active: !sketchHeaderDelegate.sketch.isEmpty
-
-                                    anchors.fill: parent
-
-                                    highlightOnFocus: false
-                                    highlighted: sketchHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
-
-                                    text: sketchHeaderDelegate.sketch.name
-                                    textSize: 10
-
-                                    onPressed: {
-                                        root.song.sketchesModel.selectedSketchIndex = index
-                                        root.lastSelectedObj = {
-                                            className: sketchHeaderDelegate.sketch.className,
-                                            value: sketchHeaderDelegate.sketch,
-                                            component: sketchHeaderDelegate
-                                        }
-                                    }
-                                }
-
                                 ChannelHeader2 {
                                     id: channelHeaderDelegate
-                                    visible: !root.songMode && !root.displayTrackButtons
+                                    visible: !root.displayTrackButtons
                                     anchors.fill: parent
 
                                     channel: root.song.channelsModel.getChannel(index)
@@ -1113,37 +1064,14 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                Connections {
-                                    target: root
-                                    onSongModeChanged: {
-                                        if (root.songMode && index === 0) {
-                                            root.lastSelectedObj = {
-                                                className: segmentHeader.segment.className,
-                                                value: segmentHeader.segment,
-                                                component: segmentHeader
-                                            }
-                                        } else if (!root.songMode && index === 0) {
-                                            root.lastSelectedObj = {
-                                                className: channel.sceneClip.className,
-                                                value: channel.sceneClip,
-                                                component: clipCell
-                                            }
-                                        }
-                                    }
-                                }
-
                                 TableHeader {
                                     id: sceneHeader
                                     anchors.fill: parent
-                                    visible: !root.songMode && root.displaySceneButtons
+                                    visible: root.displaySceneButtons
                                     text: String.fromCharCode(65+index).toUpperCase()
-                                    highlighted: !root.songMode &&
-                                                 index === root.song.scenesModel.selectedSceneIndex
+                                    highlighted: index === root.song.scenesModel.selectedSceneIndex
                                     highlightOnFocus: false
                                     onPressed: {
-                                        if (root.songMode) {
-                                            root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.copyClipsFromScene(index)
-                                        } else {
 //                                            root.lastSelectedObj = {
 //                                                className: "sketchpad_scene",
 //                                                value: index,
@@ -1151,119 +1079,6 @@ Zynthian.ScreenPage {
 //                                            }
 
                                             Zynthian.CommonUtils.switchToScene(index);
-                                        }
-                                    }
-                                }
-
-                                TableHeader {
-                                    id: segmentHeader
-
-                                    property bool startDrag: false
-                                    property point dragStartPosition
-                                    property int segmentOffsetAtDragStart
-
-                                    // Calculate current cell's segment index
-                                    // If arrow keys are visible, take into account that arrow keys will be visible no cells 0 and 9 respectively
-                                    property int thisSegmentIndex: index +
-                                                                   (sketchpadClipsColumn.shouldShowSegmentArrows ? sketchpadClipsColumn.segmentOffset : 0) + // Offset index if arrows are visible else 0
-                                                                   (sketchpadClipsColumn.shouldShowSegmentArrows ? -1 : 0) // if arrows are being displayed, display segment from 2nd slot onwards
-                                    // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
-                                    property QtObject segment: root.song.sketchesModel.selectedSketch.segmentsModel.count > 0
-                                                                ? root.song.sketchesModel.selectedSketch.segmentsModel.get_segment(segmentHeader.thisSegmentIndex)
-                                                                : null
-
-                                    visible: root.songMode
-                                    anchors.fill: parent
-                                    text: root.song.sketchesModel.selectedSketch.segmentsModel.count > 10
-                                              ? index === 0
-                                                  ? "<"
-                                                  : index === 9
-                                                      ? ">"
-                                                      : segmentHeader.segment
-                                                          ? segmentHeader.segment.name
-                                                          : ""
-                                              : segmentHeader.segment
-                                                  ? segmentHeader.segment.name
-                                                  : ""
-                                    subText: {
-                                        if (root.song.sketchesModel.selectedSketch.segmentsModel.count > 10 && (index === 0 || index === 9)) {
-                                            return " "
-                                        } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
-                                            return " "
-                                        } else {
-                                            return segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
-                                        }
-                                    }
-
-                                    textSize: 10
-                                    subTextSize: 9
-
-                                    active: {
-                                        // If song mode is active, mark respective arrow key cell as active if there are segments outside view
-                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0 && sketchpadClipsColumn.segmentOffset > 0) {
-                                            return true
-                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9 && sketchpadClipsColumn.segmentOffset < sketchpadClipsColumn.maximumSegmentOffset) {
-                                            return true
-                                        }
-
-                                        // If song mode is active, mark segment cell as active if it has a segment
-                                        if (segmentHeader.segment != null) {
-                                            return true
-                                        } else {
-                                            return false
-                                        }
-                                    }
-
-                                    highlightOnFocus: false
-                                    highlighted: {
-                                        // If song mode is active and arrow keys are visible, do not highlight arrow key cells
-                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
-                                            return false
-                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9) {
-                                            return false
-                                        }
-
-                                        // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
-                                        return segmentHeader.thisSegmentIndex === root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
-                                    }
-
-                                    onPressed: {
-                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
-                                            // If song mode is active, clicking left arrow key cells should decrement segment offset to display out of view segments
-                                            sketchpadClipsColumn.segmentOffset = Math.max(0, sketchpadClipsColumn.segmentOffset - 1)
-                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9) {
-                                            // If song mode is active, clicking right arrow key cells should increment segment offset to display out of view segments
-                                            sketchpadClipsColumn.segmentOffset = Math.min(sketchpadClipsColumn.maximumSegmentOffset, sketchpadClipsColumn.segmentOffset + 1)
-                                        } else {
-                                            // If song mode is active, clicking segment cells should activate that segment
-                                            if (segmentHeader.segment) {
-                                                root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentHeader.thisSegmentIndex
-                                                root.lastSelectedObj = {
-                                                    className: segmentHeader.segment.className,
-                                                    value: segmentHeader.segment,
-                                                    component: segmentHeader
-                                                }
-                                            }
-                                        }
-                                    }
-                                    onPressAndHold: {
-                                        segmentHeader.startDrag = true
-                                        segmentHeader.dragStartPosition = Qt.point(pressX, pressY)
-                                        segmentHeader.segmentOffsetAtDragStart = sketchpadClipsColumn.segmentOffset
-                                    }
-                                    onReleased: {
-                                        startDrag = false
-                                    }
-                                    onPressXChanged: {
-                                        if (startDrag) {
-                                            var offset = Math.round((pressX-dragStartPosition.x)/segmentHeader.width)
-
-                                            if (offset < 0) {
-                                                sketchpadClipsColumn.segmentOffset = Math.min(sketchpadClipsColumn.maximumSegmentOffset, segmentHeader.segmentOffsetAtDragStart + Math.abs(offset))
-                                            } else {
-                                                sketchpadClipsColumn.segmentOffset = Math.max(0, segmentHeader.segmentOffsetAtDragStart - Math.abs(offset))
-                                            }
-                                        }
                                     }
                                 }
 
@@ -1271,7 +1086,7 @@ Zynthian.ScreenPage {
                                     id: clipCell
 
                                     anchors.fill: parent
-                                    visible: !root.songMode && !root.displaySceneButtons
+                                    visible: !root.displaySceneButtons
 
                                     channel: model.channel
                                     backgroundColor: "#000000"

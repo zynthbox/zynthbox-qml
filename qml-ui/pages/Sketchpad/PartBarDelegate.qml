@@ -55,14 +55,14 @@ ColumnLayout {
             Layout.fillHeight: true
             color: "#000000"
             border{
-                color: Kirigami.Theme.highlightColor
-                width: root.songMode
+                color: root.songMode
                         ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
-                            ? 1
-                            : 0
+                            ? Kirigami.Theme.highlightColor
+                            : "#000000"
                         : partDelegate.clip && partDelegate.clip.inCurrentScene
-                            ? 1
-                            : 0
+                            ? Kirigami.Theme.highlightColor
+                            : "#000000"
+                width: 1
             }
             Zynthbox.WaveFormItem {
                 anchors.fill: parent

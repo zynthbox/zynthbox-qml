@@ -45,7 +45,6 @@ Rectangle {
     property alias samplesButton: samplesButton
     property alias fxButton: fxButton
     property alias soundCombinatorButton: soundCombinatorButton
-    property bool songMode: false;//Zynthbox.SegmentHandler.songMode
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
 
     readonly property QtObject song: zynqtgui.sketchpad.song
@@ -288,17 +287,13 @@ Rectangle {
                         Layout.fillHeight: true
                         checkable: true
                         checked: bottomStack.currentIndex === 0
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         text: qsTr("BottomBar")
                         visible: false
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 0
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 0
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }
@@ -308,17 +303,13 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         visible: false
                         text: qsTr("Mixer")
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 1
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 1
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }
@@ -328,17 +319,13 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         visible: false
                         text: qsTr("Sound Combinator")
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 5
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 5
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }
@@ -350,16 +337,12 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         text: qsTr("Channel")
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 3
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 3
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }
@@ -369,7 +352,7 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         text: qsTr("Clips")
                         onCheckedChanged: {
                             if (checked) {
@@ -384,16 +367,12 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         text: qsTr("Synths")
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 2
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 2
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }
@@ -403,16 +382,12 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         text: qsTr("Samples")
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 2
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 2
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }
@@ -422,16 +397,12 @@ Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
-                        enabled: !root.songMode && !root.displaySceneButtons
+                        enabled: !root.displaySceneButtons
                         text: qsTr("FX")
                         onCheckedChanged: {
                             if (checked) {
-                                if (!root.songMode) {
-                                    bottomStack.currentIndex = 2
-                                    updateLedVariablesTimer.restart()
-                                } else {
-                                    partButton.checked = true
-                                }
+                                bottomStack.currentIndex = 2
+                                updateLedVariablesTimer.restart()
                             }
                         }
                     }

@@ -320,6 +320,14 @@ Zynthian.ScreenPage {
                             color: Kirigami.Theme.focusColor
                         }
                         color: Kirigami.Theme.backgroundColor
+                        Rectangle {
+                            anchors {
+                                fill: parent
+                                margins: 2
+                            }
+                            color: Kirigami.Theme.focusColor
+                            visible: component.isVisible ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex === model.index : false
+                        }
                     }
                 }
             }
@@ -340,10 +348,14 @@ Zynthian.ScreenPage {
                         horizontalCenter: parent.horizontalCenter
                     }
                     height: Kirigami.Units.gridUnit + 10 // 10 because the default spacing is 5 and we want it to stick up and down by that spacing amount, why not
-                    width: 3
+                    width: 5
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     color: Kirigami.Theme.focusColor
+                    border {
+                        width: 1
+                        color: Kirigami.Theme.backgroundColor
+                    }
                 }
             }
         }

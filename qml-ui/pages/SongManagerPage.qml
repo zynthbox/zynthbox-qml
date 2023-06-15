@@ -363,6 +363,8 @@ Zynthian.ScreenPage {
         RowLayout {
             // BEGIN Segment picker grid
             ColumnLayout {
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 RowLayout {
                     Layout.fillWidth: true
                     Repeater {
@@ -395,6 +397,8 @@ Zynthian.ScreenPage {
             // BEGIN Segment details column
             ColumnLayout {
                 id: segmentDetails
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                 property QtObject selectedSegment: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment
                 onSelectedSegmentChanged: {
                     barLengthInput.text = segmentDetails.selectedSegment.barLength
@@ -410,13 +414,14 @@ Zynthian.ScreenPage {
                     }
                 }
 
-                QQC2.Label {
+                Kirigami.Heading {
                     Layout.fillWidth: true
                     Layout.fillHeight: false
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     horizontalAlignment: "AlignHCenter"
                     verticalAlignment: "AlignVCenter"
                     text: segmentDetails.selectedSegment.name
+                    level: 2
                 }
 
                 Kirigami.Separator {
@@ -504,8 +509,14 @@ Zynthian.ScreenPage {
                     }
                 }
 
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
                 QQC2.Button {
                     text: qsTr("Play Segment")
+                    Layout.fillWidth: true
                     onClicked: {
                         console.log(
                             "Playing Segment",
@@ -532,18 +543,34 @@ Zynthian.ScreenPage {
 
                 QQC2.Button {
                     text: qsTr("Add Before")
+                    Layout.fillWidth: true
                     onClicked: {
                         zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId);
                     }
                 }
                 QQC2.Button {
-                    text: qsTr("Remove...")
+                    text: qsTr("Add After")
+                    Layout.fillWidth: true
+                    onClicked: {
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentDetails.selectedSegment.segmentId + 1;
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                QQC2.Button {
+                    text: qsTr("Remove Segment...")
+                    Layout.fillWidth: true
                     onClicked: {
                         segmentRemover.open();
                     }
                     Zynthian.DialogQuestion {
                         id: segmentRemover
-                        title: qsTr("Remove Segment?")
+                        title: qsTr("Remove This Segment?")
                         text: qsTr("Are you sure you wish to remove this segment?\n\nThis action cannot be undone.")
                         onAccepted: {
                             if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count === 1) {
@@ -560,13 +587,6 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-                    }
-                }
-                QQC2.Button {
-                    text: qsTr("Add After")
-                    onClicked: {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentDetails.selectedSegment.segmentId + 1;
                     }
                 }
             }

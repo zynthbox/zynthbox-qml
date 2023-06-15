@@ -213,9 +213,9 @@ Zynthian.ScreenPage {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                     text: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
                                 ? index === 0
-                                    ? "<"
+                                    ? "◀"
                                     : index === segmentsLayout.lastVisibleSegmentCellIndex
-                                        ? ">"
+                                        ? "▶"
                                         : segmentHeader.segment
                                             ? segmentHeader.segment.name
                                             : ""
@@ -232,7 +232,13 @@ Zynthian.ScreenPage {
                         }
                     }
 
-                    textSize: 10
+                    textSize: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1
+                                ? index === 0
+                                    ? 20
+                                    : index === segmentsLayout.lastVisibleSegmentCellIndex
+                                        ? 20
+                                        : 10
+                                : 10
                     subTextSize: 9
 
                     active: {

@@ -97,7 +97,7 @@ Zynthian.Popup {
     }
 
     property var cuiaCallback: function(cuia) {
-        var returnValue = false;
+        var returnValue = component.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":

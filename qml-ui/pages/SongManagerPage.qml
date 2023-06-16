@@ -42,58 +42,50 @@ Zynthian.ScreenPage {
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
-        if (segmentRemover.opened) {
-            returnValue = segmentRemover.cuiaCallback(cuia);
-        } else if (segmentModelPicker.opened) {
-            returnValue = segmentModelPicker.cuiaCallback(cuia);
-        } else if (multichannelRecorderPopup.opened) {
-            returnValue = multichannelRecorderPopup.cuiaCallback(cuia);
-        } else {
-            switch (cuia) {
-                case "NAVIGATE_LEFT":
-                case "SELECT_DOWN":
-                    _private.goLeft();
-                    returnValue = true;
-                    break;
+        switch (cuia) {
+            case "NAVIGATE_LEFT":
+            case "SELECT_DOWN":
+                _private.goLeft();
+                returnValue = true;
+                break;
 
-                case "NAVIGATE_RIGHT":
-                case "SELECT_UP":
-                    _private.goRight();
-                    returnValue = true;
-                    break;
-                case "KNOB0_UP":
-                    _private.knob0Up();
-                    returnValue = true;
-                    break;
-                case "KNOB0_DOWN":
-                    _private.knob0Down();
-                    returnValue = true;
-                    break;
-                case "KNOB1_UP":
-                    _private.knob1Up();
-                    returnValue = true;
-                    break;
-                case "KNOB1_DOWN":
-                    _private.knob1Down();
-                    returnValue = true;
-                    break;
-                case "KNOB2_UP":
-                    _private.knob2Up();
-                    returnValue = true;
-                    break;
-                case "KNOB2_DOWN":
-                    _private.knob2Down();
-                    returnValue = true;
-                    break;
-                case "KNOB3_UP":
-                    _private.goRight();
-                    returnValue = true;
-                    break;
-                case "KNOB3_DOWN":
-                    _private.goLeft();
-                    returnValue = true;
-                    break;
-            }
+            case "NAVIGATE_RIGHT":
+            case "SELECT_UP":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "KNOB0_UP":
+                _private.knob0Up();
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                _private.knob0Down();
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                _private.knob1Up();
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                _private.knob1Down();
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                _private.knob2Up();
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                _private.knob2Down();
+                returnValue = true;
+                break;
+            case "KNOB3_UP":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "KNOB3_DOWN":
+                _private.goLeft();
+                returnValue = true;
+                break;
         }
         return returnValue;
     }

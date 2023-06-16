@@ -39,7 +39,7 @@ Zynthian.Popup {
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
     property var cuiaCallback: function(cuia) {
-        var result = false
+        var result = component.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":

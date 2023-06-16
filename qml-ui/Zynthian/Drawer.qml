@@ -31,26 +31,21 @@ QQC2.Drawer {
     id: root
 
     property var cuiaCallback: function(cuia) {
+        var result = component.opened;
         switch (cuia) {
             case "KNOB0_UP":
-                return true;
             case "KNOB0_DOWN":
-                return true;
             case "KNOB1_UP":
-                return true;
             case "KNOB1_DOWN":
-                return true;
             case "KNOB2_UP":
-                return true;
             case "KNOB2_DOWN":
-                return true;
             case "KNOB3_UP":
-                return true;
             case "KNOB3_DOWN":
-                return true;
+            default:
+                result = true;
+                break;
         }
-
-        return false
+        return result;
     }
 
     /** Handle opened changed to push/pop dialog to zynqtgui dialog stack

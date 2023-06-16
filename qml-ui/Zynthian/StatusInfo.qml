@@ -308,44 +308,53 @@ MouseArea {
         id: popup
 
         property var cuiaCallback: function(cuia) {
+            var result = popup.opened;
             switch(cuia) {
                 // If Global button is pressed when global popup is open, close it
                 case "SCREEN_AUDIO_SETTINGS":
-                    popup.close()
-                    return true
+                    popup.close();
+                    result = true;
+                    break;
                 case "SELECT_UP":
-                    return true
                 case "SELECT_DOWN":
-                    return true
                 case "NAVIGATE_LEFT":
-                    return true
-                case "NAVIGATE_RIGHT":
-                    return true
+                case "NAVIGATE_RIGHT":;
+                    result = true;
+                    break;
                 case "KNOB0_UP":
-                    applicationWindow().updateMasterVolume(1)
-                    return true
+                    applicationWindow().updateMasterVolume(1);
+                    result = true;
+                    break;
                 case "KNOB0_DOWN":
-                    applicationWindow().updateMasterVolume(-1)
-                    return true
+                    applicationWindow().updateMasterVolume(-1);
+                    result = true;
+                    break;
                 case "KNOB1_UP":
-                    applicationWindow().updateGlobalDelayFXAmount(1)
-                    return true
+                    applicationWindow().updateGlobalDelayFXAmount(1);
+                    result = true;
+                    break;
                 case "KNOB1_DOWN":
-                    applicationWindow().updateGlobalDelayFXAmount(-1)
-                    return true
+                    applicationWindow().updateGlobalDelayFXAmount(-1);
+                    result = true;
+                    break;
                 case "KNOB2_UP":
-                    applicationWindow().updateGlobalReverbFXAmount(1)
-                    return true
+                    applicationWindow().updateGlobalReverbFXAmount(1);
+                    result = true;
+                    break;
                 case "KNOB2_DOWN":
-                    applicationWindow().updateGlobalReverbFXAmount(-1)
-                    return true
+                    applicationWindow().updateGlobalReverbFXAmount(-1);
+                    result = true;
+                    break;
                 case "KNOB3_UP":
-                    applicationWindow().updateSketchpadBpm(1)
-                    return true
+                    applicationWindow().updateSketchpadBpm(1);
+                    result = true;
+                    break;
                 case "KNOB3_DOWN":
-                    applicationWindow().updateSketchpadBpm(-1)
-                    return true
+                    applicationWindow().updateSketchpadBpm(-1);
+                    result = true;
+                    break;
             }
+            return result;
         }
 
         visible: zynqtgui.globalPopupOpened

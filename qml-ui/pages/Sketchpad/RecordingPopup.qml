@@ -51,7 +51,7 @@ Zynthian.Popup {
         onSelected_channel_changed: selectedChannelThrottle.restart()
     }
     property var cuiaCallback: function(cuia) {
-        var returnValue = false;
+        var returnValue = root.opened;
         switch (cuia) {
             case "NAVIGATE_LEFT":
                 returnValue = true

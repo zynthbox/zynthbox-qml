@@ -1432,6 +1432,11 @@ Zynthian.BasePlayGrid {
                 x: -Kirigami.Units.largeSpacing * 2
                 width: drumsGridContainer.width - Kirigami.Units.largeSpacing * 2
                 height: drumsGridContainer.height - Kirigami.Units.largeSpacing * 3
+                property var cuiaCallback: function(cuia) {
+                    // We're not handling any of the interaction in here
+                    var result = false;
+                    return result;
+                }
                 Connections {
                     target: component
                     onShowPatternsMenu: {
@@ -1905,6 +1910,11 @@ Zynthian.BasePlayGrid {
                     stepSettings.column = column;
                     stepSettingsPopup.open();
                 }
+                property var cuiaCallback: function(cuia) {
+                    // We're not handling any of the interaction in here
+                    var result = false;
+                    return result;
+                }
                 Connections {
                     target: component
                     onIsVisibleChanged: {
@@ -1936,6 +1946,11 @@ Zynthian.BasePlayGrid {
                     noteSettings.lastBar = lastBar;
                     noteSettings.patternModel = patternModel;
                     noteSettingsPopup.open();
+                }
+                property var cuiaCallback: function(cuia) {
+                    // We're not handling any of the interaction in here
+                    var result = false;
+                    return result;
                 }
                 Connections {
                     target: component

@@ -51,19 +51,20 @@ Zynthian.Dialog {
     property alias listCount: filesListView.count
 
     property var cuiaCallback: function (cuia) {
+        var result = root.opened;
         switch (cuia) {
             case "NAVIGATE_LEFT":
             case "NAVIGATE_RIGHT":
-                return true;
-
+                result = true;
+                break;
             case "SELECT_UP":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1)
-                return true;
-
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
+                result = true;
+                break;
             case "SELECT_DOWN":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1)
-                return true;
-
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
+                result = true;
+                break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
@@ -72,37 +73,33 @@ Zynthian.Dialog {
                     console.log("ZL Filepicker SELECT :", root.filesListView.currentItem, root.filesListView.currentItem.selectItem)
                     root.filesListView.currentItem.selectItem();
                 }
-
-                return true;
-
+                result = true;
+                break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
                 root.goBack();
-
-                return true;
-
+                result = true;
+                break;
             case "KNOB0_UP":
-                return true;
             case "KNOB0_DOWN":
-                return true;
             case "KNOB1_UP":
-                return true;
             case "KNOB1_DOWN":
-                return true;
             case "KNOB2_UP":
-                return true;
             case "KNOB2_DOWN":
-                return true;
+                result = true;
+                break;
             case "KNOB3_UP":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1)
-                return true;
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex + 1, 0, root.filesListView.count - 1);
+                result = true;
+                break;
             case "KNOB3_DOWN":
-                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1)
-                return true;
-
+                root.filesListView.currentIndex = Zynthian.CommonUtils.clamp(root.filesListView.currentIndex - 1, 0, root.filesListView.count - 1);
+                result = true;
+                break;
             default:
-                return false;
+                result = true;
+                break;
         }
     }
 

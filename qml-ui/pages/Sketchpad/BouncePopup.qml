@@ -46,7 +46,7 @@ Zynthian.Popup {
     closePolicy: _private.bounceProgress === -1 ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
 
     function cuiaCallback(cuia) {
-        var returnValue = false;
+        var returnValue = root.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":

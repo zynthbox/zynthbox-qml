@@ -45,7 +45,7 @@ Zynthian.Dialog {
     parent: QQC2.Overlay.overlay
 
     property var cuiaCallback: function(cuia) {
-        result = component.opened;
+        var result = component.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":

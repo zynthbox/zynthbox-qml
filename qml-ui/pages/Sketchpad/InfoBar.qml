@@ -67,13 +67,12 @@ RowLayout {
         
         if (infoBar.clip) {
             for (var i in infoBar.clip.clipChannel.chainedSounds) {
-                if (infoBar.clip.clipChannel.chainedSounds[i] >= 0 &&
-                    infoBar.clip.clipChannel.checkIfLayerExists(infoBar.clip.clipChannel.chainedSounds[i])) {
+                if (infoBar.clip.clipChannel.chainedSounds[i] >= 0 && infoBar.clip.clipChannel.checkIfLayerExists(infoBar.clip.clipChannel.chainedSounds[i])) {
                     if (layerIndex < 0) {
                         layerIndex = i
                     }
                     count++;
-                    }
+                }
             }
         }
         
@@ -84,10 +83,12 @@ RowLayout {
         //                        infoBar.selectedChannel = zynqtgui.soundCombinatorActive
         //                                                    ? infoBar.clip.clipChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
         //                                                    : infoBar.clip.clipChannel.connectedSound
-        
-        infoBar.clip.clipChannel.updateChainedSoundsInfo()
+
+        if (infoBar.clip) {
+            infoBar.clip.clipChannel.updateChainedSoundsInfo()
+        }
     }
-    
+
     Timer {
         id: updateSoundNameTimer
         repeat: false

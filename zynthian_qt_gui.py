@@ -3373,6 +3373,7 @@ class zynthian_gui(QObject):
         # Display sketchpad page and run set_selector at last before hiding splash
         # to ensure knobs work fine
         self.show_modal("sketchpad")
+        self.session_dashboard.set_selected_channel(0, True)
         self.set_selector()
 
         # Explicitly run update_jack_port after booting is complete

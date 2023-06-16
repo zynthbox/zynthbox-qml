@@ -247,6 +247,15 @@ Zynthian.Popup {
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         // Set progress back to 0, so we get a little spinny time while it fades out
                         _private.recordingProgress = 0;
+                    } else {
+                        if (Zynthbox.PlayGridManager.metronomeBeat128th > 0) {
+                            // we're in fade-out, and for some reason we're still going...
+                            console.log("Stopped playback already, but apparently we're still going?");
+                        }
+                    }
+                }
+                onMetronomeActiveChanged: {
+                    if (Zynthbox.PlayGridManager.metronomeActive === false) {
                         if (_private.fadeoutDurationInTicks > 0) {
                             // If there is a fadeout duration, start the recording stopper timer
                             console.log("Starting the recording stopper");
@@ -257,11 +266,6 @@ Zynthian.Popup {
                             _private.stopRecording();
                             // Close out and we're done
                             root.close();
-                        }
-                    } else {
-                        if (Zynthbox.PlayGridManager.metronomeBeat128th > 0) {
-                            // we're in fade-out, and for some reason we're still going...
-                            console.log("Stopped playback already, but apparently we're still going?");
                         }
                     }
                 }

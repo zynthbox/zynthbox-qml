@@ -1347,10 +1347,14 @@ class zynthian_gui(QObject):
         self.show_screen(screen)
 
     def get_current_screen(self):
-        if self.modal_screen:
-            return self.screens[self.modal_screen]
-        else:
-            return self.screens[self.active_screen]
+        try:
+            if self.modal_screen:
+                return self.screens[self.modal_screen]
+            else:
+                return self.screens[self.active_screen]
+        except:
+            # This should never happen but if happens it is better to return None instead of crashing
+            return None
 
     def show_confirm(self, text, callback=None, cb_params=None):
         if self.modal_screen != "confirm":

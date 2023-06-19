@@ -1125,6 +1125,10 @@ Kirigami.AbstractApplicationWindow {
         modal: false
         interactive: !opened
 
+        property var cuiaCallback: function(cuia) {
+            var returnVal = false;
+            return returnVal;
+        }
         contentItem: MiniPlayGrid {}
     }
 

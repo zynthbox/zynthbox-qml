@@ -377,6 +377,7 @@ Kirigami.AbstractApplicationWindow {
                     stop: 200,
                     step: 1,
                     defaultValue: 120,
+                    visualZero: 50,
                     currentValue: Zynthbox.SyncTimer.bpm,
                     valueLabel: parseInt(Zynthbox.SyncTimer.bpm),
                     setValueFunction: valueSetter,

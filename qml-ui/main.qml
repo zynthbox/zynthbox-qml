@@ -395,15 +395,16 @@ Kirigami.AbstractApplicationWindow {
      */
     function updateSelectedChannelVolume(sign) {
         function valueSetter(value) {
-            root.selectedChannel.volume = Zynthian.CommonUtils.clamp(value - 40, -40, 20)
+            root.selectedChannel.volume = Zynthian.CommonUtils.clamp(value, -40, 20)
             applicationWindow().showOsd({
                 parameterName: "channel_volume",
                 description: qsTr("%1 Volume").arg(root.selectedChannel.name),
-                start: 0,
-                stop: 60,
+                start: -40,
+                stop: 20,
                 step: 1,
-                defaultValue: 40,
-                currentValue: root.selectedChannel.volume + 40,
+                defaultValue: 0,
+                visualZero: -40,
+                currentValue: root.selectedChannel.volume,
                 startLabel: qsTr("%1 dB").arg(-40),
                 stopLabel: qsTr("%1 dB").arg(20),
                 valueLabel: qsTr("%1 dB").arg(root.selectedChannel.volume),
@@ -414,8 +415,7 @@ Kirigami.AbstractApplicationWindow {
             })
         }
 
-        // Set OSD value from 0-60 and interpolate actual value to match the new range
-        valueSetter(root.selectedChannel.volume + 40 + sign)
+        valueSetter(root.selectedChannel.volume + sign)
     }
     /**
      * Update delay send amount of selected channel

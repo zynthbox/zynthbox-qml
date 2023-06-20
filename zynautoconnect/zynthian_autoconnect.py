@@ -713,6 +713,15 @@ def audio_autoconnect(force=False):
                 except:
                     pass
 
+    ### BEGIN Disconnect all ports of SynthPassthrough
+    for input_port in jclient.get_ports("SynthPassthrough", is_input=True, is_audio=True):
+        for connected_port in jclient.get_all_connections(input_port):
+            jclient.disconnect(connected_port, input_port)
+    for output_port in jclient.get_ports("SynthPassthrough", is_output=True, is_audio=True):
+        for connected_port in jclient.get_all_connections(output_port):
+            jclient.disconnect(output_port, connected_port)
+    ### END Disconnect all ports of SynthPassthrough
+
     ### BEGIN Connect the synth layer leafs up to the channel passthrough clients
     try:
         for channelId in range(0, 10):
@@ -721,6 +730,8 @@ def audio_autoconnect(force=False):
             if channel is not None:
                 for sound in channel.chainedSounds:
                     if sound > -1 and channel.checkIfLayerExists(sound):
+                        synth_passthrough_input_ports = [f"SynthPassthrough:Synth{sound + 1}-inputLeft", f"SynthPassthrough:Synth{sound + 1}-inputRight"]
+                        synth_passthrough_output_ports = [f"SynthPassthrough:Synth{sound + 1}-dryOutLeft", f"SynthPassthrough:Synth{sound + 1}-dryOutRight"]
                         sound_layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[sound]
                         layer_leafs = [sound_layer]
                         effect_leafs = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_ends(sound_layer)
@@ -751,13 +762,22 @@ def audio_autoconnect(force=False):
                                     except:
                                         pass
 
-                            # Connect synth engine to global fx passthrough ports
-                            for port in zip(engine_output_ports, channel_playback_ports):
+                            # Connect synth engine to synth passthrough ports
+                            for port in zip(engine_output_ports, synth_passthrough_input_ports):
+                                try:
+                                    logging.info(f"Connecting {port[0]} to synth passthrough client {port[1]}")
+                                    jclient.connect(port[0], port[1])
+                                except:
+                                    pass
+
+                            # Connect synth passthrough ports to channel passthrough ports
+                            for port in zip(synth_passthrough_output_ports, channel_playback_ports):
                                 try:
                                     logging.info(f"Connecting {port[0]} to channel passthrough client {port[1]}")
                                     jclient.connect(port[0], port[1])
                                 except:
                                     pass
+
     except Exception as e:
         logging.debug(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during synth layer leaf handling. Reported error: {e}")
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception

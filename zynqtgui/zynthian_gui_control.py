@@ -146,11 +146,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.selected_column_controller = None
         self.selected_column_gui_controller = None
 
-        self.__set_selector_timer = QTimer()
-        self.__set_selector_timer.setInterval(100)
-        self.__set_selector_timer.setSingleShot(True)
-        self.__set_selector_timer.timeout.connect(self.set_selector_actual)
-
         # xyselect mode vars
         self.xyselect_mode=False
         self.x_zctrl=None
@@ -277,8 +272,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         if self.zynqtgui.get_current_screen_id() is not None and self.zynqtgui.get_current_screen() != self:
             self.sync_selectors_visibility()
             self.set_mode_control()
-            self.selectedPage = 0
-            self.set_selector_actual()
 
     def hide(self):
         super().hide()
@@ -339,14 +332,9 @@ class zynthian_gui_control(zynthian_gui_selector):
             self.index = 1
         super().fill_list()
         self.all_controls_changed.emit()
-        self.set_selectedColumn(0, True)
 
     @Slot()
     def set_selector(self, zs_hiden=True):
-        self.__set_selector_timer.start()
-
-    @Slot()
-    def set_selector_actual(self):
         pass
 
     def get_controllers_count(self):
@@ -441,8 +429,6 @@ class zynthian_gui_control(zynthian_gui_selector):
                 os.fsync(fh.fileno())
         except Exception as e:
             logging.error("Can't save config '/zynthian/config/control_page.conf': %s" % (e))
-
-        self.set_selector_actual()
 
     def get_default_custom_control_page(self):
         if self.zynqtgui.curlayer is None or self.zynqtgui.curlayer.engine is None:
@@ -967,7 +953,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         if self.__selected_column != column:
             self.__selected_column = column
             self.selectedColumnChanged.emit()
-            self.set_selector_actual()
 
     def get_selectedColumn(self):
         return self.__selected_column
@@ -976,7 +961,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         if self.__selected_column != int(column) or force_set is True:
             self.__selected_column = int(column)
             self.selectedColumnChanged.emit()
-            self.set_selector_actual()
 
     def get_totalPages(self):
         return math.ceil(len(self.__all_controls) / 12)

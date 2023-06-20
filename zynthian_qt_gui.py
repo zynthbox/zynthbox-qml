@@ -3125,67 +3125,69 @@ class zynthian_gui(QObject):
     def all_sounds_off(self):
         logging.info("All Sounds Off!")
         for chan in range(16):
-            lib_zyncoder.ui_send_ccontrol_change(chan, 120, 0)
+            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0)
 
     def all_notes_off(self):
         logging.info("All Notes Off!")
         for chan in range(16):
-            lib_zyncoder.ui_send_ccontrol_change(chan, 123, 0)
+            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
 
     def raw_all_notes_off(self):
         logging.info("Raw All Notes Off!")
-        lib_zyncoder.ui_send_all_notes_off()
+        for chan in range(16):
+            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
 
     def all_sounds_off_chan(self, chan):
         logging.info("All Sounds Off for channel {}!".format(chan))
-        lib_zyncoder.ui_send_ccontrol_change(chan, 120, 0)
+        Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0)
 
     def all_notes_off_chan(self, chan):
         logging.info("All Notes Off for channel {}!".format(chan))
-        lib_zyncoder.ui_send_ccontrol_change(chan, 123, 0)
+        Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
 
     def raw_all_notes_off_chan(self, chan):
         logging.info("Raw All Notes Off for channel {}!".format(chan))
-        lib_zyncoder.ui_send_all_notes_off_chan(chan)
+        Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
 
     # ------------------------------------------------------------------
     # MPE initialization
     # ------------------------------------------------------------------
 
     def init_mpe_zones(self, lower_n_chans, upper_n_chans):
+        pass
         # Configure Lower Zone
-        if (
-            not isinstance(lower_n_chans, int)
-            or lower_n_chans < 0
-            or lower_n_chans > 0xF
-        ):
-            logging.error(
-                "Can't initialize MPE Lower Zone. Incorrect num of channels ({})".format(
-                    lower_n_chans
-                )
-            )
-        else:
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x79, 0x0)
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x64, 0x6)
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x65, 0x0)
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x06, lower_n_chans)
-
-        # Configure Upper Zone
-        if (
-            not isinstance(upper_n_chans, int)
-            or upper_n_chans < 0
-            or upper_n_chans > 0xF
-        ):
-            logging.error(
-                "Can't initialize MPE Upper Zone. Incorrect num of channels ({})".format(
-                    upper_n_chans
-                )
-            )
-        else:
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x79, 0x0)
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x64, 0x6)
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x65, 0x0)
-            lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x06, upper_n_chans)
+        # if (
+        #     not isinstance(lower_n_chans, int)
+        #     or lower_n_chans < 0
+        #     or lower_n_chans > 0xF
+        # ):
+        #     logging.error(
+        #         "Can't initialize MPE Lower Zone. Incorrect num of channels ({})".format(
+        #             lower_n_chans
+        #         )
+        #     )
+        # else:
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x79, 0x0)
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x64, 0x6)
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x65, 0x0)
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0x0, 0x06, lower_n_chans)
+        # 
+        # # Configure Upper Zone
+        # if (
+        #     not isinstance(upper_n_chans, int)
+        #     or upper_n_chans < 0
+        #     or upper_n_chans > 0xF
+        # ):
+        #     logging.error(
+        #         "Can't initialize MPE Upper Zone. Incorrect num of channels ({})".format(
+        #             upper_n_chans
+        #         )
+        #     )
+        # else:
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x79, 0x0)
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x64, 0x6)
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x65, 0x0)
+        #     lib_zyncoder.ctrlfb_send_ccontrol_change(0xF, 0x06, upper_n_chans)
 
     # ------------------------------------------------------------------
     # MIDI learning

@@ -215,11 +215,12 @@ def midi_autoconnect(force=False):
 
     #Get Zynthian Midi Router MIDI ports
     zmr_out=OrderedDict()
-    for p in jclient.get_ports("ZynMidiRouter", is_output=True, is_midi=True):
+    # for p in jclient.get_ports("ZynMidiRouter", is_output=True, is_midi=True):
+    for p in jclient.get_ports("ZLRouter:Zynthian-Channel", is_output=True, is_midi=True):
         zmr_out[p.shortname]=p
-    zmr_in=OrderedDict()
-    for p in jclient.get_ports("ZynMidiRouter", is_input=True, is_midi=True):
-        zmr_in[p.shortname]=p
+    # zmr_in=OrderedDict()
+    # for p in jclient.get_ports("ZynMidiRouter", is_input=True, is_midi=True):
+        # zmr_in[p.shortname]=p
 
     #logger.debug("ZynMidiRouter Input Ports: {}".format(zmr_out))
     #logger.debug("ZynMidiRouter Output Ports: {}".format(zmr_in))
@@ -229,45 +230,45 @@ def midi_autoconnect(force=False):
     #------------------------------------
 
     #Connect "Not Disabled" Input Device Ports to ZynMidiRouter:main_in
-    for hw in hw_out:
-        #logger.debug("Connecting MIDI Input {} => {}".format(hw,zmr_in['main_in']))
-        try:
-            if get_port_alias_id(hw) in zynthian_gui_config.disabled_midi_in_ports:
-                jclient.disconnect(hw,zmr_in['main_in'])
-            else:
-                jclient.connect(hw,zmr_in['main_in'])
-        except Exception as e:
-            #logger.debug("Exception {}".format(e))
-            pass
+    # for hw in hw_out:
+    #     #logger.debug("Connecting MIDI Input {} => {}".format(hw,zmr_in['main_in']))
+    #     try:
+    #         if get_port_alias_id(hw) in zynthian_gui_config.disabled_midi_in_ports:
+    #             jclient.disconnect(hw,zmr_in['main_in'])
+    #         else:
+    #             jclient.connect(hw,zmr_in['main_in'])
+    #     except Exception as e:
+    #         #logger.debug("Exception {}".format(e))
+    #         pass
 
     #logger.debug("Connecting RTP-MIDI & QMidiNet to ZynMidiRouter:net_in ...")
 
     #Connect RTP-MIDI output to ZynMidiRouter:net_in
-    if zynthian_gui_config.midi_rtpmidi_enabled:
-        try:
-            jclient.connect("jackrtpmidid:rtpmidi_out", zmr_in['net_in'])
-        except:
-            pass
+    # if zynthian_gui_config.midi_rtpmidi_enabled:
+    #     try:
+    #         jclient.connect("jackrtpmidid:rtpmidi_out", zmr_in['net_in'])
+    #     except:
+    #         pass
 
     #Connect QMidiNet output to ZynMidiRouter:net_in
-    if zynthian_gui_config.midi_network_enabled:
-        try:
-            jclient.connect("QmidiNet:out_1",zmr_in['net_in'])
-        except:
-            pass
+    # if zynthian_gui_config.midi_network_enabled:
+    #     try:
+    #         jclient.connect("QmidiNet:out_1",zmr_in['net_in'])
+    #     except:
+    #         pass
 
     #Connect ZynthStep output to ZynMidiRouter:step_in
-    try:
-        jclient.connect("zynthstep:output", zmr_in['step_in'])
-    except:
-        pass
+    # try:
+    #     jclient.connect("zynthstep:output", zmr_in['step_in'])
+    # except:
+    #     pass
 
     #Connect Engine's Controller-FeedBack to ZynMidiRouter:ctrl_in
-    try:
-        for efbp in engines_fb:
-            jclient.connect(efbp,zmr_in['ctrl_in'])
-    except:
-        pass
+    # try:
+    #     for efbp in engines_fb:
+    #         jclient.connect(efbp,zmr_in['ctrl_in'])
+    # except:
+    #     pass
 
     #logger.debug("Connecting ZynMidiRouter to engines ...")
 
@@ -290,7 +291,7 @@ def midi_autoconnect(force=False):
                         except:
                             pass
                         try:
-                            jclient.disconnect(zmr_out['ch{}_out'.format(layer.midi_chan)], engines_in[mi])
+                            jclient.disconnect(zmr_out['Zynthian-Channel{}'.format(layer.midi_chan)], engines_in[mi])
                         except:
                             pass
                     else:
@@ -332,9 +333,9 @@ def midi_autoconnect(force=False):
             for ch in range(0,16):
                 try:
                     if ch in info['chans']:
-                        jclient.connect(zmr_out['ch{}_out'.format(ch)], info['port'])
+                        jclient.connect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
                     else:
-                        jclient.disconnect(zmr_out['ch{}_out'.format(ch)], info['port'])
+                        jclient.disconnect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
                 except:
                     pass
 
@@ -708,7 +709,7 @@ def audio_autoconnect(force=False):
             midi_ports=jclient.get_ports(layer.get_midi_jackname(), is_input=True, is_midi=True, is_physical=False)
             if len(midi_ports)>0:
                 try:
-                    jclient.connect("ZynMidiRouter:ch{}_out".format(layer.midi_chan), midi_ports[0])
+                    jclient.connect("ZLRouter:Zynthian-Channel{}".format(layer.midi_chan), midi_ports[0])
                 except:
                     pass
 

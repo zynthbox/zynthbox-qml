@@ -78,26 +78,25 @@ Zynthian.ScreenPage {
      */
     function updateSelectedChannelLayerVolume(midiChannel, sign) {
         var synthName = ""
-        var controller = zynqtgui.fixed_layers.volumeControllers[midiChannel]
+        var synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel]
         try {
             synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
         } catch(e) {}
 
         function valueSetter(value) {
-            if (root.selectedChannel.checkIfLayerExists(midiChannel) && controller != null) {
-                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
-                zynqtgui.snapshot.schedule_save_last_state_snapshot()
+            if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
+                synthPassthroughClient.dryAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "layer_volume",
                     description: qsTr("%1 Volume").arg(synthName),
-                    start: controller.value_min,
-                    stop: controller.value_max,
-                    step: controller.step_size,
+                    start: 0,
+                    stop: 1,
+                    step: 0.01,
                     defaultValue: null,
-                    currentValue: controller.value,
-                    startLabel: qsTr("%1").arg(controller.value_min),
-                    stopLabel: qsTr("%1").arg(controller.value_max),
-                    valueLabel: qsTr("%1").arg(controller.value),
+                    currentValue: synthPassthroughClient.dryAmount,
+                    startLabel: "0",
+                    stopLabel: "1",
+                    valueLabel: qsTr("%1").arg(synthPassthroughClient.dryAmount.toFixed(2)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: false,
@@ -106,7 +105,8 @@ Zynthian.ScreenPage {
             }
         }
 
-        valueSetter(controller.value + sign * controller.step_size)
+        console.log("updateSelectedChannelLayerVolume:", synthPassthroughClient.dryAmount + sign * 0.01)
+        valueSetter(synthPassthroughClient.dryAmount + sign * 0.01)
     }
     /**
      * Update selected channel volume

@@ -353,6 +353,10 @@ MouseArea {
                     applicationWindow().updateSketchpadBpm(-1);
                     result = true;
                     break;
+                case "ALL_NOTES_OFF":
+                    // This is not handled by us, so pass it through
+                    result = false;
+                    break;
             }
             return result;
         }

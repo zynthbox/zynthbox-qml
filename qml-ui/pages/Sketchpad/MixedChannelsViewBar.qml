@@ -427,40 +427,17 @@ Rectangle {
 
                                         Rectangle {
                                             id: delegate
-
-                                            property var volumeControlObj: null
-                                            property real volume: volumeControlObj != null ? volumeControlObj.value/100 : 0
-                                            Timer {
-                                                id: volumeControlObjThrottle
-                                                interval: 1; running: false; repeat: false;
-                                                onTriggered: {
-                                                    delegate.volumeControlObj = zynqtgui.fixed_layers.volumeControllers[root.selectedChannel.chainedSounds[index]];
-                                                }
-                                            }
-                                            Connections {
-                                                target: zynqtgui.fixed_layers
-                                                onVolumeControllersChanged: volumeControlObjThrottle.restart()
-                                            }
-                                            Connections {
-                                                target: root
-                                                onSelectedChannelChanged: volumeControlObjThrottle.restart()
-                                            }
-                                            Connections {
-                                                target: root.selectedChannel
-                                                onChained_sounds_changed: volumeControlObjThrottle.restart()
-                                            }
+                                            property int midiChannel: root.selectedChannel.chainedSounds[index]
+                                            property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel]
 
                                             anchors.fill: parent
                                             anchors.margins: 4
-
                                             Kirigami.Theme.inherit: false
                                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                             color: Kirigami.Theme.backgroundColor
-
                                             border.color: "#ff999999"
                                             border.width: 1
                                             radius: 4
-
                                             // For loop, slice and external modes only first slot is visible.
                                             // For other modes all slots are visible
                                             enabled: root.selectedChannel.channelAudioType === "sample-loop" ||
@@ -472,7 +449,7 @@ Rectangle {
                                             visible: enabled
 
                                             Rectangle {
-                                                width: parent.width * delegate.volume
+                                                width: parent.width * delegate.synthPassthroughClient.dryAmount
                                                 anchors {
                                                     left: parent.left
                                                     top: parent.top
@@ -546,10 +523,10 @@ Rectangle {
                                                     delegateMouseArea.dragHappened = false
                                                 }
                                                 onMouseXChanged: {
-                                                    if (delegate.volumeControlObj != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                                        var newVal = (mouse.x / delegate.width) * 100
+                                                    if (delegate.midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1)
                                                         delegateMouseArea.dragHappened = true
-                                                        delegate.volumeControlObj.value = newVal
+                                                        delegate.synthPassthroughClient.dryAmount = newVal
                                                     }
                                                 }
 

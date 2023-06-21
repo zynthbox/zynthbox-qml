@@ -113,6 +113,20 @@ function clamp(val, min, max) {
     return Math.max(min, Math.min(max, val))
 }
 
+/**
+ * A helper method to interporalte a value between from a range to another range
+ *
+ * @arg num Number to interpolate
+ * @arg in_min Minumum value of the input range
+ * @arg in_max Maximum value of the input range
+ * @arg out_min Minumum value of the output range
+ * @arg out_max Maximum value of the output range
+ * @return Returns interpolated value
+ */
+function interp(num, in_min, in_max, out_min, out_max) {
+  return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 // Method to instantiate a component from URL
 // Returns the created object
 function instantiateComponent(url, params) {

@@ -4,6 +4,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import Zynthian 1.0 as Zynthian
 
 Rectangle {
     id: control
@@ -201,6 +202,54 @@ Rectangle {
                     }
                 }
             }
+
+            MouseArea {
+                id: mouseArea
+                property real initialMouseY
+                property bool dragHappened: false
+
+                anchors.fill: parent
+                enabled: control.enabled
+                onPressed: {
+                    mouseArea.initialMouseY = mouse.y
+                }
+                onReleased: {
+                    dragHappenedResetTimer.restart()
+                }
+                onMouseYChanged: {
+                    if (mouse.y - mouseArea.initialMouseY != 0) {
+                        var newVal = Zynthian.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
+                        mouseArea.dragHappened = true
+                        slider.value = Zynthian.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
+                        control.valueChanged()
+                    }
+                }
+                onClicked: {
+                    if (dblTimer.running) {
+                        control.doubleClicked();
+                        dblTimer.stop();
+                    } else {
+                        dblTimer.restart();
+                    }
+                }
+                Timer {
+                    id: dblTimer
+                    interval: 150
+                    onTriggered: {
+                        if (!mouseArea.dragHappened) {
+                            control.clicked();
+                        }
+                    }
+                }
+                Timer {
+                    id: dragHappenedResetTimer
+                    interval: dblTimer.interval
+                    repeat: false
+                    onTriggered: {
+                        mouseArea.dragHappened = false
+                    }
+                }
+            }
         }
 
         QQC2.Label {
@@ -210,48 +259,6 @@ Rectangle {
             horizontalAlignment: "AlignHCenter"
             elide: "ElideRight"
             visible: text && text.length>0
-        }
-    }
-
-    Timer {
-        id: dblTimer
-        interval: 150
-        onTriggered: {
-            if (!mouseArea.valueChanged) {
-                control.clicked();
-            }
-        }
-    }
-
-    MouseArea {
-        property real startY
-        property real startValue
-        property bool valueChanged: false
-
-        id: mouseArea
-        anchors.fill: parent
-        enabled: control.enabled
-
-        onPressed: {
-            startY = mouse.y
-            startValue = slider.value
-            valueChanged = false
-        }
-        onPositionChanged: {
-            let delta = mouse.y - startY;
-            let value = Math.max(slider.from, Math.min(slider.to, startValue - (slider.to / slider.stepSize) * (delta*slider.stepSize/(Kirigami.Units.gridUnit*8))));
-            let floored = Math.floor(value/slider.stepSize) * slider.stepSize;
-
-            slider.value = value;
-            valueChanged = true
-            control.valueChanged()
-        }
-        onClicked: {
-            if (dblTimer.running) {
-                valueChanged = true;
-                control.doubleClicked();
-            }
-            dblTimer.restart();
         }
     }
 }

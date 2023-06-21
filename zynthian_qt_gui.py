@@ -4068,7 +4068,7 @@ class zynthian_gui(QObject):
         if self.__master_volume != value:
             self.__master_volume = value
             # JackPassthroughClient expects dryAmount to be ranging from 0-1
-            Zynthbox.MidiRouter.instance().globalPlaybackClient().setDryAmount(np.interp(value, (0, 100), (0, 1)))
+            Zynthbox.Plugin.instance().globalPlaybackClient().setDryAmount(np.interp(value, (0, 100), (0, 1)))
             self.masterVolumeChanged.emit()
 
     masterVolumeChanged = Signal()

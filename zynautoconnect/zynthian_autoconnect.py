@@ -624,7 +624,7 @@ def audio_autoconnect(force=False):
                                 try:
                                     jclient.disconnect(port[0], port[1])
                                 except: pass
-                            for port in zip(channelPorts, jclient.get_ports(name_pattern=f"FXPassthrough:Channel{channel.id + 1}", is_audio=True, is_input=True)):
+                            for port in zip(channelPorts, jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channel.id + 1}", is_audio=True, is_input=True)):
                                 try:
                                     jclient.connect(port[0], port[1])
                                 except: pass
@@ -726,7 +726,7 @@ def audio_autoconnect(force=False):
     try:
         for channelId in range(0, 10):
             channel = song.channelsModel.getChannel(channelId)
-            channel_playback_ports = [f"FXPassthrough:Channel{channelId + 1}-inputLeft", f"FXPassthrough:Channel{channelId + 1}-inputRight"]
+            channel_playback_ports = [f"ChannelPassthrough:Channel{channelId + 1}-inputLeft", f"ChannelPassthrough:Channel{channelId + 1}-inputRight"]
             if channel is not None:
                 for sound in channel.chainedSounds:
                     if sound > -1 and channel.checkIfLayerExists(sound):
@@ -787,36 +787,36 @@ def audio_autoconnect(force=False):
         return
     ### END Connect the synth layer leafs up to the channel passthrough clients
 
-    ### Connect FXPassthrough:ChannelX dry and wet outputs to designated ports
+    ### Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
     for channel_index in range(song.channelsModel.count):
         channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channel_index+1}", is_audio=True, is_input=True)
         globalPlaybackInputPorts = jclient.get_ports(f"GlobalPlayback", is_audio=True, is_input=True)
 
-        for port in zip(jclient.get_ports(f"FXPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-        for port in zip(jclient.get_ports(f"FXPassthrough:Channel{channel_index+1}-wetOutFx2", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx2", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-        for port in zip(jclient.get_ports(f"FXPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), globalFx1InputPorts):
+        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), globalFx1InputPorts):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-        for port in zip(jclient.get_ports(f"FXPassthrough:Channel{channel_index+1}-wetOutFx2", is_audio=True, is_output=True), globalFx2InputPorts):
+        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx2", is_audio=True, is_output=True), globalFx2InputPorts):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-        for port in zip(jclient.get_ports(f"FXPassthrough:Channel{channel_index + 1}-dryOut", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
+        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index + 1}-dryOut", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-        for port in zip(jclient.get_ports(f"FXPassthrough:Channel{channel_index+1}-dryOut", is_audio=True, is_output=True), globalPlaybackInputPorts):
+        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-dryOut", is_audio=True, is_output=True), globalPlaybackInputPorts):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-    ### END Connect FXPassthrough:ChannelX dry and wet outputs to designated ports
+    ### END Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
 
     ### Connect Samplersynth uneffected ports to globalPlayback client and disconnect from system playback
     for port in zip(jclient.get_ports(f"SamplerSynth:global-uneffected", is_audio=True, is_output=True), playback_ports):

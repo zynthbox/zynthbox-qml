@@ -641,11 +641,11 @@ class sketchpad_song(QObject):
             for channel_index in range(self.channelsModel.count):
                 channel = self.channelsModel.getChannel(channel_index)
                 if value == -1:
-                    Zynthbox.MidiRouter.instance().channelPassthroughClients()[channel.id].setMuted(channel.muted)
+                    Zynthbox.Plugin.instance().channelPassthroughClients()[channel.id].setMuted(channel.muted)
                 elif value == channel.id:
-                    Zynthbox.MidiRouter.instance().channelPassthroughClients()[channel.id].setMuted(False)
+                    Zynthbox.Plugin.instance().channelPassthroughClients()[channel.id].setMuted(False)
                 else:
-                    Zynthbox.MidiRouter.instance().channelPassthroughClients()[channel.id].setMuted(True)
+                    Zynthbox.Plugin.instance().channelPassthroughClients()[channel.id].setMuted(True)
 
             self.playChannelSoloChanged.emit()
 

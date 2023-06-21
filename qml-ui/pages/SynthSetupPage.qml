@@ -56,12 +56,12 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Sounds")
-            Kirigami.Action {
-                text: middleColumnStack.currentIndex === 0 ? qsTr("Show Mixer") : qsTr("Hide Mixer")
-                onTriggered: {
-                    middleColumnStack.currentIndex = middleColumnStack.currentIndex === 0 ? 1 : 0;
-                }
-            }
+//            Kirigami.Action {
+//                text: middleColumnStack.currentIndex === 0 ? qsTr("Show Mixer") : qsTr("Hide Mixer")
+//                onTriggered: {
+//                    middleColumnStack.currentIndex = middleColumnStack.currentIndex === 0 ? 1 : 0;
+//                }
+//            }
             Kirigami.Action {
                 text: qsTr("Load Sound...")
                 onTriggered: {

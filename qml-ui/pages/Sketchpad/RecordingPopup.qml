@@ -51,13 +51,31 @@ Zynthian.Popup {
         onSelected_channel_changed: selectedChannelThrottle.restart()
     }
     property var cuiaCallback: function(cuia) {
-        var returnValue = root.opened;
+        var returnValue = false;
         switch (cuia) {
+            case "CHANNEL_1":
+            case "CHANNEL_2":
+            case "CHANNEL_3":
+            case "CHANNEL_4":
+            case "CHANNEL_5":
             case "NAVIGATE_LEFT":
-                returnValue = true
-                break
-
             case "NAVIGATE_RIGHT":
+            case "SELECT_UP":
+            case "SELECT_DOWN":
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+            case "MODE_SWITCH_SHORT":
+            case "MODE_SWITCH_BOLD":
+            case "MODE_SWITCH_LONG":
+            case "KNOB0_UP":
+            case "KNOB0_DOWN":
+            case "KNOB1_UP":
+            case "KNOB1_DOWN":
+            case "KNOB2_UP":
+            case "KNOB2_DOWN":
+            case "KNOB3_UP":
+            case "KNOB3_DOWN":
                 returnValue = true
                 break
 
@@ -65,31 +83,6 @@ Zynthian.Popup {
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
                 root.close();
-                returnValue = true;
-                break;
-
-            case "KNOB0_UP":
-                returnValue = true;
-                break;
-            case "KNOB0_DOWN":
-                returnValue = true;
-                break;
-            case "KNOB1_UP":
-                returnValue = true;
-                break;
-            case "KNOB1_DOWN":
-                returnValue = true;
-                break;
-            case "KNOB2_UP":
-                returnValue = true;
-                break;
-            case "KNOB2_DOWN":
-                returnValue = true;
-                break;
-            case "KNOB3_UP":
-                returnValue = true;
-                break;
-            case "KNOB3_DOWN":
                 returnValue = true;
                 break;
         }

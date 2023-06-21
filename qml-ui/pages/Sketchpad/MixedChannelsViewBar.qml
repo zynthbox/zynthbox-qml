@@ -496,6 +496,9 @@ Rectangle {
                                                 onPressed: {
                                                     delegateMouseArea.initialMouseX = mouse.x
                                                 }
+                                                onReleased: {
+                                                    dragHappenedResetTimer.restart()
+                                                }
                                                 onClicked: {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop" ||
                                                         root.selectedChannel.channelAudioType === "external"
@@ -519,8 +522,6 @@ Rectangle {
                                                             }
                                                         }
                                                     }
-
-                                                    delegateMouseArea.dragHappened = false
                                                 }
                                                 onMouseXChanged: {
                                                     if (delegate.midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
@@ -529,7 +530,6 @@ Rectangle {
                                                         delegate.synthPassthroughClient.dryAmount = newVal
                                                     }
                                                 }
-
                                                 onPressAndHold: {
                                                     if (!delegateMouseArea.dragHappened) {
                                                         if (root.selectedChannel.channelAudioType === "sample-loop") {
@@ -561,6 +561,14 @@ Rectangle {
                                                                 zynqtgui.forced_screen_back = "sketchpad"
                                                             }
                                                         }
+                                                    }
+                                                }
+                                                Timer {
+                                                    id: dragHappenedResetTimer
+                                                    interval: 100
+                                                    repeat: false
+                                                    onTriggered: {
+                                                        delegateMouseArea.dragHappened = false
                                                     }
                                                 }
                                             }

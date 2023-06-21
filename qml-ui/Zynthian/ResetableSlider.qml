@@ -25,8 +25,6 @@ QQC2.Slider {
 
         onPositionChanged: {
             var positionX = Math.max(0, Math.min(mapToItem(root, mouse.x, mouse.y).x, root.x + root.width))
-            console.log(positionX, xValPerPixel, positionX * xValPerPixel, root.from - positionX * xValPerPixel)
-
             if (root.orientation == Qt.Horizontal) {
                 root.controlObj[root.controlProp] = parseFloat(Zynthian.CommonUtils.interp(positionX * xValPerPixel, 0, root.to - root.from, root.from, root.to).toFixed(2))
             } else if (root.orientation == Qt.Vertical) {

@@ -641,7 +641,7 @@ Rectangle {
                         id: volumeSlider
 
                         property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
-                        property var volumeControlObject: zynqtgui.fixed_layers.volumeControllers[chainedSound]
+                        property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[chainedSound]
 
                         orientation: Qt.Horizontal
 
@@ -651,15 +651,13 @@ Rectangle {
 
                         visible: synthsButton.checked
                         enabled: chainedSound >= 0 &&
-                                 (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false) &&
-                                 volumeControlObject &&
-                                 volumeControlObject.controllable
-                        value: volumeControlObject ? volumeControlObject.value : 0
-                        stepSize: volumeControlObject ? volumeControlObject.step_size : 1
-                        from: volumeControlObject ? volumeControlObject.value_min : 0
-                        to: volumeControlObject ? volumeControlObject.value_max : 1
+                                 (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
+                        value: synthPassthroughClient.dryAmount
+                        stepSize: 0.01
+                        from: 0
+                        to: 1
                         onMoved: {
-                            volumeControlObject.value = value;
+                            synthPassthroughClient.dryAmount = value;
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Controls 2.4 as QQC2
+import Zynthian 1.0 as Zynthian
 
 QQC2.Slider {
     id: root
@@ -24,9 +25,10 @@ QQC2.Slider {
 
         onPositionChanged: {
             var positionX = Math.max(0, Math.min(mapToItem(root, mouse.x, mouse.y).x, root.x + root.width))
+            console.log(positionX, xValPerPixel, positionX * xValPerPixel, root.from - positionX * xValPerPixel)
 
             if (root.orientation == Qt.Horizontal) {
-                root.controlObj[root.controlProp] = parseFloat((root.from - positionX * xValPerPixel).toFixed(2))
+                root.controlObj[root.controlProp] = parseFloat(Zynthian.CommonUtils.interp(positionX * xValPerPixel, 0, root.to - root.from, root.from, root.to).toFixed(2))
             } else if (root.orientation == Qt.Vertical) {
                 // TODO : Implement vertical slider drag
             }

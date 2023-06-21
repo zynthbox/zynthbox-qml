@@ -226,6 +226,7 @@ Zynthian.Card {
                     }
 
                     Rectangle {
+                        id: synthSlot
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*10
@@ -274,13 +275,39 @@ Zynthian.Card {
                         }
 
                         MouseArea {
-                            anchors.fill: parent
+                            id: synthMouseArea
+                            property real initialMouseX
+                            property bool dragHappened: false
 
+                            anchors.fill: parent
+                            onPressed: {
+                                synthMouseArea.initialMouseX = mouse.x
+                            }
+                            onReleased: {
+                                dragHappenedResetTimer.restart()
+                            }
+                            onMouseXChanged: {
+                                if (soundDelegate.chainedSound >= 0 && root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound) && mouse.x - synthMouseArea.initialMouseX != 0) {
+                                    var newVal = Zynthian.CommonUtils.clamp(mouse.x / synthSlot.width, 0, 1)
+                                    synthMouseArea.dragHappened = true
+                                    soundDelegate.synthPassthroughClient.dryAmount = newVal
+                                }
+                            }
                             onClicked: {
-                                if (root.selectedChannel.selectedSlotRow !== index) {
-                                    root.selectedChannel.selectedSlotRow = index;
-                                } else {
-                                    layerSetupDialog.open()
+                                if (!synthMouseArea.dragHappened) {
+                                    if (root.selectedChannel.selectedSlotRow !== index) {
+                                        root.selectedChannel.selectedSlotRow = index;
+                                    } else {
+                                        layerSetupDialog.open()
+                                    }
+                                }
+                            }
+                            Timer {
+                                id: dragHappenedResetTimer
+                                interval: 100
+                                repeat: false
+                                onTriggered: {
+                                    synthMouseArea.dragHappened = false
                                 }
                             }
                         }

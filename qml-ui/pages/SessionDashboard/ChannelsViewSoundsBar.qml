@@ -116,10 +116,7 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
-                property QtObject volumeControlObject: null
-                property real volumePercent: volumeControlObject
-                                                ? (volumeControlObject.value - volumeControlObject.value_min)/(volumeControlObject.value_max - volumeControlObject.value_min)
-                                                : 0
+                property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[soundDelegate.chainedSound]
 
                 Connections {
                     target: root
@@ -143,7 +140,6 @@ Zynthian.Card {
                     interval: 1; repeat: false; running: false;
                     onTriggered: {
                         soundDelegate.chainedSound = root.chainedSounds[index];
-                        soundDelegate.volumeControlObject = zynqtgui.fixed_layers.volumeControllers[chainedSound] ? zynqtgui.fixed_layers.volumeControllers[chainedSound] : null;
                         soundLabelSynth.updateName();
                         soundLabelPreset.updateName();
                         fxLabel.updateName();
@@ -246,7 +242,7 @@ Zynthian.Card {
                         radius: 4
 
                         Rectangle {
-                            width: parent.width * soundDelegate.volumePercent
+                            width: parent.width * soundDelegate.synthPassthroughClient.dryAmount
                             anchors {
                                 left: parent.left
                                 top: parent.top

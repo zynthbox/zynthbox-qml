@@ -71,6 +71,7 @@ QQC2.ItemDelegate {
             }
             MouseArea {
                 anchors.fill: parent
+                anchors.margins: -6
                 onClicked: delegate.iconClicked(delegate.screenId, index)
             }
         }

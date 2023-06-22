@@ -356,6 +356,11 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
+            text: "" //qsTr("Sounds")
+            onTriggered: zynqtgui.show_modal("sound_categories")
+            enabled: false
+        },
+        Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.slotsBar.mixerButton.checked
             onTriggered: {
@@ -366,12 +371,6 @@ Zynthian.ScreenPage {
                 }
             }
         },
-        Kirigami.Action {
-            text: "" //qsTr("Sounds")
-            onTriggered: zynqtgui.show_modal("sound_categories")
-            enabled: false
-        },
-
         Kirigami.Action {
             text: "Get New Sketchpads"
             onTriggered: {

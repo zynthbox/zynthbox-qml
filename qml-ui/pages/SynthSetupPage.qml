@@ -55,117 +55,125 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Sounds")
-//            Kirigami.Action {
-//                text: middleColumnStack.currentIndex === 0 ? qsTr("Show Mixer") : qsTr("Hide Mixer")
-//                onTriggered: {
-//                    middleColumnStack.currentIndex = middleColumnStack.currentIndex === 0 ? 1 : 0;
-//                }
-//            }
-            Kirigami.Action {
-                text: qsTr("Load Sound...")
-                onTriggered: {
-                    pickerDialog.mode = "sound";
-                    pickerDialog.open();
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Save Sound...")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: {
-                    saveDialog.mode = "sound";
-                    saveDialog.open();
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Get New Sounds...")
-                onTriggered: zynqtgui.show_modal("sound_downloader")
-            }
-            //Kirigami.Action {
-                //text: qsTr("Get New Soundfonts...")
-                //onTriggered: zynqtgui.show_modal("soundfont_downloader")
-            //}
-            /*Kirigami.Action {
-                text: qsTr("Load Soundset...")
-                onTriggered: {
-                    pickerDialog.mode = "soundset";
-                    pickerDialog.open();
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Save Soundset...")
-                onTriggered: {
-                    saveDialog.mode = "soundset";
-                    saveDialog.open();
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Get New Soundsets...")
-                onTriggered: zynqtgui.show_modal("soundset_downloader")
-            }*/
-            /*Kirigami.Action {
-                text: qsTr("Clear Sounds")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: zynqtgui.fixed_layers.ask_clear_visible_range()
-            }*/
-            /*Kirigami.Action {
-                text: qsTr("Clear All")
-                onTriggered: zynqtgui.layer.ask_reset()
-            }*/
+            enabled: false
+            visible: false
         },
         Kirigami.Action {
-            text: qsTr("Slot")
-            Kirigami.Action {
-                text: qsTr("Synths")
-                onTriggered: {
-                    zynqtgui.layer.page_after_layer_creation = "layers_for_channel";
-                    zynqtgui.layer.select_engine(zynqtgui.fixed_layers.active_midi_channel)
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Remove Synth")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: zynqtgui.layer.ask_remove_current_layer()
-            }
-            Kirigami.Action {
-                // Disable this entry as per #299
-                visible: false
-                text: qsTr("Effect Layer")
-                onTriggered: {
-                    zynqtgui.layer.new_effect_layer(zynqtgui.fixed_layers.active_midi_channel)
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Audio-FX")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: {
-                    zynqtgui.layer_options.show(); //FIXME: that show() method should change name
-                    zynqtgui.current_screen_id = "layer_effects";
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Remove All Audio-FX")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: {
-                    zynqtgui.layer_effects.fx_reset()
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("MIDI-FX")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: {
-                    zynqtgui.layer_options.show() //FIXME: that show() method should change name
-                    zynqtgui.current_screen_id = "layer_midi_effects";
-                }
-            }
-            Kirigami.Action {
-                text: qsTr("Remove All MIDI-FX")
-                enabled: zynqtgui.fixed_layers.current_index_valid
-                onTriggered: {
-                    zynqtgui.layer_midi_effects.fx_reset()
-                }
-            }
+            enabled: false
+            visible: false
         },
+//        Kirigami.Action {
+//            text: qsTr("Sounds")
+////            Kirigami.Action {
+////                text: middleColumnStack.currentIndex === 0 ? qsTr("Show Mixer") : qsTr("Hide Mixer")
+////                onTriggered: {
+////                    middleColumnStack.currentIndex = middleColumnStack.currentIndex === 0 ? 1 : 0;
+////                }
+////            }
+//            Kirigami.Action {
+//                text: qsTr("Load Sound...")
+//                onTriggered: {
+//                    pickerDialog.mode = "sound";
+//                    pickerDialog.open();
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Save Sound...")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: {
+//                    saveDialog.mode = "sound";
+//                    saveDialog.open();
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Get New Sounds...")
+//                onTriggered: zynqtgui.show_modal("sound_downloader")
+//            }
+//            //Kirigami.Action {
+//                //text: qsTr("Get New Soundfonts...")
+//                //onTriggered: zynqtgui.show_modal("soundfont_downloader")
+//            //}
+//            /*Kirigami.Action {
+//                text: qsTr("Load Soundset...")
+//                onTriggered: {
+//                    pickerDialog.mode = "soundset";
+//                    pickerDialog.open();
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Save Soundset...")
+//                onTriggered: {
+//                    saveDialog.mode = "soundset";
+//                    saveDialog.open();
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Get New Soundsets...")
+//                onTriggered: zynqtgui.show_modal("soundset_downloader")
+//            }*/
+//            /*Kirigami.Action {
+//                text: qsTr("Clear Sounds")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: zynqtgui.fixed_layers.ask_clear_visible_range()
+//            }*/
+//            /*Kirigami.Action {
+//                text: qsTr("Clear All")
+//                onTriggered: zynqtgui.layer.ask_reset()
+//            }*/
+//        },
+//        Kirigami.Action {
+//            text: qsTr("Slot")
+//            Kirigami.Action {
+//                text: qsTr("Synths")
+//                onTriggered: {
+//                    zynqtgui.layer.page_after_layer_creation = "layers_for_channel";
+//                    zynqtgui.layer.select_engine(zynqtgui.fixed_layers.active_midi_channel)
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Remove Synth")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: zynqtgui.layer.ask_remove_current_layer()
+//            }
+//            Kirigami.Action {
+//                // Disable this entry as per #299
+//                visible: false
+//                text: qsTr("Effect Layer")
+//                onTriggered: {
+//                    zynqtgui.layer.new_effect_layer(zynqtgui.fixed_layers.active_midi_channel)
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Audio-FX")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: {
+//                    zynqtgui.layer_options.show(); //FIXME: that show() method should change name
+//                    zynqtgui.current_screen_id = "layer_effects";
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Remove All Audio-FX")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: {
+//                    zynqtgui.layer_effects.fx_reset()
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("MIDI-FX")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: {
+//                    zynqtgui.layer_options.show() //FIXME: that show() method should change name
+//                    zynqtgui.current_screen_id = "layer_midi_effects";
+//                }
+//            }
+//            Kirigami.Action {
+//                text: qsTr("Remove All MIDI-FX")
+//                enabled: zynqtgui.fixed_layers.current_index_valid
+//                onTriggered: {
+//                    zynqtgui.layer_midi_effects.fx_reset()
+//                }
+//            }
+//        },
         Kirigami.Action {
             text: qsTr("Edit")
             onTriggered: {
@@ -357,7 +365,8 @@ Zynthian.ScreenPage {
                             }
                             QQC2.Button {
                                 icon.name: "configure"
-                                visible: model.display != "-"
+                                // visible: model.display != "-"
+                                visible: false // Hide configure button for now
                                 onClicked: {
                                     //delegate.clicked();
                                     optionsMenu.open();

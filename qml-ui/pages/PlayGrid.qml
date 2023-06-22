@@ -193,6 +193,8 @@ don't want to have to dig too far...
                     Layout.minimumHeight: width * 0.6
                     Layout.maximumHeight: width * 0.6
                     icon.name: "application-menu"
+                    // TODO Reenable this for properly we re-add the ability to have more plaground modules
+                    visible: applicationWindow().playGrids.count > 2
                     Rectangle {
                         id: slideDelegateIconMask
                         anchors {

@@ -48,6 +48,8 @@ RowLayout {
             Layout.preferredHeight: width
             Layout.maximumHeight: width
             icon.name: "configure"
+            // TODO Reenable this for properly we re-add the ability to have more plaground modules
+            visible: applicationWindow().playGrids.count > 2
             Rectangle {
                 id: slideDelegateIconMask
                 anchors {

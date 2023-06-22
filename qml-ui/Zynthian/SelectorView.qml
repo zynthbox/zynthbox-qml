@@ -73,6 +73,7 @@ QQC2.ScrollView {
     signal currentScreenIdRequested(string screenId)
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)
+    signal iconClicked(string screenId, int index)
 
     Component.onCompleted: {
         if (zynqtgui.current_screen_id === root.screenId) {
@@ -142,6 +143,7 @@ QQC2.ScrollView {
             onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
             onItemActivated: root.itemActivated(screenId, index)
             onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+            onIconClicked: root.iconClicked(screenId, index)
         }
     }
 

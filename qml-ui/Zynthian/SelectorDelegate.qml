@@ -47,6 +47,7 @@ QQC2.ItemDelegate {
     signal currentScreenIdRequested(string screenId)
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)
+    signal iconClicked(string screenId, int index)
 
     //implicitHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
 
@@ -59,11 +60,19 @@ QQC2.ItemDelegate {
             Layout.fillWidth: true
             elide: Text.ElideRight
         }
-        Kirigami.Icon {
-            source: model.icon
+        Item {
             Layout.fillHeight: true
-            Layout.preferredWidth: height
-            visible: valid
+            Layout.preferredWidth: height * 2
+            Kirigami.Icon {
+                width: parent.height
+                height: parent.height
+                source: model.icon
+                visible: valid
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: delegate.iconClicked(delegate.screenId, index)
+            }
         }
     }
 

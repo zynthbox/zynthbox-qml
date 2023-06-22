@@ -627,6 +627,14 @@ Zynthian.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                onIconClicked: {
+                    if (presetView.selector.current_index != index) {
+                        presetView.selector.current_index = index;
+                        presetView.selector.activate_index(index);
+                    }
+                    zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+                    zynqtgui.current_screen_id = "preset";
+                }
                 Component.onCompleted: {
                     presetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }

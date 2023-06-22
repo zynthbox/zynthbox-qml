@@ -834,12 +834,13 @@ Zynthian.ScreenPage {
                         Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
 
                         highlightOnFocus: false
-                        highlighted: root.displayTrackButtons
-                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
+//                        highlighted: root.displayTrackButtons
+//                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
+                        text: qsTr("Channel Ch%1").arg(root.selectedChannel.id + 1)
                         onPressed: {
-                            root.displayTrackButtons = !root.displayTrackButtons
-                            bottomStack.slotsBar.channelButton.checked = true
-                            zynqtgui.sketchpad.displaySceneButtons = false
+//                            root.displayTrackButtons = !root.displayTrackButtons
+//                            bottomStack.slotsBar.channelButton.checked = true
+//                            zynqtgui.sketchpad.displaySceneButtons = false
                         }
                     }
 

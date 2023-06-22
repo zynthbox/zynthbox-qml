@@ -760,7 +760,7 @@ Rectangle {
                 text: qsTr("Pick sample")
 
                 onClicked: {
-                    samplePickerDialog.folderModel.folder = '/zynqtgui/zynqtgui-my-data/samples'
+                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
                     samplePickerDialog.open()
                     samplePickerPopup.close()
                 }
@@ -773,7 +773,7 @@ Rectangle {
                 text: qsTr("Pick sample-bank")
 
                 onClicked: {
-                    bankPickerDialog.folderModel.folder = '/zynqtgui/zynqtgui-my-data/sample-banks'
+                    bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
                     bankPickerDialog.open()
                     samplePickerPopup.close()
                 }

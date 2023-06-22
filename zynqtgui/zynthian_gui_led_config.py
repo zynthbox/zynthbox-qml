@@ -37,7 +37,7 @@ from PySide2.QtGui import QColor
 led_color_off = rpi_ws281x.Color(0, 0, 0)
 led_color_blue = rpi_ws281x.Color(0, 50, 200)
 led_color_green = rpi_ws281x.Color(0, 255, 0)
-led_color_red = rpi_ws281x.Color(247, 124, 124)
+led_color_red = rpi_ws281x.Color(255, 0, 0)
 led_color_yellow = rpi_ws281x.Color(255, 235, 59)
 led_color_purple = rpi_ws281x.Color(142, 36, 170)
 led_color_lightblue= rpi_ws281x.Color(50, 100, 255)
@@ -47,8 +47,8 @@ led_color_active = led_color_green
 
 led_color_channel_synth = led_color_red
 led_color_channel_loop = led_color_green
-led_color_channel_sample = led_color_green
-led_color_channel_external = led_color_yellow
+led_color_channel_sample = led_color_yellow
+led_color_channel_external = led_color_purple
 
 wsleds: rpi_ws281x.PixelStrip = None
 

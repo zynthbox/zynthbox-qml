@@ -515,8 +515,8 @@ Kirigami.AbstractApplicationWindow {
             font.pointSize: 11
             onClicked: {
                 // print(zynqtgui.sketchpad.song.scenesModel.getScene(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).name)
-                //zynqtgui.current_modal_screen_id = 'sketchpad'
-                tracksMenu.open()
+                zynqtgui.current_modal_screen_id = 'sketchpad'
+                // tracksMenu.open()
             }
             //onPressAndHold: zynqtgui.current_screen_id = 'main'
             // highlighted: zynqtgui.current_screen_id === 'sketchpad'
@@ -533,11 +533,11 @@ Kirigami.AbstractApplicationWindow {
                     text: zynqtgui.sketchpad.song.name
                 }
 
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    font.pointSize: 10
-                    text: zynqtgui.sketchpad.song.scenesModel.selectedTrackName + "ˬ"
-                }
+//                QQC2.Label {
+//                    Layout.alignment: Qt.AlignHCenter
+//                    font.pointSize: 10
+//                    text: zynqtgui.sketchpad.song.scenesModel.selectedTrackName + "ˬ"
+//                }
             }
 
 

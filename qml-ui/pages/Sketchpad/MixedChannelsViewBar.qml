@@ -220,25 +220,34 @@ Rectangle {
 
                             QQC2.Button {
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "synth"
-                                text: qsTr("Synth")
+                                text: qsTr("Synths")
                                 onClicked: root.selectedChannel.channelAudioType = "synth"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
-                                checked: root.selectedChannel.channelAudioType.startsWith("sample-")
+                                checked: root.selectedChannel.channelAudioType === "sample-trig"
                                 text: qsTr("Samples")
                                 onClicked: root.selectedChannel.channelAudioType = "sample-trig"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                Layout.fillHeight: true
+                                checkable: true
+                                checked: root.selectedChannel.channelAudioType.startsWith("sample-loop")
+                                text: qsTr("Sketches")
+                                onClicked: root.selectedChannel.channelAudioType = "sample-loop"
+                            }
+                            QQC2.Button {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "external"
@@ -259,37 +268,37 @@ Rectangle {
 
                                 RowLayout {
                                     anchors.fill: parent
-
-                                    RowLayout {
-                                        visible: root.selectedChannel.channelAudioType.startsWith("sample-")
-                                        Layout.fillHeight: true
-                                        spacing: 0
-
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: "Audio"
-                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
-                                            onClicked: {
-                                                root.selectedChannel.channelAudioType = "sample-loop"
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: "Trig"
-                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
-                                            onClicked: {
-                                                root.selectedChannel.channelAudioType = "sample-trig"
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: "Slice"
-                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-slice"
-                                            onClicked: {
-                                                root.selectedChannel.channelAudioType = "sample-slice"
-                                            }
-                                        }
-                                    }
+                                
+                                //     RowLayout {
+                                //         visible: root.selectedChannel.channelAudioType.startsWith("sample-")
+                                //         Layout.fillHeight: true
+                                //         spacing: 0
+                                // 
+                                //         QQC2.Button {
+                                //             Layout.fillHeight: true
+                                //             text: "Audio"
+                                //             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
+                                //             onClicked: {
+                                //                 root.selectedChannel.channelAudioType = "sample-loop"
+                                //             }
+                                //         }
+                                //         QQC2.Button {
+                                //             Layout.fillHeight: true
+                                //             text: "Trig"
+                                //             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
+                                //             onClicked: {
+                                //                 root.selectedChannel.channelAudioType = "sample-trig"
+                                //             }
+                                //         }
+                                //         QQC2.Button {
+                                //             Layout.fillHeight: true
+                                //             text: "Slice"
+                                //             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-slice"
+                                //             onClicked: {
+                                //                 root.selectedChannel.channelAudioType = "sample-slice"
+                                //             }
+                                //         }
+                                //     }
 
                                     Item {
                                         Layout.fillWidth: true
@@ -363,15 +372,21 @@ Rectangle {
                                         }
                                     }
                                     RowLayout {
+                                        id: bounceButtonLayout
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                 root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                 root.selectedChannel.channelAudioType === "synth"
+                                        property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && waveformContainer.clip && waveformContainer.clip.metadataMidiRecording != null && waveformContainer.clip.metadataMidiRecording.length > 10
+                                        property bool shouldBounce: root.selectedChannel.channelAudioType !== "sample-loop"
+                                        visible: shouldBounce || shouldUnbounce
                                         QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: "Bounce To Audio"
+                                            text: bounceButtonLayout.shouldBounce ? qsTr("Bounce To Sketch") : (bounceButtonLayout.shouldUnbounce ? qsTr("Unbounce To Pattern") : "")
+                                            icon.name: bounceButtonLayout.shouldBounce ? "go-previous" : "go-next"
                                             onClicked: {
-                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
+                                                if (bounceButtonLayout.shouldBounce) {
+                                                    bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
+                                                } else if (bounceButtonLayout.shouldUnbounce) {
+                                                    // TODO Actually implement unbouncing functionality, dependent on what's contained in the sketch
+                                                    root.selectedChannel.channelAudioType = "synth";
+                                                }
                                             }
                                         }
                                         Item {
@@ -569,6 +584,85 @@ Rectangle {
                                                     repeat: false
                                                     onTriggered: {
                                                         delegateMouseArea.dragHappened = false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+
+                                Binding { //Optimization
+                                    target: fxRepeater
+                                    property: "fxData"
+                                    delayed: true
+                                    value: root.selectedChannel.channelAudioType === "external"
+                                        ? root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                                        : [null, null, null, null, null]
+                                }
+
+                                Repeater {
+                                    id: fxRepeater
+
+                                    model: 5
+                                    property var fxData: [null, null, null, null, null]
+                                    delegate: Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        border.width: 2
+                                        color: "transparent"
+                                        radius: 4
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: 4
+                                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                            color: Kirigami.Theme.backgroundColor
+                                            border.color: "#ff999999"
+                                            border.width: 1
+                                            radius: 4
+
+                                            QQC2.Label {
+                                                anchors {
+                                                    verticalCenter: parent.verticalCenter
+                                                    left: parent.left
+                                                    right: parent.right
+                                                    leftMargin: Kirigami.Units.gridUnit*0.5
+                                                    rightMargin: Kirigami.Units.gridUnit*0.5
+                                                }
+                                                horizontalAlignment: Text.AlignLeft
+                                                text: fxRepeater.fxData[index] ? fxRepeater.fxData[index] : ""
+
+                                                elide: "ElideRight"
+                                            }
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                    var chainedSound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+                                                    if (zynqtgui.backButtonPressed) {
+                                                        // Back is pressed. Clear Slot
+                                                        if (root.selectedChannel.checkIfLayerExists(chainedSound)) {
+                                                            zynqtgui.start_loading()
+                                                            zynqtgui.fixed_layers.activate_index(chainedSound)
+                                                            zynqtgui.layer_effects.fx_reset_confirmed()
+                                                            zynqtgui.stop_loading()
+                                                        }
+                                                    } else {
+                                                        zynqtgui.fixed_layers.activate_index(chainedSound)
+                                                        zynqtgui.layer_options.show();
+                                                        var screenBack = zynqtgui.current_screen_id;
+                                                        zynqtgui.current_screen_id = "layer_effects";
+                                                        root.openBottomDrawerOnLoad = true;
+                                                        zynqtgui.forced_screen_back = screenBack;
                                                     }
                                                 }
                                             }

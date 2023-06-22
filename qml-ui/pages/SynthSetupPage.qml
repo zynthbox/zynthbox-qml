@@ -55,8 +55,13 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            enabled: false
-            visible: false
+            text: qsTr("Fav Mode")
+            checkable: true
+            checked: zynqtgui.bank.show_top_sounds
+            onToggled: {
+                zynqtgui.bank.show_top_sounds = checked;
+                zynqtgui.current_screen_id = "bank";
+            }
         },
         Kirigami.Action {
             enabled: false
@@ -279,7 +284,7 @@ Zynthian.ScreenPage {
                     text: qsTr("Channel %1 Sounds").arg(zynqtgui.session_dashboard.selectedChannel+1)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    Layout.preferredHeight: favModeButton.height
+                    Layout.preferredHeight: favToggleButton.height
                 }
             }
             Zynthian.SelectorView {
@@ -473,16 +478,7 @@ Zynthian.ScreenPage {
                         text: visible ? qsTr("Banks (%1)").arg(zynqtgui.bank.effective_count) : "";
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    }
-                    QQC2.Button {
-                        id: favModeButton
-                        text: qsTr("Fav-Mode")
-                        checkable: true
-                        checked: zynqtgui.bank.show_top_sounds
-                        onToggled: {
-                            zynqtgui.bank.show_top_sounds = checked;
-                            zynqtgui.current_screen_id = "bank";
-                        }
+                        Layout.preferredHeight: favToggleButton.height
                     }
                 }
                 Zynthian.SelectorView {

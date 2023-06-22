@@ -836,7 +836,7 @@ Zynthian.ScreenPage {
                         highlightOnFocus: false
 //                        highlighted: root.displayTrackButtons
 //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
-                        text: qsTr("Channel Ch%1").arg(root.selectedChannel.id + 1)
+                        text: qsTr("Channel\nCh%1").arg(root.selectedChannel.id + 1)
                         onPressed: {
 //                            root.displayTrackButtons = !root.displayTrackButtons
 //                            bottomStack.slotsBar.channelButton.checked = true

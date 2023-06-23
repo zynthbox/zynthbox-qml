@@ -81,7 +81,7 @@ Zynthian.Card {
             tabActions: [
                 Zynthian.TabbedControlViewAction {
                     id: channelAction
-                    text: qsTr("Channel")
+                    text: qsTr("Track")
                     page: Qt.resolvedUrl("ChannelBar.qml")
                     visible: root.controlType === SideBar.ControlType.Channel
                     initialProperties: {"sideBar": root}

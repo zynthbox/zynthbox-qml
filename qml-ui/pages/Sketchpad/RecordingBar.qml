@@ -95,7 +95,7 @@ GridLayout {
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
-            text: qsTr("Channel")
+            text: qsTr("Track")
         }
 
         QQC2.ComboBox {

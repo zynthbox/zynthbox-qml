@@ -100,7 +100,7 @@ GridLayout {
             // As per #299 disable this button
             visible: false
             Layout.alignment: Qt.AlignCenter
-            text: "Channel Editor"
+            text: "Track Editor"
             onClicked: {
                 zynqtgui.current_modal_screen_id = "channel"
             }

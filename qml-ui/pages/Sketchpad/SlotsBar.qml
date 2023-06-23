@@ -338,7 +338,7 @@ Rectangle {
                         Layout.fillHeight: true
                         checkable: true
                         enabled: !root.displaySceneButtons
-                        text: qsTr("Channel")
+                        text: qsTr("Track")
                         onCheckedChanged: {
                             if (checked) {
                                 bottomStack.currentIndex = 3

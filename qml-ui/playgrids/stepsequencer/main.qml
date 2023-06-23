@@ -1584,7 +1584,7 @@ Zynthian.BasePlayGrid {
                                                     Layout.fillHeight: true
                                                     Layout.preferredHeight: patternsMenuItem.height / 2
                                                     Layout.fillWidth: true
-                                                    text: patternsMenuItem.associatedChannel ? "Channel " + patternsMenuItem.associatedChannel.name : "(no channel)"
+                                                    text: patternsMenuItem.associatedChannel ? "Track " + patternsMenuItem.associatedChannel.name : "(no channel)"
                                                     font.pixelSize: 15
                                                     Kirigami.Theme.inherit: false
                                                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -1881,14 +1881,14 @@ Zynthian.BasePlayGrid {
                         RowLayout {
                             Layout.fillWidth: true
                             Zynthian.PlayGridButton {
-                                text: "Channel 1-5"
+                                text: "Track 1-5"
                                 onClicked: {
                                     patternsMenuListView.positionViewAtIndex(0, ListView.Beginning);
                                 }
                                 checked: patternsMenuListView.contentY < (patternsMenuList.height / 2)
                             }
                             Zynthian.PlayGridButton {
-                                text: "Channel 6-10"
+                                text: "Track 6-10"
                                 onClicked: {
                                     patternsMenuListView.positionViewAtIndex(5, ListView.Beginning);
                                 }

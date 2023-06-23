@@ -510,7 +510,7 @@ class sketchpad_channel(QObject):
 
     def name(self):
         if self.__name__ is None:
-            return f"Ch{self.__id__ + 1}"
+            return f"T{self.__id__ + 1}"
         else:
             return self.__name__
 

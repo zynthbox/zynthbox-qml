@@ -215,7 +215,7 @@ Rectangle {
                                 controlObj: root.selectedChannel
                                 controlType: "bottombar-controltype-channel"
 
-                                text: qsTr("Channel: %1").arg(controlObj ? controlObj.name : "")
+                                text: qsTr("Track: %1").arg(controlObj ? controlObj.name : "")
                             }
 
                             QQC2.Button {

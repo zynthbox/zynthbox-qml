@@ -37,7 +37,7 @@ from PySide2.QtCore import Qt, QObject, Signal, Slot, Property
 class zynthian_gui_channel(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_channel, self).__init__(parent)
-        self.title = "Channels"
+        self.title = "Tracks"
         self.__channel_id__ = 0
         self.__part_id__ = 0
 

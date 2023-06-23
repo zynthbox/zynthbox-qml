@@ -835,7 +835,7 @@ Zynthian.ScreenPage {
                         highlightOnFocus: false
 //                        highlighted: root.displayTrackButtons
 //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
-                        text: qsTr("Channel\nCh%1").arg(root.selectedChannel.id + 1)
+                        text: qsTr("Track\nT%1").arg(root.selectedChannel.id + 1)
                         onPressed: {
 //                            root.displayTrackButtons = !root.displayTrackButtons
 //                            bottomStack.slotsBar.channelButton.checked = true
@@ -1228,9 +1228,9 @@ Zynthian.ScreenPage {
                                                   ? root.lastSelectedObj.className === "sketchpad_clip"
                                                     ? qsTr("Clip")
                                                     : root.lastSelectedObj.className === "sketchpad_channel"
-                                                        ? qsTr("Channel")
+                                                        ? qsTr("Track")
                                                         : root.lastSelectedObj.className === "sketchpad_track"
-                                                            ? qsTr("Track")
+                                                            ? qsTr("Deprecated Track")
                                                             : root.lastSelectedObj.className === "sketchpad_part"
                                                               ? qsTr("Clip")
                                                               : root.lastSelectedObj.className === "sketchpad_segment"
@@ -1308,9 +1308,9 @@ Zynthian.ScreenPage {
                                                        ? root.copySourceObj.className === "sketchpad_clip"
                                                            ? qsTr("Clip")
                                                            : root.copySourceObj.className === "sketchpad_channel"
-                                                               ? qsTr("Channel")
+                                                               ? qsTr("Track")
                                                                : root.copySourceObj.className === "sketchpad_track"
-                                                                   ? qsTr("Track")
+                                                                   ? qsTr("Deprecated Track")
                                                                    : root.copySourceObj.className === "sketchpad_part"
                                                                      ? qsTr("Clip")
                                                                      : root.copySourceObj.className === "sketchpad_segment"

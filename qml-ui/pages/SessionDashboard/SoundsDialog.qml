@@ -271,7 +271,7 @@ Zynthian.Dialog {
                                     var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(i);
                                     var chains = zynqtgui.layer.chainForLayer(i);
 
-                                    // console.log("Channel T"+(parseInt(k)+1))
+                                    // console.log("Track T"+(parseInt(k)+1))
 
                                     for (var k in channel.chainedSounds) {
                                         // console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", channel.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));

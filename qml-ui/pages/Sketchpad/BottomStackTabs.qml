@@ -37,7 +37,7 @@ ColumnLayout {
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.channelButton.checked : false
         enabled: !root.displaySceneButtons
-        text: qsTr("Channel")
+        text: qsTr("Track")
         onClicked: {
             bottomStack.slotsBar.channelButton.checked = true
         }

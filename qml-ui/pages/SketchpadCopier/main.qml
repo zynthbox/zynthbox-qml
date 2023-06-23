@@ -71,10 +71,10 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: "Channel"
+            text: "Track"
 
             Kirigami.Action {
-                text: "Copy Channel"
+                text: "Copy Track"
                 iconName: "edit-copy-symbolic"
                 enabled: !copier.isCopyInProgress
                 visible: !copier.isCopyInProgress
@@ -338,7 +338,7 @@ Zynthian.ScreenPage {
             Layout.preferredHeight: 1
 
             QQC2.Label {
-                text: qsTr("Channel %1: %2")
+                text: qsTr("Track %1: %2")
                         .arg(channelsData.selectedChannel ? (channelsData.selectedChannel.id+1) : "")
                         .arg(channelsData.selectedChannel ? channelsData.selectedChannel.name : "")
                 opacity: 0.7

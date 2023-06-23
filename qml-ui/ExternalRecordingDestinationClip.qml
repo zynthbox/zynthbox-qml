@@ -128,7 +128,7 @@ ColumnLayout {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                    text: "Channel " + (index+1)
+                    text: "Track " + (index+1)
                 }
                 Repeater {
                     model: 5

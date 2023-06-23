@@ -629,7 +629,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: channelButton
             icon.color: customTheme.Kirigami.Theme.textColor
-            text: qsTr("Channel %1 ˬ")
+            text: qsTr("Track %1 ˬ")
                     .arg(zynqtgui.session_dashboard.selectedChannel+1)
 
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
@@ -1251,7 +1251,7 @@ Kirigami.AbstractApplicationWindow {
 
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("Channels")
+                            text: qsTr("Tracks")
                         }
 
                         Repeater {
@@ -1328,7 +1328,7 @@ Kirigami.AbstractApplicationWindow {
 
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("Channels")
+                            text: qsTr("Tracks")
                         }
 
                         Repeater {

@@ -131,7 +131,7 @@ Rectangle {
                         case "bottombar-controltype-pattern":
                             return qsTr("CLIP: %1").arg(text);
                         case "bottombar-controltype-channel":
-                            return qsTr("CHANNEL: %1").arg(text);
+                            return qsTr("TRACK: %1").arg(text);
                         case "bottombar-controltype-part":
                             return qsTr("PART: %1").arg(text);
     //                    case "bottombar-controltype-pattern":
@@ -273,7 +273,7 @@ Rectangle {
                             case "bottombar-controltype-pattern":
                                 return qsTr("CLIP: %1").arg(text);
                             case "bottombar-controltype-channel":
-                                return qsTr("CHANNEL: %1").arg(text);
+                                return qsTr("TRACK: %1").arg(text);
                             case "bottombar-controltype-part":
                                 return qsTr("PART: %1").arg(text);
     //                        case "bottombar-controltype-pattern":
@@ -390,7 +390,7 @@ Rectangle {
                     },
                     Zynthian.TabbedControlViewAction {
                         id: channelAction
-                        text: qsTr("Channel")
+                        text: qsTr("Track")
                         page: Qt.resolvedUrl("ChannelBar.qml")
                         preload: true
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"

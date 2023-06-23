@@ -271,16 +271,16 @@ Zynthian.Popup {
                         model: ListModel {
                             id: channelComboModel
 
-                            ListElement { text: "Channel 1"; value: 0 }
-                            ListElement { text: "Channel 2"; value: 1 }
-                            ListElement { text: "Channel 3"; value: 2 }
-                            ListElement { text: "Channel 4"; value: 3 }
-                            ListElement { text: "Channel 5"; value: 4 }
-                            ListElement { text: "Channel 6"; value: 5 }
-                            ListElement { text: "Channel 7"; value: 6 }
-                            ListElement { text: "Channel 8"; value: 7 }
-                            ListElement { text: "Channel 9"; value: 8 }
-                            ListElement { text: "Channel 10"; value: 9 }
+                            ListElement { text: "Track 1"; value: 0 }
+                            ListElement { text: "Track 2"; value: 1 }
+                            ListElement { text: "Track 3"; value: 2 }
+                            ListElement { text: "Track 4"; value: 3 }
+                            ListElement { text: "Track 5"; value: 4 }
+                            ListElement { text: "Track 6"; value: 5 }
+                            ListElement { text: "Track 7"; value: 6 }
+                            ListElement { text: "Track 8"; value: 7 }
+                            ListElement { text: "Track 9"; value: 8 }
+                            ListElement { text: "Track 10"; value: 9 }
                         }
                         textRole: "text"
                         currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
@@ -298,7 +298,7 @@ Zynthian.Popup {
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                         Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Channel")
+                        text: qsTr("Track")
                     }
 
                     Zynthian.ComboBox {

@@ -76,7 +76,7 @@ Zynthian.ScreenPage {
             QQC2.Label {
                 Layout.leftMargin: Kirigami.Units.gridUnit
                 font.pointSize: 16
-                text: qsTr("Channels")
+                text: qsTr("Tracks")
             }
 
             RowLayout {

@@ -288,7 +288,7 @@ Zynthian.Popup {
             ColumnLayout {
                 QQC2.Label {
                     Layout.fillWidth: true
-                    text: qsTr("Channel:")
+                    text: qsTr("Track:")
                 }
                 QQC2.Label {
                     Layout.fillHeight: true

@@ -35,7 +35,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: component
     screenId: "channel_external_setup"
-    title: qsTr("Channel External Setup")
+    title: qsTr(Track External Setup")
     property bool isVisible:zynqtgui.current_screen_id === "channel_external_setup"
 
     property var cuiaCallback: function(cuia) {

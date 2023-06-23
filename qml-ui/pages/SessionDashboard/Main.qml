@@ -343,7 +343,7 @@ Zynthian.ScreenPage {
             tabActions: [
                 Zynthian.TabbedControlViewAction {
                     id: channelsViewTab
-                    text: qsTr("Channels")
+                    text: qsTr("Tracks")
                     page: Qt.resolvedUrl("ChannelsView.qml")
                 },
                 Zynthian.TabbedControlViewAction {

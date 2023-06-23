@@ -545,7 +545,7 @@ Zynthian.Dialog {
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
                             visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Channels: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels : 0)
+                            label: qsTr("Tracks: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels : 0)
                         }
 
                         Kirigami.BasicListItem {

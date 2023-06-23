@@ -36,7 +36,7 @@ import "./Sketchpad" as Sketchpad
 Zynthian.ScreenPage {
     id: component
     screenId: "channel_wave_editor"
-    title: qsTr("Channel Wave Editor")
+    title: qsTr("Track Wave Editor")
 
     property bool isVisible:zynqtgui.current_screen_id === "channel_wave_editor"
     property QtObject selectedChannel: null
@@ -288,7 +288,7 @@ Zynthian.ScreenPage {
 
         QQC2.Label {
             Layout.fillHeight: false
-            text: qsTr("Channel %1 Clips").arg(component.selectedChannel.id + 1)
+            text: qsTr("Track %1 Clips").arg(component.selectedChannel.id + 1)
             font.pointSize: Kirigami.Units.gridUnit
         }
 

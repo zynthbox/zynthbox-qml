@@ -51,7 +51,7 @@ Zynthian.Dialog {
     property alias listCount: filesListView.count
 
     property var cuiaCallback: function (cuia) {
-        var result = root.opened;
+        var result = true;
         switch (cuia) {
             case "NAVIGATE_LEFT":
             case "NAVIGATE_RIGHT":
@@ -101,6 +101,7 @@ Zynthian.Dialog {
                 result = true;
                 break;
         }
+        return result;
     }
 
     function goBack() {

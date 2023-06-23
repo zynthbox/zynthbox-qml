@@ -118,7 +118,7 @@ Kirigami.AbstractApplicationWindow {
                 break;
             case "KNOB3_UP":
                 if (zynqtgui.altButtonPressed) {
-                    // Do nothing with BK
+                    root.updateMasterVolume(1);
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     root.updateSketchpadBpm(1)
@@ -127,7 +127,7 @@ Kirigami.AbstractApplicationWindow {
                 break;
             case "KNOB3_DOWN":
                 if (zynqtgui.altButtonPressed) {
-                    // Do nothing with BK
+                    root.updateMasterVolume(-1);
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
                     root.updateSketchpadBpm(-1)

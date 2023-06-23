@@ -322,11 +322,11 @@ MouseArea {
                     result = true;
                     break;
                 case "KNOB0_UP":
-                    applicationWindow().updateMasterVolume(1);
+                    applicationWindow().updateSketchpadBpm(1);
                     result = true;
                     break;
                 case "KNOB0_DOWN":
-                    applicationWindow().updateMasterVolume(-1);
+                    applicationWindow().updateSketchpadBpm(-1);
                     result = true;
                     break;
                 case "KNOB1_UP":
@@ -345,12 +345,12 @@ MouseArea {
                     applicationWindow().updateGlobalReverbFXAmount(-1);
                     result = true;
                     break;
-                case "KNOB3_UP":
-                    applicationWindow().updateSketchpadBpm(1);
+                case "KNOB3_UP":                    
+                    applicationWindow().updateMasterVolume(1);
                     result = true;
                     break;
                 case "KNOB3_DOWN":
-                    applicationWindow().updateSketchpadBpm(-1);
+                    applicationWindow().updateMasterVolume(-1);
                     result = true;
                     break;
                 case "ALL_NOTES_OFF":
@@ -371,6 +371,46 @@ MouseArea {
             GridLayout {
                 anchors.fill: parent;
                 columns: 3
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: SketchpadDial {
+                        id: volumeDial
+                        text: qsTr("Volume")
+                        controlObj: zynqtgui
+                        controlProperty: "masterVolume"
+                        valueString: qsTr("%1%").arg(dial.value)
+
+                        dial {
+                            stepSize: 1
+                            from: 0
+                            to: 100
+                        }
+                    }
+                }
+                Card {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    contentItem: ColumnLayout {
+                        visible: false // Hide scale for now
+                        SketchpadMultiSwitch {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            controlObj: zynqtgui.sketchpad.song
+                            controlProperty: "selectedScaleIndex"
+                            from: 0
+                            to: 11
+                            text: zynqtgui.sketchpad.song.selectedScale
+                        }
+                        QQC2.Label {
+                            text: qsTr("Scale")
+                            Layout.fillWidth: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                }
                 Card {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -411,46 +451,6 @@ MouseArea {
                                 bpmDial.bpm = 60000 / average;
                                 Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                             }
-                        }
-                    }
-                }
-                Card {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
-                    contentItem: ColumnLayout {
-                        visible: false // Hide scale for now
-                        SketchpadMultiSwitch {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            controlObj: zynqtgui.sketchpad.song
-                            controlProperty: "selectedScaleIndex"
-                            from: 0
-                            to: 11
-                            text: zynqtgui.sketchpad.song.selectedScale
-                        }
-                        QQC2.Label {
-                            text: qsTr("Scale")
-                            Layout.fillWidth: true
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-                }
-                Card {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
-                    contentItem: SketchpadDial {
-                        id: volumeDial
-                        text: qsTr("Volume")
-                        controlObj: zynqtgui
-                        controlProperty: "masterVolume"
-                        valueString: qsTr("%1%").arg(dial.value)
-
-                        dial {
-                            stepSize: 1
-                            from: 0
-                            to: 100
                         }
                     }
                 }

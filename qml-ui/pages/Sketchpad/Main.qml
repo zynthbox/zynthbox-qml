@@ -983,20 +983,7 @@ Zynthian.ScreenPage {
                                         onSamplesChanged: updateKeyZones();
                                     }
                                     subText: null
-                                    subSubText: {
-                                        if (channelHeaderDelegate.channel.channelAudioType === "sample-loop") {
-                                            return qsTr("Sketch")
-                                        } else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig") {
-                                            return qsTr("Sample")
-                                        } else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice") {
-                                            return qsTr("Smp: Slice")
-                                        } else if (channelHeaderDelegate.channel.channelAudioType === "synth") {
-                                            return qsTr("Synth")
-                                        } else if (channelHeaderDelegate.channel.channelAudioType === "external") {
-                                            return qsTr("External")
-                                        }
-                                    }
-
+                                    subSubText: channelHeaderDelegate.channel.channelTypeDisplayName
                                     subSubTextSize: 7
 
                                     Binding {

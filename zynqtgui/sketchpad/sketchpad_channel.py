@@ -987,6 +987,20 @@ class sketchpad_channel(QObject):
     channelAudioType = Property(str, get_channel_audio_type, set_channel_audio_type, notify=channel_audio_type_changed)
     ### END Property channelAudioType
 
+    ### BEGIN Property channelTypeDisplayName
+    def get_channelTypeDisplayName(self):
+        if self.__channel_audio_type__ == "synth":
+            return "Synths"
+        elif self.__channel_audio_type__ == "sample-loop":
+            return "Sketches"
+        elif self.__channel_audio_type__.startswith("sample"):
+            return "Samples"
+        elif self.__channel_audio_type__ == "external":
+            return "External"
+
+    channelTypeDisplayName = Property(str, get_channelTypeDisplayName, notify=channel_audio_type_changed)
+    ### END Property channelTypeDisplayName
+
     ### Property samples
     def get_samples(self):
         return self.__samples__

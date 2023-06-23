@@ -1271,9 +1271,9 @@ Kirigami.AbstractApplicationWindow {
                                     subText: null
                                     subSubText: {
                                         if (channelHeaderDelegate.channel.channelAudioType === "sample-loop") {
-                                            return qsTr("Audio")
+                                            return qsTr("Sketch")
                                         } else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig") {
-                                            return qsTr("Smp: Trig")
+                                            return qsTr("Sample")
                                         } else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice") {
                                             return qsTr("Smp: Slice")
                                         } else if (channelHeaderDelegate.channel.channelAudioType === "synth") {
@@ -1293,15 +1293,15 @@ Kirigami.AbstractApplicationWindow {
 
                                         value: {
                                             if (channelHeaderDelegate.channel.channelAudioType === "synth")
-                                                return "#66ff0000"
+                                                return zynqtgui.sketchpad.channelTypeSynthColor
                                             else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop")
-                                                return "#6600ff00"
+                                                return zynqtgui.sketchpad.channelTypeSketchesColor
                                             else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig")
-                                                return "#66ffff00"
+                                                return zynqtgui.sketchpad.channelTypeSamplesColor
                                             else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice")
-                                                return "#66ffff00"
+                                                return zynqtgui.sketchpad.channelTypeSamplesColor
                                             else if (channelHeaderDelegate.channel.channelAudioType === "external")
-                                                return "#998e24aa"
+                                                return zynqtgui.sketchpad.channelTypeExternalColor
                                             else
                                                 return "#66888888"
                                         }

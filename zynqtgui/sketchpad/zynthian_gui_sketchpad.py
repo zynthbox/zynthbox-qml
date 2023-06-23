@@ -37,6 +37,7 @@ from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
 from PySide2.QtCore import QMetaObject, Qt, Property, QObject, QTimer, Signal, Slot
+from PySide2.QtGui import QColor
 from ..zynthian_gui_multi_controller import MultiController
 from . import sketchpad_clip, sketchpad_song
 from .. import zynthian_qt_gui_base
@@ -87,6 +88,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
         self.__metronomeVolume = 1.0
+        self.__channel_type_synth_color = QColor(255, 0, 0, 200)
+        self.__channel_type_sketches_color = QColor(0, 255, 0, 200)
+        self.__channel_type_samples_color = QColor(255, 235, 59, 200)
+        self.__channel_type_external_color = QColor(142, 36, 170, 200)
         # This variable tells zynthian_qt_gui to load last state snapshot when booting when set to True
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
@@ -357,6 +362,34 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     metronomeVolume = Property(float, get_metronomeVolume, set_metronomeVolume, notify=metronomeVolumeChanged)
     ### END Property metronomeVolume
+
+    ### BEGIN Property channelTypeSynthColor
+    def get_channelTypeSynthColor(self):
+        return self.__channel_type_synth_color
+
+    channelTypeSynthColor = Property(QColor, get_channelTypeSynthColor, constant=True)
+    ### END Property channelTypeSynthColor
+
+    ### BEGIN Property channelTypeSketchesColor
+    def get_channelTypeSketchesColor(self):
+        return self.__channel_type_sketches_color
+
+    channelTypeSketchesColor = Property(QColor, get_channelTypeSketchesColor, constant=True)
+    ### END Property channelTypeSketchesColor
+
+    ### BEGIN Property channelTypeSamplesColor
+    def get_channelTypeSamplesColor(self):
+        return self.__channel_type_samples_color
+
+    channelTypeSamplesColor = Property(QColor, get_channelTypeSamplesColor, constant=True)
+    ### END Property channelTypeSamplesColor
+
+    ### BEGIN Property channelTypeExternalColor
+    def get_channelTypeExternalColor(self):
+        return self.__channel_type_external_color
+
+    channelTypeExternalColor = Property(QColor, get_channelTypeExternalColor, constant=True)
+    ### END Property channelTypeExternalColor
 
     @Signal
     def metronomeEnabledChanged(self):

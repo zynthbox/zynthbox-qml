@@ -45,11 +45,6 @@ led_color_lightblue= rpi_ws281x.Color(50, 100, 255)
 led_color_inactive = led_color_blue
 led_color_active = led_color_green
 
-led_color_channel_synth = led_color_red
-led_color_channel_loop = led_color_green
-led_color_channel_sample = led_color_yellow
-led_color_channel_external = led_color_purple
-
 wsleds: rpi_ws281x.PixelStrip = None
 
 
@@ -172,6 +167,16 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     """
     def __init__(self, parent=None):
         super(zynthian_gui_led_config, self).__init__(parent)
+
+        from . import zynthian_gui_config
+        zynqtgui = zynthian_gui_config.zynqtgui
+
+        global led_color_channel_synth, led_color_channel_loop, led_color_channel_sample, led_color_channel_external
+
+        led_color_channel_synth = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeSynthColor.red(), zynqtgui.sketchpad.channelTypeSynthColor.green(), zynqtgui.sketchpad.channelTypeSynthColor.blue())
+        led_color_channel_loop = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeSketchesColor.red(), zynqtgui.sketchpad.channelTypeSketchesColor.green(), zynqtgui.sketchpad.channelTypeSketchesColor.blue())
+        led_color_channel_sample = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeSamplesColor.red(), zynqtgui.sketchpad.channelTypeSamplesColor.green(), zynqtgui.sketchpad.channelTypeSamplesColor.blue())
+        led_color_channel_external = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeExternalColor.red(), zynqtgui.sketchpad.channelTypeExternalColor.green(), zynqtgui.sketchpad.channelTypeExternalColor.blue())
 
         self.channel = None
         self.button_config = {}

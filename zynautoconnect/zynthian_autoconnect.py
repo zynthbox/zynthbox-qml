@@ -30,6 +30,7 @@ import logging
 from time import sleep
 from threading  import Thread, Lock
 from collections import OrderedDict
+from itertools import cycle
 
 # Zynthian specific modules
 from PySide2.QtCore import QTimer
@@ -550,6 +551,8 @@ def audio_autoconnect(force=False):
     #                 return
     # ### END Bluetooth ports connection
 
+    # TODO We are only connecting the first pair of ports here (since the global channels don't really have advanced routing anyway).
+    # TODO Maybe we could actually get away with only using the one global samplersynth, and instead use the two first lanes to perform the same job? (no effect for lane 0, effects for lane 1, no connection for the other three)
     # Connect SamplerSynth's global effected to the global effects passthrough
     for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), globalFx1InputPorts):
         try:
@@ -559,14 +562,7 @@ def audio_autoconnect(force=False):
         try:
             jclient.connect(port[0], port[1])
         except: pass
-    # Disconnect global effected port from system playback
-    for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
-        try:
-            #logging.info(f"Disconnecting global effected port from {port[1]}")
-            jclient.disconnect(port[0], port[1])
-        except Exception as e:
-            #logging.info(f"Could not disconnect the global effected channel from playback: {e}")
-            pass
+
 
     # Connect global FX ports to system playback
     for port in zip(globalFx1OutputPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
@@ -587,7 +583,7 @@ def audio_autoconnect(force=False):
         for channelId in range(0, 10):
             channel = song.channelsModel.getChannel(channelId)
             if channel is not None:
-                channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}-", is_audio=True, is_output=True)
+                channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}-lane", is_audio=True, is_output=True)
                 # Firstly, attempt to connect the channel to any effects attached to the channel
                 channelHasEffects = False
                 if len(channel.chainedSounds) > 0:
@@ -603,7 +599,7 @@ def audio_autoconnect(force=False):
                                             engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
                                             if len(engineInPorts) == 1:
                                                 engineInPorts.append(engineInPorts[0]);
-                                            for port in zip(channelPorts, engineInPorts):
+                                            for port in zip(channelPorts, cycle(engineInPorts)):
                                                 channelHasEffects = True
                                                 try:
                                                     jclient.connect(port[0], port[1])
@@ -620,16 +616,16 @@ def audio_autoconnect(force=False):
                 if not channelHasEffects:
                     try:
                         if channel.routeThroughGlobalFX:
-                            for port in zip(channelPorts, playback_ports):
+                            for port in zip(channelPorts, cycle(playback_ports)):
                                 try:
                                     jclient.disconnect(port[0], port[1])
                                 except: pass
-                            for port in zip(channelPorts, jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channel.id + 1}", is_audio=True, is_input=True)):
+                            for port in zip(channelPorts, cycle(jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channel.id + 1}-input", is_audio=True, is_input=True))):
                                 try:
                                     jclient.connect(port[0], port[1])
                                 except: pass
                         else:
-                            for port in zip(channelPorts, playback_ports):
+                            for port in zip(channelPorts, cycle(playback_ports)):
                                 try:
                                     jclient.connect(port[0], port[1])
                                 except: pass

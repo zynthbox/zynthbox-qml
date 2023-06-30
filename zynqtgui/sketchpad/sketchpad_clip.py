@@ -80,6 +80,7 @@ class sketchpad_clip(QObject):
         self.__slices__ = 16
         self.__enabled__ = False
         self.channel = None
+        self.__lane = 0
 
         self.__autoStopTimer__ = QTimer()
         self.__autoStopTimer__.setSingleShot(True)
@@ -117,6 +118,8 @@ class sketchpad_clip(QObject):
         self.saveMetadataTimer.setInterval(1000)
         self.saveMetadataTimer.setSingleShot(True)
         self.saveMetadataTimer.timeout.connect(self.doSaveMetadata)
+
+        self.path_changed.connect(self.zynqtgui.zynautoconnect_audio)
 
     # A helper method to generate unique name when copying a clip file into a folder
     # Arg file : Full Path of file to be copied
@@ -455,6 +458,21 @@ class sketchpad_clip(QObject):
 
     part = Property(int, part, constant=True)
 
+    def lane(self):
+        return self.__lane
+
+    def set_lane(self, lane: int):
+        if self.__lane != lane:
+            self.__lane = lane
+            if self.audioSource is not None:
+                self.audioSource.setLaneAffinity(lane)
+            self.lane_changed.emit()
+
+    @Signal
+    def lane_changed(self):
+        pass
+
+    lane = Property(int, lane, set_lane, notify=lane_changed)
 
     def name(self):
         return f"{self.get_channel_name()}-{self.get_part_name()}"
@@ -622,6 +640,7 @@ class sketchpad_clip(QObject):
             self.audioSource.deleteLater()
 
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
+        self.audioSource.setLaneAffinity(self.__lane)
         if self.clipChannel is not None and self.__song__.isLoading == False:
             self.clipChannel.channelAudioType = "sample-loop"
         self.cppObjIdChanged.emit()

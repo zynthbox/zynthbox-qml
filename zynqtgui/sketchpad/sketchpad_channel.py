@@ -110,7 +110,9 @@ class sketchpad_channel(QObject):
 
         # Create 5 clip objects for 5 samples per channel
         for i in range(0, 5):
-            self.__samples__.append(sketchpad_clip(self.id, -1, -1, self.__song__, self, True))
+            newSample = sketchpad_clip(self.id, -1, -1, self.__song__, self, True)
+            newSample.set_lane(i)
+            self.__samples__.append(newSample)
 
         self.__channel_audio_type__ = "synth"
 

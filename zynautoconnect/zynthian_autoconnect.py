@@ -583,6 +583,13 @@ def audio_autoconnect(force=False):
         for channelId in range(0, 10):
             channel = song.channelsModel.getChannel(channelId)
             if channel is not None:
+                portsToConnect = [False] * 10
+                portIndex = 0
+                for sample in channel.samples:
+                    portsToConnect[portIndex] = (sample.audioSource is not None)
+                    portIndex += 1;
+                    portsToConnect[portIndex] = (sample.audioSource is not None)
+                    portIndex += 1;
                 channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}-lane", is_audio=True, is_output=True)
                 # Firstly, attempt to connect the channel to any effects attached to the channel
                 channelHasEffects = False
@@ -599,11 +606,12 @@ def audio_autoconnect(force=False):
                                             engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
                                             if len(engineInPorts) == 1:
                                                 engineInPorts.append(engineInPorts[0]);
-                                            for port in zip(channelPorts, cycle(engineInPorts)):
+                                            for portIndex, port in enumerate(zip(channelPorts, cycle(engineInPorts))):
                                                 channelHasEffects = True
-                                                try:
-                                                    jclient.connect(port[0], port[1])
-                                                except: pass
+                                                if portsToConnect[portIndex] == True:
+                                                    try:
+                                                        jclient.connect(port[0], port[1])
+                                                    except: pass
                                         except Exception as e:
                                             logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
                                             # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
@@ -616,19 +624,22 @@ def audio_autoconnect(force=False):
                 if not channelHasEffects:
                     try:
                         if channel.routeThroughGlobalFX:
-                            for port in zip(channelPorts, cycle(playback_ports)):
-                                try:
-                                    jclient.disconnect(port[0], port[1])
-                                except: pass
-                            for port in zip(channelPorts, cycle(jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channel.id + 1}-input", is_audio=True, is_input=True))):
-                                try:
-                                    jclient.connect(port[0], port[1])
-                                except: pass
+                            for portIndex, port in enumerate(zip(channelPorts, cycle(playback_ports))):
+                                if portsToConnect[portIndex] == True:
+                                    try:
+                                        jclient.disconnect(port[0], port[1])
+                                    except: pass
+                            for portIndex, port in enumerate(zip(channelPorts, cycle(jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channel.id + 1}-input", is_audio=True, is_input=True)))):
+                                if portsToConnect[portIndex] == True:
+                                    try:
+                                        jclient.connect(port[0], port[1])
+                                    except: pass
                         else:
-                            for port in zip(channelPorts, cycle(playback_ports)):
-                                try:
-                                    jclient.connect(port[0], port[1])
-                                except: pass
+                            for portIndex, port in enumerate(zip(channelPorts, cycle(playback_ports))):
+                                if portsToConnect[portIndex] == True:
+                                    try:
+                                        jclient.connect(port[0], port[1])
+                                    except: pass
                     except Exception as e:
                         logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
                         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception

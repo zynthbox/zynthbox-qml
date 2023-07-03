@@ -550,29 +550,36 @@ def audio_autoconnect(force=False):
     #                 release_lock()
     #                 return
     # ### END Bluetooth ports connection
+    globalPlaybackInputPorts = jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)
+
+    # BEGIN Connect global FX ports to system playback
+    for port in zip(globalFx1OutputPorts, globalPlaybackInputPorts):
+        try:
+            jclient.connect(port[0], port[1])
+        except: pass
+    for port in zip(globalFx2OutputPorts, globalPlaybackInputPorts):
+        try:
+            jclient.connect(port[0], port[1])
+        except: pass
+    # END Connect global FX ports to system playback
 
     # TODO We are only connecting the first pair of ports here (since the global channels don't really have advanced routing anyway).
     # TODO Maybe we could actually get away with only using the one global samplersynth, and instead use the two first lanes to perform the same job? (no effect for lane 0, effects for lane 1, no connection for the other three)
-    # Connect SamplerSynth's global effected to the global effects passthrough
-    for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), globalFx1InputPorts):
+    # BEGIN Connect SamplerSynth's global effected to the global effects passthrough
+    samplerSynthEffectedPorts =jclient.get_ports("SamplerSynth:global-lane2", is_audio=True, is_output=True)
+    for port in zip(samplerSynthEffectedPorts, globalFx1InputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass
-    for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), globalFx2InputPorts):
+    for port in zip(samplerSynthEffectedPorts, globalFx2InputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass
-
-
-    # Connect global FX ports to system playback
-    for port in zip(globalFx1OutputPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
+    for port in zip(samplerSynthEffectedPorts, globalPlaybackInputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass
-    for port in zip(globalFx2OutputPorts, jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+    # END Connect SamplerSynth's global effected to the global effects passthrough
 
     # Connect each channel's ports to either that channel's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the channel
     # If there's no song yet, we can't do a lot...
@@ -797,7 +804,6 @@ def audio_autoconnect(force=False):
     ### Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
     for channel_index in range(song.channelsModel.count):
         channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channel_index+1}", is_audio=True, is_input=True)
-        globalPlaybackInputPorts = jclient.get_ports(f"GlobalPlayback", is_audio=True, is_input=True)
 
         for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
             try:
@@ -825,12 +831,8 @@ def audio_autoconnect(force=False):
             except: pass
     ### END Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
 
-    ### Connect Samplersynth uneffected ports to globalPlayback client and disconnect from system playback
-    for port in zip(jclient.get_ports(f"SamplerSynth:global-uneffected", is_audio=True, is_output=True), playback_ports):
-        try:
-            jclient.disconnect(port[0], port[1])
-        except: pass
-    for port in zip(jclient.get_ports(f"SamplerSynth:global-uneffected", is_audio=True, is_output=True), globalPlaybackInputPorts):
+    ### BEGIN Connect Samplersynth uneffected ports to globalPlayback client
+    for port in zip(jclient.get_ports(f"SamplerSynth:global-lane1", is_audio=True, is_output=True), globalPlaybackInputPorts):
         try:
             jclient.connect(port[0], port[1])
         except: pass

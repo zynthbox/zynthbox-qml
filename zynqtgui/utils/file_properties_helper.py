@@ -80,6 +80,7 @@ class file_properties_helper(QObject):
                 self.preview_clip.stop()
                 self.preview_clip.deleteLater()
             self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), False, self)
+            self.preview_clip.setLaneAffinity(1)
 
             self.preview_clip.play()
             self.is_preview_playing = True

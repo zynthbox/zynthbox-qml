@@ -407,6 +407,11 @@ class sketchpad_clip(QObject):
             if self.audioSource is not None:
                 self.audioSource.setGain(gain)
 
+    @Slot(None)
+    def updateGain(self):
+        if self.audioSource is not None:
+            self.set_gain(self.audioSource.getGainDB())
+
     gain = Property(float, get_gain, set_gain, notify=gain_changed)
 
 
@@ -636,6 +641,12 @@ class sketchpad_clip(QObject):
         self.__filename__ = self.__path__.split("/")[-1]
         self.stop()
 
+        try:
+            self.audioSource.audioLevelChanged.disconnect()
+            self.audioSource.progressChanged.disconnect()
+            self.audioSource.gainAbsoluteChanged.disconnect()
+        except Exception as e:
+            logging.debug(f"Not connected : {str(e)}")
         if self.audioSource is not None:
             self.audioSource.deleteLater()
 
@@ -683,13 +694,8 @@ class sketchpad_clip(QObject):
 
         self.reset_beat_count()
 
-        try:
-            self.audioSource.audioLevelChanged.disconnect()
-            self.audioSource.progressChanged.disconnect()
-        except Exception as e:
-            logging.debug(f"Not connected : {str(e)}")
-
         self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
+        self.audioSource.gainAbsoluteChanged.connect(self.updateGain, Qt.QueuedConnection)
 
         try:
             logging.info(f"Setting bpm from metadata")

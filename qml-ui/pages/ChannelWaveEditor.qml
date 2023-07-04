@@ -369,6 +369,18 @@ Zynthian.ScreenPage {
                                 onClicked: clipSettingsSectionView.currentItem = clipSettingsGrainerator
                             }
                         }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            text: qsTr("Clip Info")
+                            enabled: component.selectedClipHasWav
+                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
+                            MouseArea {
+                                anchors.fill: parent;
+                                enabled: component.selectedClipHasWav
+                                onClicked: clipSettingsSectionView.currentItem = clipSettingsInfoView
+                            }
+                        }
                     }
                     Rectangle {
                         id: clipSettingsSectionView
@@ -388,6 +400,7 @@ Zynthian.ScreenPage {
                                 clipSettingsBarControlObjThrottle.restart();
                                 clipSettingsADSRClipThrottle.restart();
                                 clipSettingsGraineratorClipThrottle.restart();
+                                clipSettingsInfoViewClipThrottle.restart();
                             }
                         }
                         Sketchpad.ClipSettingsBar {
@@ -438,6 +451,20 @@ Zynthian.ScreenPage {
                                 }
                             }
                             onSaveMetadata: component.selectedClip.saveMetadata();
+                        }
+                        Zynthian.ClipInfoView {
+                            id: clipSettingsInfoView
+                            objectName: "clipSettingsInfoView"
+                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                            anchors.fill: parent
+                            clip: null
+                            Timer {
+                                id: clipSettingsInfoViewClipThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    clipSettingsInfoView.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
+                                }
+                            }
                         }
                     }
                 }

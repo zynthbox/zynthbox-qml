@@ -54,3 +54,4 @@ AbstractADSRView 1.0 AbstractADSRView.qml
 ADSRClipView 1.0 ADSRClipView.qml
 ClipGraineratorSettings 1.0 ClipGraineratorSettings.qml
 InfinitySlider 1.0 InfinitySlider.qml
+ClipInfoView 1.0 ClipInfoView.qml

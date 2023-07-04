@@ -348,7 +348,7 @@ Zynthian.BasePlayGrid {
 
             QQC2.ComboBox {
                 id: comboScale
-                Kirigami.FormData.label: "Modes"
+                // Kirigami.FormData.label: "Modes"
                 Layout.fillWidth: true
                 model: ListModel {
                     id: scaleModel
@@ -374,7 +374,7 @@ Zynthian.BasePlayGrid {
 
             QQC2.Button {
                 Layout.fillWidth: true
-                Kirigami.FormData.label: "Transpose"
+                // Kirigami.FormData.label: "Transpose"
                 text: "-"
                 enabled: _private.transposeAmount > 0
                 onClicked: {
@@ -385,7 +385,7 @@ Zynthian.BasePlayGrid {
                 }
             }
             QQC2.Button {
-                Kirigami.FormData.label: _private.transposeAmount
+                // Kirigami.FormData.label: _private.transposeAmount
                 Layout.fillWidth: true
                 text: "+"
                 enabled: _private.transposeAmount < 11
@@ -400,7 +400,7 @@ Zynthian.BasePlayGrid {
             QQC2.ComboBox {
                 id: optionGrid
                 Layout.fillWidth: true
-                Kirigami.FormData.label: "Grid"
+                // Kirigami.FormData.label: "Grid"
                 model: ListModel {
                     id: gridModel
                     ListElement { row: 0; column: 0; text: "Custom" }
@@ -428,7 +428,7 @@ Zynthian.BasePlayGrid {
                 id: customRows
                 Layout.fillWidth: true
                 visible: optionGrid.currentIndex === 0
-                Kirigami.FormData.label: "Custom Grid Rows"
+                // Kirigami.FormData.label: "Custom Grid Rows"
                 model: [3,4,5,6,7,8,9]
                 displayText: currentText
                 currentIndex: 0
@@ -440,7 +440,7 @@ Zynthian.BasePlayGrid {
                 id: customColumns
                 Layout.fillWidth: true
                 visible: optionGrid.currentIndex === 0
-                Kirigami.FormData.label: "Custom Grid Columns"
+                // Kirigami.FormData.label: "Custom Grid Columns"
                 model: [3,4,5,6,7,8,9]
                 displayText: currentText
                 currentIndex: 0
@@ -452,7 +452,7 @@ Zynthian.BasePlayGrid {
                 Layout.fillWidth: true
                 implicitWidth: Kirigami.Units.gridUnit * 5
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 5
-                Kirigami.FormData.label: "Use Tap Position As Velocity"
+                // Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: component.getProperty("positionalVelocity")
                 onClicked: {
                     var positionalVelocity = component.getProperty("positionalVelocity")

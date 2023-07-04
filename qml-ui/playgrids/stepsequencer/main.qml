@@ -2321,7 +2321,7 @@ Zynthian.BasePlayGrid {
                 Layout.fillWidth: true
                 implicitWidth: Kirigami.Units.gridUnit * 5
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 5
-                Kirigami.FormData.label: "Use Tap Position As Velocity"
+                // Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: component.getProperty("positionalVelocity")
                 onClicked: {
                     var positionalVelocity = component.getProperty("positionalVelocity")
@@ -2347,7 +2347,7 @@ Zynthian.BasePlayGrid {
                     Layout.minimumWidth: Kirigami.Units.gridUnit * 5
                     Layout.minimumHeight: Kirigami.Units.gridUnit * 2
                     implicitWidth: Kirigami.Units.gridUnit * 5
-                    Kirigami.FormData.label: "Use Tap Position As Velocity"
+                    // Kirigami.FormData.label: "Use Tap Position As Velocity"
                     checked: component.getProperty("positionalVelocity")
                     onClicked: {
                         var positionalVelocity = component.getProperty("positionalVelocity")

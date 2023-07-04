@@ -347,7 +347,7 @@ Zynthian.Popup {
             QQC2.SpinBox{
                 id: leadinSpin
                 Layout.fillWidth: true
-                Kirigami.FormData.label: qsTr("Lead-in in beats:")
+                // Kirigami.FormData.label: qsTr("Lead-in in beats:")
                 enabled: !_private.isRecording
                 value: 4
                 from: 0
@@ -368,7 +368,7 @@ Zynthian.Popup {
                 id: songDurationSpin
                 Layout.fillWidth: true
                 visible: _private.song && !(zynqtgui.current_screen_id == "song_manager")
-                Kirigami.FormData.label: qsTr("Recording duration in beats:")
+                // Kirigami.FormData.label: qsTr("Recording duration in beats:")
                 enabled: !_private.isRecording
                 value: 32
                 from: 0
@@ -377,7 +377,7 @@ Zynthian.Popup {
             QQC2.SpinBox {
                 id: fadeoutSpin
                 Layout.fillWidth: true
-                Kirigami.FormData.label: qsTr("Fade-out in beats:")
+                // Kirigami.FormData.label: qsTr("Fade-out in beats:")
                 enabled: !_private.isRecording
                 value: 4
                 from: 0

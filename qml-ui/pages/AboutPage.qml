@@ -42,31 +42,31 @@ Zynthian.ScreenPage {
         Kirigami.FormLayout {
             Layout.alignment: Qt.AlignCenter
             QQC2.Label {
-                Kirigami.FormData.label: "Zynthbox OS:"
+                // Kirigami.FormData.label: "Zynthbox OS:"
                 text: zynqtgui.about.zynthbox_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Qt:"
+                // Kirigami.FormData.label: "Qt:"
                 text: zynqtgui.about.qt_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Kirigami:"
+                // Kirigami.FormData.label: "Kirigami:"
                 text: zynqtgui.about.kirigami_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Libzynthbox:"
+                // Kirigami.FormData.label: "Libzynthbox:"
                 text: zynqtgui.about.libzynthbox_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Distribution:"
+                // Kirigami.FormData.label: "Distribution:"
                 text: zynqtgui.about.distribution_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Kernel:"
+                // Kirigami.FormData.label: "Kernel:"
                 text: zynqtgui.about.kernel_version
             }
             QQC2.Label {
-                Kirigami.FormData.label: "Hostname:"
+                // Kirigami.FormData.label: "Hostname:"
                 text: zynqtgui.network.getHostname()
             }
         }

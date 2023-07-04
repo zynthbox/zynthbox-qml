@@ -1,5 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
@@ -146,5 +147,11 @@ Item {
                 x: Math.floor(model.positionProgress * parent.width)
             }
         }
+    }
+    QQC2.Label {
+        anchors.centerIn: parent
+        opacity: 0.5
+        text: qsTr("No sample data to display")
+        visible: _private.sample && _private.sample.cppObjId === -1
     }
 }

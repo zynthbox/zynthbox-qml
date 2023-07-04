@@ -360,6 +360,7 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             text: qsTr("Granular")
+                            visible: zynqtgui.graineratorEnabled
                             enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
                             MouseArea {

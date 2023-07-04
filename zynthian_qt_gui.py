@@ -2925,6 +2925,9 @@ class zynthian_gui(QObject):
     def get_is_loading(self):
         return self.loading > 0
 
+    def get_grainerator_enabled(self):
+        return "grainerator" in zynthian_gui_config.experimental_features
+
     # FIXME: is this necessary?
     def loading_refresh(self):
         while not self.exit_flag:
@@ -4148,6 +4151,8 @@ class zynthian_gui(QObject):
         get_last_note,
         notify=last_note_changed
     )
+
+    graineratorEnabled = Property(bool, get_grainerator_enabled, constant=True)
 
     is_loading = Property(bool, get_is_loading, notify=is_loading_changed)
 

@@ -259,7 +259,6 @@ Rectangle {
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            spacing: Kirigami.Units.gridUnit
 
                             Item {
                                 Layout.fillWidth: true
@@ -396,6 +395,11 @@ Rectangle {
                                         }
                                     }
                                 }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                             }
 
                             RowLayout {
@@ -605,6 +609,11 @@ Rectangle {
                                         }
                                     }
                                 }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                             }
 
                             RowLayout {

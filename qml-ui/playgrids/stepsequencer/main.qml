@@ -1885,14 +1885,14 @@ Zynthian.BasePlayGrid {
                                 onClicked: {
                                     patternsMenuListView.positionViewAtIndex(0, ListView.Beginning);
                                 }
-                                checked: patternsMenuListView.contentY < (patternsMenuList.height / 2)
+                                checked: patternsMenuList.QQC2.ScrollBar.vertical.position < 0.49
                             }
                             Zynthian.PlayGridButton {
                                 text: "Track 6-10"
                                 onClicked: {
                                     patternsMenuListView.positionViewAtIndex(5, ListView.Beginning);
                                 }
-                                checked: patternsMenuListView.contentY > (patternsMenuList.height / 2)
+                                checked: patternsMenuList.QQC2.ScrollBar.vertical.position > 0.49
                             }
                         }
                     }

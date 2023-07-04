@@ -27,49 +27,19 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import org.kde.plasma.core 2.0 as PlasmaCore
 
-PlasmaCore.FrameSvgItem {
-    id: root
+Rectangle {
     property bool highlighted
 
-    readonly property real leftPadding: margins.left
-    readonly property real rightPadding: margins.right
-    readonly property real topPadding: margins.top
-    readonly property real bottomPadding: margins.bottom
+    readonly property real leftPadding: 1
+    readonly property real rightPadding: 1
+    readonly property real topPadding: Kirigami.Units.gridUnit/2
+    readonly property real bottomPadding: Kirigami.Units.gridUnit/2
 
-    imagePath: "widgets/background"
-    prefix: highlighted ? ["focus", ""] : ""
-    //colorGroup: PlasmaCore.Theme.ViewColorGroup
-
-    Timer { //HACK AND BUG WORKAROUND
-        id: updateTimer
-        interval: 200
-        onTriggered: {
-            root.imagePath = "invalid"
-            root.imagePath = "widgets/background"
-            root.margins.marginsChanged()
-        }
-    }
-    Connections {
-        target: theme
-        onThemeChangedProxy: {
-            updateTimer.restart()
-        }
-    }
-
-    Rectangle {
-        anchors {
-            fill: parent
-            leftMargin: parent.margins.left
-            topMargin: parent.margins.top
-            rightMargin: parent.margins.right
-            bottomMargin: parent.margins.bottom
-        }
-        visible: parent.highlighted && parent.usedPrefix !== "focus"
-        color: "transparent"
-        border.color: Kirigami.Theme.highlightColor
-        radius: Kirigami.Units.smallSpacing
-    }
+    color: Kirigami.Theme.backgroundColor
+    border.color: highlighted
+            ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.5)
+            : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+    radius: Kirigami.Units.gridUnit/2
 }
 

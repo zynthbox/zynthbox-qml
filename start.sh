@@ -78,14 +78,22 @@ else
 fi
 
 # Start Zynthian GUI & Synth Engine
+export QT_QUICK_CONTROLS_MOBILE=1
+export QT_QUICK_CONTROLS_STYLE=Zynthian-Plasma
+export QT_FILE_SELECTORS=Plasma
+export QT_QUICK_CONTROLS_STYLE_PATH=./qtquick-controls-style
+export QT_IM_MODULE=qtvirtualkeyboard
+#export QT_SCALE_FACTOR=1.2
+#Qt5.11 didn't support this var yet
+#export QT_QPA_SYSTEM_ICON_THEME=breeze
+#workaround for the old kirigami version
+export XDG_CURRENT_DESKTOP=kde
+export QT_QPA_PLATFORMTHEME=generic
+export XDG_DATA_DIRS=/usr/share
 
 #HACK
 rm ../config/keybinding.yaml
 
-export QT_QUICK_CONTROLS_MOBILE=1
-export QT_QUICK_CONTROLS_STYLE=Plasma
-export QT_IM_MODULE=qtvirtualkeyboard
-export QT_QPA_SYSTEM_ICON_THEME=breeze
 export QSG_RENDER_LOOP=threaded
 export QT_SCALE_FACTOR=1
 export QT_SCREEN_SCALE_FACTORS=1
@@ -100,7 +108,8 @@ if command -v kwin_x11 &> /dev/null; then
         export ZYNTHIAN_LOG_LEVEL=20
 
         python3 -X faulthandler ./bootlog_window.py &
-        python3 -X faulthandler./zynthian_qt_gui.py
+        #taskset --cpu-list 0-3
+        ./zynthian_qt_gui.py
     else
         export ZYNTHIAN_LOG_LEVEL=10
         extra_args=""
@@ -110,6 +119,7 @@ if command -v kwin_x11 &> /dev/null; then
         fi
 
         python3 -X faulthandler ./bootlog_window.py &
+        #taskset --cpu-list 0-3
         python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
     fi
 

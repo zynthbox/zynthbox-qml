@@ -27,18 +27,19 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import org.kde.plasma.core 2.0 as PlasmaCore
 
-PlasmaCore.FrameSvgItem {
+Rectangle {
     property bool highlighted
 
-    readonly property real leftPadding: margins.left
-    readonly property real rightPadding: margins.right
-    readonly property real topPadding: margins.top
-    readonly property real bottomPadding: margins.bottom
+    readonly property real leftPadding: Kirigami.Units.gridUnit/2
+    readonly property real rightPadding: Kirigami.Units.gridUnit/2
+    readonly property real topPadding: Kirigami.Units.gridUnit/2
+    readonly property real bottomPadding: Kirigami.Units.gridUnit/2
 
-    imagePath: "widgets/background"
-    //colorGroup: PlasmaCore.Theme.ViewColorGroup
-    prefix: highlighted ? ["focus", ""] : ""
+    color: Kirigami.Theme.backgroundColor
+    border.color: highlighted
+            ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.5)
+            : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+    radius: Kirigami.Units.gridUnit/2
 }
 

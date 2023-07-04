@@ -25,26 +25,17 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
-QQC2.Button {
-    id: root
-    Layout.fillHeight: true
-    rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
-    background: Item {
-        Image {
-            id: breadcrumbSeparator
-            anchors {
-                right: parent.right
-                top: parent.top
-                bottom: parent.bottom
-            }
-            source: "./img/breadcrumb-separator.svg"
-        }
-    }
-    opacity: highlighted ? 1 : 0.5
-    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
+PlasmaCore.FrameSvgItem {
+    property QQC2.ItemDelegate delegate
+    visible: delegate.ListView.isCurrentItem || delegate.pressed
+    imagePath: "widgets/viewitem"
+    
+    // Always add hover prefix as it should not show filled background for selected items
+    // Always show white outline for hover/selected item.
+    prefix: "hover"
 }
-
 

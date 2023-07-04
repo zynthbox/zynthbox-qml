@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
@@ -86,18 +87,18 @@ ColumnLayout {
         Layout.fillWidth: true
         Zynthian.SketchpadDial {
             id: gainDial
-            text: qsTr("Loudness (dB)")
-            controlObj: root.controlObj
-            controlProperty: "gain"
-            valueString: dial.value.toFixed(1)
+            text: qsTr("Gain (dB)")
+            controlObj: root.controlObj ? Zynthbox.PlayGridManager.getClipById(root.controlObj.cppObjId) : null
+            controlProperty: "gainAbsolute"
+            valueString: root.controlObj.gain.toFixed(1)
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
             dial {
-                stepSize: 1
-                from: -24
-                to: 8
+                stepSize: 0.01
+                from: 0
+                to: 1
             }
 
             onDoubleClicked: {

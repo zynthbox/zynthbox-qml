@@ -444,6 +444,7 @@ Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
                                             property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel]
+                                            property QtObject sample: root.selectedChannel.channelAudioType.startsWith("sample-") ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
 
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -473,6 +474,16 @@ Rectangle {
                                                 visible: root.selectedChannel.channelAudioType === "synth" &&
                                                          synthNameLabel.text.trim().length > 0
 
+                                                color: Kirigami.Theme.highlightColor
+                                            }
+                                            Rectangle {
+                                                width: delegate.sample ? parent.width * delegate.sample.gainAbsolute : 0
+                                                anchors {
+                                                    left: parent.left
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                visible: delegate.sample !== null
                                                 color: Kirigami.Theme.highlightColor
                                             }
 
@@ -540,9 +551,13 @@ Rectangle {
                                                 }
                                                 onMouseXChanged: {
                                                     if (delegate.midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1)
-                                                        delegateMouseArea.dragHappened = true
-                                                        delegate.synthPassthroughClient.dryAmount = newVal
+                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                                        delegateMouseArea.dragHappened = true;
+                                                        delegate.synthPassthroughClient.dryAmount = newVal;
+                                                    } else if (delegate.sample && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                                        delegateMouseArea.dragHappened = true;
+                                                        delegate.sample.gainAbsolute = newVal;
                                                     }
                                                 }
                                                 onPressAndHold: {

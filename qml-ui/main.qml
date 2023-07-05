@@ -481,7 +481,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: menuButton
             icon.name: "application-menu"
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             padding: Kirigami.Units.largeSpacing*1.5
             rightPadding: Kirigami.Units.largeSpacing*1.5
             property string oldPage: "sketchpad"
@@ -562,7 +562,7 @@ Kirigami.AbstractApplicationWindow {
             }
         }
     /* Zynthian.BreadcrumbButton {
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: qsTr("1-6")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
@@ -573,7 +573,7 @@ Kirigami.AbstractApplicationWindow {
             }
         }
         Zynthian.BreadcrumbButton {
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: qsTr("7-12")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
@@ -585,7 +585,7 @@ Kirigami.AbstractApplicationWindow {
         }*/
         Zynthian.BreadcrumbButton {
             id: sceneButton
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: qsTr("Scene %1 ˬ").arg(zynqtgui.sketchpad.song.scenesModel.selectedSceneName)
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
@@ -628,7 +628,7 @@ Kirigami.AbstractApplicationWindow {
         }
         Zynthian.BreadcrumbButton {
             id: channelButton
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: qsTr("Track %1 ˬ")
                     .arg(zynqtgui.session_dashboard.selectedChannel+1)
 
@@ -678,7 +678,7 @@ Kirigami.AbstractApplicationWindow {
                 samplesButtonThrottle.restart();
             }
 
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: qsTr("Sample %1 ˬ %2")
                     .arg(root.selectedChannel.selectedSlotRow + 1)
                     .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
@@ -711,7 +711,7 @@ Kirigami.AbstractApplicationWindow {
 
             property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
 
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
@@ -721,7 +721,7 @@ Kirigami.AbstractApplicationWindow {
         }
         Zynthian.BreadcrumbButton {
             id: synthButton
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
@@ -776,7 +776,7 @@ Kirigami.AbstractApplicationWindow {
         }
         Zynthian.BreadcrumbButton {
             id: presetButton
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
@@ -824,7 +824,7 @@ Kirigami.AbstractApplicationWindow {
             }
         }
         Zynthian.BreadcrumbButton {
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: {
                 switch (effectScreen) {
                 case "layer_midi_effects":
@@ -869,7 +869,7 @@ Kirigami.AbstractApplicationWindow {
             font.pointSize: 11
         }
         Zynthian.BreadcrumbButton {
-            icon.color: customTheme.Kirigami.Theme.textColor
+            icon.color: Kirigami.Theme.textColor
             text: "EDIT"
             visible: zynqtgui.current_screen_id === "control"
             Layout.maximumWidth: Kirigami.Units.gridUnit * 4
@@ -982,15 +982,6 @@ Kirigami.AbstractApplicationWindow {
     PageManager {
         id: pageManager
         anchors.fill: parent
-    }
-
-    CustomTheme {
-        id: customTheme
-        Component.onCompleted: {
-            // Force write config file after QML engine starts loading main page to load theme correctly
-            // Without this force write, bullseye doesn't load previously selected theme from plasmarc
-            zynqtgui.theme_chooser.select_action(zynqtgui.theme_chooser.current_index)
-        }
     }
 
     Instantiator {

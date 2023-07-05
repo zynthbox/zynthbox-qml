@@ -27,31 +27,15 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
-Rectangle {
+PlasmaCore.FrameSvgItem {
     property QQC2.ItemDelegate delegate
-
-    readonly property real leftPadding: Kirigami.Units.largeSpacing
-    readonly property real rightPadding: Kirigami.Units.largeSpacing
-    readonly property real topPadding: Kirigami.Units.largeSpacing
-    readonly property real bottomPadding: Kirigami.Units.largeSpacing
-
-//    color: !delegate.ListView.isCurrentItem && !delegate.pressed
-//        ? "transparent"
-//        : ((delegate.ListView.view.activeFocus && !delegate.pressed || !delegate.ListView.view.activeFocus && delegate.pressed)
-//                ? Kirigami.Theme.highlightColor
-//                : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4))
-
-//    Behavior on color {
-//        ColorAnimation {
-//            duration: Kirigami.Units.shortDuration
-//            easing.type: Easing.InOutQuad
-//        }
-//    }
-
-    color: "transparent"
-    border.width: delegate.ListView.isCurrentItem ? 1 : 0
-    border.color: Qt.rgba(255, 255, 255, 0.8)
-    radius: 4
+    visible: delegate.ListView.isCurrentItem || delegate.pressed
+    imagePath: "widgets/viewitem"
+    
+    // Always add hover prefix as it should not show filled background for selected items
+    // Always show white outline for hover/selected item.
+    prefix: "hover"
 }
 

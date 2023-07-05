@@ -101,7 +101,7 @@ if command -v kwin_x11 &> /dev/null; then
         export ZYNTHIAN_LOG_LEVEL=20
 
         python3 -X faulthandler ./bootlog_window.py &
-        python3 -X faulthandler./zynthian_qt_gui.py
+        python3 -X faulthandler ./zynthian_qt_gui.py
     else
         export ZYNTHIAN_LOG_LEVEL=10
         extra_args=""

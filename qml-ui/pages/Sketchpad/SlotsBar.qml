@@ -729,68 +729,54 @@ Rectangle {
         }
     }
 
-    Zynthian.Popup {
+    Zynthian.ActionPickerPopup {
         id: samplePickerPopup
-
-        parent: QQC2.Overlay.overlay
-        y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-        x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-        width: Kirigami.Units.gridUnit*12
-
-        ColumnLayout {
-            anchors.fill: parent
-
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.alignment: Qt.AlignCenter
+        actions: [
+            QQC2.Action {
+                text: qsTr("Save As...")
+                enabled: root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].cppObjId !== -1
+                onTriggered: {
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Remove")
+                enabled: root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].cppObjId !== -1
+                onTriggered: {
+                    root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].clear()
+                }
+            },
+            QQC2.Action {
                 text: qsTr("Pick recording")
-
-                onClicked: {
+                onTriggered: {
                     samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir
                     samplePickerDialog.open()
                     samplePickerPopup.close()
                 }
-            }
-
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.alignment: Qt.AlignCenter
+            },
+            QQC2.Action {
                 text: qsTr("Pick sample")
-
-                onClicked: {
+                onTriggered: {
                     samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
                     samplePickerDialog.open()
                     samplePickerPopup.close()
                 }
-            }
-
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.alignment: Qt.AlignCenter
+            },
+            QQC2.Action {
                 text: qsTr("Pick sample-bank")
-
-                onClicked: {
+                onTriggered: {
                     bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
                     bankPickerDialog.open()
                     samplePickerPopup.close()
                 }
-            }
-
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.alignment: Qt.AlignCenter
+            },
+            QQC2.Action {
                 text: qsTr("Download Samples")
-                visible: false // Hide for now
-                onClicked: {
+                onTriggered: {
                     zynqtgui.current_modal_screen_id = "sample_downloader"
                     samplePickerPopup.close()
                 }
             }
-        }
+        ]
     }
 
     Zynthian.LayerSetupDialog {

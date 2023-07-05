@@ -36,52 +36,60 @@ ColumnLayout {
                 : dial.from
     }
 
-    QQC2.Dial {
-        id: dial
+    Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
-
-        value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
-
-        onMoved: {
-            if (!root.controlObj || !root.controlObj.hasOwnProperty(root.controlProperty)) {
-                return;
+        QQC2.Dial {
+            id: dial
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                horizontalCenter: parent.horizontalCenter
             }
-            root.controlObj[root.controlProperty] = value
-        }
+            width: height
 
-        QQC2.Label {
-            id: valueLabel
-            anchors.centerIn: dial
-            text: dial.value
-        }
+            value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
 
-        //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
-        MouseArea {
-            id: dialMouse
-            anchors.fill: parent
-            preventStealing: true
-            property real startY
-            property real startValue
-            property real startDiff
-            onPressed: {
-                root.pressed(mouse);
-                startY = mouse.y;
-                startValue = dial.value
-                // Calculate difference from floored value to apply when writing final value
-                startDiff = startValue - (Math.floor(startValue/dial.stepSize)*dial.stepSize)
-                dial.forceActiveFocus()
+            onMoved: {
+                if (!root.controlObj || !root.controlObj.hasOwnProperty(root.controlProperty)) {
+                    return;
+                }
+                root.controlObj[root.controlProperty] = value
             }
-            onPositionChanged: {
-                let delta = mouse.y - startY;
-                let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
 
-                let floored = Math.floor(value/dial.stepSize) * dial.stepSize;
-                dial.value = floored+startDiff
-                dial.moved()
+            QQC2.Label {
+                id: valueLabel
+                anchors.centerIn: parent
+                text: dial.value
             }
-            onDoubleClicked: {
-                root.doubleClicked();
+
+            //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
+            MouseArea {
+                id: dialMouse
+                anchors.fill: parent
+                preventStealing: true
+                property real startY
+                property real startValue
+                property real startDiff
+                onPressed: {
+                    root.pressed(mouse);
+                    startY = mouse.y;
+                    startValue = dial.value
+                    // Calculate difference from floored value to apply when writing final value
+                    startDiff = startValue - (Math.floor(startValue/dial.stepSize)*dial.stepSize)
+                    dial.forceActiveFocus()
+                }
+                onPositionChanged: {
+                    let delta = mouse.y - startY;
+                    let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
+
+                    let floored = Math.floor(value/dial.stepSize) * dial.stepSize;
+                    dial.value = floored+startDiff
+                    dial.moved()
+                }
+                onDoubleClicked: {
+                    root.doubleClicked();
+                }
             }
         }
     }

@@ -116,7 +116,7 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
-                property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[soundDelegate.chainedSound]
+                property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[soundDelegate.chainedSound] ? Zynthbox.Plugin.synthPassthroughClients[soundDelegate.chainedSound] : null
 
                 Connections {
                     target: root
@@ -243,7 +243,7 @@ Zynthian.Card {
                         radius: 4
 
                         Rectangle {
-                            width: parent.width * soundDelegate.synthPassthroughClient.dryAmount
+                            width: soundDelegate.synthPassthroughClient ? parent.width * soundDelegate.synthPassthroughClient.dryAmount : 0
                             anchors {
                                 left: parent.left
                                 top: parent.top

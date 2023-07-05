@@ -50,17 +50,6 @@ ColumnLayout {
             root.controlObj[root.controlProperty] = value
         }
 
-        // HACK for default style
-        Binding {
-            target: dial.background
-            property: "color"
-            value: Kirigami.Theme.highlightColor
-        }
-        Binding {
-            target: dial.handle
-            property: "color"
-            value: Kirigami.Theme.highlightColor
-        }
         QQC2.Label {
             id: valueLabel
             anchors.centerIn: dial

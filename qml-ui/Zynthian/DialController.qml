@@ -55,17 +55,6 @@ AbstractController {
         to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
         onMoved: root.controller.ctrl.value = value
 
-        // HACK for default style
-        Binding {
-            target: dial.background
-            property: "color"
-            value: Kirigami.Theme.highlightColor
-        }
-        Binding {
-            target: dial.handle
-            property: "color"
-            value: Kirigami.Theme.highlightColor
-        }
         Kirigami.Heading {
             id: valueLabel
             anchors.centerIn: parent

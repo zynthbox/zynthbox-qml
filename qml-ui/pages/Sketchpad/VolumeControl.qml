@@ -201,52 +201,52 @@ Rectangle {
                         }
                     }
                 }
-            }
 
-            MouseArea {
-                id: mouseArea
-                property real initialMouseY
-                property bool dragHappened: false
+                MouseArea {
+                    id: mouseArea
+                    property real initialMouseY
+                    property bool dragHappened: false
 
-                anchors.fill: parent
-                enabled: control.enabled
-                onPressed: {
-                    mouseArea.initialMouseY = mouse.y
-                }
-                onReleased: {
-                    dragHappenedResetTimer.restart()
-                }
-                onMouseYChanged: {
-                    if (mouse.y - mouseArea.initialMouseY != 0) {
-                        var newVal = Zynthian.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
-                        mouseArea.dragHappened = true
-                        slider.value = Zynthian.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
-                        control.valueChanged()
+                    anchors.fill: parent
+                    enabled: control.enabled
+                    onPressed: {
+                        mouseArea.initialMouseY = mouse.y
                     }
-                }
-                onClicked: {
-                    if (dblTimer.running) {
-                        control.doubleClicked();
-                        dblTimer.stop();
-                    } else {
-                        dblTimer.restart();
+                    onReleased: {
+                        dragHappenedResetTimer.restart()
                     }
-                }
-                Timer {
-                    id: dblTimer
-                    interval: 150
-                    onTriggered: {
-                        if (!mouseArea.dragHappened) {
-                            control.clicked();
+                    onMouseYChanged: {
+                        if (mouse.y - mouseArea.initialMouseY != 0) {
+                            var newVal = Zynthian.CommonUtils.clamp((mouseArea.height - mouse.y) / mouseArea.height, 0, 1)
+                            mouseArea.dragHappened = true
+                            slider.value = Zynthian.CommonUtils.interp(newVal * (slider.to - slider.from), 0, (slider.to - slider.from), slider.from, slider.to)
+                            control.valueChanged()
                         }
                     }
-                }
-                Timer {
-                    id: dragHappenedResetTimer
-                    interval: dblTimer.interval
-                    repeat: false
-                    onTriggered: {
-                        mouseArea.dragHappened = false
+                    onClicked: {
+                        if (dblTimer.running) {
+                            control.doubleClicked();
+                            dblTimer.stop();
+                        } else {
+                            dblTimer.restart();
+                        }
+                    }
+                    Timer {
+                        id: dblTimer
+                        interval: 150
+                        onTriggered: {
+                            if (!mouseArea.dragHappened) {
+                                control.clicked();
+                            }
+                        }
+                    }
+                    Timer {
+                        id: dragHappenedResetTimer
+                        interval: dblTimer.interval
+                        repeat: false
+                        onTriggered: {
+                            mouseArea.dragHappened = false
+                        }
                     }
                 }
             }

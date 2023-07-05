@@ -447,7 +447,7 @@ Rectangle {
                                         Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
-                                            property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel]
+                                            property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
                                             property QtObject sample: root.selectedChannel.channelAudioType.startsWith("sample-") ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
 
                                             anchors.fill: parent
@@ -469,7 +469,7 @@ Rectangle {
                                             visible: enabled
 
                                             Rectangle {
-                                                width: parent.width * delegate.synthPassthroughClient.dryAmount
+                                                width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryAmount : 0
                                                 anchors {
                                                     left: parent.left
                                                     top: parent.top
@@ -639,6 +639,7 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                                        property bool highlighted: false
                                         border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         border.width: 2
                                         color: "transparent"

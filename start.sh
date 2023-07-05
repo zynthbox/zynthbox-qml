@@ -82,15 +82,16 @@ fi
 #HACK
 rm ../config/keybinding.yaml
 
+export QSG_RENDER_LOOP=threaded
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+export QT_IM_MODULE=qtvirtualkeyboard
+export QT_QPA_PLATFORMTHEME=generic
 export QT_QUICK_CONTROLS_MOBILE=1
 export QT_QUICK_CONTROLS_STYLE=Plasma
-export QT_IM_MODULE=qtvirtualkeyboard
-export QT_QPA_SYSTEM_ICON_THEME=breeze
-export QSG_RENDER_LOOP=threaded
 export QT_SCALE_FACTOR=1
 export QT_SCREEN_SCALE_FACTORS=1
-export QT_AUTO_SCREEN_SCALE_FACTOR=0
-export QT_QPA_PLATFORMTHEME=generic
+export XDG_CURRENT_DESKTOP=kde
+export XDG_DATA_DIRS=/usr/share
 
 if command -v kwin_x11 &> /dev/null; then
     kwin_x11 &

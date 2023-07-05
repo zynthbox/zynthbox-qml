@@ -42,11 +42,32 @@ ColumnLayout {
 
     property QtObject bottomBar: null
     property string controlType: zynqtgui.bottomBarControlType
-    property QtObject controlObj: (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
+    property QtObject controlObj: null;/*(root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
                                     ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
                                     : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
                                         ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
-                                        : null
+                                        : null*/
+    Timer {
+        id: controlObjUpdater
+        interval: 1; repeat: false; running: false;
+        onTriggered: {
+            root.controlObj = (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
+                ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
+                : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
+                    ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
+                    : null
+        }
+    }
+    Connections {
+        target: zynqtgui
+        onBottomBarControlObjChanged: controlObjUpdater.restart()
+    }
+    Connections {
+        target: zynqtgui.bottomBarControlObj
+        onSamplesChanged: controlObjUpdater.restart()
+        onSelectedSlotRowChanged: controlObjUpdater.restart()
+    }
+    onControlTypeChanged: controlObjUpdater.restart()
     property bool showCopyPasteButtons: true
 
     function cuiaCallback(cuia) {
@@ -83,8 +104,15 @@ ColumnLayout {
         return false;
     }
 
+    Item {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+    }
+
     RowLayout {
         Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.maximumHeight: Kirigami.Units.gridUnit * 10
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
@@ -92,8 +120,8 @@ ColumnLayout {
             controlProperty: "gainAbsolute"
             valueString: root.controlObj ? root.controlObj.gain.toFixed(1) : 0
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-            Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
             dial {
                 stepSize: 0.01
@@ -155,8 +183,8 @@ ColumnLayout {
             controlObj: root.controlObj
             controlProperty: "pitch"
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-            Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
             dial {
                 stepSize: 1
@@ -188,8 +216,8 @@ ColumnLayout {
             valueString: dial.value.toFixed(2)
             enabled: root.controlObj ? !root.controlObj.shouldSync : false
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-            Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
             dial {
                 stepSize: 0.1
@@ -203,18 +231,23 @@ ColumnLayout {
         }
 
         ColumnLayout {
-            Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             QQC2.Label {
-                Layout.alignment: Qt.AlignCenter
+                Layout.alignment: Qt.AlignHCenter
                 text: qsTr("BPM")
             }
 
             QQC2.Label {
                 id: bpmLabel
-                Layout.alignment: Qt.AlignCenter
+                Layout.alignment: Qt.AlignHCenter
                 visible: root.controlObj && root.controlObj.metadataBPM ? true : false
                 font.pointSize: 9
                 Timer {
@@ -234,7 +267,7 @@ ColumnLayout {
                 id: objBpmEdit
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                Layout.alignment: Qt.AlignCenter
+                Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: TextInput.AlignHCenter
                 focus: false
                 text: enabled
@@ -264,13 +297,17 @@ ColumnLayout {
                 }
             }
 
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             QQC2.Switch {
                 id: syncSwitch
-                Layout.alignment: Qt.AlignCenter
-                implicitWidth: Kirigami.Units.gridUnit * 3
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 checked: root.controlObj && root.controlObj.hasOwnProperty("shouldSync") ? root.controlObj.shouldSync : false
+                enabled: root.controlObj && root.controlObj.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
                     root.controlObj.shouldSync = checked
                 }
@@ -313,22 +350,27 @@ ColumnLayout {
         // }
 
         ColumnLayout {
-            Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
             QQC2.Switch {
                 id: snapLengthToBeatSwitch
-                Layout.alignment: Qt.AlignCenter
-                implicitWidth: Kirigami.Units.gridUnit * 3
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.snapLengthToBeat : true
                 onToggled: {
                     root.controlObj.snapLengthToBeat = checked
                 }
             }
-
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: TextInput.AlignHCenter
@@ -338,29 +380,25 @@ ColumnLayout {
         }
     }
 
-    //Item {
-        //Layout.fillWidth: true
-    //}
-
-    ColumnLayout {
-        Layout.fillWidth: true
-        Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-
-        QQC2.Label {
-            visible: root.controlObj && root.controlObj.soundData ? root.controlObj.soundData.length <= 0 : false
-            text: "<No Metadata>"
-        }
-        QQC2.Label {
-            visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
-            text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
-            font.pointSize: 10
-        }
-        QQC2.Label {
-            visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
-            text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
-            font.pointSize: 10
-        }
-    }
+    // ColumnLayout {
+    //     Layout.fillWidth: true
+    //     Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+    //     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+    // 
+    //     QQC2.Label {
+    //         visible: root.controlObj && root.controlObj.soundData ? root.controlObj.soundData.length <= 0 : false
+    //         text: "<No Metadata>"
+    //     }
+    //     QQC2.Label {
+    //         visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
+    //         text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
+    //         font.pointSize: 10
+    //     }
+    //     QQC2.Label {
+    //         visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
+    //         text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
+    //         font.pointSize: 10
+    //     }
+    // }
 }
 

@@ -32,17 +32,20 @@ import org.kde.kirigami 2.6 as Kirigami
 Popup {
     id: component
 
+    property list<QQC2.Action> actions
+    property alias columns: mainLayout.columns
+
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    width: Kirigami.Units.gridUnit*12
-    height: actions.length * Kirigami.Units.gridUnit * 4
+    width: (columns > 1 ? columns : 1) * Kirigami.Units.gridUnit*12
+    height: (columns > 1 ? (actions.length / columns) : actions.length) * Kirigami.Units.gridUnit * 4
 
-    property list<QQC2.Action> actions
-
-    ColumnLayout {
+    GridLayout {
+        id: mainLayout
         anchors.fill: parent
-        spacing: Kirigami.Units.largeSpacing
+        rowSpacing: Kirigami.Units.largeSpacing
+        columnSpacing: Kirigami.Units.largeSpacing
         Repeater {
             model: component.actions
             delegate: QQC2.Button {

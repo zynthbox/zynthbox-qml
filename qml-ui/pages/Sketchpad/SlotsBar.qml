@@ -731,6 +731,7 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: samplePickerPopup
+        columns: 2
         actions: [
             QQC2.Action {
                 text: qsTr("Save As...")

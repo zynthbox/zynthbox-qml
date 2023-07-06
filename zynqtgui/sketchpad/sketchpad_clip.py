@@ -229,6 +229,7 @@ class sketchpad_clip(QObject):
         return {"path": self.__path__,
                 "start": self.__start_position__,
                 "loopDelta": self.__loop_delta__,
+                "bpm": self.metadataBPM,
                 "length": self.__length__,
                 "pitch": self.__pitch__,
                 "time": self.__time__,
@@ -641,6 +642,7 @@ class sketchpad_clip(QObject):
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__is_playing__ = False
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
+        self.audioSource.setLooping(bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True)))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
         self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
@@ -961,6 +963,7 @@ class sketchpad_clip(QObject):
             self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
             self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
             self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
+            self.write_metadata("ZYNTHBOX_LOOPING_PLAYBACK", [str(self.audioSource.looping())])
             self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
             self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
             self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.adsrAttack())])
@@ -1053,6 +1056,24 @@ class sketchpad_clip(QObject):
 
     snapLengthToBeat = Property(bool, get_snap_length_to_beat, set_snap_length_to_beat, notify=snap_length_to_beat_changed)
     ### END Property snapLengthToBeat
+
+    ### BEGIN Property loopingPlayback
+    @Signal
+    def looping_playback_changed(self):
+        pass
+    def get_looping_playback(self):
+        if self.audioSource is not None:
+            return self.audioSource.looping()
+        return False
+
+    def set_looping_playback(self, loop):
+        if self.audioSource is not None and self.audioSource.looping() != loop:
+            self.audioSource.setLooping(loop)
+            self.saveMetadata()
+            self.looping_playback_changed.emit()
+
+    loopingPlayback = Property(bool, get_looping_playback, set_looping_playback, notify=looping_playback_changed)
+    ### END Property loopingPlayback
 
     ### Property loopDelta
     def get_loop_delta(self):

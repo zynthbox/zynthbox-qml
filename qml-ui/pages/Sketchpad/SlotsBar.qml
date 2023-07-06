@@ -641,7 +641,7 @@ Rectangle {
                         id: volumeSlider
 
                         property int chainedSound: root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] : -1
-                        property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[chainedSound]
+                        property QtObject synthPassthroughClient: chainedSound > -1 ? Zynthbox.Plugin.synthPassthroughClients[chainedSound] : null
 
                         orientation: Qt.Horizontal
 
@@ -652,7 +652,7 @@ Rectangle {
                         visible: synthsButton.checked
                         enabled: chainedSound >= 0 &&
                                  (root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) : false)
-                        value: synthPassthroughClient.dryAmount
+                        value: synthPassthroughClient ? synthPassthroughClient.dryAmount : 0
                         stepSize: 0.01
                         from: 0
                         to: 1

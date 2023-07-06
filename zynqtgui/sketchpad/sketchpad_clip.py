@@ -644,6 +644,7 @@ class sketchpad_clip(QObject):
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
         self.audioSource.setLooping(bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True)))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
+        self.audioSource.setLoopDelta(self.__loop_delta__)
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
         self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
@@ -1082,6 +1083,8 @@ class sketchpad_clip(QObject):
     def set_loop_delta(self, val, force_set=False):
         if self.__loop_delta__ != val or force_set is True:
             self.__loop_delta__ = val
+            if self.audioSource is not None:
+                self.audioSource.setLoopDelta(val)
             self.loop_delta_changed.emit()
             if force_set is False:
                 self.__song__.schedule_save()

@@ -68,6 +68,21 @@ ColumnLayout {
         onSelectedSlotRowChanged: controlObjUpdater.restart()
     }
     onControlTypeChanged: controlObjUpdater.restart()
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 0; running: false; repeat: false;
+        onTriggered: {
+            root.selectedChannel = applicationWindow().selectedChannel;
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
+    Component.onCompleted: {
+        selectedChannelThrottle.restart()
+    }
     property bool showCopyPasteButtons: true
 
     function cuiaCallback(cuia) {
@@ -329,14 +344,29 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
+            QQC2.Switch {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                checked: root.controlObj && root.controlObj.hasOwnProperty("loopingPlayback") ? root.controlObj.loopingPlayback : true
+                visible: root.selectedChannel.channelAudioType !== "sample-loop"
+                onToggled: {
+                    root.controlObj.loopingPlayback = checked
+                }
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                visible: root.selectedChannel.channelAudioType !== "sample-loop"
+                horizontalAlignment: TextInput.AlignHCenter
+                wrapMode: Text.Wrap
+                text: qsTr("Loop")
+            }
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }
             QQC2.Switch {
-                id: snapLengthToBeatSwitch
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.snapLengthToBeat : true
                 onToggled: {
                     root.controlObj.snapLengthToBeat = checked
@@ -345,6 +375,7 @@ ColumnLayout {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                visible: root.selectedChannel.channelAudioType === "sample-loop"
             }
             QQC2.Label {
                 Layout.fillWidth: true

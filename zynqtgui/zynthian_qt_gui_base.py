@@ -53,4 +53,7 @@ class zynqtgui(QObject):
     def set_selector(self):
         pass
 
+    def switch_select(self, t='S'):
+        pass
+
 #------------------------------------------------------------------------------

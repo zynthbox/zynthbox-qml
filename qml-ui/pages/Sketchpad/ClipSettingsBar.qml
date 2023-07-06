@@ -63,7 +63,7 @@ ColumnLayout {
         onBottomBarControlObjChanged: controlObjUpdater.restart()
     }
     Connections {
-        target: zynqtgui.bottomBarControlObj
+        target: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") ? zynqtgui.bottomBarControlObj : null
         onSamplesChanged: controlObjUpdater.restart()
         onSelectedSlotRowChanged: controlObjUpdater.restart()
     }
@@ -245,24 +245,6 @@ ColumnLayout {
                 text: qsTr("BPM")
             }
 
-            QQC2.Label {
-                id: bpmLabel
-                Layout.alignment: Qt.AlignHCenter
-                visible: root.controlObj && root.controlObj.metadataBPM ? true : false
-                font.pointSize: 9
-                Timer {
-                    id: bpmLabelThrottle
-                    interval: 1; repeat: false; running: false;
-                    onTriggered: {
-                        bpmLabel.text = root.controlObj && root.controlObj.hasOwnProperty("metadataBPM") ? root.controlObj.metadataBPM : "";
-                    }
-                }
-                Connections {
-                    target: root
-                    onControlObjChanged: bpmLabelThrottle.restart()
-                }
-            }
-
             QQC2.TextField {
                 id: objBpmEdit
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -271,7 +253,7 @@ ColumnLayout {
                 horizontalAlignment: TextInput.AlignHCenter
                 focus: false
                 text: enabled
-                        ? root.controlObj && root.controlObj.bpm ? (root.controlObj.bpm <= 0 ? "" : root.controlObj.bpm) : ""
+                        ? root.controlObj && root.controlObj.metadataBPM ? (root.controlObj.metadataBPM <= 0 ? "" : root.controlObj.metadataBPM) : ""
                         : ""
                 // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
@@ -280,19 +262,12 @@ ColumnLayout {
                 */
                 validator: RegExpValidator { regExp: /^[0-9]*(\.(0{0}|0[1-9]{0,1}|[1-9]{0,2}))?$/ }
                 inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
+                activeFocusOnTab: false
                 enabled: root.controlObj ? !root.controlObj.shouldSync : false
-                onAccepted: {
-                    root.controlObj.bpm = parseFloat(text);
-                }
-                onPressed: {
-                    forceActiveFocus()
-                }
-                Connections {
-                    target: Qt.inputMethod
-                    onVisibleChanged: {
-                        if (!Qt.inputMethod.visible) {
-                            syncSwitch.forceActiveFocus()
-                        }
+                onTextChanged: {
+                    var newValue = parseFloat(text);
+                    if (text !== "" && root.controlObj.metadataBPM !== newValue) {
+                        root.controlObj.metadataBPM = newValue;
                     }
                 }
             }
@@ -307,7 +282,7 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 checked: root.controlObj && root.controlObj.hasOwnProperty("shouldSync") ? root.controlObj.shouldSync : false
-                enabled: root.controlObj && root.controlObj.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
+                enabled: root.controlObj && root.controlObj.metadataBPM > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
                     root.controlObj.shouldSync = checked
                 }

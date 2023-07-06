@@ -62,7 +62,6 @@ class sketchpad_clip(QObject):
         self.__pitch__ = self.__initial_pitch__
         self.__initial_time__ = 1
         self.__time__ = self.__initial_time__
-        self.__bpm__ = 0
         self.__initial_gain__ = 0
         self.__gain__ = self.__initial_gain__
         self.__progress__ = 0.0
@@ -85,10 +84,10 @@ class sketchpad_clip(QObject):
         self.__autoStopTimer__ = QTimer()
         self.__autoStopTimer__.setSingleShot(True)
         self.__autoStopTimer__.timeout.connect(self.stop_audio)
-        self.__bpm_changed_throttle = QTimer()
-        self.__bpm_changed_throttle.setSingleShot(True)
-        self.__bpm_changed_throttle.setInterval(50)
-        self.__bpm_changed_throttle.timeout.connect(self.song_bpm_changed, Qt.QueuedConnection)
+        self.__update_synced_values_throttle = QTimer()
+        self.__update_synced_values_throttle.setSingleShot(True)
+        self.__update_synced_values_throttle.setInterval(50)
+        self.__update_synced_values_throttle.timeout.connect(self.update_synced_values_actual, Qt.QueuedConnection)
 
         try:
             # Check if a dir named <somerandomname>.<channel_id> exists.
@@ -98,7 +97,7 @@ class sketchpad_clip(QObject):
             bank_name = "sample-bank"
         self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
 
-        Zynthbox.SyncTimer.instance().bpmChanged.connect(self.__bpm_changed_throttle.start, Qt.QueuedConnection)
+        Zynthbox.SyncTimer.instance().bpmChanged.connect(self.update_synced_values, Qt.QueuedConnection)
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat, Qt.QueuedConnection)
 
         try:
@@ -210,14 +209,13 @@ class sketchpad_clip(QObject):
 
     currentBeat = Property(int, get_current_beat, notify=current_beat_changed)
 
-    def song_bpm_changed(self):
-        self.update_synced_values()
-
     def update_synced_values(self):
+        self.__update_synced_values_throttle.start()
+
+    def update_synced_values_actual(self):
         if self.__should_sync__:
-            logging.debug(f"Song BPM : {Zynthbox.SyncTimer.instance().getBpm()}")
-            new_ratio = Zynthbox.SyncTimer.instance().getBpm() / self.__bpm__
-            logging.debug(f"Song New Ratio : {new_ratio}")
+            new_ratio = Zynthbox.SyncTimer.instance().getBpm() / self.metadataBPM
+            logging.info(f"Song BPM : {Zynthbox.SyncTimer.instance().getBpm()} - Sample BPM: {self.metadataBPM} - New Speed Ratio : {new_ratio}")
             self.set_time(new_ratio, True)
 
             # if self.__start_position_before_sync__ is not None:
@@ -234,7 +232,6 @@ class sketchpad_clip(QObject):
                 "length": self.__length__,
                 "pitch": self.__pitch__,
                 "time": self.__time__,
-                "bpm": self.__bpm__,
                 "enabled": self.__enabled__,
                 "shouldSync": self.__should_sync__,
                 "snapLengthToBeat": self.__snap_length_to_beat__,
@@ -268,9 +265,6 @@ class sketchpad_clip(QObject):
             if "time" in obj:
                 self.__time__ = obj["time"]
                 self.set_time(self.__time__, True)
-            if "bpm" in obj:
-                self.__bpm__ = obj["bpm"]
-                self.set_bpm(self.__bpm__, True)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
@@ -560,20 +554,6 @@ class sketchpad_clip(QObject):
     time = Property(float, time, set_time, notify=time_changed)
 
 
-    def bpm(self):
-        return self.__bpm__
-
-    def set_bpm(self, bpm: float, force_set=False):
-        if self.__bpm__ != bpm or force_set is True:
-            self.__bpm__ = bpm
-            self.bpm_changed.emit()
-            if force_set is False:
-                self.__song__.schedule_save()
-            self.reset_beat_count()
-
-    bpm = Property(float, bpm, set_bpm, notify=bpm_changed)
-
-
     def shouldSync(self):
         return self.__should_sync__
 
@@ -665,7 +645,6 @@ class sketchpad_clip(QObject):
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
         self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
-        self.__bpm__ = 0
         self.__progress__ = 0.0
         self.__audio_level__ = -200
         self.__snap_length_to_beat__ = (self.__get_metadata_prop__("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", 'True').lower() == "true")
@@ -696,12 +675,6 @@ class sketchpad_clip(QObject):
 
         self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
         self.audioSource.gainAbsoluteChanged.connect(self.updateGain, Qt.QueuedConnection)
-
-        try:
-            logging.info(f"Setting bpm from metadata")
-            self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
-        except Exception as e:
-            logging.debug(f"Error setting bpm from metadata : {str(e)}")
 
         # self.startPosition = self.__start_position__
         # self.length = self.__length__
@@ -836,14 +809,6 @@ class sketchpad_clip(QObject):
         if self.path is not None:
             try:
                 self.audio_metadata = taglib.File(self.path).tags
-
-                # try:
-                #     if self.__bpm__ <= 0:
-                #         self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
-                # except Exception as e:
-                #     # logging.info(f"Error setting BPM from metadata : {str(e)}")
-                #     pass
-
                 self.sound_data_changed.emit()
                 self.metadata_bpm_changed.emit()
                 self.metadata_audio_type_changed.emit()
@@ -923,6 +888,11 @@ class sketchpad_clip(QObject):
     def metadata_bpm_changed(self):
         pass
 
+    def set_metadata_bpm(self, bpm:int):
+        if (self.get_metadataBPM() != bpm):
+            self.write_metadata("ZYNTHBOX_BPM", [str(bpm)])
+            self.metadata_bpm_changed.emit()
+
     def get_metadataBPM(self):
         try:
             if self.audio_metadata is not None:
@@ -932,7 +902,7 @@ class sketchpad_clip(QObject):
 
         return None
 
-    metadataBPM = Property(int, get_metadataBPM, notify=metadata_bpm_changed)
+    metadataBPM = Property(int, get_metadataBPM, set_metadata_bpm, notify=metadata_bpm_changed)
 
     @Signal
     def metadata_midi_recording_changed(self):

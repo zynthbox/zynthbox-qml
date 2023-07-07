@@ -945,7 +945,7 @@ Kirigami.AbstractApplicationWindow {
         z: 999999
         currentPage: root.currentPage
         visible: root.controlsVisible
-       // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
+        height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2.5)
     }
     Component.onCompleted: {
         zynqtgui.showMessageDialog.connect(root.showMessageDialog)

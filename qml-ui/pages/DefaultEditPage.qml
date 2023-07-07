@@ -89,7 +89,7 @@ RowLayout {
     ListView {
         id: pageSelectorListview
         Layout.fillHeight: true
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
         model: zynqtgui.current_screen_id === "control"
                && root.selectedChannel.channelHasSynth
                 ? zynqtgui.control.totalPages
@@ -109,7 +109,7 @@ RowLayout {
         }
         delegate: Rectangle {
             width: ListView.view.width
-            height: ListView.view.height / 6
+            height: ListView.view.height / 8
             color: "transparent"
             border.color: "#88ffffff"
             border.width: zynqtgui.control.selectedPage === index ? 2 : 0

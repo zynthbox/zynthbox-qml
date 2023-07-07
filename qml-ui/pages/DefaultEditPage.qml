@@ -86,59 +86,6 @@ RowLayout {
 
     spacing: 4
 
-
-    ListView {
-        id: synthSelectorListview
-        Layout.fillHeight: true
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-        model: zynqtgui.current_screen_id === "control"
-               && root.selectedChannel.channelHasSynth
-                ? 5
-                : 0
-        clip: true
-        currentIndex: 0
-        highlightFollowsCurrentItem: true
-        QQC2.ScrollBar.vertical: QQC2.ScrollBar {
-            width: Kirigami.Units.gridUnit * 0.3
-            policy: QQC2.ScrollBar.AlwaysOn
-            active: true
-            contentItem: Rectangle {
-                radius: width/2
-                color: Kirigami.Theme.textColor
-                opacity: 0.3
-            }
-        }
-        delegate: Rectangle {
-            width: ListView.view.width
-            height: ListView.view.height / 6
-            color: "transparent"
-            border.color: "#88ffffff"
-            border.width: index === synthSelectorListview.currentIndex ? 2 : 0
-            radius: 2
-
-            QQC2.Label {
-                anchors.centerIn: parent
-                text: qsTr("Synth %1").arg(index+1)
-            }
-
-            Kirigami.Separator {
-                height: 1
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    synthSelectorListview.currentIndex = index
-                }
-            }
-        }
-    }
-
     ListView {
         id: pageSelectorListview
         Layout.fillHeight: true

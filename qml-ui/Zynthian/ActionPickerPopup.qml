@@ -28,8 +28,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+import Zynthian 1.0 as Zynthian
 
-Popup {
+Zynthian.Popup {
     id: component
 
     property list<QQC2.Action> actions

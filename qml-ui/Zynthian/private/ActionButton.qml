@@ -27,7 +27,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-
+import Zynthian 1.0 as Zynthian
 
 QQC2.Button {
     id: root
@@ -69,14 +69,9 @@ QQC2.Button {
         color: Kirigami.Theme.highlightColor
     }
 
-    ActionsMenu {
+    Zynthian.ActionPickerPopup {
         id: mainActionSubMenu
-        y: -height
-        x: -width/2 + parent.width/2
-        actions: root.kirigamiAction && root.kirigamiAction.hasOwnProperty("children") ? root.kirigamiAction.children : ""
-        submenuComponent: Component {
-            ActionsMenu {}
-        }
+        actions: root.kirigamiAction && root.kirigamiAction.hasOwnProperty("children") ? root.kirigamiAction.children : null
     }
 }
 

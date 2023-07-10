@@ -37,6 +37,8 @@ QQC2.Popup {
         var result = component.opened;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
                 root.close()
                 result = true;
                 break;

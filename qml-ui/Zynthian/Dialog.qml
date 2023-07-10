@@ -36,6 +36,12 @@ QQC2.Dialog {
     property var cuiaCallback: function(cuia) {
         var result = component.opened;
         switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                root.close()
+                result = true;
+                break;
             case "KNOB0_UP":
             case "KNOB0_DOWN":
             case "KNOB1_UP":

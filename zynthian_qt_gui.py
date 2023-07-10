@@ -3127,17 +3127,17 @@ class zynthian_gui(QObject):
 
     def all_sounds_off(self):
         logging.info("All Sounds Off!")
-        for chan in range(16):
+        for chan in range(10): # One for each track (not midi channel)
             Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0)
 
     def all_notes_off(self):
         logging.info("All Notes Off!")
-        for chan in range(16):
+        for chan in range(10): # One for each track (not midi channel)
             Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
 
     def raw_all_notes_off(self):
         logging.info("Raw All Notes Off!")
-        for chan in range(16):
+        for chan in range(10): # One for each track (not midi channel)
             Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
 
     def all_sounds_off_chan(self, chan):

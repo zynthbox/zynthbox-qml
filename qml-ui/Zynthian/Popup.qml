@@ -36,6 +36,10 @@ QQC2.Popup {
     property var cuiaCallback: function(cuia) {
         var result = component.opened;
         switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+                root.close()
+                result = true;
+                break;
             case "KNOB0_UP":
             case "KNOB0_DOWN":
             case "KNOB1_UP":

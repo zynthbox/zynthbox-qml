@@ -33,27 +33,34 @@ Popup {
     id: component
 
     property list<QQC2.Action> actions
-    property alias columns: mainLayout.columns
+    property int rows: 3
+    property int columns: Math.ceil(component.actions.length / 3) // Auto calculate columns if not provided
 
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    width: (columns > 1 ? columns : 1) * Kirigami.Units.gridUnit*12
-    height: (columns > 1 ? (actions.length / columns) : actions.length) * Kirigami.Units.gridUnit * 4
+    width: mainLayout.implicitWidth + mainLayout.columnSpacing*2
+    height: mainLayout.implicitHeight + mainLayout.rowSpacing*2
 
     GridLayout {
         id: mainLayout
         anchors.fill: parent
         rowSpacing: Kirigami.Units.largeSpacing
         columnSpacing: Kirigami.Units.largeSpacing
+        columns: component.columns
+        rows: component.rows
+        flow: GridLayout.TopToBottom
         Repeater {
             model: component.actions
             delegate: QQC2.Button {
                 id: delegate
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.minimumWidth: Kirigami.Units.gridUnit * 12
+                Layout.minimumHeight: Kirigami.Units.gridUnit * 4
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 12
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 4
                 Layout.alignment: Qt.AlignCenter
                 action: modelData
+                visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
             }
         }
     }

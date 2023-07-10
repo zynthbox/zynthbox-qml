@@ -62,6 +62,9 @@ Zynthian.Popup {
                 Layout.alignment: Qt.AlignCenter
                 action: modelData
                 visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
+                onClicked: {
+                    component.close();
+                }
             }
         }
     }

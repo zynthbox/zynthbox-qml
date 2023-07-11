@@ -224,7 +224,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "synth"
-                                text: qsTr("Synths")
+                                text: qsTr("Synth")
                                 onClicked: root.selectedChannel.channelAudioType = "synth"
                             }
                             QQC2.Button {
@@ -233,7 +233,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "sample-trig"
-                                text: qsTr("Samples")
+                                text: qsTr("Sample")
                                 onClicked: root.selectedChannel.channelAudioType = "sample-trig"
                             }
                             QQC2.Button {
@@ -242,7 +242,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType.startsWith("sample-loop")
-                                text: qsTr("Sketches")
+                                text: qsTr("Sketch")
                                 onClicked: root.selectedChannel.channelAudioType = "sample-loop"
                             }
                             QQC2.Button {

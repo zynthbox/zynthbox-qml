@@ -10,6 +10,7 @@ Rectangle {
     id: control
     property bool highlight: false
     property alias headerText: headerLabel.text
+    property alias headerTextVisible: headerLabel.visible
     property alias footerText: footerLabel.text
     property alias audioLeveldB: audioGauge.value
     property var inputAudioLeveldB: null

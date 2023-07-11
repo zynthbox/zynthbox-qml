@@ -136,17 +136,9 @@ Rectangle {
                         id: channelsVolumeRow
 
                         function handleClick(channel) {
-                            if (zynqtgui.session_dashboard.selectedChannel !== channel.id) {
-                                zynqtgui.session_dashboard.disableNextSoundSwitchTimer();
-                                zynqtgui.session_dashboard.selectedChannel = channel.id;
-                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
-                            } else {
-                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
-
-                                bottomStack.currentIndex = 0
-                            }
+                            zynqtgui.session_dashboard.selectedChannel = channel.id;
+                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                            zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
                         }
 
                         Layout.fillWidth: true
@@ -173,7 +165,7 @@ Rectangle {
                                     ColumnLayout {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        spacing: 0
+                                        spacing: Kirigami.Units.smallSpacing
 
                                         Item {
                                             Layout.fillWidth: true
@@ -194,12 +186,7 @@ Rectangle {
                                                 anchors.fill: parent
 
                                                 enabled: !model.channel.muted
-                                                headerText: visible
-                                                                ? model.channel.muted || Zynthbox.AudioLevels.channels[model.channel.id] <= -40
-                                                                    ? ""
-                                                                    : (Math.round(Zynthbox.AudioLevels.channels[model.channel.id]) + " (dB)")
-                                                                : ""
-            //                                    footerText: model.channel.name
+                                                headerTextVisible: false
                                                 audioLeveldB: visible && !model.channel.muted
                                                                 ? Zynthbox.AudioLevels.channels[model.channel.id]
                                                                 : -400

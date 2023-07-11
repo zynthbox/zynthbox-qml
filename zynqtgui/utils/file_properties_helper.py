@@ -1,4 +1,7 @@
 import logging
+import taglib
+import tempfile
+from subprocess import check_output
 import Zynthbox
 
 from PySide2.QtCore import Property, QMimeDatabase, QObject, Signal, Slot
@@ -52,6 +55,37 @@ class file_properties_helper(QObject):
     file_metadata_changed = Signal()
     fileMetadata = Property('QVariantMap', get_file_metadata, notify=file_metadata_changed)
     ### END Property fileMetadata
+
+    @Slot(str, 'QVariantMap')
+    def writeMetadata(self, filename, values: dict):
+        # for key, value in values.items():
+            # logging.info(f"Writing metadata to {filename} : {key} -> {value}")
+        if filename is not None:
+            try:
+                file = taglib.File(filename)
+                for key, value in values.items():
+                    file.tags[key] = [str(value)]
+                file.save()
+            except Exception as e:
+                logging.error(f"Error writing metadata : {str(e)}")
+                logging.info(f"Trying to create a new file without metadata")
+
+                try:
+                    with tempfile.TemporaryDirectory() as tmp:
+                        logging.info("Creating new temp file without metadata")
+                        logging.debug(f"ffmpeg -i {filename} -codec copy {Path(tmp) / 'output.wav'}")
+                        check_output(f"ffmpeg -i {filename} -codec copy {Path(tmp) / 'output.wav'}", shell=True)
+
+                        logging.info("Replacing old file")
+                        logging.debug(f"mv {Path(tmp) / 'output.wav'} {filename}")
+                        check_output(f"mv {Path(tmp) / 'output.wav'} {filename}", shell=True)
+
+                        file = taglib.File(filename)
+                        for key, value in values.items():
+                            file.tags[key] = [str(value)]
+                        file.save()
+                except Exception as e:
+                    logging.error(f"Error creating new file and writing metadata : {str(e)}")
 
     ### Property isPreviewPlaying
     def get_is_preview_playing(self):

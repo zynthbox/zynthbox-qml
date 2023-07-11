@@ -99,11 +99,11 @@ Rectangle {
                 }
                 break;
             case "KNOB0_UP":
-                pageManager.getPage("sketchpad").updateSelectedChannelVolume(1, true)
+                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                pageManager.getPage("sketchpad").updateSelectedChannelVolume(-1, true)
+                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
                 returnValue = true;
                 break;
             case "KNOB1_UP":

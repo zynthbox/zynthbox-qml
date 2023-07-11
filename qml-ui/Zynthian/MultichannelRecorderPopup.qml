@@ -31,6 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
+import Helpers 1.0 as Helpers
 
 Zynthian.Popup {
     id: component
@@ -125,6 +126,7 @@ Zynthian.Popup {
             text: "Record Song"
             QtObject {
                 id: _private
+                property var filePropertiesHelper: Helpers.FilePropertiesHelper { }
                 property double recordingProgress: -1
                 property QtObject song
                 // This is a bit of a hackery type thing, but songMode in this context means "starting playback will be in song mode", so... this will do the trick
@@ -213,6 +215,33 @@ Zynthian.Popup {
                     if (Zynthbox.PlayGridManager.metronomeActive) {
                         // Stop the playback, again, in case this was called by someone else (like the close button)
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                    }
+                    // Save metadata into the newly created recordings
+                    let recordingFilenames = Zynthbox.AudioLevels.recordingFilenames();
+                    for (let filenameIndex = 0; filenameIndex < recordingFilenames.length; ++filenameIndex) {
+                        let filename = recordingFilenames[filenameIndex];
+                        if (filename.length > 0) {
+                            let metadata = {
+                                "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm
+                            };
+                            // If the filename is a thing, it means we have produced a recording
+                            if (filenameIndex === 0) {
+                                // Index 0 is the global recorder (what records our song)
+                                // TODO: It doesn't really make sense to store the entire sound setup here... or does it? What should we do here?
+                                metadata["ZYNTHBOX_MIDI_RECORDING"] = Zynthbox.MidiRecorder.base64Midi();
+                            } else if (filenameIndex === 1) {
+                                // Index 1 is the port recorder (which we're not using here, so just skip that)
+                                // This block is unlikely to ever be reached anyway, but hey
+                            } else {
+                                // Indices 2 through 11 are the sketchpad track recorders
+                                let channel = zynqtgui.sketchpad.song.channelsModel.getChannel(filenameIndex - 2);
+                                if (channel) { // by all rights this should not be possible, but... best safe
+                                    metadata["ZYNTHBOX_ACTIVELAYER"] = channel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
+                                }
+                                metadata["ZYNTHBOX_MIDI_RECORDING"] = Zynthbox.MidiRecorder.base64TrackMidi(filenameIndex - 2);
+                            }
+                            _private.filePropertiesHelper.writeMetadata(filename, metadata);
+                        }
                     }
                 }
             }
@@ -445,7 +474,7 @@ Zynthian.Popup {
                     bottom: parent.bottom
                     bottomMargin: -2
                     left: parent.left
-                    leftMargin: component.visible ? songProgressRow.width * (Zynthbox.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                    leftMargin: component.visible ? songProgressRow.width * Math.min(1, (Zynthbox.SegmentHandler.playhead / segmentsRepeater.totalDuration)) : 0
                 }
                 width: 1
                 Rectangle {

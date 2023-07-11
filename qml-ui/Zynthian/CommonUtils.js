@@ -55,7 +55,7 @@ function stopMetronomeAndPlayback() {
 
         if (zynqtgui.sketchpad.isRecording) {
             Zynthbox.MidiRecorder.stopRecording()
-            zynqtgui.sketchpad.lastRecordingMidi = Zynthbox.MidiRecorder.base64Midi()
+            zynqtgui.sketchpad.lastRecordingMidi = Zynthbox.MidiRecorder.base64TrackMidi(Zynthbox.PlayGridManager.currentMidiChannel)
 
             if (zynqtgui.sketchpad.recordingType === "audio") {
                 zynqtgui.sketchpad.stopAudioRecording()

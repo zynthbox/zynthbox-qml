@@ -581,11 +581,17 @@ Zynthian.BasePlayGrid {
         onNoteChanged: {
             if (port == 0 && midiChannel === _private.activePatternModel.midiChannel) {
                 if (setOn == true) {
+                    if (component.noteListeningActivations === 0) {
+                        // Clear the current state, in case there's something there (otherwise things look a little weird)
+                        component.heardNotes = [];
+                        component.heardVelocities = [];
+                        component.mostRecentlyPlayedNote = undefined;
+                    }
                     // Count up one tick for a note on message
                     component.noteListeningActivations = component.noteListeningActivations + 1;
                     // Create a new note based on the new thing that just arrived, but only if it's an on note
                     var newNote = component.getNote(midiNote, midiChannel);
-                    var existingIndex = component.heardNotes.indexOf(newNote);
+                    var existingIndex = component.noteListeningNotes.indexOf(newNote);
                     if (existingIndex > -1) {
                         component.noteListeningNotes.splice(existingIndex, 1);
                         component.noteListeningVelocities.splice(existingIndex, 1);

@@ -1164,6 +1164,17 @@ Zynthian.ScreenPage {
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
+                                        var toggle = false;
+
+                                        if (root.lastSelectedObj != null &&
+                                                root.lastSelectedObj.className === channel.sceneClip.className &&
+                                                root.lastSelectedObj.value === channel.sceneClip &&
+                                                root.lastSelectedObj.component != null &&
+                                                root.lastSelectedObj.component === clipCell) {
+                                            // Clip is already selected. Toggle between track/clips view
+                                            toggle = true
+                                        }
+
                                         root.lastSelectedObj = {
                                             className: channel.sceneClip.className,
                                             value: channel.sceneClip,
@@ -1172,7 +1183,7 @@ Zynthian.ScreenPage {
 
                                         zynqtgui.session_dashboard.selectedChannel = channel.id;
 
-                                        root.resetBottomBar(false)
+                                        root.resetBottomBar(toggle)
                                         zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                         zynqtgui.bottomBarControlObj = channel;
 

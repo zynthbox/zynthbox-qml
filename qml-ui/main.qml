@@ -1241,7 +1241,9 @@ Kirigami.AbstractApplicationWindow {
 
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("Tracks")
+                            horizontalAlignment: QQC2.Label.AlignHCenter
+                            verticalAlignment: QQC2.Label.AlignVCenter
+                            text: qsTr("Tracks\n1-5")
                         }
 
                         Repeater {
@@ -1318,7 +1320,9 @@ Kirigami.AbstractApplicationWindow {
 
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
-                            text: qsTr("Tracks")
+                            horizontalAlignment: QQC2.Label.AlignHCenter
+                            verticalAlignment: QQC2.Label.AlignVCenter
+                            text: qsTr("Tracks\n6-10")
                         }
 
                         Repeater {

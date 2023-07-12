@@ -13,6 +13,9 @@ QQC2.Slider {
     signal released(var mouse)
 
     value: controlObj[controlProp]
+    // Set inset values explicitly to calculate height correctly
+    topInset: 0
+    bottomInset: 0
 
     MouseArea {
         id: mouseArea

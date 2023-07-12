@@ -95,7 +95,7 @@ ColumnLayout {
             }
             QQC2.Label {
                 anchors.centerIn: parent
-                font.pointSize: 8
+                font.pointSize: 12
                 visible: ["sample-trig", "sample-slice", "synth", "external"].indexOf(root.channel.channelAudioType) >= 0
                 text: qsTr("%1%2")
                         .arg(root.channel.id + 1)

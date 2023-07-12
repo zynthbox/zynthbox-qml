@@ -153,12 +153,12 @@ QQC2.AbstractButton {
 //            }
 //        }
 
-        QQC2.Label {
-            anchors.centerIn: parent
-            color: "#f44336"
-            text: qsTr("Mute")
-            visible: !root.isInScene
-        }
+//        QQC2.Label {
+//            anchors.centerIn: parent
+//            color: "#f44336"
+//            text: qsTr("Mute")
+//            visible: !root.isInScene
+//        }
 
         ColumnLayout {
             anchors.fill: parent
@@ -205,11 +205,10 @@ QQC2.AbstractButton {
             anchors.centerIn: parent
             horizontalAlignment: "AlignHCenter"
             elide: "ElideRight"
-            color: "#ffffff"
+            color: root.isInScene ? "#ffffff" : "#f44336" // Color text red when muted
             text: qsTr("%1")
                     .arg(channel.id+1)
-            font.pointSize: 12
-            visible: root.isInScene
+            font.pointSize: 16
 
             layer.enabled: true
             layer.effect: DropShadow {

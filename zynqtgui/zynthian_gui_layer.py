@@ -67,7 +67,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
         self.create_amixer_layer()
         self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
         self.__sounds_basepath__ = "/zynthian/zynthian-my-data/sounds/"
-        for pathToMake in [self.__soundsets_basepath__ + "my-soundsets/", self.__soundsets_basepath__ + "community-soundsets/", self.__sounds_basepath__ + "my-sounds/", self.__sounds_basepath__ + "community-sounds/"]:
+        for pathToMake in [self.__soundsets_basepath__ + "my-soundsets/", self.__soundsets_basepath__ + "community-soundsets/", self.__sounds_basepath__ + "default-sounds/", self.__sounds_basepath__ + "my-sounds/", self.__sounds_basepath__ + "community-sounds/"]:
             Path(pathToMake).mkdir(parents=True, exist_ok=True)
         self.show()
 

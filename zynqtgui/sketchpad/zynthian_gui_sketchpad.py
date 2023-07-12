@@ -105,6 +105,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)
         Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.metronomeEnabledChanged)
 
+        Path('/zynthian/zynthian-my-data/sketchpads/default-sketchpads').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/sketchpads/my-sketchpads').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/sketchpads/community-sketchpads').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/samples/default-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/samples/my-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/samples/community-samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)

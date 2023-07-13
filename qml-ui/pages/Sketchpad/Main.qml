@@ -27,6 +27,8 @@ import QtQuick 2.10
 import QtQuick.Window 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls.Styles 1.4
+import QtQuick.Extras 1.4 as Extras
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
@@ -1057,6 +1059,32 @@ Zynthian.ScreenPage {
                                             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                             zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
                                         })
+                                    }
+                                }
+
+                                Extras.Gauge {
+                                    id: volumeGauge
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                        right: parent.right
+                                        rightMargin: 2
+                                        topMargin: -4
+                                        bottomMargin: -4
+                                    }
+                                    minimumValue: -40
+                                    maximumValue: 20
+                                    value: channelHeaderDelegate.channel.volume
+                                    font.pointSize: 8
+                                    opacity: 0.7
+                                    style: GaugeStyle {
+                                        valueBar: Rectangle {
+                                            color: Kirigami.Theme.highlightColor
+                                            implicitWidth: 6
+                                        }
+                                        minorTickmark: null
+                                        tickmark: null
+                                        tickmarkLabel: null
                                     }
                                 }
                             }

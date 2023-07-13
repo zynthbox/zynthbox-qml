@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Channel Wave Editor
+Action Picker Popup, shows a list of actions in a finger-friendly manner
 
 Copyright (C) 2023 Dan Leinir Turthra Jensen <admin@leinir.dk>
 

@@ -357,10 +357,19 @@ Zynthian.ScreenPage {
                     zynqtgui.sketchpad.newSketchpad()
                 }
             }
+            Kirigami.Action {
+                text: "Get New Sketchpads"
+                onTriggered: {
+                    zynqtgui.show_modal("sketchpad_downloader")
+                }
+            }
         },
         Kirigami.Action {
             text: "" //qsTr("Sounds")
             onTriggered: zynqtgui.show_modal("sound_categories")
+            enabled: false
+        },
+        Kirigami.Action {
             enabled: false
         },
         Kirigami.Action {
@@ -372,12 +381,6 @@ Zynthian.ScreenPage {
                 } else {
                     bottomStack.slotsBar.mixerButton.checked = true
                 }
-            }
-        },
-        Kirigami.Action {
-            text: "Get New Sketchpads"
-            onTriggered: {
-                zynqtgui.show_modal("sketchpad_downloader")
             }
         }
 

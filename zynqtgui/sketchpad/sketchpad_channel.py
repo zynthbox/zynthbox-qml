@@ -32,6 +32,7 @@ import threading
 import traceback
 import jack
 import numpy as np
+import base64
 import Zynthbox
 
 from pathlib import Path
@@ -1203,6 +1204,17 @@ class sketchpad_channel(QObject):
     occupiedSlotsCount = Property(int, get_occupiedSlotsCount, notify=occupiedSlotsChanged)
     ### END Property occupiedSlotsCount
 
+    ### BEGIN Property occupiedSampleSlotsCount
+    def get_occupiedSampleSlotsCount(self):
+        count = 0
+        for sample in self.__samples__:
+            if sample is not None and sample.path is not None and len(sample.path) > 0:
+                count += 1
+        return count
+
+    occupiedSampleSlotsCount = Property(int, get_occupiedSampleSlotsCount, notify=occupiedSlotsChanged)
+    ### END Property occupiedSampleSlotsCount
+
     ### Property selectedPart
     def get_selected_part(self):
         return self.__selected_part__
@@ -1390,6 +1402,44 @@ class sketchpad_channel(QObject):
             return self.samples[self.selectedSlotRow]
         else:
             return self.getClipsModelByPart(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedTrackIndex)
+
+    @Slot(str)
+    def setChannelSamplesFromSnapshot(self, snapshot: str):
+        sampleData = json.loads(snapshot)
+        i = 0
+        for sample in sampleData:
+            if i > 4:
+                logging.error("For some reason we have more than five elements in the encoded sample data, what happened?!")
+                break;
+            filename = sample["filename"]
+            # Clear out the existing sample, whether or not there's a new sample to go into that spot
+            # If the filename is an empty string, nothing to load
+            if len(filename) == 0:
+                # Store the new sample in a temporary file
+                with tempfile.TemporaryDirectory() as tmp:
+                    temporaryFile = Path(tmp) / filename
+                    with open(temporaryFile, "wb") as file:
+                        file.write(base64.b64decode(sample["sampledata"]))
+                    # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
+                    self.__samples__[i].set_path(temporaryFile, should_copy=True)
+            i += 1
+        pass
+
+    @Slot(None, result=str)
+    def getChannelSampleSnapshot(self):
+        encodedSampleData = {};
+        for index in range(5):
+            sample = self.__samples__[index]
+            thisSample = {
+                "filename": "",
+                "sampledata": ""
+                }
+            if len(sample.path()) > 0:
+                thisSample["filename"] = sample.filename()
+                with open(sample.path(), "rb") as file:
+                    thisSample["sampledata"] = base64.b64encode(file.read())
+            encodedSampleData[index] = thisSample
+        return json.dumps(encodedSampleData)
 
     @Slot(None, result=str)
     def getChannelSoundSnapshotJson(self):

@@ -42,6 +42,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynqtgui.sketchpad.song
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
+    property bool showOccupiedSlotsHeader: false
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -833,13 +834,14 @@ Zynthian.ScreenPage {
                         Layout.maximumHeight: sketchpadSketchHeadersColumn.height / 2 - sketchpadSketchHeadersColumn.spacing
 
                         highlightOnFocus: false
-//                        highlighted: root.displayTrackButtons
+                        highlighted: root.showOccupiedSlotsHeader
 //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         text: qsTr("Track\nT%1").arg(root.selectedChannel.id + 1)
                         onPressed: {
 //                            root.displayTrackButtons = !root.displayTrackButtons
 //                            bottomStack.slotsBar.channelButton.checked = true
 //                            zynqtgui.sketchpad.displaySceneButtons = false
+                            root.showOccupiedSlotsHeader = !root.showOccupiedSlotsHeader
                         }
                     }
 
@@ -892,46 +894,69 @@ Zynthian.ScreenPage {
                                     : 0
 
                             delegate: Item {
+                                id: headerDelegate
+                                property QtObject channel: root.song.channelsModel.getChannel(index)
+
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                TableHeader {
-                                    id: trackHeaderDelegate
+//                                TableHeader {
+//                                    id: trackHeaderDelegate
+//                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
 
-                                    property QtObject channel: root.song.channelsModel.getChannel(index)
-                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
+//                                    visible: root.displayTrackButtons
+//                                    anchors.fill: parent
+//                                    color: Kirigami.Theme.backgroundColor
+//                                    highlightOnFocus: false
+//                                    highlighted: root.displayTrackButtons
+//                                                    ? root.song.scenesModel.selectedTrackIndex === index
+//                                                    : ""
 
-                                    visible: root.displayTrackButtons
+//                                    text: root.displayTrackButtons
+//                                            ? qsTr("T%1").arg(index+1)
+//                                            : ""
+//                                    textSize: 10
+
+//                                    onPressed: {
+//                                        if (root.displayTrackButtons) {
+//                                            root.lastSelectedObj = {
+//                                                className: "sketchpad_track",
+//                                                value: index,
+//                                                component: trackHeaderDelegate
+//                                            }
+//                                            root.song.scenesModel.selectedTrackIndex = index
+//                                        }
+//                                    }
+//                                }
+
+                                Item {
+                                    id: filledSlotsOverview
                                     anchors.fill: parent
-                                    color: Kirigami.Theme.backgroundColor
-                                    highlightOnFocus: false
-                                    highlighted: root.displayTrackButtons
-                                                    ? root.song.scenesModel.selectedTrackIndex === index
-                                                    : ""
+                                    visible: root.showOccupiedSlotsHeader
 
-                                    text: root.displayTrackButtons
-                                            ? qsTr("T%1").arg(index+1)
-                                            : ""
-                                    textSize: 10
+                                    ColumnLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: Kirigami.Units.largeSpacing
+                                        spacing: Kirigami.Units.largeSpacing
 
-                                    onPressed: {
-                                        if (root.displayTrackButtons) {
-                                            root.lastSelectedObj = {
-                                                className: "sketchpad_track",
-                                                value: index,
-                                                component: trackHeaderDelegate
+                                        Repeater {
+                                            model: headerDelegate.channel.occupiedSlots
+                                            delegate: Rectangle {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                radius: height
+                                                color: modelData ? "#aaffffff" : "#33ffffff"
                                             }
-                                            root.song.scenesModel.selectedTrackIndex = index
                                         }
                                     }
                                 }
 
                                 ChannelHeader2 {
                                     id: channelHeaderDelegate
-                                    visible: !root.displayTrackButtons
+                                    visible: !root.showOccupiedSlotsHeader
                                     anchors.fill: parent
 
-                                    channel: root.song.channelsModel.getChannel(index)
+                                    channel: headerDelegate.channel
                                     text: channelHeaderDelegate.channel.name
 
                                     Connections {

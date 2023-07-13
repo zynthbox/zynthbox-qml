@@ -1189,7 +1189,7 @@ class sketchpad_channel(QObject):
     occupiedSlots = Property('QVariantList', get_occupiedSlots, notify=occupiedSlotsChanged)
     ### END Property occupiedSlots
 
-    ### Property occupiedSlots
+    ### Property occupiedSlotsCount
     @Slot(None, result='QVariantList')
     def get_occupiedSlotsCount(self):
         count = 0
@@ -1201,7 +1201,7 @@ class sketchpad_channel(QObject):
         return count
 
     occupiedSlotsCount = Property(int, get_occupiedSlotsCount, notify=occupiedSlotsChanged)
-    ### END Property occupiedSlots
+    ### END Property occupiedSlotsCount
 
     ### Property selectedPart
     def get_selected_part(self):

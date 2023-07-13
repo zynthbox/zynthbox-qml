@@ -245,6 +245,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
                 def post_removal_task():
                     nonlocal cb_counter
+                    nonlocal channel
                     cb_counter -= 1
 
                     # Check if all callbacks are called
@@ -265,8 +266,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                         logging.debug(f"# Free Layers            : {free_layers}")
                         logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
 
-                        for index, channel in enumerate(source_channels):
-                            new_channels_map[f"{channel}"] = f"{free_layers[index]}"
+                        for index, _channel in enumerate(source_channels):
+                            new_channels_map[f"{_channel}"] = f"{free_layers[index]}"
 
                         logging.debug(f"# Channel map for loading sound : {new_channels_map}")
 

@@ -58,10 +58,12 @@ AbstractController {
                 topMargin: Kirigami.Units.largeSpacing
                 horizontalCenter: parent.horizontalCenter
             }
-            width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
+            width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 3)
             height: Kirigami.Units.gridUnit * 3
             checked: root.controller.ctrl && root.controller.ctrl.value !== root.controller.ctrl.value0
             onToggled: root.controller.ctrl.value = checked ? root.controller.ctrl.max_value : root.controller.ctrl.value0
+            // Explicitly set indicator implicitWidth otherwise the switch size is too small
+            indicator.implicitWidth: width
 
             // HACK for default style
             /* Binding {

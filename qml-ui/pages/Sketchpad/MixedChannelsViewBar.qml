@@ -374,18 +374,21 @@ Rectangle {
                                         id: bounceButtonLayout
                                         Layout.fillHeight: true
                                         property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && waveformContainer.clip && waveformContainer.clip.metadataMidiRecording != null && waveformContainer.clip.metadataMidiRecording.length > 10
-                                        property bool shouldBounce: root.selectedChannel.channelAudioType !== "sample-loop"
+                                        property bool shouldBounce: root.selectedChannel.channelAudioType !== "sample-loop" && root.selectedChannel.channelAudioType !== "external"
                                         visible: shouldBounce || shouldUnbounce
                                         QQC2.Button {
                                             text: bounceButtonLayout.shouldBounce ? qsTr("Bounce To Sketch") : (bounceButtonLayout.shouldUnbounce ? qsTr("Unbounce To Pattern") : "")
-                                            icon.name: bounceButtonLayout.shouldBounce ? "go-previous" : "go-next"
+                                            icon.name: bounceButtonLayout.shouldBounce ? "go-next" : "go-previous"
                                             onClicked: {
                                                 if (bounceButtonLayout.shouldBounce) {
                                                     bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
                                                 } else if (bounceButtonLayout.shouldUnbounce) {
                                                     // TODO Actually implement unbouncing functionality, dependent on what's contained in the sketch
-                                                    root.selectedChannel.channelAudioType = "synth";
+                                                    sketchUnbouncer.unbounce(waveformContainer.clip, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                                                 }
+                                            }
+                                            SketchUnbouncer {
+                                                id: sketchUnbouncer
                                             }
                                         }
                                         Item {

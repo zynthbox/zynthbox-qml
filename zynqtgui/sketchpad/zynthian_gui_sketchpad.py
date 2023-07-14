@@ -46,6 +46,56 @@ from .. import zynthian_gui_config
 from zyngine import zynthian_controller
 
 
+class last_selected_obj_dto(QObject):
+    def __init__(self, parent=None):
+        super(last_selected_obj_dto, self).__init__(parent)
+        self.__className = None
+        self.__value = None
+        self.__component = None
+
+    ### BEGIN Property className
+    def get_className(self):
+        return self.__className
+
+    def set_className(self, val):
+        if self.__className != val:
+            self.__className = val
+            self.classNameChanged.emit()
+
+    classNameChanged = Signal()
+
+    className = Property(str, get_className, set_className, notify=classNameChanged)
+    ### END Property className
+
+    ### BEGIN Property value
+    def get_value(self):
+        return self.__value
+
+    def set_value(self, val):
+        if self.__value != val:
+            self.__value = val
+            self.valueChanged.emit()
+
+    valueChanged = Signal()
+
+    value = Property("QVariant", get_value, set_value, notify=valueChanged)
+    ### END Property value
+
+    ### BEGIN Property component
+    def get_component(self):
+        return self.__component
+
+    def set_component(self, val):
+        if self.__component != val:
+            self.__component = val
+            self.componentChanged.emit()
+
+    componentChanged = Signal()
+
+    component = Property(QObject, get_component, set_component, notify=componentChanged)
+    ### END Property component
+
+
 class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_sketchpad, self).__init__(parent)
@@ -95,6 +145,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # This variable tells zynthian_qt_gui to load last state snapshot when booting when set to True
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
+        self.__last_selected_obj = last_selected_obj_dto(self)
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
         self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)
@@ -394,6 +445,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     channelTypeExternalColor = Property(QColor, get_channelTypeExternalColor, constant=True)
     ### END Property channelTypeExternalColor
+
+    ### BEGIN Property lastSelectedObj
+    def get_lastSelectedObj(self):
+        return self.__last_selected_obj
+
+    lastSelectedObj = Property(QObject, get_lastSelectedObj, constant=True)
+    ### END Property lastSelectedObj
 
     @Signal
     def metronomeEnabledChanged(self):

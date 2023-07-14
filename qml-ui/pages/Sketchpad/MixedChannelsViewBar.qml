@@ -225,7 +225,10 @@ Rectangle {
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "synth"
                                 text: qsTr("Synth")
-                                onClicked: root.selectedChannel.channelAudioType = "synth"
+                                onClicked: {
+                                    zynqtgui.sketchpad.lastSelectedObj.reset()
+                                    root.selectedChannel.channelAudioType = "synth"
+                                }
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
@@ -234,7 +237,10 @@ Rectangle {
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "sample-trig"
                                 text: qsTr("Sample")
-                                onClicked: root.selectedChannel.channelAudioType = "sample-trig"
+                                onClicked: {
+                                    zynqtgui.sketchpad.lastSelectedObj.reset()
+                                    root.selectedChannel.channelAudioType = "sample-trig"
+                                }
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
@@ -243,7 +249,10 @@ Rectangle {
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType.startsWith("sample-loop")
                                 text: qsTr("Sketch")
-                                onClicked: root.selectedChannel.channelAudioType = "sample-loop"
+                                onClicked: {
+                                    zynqtgui.sketchpad.lastSelectedObj.reset()
+                                    root.selectedChannel.channelAudioType = "sample-loop"
+                                }
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
@@ -252,7 +261,10 @@ Rectangle {
                                 checkable: true
                                 checked: root.selectedChannel.channelAudioType === "external"
                                 text: qsTr("External")
-                                onClicked: root.selectedChannel.channelAudioType = "external"
+                                onClicked: {
+                                    zynqtgui.sketchpad.lastSelectedObj.reset()
+                                    root.selectedChannel.channelAudioType = "external"
+                                }
                             }
                         }
 
@@ -437,6 +449,7 @@ Rectangle {
                                     model: 5
                                     property var synthData: [null, null, null, null, null]
                                     delegate: Rectangle {
+                                        id: slotDelegate
                                         property bool highlighted: root.selectedChannel.channelAudioType === "sample-slice" ||
                                                                    root.selectedChannel.channelAudioType === "external"
                                                                     ? index === 0
@@ -535,6 +548,10 @@ Rectangle {
                                                     dragHappenedResetTimer.restart()
                                                 }
                                                 onClicked: {
+                                                    zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
+                                                    zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                    zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
+
                                                     if (root.selectedChannel.channelAudioType === "external") {
                                                         // If channel type is external, then it has only 1 slot visible
                                                         // and the respective selectedSlotRow is already selected. Hence directly handle item click
@@ -641,6 +658,7 @@ Rectangle {
                                     model: 5
                                     property var fxData: [null, null, null, null, null]
                                     delegate: Rectangle {
+                                        id: fxRowDelegate
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
@@ -694,6 +712,11 @@ Rectangle {
 //                                                        root.openBottomDrawerOnLoad = true;
 //                                                        zynqtgui.forced_screen_back = screenBack;
 //                                                    }
+
+                                                    zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
+                                                    zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                    zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
+
                                                     if (root.selectedChannel.selectedFxSlotRow !== index) {
                                                         root.selectedChannel.selectedFxSlotRow = index
                                                     }

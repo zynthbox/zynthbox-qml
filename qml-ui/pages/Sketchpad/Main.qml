@@ -782,7 +782,9 @@ Zynthian.ScreenPage {
                                             ? root.displaySceneButtons
                                             : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
                                                 ? root.displayTrackButtons
-                                                : false
+                                                : ["MixedChannelsViewBar_slot", "MixedChannelsViewBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
+                                                    ? zynqtgui.slotsBarChannelActive
+                                                    : false
                             : false
 
             width: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.width + 8 : 0

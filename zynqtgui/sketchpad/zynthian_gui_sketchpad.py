@@ -53,6 +53,16 @@ class last_selected_obj_dto(QObject):
         self.__value = None
         self.__component = None
 
+    @Slot()
+    def reset(self):
+        self.__className = None
+        self.__value = None
+        self.__component = None
+
+        self.classNameChanged.emit()
+        self.valueChanged.emit()
+        self.componentChanged.emit()
+
     ### BEGIN Property className
     def get_className(self):
         return self.__className

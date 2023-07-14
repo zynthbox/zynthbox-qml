@@ -628,9 +628,11 @@ Rectangle {
                                     target: fxRepeater
                                     property: "fxData"
                                     delayed: true
-                                    value: root.selectedChannel.channelAudioType === "external"
-                                        ? root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-                                        : [null, null, null, null, null]
+                                    value: [root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[0]),
+                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[1]),
+                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[2]),
+                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[3]),
+                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[4])]
                                 }
 
                                 Repeater {
@@ -642,7 +644,7 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                                        property bool highlighted: false
+                                        property bool highlighted: root.selectedChannel.selectedFxSlotRow === index
                                         border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         border.width: 2
                                         color: "transparent"
@@ -675,22 +677,25 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    var chainedSound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-                                                    if (zynqtgui.backButtonPressed) {
-                                                        // Back is pressed. Clear Slot
-                                                        if (root.selectedChannel.checkIfLayerExists(chainedSound)) {
-                                                            zynqtgui.start_loading()
-                                                            zynqtgui.fixed_layers.activate_index(chainedSound)
-                                                            zynqtgui.layer_effects.fx_reset_confirmed()
-                                                            zynqtgui.stop_loading()
-                                                        }
-                                                    } else {
-                                                        zynqtgui.fixed_layers.activate_index(chainedSound)
-                                                        zynqtgui.layer_options.show();
-                                                        var screenBack = zynqtgui.current_screen_id;
-                                                        zynqtgui.current_screen_id = "layer_effects";
-                                                        root.openBottomDrawerOnLoad = true;
-                                                        zynqtgui.forced_screen_back = screenBack;
+//                                                    var chainedSound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+//                                                    if (zynqtgui.backButtonPressed) {
+//                                                        // Back is pressed. Clear Slot
+//                                                        if (root.selectedChannel.checkIfLayerExists(chainedSound)) {
+//                                                            zynqtgui.start_loading()
+//                                                            zynqtgui.fixed_layers.activate_index(chainedSound)
+//                                                            zynqtgui.layer_effects.fx_reset_confirmed()
+//                                                            zynqtgui.stop_loading()
+//                                                        }
+//                                                    } else {
+//                                                        zynqtgui.fixed_layers.activate_index(chainedSound)
+//                                                        zynqtgui.layer_options.show();
+//                                                        var screenBack = zynqtgui.current_screen_id;
+//                                                        zynqtgui.current_screen_id = "layer_effects";
+//                                                        root.openBottomDrawerOnLoad = true;
+//                                                        zynqtgui.forced_screen_back = screenBack;
+//                                                    }
+                                                    if (root.selectedChannel.selectedFxSlotRow !== index) {
+                                                        root.selectedChannel.selectedFxSlotRow = index
                                                     }
                                                 }
                                             }

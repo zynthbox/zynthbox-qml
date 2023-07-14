@@ -75,6 +75,7 @@ class sketchpad_channel(QObject):
         self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
+        self.__selected_fx_slot_row = 0
         self.__selected_part__ = 0
         self.__externalMidiChannel__ = -1
         self.__sound_json_snapshot__ = ""
@@ -1141,6 +1142,20 @@ class sketchpad_channel(QObject):
     selectedSlotRowChanged = Signal()
 
     selectedSlotRow = Property(int, get_selectedSlotRow, set_selectedSlotRow, notify=selectedSlotRowChanged)
+    ### END Property selectedSlotRow
+
+    ### Property selectedFxSlotRow
+    def get_selectedFxSlotRow(self):
+        return self.__selected_fx_slot_row
+
+    def set_selectedFxSlotRow(self, row):
+        if self.__selected_fx_slot_row != row:
+            self.__selected_fx_slot_row = row
+            self.selectedFxSlotRowChanged.emit()
+
+    selectedFxSlotRowChanged = Signal()
+
+    selectedFxSlotRow = Property(int, get_selectedFxSlotRow, set_selectedFxSlotRow, notify=selectedFxSlotRowChanged)
     ### END Property selectedSlotRow
 
     ### Property occupiedSlots

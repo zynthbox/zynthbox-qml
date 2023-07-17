@@ -858,8 +858,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        text: qsTr("Scene")
-                        subText: root.song.scenesModel.selectedSceneName
+                        text: qsTr("Scene\n%1").arg(root.song.scenesModel.selectedSceneName)
                         highlightOnFocus: false
                         highlighted: root.displaySceneButtons
                         onPressed: {

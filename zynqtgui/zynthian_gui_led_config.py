@@ -34,13 +34,16 @@ from PySide2.QtCore import Property, QTimer, Signal, Slot
 from PySide2.QtGui import QColor
 
 
+darkening_factor=800
+
+color_red = QColor.fromRgb(255, 0, 0).darker(darkening_factor)
+color_green = QColor.fromRgb(0, 255, 0).darker(darkening_factor)
+color_blue = QColor.fromRgb(0, 50, 200).darker(darkening_factor)
+
 led_color_off = rpi_ws281x.Color(0, 0, 0)
-led_color_blue = rpi_ws281x.Color(0, 50, 200)
-led_color_green = rpi_ws281x.Color(0, 255, 0)
-led_color_red = rpi_ws281x.Color(255, 0, 0)
-led_color_yellow = rpi_ws281x.Color(255, 235, 59)
-led_color_purple = rpi_ws281x.Color(142, 36, 170)
-led_color_lightblue= rpi_ws281x.Color(50, 100, 255)
+led_color_red = rpi_ws281x.Color(color_red.red(), color_red.green(), color_red.blue())
+led_color_green = rpi_ws281x.Color(color_green.red(), color_green.green(), color_green.blue())
+led_color_blue = rpi_ws281x.Color(color_blue.red(), color_blue.green(), color_blue.blue())
 
 led_color_inactive = led_color_blue
 led_color_active = led_color_green
@@ -95,7 +98,7 @@ if __name__ == "__main__":
         rainbow_led_counter = 0
         while True:
             for i in range(25):
-                color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127)
+                color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127).darker(darkening_factor)
                 wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
             wsleds.show()
             rainbow_led_counter += 3
@@ -171,12 +174,15 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         from . import zynthian_gui_config
         zynqtgui = zynthian_gui_config.zynqtgui
 
-        global led_color_channel_synth, led_color_channel_loop, led_color_channel_sample, led_color_channel_external
+        channelTypeSynthColorDarkened = zynqtgui.sketchpad.channelTypeSynthColor.darker(darkening_factor)
+        channelTypeSketchesColorDarkened = zynqtgui.sketchpad.channelTypeSketchesColor.darker(darkening_factor)
+        channelTypeSamplesColorDarkened = zynqtgui.sketchpad.channelTypeSamplesColor.darker(darkening_factor)
+        channelTypeExternalColorDarkened = zynqtgui.sketchpad.channelTypeExternalColor.darker(darkening_factor)
 
-        led_color_channel_synth = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeSynthColor.red(), zynqtgui.sketchpad.channelTypeSynthColor.green(), zynqtgui.sketchpad.channelTypeSynthColor.blue())
-        led_color_channel_loop = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeSketchesColor.red(), zynqtgui.sketchpad.channelTypeSketchesColor.green(), zynqtgui.sketchpad.channelTypeSketchesColor.blue())
-        led_color_channel_sample = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeSamplesColor.red(), zynqtgui.sketchpad.channelTypeSamplesColor.green(), zynqtgui.sketchpad.channelTypeSamplesColor.blue())
-        led_color_channel_external = rpi_ws281x.Color(zynqtgui.sketchpad.channelTypeExternalColor.red(), zynqtgui.sketchpad.channelTypeExternalColor.green(), zynqtgui.sketchpad.channelTypeExternalColor.blue())
+        self.led_color_channel_synth = rpi_ws281x.Color(channelTypeSynthColorDarkened.red(), channelTypeSynthColorDarkened.green(), channelTypeSynthColorDarkened.blue())
+        self.led_color_channel_loop = rpi_ws281x.Color(channelTypeSketchesColorDarkened.red(), channelTypeSketchesColorDarkened.green(), channelTypeSketchesColorDarkened.blue())
+        self.led_color_channel_sample = rpi_ws281x.Color(channelTypeSamplesColorDarkened.red(), channelTypeSamplesColorDarkened.green(), channelTypeSamplesColorDarkened.blue())
+        self.led_color_channel_external = rpi_ws281x.Color(channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
 
         self.channel = None
         self.button_config = {}
@@ -249,13 +255,13 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
         if setChannelColor:
             if self.channel.channelAudioType == "synth":
-                buttonColor = led_color_channel_synth
+                buttonColor = self.led_color_channel_synth
             elif self.channel.channelAudioType in ["sample-trig", "sample-slice"]:
-                buttonColor = led_color_channel_sample
+                buttonColor = self.led_color_channel_sample
             elif self.channel.channelAudioType == "sample-loop":
-                buttonColor = led_color_channel_loop
+                buttonColor = self.led_color_channel_loop
             elif self.channel.channelAudioType == "external":
-                buttonColor = led_color_channel_external
+                buttonColor = self.led_color_channel_external
         else:
             assert color is not None, "color cannot be None when setChannelColor is False"
 

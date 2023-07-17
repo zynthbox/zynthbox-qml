@@ -938,10 +938,34 @@ Zynthian.ScreenPage {
 //                                    }
 //                                }
 
-                                Item {
+                                QQC2.AbstractButton {
                                     id: filledSlotsOverview
                                     anchors.fill: parent
                                     visible: root.showOccupiedSlotsHeader
+                                    background: Rectangle {
+                                        border.width: index === zynqtgui.session_dashboard.selectedChannel ? 1 : 0
+                                        border.color: Kirigami.Theme.highlightColor
+
+                                        color: Kirigami.Theme.backgroundColor
+                                    }
+                                    onClicked: {
+                                        // If song mode is not active, clicking on cells should activate that channel
+                                        zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
+                                        zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
+                                        zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
+
+                                        zynqtgui.session_dashboard.selectedChannel = index;
+
+                                        // zynqtgui.session_dashboard.disableNextSoundSwitchTimer();
+
+                                        Qt.callLater(function() {
+                                            // Open MixedChannelsViewBar and switch to channel
+                                            // bottomStack.slotsBar.channelButton.checked = true
+                                            root.resetBottomBar(false)
+                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                            zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
+                                        })
+                                    }
 
                                     ColumnLayout {
                                         anchors.fill: parent

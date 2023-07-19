@@ -930,6 +930,22 @@ Zynthian.ScreenPage {
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                state: root.showOccupiedSlotsHeader
+                                        ? "SlotsOverviewMode"
+                                        : "ChannelMode"
+                                states: [
+                                    State {
+                                        name: "SlotsOverviewMode"
+                                        PropertyChanges { target: filledSlotsOverview; visible: true }
+                                        PropertyChanges { target: channelHeaderDelegate; visible: false }
+                                    },
+                                    State {
+                                        name: "ChannelMode"
+                                        PropertyChanges { target: filledSlotsOverview; visible: false }
+                                        PropertyChanges { target: channelHeaderDelegate; visible: true }
+                                    }
+                                ]
+
 
 //                                TableHeader {
 //                                    id: trackHeaderDelegate
@@ -963,7 +979,6 @@ Zynthian.ScreenPage {
                                 QQC2.AbstractButton {
                                     id: filledSlotsOverview
                                     anchors.fill: parent
-                                    visible: root.showOccupiedSlotsHeader
                                     background: Rectangle {
                                         border.width: index === zynqtgui.session_dashboard.selectedChannel ? 1 : 0
                                         border.color: Kirigami.Theme.highlightColor
@@ -993,7 +1008,6 @@ Zynthian.ScreenPage {
 
                                 ChannelHeader2 {
                                     id: channelHeaderDelegate
-                                    visible: !root.showOccupiedSlotsHeader
                                     anchors.fill: parent
 
                                     channel: headerDelegate.channel

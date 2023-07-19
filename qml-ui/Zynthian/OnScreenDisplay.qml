@@ -36,6 +36,7 @@ Zynthian.Popup {
     parent: QQC2.Overlay.overlay
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
+    modal: false
 
     property var cuiaCallback: function(cuia) {
         // Do not handle any cuia callbacks in OSD

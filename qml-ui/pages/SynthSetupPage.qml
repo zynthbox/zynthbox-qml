@@ -591,6 +591,13 @@ Zynthian.ScreenPage {
                                 elide: Text.ElideRight
                             }
                         }
+                        Rectangle {
+                            Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryAmount
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                            visible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
+                            color: Kirigami.Theme.highlightColor
+                            opacity: 0.7
+                        }
                     }
                 }
             }

@@ -385,6 +385,7 @@ Zynthian.ScreenPage {
                     bottomStack.slotsBar.channelButton.checked = true
                 } else {
                     bottomStack.slotsBar.mixerButton.checked = true
+                    zynqtgui.sketchpad.displaySceneButtons = false
                 }
             }
         }
@@ -1178,17 +1179,27 @@ Zynthian.ScreenPage {
                                 Layout.fillHeight: true
                                 state: root.displaySceneButtons
                                         ? "SceneMode"
-                                        : "ClipsMode"
+                                        : bottomStack.slotsBar.mixerButton.checked
+                                            ? "MixerMode"
+                                            : "ClipsMode"
                                 states: [
                                     State {
                                         name: "SceneMode"
                                         PropertyChanges { target: sceneHeader; visible: true }
                                         PropertyChanges { target: clipCell; visible: false }
+                                        PropertyChanges { target: mixerCell; visible: false }
                                     },
                                     State {
                                         name: "ClipsMode"
                                         PropertyChanges { target: sceneHeader; visible: false }
                                         PropertyChanges { target: clipCell; visible: true }
+                                        PropertyChanges { target: mixerCell; visible: false }
+                                    },
+                                    State {
+                                        name: "MixerMode"
+                                        PropertyChanges { target: sceneHeader; visible: false }
+                                        PropertyChanges { target: clipCell; visible: false }
+                                        PropertyChanges { target: mixerCell; visible: true }
                                     }
                                 ]
 
@@ -1319,6 +1330,54 @@ Zynthian.ScreenPage {
 //                                            bottomStack.bottomBar.patternAction.trigger();
 //                                        }
 //                                    }
+                                }
+
+                                Rectangle {
+                                    id: mixerCell
+                                    anchors.fill: parent
+                                    color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+
+                                    RowLayout {
+                                        anchors.fill: parent
+
+                                        QQC2.Dial {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            Layout.leftMargin: Kirigami.Units.smallSpacing
+                                            Layout.rightMargin: Kirigami.Units.smallSpacing
+                                            handle: null
+                                            value: applicationWindow().channels[index].wetFx1Amount
+                                            stepSize: 1
+                                            from: 0
+                                            to: 100
+                                        }
+
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+
+                                            QQC2.Label {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: false
+                                                Layout.preferredWidth: 1
+                                                Layout.topMargin: Kirigami.Units.smallSpacing
+                                                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                                                font.pointSize: 9
+                                                text: "Sends"
+                                            }
+                                            QQC2.Dial {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                Layout.leftMargin: Kirigami.Units.smallSpacing
+                                                Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                handle: null
+                                                value: applicationWindow().channels[index].wetFx2Amount
+                                                stepSize: 1
+                                                from: 0
+                                                to: 100
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

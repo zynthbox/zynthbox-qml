@@ -1162,11 +1162,25 @@ Zynthian.ScreenPage {
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                state: root.displaySceneButtons
+                                        ? "SceneMode"
+                                        : "ClipsMode"
+                                states: [
+                                    State {
+                                        name: "SceneMode"
+                                        PropertyChanges { target: sceneHeader; visible: true }
+                                        PropertyChanges { target: clipCell; visible: false }
+                                    },
+                                    State {
+                                        name: "ClipsMode"
+                                        PropertyChanges { target: sceneHeader; visible: false }
+                                        PropertyChanges { target: clipCell; visible: true }
+                                    }
+                                ]
 
                                 TableHeader {
                                     id: sceneHeader
                                     anchors.fill: parent
-                                    visible: root.displaySceneButtons
                                     text: String.fromCharCode(65+index).toUpperCase()
                                     highlighted: index === root.song.scenesModel.selectedSceneIndex
                                     highlightOnFocus: false
@@ -1185,8 +1199,6 @@ Zynthian.ScreenPage {
                                     id: clipCell
 
                                     anchors.fill: parent
-                                    visible: !root.displaySceneButtons
-
                                     channel: model.channel
                                     backgroundColor: "#000000"
                                     onHighlightedChanged: {

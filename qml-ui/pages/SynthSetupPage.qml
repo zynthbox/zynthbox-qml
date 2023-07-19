@@ -55,7 +55,7 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Fav Mode")
+            text: qsTr("Favorites")
             checkable: true
             checked: zynqtgui.bank.show_top_sounds
             onToggled: {

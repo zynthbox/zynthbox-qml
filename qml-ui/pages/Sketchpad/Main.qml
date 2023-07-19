@@ -51,6 +51,11 @@ Zynthian.ScreenPage {
         interval: 1; running: false; repeat: false;
         onTriggered: {
             root.selectedChannel = applicationWindow().selectedChannel;
+            if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_channel") {
+                channelsHeaderRepeater.itemAt(root.selectedChannel.id).switchToThisChannel();
+            } else if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_clip") {
+                clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip();
+            }
         }
     }
     Connections {
@@ -904,6 +909,24 @@ Zynthian.ScreenPage {
                             delegate: Item {
                                 id: headerDelegate
                                 property QtObject channel: root.song.channelsModel.getChannel(index)
+                                function switchToThisChannel() {
+                                    // If song mode is not active, clicking on cells should activate that channel
+                                    zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
+                                    zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
+                                    zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
+
+                                    zynqtgui.session_dashboard.selectedChannel = index;
+
+                                    // zynqtgui.session_dashboard.disableNextSoundSwitchTimer();
+
+                                    Qt.callLater(function() {
+                                        // Open MixedChannelsViewBar and switch to channel
+                                        // bottomStack.slotsBar.channelButton.checked = true
+                                        root.resetBottomBar(false)
+                                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                        zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
+                                    })
+                                }
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
@@ -948,22 +971,7 @@ Zynthian.ScreenPage {
                                         color: Kirigami.Theme.backgroundColor
                                     }
                                     onClicked: {
-                                        // If song mode is not active, clicking on cells should activate that channel
-                                        zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
-                                        zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
-                                        zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
-
-                                        zynqtgui.session_dashboard.selectedChannel = index;
-
-                                        // zynqtgui.session_dashboard.disableNextSoundSwitchTimer();
-
-                                        Qt.callLater(function() {
-                                            // Open MixedChannelsViewBar and switch to channel
-                                            // bottomStack.slotsBar.channelButton.checked = true
-                                            root.resetBottomBar(false)
-                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                            zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
-                                        })
+                                        headerDelegate.switchToThisChannel()
                                     }
 
                                     ColumnLayout {
@@ -1071,22 +1079,7 @@ Zynthian.ScreenPage {
                                     highlighted: index === zynqtgui.session_dashboard.selectedChannel // If song mode is not active, highlight if current cell is selected channel
 
                                     onPressed: {
-                                        // If song mode is not active, clicking on cells should activate that channel
-                                        zynqtgui.sketchpad.lastSelectedObj.className = channelHeaderDelegate.channel.className
-                                        zynqtgui.sketchpad.lastSelectedObj.value = channelHeaderDelegate.channel
-                                        zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
-
-                                        zynqtgui.session_dashboard.selectedChannel = index;
-
-                                        // zynqtgui.session_dashboard.disableNextSoundSwitchTimer();
-
-                                        Qt.callLater(function() {
-                                            // Open MixedChannelsViewBar and switch to channel
-                                            // bottomStack.slotsBar.channelButton.checked = true
-                                            root.resetBottomBar(false)
-                                            zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                            zynqtgui.bottomBarControlObj = channelHeaderDelegate.channel;
-                                        })
+                                        headerDelegate.switchToThisChannel()
                                     }
                                 }
 
@@ -1125,10 +1118,48 @@ Zynthian.ScreenPage {
                         spacing: 1
 
                         Repeater {
+                            id: clipsRepeater
                             // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                             model: zynqtgui.isBootingComplete ? root.song.channelsModel : 0
 
                             delegate: Item {
+                                id: clipsDelegate
+                                function switchToThisClip() {
+                                    var toggle = false;
+
+                                    if (zynqtgui.sketchpad.lastSelectedObj != null &&
+                                            zynqtgui.sketchpad.lastSelectedObj.className === channel.sceneClip.className &&
+                                            zynqtgui.sketchpad.lastSelectedObj.value === channel.sceneClip &&
+                                            zynqtgui.sketchpad.lastSelectedObj.component != null &&
+                                            zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
+                                        // Clip is already selected. Toggle between track/clips view
+                                        toggle = true
+                                    }
+
+                                    zynqtgui.sketchpad.lastSelectedObj.className = channel.sceneClip.className
+                                    zynqtgui.sketchpad.lastSelectedObj.value = channel.sceneClip
+                                    zynqtgui.sketchpad.lastSelectedObj.component = clipCell
+
+                                    zynqtgui.session_dashboard.selectedChannel = channel.id;
+
+                                    root.resetBottomBar(toggle)
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.bottomBarControlObj = channel;
+
+//                                        zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
+//                                        bottomStack.slotsBar.partButton.checked = true
+
+//                                        Qt.callLater(function() {
+//                                            if (channel.connectedPattern >= 0) {
+//                                                zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+//                                                zynqtgui.bottomBarControlObj = channel.sceneClip;
+//                                            } else {
+//                                                zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
+//                                                zynqtgui.bottomBarControlObj = channel.sceneClip;
+//                                            }
+//                                        })
+                                }
+
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
@@ -1245,39 +1276,7 @@ Zynthian.ScreenPage {
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
-                                        var toggle = false;
-
-                                        if (zynqtgui.sketchpad.lastSelectedObj != null &&
-                                                zynqtgui.sketchpad.lastSelectedObj.className === channel.sceneClip.className &&
-                                                zynqtgui.sketchpad.lastSelectedObj.value === channel.sceneClip &&
-                                                zynqtgui.sketchpad.lastSelectedObj.component != null &&
-                                                zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
-                                            // Clip is already selected. Toggle between track/clips view
-                                            toggle = true
-                                        }
-
-                                        zynqtgui.sketchpad.lastSelectedObj.className = channel.sceneClip.className
-                                        zynqtgui.sketchpad.lastSelectedObj.value = channel.sceneClip
-                                        zynqtgui.sketchpad.lastSelectedObj.component = clipCell
-
-                                        zynqtgui.session_dashboard.selectedChannel = channel.id;
-
-                                        root.resetBottomBar(toggle)
-                                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                        zynqtgui.bottomBarControlObj = channel;
-
-//                                        zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
-//                                        bottomStack.slotsBar.partButton.checked = true
-
-//                                        Qt.callLater(function() {
-//                                            if (channel.connectedPattern >= 0) {
-//                                                zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-//                                                zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                            } else {
-//                                                zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
-//                                                zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                            }
-//                                        })
+                                        clipsDelegate.switchToThisClip()
                                     }
 //                                    onPressAndHold: {
 //                                        zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";

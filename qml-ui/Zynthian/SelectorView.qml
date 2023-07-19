@@ -49,14 +49,6 @@ QQC2.ScrollView {
         var returnVal = false
 
         switch(cuia) {
-            case "KNOB0_UP":
-            case "KNOB0_DOWN":
-            case "KNOB1_UP":
-            case "KNOB1_DOWN":
-            case "KNOB2_UP":
-            case "KNOB2_DOWN":
-                returnVal = true
-                break
             case "KNOB3_UP":
                 root.selector.select_down()
                 returnVal = true

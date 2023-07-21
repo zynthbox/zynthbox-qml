@@ -97,31 +97,51 @@ Rectangle {
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
             case "CHANNEL_1":
             case "CHANNEL_6":
-                root.selectedSlotRowItem.channel.selectedSlotRow = 0
+                if (fxButton.checked) {
+                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 0
+                } else {
+                    root.selectedSlotRowItem.channel.selectedSlotRow = 0
+                }
                 handleItemClick()
                 return true
 
             case "CHANNEL_2":
             case "CHANNEL_7":
-                root.selectedSlotRowItem.channel.selectedSlotRow = 1
+                if (fxButton.checked) {
+                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 1
+                } else {
+                    root.selectedSlotRowItem.channel.selectedSlotRow = 1
+                }
                 handleItemClick()
                 return true
 
             case "CHANNEL_3":
             case "CHANNEL_8":
-                root.selectedSlotRowItem.channel.selectedSlotRow = 2
+                if (fxButton.checked) {
+                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 2
+                } else {
+                    root.selectedSlotRowItem.channel.selectedSlotRow = 2
+                }
                 handleItemClick()
                 return true
 
             case "CHANNEL_4":
             case "CHANNEL_9":
-                root.selectedSlotRowItem.channel.selectedSlotRow = 3
+                if (fxButton.checked) {
+                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 3
+                } else {
+                    root.selectedSlotRowItem.channel.selectedSlotRow = 3
+                }
                 handleItemClick()
                 return true
 
             case "CHANNEL_5":
             case "CHANNEL_10":
-                root.selectedSlotRowItem.channel.selectedSlotRow = 4
+                if (fxButton.checked) {
+                    root.selectedSlotRowItem.channel.selectedFxSlotRow = 4
+                } else {
+                    root.selectedSlotRowItem.channel.selectedSlotRow = 4
+                }
                 handleItemClick()
                 return true
             case "KNOB0_UP":
@@ -203,25 +223,26 @@ Rectangle {
         } else if (fxButton.checked) {
             // Clicked entry is fx
             console.log("handleItemClick : FX")
+            fxSetupDialog.open()
 
-            var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
+//            var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedFxSlotRow]
 
-            if (zynqtgui.backButtonPressed) {
-                // Back is pressed. Clear Slot
-                if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
-                    zynqtgui.start_loading()
-                    zynqtgui.fixed_layers.activate_index(chainedSound)
-                    zynqtgui.layer_effects.fx_reset_confirmed()
-                    zynqtgui.stop_loading()
-                }
-            } else {
-                zynqtgui.fixed_layers.activate_index(chainedSound)
-                zynqtgui.layer_options.show();
-                var screenBack = zynqtgui.current_screen_id;
-                zynqtgui.current_screen_id = "layer_effects";
-                root.openBottomDrawerOnLoad = true;
-                zynqtgui.forced_screen_back = screenBack;
-            }
+//            if (zynqtgui.backButtonPressed) {
+//                // Back is pressed. Clear Slot
+//                if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
+//                    zynqtgui.start_loading()
+//                    zynqtgui.fixed_layers.activate_index(chainedSound)
+//                    zynqtgui.layer_effects.fx_reset_confirmed()
+//                    zynqtgui.stop_loading()
+//                }
+//            } else {
+//                zynqtgui.fixed_layers.activate_index(chainedSound)
+//                zynqtgui.layer_options.show();
+//                var screenBack = zynqtgui.current_screen_id;
+//                zynqtgui.current_screen_id = "layer_effects";
+//                root.openBottomDrawerOnLoad = true;
+//                zynqtgui.forced_screen_back = screenBack;
+//            }
         } else if (samplesButton.checked || type === "sample-trig" || type === "sample-slice") {
             // Clicked entry is samples
             console.log("handleItemClick : Samples")
@@ -478,15 +499,23 @@ Rectangle {
                                             Layout.rightMargin: 4
                                             color: "transparent"
                                             border.width: 2
-                                            border.color: channelDelegate.highlighted && channelDelegate.channel.selectedSlotRow === index ? Kirigami.Theme.highlightColor : "transparent"
+                                            border.color: channelDelegate.highlighted &&
+                                                          ((!fxButton.checked && channelDelegate.channel.selectedSlotRow === index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow === index))
+                                                            ? Kirigami.Theme.highlightColor
+                                                            : "transparent"
 
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
                                                     if (zynqtgui.session_dashboard.selectedChannel !== channelDelegate.channelIndex ||
-                                                        channelDelegate.channel.selectedSlotRow !== index) {
+                                                        ((!fxButton.checked && channelDelegate.channel.selectedSlotRow !== index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow !== index))) {
                                                         channelsSlotsRow.currentIndex = index
-                                                        channelDelegate.channel.selectedSlotRow = index
+                                                        if (fxButton.checked) {
+                                                            channelDelegate.channel.selectedFxSlotRow = index
+                                                        } else {
+                                                            channelDelegate.channel.selectedSlotRow = index
+                                                        }
+
                                                         zynqtgui.session_dashboard.selectedChannel = channelDelegate.channelIndex;
                                                     } else {
                                                         handleItemClick()
@@ -786,5 +815,24 @@ Rectangle {
 
     ExternalMidiChannelPicker {
         id: externalMidiChannelPicker
+    }
+
+    Zynthian.ActionPickerPopup {
+        id: fxSetupDialog
+
+        actions: [
+            QQC2.Action {
+                text: qsTr("Pick FX")
+            },
+            QQC2.Action {
+                text: qsTr("Change FX")
+            },
+            QQC2.Action {
+                text: qsTr("Remove FX")
+            },
+            QQC2.Action {
+                text: qsTr("Edit FX")
+            }
+        ]
     }
 }

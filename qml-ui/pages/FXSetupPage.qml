@@ -34,8 +34,8 @@ Zynthian.MultiSelectorPage {
     id: root
 
 
-    screenIds: ["layer_effects", "effect_types", "layer_effect_chooser"]
-    screenTitles: [qsTr("Active FX (%1)").arg(zynqtgui.layer_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count)]
+    screenIds: ["effect_types", "layer_effect_chooser", ""]
+    screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), ""]
 
     previousScreen: "preset"
 

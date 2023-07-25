@@ -730,10 +730,16 @@ def audio_autoconnect(force=False):
     ### BEGIN Disconnect all ports of SynthPassthrough
     for input_port in jclient.get_ports("SynthPassthrough", is_input=True, is_audio=True):
         for connected_port in jclient.get_all_connections(input_port):
-            jclient.disconnect(connected_port, input_port)
+            try:
+                jclient.disconnect(connected_port, input_port)
+            except Exception as e:
+                logging.exception(e)
     for output_port in jclient.get_ports("SynthPassthrough", is_output=True, is_audio=True):
         for connected_port in jclient.get_all_connections(output_port):
-            jclient.disconnect(output_port, connected_port)
+            try:
+                jclient.disconnect(output_port, connected_port)
+            except Exception as e:
+                logging.exception(e)
     ### END Disconnect all ports of SynthPassthrough
 
     ### BEGIN Connect the synth layer leafs up to the channel passthrough clients

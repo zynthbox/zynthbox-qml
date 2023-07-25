@@ -732,14 +732,12 @@ def audio_autoconnect(force=False):
         for connected_port in jclient.get_all_connections(input_port):
             try:
                 jclient.disconnect(connected_port, input_port)
-            except Exception as e:
-                logging.exception(e)
+            except: pass
     for output_port in jclient.get_ports("SynthPassthrough", is_output=True, is_audio=True):
         for connected_port in jclient.get_all_connections(output_port):
             try:
                 jclient.disconnect(output_port, connected_port)
-            except Exception as e:
-                logging.exception(e)
+            except: pass
     ### END Disconnect all ports of SynthPassthrough
 
     ### BEGIN Connect the synth layer leafs up to the channel passthrough clients
@@ -754,9 +752,6 @@ def audio_autoconnect(force=False):
                         synth_passthrough_output_ports = [f"SynthPassthrough:Synth{sound + 1}-dryOutLeft", f"SynthPassthrough:Synth{sound + 1}-dryOutRight"]
                         sound_layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[sound]
                         layer_leafs = [sound_layer]
-                        effect_leafs = zynthian_gui_config.zynqtgui.screens['layer'].get_fxchain_ends(sound_layer)
-                        if len(effect_leafs) > 0:
-                            layer_leafs = effect_leafs
                         for layer in layer_leafs:
                             # If connected to system_playback, disconnect that client and connect it to the passthrough client instead
                             is_engine_connected_to_system = False
@@ -809,6 +804,7 @@ def audio_autoconnect(force=False):
 
     ### Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
     for channel_index in range(song.channelsModel.count):
+        channel = song.channelsModel.getChannel(channel_index)
         channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channel_index+1}", is_audio=True, is_input=True)
 
         for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
@@ -827,14 +823,65 @@ def audio_autoconnect(force=False):
             try:
                 jclient.connect(port[0], port[1])
             except: pass
-        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index + 1}-dryOut", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
-            try:
-                jclient.connect(port[0], port[1])
-            except: pass
-        for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-dryOut", is_audio=True, is_output=True), globalPlaybackInputPorts):
-            try:
-                jclient.connect(port[0], port[1])
-            except: pass
+
+        logging.debug(f"# Channel{channel_index+1} effects port connections :")
+
+        # Create a list of set of ports to be connected in order
+        # The order should be ChannelPassthrough:ChannelX-dryOut -> effect layers in order -> global playback / Audio levels
+
+        fx_client_names = list(map(lambda x: x.get_jackname(), list(filter(lambda x: x is not None, channel.chainedFx))))
+        # output_client_names will contain the client names as it should be connected. The last client should be connected to global playback as well as audio level
+        # In case there is no effects in channel, then by the same logic the ChannelPassthrough client will get connect to GlobalPlayback and AudioLevel
+        output_client_names = [f"ChannelPassthrough:Channel{channel_index+1}-dryOut"] + fx_client_names
+
+        logging.debug(f"# Output client names : {output_client_names}")
+
+        # Disconnect all output clients first
+        for client_name in output_client_names:
+            in_ports = jclient.get_ports(client_name, is_audio=True, is_input=True, is_output=False)
+            out_ports = jclient.get_ports(client_name, is_audio=True, is_input=False, is_output=True)
+
+            for port in in_ports:
+                for connected_port in jclient.get_all_connections(port):
+                    logging.info(f"Disonnecting {connected_port} from {port}")
+                    try:
+                        jclient.disconnect(connected_port, port)
+                    except: pass
+            for port in out_ports:
+                for connected_port in jclient.get_all_connections(port):
+                    logging.info(f"Disonnecting {port} from {connected_port}")
+                    try:
+                        jclient.disconnect(port, connected_port)
+                    except: pass
+
+        for (index, client_name) in enumerate(output_client_names):
+            logging.debug(f"## Processing client : {client_name}")
+
+            if index == len(output_client_names) - 1:
+                # We have reached last client in output. Connect this client to both GlobalPlayback as well as AudioLevel
+                out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
+
+                for ports in zip(out_ports, channelAudioLevelsInputPorts):
+                    logging.info(f"Connecting {ports[0]} to Audio levels {ports[1]}")
+                    try:
+                        jclient.connect(ports[0], ports[1])
+                    except: pass
+                for ports in zip(out_ports, globalPlaybackInputPorts):
+                    logging.info(f"Connecting {ports[0]} to Global Playback {ports[1]}")
+                    try:
+                        jclient.connect(ports[0], ports[1])
+                    except: pass
+            else:
+                # Connect this client to the next client in list
+                out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
+                in_ports = jclient.get_ports(output_client_names[index+1], is_audio=True, is_input=True)
+
+                for ports in zip(out_ports, in_ports):
+                    logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                    try:
+                        jclient.connect(ports[0], ports[1])
+                    except: pass
+
     ### END Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
 
     ### BEGIN Connect Samplersynth uneffected ports to globalPlayback client

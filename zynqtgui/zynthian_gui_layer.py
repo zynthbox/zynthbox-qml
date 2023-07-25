@@ -591,13 +591,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
             else:
                 # When creating zynthian_layer, if engine is an audio effect, stores the channel id instead of midi channel
                 channel = midich
+                slot_index = -1
                 if zyngine.type=="Audio Effect":
                     channel = self.zynqtgui.session_dashboard.selectedChannel
+                    slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel).selectedFxSlotRow
 
-                layer = zynthian_layer(zyngine, channel, self.zynqtgui)
-                logging.debug(f">>>> add_layer_midich 3: {layer}, {layer.engine.type}, {layer.engine.name}")
+                layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
 
-            logging.debug(f">>>> add_layer_midich 4: {midich}, {position_in_channel}")
             self.add_midichannel_to_channel(midich, position_in_channel)
 
             # Try to connect Audio Effects ...
@@ -1430,8 +1430,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         snapshot['amixer_layer'] = lss
                     del(snapshot['layers'][i])
                 else:
+                    slot_index = lss['slot_index'] if "slot_index" in lss else -1
                     engine=self.zynqtgui.screens['engine'].start_engine(lss['engine_nick'])
-                    self.layers.append(zynthian_layer(engine,lss['midi_chan'], self.zynqtgui))
+                    layer = zynthian_layer(engine,lss['midi_chan'], self.zynqtgui, slot_index)
+                    self.layers.append(layer)
+                    if engine.type == "Audio Effect":
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer, slot_index)
                 i += 1
 
             # Finally, stop all unused engines

@@ -924,6 +924,7 @@ class sketchpad_channel(QObject):
     # Add or replace a fx layer at slot_row to fx chain
     # If explicit slot_row is not set then selected slot row is used
     def setFxToChain(self, layer, slot_row=-1):
+
         if slot_row is -1:
             slot_row = self.__selected_fx_slot_row
 
@@ -934,8 +935,8 @@ class sketchpad_channel(QObject):
             try:
                 old_layer_index = self.zynqtgui.layer.layers.index(old_layer)
                 self.zynqtgui.layer.layers[old_layer_index] = layer
-            except:
-                pass
+            except Exception as e:
+                logging.exception(e)
 
             self.zynqtgui.zynautoconnect_acquire_lock()
             old_layer.reset()

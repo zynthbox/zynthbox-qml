@@ -861,6 +861,10 @@ def audio_autoconnect(force=False):
                 # We have reached last client in output. Connect this client to both GlobalPlayback as well as AudioLevel
                 out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
 
+                if len(out_ports) == 1:
+                    # If output is mono, connect both input to same output.
+                    out_ports = [out_ports[0], out_ports[0]]
+
                 for ports in zip(out_ports, channelAudioLevelsInputPorts):
                     logging.info(f"Connecting {ports[0]} to Audio levels {ports[1]}")
                     try:
@@ -875,6 +879,14 @@ def audio_autoconnect(force=False):
                 # Connect this client to the next client in list
                 out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
                 in_ports = jclient.get_ports(output_client_names[index+1], is_audio=True, is_input=True)
+
+                if len(in_ports) == 1:
+                    # If input is mono, connect both output to same input.
+                    in_ports = [in_ports[0], in_ports[0]]
+
+                if len(out_ports) == 1:
+                    # If output is mono, connect both input to same output.
+                    out_ports = [out_ports[0], out_ports[0]]
 
                 for ports in zip(out_ports, in_ports):
                     logging.info(f"Connecting {ports[0]} to {ports[1]}")

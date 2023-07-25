@@ -923,8 +923,8 @@ class sketchpad_channel(QObject):
 
     # Add or replace a fx layer at slot_row to fx chain
     # If explicit slot_row is not set then selected slot row is used
-    def setFxToChain(self, layer, slot_row = None):
-        if slot_row is None:
+    def setFxToChain(self, layer, slot_row=-1):
+        if slot_row is -1:
             slot_row = self.__selected_fx_slot_row
 
         old_layer = self.__chained_fx[slot_row]
@@ -951,20 +951,26 @@ class sketchpad_channel(QObject):
 
     @Slot()
     def removeSelectedFxFromChain(self):
-        if self.__chained_fx[self.__selected_fx_slot_row] is not None:
-            try:
-                layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[self.__selected_fx_slot_row])
-                self.zynqtgui.layer.remove_layer(layer_index)
-                self.__chained_fx[self.__selected_fx_slot_row] = None
+        def task():
+            if self.__chained_fx[self.__selected_fx_slot_row] is not None:
+                try:
+                    layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[self.__selected_fx_slot_row])
+                    self.zynqtgui.layer.remove_layer(layer_index)
+                    self.__chained_fx[self.__selected_fx_slot_row] = None
 
-                self.chainedFxChanged.emit()
-    #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
-    #            self.zynqtgui.layer_effects.fx_layer = None
-    #            self.zynqtgui.layer_effects.fill_list()
-    #            self.zynqtgui.main_layers_view.fill_list()
-    #            self.zynqtgui.fixed_layers.fill_list()
-            except Exception as e:
-                logging.exception(e)
+                    self.chainedFxChanged.emit()
+        #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
+        #            self.zynqtgui.layer_effects.fx_layer = None
+        #            self.zynqtgui.layer_effects.fill_list()
+        #            self.zynqtgui.main_layers_view.fill_list()
+        #            self.zynqtgui.fixed_layers.fill_list()
+                except Exception as e:
+                    logging.exception(e)
+
+                self.zynqtgui.end_long_task()
+
+        self.zynqtgui.currentTaskMessage = f"Removing chained fx at slot `{self.selectedFxSlotRow + 1}` from channel `{self.name}`"
+        self.zynqtgui.do_long_task(task)
 
     chainedFxChanged = Signal()
     chainedFx = Property('QVariantList', get_chainedFx, set_chainedFx, notify=chainedFxChanged)

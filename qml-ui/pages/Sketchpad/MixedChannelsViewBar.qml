@@ -476,7 +476,8 @@ Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
                                             property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-                                            property QtObject sample: root.selectedChannel.channelAudioType.startsWith("sample-") ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
+                                            property QtObject sample: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0 ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
+                                            property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop" && synthRepeater.synthData[index] != null && synthRepeater.synthData[index].path != null && synthRepeater.synthData[index].path.length >= 0 ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
 
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -514,7 +515,17 @@ Rectangle {
                                                     top: parent.top
                                                     bottom: parent.bottom
                                                 }
-                                                visible: delegate.sample !== null
+                                                visible: delegate.sample != null
+                                                color: Kirigami.Theme.highlightColor
+                                            }
+                                            Rectangle {
+                                                width: delegate.clip ? parent.width * delegate.clip.gainAbsolute : 0
+                                                anchors {
+                                                    left: parent.left
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                visible: delegate.clip != null
                                                 color: Kirigami.Theme.highlightColor
                                             }
 

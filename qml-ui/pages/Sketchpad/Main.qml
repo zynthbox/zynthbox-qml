@@ -146,6 +146,35 @@ Zynthian.ScreenPage {
         valueSetter(sample.gain + sign)
     }
     /**
+     * Update selected sketch gain
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedSketchGain(sign) {
+        var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+        function valueSetter(value) {
+            if (clip != null && clip.path != null && clip.path.length > 0) {
+                clip.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
+                applicationWindow().showOsd({
+                    parameterName: "clip_gain",
+                    description: qsTr("%1 Gain").arg(clip.path.split("/").pop()),
+                    start: -100,
+                    stop: 24,
+                    step: 1,
+                    defaultValue: 0,
+                    currentValue: parseInt(clip.gain),
+                    startLabel: "-100 dB",
+                    stopLabel: "24 dB",
+                    valueLabel: qsTr("%1 dB").arg(clip.gain),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: true,
+                    showVisualZero: true
+                })
+            }
+        }
+        valueSetter(clip.gain + sign)
+    }
+    /**
      * Update selected channel volume
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */

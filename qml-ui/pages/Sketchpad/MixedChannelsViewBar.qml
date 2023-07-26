@@ -103,6 +103,8 @@ Rectangle {
                     pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
                 } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
                     pageManager.getPage("sketchpad").updateSelectedSampleGain(1)
+                } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                    pageManager.getPage("sketchpad").updateSelectedSketchGain(1)
                 }
 
                 returnValue = true;
@@ -112,6 +114,8 @@ Rectangle {
                     pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
                 } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
                     pageManager.getPage("sketchpad").updateSelectedSampleGain(-1)
+                } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                    pageManager.getPage("sketchpad").updateSelectedSketchGain(-1)
                 }
                 returnValue = true;
                 break;

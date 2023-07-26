@@ -54,7 +54,7 @@ Zynthian.ScreenPage {
             if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_channel") {
                 channelsHeaderRepeater.itemAt(root.selectedChannel.id).switchToThisChannel();
             } else if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_clip") {
-                clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip();
+                clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip(false);
             }
         }
     }
@@ -1197,7 +1197,7 @@ Zynthian.ScreenPage {
 
                             delegate: Item {
                                 id: clipsDelegate
-                                function switchToThisClip() {
+                                function switchToThisClip(allowToggle) {
                                     var toggle = false;
 
                                     if (zynqtgui.sketchpad.lastSelectedObj != null &&
@@ -1215,7 +1215,7 @@ Zynthian.ScreenPage {
 
                                     zynqtgui.session_dashboard.selectedChannel = clipCell.channel.id;
 
-                                    root.resetBottomBar(toggle)
+                                    root.resetBottomBar(allowToggle ? toggle : false)
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                     zynqtgui.bottomBarControlObj = clipCell.channel;
 
@@ -1371,7 +1371,7 @@ Zynthian.ScreenPage {
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
-                                        clipsDelegate.switchToThisClip()
+                                        clipsDelegate.switchToThisClip(true)
                                     }
 //                                    onPressAndHold: {
 //                                        zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";

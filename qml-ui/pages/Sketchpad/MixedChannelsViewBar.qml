@@ -99,11 +99,20 @@ Rectangle {
                 }
                 break;
             case "KNOB0_UP":
-                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
+                } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                    pageManager.getPage("sketchpad").updateSelectedSampleGain(1)
+                }
+
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+                if (root.selectedChannel.channelAudioType == "synth") {
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
+                } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                    pageManager.getPage("sketchpad").updateSelectedSampleGain(-1)
+                }
                 returnValue = true;
                 break;
             case "KNOB1_UP":

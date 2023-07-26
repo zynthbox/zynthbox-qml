@@ -117,6 +117,35 @@ Zynthian.ScreenPage {
         valueSetter(synthPassthroughClient.dryAmount + sign * 0.01)
     }
     /**
+     * Update selected sample gain
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedSampleGain(sign) {
+        var sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+        function valueSetter(value) {
+            if (sample != null && sample.path != null && sample.path.length > 0) {
+                sample.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
+                applicationWindow().showOsd({
+                    parameterName: "sample_gain",
+                    description: qsTr("%1 Gain").arg(sample.path.split("/").pop()),
+                    start: -100,
+                    stop: 24,
+                    step: 1,
+                    defaultValue: 0,
+                    currentValue: parseInt(sample.gain),
+                    startLabel: "-100 dB",
+                    stopLabel: "24 dB",
+                    valueLabel: qsTr("%1 dB").arg(sample.gain),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: true,
+                    showVisualZero: true
+                })
+            }
+        }
+        valueSetter(sample.gain + sign)
+    }
+    /**
      * Update selected channel volume
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */
@@ -1143,23 +1172,23 @@ Zynthian.ScreenPage {
                                     var toggle = false;
 
                                     if (zynqtgui.sketchpad.lastSelectedObj != null &&
-                                            zynqtgui.sketchpad.lastSelectedObj.className === channel.sceneClip.className &&
-                                            zynqtgui.sketchpad.lastSelectedObj.value === channel.sceneClip &&
+                                            zynqtgui.sketchpad.lastSelectedObj.className === clipCell.channel.sceneClip.className &&
+                                            zynqtgui.sketchpad.lastSelectedObj.value === clipCell.channel.sceneClip &&
                                             zynqtgui.sketchpad.lastSelectedObj.component != null &&
                                             zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
                                         // Clip is already selected. Toggle between track/clips view
                                         toggle = true
                                     }
 
-                                    zynqtgui.sketchpad.lastSelectedObj.className = channel.sceneClip.className
-                                    zynqtgui.sketchpad.lastSelectedObj.value = channel.sceneClip
+                                    zynqtgui.sketchpad.lastSelectedObj.className = clipCell.channel.sceneClip.className
+                                    zynqtgui.sketchpad.lastSelectedObj.value = clipCell.channel.sceneClip
                                     zynqtgui.sketchpad.lastSelectedObj.component = clipCell
 
-                                    zynqtgui.session_dashboard.selectedChannel = channel.id;
+                                    zynqtgui.session_dashboard.selectedChannel = clipCell.channel.id;
 
                                     root.resetBottomBar(toggle)
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.bottomBarControlObj = channel;
+                                    zynqtgui.bottomBarControlObj = clipCell.channel;
 
 //                                        zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
 //                                        bottomStack.slotsBar.partButton.checked = true

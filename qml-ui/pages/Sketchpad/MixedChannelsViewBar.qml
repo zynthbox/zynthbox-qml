@@ -645,11 +645,7 @@ Rectangle {
                                     target: fxRepeater
                                     property: "fxData"
                                     delayed: true
-                                    value: [root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[0]),
-                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[1]),
-                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[2]),
-                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[3]),
-                                            root.selectedChannel.getEffectsNameByMidiChannel(root.selectedChannel.chainedSounds[4])]
+                                    value: root.selectedChannel.chainedFxNames
                                 }
 
                                 Repeater {
@@ -719,6 +715,8 @@ Rectangle {
 
                                                     if (root.selectedChannel.selectedFxSlotRow !== index) {
                                                         root.selectedChannel.selectedFxSlotRow = index
+                                                    } else {
+                                                        bottomStack.slotsBar.handleItemClick("fx")
                                                     }
                                                 }
                                             }

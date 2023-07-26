@@ -551,8 +551,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
                             chain[i] = midich
                             break
             selected_channel.set_chained_sounds(chain)
-        except:
-            pass
+        except Exception as e:
+            logging.exception(e)
 
     def remove_midichannel_from_channel(self, midich):
         try:
@@ -562,14 +562,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 if el == midich:
                     chain[i] = -1
             selected_channel.set_chained_sounds(chain)
-        except:
-            pass
+        except Exception as e:
+            logging.exception(e)
 
     def add_layer_midich(self, midich, select=True):
         if self.add_layer_eng:
             zyngine = self.zynqtgui.screens['engine'].start_engine(self.add_layer_eng)
             self.add_layer_eng = None
-
             position_in_channel = -1
             for i, element in enumerate(self.zynqtgui.screens['layers_for_channel'].list_data):
                 if midich == element[1]:
@@ -590,19 +589,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 if not self.zynqtgui.screens['bank'].get_show_top_sounds():
                     self.zynqtgui.screens['bank'].select_action(0)
             else:
-                layer = zynthian_layer(zyngine, midich, self.zynqtgui)
+                # When creating zynthian_layer, if engine is an audio effect, stores the channel id instead of midi channel
+                channel = midich
+                slot_index = -1
+                if zyngine.type=="Audio Effect":
+                    channel = self.zynqtgui.session_dashboard.selectedChannel
+                    slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel).selectedFxSlotRow
+
+                layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
 
             self.add_midichannel_to_channel(midich, position_in_channel)
 
             # Try to connect Audio Effects ...
             if len(self.layers)>0 and layer.engine.type=="Audio Effect":
-                if self.replace_layer_index is not None:
-                    self.replace_on_fxchain(layer)
-                else:
-                    self.add_to_fxchain(layer, self.layer_chain_parallel)
-                    if layer not in self.layers:
-                        self.layers.append(layer)
-                        self.layer_created.emit(midich)
+                # setFxToChain will handle adding layer to self.layers if a new fx is created or replace new layer with an old one
+                self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer)
             # Try to connect MIDI tools ...
             elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
                 if self.replace_layer_index is not None:
@@ -650,7 +651,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 self.drop_from_midichain(self.layers[i])
                 self.layers[i].mute_midi_out()
             else:
-                self.drop_from_fxchain(self.layers[i])
                 self.layers[i].mute_audio_out()
 
             self.layers[i].reset()
@@ -709,7 +709,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 layers_to_delete += fxchain_layers
                 for layer in reversed(fxchain_layers):
                     logging.debug("Mute Audio layer '{}' ...".format(i, layer.get_basepath()))
-                    self.drop_from_fxchain(layer)
                     layer.mute_audio_out()
                 # Root_layer
                 layers_to_delete.append(root_layer)
@@ -761,7 +760,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
             logging.debug("Mute layer {} => {} ...".format(i, self.layers[i].get_basepath()))
             self.drop_from_midichain(self.layers[i])
             self.layers[i].mute_midi_out()
-            self.drop_from_fxchain(self.layers[i])
             self.layers[i].mute_audio_out()
 
 
@@ -1091,94 +1089,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 pars.append(l)
                 #logging.error("PARALLEL LAYER => {}".format(l.get_audio_jackname()))
         return pars
-
-
-    def add_to_fxchain(self, layer, chain_parallel=False):
-        try:
-            for end in self.get_fxchain_ends(layer):
-                if end!=layer:
-                    logging.debug("Adding to FX-chain {} => {}".format(end.get_audio_jackname(), layer.get_audio_jackname()))
-                    layer.set_audio_out(end.get_audio_out())
-                    if chain_parallel:
-                        for uslayer in self.get_fxchain_upstream(end):
-                            uslayer.add_audio_out(layer.get_audio_jackname())
-                    else:
-                        end.set_audio_out([layer.get_audio_jackname()])
-
-        except Exception as e:
-            logging.error("Error chaining Audio Effect ({})".format(e))
-
-
-    def replace_on_fxchain(self, layer):
-        try:
-            rlayer = self.layers[self.replace_layer_index]
-            logging.debug("Replacing on FX-chain {} => {}".format(rlayer.get_jackname(), layer.get_jackname()))
-            
-            # Re-route audio
-            layer.set_audio_out(rlayer.get_audio_out())
-            rlayer.mute_audio_out()
-            for uslayer in self.get_fxchain_upstream(rlayer):
-                uslayer.del_audio_out(rlayer.get_jackname())
-                uslayer.add_audio_out(layer.get_jackname())
-
-            # Replace layer in list
-            self.layers[self.replace_layer_index] = layer
-
-            # Remove old layer and stop unused engines
-            self.zynqtgui.zynautoconnect_acquire_lock()
-            rlayer.reset()
-            self.zynqtgui.zynautoconnect_release_lock()
-            self.zynqtgui.screens['engine'].stop_unused_engines()
-
-            self.replace_layer_index = None
-
-        except Exception as e:
-            logging.error("Error replacing Audio Effect ({})".format(e))
-
-
-    def drop_from_fxchain(self, layer):
-        try:
-            for up in self.get_fxchain_upstream(layer):
-                logging.debug("Dropping from FX-chain {} => {}".format(up.get_jackname(), layer.get_jackname()))
-                up.del_audio_out(layer.get_jackname())
-                if len(up.get_audio_out())==0:
-                    up.set_audio_out(layer.get_audio_out())
-
-        except Exception as e:
-            logging.error("Error unchaining Audio Effect ({})".format(e))
-
-
-    def swap_fxchain(self, layer1, layer2):
-        ups1 = self.get_fxchain_upstream(layer1)
-        ups2 = self.get_fxchain_upstream(layer2)
-
-        self.zynqtgui.zynautoconnect_acquire_lock()
-
-        # Move inputs from layer1 to layer2
-        for l in ups1:
-            l.add_audio_out(layer2.get_jackname())
-            l.del_audio_out(layer1.get_jackname())
-
-        # Move inputs from layer2 to layer1
-        for l in ups2:
-            l.add_audio_out(layer1.get_jackname())
-            l.del_audio_out(layer2.get_jackname())
-
-        # Swap outputs from layer1 & layer2
-        ao1 = layer1.audio_out
-        ao2 = layer2.audio_out
-        layer1.set_audio_out(ao2)
-        layer2.set_audio_out(ao1)
-
-        self.zynqtgui.zynautoconnect_release_lock()
-
-        # Swap position in layer list
-        for i,layer in enumerate(self.layers):
-            if layer==layer1:
-                self.layers[i] = layer2
-
-            elif layer==layer2:
-                self.layers[i] = layer1
 
     # ---------------------------------------------------------------------------
     # MIDI-Chain
@@ -1520,8 +1430,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         snapshot['amixer_layer'] = lss
                     del(snapshot['layers'][i])
                 else:
+                    slot_index = lss['slot_index'] if "slot_index" in lss else -1
                     engine=self.zynqtgui.screens['engine'].start_engine(lss['engine_nick'])
-                    self.layers.append(zynthian_layer(engine,lss['midi_chan'], self.zynqtgui))
+                    layer = zynthian_layer(engine,lss['midi_chan'], self.zynqtgui, slot_index)
+                    self.layers.append(layer)
+                    if engine.type == "Audio Effect":
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer, slot_index)
                 i += 1
 
             # Finally, stop all unused engines

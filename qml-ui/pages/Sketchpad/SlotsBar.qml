@@ -220,29 +220,30 @@ Rectangle {
             } else {
                 layerSetupDialog.open()
             }
-        } else if (fxButton.checked) {
+        } else if (fxButton.checked || type === "fx") {
             // Clicked entry is fx
             console.log("handleItemClick : FX")
-            fxSetupDialog.open()
 
 //            var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedFxSlotRow]
 
-//            if (zynqtgui.backButtonPressed) {
+            if (zynqtgui.backButtonPressed) {
 //                // Back is pressed. Clear Slot
+                root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
 //                if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
 //                    zynqtgui.start_loading()
 //                    zynqtgui.fixed_layers.activate_index(chainedSound)
 //                    zynqtgui.layer_effects.fx_reset_confirmed()
 //                    zynqtgui.stop_loading()
 //                }
-//            } else {
+            } else {
+                fxSetupDialog.open()
 //                zynqtgui.fixed_layers.activate_index(chainedSound)
 //                zynqtgui.layer_options.show();
 //                var screenBack = zynqtgui.current_screen_id;
 //                zynqtgui.current_screen_id = "layer_effects";
 //                root.openBottomDrawerOnLoad = true;
 //                zynqtgui.forced_screen_back = screenBack;
-//            }
+            }
         } else if (samplesButton.checked || type === "sample-trig" || type === "sample-slice") {
             // Clicked entry is samples
             console.log("handleItemClick : Samples")
@@ -527,8 +528,8 @@ Rectangle {
                                             Rectangle {
                                                 property string text: synthsButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
                                                                         ? channelDelegate.channel.getLayerNameByMidiChannel(channelDelegate.channel.chainedSounds[index]).split(">")[0]
-                                                                        : fxButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
-                                                                            ? channelDelegate.channel.getEffectsNameByMidiChannel(channelDelegate.channel.chainedSounds[index])
+                                                                        : fxButton.checked
+                                                                            ? channelDelegate.channel.chainedFxNames[index]
                                                                             : samplesButton.checked && channelDelegate.channel.samples[index].path
                                                                                 ? channelDelegate.channel.samples[index].path.split("/").pop()
                                                                                 : ""
@@ -650,8 +651,8 @@ Rectangle {
                             text: root.selectedSlotRowItem
                                       ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
                                           ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
-                                          : fxButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                              ? root.selectedSlotRowItem.channel.getEffectsNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                          : fxButton.checked
+                                              ? root.selectedSlotRowItem.channel.chainedFxNames[root.selectedSlotRowItem.channel.selectedFxSlotRow]
                                               : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
                                                   ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
                                                   : ""
@@ -819,19 +820,28 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: fxSetupDialog
+        property var selectedFx: root.selectedSlotRowItem.channel.chainedFx[root.selectedSlotRowItem.channel.selectedFxSlotRow]
 
         actions: [
-            QQC2.Action {
-                text: qsTr("Pick FX")
+            Kirigami.Action {
+                text: fxSetupDialog.selectedFx == null
+                        ? qsTr("Pick FX")
+                        : qsTr("Change FX")
+                onTriggered: {
+                    zynqtgui.forced_screen_back = "sketchpad"
+                    zynqtgui.current_screen_id = "effect_types"
+                }
             },
-            QQC2.Action {
-                text: qsTr("Change FX")
-            },
-            QQC2.Action {
+            Kirigami.Action {
                 text: qsTr("Remove FX")
+                visible: fxSetupDialog.selectedFx != null
+                onTriggered: {
+                    root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
+                }
             },
-            QQC2.Action {
+            Kirigami.Action {
                 text: qsTr("Edit FX")
+                visible: false
             }
         ]
     }

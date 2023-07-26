@@ -68,6 +68,7 @@ class sketchpad_channel(QObject):
         self.__connected_pattern__ = -1
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
+        self.__chained_fx = [None, None, None, None, None]
         self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
         self.__samples__ = []
@@ -907,6 +908,85 @@ class sketchpad_channel(QObject):
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)
     ### END Property chainedSounds
+
+    ### Property chainedFx
+    def get_chainedFx(self):
+        return self.__chained_fx
+
+    def set_chainedFx(self, fx):
+        if fx != self.__chained_fx:
+            self.__chained_fx = fx
+            self.update_jack_port()
+            self.update_sound_snapshot_json()
+            self.__song__.schedule_save()
+            self.chainedFxChanged.emit()
+
+    # Add or replace a fx layer at slot_row to fx chain
+    # If explicit slot_row is not set then selected slot row is used
+    def setFxToChain(self, layer, slot_row=-1):
+
+        if slot_row is -1:
+            slot_row = self.__selected_fx_slot_row
+
+        old_layer = self.__chained_fx[slot_row]
+
+        if old_layer is not None:
+            # Since there is already a layer in slot, replace existing layer with new one
+            try:
+                old_layer_index = self.zynqtgui.layer.layers.index(old_layer)
+                self.zynqtgui.layer.layers[old_layer_index] = layer
+            except Exception as e:
+                logging.exception(e)
+
+            self.zynqtgui.zynautoconnect_acquire_lock()
+            old_layer.reset()
+            self.zynqtgui.zynautoconnect_release_lock()
+            self.zynqtgui.screens['engine'].stop_unused_engines()
+        else:
+            # Since there are no layer in slot, add layer to layer list
+            if layer not in self.zynqtgui.layer.layers:
+                self.zynqtgui.layer.layers.append(layer)
+
+        self.__chained_fx[slot_row] = layer
+        self.chainedFxChanged.emit()
+
+    @Slot()
+    def removeSelectedFxFromChain(self):
+        def task():
+            if self.__chained_fx[self.__selected_fx_slot_row] is not None:
+                try:
+                    layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[self.__selected_fx_slot_row])
+                    self.zynqtgui.layer.remove_layer(layer_index)
+                    self.__chained_fx[self.__selected_fx_slot_row] = None
+
+                    self.chainedFxChanged.emit()
+        #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
+        #            self.zynqtgui.layer_effects.fx_layer = None
+        #            self.zynqtgui.layer_effects.fill_list()
+        #            self.zynqtgui.main_layers_view.fill_list()
+        #            self.zynqtgui.fixed_layers.fill_list()
+                except Exception as e:
+                    logging.exception(e)
+
+                self.zynqtgui.end_long_task()
+
+        self.zynqtgui.currentTaskMessage = f"Removing chained fx at slot `{self.selectedFxSlotRow + 1}` from channel `{self.name}`"
+        self.zynqtgui.do_long_task(task)
+
+    chainedFxChanged = Signal()
+    chainedFx = Property('QVariantList', get_chainedFx, set_chainedFx, notify=chainedFxChanged)
+    ### END Property chainedFx
+
+    ### Property chainedFxNames
+    def get_chainedFxNames(self):
+        return [self.__chained_fx[0].engine.name if self.__chained_fx[0] is not None else "",
+                self.__chained_fx[1].engine.name if self.__chained_fx[1] is not None else "",
+                self.__chained_fx[2].engine.name if self.__chained_fx[2] is not None else "",
+                self.__chained_fx[3].engine.name if self.__chained_fx[3] is not None else "",
+                self.__chained_fx[4].engine.name if self.__chained_fx[4] is not None else ""]
+
+    chainedFxNames = Property('QStringList', get_chainedFxNames, notify=chainedFxChanged)
+    ### END Property chainedFxNames
 
     ### Property connectedSound
     def get_connected_sound(self):

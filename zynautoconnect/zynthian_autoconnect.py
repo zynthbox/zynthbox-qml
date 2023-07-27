@@ -802,11 +802,30 @@ def audio_autoconnect(force=False):
         return
     ### END Connect the synth layer leafs up to the channel passthrough clients
 
-    ### Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
+    ### Connect ChannelPassthrough to GlobalPlayback and AudioLevels via FX
+    fxpassthrough_in_ports = jclient.get_ports("FXPassthrough", is_audio=True, is_input=True, is_output=False)
+    fxpassthrough_out_ports = jclient.get_ports("FXPassthrough", is_audio=True, is_input=False, is_output=True)
+
+    # Disconnect all FXPassthrough ports first
+    for port in fxpassthrough_in_ports:
+        for connected_port in jclient.get_all_connections(port):
+            logging.info(f"Disonnecting {connected_port} from {port}")
+            try:
+                jclient.disconnect(connected_port, port)
+            except: pass
+    for port in fxpassthrough_out_ports:
+        for connected_port in jclient.get_all_connections(port):
+            logging.info(f"Disonnecting {port} from {connected_port}")
+            try:
+                jclient.disconnect(port, connected_port)
+            except: pass
+
+    # Process each channel individually
     for channel_index in range(song.channelsModel.count):
         channel = song.channelsModel.getChannel(channel_index)
         channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channel_index+1}", is_audio=True, is_input=True)
 
+        # Connect ChannelPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
         for port in zip(jclient.get_ports(f"ChannelPassthrough:Channel{channel_index+1}-wetOutFx1", is_audio=True, is_output=True), channelAudioLevelsInputPorts):
             try:
                 jclient.connect(port[0], port[1])
@@ -826,75 +845,150 @@ def audio_autoconnect(force=False):
 
         logging.debug(f"# Channel{channel_index+1} effects port connections :")
 
-        # Create a list of set of ports to be connected in order
-        # The order should be ChannelPassthrough:ChannelX-dryOut -> effect layers in order -> global playback / Audio levels
+        # Connect ChannelPassthrough dry ports to GlobalPlayback and AudioLevels via channel FX if any
 
-        fx_client_names = list(map(lambda x: x.get_jackname(), list(filter(lambda x: x is not None, channel.chainedFx))))
-        # output_client_names will contain the client names as it should be connected. The last client should be connected to global playback as well as audio level
-        # In case there is no effects in channel, then by the same logic the ChannelPassthrough client will get connect to GlobalPlayback and AudioLevel
-        output_client_names = [f"ChannelPassthrough:Channel{channel_index+1}-dryOut"] + fx_client_names
+        # Create a list of set of ports to be connected in order
+        # The order should be ChannelPassthrough:ChannelX-dryOut -> FXPassthrough + FX layers in order -> global playback / Audio levels
+        # Hence at minimum there should be 2 elements, i.e. ChannelPassthrough and GlobalPlayback
+        # If there are FX in chain, then there will be 2 clients per FX, i.e. one FX Passthrough and the actual FX client
+
+        fx_client_names = []
+        # Create a set of client names for each FX in channel
+        # The FX Passthrough should be placed first and then the fx client na,e
+        for index, fxlayer in enumerate(filter(lambda x: x is not None, channel.chainedFx)):
+            fx_client_names = fx_client_names + [f"FXPassthrough:Channel{channel.id + 1}-lane{index + 1}", fxlayer.get_jackname()]
+
+        # Create final output_client_names with the client names as it should be connected in order.
+        # The last client is global playback hence does not need to be processed
+        # This will create a two scenarios based if FX clients are connected:
+        #    Scenario 1 : There are no FX in channel
+        #                 Then the final client list would be : ChannelPassthrough -> GlobalPlayback
+        #    Scenario 2 : There is one or more FX Client
+        #                 Then the final client list would be : ChannelPassthrough -> [FXPassthrough:ChannelX-laneY -> FX](There will be a set of passthrough + fx for each fx client) -> GlobalPlayback
+        # In any of the scenarios the last port, GlobalPlayback, does not need to be connected to anything else. Hence do not process GlobalPlayback
+        # For all other clients, check if the client is an FXPassthrough.
+        # If the client is not a FXPassthrough, then it means it can either be a Channelpassthrough or an FX. So connect it's output to the next client
+        # If the client is an FXPassthrough then it means the next client is FX and the next to next client can either be another passthrough or GlobalPlayback (does not matter as the logic is same for both). In that case connect dry ports to next to next client and wet ports to the fx for dry/wet mix to actually work like it should
+        # When connecting ports check if the port is getting connected to GlobalPlayback. If it is getting connected to GlobalPlayback then connect the same port to AudioLevels too of the channel being processed for the AudioLevel meter to work
+
+        output_client_names = [f"ChannelPassthrough:Channel{channel_index+1}-dryOut"] + fx_client_names + ["GlobalPlayback"]
 
         logging.debug(f"# Output client names : {output_client_names}")
 
         # Disconnect all output clients first
         for client_name in output_client_names:
-            in_ports = jclient.get_ports(client_name, is_audio=True, is_input=True, is_output=False)
-            out_ports = jclient.get_ports(client_name, is_audio=True, is_input=False, is_output=True)
+            if client_name != "GlobalPlayback":
+                in_ports = jclient.get_ports(client_name, is_audio=True, is_input=True, is_output=False)
+                out_ports = jclient.get_ports(client_name, is_audio=True, is_input=False, is_output=True)
 
-            for port in in_ports:
-                for connected_port in jclient.get_all_connections(port):
-                    logging.info(f"Disonnecting {connected_port} from {port}")
-                    try:
-                        jclient.disconnect(connected_port, port)
-                    except: pass
-            for port in out_ports:
-                for connected_port in jclient.get_all_connections(port):
-                    logging.info(f"Disonnecting {port} from {connected_port}")
-                    try:
-                        jclient.disconnect(port, connected_port)
-                    except: pass
+                for port in in_ports:
+                    for connected_port in jclient.get_all_connections(port):
+                        logging.info(f"Disonnecting {connected_port} from {port}")
+                        try:
+                            jclient.disconnect(connected_port, port)
+                        except: pass
+                for port in out_ports:
+                    for connected_port in jclient.get_all_connections(port):
+                        logging.info(f"Disonnecting {port} from {connected_port}")
+                        try:
+                            jclient.disconnect(port, connected_port)
+                        except: pass
 
         for (index, client_name) in enumerate(output_client_names):
             logging.debug(f"## Processing client : {client_name}")
 
+            # The last client can either be an FX or the ChannelPassthrough if there are no FX.
+            # For both cases, it should be connected to AudioLevels and GlobalPlayback as it is the end node
+
             if index == len(output_client_names) - 1:
-                # We have reached last client in output. Connect this client to both GlobalPlayback as well as AudioLevel
-                out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
-
-                if len(out_ports) == 1:
-                    # If output is mono, connect both input to same output.
-                    out_ports = [out_ports[0], out_ports[0]]
-
-                for ports in zip(out_ports, channelAudioLevelsInputPorts):
-                    logging.info(f"Connecting {ports[0]} to Audio levels {ports[1]}")
-                    try:
-                        jclient.connect(ports[0], ports[1])
-                    except: pass
-                for ports in zip(out_ports, globalPlaybackInputPorts):
-                    logging.info(f"Connecting {ports[0]} to Global Playback {ports[1]}")
-                    try:
-                        jclient.connect(ports[0], ports[1])
-                    except: pass
+                # The last port, GlobalPlayback, does not need to be connected to anything else. Hence do not process GlobalPlayback
+                pass
             else:
-                # Connect this client to the next client in list
-                out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
-                in_ports = jclient.get_ports(output_client_names[index+1], is_audio=True, is_input=True)
+                # If the client that is being processed is not the last client,
+                # that means this client is either ChannelPassthroug, or FXPassthrough or FX itself.
 
-                if len(in_ports) == 1:
-                    # If input is mono, connect both output to same input.
-                    in_ports = [in_ports[0], in_ports[0]]
+                # If the client that is being processed is a passthrough then connect the dryOutput to the
+                # next to next client so that the dry output is passed on the the next in line FX or Global Playback
 
-                if len(out_ports) == 1:
-                    # If output is mono, connect both input to same output.
-                    out_ports = [out_ports[0], out_ports[0]]
+                # If the client that is being processed is ChannelPassthrough or an FX then just connect it to the
+                # next in line client
 
-                for ports in zip(out_ports, in_ports):
-                    logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                    try:
-                        jclient.connect(ports[0], ports[1])
-                    except: pass
+                if client_name.startswith("FXPassthrough"):
+                    # Client being processed is an FXPasshrough client
+                    # It means that the next client is FX and the next to next client can either be another passthrough or GlobalPlayback (does not matter as the logic is same for both).
+                    # In that case connect dry ports to next to next client and wet ports to the fx for dry/wet mix to actually work like it should
 
-    ### END Connect ChannelPassthrough:ChannelX dry and wet outputs to designated ports
+                    # Connect this client to the next client in list
+                    dry_out_ports = jclient.get_ports(client_name + "-dryOut", is_audio=True, is_output=True)
+                    wet_out_ports = jclient.get_ports(client_name + "-wetOutFx1", is_audio=True, is_output=True)
+                    next_in_ports = jclient.get_ports(output_client_names[index+1], is_audio=True, is_input=True)
+                    next_next_in_ports = jclient.get_ports(output_client_names[index+2], is_audio=True, is_input=True)
+
+                    # If input/output is mono, make to connect to stereo input/output.
+                    if len(dry_out_ports) == 1:
+                        dry_out_ports = [dry_out_ports[0], dry_out_ports[0]]
+                    if len(wet_out_ports) == 1:
+                        wet_out_ports = [wet_out_ports[0], wet_out_ports[0]]
+                    if len(next_in_ports) == 1:
+                        next_in_ports = [next_in_ports[0], next_in_ports[0]]
+                    if len(next_next_in_ports) == 1:
+                        next_next_in_ports = [next_next_in_ports[0], next_next_in_ports[0]]
+
+                    # Connect dry ports to next to next client
+                    for ports in zip(dry_out_ports, next_next_in_ports):
+                        logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                        try:
+                            jclient.connect(ports[0], ports[1])
+                        except: pass
+                    # Connect wet ports to FX client which is right next to this client in output_client_names
+                    for ports in zip(wet_out_ports, next_in_ports):
+                        logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                        try:
+                            jclient.connect(ports[0], ports[1])
+                        except: pass
+                    # If next to next client is GlobalPlayback then connect the same port to AudioLevels too
+                    if output_client_names[index+2] == "GlobalPlayback":
+                        for ports in zip(dry_out_ports, channelAudioLevelsInputPorts):
+                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                            try:
+                                jclient.connect(ports[0], ports[1])
+                            except: pass
+                else:
+                    # This client is not a FXPassthrough, then it means it can either be a Channelpassthrough or an FX. So connect it's output to the next client
+
+                    # Connect this client to the next client in list
+                    next_client_name = output_client_names[index+1]
+                    out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
+                    if len(out_ports) == 1:
+                        # If output is mono, connect both input to same output.
+                        out_ports = [out_ports[0], out_ports[0]]
+
+                    if next_client_name == "GlobalPlayback":
+                        # Next client is GlobalPlayback then connect the same port to both GlobalPlayback and AudioLevels
+                        for ports in zip(out_ports, channelAudioLevelsInputPorts):
+                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                            try:
+                                jclient.connect(ports[0], ports[1])
+                            except: pass
+                        for ports in zip(out_ports, globalPlaybackInputPorts):
+                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                            try:
+                                jclient.connect(ports[0], ports[1])
+                            except: pass
+                    else:
+                        # Next client is not GlobalPlaybac. Connect the ports to next client
+                        next_in_ports = jclient.get_ports(next_client_name, is_audio=True, is_input=True)
+
+                        if len(next_in_ports) == 1:
+                            # If input is mono, connect both output to same input.
+                            next_in_ports = [next_in_ports[0], next_in_ports[0]]
+
+                        for ports in zip(out_ports, next_in_ports):
+                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                            try:
+                                jclient.connect(ports[0], ports[1])
+                            except: pass
+    ### END Connect ChannelPassthrough to GlobalPlayback and AudioLevels via FX
 
     ### BEGIN Connect Samplersynth uneffected ports to globalPlayback client
     for port in zip(jclient.get_ports(f"SamplerSynth:global-lane1", is_audio=True, is_output=True), globalPlaybackInputPorts):

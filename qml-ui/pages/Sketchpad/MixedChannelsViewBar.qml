@@ -679,10 +679,11 @@ Rectangle {
                                     property var fxData: [null, null, null, null, null]
                                     delegate: Rectangle {
                                         id: fxRowDelegate
+                                        property bool highlighted: root.selectedChannel.selectedFxSlotRow === index
+                                        property QtObject fxPassthroughClient: Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                                        property bool highlighted: root.selectedChannel.selectedFxSlotRow === index
                                         border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
                                         border.width: 2
                                         color: "transparent"
@@ -697,6 +698,17 @@ Rectangle {
                                             border.color: "#ff999999"
                                             border.width: 1
                                             radius: 4
+
+                                            Rectangle {
+                                                width: fxRowDelegate.fxPassthroughClient && fxRowDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * fxRowDelegate.fxPassthroughClient.dryWetMixAmount : 0
+                                                anchors {
+                                                    left: parent.left
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                visible: fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0
+                                                color: Kirigami.Theme.highlightColor
+                                            }
 
                                             QQC2.Label {
                                                 anchors {
@@ -713,7 +725,24 @@ Rectangle {
                                             }
 
                                             MouseArea {
+                                                id: fxDelegateMouseArea
+                                                property real initialMouseX
+                                                property bool dragHappened: false
+
                                                 anchors.fill: parent
+                                                onPressed: {
+                                                    fxDelegateMouseArea.initialMouseX = mouse.x
+                                                }
+                                                onReleased: {
+                                                    fxDelegateDragHappenedResetTimer.restart()
+                                                }
+                                                onMouseXChanged: {
+                                                    if (fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0 && mouse.x - fxDelegateMouseArea.initialMouseX != 0) {
+                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / fxRowDelegate.width, 0, 1);
+                                                        fxDelegateMouseArea.dragHappened = true;
+                                                        fxRowDelegate.fxPassthroughClient.dryWetMixAmount = newVal;
+                                                    }
+                                                }
                                                 onClicked: {
 //                                                    var chainedSound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
 //                                                    if (zynqtgui.backButtonPressed) {
@@ -740,7 +769,17 @@ Rectangle {
                                                     if (root.selectedChannel.selectedFxSlotRow !== index) {
                                                         root.selectedChannel.selectedFxSlotRow = index
                                                     } else {
-                                                        bottomStack.slotsBar.handleItemClick("fx")
+                                                        if (!fxDelegateMouseArea.dragHappened) {
+                                                            bottomStack.slotsBar.handleItemClick("fx")
+                                                        }
+                                                    }
+                                                }
+                                                Timer {
+                                                    id: fxDelegateDragHappenedResetTimer
+                                                    interval: 100
+                                                    repeat: false
+                                                    onTriggered: {
+                                                        fxDelegateMouseArea.dragHappened = false
                                                     }
                                                 }
                                             }

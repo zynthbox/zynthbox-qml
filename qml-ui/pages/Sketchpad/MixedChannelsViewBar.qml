@@ -598,12 +598,13 @@ Rectangle {
                                                     }
                                                 }
                                                 onMouseXChanged: {
-                                                    if (delegate.midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                                    var newVal
+                                                    if (root.selectedChannel.channelAudioType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                        newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
                                                         delegate.synthPassthroughClient.dryAmount = newVal;
-                                                    } else if (delegate.sample && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                                                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0 && delegate.sample && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                        newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
                                                         delegate.sample.gainAbsolute = newVal;
                                                     }

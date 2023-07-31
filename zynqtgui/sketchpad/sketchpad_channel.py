@@ -968,7 +968,7 @@ class sketchpad_channel(QObject):
                 except Exception as e:
                     logging.exception(e)
 
-                self.zynqtgui.end_long_task()
+                QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.currentTaskMessage = f"Removing chained fx at slot `{self.selectedFxSlotRow + 1}` from channel `{self.name}`"
         self.zynqtgui.do_long_task(task)

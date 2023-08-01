@@ -91,7 +91,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
     #                logging.debug(self.layer_chain_parallel)
                     self.zynqtgui.screens['layer'].layer_chain_parallel = self.layer_chain_parallel
                     #sometimes this raises an invalid index exection, despite the indexes having been checked already
-                    self.zynqtgui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zynqtgui.curlayer.midi_chan, False)
+                    self.zynqtgui.screens['layer'].add_layer_engine(self.list_data[i][0], None, False)
 
     #                self.zynqtgui.screens[self.effects_screen].show()
 

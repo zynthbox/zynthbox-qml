@@ -841,7 +841,10 @@ Rectangle {
             },
             Kirigami.Action {
                 text: qsTr("Edit FX")
-                visible: false
+                visible: fxSetupDialog.selectedFx != null
+                onTriggered: {
+                    zynqtgui.show_modal("control")
+                }
             }
         ]
     }

@@ -334,13 +334,14 @@ class zynthian_gui_control(zynthian_gui_selector):
             for cscr in layer.get_ctrl_screens():
                 self.list_data.append((cscr,i,cscr,layer,j))
 
-                for index, ctrl in enumerate(layer.get_ctrl_screens()[cscr]):
-                    self.__all_controls.append({
-                        "engine": layer.engine.name.split("/")[-1],
-                        "control_screen": cscr,
-                        "index": index,
-                        "control": ctrl
-                    })
+                if layer == self.zynqtgui.curlayer:
+                    for index, ctrl in enumerate(layer.get_ctrl_screens()[cscr]):
+                        self.__all_controls.append({
+                            "engine": layer.engine.name.split("/")[-1],
+                            "control_screen": cscr,
+                            "index": index,
+                            "control": ctrl
+                        })
                 i += 1
                 j += 1
         if self.__single_effect_engine == None:
@@ -366,7 +367,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         return self.zgui_controllers[index]
 
     @Slot(str, int, result=QObject)
-    def controller_by_category(self, cat, index):
+    def controller_by_category(self, cat, index, layer=None):
         controllers = []
         if self.__single_effect_engine != None:
             fxchain_layers = self.zynqtgui.screens['layer'].get_fxchain_layers()
@@ -987,10 +988,10 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_totalColumns(self):
         return math.ceil(len(self.__all_controls) / 3)
 
-    @Slot(int, result="QVariant")
+    @Slot(int, result=QObject)
     def getAllControlAt(self, index):
         if index < len(self.__all_controls):
-            return self.__all_controls[index]
+            return self.controller_by_category(self.__all_controls[index]["control_screen"], self.__all_controls[index]["index"])
         else:
             return None
 

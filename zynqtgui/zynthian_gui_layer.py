@@ -530,10 +530,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
             self.index=len(self.layers)-4
             self.layer_control()
 
-        elif midi_chan is None:
-            self.replace_layer_index=None
-            self.zynqtgui.screens['midi_chan'].set_mode("ADD", 0, self.get_free_midi_chans())
-            self.zynqtgui.show_modal('midi_chan')
+#        elif midi_chan is None:
+#            self.replace_layer_index=None
+#            self.zynqtgui.screens['midi_chan'].set_mode("ADD", 0, self.get_free_midi_chans())
+#            self.zynqtgui.show_modal('midi_chan')
 
         else:
             self.add_layer_midich(midi_chan, select)
@@ -598,7 +598,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
                 layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
 
-            self.add_midichannel_to_channel(midich, position_in_channel)
+            if not zyngine.type == "Audio Effect":
+                self.add_midichannel_to_channel(midich, position_in_channel)
 
             # Try to connect Audio Effects ...
             if len(self.layers)>0 and layer.engine.type=="Audio Effect":

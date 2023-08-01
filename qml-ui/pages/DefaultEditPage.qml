@@ -194,8 +194,7 @@ RowLayout {
                             visible: controlDelegate.control != null
                             anchors.fill: parent
                             controller {
-                                category: controlDelegate.control ? controlDelegate.control["control_screen"] : ""
-                                index: controlDelegate.control ? controlDelegate.control["index"] : -1
+                                ctrl: controlDelegate.control
                             }
                         }
                     }

@@ -114,6 +114,16 @@ Zynthian.Dialog {
                     root.accept();
                 }
             }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                text: qsTr("Edit Sound")
+                onClicked: {
+                    root.accept();
+                    zynqtgui.show_modal("control")
+                }
+            }
+
             Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1

@@ -596,6 +596,18 @@ Rectangle {
                                                             }
                                                         }
                                                     }
+
+                                                    if (root.selectedChannel.channelAudioType == "synth") {
+                                                        root.selectedChannel.setCurlayerByType("synth")
+                                                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) == 0) {
+                                                        root.selectedChannel.setCurlayerByType("sample")
+                                                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                                                        root.selectedChannel.setCurlayerByType("loop")
+                                                    } else if (root.selectedChannel.channelAudioType == "external") {
+                                                        root.selectedChannel.setCurlayerByType("external")
+                                                    } else {
+                                                        root.selectedChannel.setCurlayerByType("")
+                                                    }
                                                 }
                                                 onMouseXChanged: {
                                                     var newVal
@@ -774,6 +786,7 @@ Rectangle {
                                                             bottomStack.slotsBar.handleItemClick("fx")
                                                         }
                                                     }
+                                                    root.selectedChannel.setCurlayerByType("fx")
                                                 }
                                                 Timer {
                                                     id: fxDelegateDragHappenedResetTimer

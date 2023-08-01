@@ -1510,6 +1510,7 @@ class zynthian_gui(QObject):
         self.add_screen_to_show_queue(self.screens["bank"], False, True)
         self.add_screen_to_show_queue(self.screens["preset"], False, True)
         self.add_screen_to_show_queue(self.screens["control"], False, True)
+        self.control.selectedColumn = 0
         if self.curlayer:
             self.screens["midi_key_range"].config(self.curlayer.midi_chan)
             midi_chan = self.curlayer.midi_chan

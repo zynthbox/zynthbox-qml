@@ -42,11 +42,12 @@ QQC2.Button {
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-    readonly property color borderColor: component.visible ? (component.down ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor) : ""
+    property bool invertBorderColor: false
+    readonly property color borderColor: component.visible ? (component.down !== component.invertBorderColor ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor) : ""
     readonly property color backgroundColor: component.visible ? (component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor) : ""
     readonly property color focusColor: component.visible ? Kirigami.Theme.focusColor : ""
     background: Rectangle {
-        radius: 2
+        radius: 3
         border {
             width: 1
             color: component.borderColor

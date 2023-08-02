@@ -1237,6 +1237,7 @@ class zynthian_gui(QObject):
 
         exclude_obj = self.screens[exclude]
 
+    @Slot(str)
     def show_screen(self, screen=None):
         if screen is None:
             if self.active_screen:
@@ -1808,14 +1809,10 @@ class zynthian_gui(QObject):
                 self.show_screen("main")
 
         elif cuia == "SCREEN_EDIT_CONTEXTUAL":
-            if self.sketchpad.song is not None:
-                channel = self.sketchpad.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
-                if channel.channelAudioType == "synth": # The channel is set to send stuff to the zynthian engines
-                    self.show_screen("control")
-                elif channel.channelAudioType == "external": # The channel is set to spit midi events out through the midi_out port
-                    self.show_modal("channel_external_setup")
-                else: # The rest are different kinds of samples for SamplerSynth playback, so we'll show the wave editor for those
-                    self.show_modal("channel_wave_editor")
+            # Do not handle this here. Instead handle it from the page itself
+            # Open respective edit page as per selected slot from MixedChannelsViewBar
+            # Open control page if selected slot has synth from SynthSetupPage
+            pass
 
         # elif cuia == "SCREEN_ADMIN":
             # Do not handle 5th under screen button globally.

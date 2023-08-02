@@ -380,6 +380,13 @@ Zynthian.ScreenPage {
                 case "KNOB2_DOWN":
                     root.updateChannelResonance(midiChannel, -1)
                     return true;
+                case "SCREEN_EDIT_CONTEXTUAL":
+                    if (zynqtgui.fixed_layers.current_index_valid) {
+                        zynqtgui.show_screen("control")
+                    } else {
+                        applicationWindow().showMessageDialog(qsTr("Selected slot is empty. Cannot open edit page."), 2000)
+                    }
+                    return true;
                 default:
                     return false;
             }

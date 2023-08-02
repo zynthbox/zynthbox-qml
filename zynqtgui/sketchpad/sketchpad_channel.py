@@ -77,7 +77,6 @@ class sketchpad_channel(QObject):
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
         self.__selected_fx_slot_row = 0
-        self.__selected_slot_type = ""
         self.__selected_part__ = 0
         self.__externalMidiChannel__ = -1
         self.__sound_json_snapshot__ = ""
@@ -1492,20 +1491,6 @@ class sketchpad_channel(QObject):
     filterResonanceControllers = Property("QVariantList", get_filterResonanceControllers, notify=filterResonanceControllersChanged)
     ### End property filterResonanceControllers
 
-    ### Begin property selectedSlotType
-    def get_selectedSlotType(self):
-        return self.__selected_slot_type
-
-    def set_selectedSlotType(self, type):
-        if self.__selected_slot_type != type:
-            self.__selected_slot_type = type
-            self.selectedSlotTypeChanged.emit()
-
-    selectedSlotTypeChanged = Signal()
-
-    selectedSlotType = Property(str, get_selectedSlotType, set_selectedSlotType, notify=selectedSlotTypeChanged)
-    ### End property selectedSlotType
-
     @Slot(None, result=QObject)
     def getClipToRecord(self):
         if self.channelAudioType in ["sample-trig", "sample-slice"]:
@@ -1568,22 +1553,16 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.set_curlayer(self.zynqtgui.layer.layer_midi_map[sound])
             else:
                 self.zynqtgui.set_curlayer(None)
-            self.selectedSlotType = "synth"
         elif type == "fx":
             self.zynqtgui.set_curlayer(self.chainedFx[self.selectedFxSlotRow])
-            self.selectedSlotType = "fx"
         elif type == "loop":
             self.zynqtgui.set_curlayer(None)
-            self.selectedSlotType = "loop"
         elif type == "sample":
             self.zynqtgui.set_curlayer(None)
-            self.selectedSlotType = "sample"
         elif type == "external":
             self.zynqtgui.set_curlayer(None)
-            self.selectedSlotType = "external"
         else:
             self.zynqtgui.set_curlayer(None)
-            self.selectedSlotType = ""
 
     def update_sound_snapshot_json(self):
         if self.connectedSound == -1:

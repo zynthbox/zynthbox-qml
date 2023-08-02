@@ -38,11 +38,18 @@ Zynthian.Popup {
     property int columns: Math.ceil(component.actions.length / 3) // Auto calculate columns if not provided
 
     parent: QQC2.Overlay.overlay
-    y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-    x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+    y: parent !== null ? parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y : 0
+    x: parent !== null ? parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x : 0
     width: mainLayout.implicitWidth + mainLayout.columnSpacing*2
     height: mainLayout.implicitHeight + mainLayout.rowSpacing*2
 
+    Timer {
+        id: popupCloser
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            component.close();
+        }
+    }
     GridLayout {
         id: mainLayout
         anchors.fill: parent
@@ -53,7 +60,7 @@ Zynthian.Popup {
         flow: GridLayout.TopToBottom
         Repeater {
             model: component.actions
-            delegate: QQC2.Button {
+            delegate: PlayGridButton {
                 id: delegate
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 12
                 Layout.minimumHeight: Kirigami.Units.gridUnit * 4
@@ -62,7 +69,9 @@ Zynthian.Popup {
                 Layout.alignment: Qt.AlignCenter
                 action: modelData
                 visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
+                invertBorderColor: true
                 onClicked: {
+                    action.trigger();
                     component.close();
                 }
             }

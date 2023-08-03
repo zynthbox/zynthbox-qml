@@ -42,9 +42,16 @@ Rectangle {
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
-        interval: 0; running: false; repeat: false;
+        interval: 1; running: false; repeat: false;
         onTriggered: {
             root.selectedChannel = applicationWindow().selectedChannel;
+            // Focus a slot when a clip/channel/slot is not already focussed
+            if (zynqtgui.sketchpad.lastSelectedObj.className != "sketchpad_channel" &&
+                    zynqtgui.sketchpad.lastSelectedObj.className != "sketchpad_clip" &&
+                    zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" &&
+                    zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" ) {
+                synthRepeater.itemAt(0).switchToThisSlot(true)
+            }
         }
     }
     Connections {
@@ -536,6 +543,49 @@ Rectangle {
                                         color: "transparent"
                                         radius: 4
 
+                                        function switchToThisSlot(onlyFocus=false) {
+                                            if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
+                                                zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
+                                                zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
+                                                root.selectedChannel.selectedSlotRow = index
+                                            } else {
+                                                if (root.selectedChannel.channelAudioType === "external") {
+                                                    // If channel type is external, then it has only 1 slot visible
+                                                    // and the respective selectedSlotRow is already selected. Hence directly handle item click
+                                                    if (!onlyFocus) {
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    }
+                                                } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                                                    // If channel type is sample-slice, then it has only 1 slot visible and it is always slot 0
+                                                    // Hence set selectedSlotRow to 0 and call handle item click
+                                                    root.selectedChannel.selectedSlotRow  = 0
+                                                    if (!onlyFocus) {
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    }
+                                                } else {
+                                                    // For synth, handle item click only if not dragged. For other cases handle click immediately
+                                                    if ((root.selectedChannel.channelAudioType == "synth" && !delegateMouseArea.dragHappened) || root.selectedChannel.channelAudioType != "synth") {
+                                                        if (!onlyFocus) {
+                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            if (root.selectedChannel.channelAudioType == "synth") {
+                                                root.selectedChannel.setCurlayerByType("synth")
+                                            } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) == 0) {
+                                                root.selectedChannel.setCurlayerByType("sample")
+                                            } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                                                root.selectedChannel.setCurlayerByType("loop")
+                                            } else if (root.selectedChannel.channelAudioType == "external") {
+                                                root.selectedChannel.setCurlayerByType("external")
+                                            } else {
+                                                root.selectedChannel.setCurlayerByType("")
+                                            }
+                                        }
+
                                         Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
@@ -631,42 +681,7 @@ Rectangle {
                                                 onReleased: {
                                                     dragHappenedResetTimer.restart()
                                                 }
-                                                onClicked: {
-                                                    if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
-                                                        zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
-                                                        zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                        zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
-                                                        root.selectedChannel.selectedSlotRow = index
-                                                    } else {
-                                                        if (root.selectedChannel.channelAudioType === "external") {
-                                                            // If channel type is external, then it has only 1 slot visible
-                                                            // and the respective selectedSlotRow is already selected. Hence directly handle item click
-                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                                                        } else if (root.selectedChannel.channelAudioType === "sample-slice") {
-                                                            // If channel type is sample-slice, then it has only 1 slot visible and it is always slot 0
-                                                            // Hence set selectedSlotRow to 0 and call handle item click
-                                                            root.selectedChannel.selectedSlotRow  = 0
-                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                                                        } else {
-                                                            // For synth, handle item click only if not dragged. For other cases handle click immediately
-                                                            if ((root.selectedChannel.channelAudioType == "synth" && !delegateMouseArea.dragHappened) || root.selectedChannel.channelAudioType != "synth") {
-                                                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                                                            }
-                                                        }
-                                                    }
-
-                                                    if (root.selectedChannel.channelAudioType == "synth") {
-                                                        root.selectedChannel.setCurlayerByType("synth")
-                                                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) == 0) {
-                                                        root.selectedChannel.setCurlayerByType("sample")
-                                                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
-                                                        root.selectedChannel.setCurlayerByType("loop")
-                                                    } else if (root.selectedChannel.channelAudioType == "external") {
-                                                        root.selectedChannel.setCurlayerByType("external")
-                                                    } else {
-                                                        root.selectedChannel.setCurlayerByType("")
-                                                    }
-                                                }
+                                                onClicked: slotDelegate.switchToThisSlot()
                                                 onMouseXChanged: {
                                                     var newVal
                                                     if (root.selectedChannel.channelAudioType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
@@ -760,6 +775,20 @@ Rectangle {
                                         color: "transparent"
                                         radius: 4
 
+                                        function switchToThisSlot() {
+                                            if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
+                                                zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
+                                                zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
+                                                root.selectedChannel.selectedFxSlotRow = index
+                                            } else {
+                                                if (!fxDelegateMouseArea.dragHappened) {
+                                                    bottomStack.slotsBar.handleItemClick("fx")
+                                                }
+                                            }
+                                            root.selectedChannel.setCurlayerByType("fx")
+                                        }
+
                                         Rectangle {
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -814,37 +843,7 @@ Rectangle {
                                                         fxRowDelegate.fxPassthroughClient.dryWetMixAmount = newVal;
                                                     }
                                                 }
-                                                onClicked: {
-//                                                    var chainedSound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-//                                                    if (zynqtgui.backButtonPressed) {
-//                                                        // Back is pressed. Clear Slot
-//                                                        if (root.selectedChannel.checkIfLayerExists(chainedSound)) {
-//                                                            zynqtgui.start_loading()
-//                                                            zynqtgui.fixed_layers.activate_index(chainedSound)
-//                                                            zynqtgui.layer_effects.fx_reset_confirmed()
-//                                                            zynqtgui.stop_loading()
-//                                                        }
-//                                                    } else {
-//                                                        zynqtgui.fixed_layers.activate_index(chainedSound)
-//                                                        zynqtgui.layer_options.show();
-//                                                        var screenBack = zynqtgui.current_screen_id;
-//                                                        zynqtgui.current_screen_id = "layer_effects";
-//                                                        root.openBottomDrawerOnLoad = true;
-//                                                        zynqtgui.forced_screen_back = screenBack;
-//                                                    }
-
-                                                    if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
-                                                        zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
-                                                        zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                        zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
-                                                        root.selectedChannel.selectedFxSlotRow = index
-                                                    } else {
-                                                        if (!fxDelegateMouseArea.dragHappened) {
-                                                            bottomStack.slotsBar.handleItemClick("fx")
-                                                        }
-                                                    }
-                                                    root.selectedChannel.setCurlayerByType("fx")
-                                                }
+                                                onClicked: fxRowDelegate.switchToThisSlot()
                                                 Timer {
                                                     id: fxDelegateDragHappenedResetTimer
                                                     interval: 100

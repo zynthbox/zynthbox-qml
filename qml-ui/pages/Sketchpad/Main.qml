@@ -80,48 +80,91 @@ Zynthian.ScreenPage {
     property var copySourceObj: null
 
     /**
-     * Update layer volume of selected channel
-     * @param midiChannel The layer midi channel whose volume needs to be updated
+     * Update layer volume of selected fx slot
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelLayerVolume(midiChannel, sign) {
-        var synthName = ""
-        var synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel]
-        try {
-            synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
-        } catch(e) {}
+    function updateSelectedFxLayerVolume(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedFxSlotRow
+        }
+        var fxName = root.selectedChannel.chainedFxNames[slot]
+        var fxLayer = root.selectedChannel.chainedFx[slot]
 
-        function valueSetter(value) {
-            if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
-                synthPassthroughClient.dryAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
+        if (fxLayer != null) {
+            var fxPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][slot]
+
+            function valueSetter(value) {
+                fxPassthroughClient.dryWetMixAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
-                    parameterName: "layer_volume",
-                    description: qsTr("%1 Volume").arg(synthName),
+                    parameterName: "fxlayer_volume",
+                    description: qsTr("%1 Dry/Wet Mix").arg(fxName),
                     start: 0,
                     stop: 1,
                     step: 0.01,
                     defaultValue: null,
-                    currentValue: synthPassthroughClient.dryAmount,
+                    currentValue: fxPassthroughClient.dryWetMixAmount,
                     startLabel: "0",
                     stopLabel: "1",
-                    valueLabel: qsTr("%1").arg(synthPassthroughClient.dryAmount.toFixed(2)),
+                    valueLabel: qsTr("%1").arg(fxPassthroughClient.dryWetMixAmount.toFixed(2)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: false,
                     showVisualZero: false
                 })
             }
+            valueSetter(fxPassthroughClient.dryWetMixAmount + sign * 0.01)
+        } else {
+            applicationWindow().showMessageDialog(qsTr("Selected slot does not have any FX"), 2000)
+        }
+    }
+    /**
+     * Update layer volume of selected channel
+     * @param midiChannel The layer midi channel whose volume needs to be updated
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelLayerVolume(midiChannel, sign) {
+        var synthName = ""
+        var synthPassthroughClient
+        try {
+            synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel]
+            synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
+        } catch(e) {}
+
+        function valueSetter(value) {
+            synthPassthroughClient.dryAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
+            applicationWindow().showOsd({
+                parameterName: "layer_volume",
+                description: qsTr("%1 Volume").arg(synthName),
+                start: 0,
+                stop: 1,
+                step: 0.01,
+                defaultValue: null,
+                currentValue: synthPassthroughClient.dryAmount,
+                startLabel: "0",
+                stopLabel: "1",
+                valueLabel: qsTr("%1").arg(synthPassthroughClient.dryAmount.toFixed(2)),
+                setValueFunction: valueSetter,
+                showValueLabel: true,
+                showResetToDefault: false,
+                showVisualZero: false
+            })
         }
 
-        console.log("updateSelectedChannelLayerVolume:", synthPassthroughClient.dryAmount + sign * 0.01)
-        valueSetter(synthPassthroughClient.dryAmount + sign * 0.01)
+        if (synthPassthroughClient != null && root.selectedChannel.checkIfLayerExists(midiChannel)) {
+            valueSetter(synthPassthroughClient.dryAmount + sign * 0.01)
+        } else {
+            applicationWindow().showMessageDialog(qsTr("Selected slot does not have any synth"), 2000)
+        }
     }
     /**
      * Update selected sample gain
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedSampleGain(sign) {
-        var sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+    function updateSelectedSampleGain(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlotRow
+        }
+        var sample = root.selectedChannel.samples[slot]
         function valueSetter(value) {
             if (sample != null && sample.path != null && sample.path.length > 0) {
                 sample.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
@@ -141,6 +184,8 @@ Zynthian.ScreenPage {
                     showResetToDefault: true,
                     showVisualZero: true
                 })
+            } else {
+                applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sample"), 2000)
             }
         }
         valueSetter(sample.gain + sign)
@@ -149,8 +194,11 @@ Zynthian.ScreenPage {
      * Update selected sketch gain
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedSketchGain(sign) {
-        var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+    function updateSelectedSketchGain(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlotRow
+        }
+        var clip = root.selectedChannel.getClipsModelByPart(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
         function valueSetter(value) {
             if (clip != null && clip.path != null && clip.path.length > 0) {
                 clip.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
@@ -170,6 +218,8 @@ Zynthian.ScreenPage {
                     showResetToDefault: true,
                     showVisualZero: true
                 })
+            } else {
+                applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sketch"), 2000)
             }
         }
         valueSetter(clip.gain + sign)
@@ -225,10 +275,13 @@ Zynthian.ScreenPage {
      * Update layer filter cutoff for selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelSlotLayerCutoff(sign) {
+    function updateSelectedChannelSlotLayerCutoff(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlotRow
+        }
         var synthName = ""
-        var midiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-        var controller = root.selectedChannel.filterCutoffControllers[root.selectedChannel.selectedSlotRow]
+        var midiChannel = root.selectedChannel.chainedSounds[slot]
+        var controller = root.selectedChannel.filterCutoffControllers[slot]
         try {
             synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
         } catch(e) {}
@@ -288,10 +341,13 @@ Zynthian.ScreenPage {
      * Update layer filter resonance for selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelSlotLayerResonance(sign) {
+    function updateSelectedChannelSlotLayerResonance(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlotRow
+        }
         var synthName = ""
-        var midiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-        var controller = root.selectedChannel.filterResonanceControllers[root.selectedChannel.selectedSlotRow]
+        var midiChannel = root.selectedChannel.chainedSounds[slot]
+        var controller = root.selectedChannel.filterResonanceControllers[slot]
         try {
             synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
         } catch(e) {}

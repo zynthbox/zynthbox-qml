@@ -64,7 +64,6 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         var returnValue = false;
-        var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
         console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
@@ -99,47 +98,82 @@ Rectangle {
                 }
                 break;
             case "KNOB0_UP":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, 1)
-                } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
-                    pageManager.getPage("sketchpad").updateSelectedSampleGain(1)
-                } else if (root.selectedChannel.channelAudioType == "sample-loop") {
-                    pageManager.getPage("sketchpad").updateSelectedSketchGain(1)
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 1)
+                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                } else {
+                    applicationWindow().showMessageDialog(qsTr("No slots selected. Small Knob 1 is disabled."), 2000)
                 }
-
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
-                } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
-                    pageManager.getPage("sketchpad").updateSelectedSampleGain(-1)
-                } else if (root.selectedChannel.channelAudioType == "sample-loop") {
-                    pageManager.getPage("sketchpad").updateSelectedSketchGain(-1)
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], -1)
+                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                } else {
+                    applicationWindow().showMessageDialog(qsTr("No slots selected. Small Knob 1 is disabled."), 2000)
                 }
                 returnValue = true;
                 break;
             case "KNOB1_UP":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1)
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                } else {
+                    applicationWindow().showMessageDialog(qsTr("No slots selected. Small Knob 2 is disabled."), 2000)
                 }
                 returnValue = true;
                 break;
             case "KNOB1_DOWN":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1)
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                } else {
+                    applicationWindow().showMessageDialog(qsTr("No slots selected. Small Knob 2 is disabled."), 2000)
                 }
                 returnValue = true;
                 break;
             case "KNOB2_UP":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1)
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                } else {
+                    applicationWindow().showMessageDialog(qsTr("No slots selected. Small Knob 3 is disabled."), 2000)
                 }
                 returnValue = true;
                 break;
             case "KNOB2_DOWN":
-                if (root.selectedChannel.channelAudioType == "synth") {
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1)
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                } else {
+                    applicationWindow().showMessageDialog(qsTr("No slots selected. Small Knob 3 is disabled."), 2000)
                 }
                 returnValue = true;
                 break;

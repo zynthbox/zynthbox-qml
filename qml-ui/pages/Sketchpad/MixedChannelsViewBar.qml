@@ -531,8 +531,8 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                                        border.width: 2
+//                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+//                                        border.width: 2
                                         color: "transparent"
                                         radius: 4
 
@@ -632,23 +632,21 @@ Rectangle {
                                                     dragHappenedResetTimer.restart()
                                                 }
                                                 onClicked: {
-                                                    zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
-                                                    zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                    zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
-
-                                                    if (root.selectedChannel.channelAudioType === "external") {
-                                                        // If channel type is external, then it has only 1 slot visible
-                                                        // and the respective selectedSlotRow is already selected. Hence directly handle item click
-                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
-                                                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
-                                                        // If channel type is sample-slice, then it has only 1 slot visible and it is always slot 0
-                                                        // Hence set selectedSlotRow to 0 and call handle item click
-                                                        root.selectedChannel.selectedSlotRow  = 0
-                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
+                                                        zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
+                                                        zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                        zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
+                                                        root.selectedChannel.selectedSlotRow = index
                                                     } else {
-                                                        // For any other channel modes, set selectedSlotRow first if not already set
-                                                        if (index !== root.selectedChannel.selectedSlotRow) {
-                                                            root.selectedChannel.selectedSlotRow = index
+                                                        if (root.selectedChannel.channelAudioType === "external") {
+                                                            // If channel type is external, then it has only 1 slot visible
+                                                            // and the respective selectedSlotRow is already selected. Hence directly handle item click
+                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                        } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                                                            // If channel type is sample-slice, then it has only 1 slot visible and it is always slot 0
+                                                            // Hence set selectedSlotRow to 0 and call handle item click
+                                                            root.selectedChannel.selectedSlotRow  = 0
+                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                                                         } else {
                                                             // For synth, handle item click only if not dragged. For other cases handle click immediately
                                                             if ((root.selectedChannel.channelAudioType == "synth" && !delegateMouseArea.dragHappened) || root.selectedChannel.channelAudioType != "synth") {
@@ -757,8 +755,8 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
-                                        border.width: 2
+//                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+//                                        border.width: 2
                                         color: "transparent"
                                         radius: 4
 
@@ -835,11 +833,10 @@ Rectangle {
 //                                                        zynqtgui.forced_screen_back = screenBack;
 //                                                    }
 
-                                                    zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
-                                                    zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                    zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
-
-                                                    if (root.selectedChannel.selectedFxSlotRow !== index) {
+                                                    if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
+                                                        zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
+                                                        zynqtgui.sketchpad.lastSelectedObj.value = index
+                                                        zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
                                                         root.selectedChannel.selectedFxSlotRow = index
                                                     } else {
                                                         if (!fxDelegateMouseArea.dragHappened) {

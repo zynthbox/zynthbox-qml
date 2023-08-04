@@ -37,12 +37,61 @@ Zynthian.Popup {
     property int rows: 3
     property int columns: Math.ceil(component.actions.length / 3) // Auto calculate columns if not provided
 
+    property var cuiaCallback: function(cuia) {
+        var result = component.opened;
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                component.close();
+                result = true;
+                break;
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                if (_private.currentIndex > -1) {
+                    component.actions[_private.currentIndex].trigger();
+                    component.close();
+                }
+                result = true;
+                break;
+            case "KNOB3_UP":
+                _private.currentIndex = (_private.currentIndex + 1 === component.actions.length) ? 0 : _private.currentIndex + 1;
+                result = true;
+                break;
+            case "KNOB3_DOWN":
+                _private.currentIndex = (_private.currentIndex === 0) ? component.actions.length - 1 : _private.currentIndex - 1;
+                result = true;
+                break;
+            case "KNOB0_UP":
+            case "KNOB0_DOWN":
+            case "KNOB1_UP":
+            case "KNOB1_DOWN":
+            case "KNOB2_UP":
+            case "KNOB2_DOWN":
+            default:
+                result = true;
+                break;
+        }
+        return result;
+    }
+
     parent: QQC2.Overlay.overlay
     y: parent !== null ? parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y : 0
     x: parent !== null ? parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x : 0
     width: mainLayout.implicitWidth + mainLayout.columnSpacing*2
     height: mainLayout.implicitHeight + mainLayout.rowSpacing*2
 
+    Connections {
+        target: component
+        onOpenedChanged: {
+            _private.currentIndex = -1;
+        }
+    }
+    QtObject {
+        id: _private
+        property int currentIndex: -1
+    }
     GridLayout {
         id: mainLayout
         anchors.fill: parent
@@ -67,6 +116,18 @@ Zynthian.Popup {
                 onClicked: {
                     modelData.trigger();
                     component.close();
+                }
+                Rectangle {
+                    anchors {
+                        fill: parent
+                        margins: -5
+                    }
+                    color: "transparent"
+                    border {
+                        width: 2
+                        color: Kirigami.Theme.textColor
+                    }
+                    opacity: _private.currentIndex === index ? 0.7 : 0
                 }
             }
         }

@@ -830,6 +830,7 @@ Rectangle {
                 onTriggered: {
                     zynqtgui.forced_screen_back = "sketchpad"
                     zynqtgui.current_screen_id = "effect_types"
+                    zynqtgui.layer.page_after_layer_creation = "sketchpad"
                 }
             },
             Kirigami.Action {

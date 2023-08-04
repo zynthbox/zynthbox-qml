@@ -635,14 +635,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     logging.error(e)
                     self.zynqtgui.show_screen('layer')
         self.layer_index_replace_engine = None
-        if layer.engine.type != "Audio Effect":
-            if self.__page_after_layer_creation in self.zynqtgui.non_modal_screens:
-                self.zynqtgui.show_screen(self.__page_after_layer_creation)
-            else:
-                self.zynqtgui.show_modal(self.__page_after_layer_creation)
-            self.zynqtgui.screens['fixed_layers'].select_action(midich)
-            if not self.zynqtgui.screens['bank'].get_show_top_sounds():
-                self.zynqtgui.screens['bank'].select_action(0)
+        if self.__page_after_layer_creation in self.zynqtgui.non_modal_screens:
+            self.zynqtgui.show_screen(self.__page_after_layer_creation)
+        else:
+            self.zynqtgui.show_modal(self.__page_after_layer_creation)
+        self.zynqtgui.screens['fixed_layers'].select_action(midich)
+        if not self.zynqtgui.screens['bank'].get_show_top_sounds():
+            self.zynqtgui.screens['bank'].select_action(0)
 
     def remove_layer(self, i, stop_unused_engines=True):
         if i>=0 and i<len(self.layers):

@@ -124,7 +124,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
         return len(self.fx_layers)
 
     def back_action(self):
-        return 'preset'
+        return 'sketchpad'
 
     def next_action(self):
         return self.types_screen

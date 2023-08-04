@@ -55,39 +55,37 @@ Zynthian.MultiSelectorPage {
         },
         Kirigami.Action {
             visible: false
+        },
+        Kirigami.Action {
+            text: qsTr("Edit")
+            onTriggered: {
+                zynqtgui.show_screen("control");
+            }
         }
-//        Kirigami.Action {
-//            text: qsTr("Edit")
-//            enabled: zynqtgui.layer_effects.current_effect_engine.length > 0
-//            onTriggered: {
-//                zynqtgui.control.single_effect_engine = zynqtgui.layer_effects.current_effect_engine;
-//                zynqtgui.current_screen_id = "control";
-//            }
-//        }
     ]
     onVisibleChanged: {
         if (visible) {
             zynqtgui.control.single_effect_engine = ""
         }
     }
-    Connections {
-        id: currentConnection
-        target: zynqtgui
-        onCurrent_screen_idChanged: {
-            if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
-                pageRemoveTimer.restart()
-            }
-        }
-    }
-    Timer {
-        id: pageRemoveTimer
-        interval: Kirigami.Units.longDuration
-        onTriggered: {
-            if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
-                applicationWindow().pageStack.pop();
-            }
-        }
-    }
+//    Connections {
+//        id: currentConnection
+//        target: zynqtgui
+//        onCurrent_screen_idChanged: {
+//            if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
+//                pageRemoveTimer.restart()
+//            }
+//        }
+//    }
+//    Timer {
+//        id: pageRemoveTimer
+//        interval: Kirigami.Units.longDuration
+//        onTriggered: {
+//            if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
+//                applicationWindow().pageStack.pop();
+//            }
+//        }
+//    }
 }
 
 

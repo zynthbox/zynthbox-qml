@@ -43,13 +43,6 @@ Zynthian.Popup {
     width: mainLayout.implicitWidth + mainLayout.columnSpacing*2
     height: mainLayout.implicitHeight + mainLayout.rowSpacing*2
 
-    Timer {
-        id: popupCloser
-        interval: 1; running: false; repeat: false;
-        onTriggered: {
-            component.close();
-        }
-    }
     GridLayout {
         id: mainLayout
         anchors.fill: parent
@@ -67,11 +60,12 @@ Zynthian.Popup {
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 12
                 Layout.maximumHeight: Kirigami.Units.gridUnit * 4
                 Layout.alignment: Qt.AlignCenter
-                action: modelData
+                text: modelData != null && modelData.hasOwnProperty("text") ? modelData.text : ""
                 visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
+                enabled: modelData != null && modelData.hasOwnProperty("enabled") ? modelData.enabled : true
                 invertBorderColor: true
                 onClicked: {
-                    action.trigger();
+                    modelData.trigger();
                     component.close();
                 }
             }

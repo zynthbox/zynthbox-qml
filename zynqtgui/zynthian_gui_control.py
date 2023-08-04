@@ -647,30 +647,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         return True
 
     def back_action(self):
-        if self.__single_effect_engine != None:
-            if "MIDI" in self.__single_effect_engine:
-                return "layer_midi_effect_chooser"
-            else:
-                return "layer_effect_chooser"
-        # If in controller map selection, back to instrument control
-        if self.mode=='select':
-            self.set_mode_control()
-            return ''
-
-        # If control xyselect mode active, disable xyselect mode
-        elif self.xyselect_mode:
-            logging.debug("DISABLE XYSELECT MODE")
-            self.unset_xyselect_mode()
-            return 'control'
-
-        # If in MIDI-learn mode, back to instrument control
-        elif self.zynqtgui.midi_learn_mode or self.zynqtgui.midi_learn_zctrl:
-            self.zynqtgui.exit_midi_learn_mode()
-            return ''
-
-        else:
-            self.zynqtgui.screens['layer'].restore_curlayer()
-            return None
+        return "sketchpad"
 
 
     def next(self):

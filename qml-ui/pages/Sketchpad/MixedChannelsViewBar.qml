@@ -69,9 +69,10 @@ Rectangle {
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
+    property bool ignoreNextModeButtonPress: false
     function cuiaCallback(cuia) {
         var returnValue = false;
-        console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}`)
+        console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
                 if (zynqtgui.session_dashboard.selectedChannel > 0) {
@@ -175,6 +176,77 @@ Rectangle {
                     returnValue = true;
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                     // Do nothing
+                    returnValue = true;
+                }
+                break;
+            case "MODE_SWITCH_SHORT":
+            case "MODE_SWITCH_BOLD":
+            case "MODE_SWITCH_LONG":
+                if (root.ignoreNextModeButtonPress) {
+                    root.ignoreNextModeButtonPress = false;
+                    returnValue = true;
+                }
+                break;
+            case "KNOB3_UP":
+                if (zynqtgui.modeButtonPressed) {
+                    root.ignoreNextModeButtonPress = true;
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                            // if we're on the last slot, select the first fx slot
+                            fxRepeater.itemAt(0).switchToThisSlot(true);
+                        } else {
+                            // otherwise select the next slot
+                            synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
+                        }
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                            // if we're on the last fx slot, select the first slot
+                            synthRepeater.itemAt(0).switchToThisSlot(true);
+                        } else {
+                            // otherwise select the next slot
+                            fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
+                        }
+                    } else {
+                        // select the first slot
+                        synthRepeater.itemAt(0).switchToThisSlot(true);
+                    }
+                    returnValue = true;
+                }
+                break;
+            case "KNOB3_DOWN":
+                if (zynqtgui.modeButtonPressed) {
+                    root.ignoreNextModeButtonPress = true;
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                            // if we're on the first slot, select the last fx slot
+                            fxRepeater.itemAt(4).switchToThisSlot(true);
+                        } else {
+                            // otherwise select the previous slot
+                            synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
+                        }
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                            // if we're on the first fx slot, select the last slot
+                            synthRepeater.itemAt(4).switchToThisSlot(true);
+                        } else {
+                            // otherwise select the previous fx slot
+                            fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
+                        }
+                    } else {
+                        // select the last fx
+                        fxRepeater.itemAt(4).switchToThisSlot(true);
+                    }
+                    returnValue = true;
+                }
+                break;
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    bottomStack.slotsBar.handleItemClick("fx")
                     returnValue = true;
                 }
                 break;

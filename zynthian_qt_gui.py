@@ -459,6 +459,7 @@ class zynthian_gui(QObject):
         self.global_fx_engines = []
 
         self.__switch_channels_button_pressed__ = False
+        self.__mode_button_pressed__ = False
         self.__alt_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
@@ -2100,6 +2101,8 @@ class zynthian_gui(QObject):
                 # Handle button press event
                 if i == 10:
                     self.switchChannelsButtonPressed = True
+                elif i == 11:
+                    self.modeButtonPressed = True
                 elif i == 17:
                     self.altButtonPressed = True
                 elif i == 18:
@@ -2136,6 +2139,8 @@ class zynthian_gui(QObject):
                 # Handle button release event
                 if i == 10:
                     self.switchChannelsButtonPressed = False
+                elif i == 11:
+                    self.modeButtonPressed = False
                 elif i == 17:
                     self.altButtonPressed = False
                 elif i == 18:
@@ -3682,6 +3687,21 @@ class zynthian_gui(QObject):
 
     switchChannelsButtonPressed = Property(bool, get_switch_channels_button_pressed, set_switch_channels_button_pressed, notify=switch_channels_button_pressed_changed)
     ### END Property switchChannelsButtonPressed
+
+    ### Property modeButtonPressed
+    def get_mode_button_pressed(self):
+        return self.__mode_button_pressed__
+
+    def set_mode_button_pressed(self, pressed):
+        if self.__mode_button_pressed__ != pressed:
+            logging.debug(f"Mode Button pressed : {pressed}")
+            self.__mode_button_pressed__ = pressed
+            self.mode_button_pressed_changed.emit()
+
+    mode_button_pressed_changed = Signal()
+
+    modeButtonPressed = Property(bool, get_mode_button_pressed, set_mode_button_pressed, notify=mode_button_pressed_changed)
+    ### END Property modeButtonPressed
 
     ### Property altButtonPressed
     def get_alt_button_pressed(self):

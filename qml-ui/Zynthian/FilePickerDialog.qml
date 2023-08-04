@@ -68,7 +68,10 @@ Zynthian.Dialog {
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
-                if (root.filesListView.currentIndex >= 0 &&
+                if (root.saveMode === false && root.filesListView.selectedModelData !== null && root.filesListView.selectedModelData !== null && root.filesListView.selectedModelData.filePath === root.filesListView.selectedModelData.filePath) {
+                    // We are loading, and have a file selected, and that file is what's in the sidebar now too
+                    acceptSaveButton.clicked();
+                } else if (root.filesListView.currentIndex >= 0 &&
                     root.filesListView.currentIndex < root.filesListView.count) {
                     console.log("ZL Filepicker SELECT :", root.filesListView.currentItem, root.filesListView.currentItem.selectItem)
                     root.filesListView.currentItem.selectItem();
@@ -225,6 +228,7 @@ Zynthian.Dialog {
                     onClicked: root.close();
                 }
                 QQC2.Button {
+                    id: acceptSaveButton
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     text: {

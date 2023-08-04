@@ -843,7 +843,7 @@ Rectangle {
                 text: qsTr("Edit FX")
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    zynqtgui.show_modal("control")
+                    zynqtgui.show_screen("control")
                 }
             }
         ]

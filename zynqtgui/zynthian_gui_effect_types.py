@@ -83,7 +83,7 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 
 
     def back_action(self):
-        return self.effects_screen
+        return "sketchpad"
 
     def next_action(self):
         return self.effect_chooser_screen

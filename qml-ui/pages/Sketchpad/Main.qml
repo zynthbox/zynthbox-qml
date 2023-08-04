@@ -529,7 +529,9 @@ Zynthian.ScreenPage {
             }
         } else {
             if (bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback != null) {
-                if (bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback(cuia)) {
+                var returnVal = bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback(cuia)
+                if (returnVal) {
+                    // Return true only if bottomStack handled the cuia events. Otherwise handle it here
                     return true;
                 }
             }
@@ -620,6 +622,28 @@ Zynthian.ScreenPage {
 
                 return true
 
+            case "KNOB0_UP":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                    root.updateSelectedChannelVolume(1, true)
+                }
+                return true
+            case "KNOB0_DOWN":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                    root.updateSelectedChannelVolume(-1, true)
+                }
+                return true
+            case "KNOB1_UP":
+                // Do nothing
+                return true
+            case "KNOB1_DOWN":
+                // Do nothing
+                return true
+            case "KNOB2_UP":
+                // Do nothing
+                return true
+            case "KNOB2_DOWN":
+                // Do nothing
+                return true
             case "KNOB3_UP":
                 zynqtgui.session_dashboard.selectedChannel = Zynthian.CommonUtils.clamp(zynqtgui.session_dashboard.selectedChannel + 1, 0, 9)
                 return true

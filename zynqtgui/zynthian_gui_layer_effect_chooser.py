@@ -120,7 +120,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 
     def back_action(self):
-        return self.effects_types_screen
+        return "sketchpad"
 
 
     def set_select_path(self):

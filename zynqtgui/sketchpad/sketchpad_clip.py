@@ -816,6 +816,7 @@ class sketchpad_clip(QObject):
                 self.metadata_bpm_changed.emit()
                 self.metadata_audio_type_changed.emit()
                 self.metadata_midi_recording_changed.emit()
+                self.samples_data_changed.emit()
             except Exception as e:
                 # logging.error(f"Cannot read metadata : {str(e)}")
                 pass
@@ -877,6 +878,36 @@ class sketchpad_clip(QObject):
         return data
 
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
+
+    ### BEGIN Property sketchContainsSound
+    def get_sketchContainsSound(self):
+        if self.audio_metadata is not None:
+            try:
+                jsondata = json.loads(self.audio_metadata["ZYNTHBOX_ACTIVELAYER"][0])
+                if len(jsondata["layers"]) > 0:
+                    return True;
+            except:
+                pass
+        return False;
+
+    sketchContainsSound = Property(bool, get_sketchContainsSound, notify=sound_data_changed)
+    ### END Property sketchContainsSound
+
+    ### BEGIN Property sketchContainsSamples
+    def get_sketchContainsSamples(self):
+        if self.audio_metadata is not None:
+            try:
+                sampleData = json.loads(self.audio_metadata["ZYNTHBOX_SAMPLES"][0])
+                if len(sampleData) > 0:
+                    return True
+            except:
+                pass
+        return False
+
+    samples_data_changed = Signal()
+
+    sketchContainsSamples = Property(bool, get_sketchContainsSamples, notify=samples_data_changed)
+    ### END Property sketchContainsSamples
 
     @Signal
     def sec_per_beat_changed(self):

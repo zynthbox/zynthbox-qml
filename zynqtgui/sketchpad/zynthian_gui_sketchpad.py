@@ -993,12 +993,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except:
                 layer = None
 
+            currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+
             self.clip_to_record.set_path(self.clip_to_record_path, False)
             if layer is not None:
                 self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
             self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
-            self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+            self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.channelAudioType])
             self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+            if (currentChannel.channelAudioType.startswith("sample")):
+                self.clip_to_record.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 
 
             # Set same recorded clip to other additional clips
@@ -1010,13 +1014,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     if layer is not None:
                         clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
                     clip.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
-                    clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+                    clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.channelAudioType])
                     clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+                    if (currentChannel.channelAudioType == "sample-trig" or currentChannel.channelAudioType == "sample-slice"):
+                        clip.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 
             if self.clip_to_record.isChannelSample:
                 logging.info(f"Recorded clip is a sample")
-                channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
-                channel.samples_changed.emit()
+                currentChannel.samples_changed.emit()
         # self.__song__.save()
 
     def get_next_free_layer(self):

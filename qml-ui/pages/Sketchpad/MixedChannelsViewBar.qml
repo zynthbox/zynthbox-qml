@@ -542,7 +542,7 @@ Rectangle {
                                                     bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
                                                 } else if (bounceButtonLayout.shouldUnbounce) {
                                                     // TODO Actually implement unbouncing functionality, dependent on what's contained in the sketch
-                                                    sketchUnbouncer.unbounce(waveformContainer.clip, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                                                    sketchUnbouncer.unbounce(waveformContainer.clip, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                                                 }
                                             }
                                             SketchUnbouncer {

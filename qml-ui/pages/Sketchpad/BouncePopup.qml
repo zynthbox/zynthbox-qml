@@ -282,7 +282,8 @@ Zynthian.Popup {
         }
         RowLayout {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.fillHeight: false
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true

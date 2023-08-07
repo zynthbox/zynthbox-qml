@@ -41,7 +41,7 @@ Zynthian.Dialog {
         QQC2.TextField {
             id: fileName
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.6)
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             onAccepted: {
                 if (fileName.text.length > 0) {
                     if (overwriteOnConflict && conflict)
@@ -72,6 +72,7 @@ Zynthian.Dialog {
                 id: cancelSaveButton
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 text: qsTr("Cancel")
                 onClicked: {
                     saveDialog.reject();
@@ -80,6 +81,7 @@ Zynthian.Dialog {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 text: conflict && overwriteOnConflict ? qsTr("Overwrite") : qsTr("Save")
                 enabled: {
                     if (fileName.text.length > 0) {

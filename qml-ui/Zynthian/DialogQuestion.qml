@@ -73,7 +73,7 @@ Zynthian.Dialog {
     footer: RowLayout {
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
             text: qsTr("No")
             onClicked: {
@@ -82,7 +82,7 @@ Zynthian.Dialog {
         }
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
             text: qsTr("Yes")
             onClicked: {

@@ -501,6 +501,7 @@ Zynthian.Popup {
                 Layout.fillHeight: true
             }
             QQC2.Button {
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 text: _private.isRecording ? qsTr("Stop Recording") : qsTr("Record Song")
                 onClicked: {
                     if (_private.isRecording) {
@@ -511,6 +512,7 @@ Zynthian.Popup {
                 }
             }
             QQC2.Button {
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 text: qsTr("Close")
                 enabled: !_private.isRecording
                 onClicked: {

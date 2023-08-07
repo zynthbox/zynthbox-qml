@@ -224,6 +224,7 @@ Zynthian.Dialog {
                     id: cancelSaveButton
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: qsTr("Cancel")
                     onClicked: root.close();
                 }
@@ -231,6 +232,7 @@ Zynthian.Dialog {
                     id: acceptSaveButton
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: {
                         if (root.saveMode) {
                             return conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save");

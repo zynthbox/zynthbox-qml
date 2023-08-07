@@ -115,7 +115,8 @@ Zynthian.Popup {
         }
         QQC2.Button {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.fillHeight: false
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             text: "Close"
             onClicked: {
                 root.close();

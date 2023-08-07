@@ -84,7 +84,7 @@ Item {
             QQC2.TextField {
                 id: objNameEdit
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.6)
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             }
         }
         footer: QQC2.Control {
@@ -97,6 +97,7 @@ Item {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: qsTr("Cancel")
                     onClicked: {
                         editDialog.reject();
@@ -105,6 +106,7 @@ Item {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: qsTr("Ok")
                     onClicked: {
                         editDialog.accept();

@@ -372,7 +372,7 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType === "synth"
                                 text: qsTr("Synth")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot()
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "synth"
                                 }
                             }
@@ -384,7 +384,7 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType === "sample-trig"
                                 text: qsTr("Sample")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot()
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "sample-trig"
                                 }
                             }
@@ -396,7 +396,7 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType.startsWith("sample-loop")
                                 text: qsTr("Sketch")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot()
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "sample-loop"
                                 }
                             }
@@ -408,7 +408,7 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType === "external"
                                 text: qsTr("External")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot()
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "external"
                                 }
                             }

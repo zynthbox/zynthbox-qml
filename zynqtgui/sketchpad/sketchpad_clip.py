@@ -879,6 +879,19 @@ class sketchpad_clip(QObject):
 
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
+    ### BEGIN Property metadataActiveLayer
+    def get_metadataActiveLayer(self):
+        data = ""
+        if self.audio_metadata is not None:
+            try:
+                data = self.audio_metadata["ZYNTHBOX_ACTIVELAYER"][0]
+            except:
+                pass
+        return data
+
+    metadataActiveLayer = Property(str, get_metadataActiveLayer, notify=sound_data_changed)
+    ### END Property metadataActiveLayer
+
     ### BEGIN Property sketchContainsSound
     def get_sketchContainsSound(self):
         if self.audio_metadata is not None:

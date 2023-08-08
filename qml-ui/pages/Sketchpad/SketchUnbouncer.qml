@@ -42,6 +42,8 @@ Zynthian.DialogQuestion {
         _private.clip = clip;
 
         // TODO store pattern settings in sketches, and when restoring, apply those as well (note length, available bars)
+        // - "The current pattern settings don't match what was used to create the sketch - adjust to match the sketch?"
+        // TODO store an offset when using a count-in start, offer to apply that (by default probably?)
         // TODO Maybe handle manually played extra bits of pattern, by allowing multiplying the duration if there's enough left? (max 8 bars)
 
         // If there's notes in the pattern, ask first
@@ -89,19 +91,27 @@ Zynthian.DialogQuestion {
                 function performUnbounce() {
                     if (clip.metadataAudioType === "sample-trig") {
                         console.log("Sketch was recorded via sample-trig, so switch to that");
-                        // component.selectedChannel.channelAudioType = "sample-trig";
+                        _private.channel.channelAudioType = "sample-trig";
                     } else if (clip.metadataAudioType === "synth") {
                         console.log("Sketch was recorded via synth sounds, so switch to that");
-                        // component.selectedChannel.channelAudioType = "synth";
+                        _private.channel.channelAudioType = "synth";
                     } else {
                         console.log("Weird audio type:", clip.metadataAudioType);
                     }
+                    if (replacePattern.checked) {
+                        console.log("Replace the slot's pattern content");
+                        // Load the recording into the global recorder track
+                        Zynthbox.MidiRecorder.loadTrackFromBase64Midi(_private.clip.metadataMidiRecording, -1);
+                        // Apply that newly loaded recording to the pattern
+                        Zynthbox.MidiRecorder.applyToPattern(_private.pattern);
+                    }
                     if (replaceSamples.checked) {
                         console.log("Replace the channel's sample selection");
-                        // channel.setChannelSamplesFromSnapshot(clip.metadataSamples);
+                        _private.channel.setChannelSamplesFromSnapshot(clip.metadataSamples);
                     }
                     if (replaceSounds.checked) {
                         console.log("Replace the channel's current sound setup with what's stored in the sketch");
+                        _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadataActiveLayer)
                     }
                     _private.clip = null;
                 }

@@ -229,25 +229,25 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_single_effect_engine(self):
         return self.__single_effect_engine
 
-    def get_active_custom_controller(self):
-        return self._active_custom_controller
+#    def get_active_custom_controller(self):
+#        return self._active_custom_controller
 
-    def set_active_custom_controller(self, controller):
-        # If there is no custom control page, do not update values of selected controller with Big knob
-        if self.custom_control_page == "":
-            return
+#    def set_active_custom_controller(self, controller):
+#        # If there is no custom control page, do not update values of selected controller with Big knob
+#        if self.custom_control_page == "":
+#            return
 
-        if self._active_custom_controller == controller:
-            return
-        if self._active_custom_controller:
-            self._active_custom_controller.index = self._active_custom_controller.old_index
-            self._active_custom_controller.setup_zyncoder()
-        self._active_custom_controller = controller
-        if controller:
-            self._active_custom_controller.old_index = self._active_custom_controller.index
-            self._active_custom_controller.index = zynthian_gui_config.select_ctrl
-            self._active_custom_controller.setup_zyncoder()
-        self.active_custom_controller_changed.emit()
+#        if self._active_custom_controller == controller:
+#            return
+#        if self._active_custom_controller:
+#            self._active_custom_controller.index = self._active_custom_controller.old_index
+#            self._active_custom_controller.setup_zyncoder()
+#        self._active_custom_controller = controller
+#        if controller:
+#            self._active_custom_controller.old_index = self._active_custom_controller.index
+#            self._active_custom_controller.index = zynthian_gui_config.select_ctrl
+#            self._active_custom_controller.setup_zyncoder()
+#        self.active_custom_controller_changed.emit()
 
     def show(self):
         super().show()
@@ -548,20 +548,23 @@ class zynthian_gui_control(zynthian_gui_selector):
 
     def set_zcontroller(self, i, ctrl):
         if i < len(self.zgui_controllers):
-            self.zgui_controllers[i].set_visible(self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self)
+            # Always set visible to false otherwise it interferes with global knobs
+            self.zgui_controllers[i].set_visible(False)
             self.zgui_controllers[i].config(ctrl)
         else:
-            self.zgui_controllers.append(zynthian_gui_controller(i, ctrl, self))
+            # Always set visible to false otherwise it interferes with global knobs
+            # Always set index to -1 otherwise it takes control of global knobs
+            self.zgui_controllers.append(zynthian_gui_controller(-1, ctrl, self))
             self.controllers_count_changed.emit()
         self.zgui_controllers_map[ctrl]=self.zgui_controllers[i]
 
 
     def set_custom_zcontroller(self, i, ctrl):
         if i < len(self.zgui_custom_controllers):
-            self.zgui_custom_controllers[i].set_visible(self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self)
+            self.zgui_custom_controllers[i].set_visible(False)
             self.zgui_custom_controllers[i].config(ctrl)
         else:
-            self.zgui_custom_controllers.append(zynthian_gui_controller(i + self.custom_controller_id_start, ctrl, self))
+            self.zgui_custom_controllers.append(zynthian_gui_controller(-1, ctrl, self))
         self.zgui_custom_controllers_map[ctrl]=self.zgui_custom_controllers[i]
 
 
@@ -710,46 +713,46 @@ class zynthian_gui_control(zynthian_gui_selector):
     def selectPrevPage(self):
         self.selectedPage = max(0, self.selectedPage - 1)
 
-    @Slot()
-    def zyncoder_set_knob1_value(self):
-        try:
-            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-            controller = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
-            if controller.index in [0, 1, 2, 3]:
-                controller.read_zyncoder()
-        except:
-            pass
+#    @Slot()
+#    def zyncoder_set_knob1_value(self):
+#        try:
+#            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
+#            controller = self.controller_by_category(self.all_controls[start_index]["control_screen"], self.all_controls[start_index]["index"])
+#            if controller.index in [0, 1, 2, 3]:
+#                controller.read_zyncoder()
+#        except:
+#            pass
 
-    @Slot()
-    def zyncoder_set_knob2_value(self):
-        try:
-            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-            controller = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
-            if controller.index in [0, 1, 2, 3]:
-                controller.read_zyncoder()
-        except:
-            pass
+#    @Slot()
+#    def zyncoder_set_knob2_value(self):
+#        try:
+#            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
+#            controller = self.controller_by_category(self.all_controls[start_index + 1]["control_screen"], self.all_controls[start_index + 1]["index"])
+#            if controller.index in [0, 1, 2, 3]:
+#                controller.read_zyncoder()
+#        except:
+#            pass
 
-    @Slot()
-    def zyncoder_set_knob3_value(self):
-        try:
-            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
-            controller = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
-            if controller.index in [0, 1, 2, 3]:
-                controller.read_zyncoder()
-        except:
-            pass
+#    @Slot()
+#    def zyncoder_set_knob3_value(self):
+#        try:
+#            start_index = self.selectedPage * 12 + (self.selectedColumn % 4) * 3
+#            controller = self.controller_by_category(self.all_controls[start_index + 2]["control_screen"], self.all_controls[start_index + 2]["index"])
+#            if controller.index in [0, 1, 2, 3]:
+#                controller.read_zyncoder()
+#        except:
+#            pass
 
-    @Slot()
-    def zyncoder_set_big_knob_value(self):
-        try:
-            if self.zynqtgui.get_current_screen() == self and self.custom_control_page == "":
-                self.selected_column_gui_controller.read_zyncoder()
+#    @Slot()
+#    def zyncoder_set_big_knob_value(self):
+#        try:
+#            if self.zynqtgui.get_current_screen() == self and self.custom_control_page == "":
+#                self.selected_column_gui_controller.read_zyncoder()
 
-                if (self.selected_column_gui_controller.value // self.bigknob_multiplier) != self.selectedColumn:
-                    self.selectedColumn = self.selected_column_gui_controller.value // self.bigknob_multiplier
-        except:
-            pass
+#                if (self.selected_column_gui_controller.value // self.bigknob_multiplier) != self.selectedColumn:
+#                    self.selectedColumn = self.selected_column_gui_controller.value // self.bigknob_multiplier
+#        except:
+#            pass
 
 #    def zyncoder_read(self, zcnums=None):
 #        if not self.zynqtgui.isBootingComplete:
@@ -792,22 +795,22 @@ class zynthian_gui_control(zynthian_gui_selector):
 #            super().zyncoder_read()
 
 
-    def zyncoder_read_xyselect(self, zctrl, i):
-        #Detect a serie of changes in the same controller
-        if zctrl==self.xyselect_zread_last_zctrl:
-            self.xyselect_zread_counter+=1
-        else:
-            self.xyselect_zread_last_zctrl=zctrl
-            self.xyselect_zread_counter=0
+#    def zyncoder_read_xyselect(self, zctrl, i):
+#        #Detect a serie of changes in the same controller
+#        if zctrl==self.xyselect_zread_last_zctrl:
+#            self.xyselect_zread_counter+=1
+#        else:
+#            self.xyselect_zread_last_zctrl=zctrl
+#            self.xyselect_zread_counter=0
 
-        #If the change counter is major of ...
-        if self.xyselect_zread_counter>5:
-            if self.xyselect_zread_axis=='X' and self.set_xyselect_x(i):
-                self.xyselect_zread_axis='Y'
-                self.xyselect_zread_counter=0
-            elif self.xyselect_zread_axis=='Y' and self.set_xyselect_y(i):
-                self.xyselect_zread_axis='X'
-                self.xyselect_zread_counter=0
+#        #If the change counter is major of ...
+#        if self.xyselect_zread_counter>5:
+#            if self.xyselect_zread_axis=='X' and self.set_xyselect_x(i):
+#                self.xyselect_zread_axis='Y'
+#                self.xyselect_zread_counter=0
+#            elif self.xyselect_zread_axis=='Y' and self.set_xyselect_y(i):
+#                self.xyselect_zread_axis='X'
+#                self.xyselect_zread_counter=0
 
 
     def get_zgui_controller(self, zctrl):
@@ -978,7 +981,7 @@ class zynthian_gui_control(zynthian_gui_selector):
     default_custom_control_page_changed = Signal()
     single_effect_engine_changed = Signal()
     custom_controller_mode_changed = Signal()
-    active_custom_controller_changed = Signal()
+#    active_custom_controller_changed = Signal()
     all_controls_changed = Signal()
     selectedColumnChanged = Signal()
 
@@ -987,7 +990,7 @@ class zynthian_gui_control(zynthian_gui_selector):
     default_custom_control_page = Property(str, get_default_custom_control_page, notify = default_custom_control_page_changed)
     control_pages_model = Property(QObject, get_control_pages_model, constant = True)
     single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
-    active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
+#    active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
     all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
 
     selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedColumnChanged)

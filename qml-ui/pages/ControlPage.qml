@@ -80,36 +80,36 @@ Zynthian.ScreenPage {
         }
     ]
 
-    Connections {
-        target: applicationWindow()
-        onActiveFocusItemChanged: {
-            var candidate = applicationWindow().activeFocusItem
-            while(candidate) {
-                if (candidate.hasOwnProperty("controller")) {
-                    break;
-                }
-                candidate = candidate.parent
-            }
-            if (candidate) {
-                zynqtgui.control.active_custom_controller = candidate.controller.ctrl
-            } else {
-                zynqtgui.control.active_custom_controller = null
-            }
-        }
-    }
-    Connections {
-        target: applicationWindow()
-        enabled: root.isVisible
-        onSelectedChannelChanged: {
-            if (applicationWindow().selectedChannel) {
-                if (applicationWindow().selectedChannel.channelAudioType === "external") {
-                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
-                } else if (applicationWindow().selectedChannel.channelAudioType.startsWith("sample-")) {
-                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
-                }
-            }
-        }
-    }
+//    Connections {
+//        target: applicationWindow()
+//        onActiveFocusItemChanged: {
+//            var candidate = applicationWindow().activeFocusItem
+//            while(candidate) {
+//                if (candidate.hasOwnProperty("controller")) {
+//                    break;
+//                }
+//                candidate = candidate.parent
+//            }
+//            if (candidate) {
+//                zynqtgui.control.active_custom_controller = candidate.controller.ctrl
+//            } else {
+//                zynqtgui.control.active_custom_controller = null
+//            }
+//        }
+//    }
+//    Connections {
+//        target: applicationWindow()
+//        enabled: root.isVisible
+//        onSelectedChannelChanged: {
+//            if (applicationWindow().selectedChannel) {
+//                if (applicationWindow().selectedChannel.channelAudioType === "external") {
+//                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+//                } else if (applicationWindow().selectedChannel.channelAudioType.startsWith("sample-")) {
+//                    zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
+//                }
+//            }
+//        }
+//    }
     QQC2.Menu {
         id: customControlsMenu
         y: -height

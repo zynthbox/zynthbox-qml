@@ -98,18 +98,18 @@ Zynthian.DialogQuestion {
                     } else {
                         console.log("Weird audio type:", clip.metadataAudioType);
                     }
-                    if (replacePattern.checked) {
+                    if (replacePattern.sketchHasData && replacePattern.checked) {
                         console.log("Replace the slot's pattern content");
                         // Load the recording into the global recorder track
                         Zynthbox.MidiRecorder.loadTrackFromBase64Midi(_private.clip.metadataMidiRecording, -1);
                         // Apply that newly loaded recording to the pattern
                         Zynthbox.MidiRecorder.applyToPattern(_private.pattern);
                     }
-                    if (replaceSamples.checked) {
+                    if (replaceSamples.sketchHasData && replaceSamples.checked) {
                         console.log("Replace the channel's sample selection");
                         _private.channel.setChannelSamplesFromSnapshot(clip.metadataSamples);
                     }
-                    if (replaceSounds.checked) {
+                    if (replaceSounds.sketchHasData && replaceSounds.checked) {
                         console.log("Replace the channel's current sound setup with what's stored in the sketch");
                         _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadataActiveLayer)
                     }

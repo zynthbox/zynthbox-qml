@@ -75,24 +75,37 @@ class zynthian_basic_engine:
     # ---------------------------------------------------------------------------
 
     def start(self):
+        def task():
+            logging.debug("Command: {}".format(self.command))
+            self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
+            #os.sched_setaffinity(self.proc.pid, [0,1,2])
+
+            self.proc.delaybeforesend = 0
+
+            output = self.proc_get_output()
+
+            if self.proc_start_sleep:
+                sleep(self.proc_start_sleep)
+
+            return output
+
+        restart_count = 0
+
         if not self.proc:
+            output = None
             logging.info("Starting Engine {}".format(self.name))
-            try:
-                logging.debug("Command: {}".format(self.command))
-                self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
-                #os.sched_setaffinity(self.proc.pid, [0,1,2])
+            while output is None:
+                try:
+                    output = task()
+                except Exception as err:
+                    restart_count += 1
+                    logging.error("Can't start engine {} => {}".format(self.name, err))
+                    logging.debug(f"Engine {self.name} Restart Count : {restart_count}")
 
-                self.proc.delaybeforesend = 0
-
-                output = self.proc_get_output()
-
-                if self.proc_start_sleep:
-                    sleep(self.proc_start_sleep)
-
-                return output
-
-            except Exception as err:
-                logging.error("Can't start engine {} => {}".format(self.name, err))
+                if restart_count >= 5:
+                    # Tried restarting engine 5 times but failed. Force restart the entire application
+                    self.zynqtgui.exit(102)
+            return output
 
 
     def stop(self):

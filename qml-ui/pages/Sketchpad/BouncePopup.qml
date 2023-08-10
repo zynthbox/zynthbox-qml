@@ -186,6 +186,7 @@ Zynthian.Popup {
                             // Whatever the start time is, end time should be moved by the pattern loopLength
                             loopLength = loopLength + _private.patternDurationInBeats;
                         }
+                        // TODO Loop point 2 would allow us to have a start-at-0, loop-from-first-round, loop-until-fadeout, stop-at-end option (for a very clean recording which does play-into-loop-with-fadeout for playback)
                         while (clip.duration == 0) {
                             // wait a moment before we go on...
                             console.log("No clip duration yet...");

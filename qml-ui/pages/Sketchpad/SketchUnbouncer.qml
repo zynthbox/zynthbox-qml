@@ -44,6 +44,10 @@ Zynthian.DialogQuestion {
         // TODO store pattern settings in sketches, and when restoring, apply those as well (note length, available bars)
         // - "The current pattern settings don't match what was used to create the sketch - adjust to match the sketch?"
         // TODO store an offset when using a count-in start, offer to apply that (by default probably?)
+        // - If start is > 0, offer to use apply that as an offset (by default probably)
+        // - If a loop point is set, offer to use that as an offset (by default probably)
+        // - If there's a loop-end point set, offer to use that as the end point
+        // - If duration stops short of the clip length, also stop handling events then (by default)
         // TODO Maybe handle manually played extra bits of pattern, by allowing multiplying the duration if there's enough left? (max 8 bars)
 
         // If there's notes in the pattern, ask first

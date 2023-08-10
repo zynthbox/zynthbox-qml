@@ -401,7 +401,9 @@ class zynthian_gui_preset(zynthian_gui_selector):
         return self.__top_sounds_engine
 
     def get_engine_name(self):
-        return self.zynqtgui.curlayer.engine.plugin_name
+        if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.engine is not None:
+            return self.zynqtgui.curlayer.engine.plugin_name
+        return ""
 
     def index_supports_immediate_activation(self, index=None):
         return self.__top_sounds_engine == None or (self.zynqtgui.curlayer != None and self.zynqtgui.curlayer.engine.nickname == self.__top_sounds_engine)

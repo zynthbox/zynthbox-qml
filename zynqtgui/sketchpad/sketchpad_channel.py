@@ -1523,15 +1523,15 @@ class sketchpad_channel(QObject):
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):
         encodedSampleData = {};
-        for index in range(5):
+        for index in range(0, 5):
             sample = self.__samples__[index]
             thisSample = {
                 "filename": "",
                 "sampledata": ""
                 }
-            if len(sample.path()) > 0:
+            if sample is not None and sample.path is not None and len(sample.path) > 0:
                 thisSample["filename"] = sample.filename()
-                with open(sample.path(), "rb") as file:
+                with open(sample.path, "rb") as file:
                     thisSample["sampledata"] = base64.b64encode(file.read())
             encodedSampleData[index] = thisSample
         return json.dumps(encodedSampleData)

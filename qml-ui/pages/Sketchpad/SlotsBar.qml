@@ -262,8 +262,7 @@ Rectangle {
             if (zynqtgui.backButtonPressed) {
                 clip.clear()
             } else {
-                loopPickerDialog.folderModel.folder = clip.recordingDir
-                loopPickerDialog.open()
+                sketchPickerPopup.open()
             }
         } else if (type === "external") {
             console.log("handleItemClick : External")
@@ -737,6 +736,58 @@ Rectangle {
         onFileSelected: {
             root.selectedSlotRowItem.channel.setBank(file.filePath)
         }
+    }
+
+    Zynthian.ActionPickerPopup {
+        id: sketchPickerPopup
+        columns: 2
+        property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+        actions: [
+            QQC2.Action {
+                text: qsTr("Save As...")
+                enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
+                onTriggered: {
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Remove")
+                enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
+                onTriggered: {
+                    sketchPickerPopup.sketch && sketchPickerPopup.sketch.clear()
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Pick recording")
+                onTriggered: {
+                    loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir
+                    loopPickerDialog.open()
+                    sketchPickerPopup.close()
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Pick sample")
+                onTriggered: {
+                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
+                    samplePickerDialog.open()
+                    sketchPickerPopup.close()
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Pick sample-bank")
+                onTriggered: {
+                    bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
+                    bankPickerDialog.open()
+                    sketchPickerPopup.close()
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Download Samples")
+                onTriggered: {
+                    zynqtgui.current_modal_screen_id = "sample_downloader"
+                    sketchPickerPopup.close()
+                }
+            }
+        ]
     }
 
     Zynthian.FilePickerDialog {

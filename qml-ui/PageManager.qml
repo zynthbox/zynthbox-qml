@@ -22,6 +22,7 @@ Zynthian.Stack {
         "layer_effects": "FXSetupPage.qml",
         "effect_types": "FXSetupPage.qml",
         "layer_effect_chooser": "FXSetupPage.qml",
+        "effect_preset": "FXSetupPage.qml",
         "layer_midi_effects": "MidiFXSetupPage.qml",
         "midi_effect_types": "MidiFXSetupPage.qml",
         "session_dashboard": "SessionDashboard/Main.qml",
@@ -125,7 +126,7 @@ Zynthian.Stack {
         if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(page) >= 0) {
             console.log("Page", page, "is a library page. Using layers_for_channel cache")
             page = "layers_for_channel"
-        } else if (["layer_effects", "effect_types", "layer_effect_chooser"].indexOf(page) >= 0) {
+        } else if (["layer_effects", "effect_types", "layer_effect_chooser", "effect_preset"].indexOf(page) >= 0) {
             console.log("Page", page, "is an FX page. Using layers_effects cache")
             page = "layer_effects"
         } else if (["layer_midi_effects", "midi_effect_types", "layer_midi_effect_chooser"].indexOf(page) >= 0) {

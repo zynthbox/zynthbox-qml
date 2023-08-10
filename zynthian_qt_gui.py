@@ -1099,6 +1099,7 @@ class zynthian_gui(QObject):
         self.screens['audio_in'] = zynthian_gui_audio_in(self)
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
+        self.screens["effect_preset"] = self.screens["preset"]
         self.screens["control"] = zynthian_gui_control(self)
         self.screens["control_downloader"] = zynthian_gui_newstuff(self)
         self.screens["fx_control_downloader"] = self.screens["control_downloader"]
@@ -3503,6 +3504,9 @@ class zynthian_gui(QObject):
     def get_preset(self):
         return self.screens["preset"]
 
+    def get_effect_preset(self):
+        return self.screens["effect_preset"]
+
     def get_control(self):
         return self.screens["control"]
 
@@ -4231,6 +4235,7 @@ class zynthian_gui(QObject):
     midi_key_range = Property(QObject, get_midi_key_range, constant=True)
     bank = Property(QObject, get_bank, constant=True)
     preset = Property(QObject, get_preset, constant=True)
+    effect_preset = Property(QObject, get_effect_preset, constant=True)
     control = Property(QObject, get_control, constant=True)
     channel = Property(QObject, get_channel, constant=True)
     channel_external_setup = Property(QObject, get_channel_external_setup, constant=True)

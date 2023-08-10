@@ -111,6 +111,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
         super().fill_list()
         self.set_select_path()
+        self.engine_name_changed.emit()
 
 
     def show(self, show_fav_presets=None):
@@ -399,6 +400,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
     def get_top_sounds_engine(self):
         return self.__top_sounds_engine
 
+    def get_engine_name(self):
+        return self.zynqtgui.curlayer.engine.plugin_name
 
     def index_supports_immediate_activation(self, index=None):
         return self.__top_sounds_engine == None or (self.zynqtgui.curlayer != None and self.zynqtgui.curlayer.engine.nickname == self.__top_sounds_engine)
@@ -482,10 +485,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
     show_only_favorites_changed = Signal()
     current_is_favorite_changed = Signal()
     top_sounds_engine_changed = Signal()
+    engine_name_changed = Signal()
 
     show_only_favorites = Property(bool, get_show_only_favorites, set_show_only_favorites, notify = show_only_favorites_changed)
     current_is_favorite = Property(bool, get_current_is_favorite, set_current_is_favorite, notify = current_is_favorite_changed)
     top_sounds_engine = Property(str, get_top_sounds_engine, set_top_sounds_engine, notify = top_sounds_engine_changed)
+    engine_name = Property(str, get_engine_name, notify = engine_name_changed)
 
 
 #------------------------------------------------------------------------------

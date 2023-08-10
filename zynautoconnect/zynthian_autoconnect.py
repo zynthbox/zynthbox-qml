@@ -854,9 +854,10 @@ def audio_autoconnect(force=False):
 
         fx_client_names = []
         # Create a set of client names for each FX in channel
-        # The FX Passthrough should be placed first and then the fx client na,e
-        for index, fxlayer in enumerate(filter(lambda x: x is not None, channel.chainedFx)):
-            fx_client_names = fx_client_names + [f"FXPassthrough:Channel{channel.id + 1}-lane{index + 1}", fxlayer.get_jackname()]
+        # The FX Passthrough should be placed first and then the fx client name
+        for index, fxlayer in enumerate(channel.chainedFx):
+            if fxlayer is not None:
+                fx_client_names = fx_client_names + [f"FXPassthrough:Channel{channel.id + 1}-lane{index + 1}", fxlayer.get_jackname()]
 
         # Create final output_client_names with the client names as it should be connected in order.
         # The last client is global playback hence does not need to be processed

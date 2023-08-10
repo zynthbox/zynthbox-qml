@@ -834,10 +834,12 @@ Rectangle {
                 }
             },
             Kirigami.Action {
-                text: qsTr("Remove FX")
+                text: qsTr("Change FX Preset")
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
+                    zynqtgui.forced_screen_back = "sketchpad"
+                    zynqtgui.current_screen_id = "effect_preset"
+                    zynqtgui.layer.page_after_layer_creation = "sketchpad"
                 }
             },
             Kirigami.Action {
@@ -845,6 +847,13 @@ Rectangle {
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
                     zynqtgui.show_screen("control")
+                }
+            },
+            Kirigami.Action {
+                text: qsTr("Remove FX")
+                visible: fxSetupDialog.selectedFx != null
+                onTriggered: {
+                    root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
                 }
             }
         ]

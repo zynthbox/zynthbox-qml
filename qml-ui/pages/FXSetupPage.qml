@@ -33,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
     property var screenIds: ["effect_types", "layer_effect_chooser", "effect_preset"]
-    property var screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), qsTr("FX Preset (%1)").arg(zynqtgui.preset.effective_count)]
+    property var screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), qsTr("%1 Preset (%2)").arg(zynqtgui.preset.engine_name).arg(zynqtgui.preset.effective_count)]
 
     contextualActions: [
         Kirigami.Action {

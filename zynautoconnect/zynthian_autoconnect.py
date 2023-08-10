@@ -597,6 +597,15 @@ def audio_autoconnect(force=False):
                     portIndex += 1;
                     portsToConnect[portIndex] = (sample.audioSource is not None)
                     portIndex += 1;
+                portIndex = 0
+                for clips_model in channel.parts:
+                    clip = clips_model.getClip(0)
+                    if portsToConnect[portIndex] == False and clip and clip.audioSource is not None:
+                        portsToConnect[portIndex] = True
+                    portIndex += 1;
+                    if portsToConnect[portIndex] == False and clip and clip.audioSource is not None:
+                        portsToConnect[portIndex] = True
+                    portIndex += 1;
                 channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}-lane", is_audio=True, is_output=True)
                 # Firstly, attempt to connect the channel to any effects attached to the channel
                 channelHasEffects = False

@@ -30,25 +30,11 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-Zynthian.MultiSelectorPage {
+Zynthian.ScreenPage {
     id: root
+    property var screenIds: ["effect_types", "layer_effect_chooser", "effect_preset"]
+    property var screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), qsTr("FX Preset (%1)").arg(zynqtgui.preset.effective_count)]
 
-
-    screenIds: ["effect_types", "layer_effect_chooser", ""]
-    screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), ""]
-
-    previousScreen: "preset"
-
-    backAction: Kirigami.Action {
-        text: qsTr("Back")
-        onTriggered: {
-            if (zynqtgui.forced_screen_back !== "") {
-                zynqtgui.current_screen_id = zynqtgui.forced_screen_back;
-            } else {
-                zynqtgui.current_screen_id = "preset"
-            }
-        }
-    }
     contextualActions: [
         Kirigami.Action {
             visible: false
@@ -68,24 +54,130 @@ Zynthian.MultiSelectorPage {
             zynqtgui.control.single_effect_engine = ""
         }
     }
-//    Connections {
-//        id: currentConnection
-//        target: zynqtgui
-//        onCurrent_screen_idChanged: {
-//            if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
-//                pageRemoveTimer.restart()
-//            }
-//        }
-//    }
-//    Timer {
-//        id: pageRemoveTimer
-//        interval: Kirigami.Units.longDuration
-//        onTriggered: {
-//            if (zynqtgui.current_screen_id !== "layer_effects" && zynqtgui.current_screen_id !== "effect_types" && zynqtgui.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
-//                applicationWindow().pageStack.pop();
-//            }
-//        }
-//    }
+    cuiaCallback: function(cuia) {
+        // Call cuiaCallback of current selectorView
+        var selectorCuiaReturnVal = false
+        switch(zynqtgui.current_screen_id) {
+            case "effect_types":
+                selectorCuiaReturnVal = effectTypesView.cuiaCallback(cuia)
+                break
+            case "layer_effect_chooser":
+                selectorCuiaReturnVal = effectChooserView.cuiaCallback(cuia)
+                break
+            case "effect_preset":
+                selectorCuiaReturnVal = effectPresetView.cuiaCallback(cuia)
+                break
+        }
+        if (selectorCuiaReturnVal == true) {
+            // If selected view returns true, return from here as well since CUIA event is already handled
+            return true
+        } else {
+            let currentScreenIndex = root.screenIds.indexOf(zynqtgui.current_screen_id);
+            var newIndex
+
+            switch (cuia) {
+                case "NAVIGATE_LEFT":
+                    newIndex = Math.max(0, currentScreenIndex - 1);
+                    zynqtgui.current_screen_id = root.screenIds[newIndex];
+                    return true;
+                case "NAVIGATE_RIGHT":
+                    newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
+                    zynqtgui.current_screen_id = root.screenIds[newIndex];
+                    return true;
+                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_BOLD":
+                case "SWITCH_BACK_LONG":
+                    zynqtgui.go_back();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+    contentItem: RowLayout {
+        id: layout
+        // FIXME : Find a way to correctly expand the columns equally with filLWidth property instead of using manually calculated width value
+        property real columnWidth: width / children.length - spacing/2
+        spacing: Kirigami.Units.gridUnit
+
+        ColumnLayout {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.preferredWidth: layout.columnWidth
+
+            Kirigami.Heading {
+                level: 2
+                text: root.screenTitles[0]
+                Kirigami.Theme.inherit: false
+                // TODO: this should eventually go to Window and the panels to View
+                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            }
+            Zynthian.SelectorView {
+                id: effectTypesView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                screenId: root.screenIds[0]
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                autoActivateIndexOnChange: true
+                Component.onCompleted: {
+                    effectTypesView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                }
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.preferredWidth: layout.columnWidth
+
+            Kirigami.Heading {
+                level: 2
+                text: root.screenTitles[1]
+                Kirigami.Theme.inherit: false
+                // TODO: this should eventually go to Window and the panels to View
+                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            }
+            Zynthian.SelectorView {
+                id: effectChooserView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                screenId: root.screenIds[1]
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                Component.onCompleted: {
+                    effectChooserView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                }
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.preferredWidth: layout.columnWidth
+
+            Kirigami.Heading {
+                level: 2
+                text: root.screenTitles[2]
+                Kirigami.Theme.inherit: false
+                // TODO: this should eventually go to Window and the panels to View
+                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            }
+            Zynthian.SelectorView {
+                id: effectPresetView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                screenId: root.screenIds[2]
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                autoActivateIndexOnChange: true
+                Component.onCompleted: {
+                    effectPresetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                }
+            }
+        }
+    }
 }
-
-

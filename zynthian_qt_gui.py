@@ -436,6 +436,7 @@ class zynthian_gui(QObject):
         self.metronomeVolumeBeforePressingMetronome = 0
         self.delayBeforePressingMetronome = 0
         self.reverbBeforePressingMetronome = 0
+        self.__ignoreNextModeButtonPress = False
         self.__current_task_message = ""
         self.__recent_task_messages = queue.Queue()
         self.__show_current_task_message = True
@@ -2190,18 +2191,28 @@ class zynthian_gui(QObject):
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 
+
             if not self.is_external_app_active():
-                if dtus < 0:
+                # Do not handle idle state
+                if dtus <= 0:
                     pass
-                elif dtus>zynthian_gui_config.zynswitch_long_us:
-                    self.zynswitch_long_triggered.emit(i)
-                elif dtus>zynthian_gui_config.zynswitch_bold_us:
-                    # Double switches must be bold!!! => by now ...
-                    if not self.zynswitch_double(i):
-                        self.zynswitch_bold_triggered.emit(i)
-                elif dtus>0:
-                    #print("Switch "+str(i)+" dtus="+str(dtus))
-                    self.zynswitch_short_triggered.emit(i)
+                else:
+                    # Do not emit switch signals if the key is set to be ignored
+                    ignore_switch = False
+                    logging.debug(f"????? switch: {i}, ignoreMode: {self.ignoreNextModeButtonPress}")
+                    if i == 11 and self.ignoreNextModeButtonPress:
+                        ignore_switch = True
+                        self.ignoreNextModeButtonPress = False
+
+                    if not ignore_switch and dtus>zynthian_gui_config.zynswitch_long_us:
+                        self.zynswitch_long_triggered.emit(i)
+                    elif not ignore_switch and dtus>zynthian_gui_config.zynswitch_bold_us:
+                        # Double switches must be bold!!! => by now ...
+                        if not self.zynswitch_double(i):
+                            self.zynswitch_bold_triggered.emit(i)
+                    elif not ignore_switch and dtus>0:
+                        #print("Switch "+str(i)+" dtus="+str(dtus))
+                        self.zynswitch_short_triggered.emit(i)
             i += 1;
 
         self.fake_key_event_for_zynpot(3, Key.left, Key.right)
@@ -4112,6 +4123,20 @@ class zynthian_gui(QObject):
 
     initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
     ### END Property initialMasterVolume
+
+    ### Property ignoreNextModeButtonPress
+    def get_ignoreNextModeButtonPress(self):
+        return self.__ignoreNextModeButtonPress
+
+    def set_ignoreNextModeButtonPress(self, val):
+        if self.__ignoreNextModeButtonPress != val:
+            self.__ignoreNextModeButtonPress = val
+            self.ignoreNextModeButtonPressChanged.emit()
+
+    ignoreNextModeButtonPressChanged = Signal()
+
+    ignoreNextModeButtonPress = Property(bool, get_ignoreNextModeButtonPress, set_ignoreNextModeButtonPress, notify=ignoreNextModeButtonPressChanged)
+    ### END Property ignoreNextModeButtonPress
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

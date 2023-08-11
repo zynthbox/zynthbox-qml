@@ -55,10 +55,12 @@ Zynthian.Popup {
                 }
                 result = true;
                 break;
+            case "SELECT_DOWN":
             case "KNOB3_UP":
                 _private.currentIndex = (_private.currentIndex + 1 === component.actions.length) ? 0 : _private.currentIndex + 1;
                 result = true;
                 break;
+            case "SELECT_UP":
             case "KNOB3_DOWN":
                 _private.currentIndex = (_private.currentIndex === 0) ? component.actions.length - 1 : _private.currentIndex - 1;
                 result = true;

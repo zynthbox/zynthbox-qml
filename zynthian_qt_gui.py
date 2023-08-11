@@ -2199,7 +2199,6 @@ class zynthian_gui(QObject):
                 else:
                     # Do not emit switch signals if the key is set to be ignored
                     ignore_switch = False
-                    logging.debug(f"????? switch: {i}, ignoreMode: {self.ignoreNextModeButtonPress}")
                     if i == 11 and self.ignoreNextModeButtonPress:
                         ignore_switch = True
                         self.ignoreNextModeButtonPress = False

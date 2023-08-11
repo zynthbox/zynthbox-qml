@@ -65,6 +65,16 @@ Zynthian.Popup {
                 _private.currentIndex = (_private.currentIndex === 0) ? component.actions.length - 1 : _private.currentIndex - 1;
                 result = true;
                 break;
+            case "NAVIGATE_LEFT":
+                // When navigating left, decrement by row number. If index goes negetive then deduct it from length to rollover to otherside
+                _private.currentIndex = (_private.currentIndex - component.rows) < 0 ? component.actions.length + (_private.currentIndex - component.rows) : _private.currentIndex - component.rows
+                result = true;
+                break;
+            case "NAVIGATE_RIGHT":
+                // When navigating right, increment by row number. If index exceeds length then modulo it by length to rollover to other side
+                _private.currentIndex = (_private.currentIndex + component.rows) % component.actions.length
+                result = true;
+                break;
             case "KNOB0_UP":
             case "KNOB0_DOWN":
             case "KNOB1_UP":

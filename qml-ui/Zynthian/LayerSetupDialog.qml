@@ -34,10 +34,10 @@ import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
 
-Zynthian.Dialog {
+Zynthian.ActionPickerPopup {
     id: root
-
     property QtObject selectedChannel: null
+
     Timer {
         id: selectedChannelThrottle
         interval: 10; running: false; repeat: false;
@@ -52,123 +52,89 @@ Zynthian.Dialog {
     Component.onCompleted: {
         selectedChannelThrottle.restart()
     }
+    Zynthian.Popup {
+        id: noFreeSlotsPopup
+        parent: QQC2.Overlay.overlay
+        y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
+        x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+        width: Kirigami.Units.gridUnit*12
+        height: Kirigami.Units.gridUnit*4
 
-    parent: QQC2.Overlay.overlay
-    y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-    x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    height: footer.implicitHeight + topMargin + bottomMargin
-    modal: true
-
-    onAccepted: {
+        QQC2.Label {
+            width: parent.width
+            height: parent.height
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            text: qsTr("No free slots remaining")
+            font.italic: true
+        }
     }
-    onRejected: {
-    }
-
-    footer: QQC2.Control {
-        leftPadding: root.leftPadding
-        topPadding: root.topPadding
-        rightPadding: root.rightPadding
-        bottomPadding: root.bottomPadding
-        contentItem: ColumnLayout {
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                text: qsTr("Pick a Synth")
-                onPressed: {
-                    Qt.callLater(function() {
-                        if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
-                            zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
-                            root.accept()
-                            zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
-                            newSynthWorkaroundTimer.restart()
-                            zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-                        } else if (!root.selectedChannel.createChainedSoundInNextFreeLayer(root.selectedChannel.selectedSlotRow)) {
-                            root.reject();
-                            noFreeSlotsPopup.open();
-                        } else {
-                            zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
-                            root.accept()
-                            zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
-                            newSynthWorkaroundTimer.restart()
-                            zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-                        }
-                    })
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-                text: qsTr("Change preset")
-                onClicked: {
-                    zynqtgui.current_screen_id = "preset"
-                    root.accept();
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                text: qsTr("Load A Sound")
-                onClicked: {
-                    zynqtgui.show_modal("sound_categories")
-                    root.accept();
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                text: qsTr("Edit Sound")
-                onClicked: {
-                    root.accept();
-                    zynqtgui.show_modal("control")
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-                text: qsTr("Remove Synth")
-                onClicked: {
-                    root.accept();
-                    if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
-                        root.selectedChannel.remove_and_unchain_sound(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
-                    }
-                }
-            }
-            Timer { //HACK why is this necessary?
-                id: newSynthWorkaroundTimer
-                interval: 200
-                onTriggered: {
-                    if (root.selectedChannel.connectedPattern >= 0) {
-                        var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
-                        pattern.midiChannel = root.selectedChannel.connectedSound;
-                    }
-                }
-            }
-            Zynthian.Popup {
-                id: noFreeSlotsPopup
-                parent: QQC2.Overlay.overlay
-                y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-                x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-                width: Kirigami.Units.gridUnit*12
-                height: Kirigami.Units.gridUnit*4
-
-                QQC2.Label {
-                    width: parent.width
-                    height: parent.height
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    text: qsTr("No free slots remaining")
-                    font.italic: true
-                }
+    Timer { //HACK why is this necessary?
+        id: newSynthWorkaroundTimer
+        interval: 200
+        onTriggered: {
+            if (root.selectedChannel.connectedPattern >= 0) {
+                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                pattern.midiChannel = root.selectedChannel.connectedSound;
             }
         }
     }
+
+    actions: [
+        Kirigami.Action {
+            text: qsTr("Pick a Synth")
+            onTriggered: {
+                Qt.callLater(function() {
+                    if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
+                        zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
+                        root.close()
+                        zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
+                        newSynthWorkaroundTimer.restart()
+                        zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                    } else if (!root.selectedChannel.createChainedSoundInNextFreeLayer(root.selectedChannel.selectedSlotRow)) {
+                        root.close();
+                        noFreeSlotsPopup.open();
+                    } else {
+                        zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
+                        root.close()
+                        zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
+                        newSynthWorkaroundTimer.restart()
+                        zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                    }
+                })
+            }
+        },
+        Kirigami.Action {
+            visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+            text: qsTr("Change preset")
+            onTriggered: {
+                zynqtgui.current_screen_id = "preset"
+                root.close();
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Load A Sound")
+            onTriggered: {
+                zynqtgui.show_modal("sound_categories")
+                root.close();
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Edit Sound")
+            onTriggered: {
+                root.close();
+                zynqtgui.show_modal("control")
+            }
+        },
+        Kirigami.Action {
+            visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+            text: qsTr("Remove Synth")
+            onTriggered: {
+                root.close();
+                if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
+                    root.selectedChannel.remove_and_unchain_sound(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                }
+            }
+        }
+    ]
 }

@@ -1099,7 +1099,12 @@ class zynthian_gui(QObject):
         self.screens['audio_in'] = zynthian_gui_audio_in(self)
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
+
+        # effect_preset is the same instance as preset screen
+        # This is done to be able to differentiate if the preset page is open from SynthSetupPage or FXSetupPage
+        # Since the same data is displayed in both the pages we need to be able to differentiate it so that PageManager can know which container page to open
         self.screens["effect_preset"] = self.screens["preset"]
+
         self.screens["control"] = zynthian_gui_control(self)
         self.screens["control_downloader"] = zynthian_gui_newstuff(self)
         self.screens["fx_control_downloader"] = self.screens["control_downloader"]

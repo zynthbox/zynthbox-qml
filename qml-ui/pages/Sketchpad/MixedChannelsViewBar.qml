@@ -69,7 +69,6 @@ Rectangle {
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
-    property bool ignoreNextModeButtonPress: false
     function cuiaCallback(cuia) {
         var returnValue = false;
         console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
@@ -179,17 +178,9 @@ Rectangle {
                     returnValue = true;
                 }
                 break;
-            case "MODE_SWITCH_SHORT":
-            case "MODE_SWITCH_BOLD":
-            case "MODE_SWITCH_LONG":
-                if (root.ignoreNextModeButtonPress) {
-                    root.ignoreNextModeButtonPress = false;
-                    returnValue = true;
-                }
-                break;
             case "KNOB3_UP":
                 if (zynqtgui.modeButtonPressed) {
-                    root.ignoreNextModeButtonPress = true;
+                    zynqtgui.ignoreNextModeButtonPress = true;
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
                             // if we're on the last slot, select the first fx slot
@@ -215,7 +206,7 @@ Rectangle {
                 break;
             case "KNOB3_DOWN":
                 if (zynqtgui.modeButtonPressed) {
-                    root.ignoreNextModeButtonPress = true;
+                    zynqtgui.ignoreNextModeButtonPress = true;
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
                             // if we're on the first slot, select the last fx slot

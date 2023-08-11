@@ -401,9 +401,20 @@ class zynthian_gui_preset(zynthian_gui_selector):
         return self.__top_sounds_engine
 
     def get_engine_name(self):
-        if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.engine is not None:
-            return self.zynqtgui.curlayer.engine.plugin_name
-        return ""
+        engine_name = ""
+        try:
+            if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.engine is not None:
+                engine_fullname = self.zynqtgui.curlayer.engine.name
+                # Some engine names have the pattern "XXXX/YYYYY" where YYYYY is the engine name
+                # Other engines have their name stored directly
+                if "/" in engine_fullname:
+                    engine_name = engine_fullname.split("/")[1]
+                else:
+                    engine_name = engine_fullname
+        except Exception as e:
+            logging.error(f"Cannot determine engine name : {str(e)}")
+
+        return engine_name
 
     def index_supports_immediate_activation(self, index=None):
         return self.__top_sounds_engine == None or (self.zynqtgui.curlayer != None and self.zynqtgui.curlayer.engine.nickname == self.__top_sounds_engine)

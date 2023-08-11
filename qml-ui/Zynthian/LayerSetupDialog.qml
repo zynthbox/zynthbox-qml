@@ -105,7 +105,7 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+            enabled: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
             text: qsTr("Change preset")
             onTriggered: {
                 zynqtgui.current_screen_id = "preset"
@@ -127,7 +127,7 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+            enabled: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
             text: qsTr("Remove Synth")
             onTriggered: {
                 root.close();

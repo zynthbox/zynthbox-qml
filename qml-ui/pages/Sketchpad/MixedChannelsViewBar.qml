@@ -363,8 +363,8 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType === "synth"
                                 text: qsTr("Synth")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "synth"
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
                             QQC2.Button {
@@ -375,8 +375,8 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType === "sample-trig"
                                 text: qsTr("Sample")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "sample-trig"
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
                             QQC2.Button {
@@ -387,8 +387,8 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType.startsWith("sample-loop")
                                 text: qsTr("Sketch")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "sample-loop"
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
                             QQC2.Button {
@@ -399,8 +399,8 @@ Rectangle {
                                 checked: root.selectedChannel.channelAudioType === "external"
                                 text: qsTr("External")
                                 onClicked: {
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                     root.selectedChannel.channelAudioType = "external"
+                                    synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
                         }

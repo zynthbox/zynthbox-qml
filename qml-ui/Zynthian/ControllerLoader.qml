@@ -33,11 +33,9 @@ import "private"
 Item {
     id: root
 
+    signal pressedChanged(bool pressed)
     readonly property ControllerGroup controller: ControllerGroup {}
-
-    Layout.fillWidth: true
-    Layout.fillHeight: true
-
+    property bool highlighted: false    
     readonly property string valueType: {
         //FIXME: Ugly heuristics
         if (!root.controller.ctrl) {
@@ -52,17 +50,52 @@ Item {
         }
         return root.controller.ctrl.value_type;
     }
-
     // Just a stand-in to point invisible controllers at
     readonly property ControllerGroup noController: ControllerGroup {}
+    property var cuiaCallback: function(cuia) {
+        switch (cuia) {
+            case "KNOB0_UP":
+                if (switchController.visible) {
+                    root.controller.ctrl.value = root.controller.ctrl.max_value
+                } else if (dialController.visible) {
+                    dialController.dial.increase()
+                    dialController.dial.moved()
+                }
+                return true
+            case "KNOB0_DOWN":
+                if (switchController.visible) {
+                    root.controller.ctrl.value = root.controller.ctrl.value0
+                } else if (dialController.visible) {
+                    dialController.dial.decrease()
+                    dialController.dial.moved()
+                }
+                return true
+            default:
+                return false
+        }
+    }
+
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+
     SwitchController {
+        id: switchController
         visible: root.valueType === "bool"
         anchors.fill: parent
         controller: visible ? root.controller : root.noController;
+        highlighted: root.highlighted
+        onPressedChanged: {
+            root.pressedChanged(pressed)
+        }
     }
     DialController {
+        id: dialController
         visible: root.valueType !== "bool"
         anchors.fill: parent
         controller: visible ? root.controller : root.noController;
+        highlighted: root.highlighted
+        onPressedChanged: {
+            root.pressedChanged(pressed)
+        }
     }
 }

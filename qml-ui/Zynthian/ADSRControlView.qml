@@ -60,27 +60,23 @@ GridLayout {
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
-        encoderIndex: 0
     }
     SliderController {
         id: decaySlider
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
-        encoderIndex: 1
     }
     SliderController {
         id: sustainSlider
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
-        encoderIndex: 2
     }
     SliderController {
         id: releaseSlider
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
-        encoderIndex: 3
     }
 }

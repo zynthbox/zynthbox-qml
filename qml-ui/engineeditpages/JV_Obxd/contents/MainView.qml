@@ -40,7 +40,6 @@ GridLayout {
         title: qsTr("Voices")
         controller.category: "Ctrls#2"
         controller.index: 0
-        encoderIndex: 0
         stepSize: Math.round(multiSwitch.to / 7)
         valueLabel: Math.round(multiSwitch.value / (200 / 7)) + 1
     }
@@ -49,7 +48,6 @@ GridLayout {
         title: qsTr("Transpose")
         controller.category: "Ctrls#2"
         controller.index: 2
-        encoderIndex: 1
         stepSize: 50
         valueLabel: {
             let val = Math.round((multiSwitch.value - 100) / 50)
@@ -61,13 +59,11 @@ GridLayout {
         title: qsTr("Tune")
         controller.category: "Ctrls#2"
         controller.index: 1
-        encoderIndex: 2
         valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
     }
     // VOLUME
     Zynthian.SliderController {
         title: qsTr("Volume")
-        encoderIndex: 3
         controller.category: "Ctrls#1"
         controller.index: 3
         valueLabel: Math.round(value / 2)

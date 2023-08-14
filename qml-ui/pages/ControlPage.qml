@@ -117,6 +117,7 @@ Zynthian.ScreenPage {
             model: zynqtgui.control.control_pages_model
             delegate: QQC2.MenuItem {
                 id: menuItem
+                height: Kirigami.Units.gridUnit * 2
                 text: model.display
                 checkable: true
                 autoExclusive: true

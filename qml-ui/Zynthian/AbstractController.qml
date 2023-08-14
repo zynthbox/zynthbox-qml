@@ -34,21 +34,23 @@ import "../"
 Card {
     id: root
 
+    signal pressedChanged(bool pressed)
+
     // instance of zynthian_gui_controller.py, TODO: should be registered in qml?
     property ControllerGroup controller: ControllerGroup {}
-
     // Those are automatically binded by default,
     property alias title: heading.text
     property alias heading: heading
     property alias legend: legend.text
     property int encoderIndex: -1
+    property alias control: contentItem.contentItem
+    property int _oldEncoderIndex: -1
 
     Layout.fillWidth: true
     Layout.fillHeight: true
     Layout.preferredWidth: 1
     Layout.preferredHeight: 1
     visible: controller.ctrl !== null
-
     onVisibleChanged: {
         if (controller.ctrl) {
             controller.ctrl.visible = visible;
@@ -64,7 +66,6 @@ Card {
             }
         }
     }
-
     onEncoderIndexChanged: {
         if (_oldEncoderIndex != -1 && encoderIndex != _oldEncoderIndex) {
             controller.ctrl.encoder_index = encoderIndex;
@@ -72,16 +73,6 @@ Card {
 
         _oldEncoderIndex = encoderIndex;
     }
-
-    property alias control: contentItem.contentItem
-
-    property int _oldEncoderIndex: -1
-    onActiveFocusChanged: {
-        if (activeFocus) {
-            control.forceActiveFocus();
-        }
-    }
-
     contentItem: ColumnLayout {
         QQC2.Label {
             id: heading

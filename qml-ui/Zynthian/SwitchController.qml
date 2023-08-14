@@ -33,23 +33,12 @@ AbstractController {
 
     property alias valueLabel: valueLabel.text
     property alias switchControl: switchControl
-    highlighted: switchControl.activeFocus
 
     control: MouseArea {
         anchors.fill: parent
         onClicked: root.controller.ctrl.value = root.controller.ctrl.value == root.controller.ctrl.value0 ? root.controller.ctrl.max_value : root.controller.ctrl.value0
+        onPressedChanged: root.pressedChanged(pressed)
 
-        onActiveFocusChanged: {
-            if (activeFocus) {
-                switchControl.forceActiveFocus();
-            }
-        }
-        /*Behavior on scale {
-            NumberAnimation {
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutQuad
-            }
-        }*/
         QQC2.Switch {
             id: switchControl
             z: -1
@@ -64,13 +53,6 @@ AbstractController {
             onToggled: root.controller.ctrl.value = checked ? root.controller.ctrl.max_value : root.controller.ctrl.value0
             // Explicitly set indicator implicitWidth otherwise the switch size is too small
             indicator.implicitWidth: width
-
-            // HACK for default style
-            /* Binding {
-                target: switchControl.indicator
-                property: "color"
-                value: switchControl.checked ? Kirigami.Theme.highlightColor : switchControl.palette.midlight
-            }*/
         }
         Kirigami.Heading {
             id: valueLabel
@@ -78,7 +60,6 @@ AbstractController {
                 horizontalCenter: parent.horizontalCenter
                 bottom: parent.bottom
                 bottomMargin: Kirigami.Units.smallSpacing
-                //bottomMargin: Kirigami.Units.gridUnit * 2
             }
             level: 2
             text: root.controller.ctrl ? root.controller.ctrl.value_print : ""

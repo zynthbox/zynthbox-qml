@@ -30,15 +30,14 @@ import org.kde.kirigami 2.4 as Kirigami
 
 AbstractController {
     id: root
-    property alias valueLabel: valueLabel.text
 
+    property alias valueLabel: valueLabel.text
     property alias value: dial.value
     property alias from: dial.from
     property alias to: dial.to
     property alias stepSize: dial.stepSize
     property alias snapMode: dial.snapMode
     property alias dial: dial
-    highlighted: dial.activeFocus
 
     control: QQC2.Dial {
         id: dial
@@ -54,6 +53,7 @@ AbstractController {
         from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
         to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
         onMoved: root.controller.ctrl.value = value
+        onPressedChanged: root.pressedChanged(pressed)
 
         Kirigami.Heading {
             id: valueLabel

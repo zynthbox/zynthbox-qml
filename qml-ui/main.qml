@@ -1546,6 +1546,7 @@ Kirigami.AbstractApplicationWindow {
             anchors.margins: Kirigami.Units.gridUnit
             horizontalAlignment: QQC2.Label.AlignHCenter
             verticalAlignment: QQC2.Label.AlignVCenter
+            wrapMode: QQC2.Label.WrapAtWordBoundaryOrAnywhere
         }
 
         Timer {

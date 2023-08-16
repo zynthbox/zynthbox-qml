@@ -37,6 +37,7 @@ class sketchpad_segment(QObject):
         self.__sketch = sketch
         self.__bar_length = 1
         self.__beat_length = 0
+        self.__tick_length = 0
         self.__clips = []
 
         self.__segment_model = segment_model
@@ -61,6 +62,7 @@ class sketchpad_segment(QObject):
         return {
             "barLength": self.__bar_length,
             "beatLength": self.__beat_length,
+            "tickLength": self.__tick_length,
             "clips": [
                 {
                     "row": clip.row,
@@ -77,6 +79,10 @@ class sketchpad_segment(QObject):
             self.set_barLength(obj["barLength"], True)
         if "beatLength" in obj:
             self.set_beatLength(obj["beatLength"], True)
+        if "tickLength" in obj:
+            self.set_tickLength(obj["tickLength"], True)
+        else:
+            self.set_tickLength(0, True)
         if "clips" in obj:
             for clip in obj["clips"]:
                 self.__clips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
@@ -175,6 +181,24 @@ class sketchpad_segment(QObject):
 
     beatLength = Property(int, get_beatLength, set_beatLength, notify=beatLengthChanged)
     ### END Property beatLength
+
+    ### BEGIN Property tickLength
+    def get_tickLength(self):
+        return self.__tick_length
+
+    def set_tickLength(self, length, force_set=False):
+        if self.__tick_length != length or force_set:
+            self.__tick_length = length
+
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
+
+            self.tickLengthChanged.emit()
+
+    tickLengthChanged = Signal()
+
+    tickLength = Property(int, get_tickLength, set_tickLength, notify=tickLengthChanged)
+    ### END Property tickLength
 
     ### Property clips
     def get_clips(self):

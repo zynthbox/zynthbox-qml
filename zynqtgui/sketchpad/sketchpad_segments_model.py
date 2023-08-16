@@ -116,7 +116,7 @@ class sketchpad_segments_model(QAbstractListModel):
     @Slot(int, result=QObject)
     def new_segment(self, segment_index = -1):
         if segment_index == -1:
-            segment_index = self.__segments.count
+            segment_index = len(self.__segments)
         newSegment = sketchpad_segment(self.__sketch, self, self.__song)
         self.__segments.insert(segment_index, newSegment)
         self.countChangedThrottle.start()

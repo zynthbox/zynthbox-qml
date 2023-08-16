@@ -814,7 +814,28 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         for channel_index in range(self.__song__.channelsModel.count):
             self.__song__.channelsModel.getChannel(channel_index).stopAllClips()
 
-    def queue_clip_record(self, clip):
+    @Slot(QObject,result=str)
+    def get_channel_recording_filename(self, channel):
+        generated_path = ""
+        preset_name = "no-preset"
+        if channel.channelAudioType == "synth":
+            layers_snapshot = json.loads(channel.getChannelSoundSnapshotJson())
+            try:
+                preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
+            except:
+                preset_name = "no-layer"
+        elif channel.channelAudioType == "sample-trig" or channel.channelAudioType == "sample-slice":
+            preset_name = "samples"
+        count = 0
+        base_recording_dir = f"{self.__song__.sketchpad_folder}wav"
+        base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
+        # Check if file exists otherwise append count
+        while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav").exists():
+            count += 1
+        generated_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
+        return generated_path
+
+    def queue_clip_record(self, clip, do_countin = True):
         # When sketchpad is open, curLayer is not updated when changing channels as it is a considerably heavy task
         # but not necessary to change to selected channel's synth.
         # Hence make sure to update curLayer before doing operations depending upon curLayer
@@ -861,7 +882,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
 
-        self.ongoingCountIn = self.countInBars + 1
+        if do_countin:
+            self.ongoingCountIn = self.countInBars + 1
 
         if self.recordingType == "audio":
             if self.recordingSource == 'internal':
@@ -1001,7 +1023,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
             self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.channelAudioType])
             self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
-            if (currentChannel.channelAudioType.startswith("sample")):
+            if (currentChannel.channelAudioType == "sample-trig" or currentChannel.channelAudioType == "sample-slice"):
                 self.clip_to_record.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 
 

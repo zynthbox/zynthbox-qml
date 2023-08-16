@@ -460,6 +460,7 @@ class zynthian_gui(QObject):
         # 2nd element of the set is the zynthian controller to control fx
         self.global_fx_engines = []
 
+        self.__forceSongMode__ = False
         self.__switch_channels_button_pressed__ = False
         self.__mode_button_pressed__ = False
         self.__alt_button_pressed__ = False
@@ -3676,6 +3677,17 @@ class zynthian_gui(QObject):
     longTaskStarted = Signal()
     longTaskEnded = Signal()
     ### END Alternative long task handling
+
+    ### BEGIN Property forceSongMode
+    def get_forceSongMode(self):
+        return self.__forceSongMode__
+    def set_forceSongMode(self, newValue):
+        if self.__forceSongMode__ != newValue:
+            self.__forceSongMode__ = newValue
+            self.forceSongModeChanged.emit()
+    forceSongModeChanged = Signal()
+    forceSongMode = Property(bool, get_forceSongMode, set_forceSongMode, notify=forceSongModeChanged)
+    ### END Property forceSongMode
 
     ### Property switchChannelsButtonPressed
     def get_switch_channels_button_pressed(self):

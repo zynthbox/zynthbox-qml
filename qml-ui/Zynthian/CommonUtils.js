@@ -6,7 +6,10 @@ function startMetronomeAndPlayback() {
     // page is shown, where we invert that logic and allow you to start in not song mode using
     // alt+play and play on its own starts playback in song mode.
     var playInSongMode = false;
-    if (zynqtgui.current_screen_id === "song_manager") {
+    if (zynqtgui.forceSongMode === true) {
+        playInSongMode = true;
+        zynqtgui.forceSongMode = false;
+    } else if (zynqtgui.current_screen_id === "song_manager") {
         if (zynqtgui.altButtonPressed === false) {
             playInSongMode = true;
         }

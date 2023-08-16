@@ -437,6 +437,7 @@ class zynthian_gui(QObject):
         self.delayBeforePressingMetronome = 0
         self.reverbBeforePressingMetronome = 0
         self.__ignoreNextModeButtonPress = False
+        self.__ignoreNextMetronomeButtonPress = False
         self.__current_task_message = ""
         self.__recent_task_messages = queue.Queue()
         self.__show_current_task_message = True
@@ -2117,11 +2118,6 @@ class zynthian_gui(QObject):
                 elif i == 19:
                     self.playButtonPressed = True
                 elif i == 20:
-                    self.bpmBeforePressingMetronome = Zynthbox.SyncTimer.instance().getBpm()
-                    self.volumeBeforePressingMetronome = self.masterVolume
-                    self.metronomeVolumeBeforePressingMetronome = self.sketchpad.metronomeVolume
-                    self.delayBeforePressingMetronome = self.global_fx_engines[0][1].value
-                    self.reverbBeforePressingMetronome = self.global_fx_engines[1][1].value
                     self.metronomeButtonPressed = True
                 elif i == 21:
                     self.stopButtonPressed = True
@@ -2158,20 +2154,6 @@ class zynthian_gui(QObject):
                     if self.__start_playback_on_metronome_release:
                         self.__start_playback_on_metronome_release = False
                         Zynthbox.SyncTimer.instance().startWithCountin()
-                    else:
-                        # Toggle metronome only if metronome+BK is not used to change bpm or volume or delay or reverb
-                        bpmAfterPressingMetronome = Zynthbox.SyncTimer.instance().getBpm()
-                        volumeAfterPressingMetronome = self.masterVolume
-                        metronomeVolumeAfterPressingMetronome = self.sketchpad.metronomeVolume
-                        delayAfterPressingMetronome = self.global_fx_engines[0][1].value
-                        reverbAfterPressingMetronome = self.global_fx_engines[1][1].value
-                        if bpmAfterPressingMetronome == self.bpmBeforePressingMetronome and \
-                                volumeAfterPressingMetronome == self.volumeBeforePressingMetronome and \
-                                metronomeVolumeAfterPressingMetronome == self.metronomeVolumeBeforePressingMetronome and \
-                                delayAfterPressingMetronome == self.delayBeforePressingMetronome and \
-                                reverbAfterPressingMetronome == self.reverbBeforePressingMetronome:
-                            # BPM/Volume/Delay/Reverb did not change. Toggle metronome state
-                            self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
                     self.metronomeButtonPressed = False
                 elif i == 21:
                     self.stopButtonPressed = False
@@ -2202,6 +2184,9 @@ class zynthian_gui(QObject):
                     if i == 11 and self.ignoreNextModeButtonPress:
                         ignore_switch = True
                         self.ignoreNextModeButtonPress = False
+                    elif i == 20 and self.ignoreNextMetronomeButtonPress:
+                        ignore_switch = True
+                        self.ignoreNextMetronomeButtonPress = False
 
                     if not ignore_switch and dtus>zynthian_gui_config.zynswitch_long_us:
                         self.zynswitch_long_triggered.emit(i)

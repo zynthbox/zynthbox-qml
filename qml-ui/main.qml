@@ -61,11 +61,16 @@ Kirigami.AbstractApplicationWindow {
         var result = false;
 
         switch (cuia) {
+            case "SWITCH_METRONOME_SHORT":
+                zynqtgui.sketchpad.metronomeEnabled = !zynqtgui.sketchpad.metronomeEnabled
+                result = true;
+                break;
             case "KNOB0_UP":
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     root.updateMetronomeVolume(1)
                     result = true;
                 }
@@ -75,6 +80,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelVolume(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     root.updateMetronomeVolume(-1)
                     result = true;
                 }
@@ -84,6 +90,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelDelaySend(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     // root.updateGlobalDelayFXAmount(1)
                     result = true;
                 }
@@ -93,6 +100,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelDelaySend(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     // root.updateGlobalDelayFXAmount(-1)
                     result = true;
                 }
@@ -102,6 +110,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelReverbSend(1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     // root.updateGlobalReverbFXAmount(1)
                     result = true;
                 }
@@ -111,6 +120,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSelectedChannelReverbSend(-1)
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     // root.updateGlobalReverbFXAmount(-1)
                     result = true;
                 }
@@ -120,6 +130,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateMasterVolume(1);
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     root.updateSketchpadBpm(1)
                     result = true;
                 }
@@ -129,6 +140,7 @@ Kirigami.AbstractApplicationWindow {
                     root.updateMasterVolume(-1);
                     result = true;
                 } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     root.updateSketchpadBpm(-1)
                     result = true;
                 }

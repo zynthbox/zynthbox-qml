@@ -794,9 +794,9 @@ class sketchpad_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.deleteLater()
 
-    @Slot()
-    def queueRecording(self):
-        self.__song__.get_metronome_manager().queue_clip_record(self)
+    @Slot(bool)
+    def queueRecording(self, do_countin=True):
+        self.__song__.get_metronome_manager().queue_clip_record(self, do_countin)
 
     @Slot(None)
     def stopRecording(self):

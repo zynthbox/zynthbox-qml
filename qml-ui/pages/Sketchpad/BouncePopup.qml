@@ -31,12 +31,14 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
+import Helpers 1.0 as Helpers
 
 Zynthian.Popup {
     id: root
-    function bounce(trackName, channel) {
+    function bounce(trackName, channel, partIndex) {
         _private.trackName = trackName;
         _private.selectedChannel = channel;
+        _private.partIndex = partIndex;
         open();
     }
 
@@ -74,6 +76,7 @@ Zynthian.Popup {
                 id: _private
                 property string trackName
                 property QtObject selectedChannel
+                property int partIndex
                 property double bounceProgress: -1
 
                 property QtObject sequence: null
@@ -87,51 +90,71 @@ Zynthian.Popup {
                 property int playbackStopDurationInBeats
                 property bool isRecording: false
                 property int cumulativeBeats
+                property int previouslySelectedSegmentsModel: -1
+                property var filePropertiesHelper: Helpers.FilePropertiesHelper { }
                 function performBounce() {
-                    _private.bounceProgress = 0;
-                    // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
-                    _private.sequence = Zynthbox.PlayGridManager.getSequenceModel(_private.trackName);
+                    // Now everything is locked down, set up the temporary song that we'll be using to perform the playback
+                    _private.sequence = Zynthbox.PlayGridManager.getSequenceModel(_private.trackName)
                     if (_private.sequence) {
-                        _private.pattern = sequence.getByPart(_private.selectedChannel.connectedPattern, _private.selectedChannel.selectedPart);
+                        _private.pattern = _private.sequence.getByPart(_private.selectedChannel.connectedPattern, _private.selectedChannel.selectedPart);
                         if (_private.pattern) {
-                            // If there's currently a pattern set to be solo, let's remember that
-                            _private.previousSolo = _private.sequence.soloPattern;
-                            // Now, set the pattern we're wanting to record as solo
-                            _private.sequence.soloPattern = _private.selectedChannel.connectedPattern;
+                            _private.bounceProgress = 0;
+                            console.log("Bouncing on channel with ID", _private.selectedChannel.id)
+                            // Create a new song for us to use temporarily
+                            _private.previouslySelectedSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
+                            let newSegmentsModelIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.newSegmentsModel();
+                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = newSegmentsModelIndex;
                             // Assemble the duration of time we want to be recording for
                             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
+                            var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                             _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
-                            var beatMultiplier = Zynthbox.PlayGridManager.syncTimer.getMultiplier();
-                            var beatsPerMinute = Zynthbox.SyncTimer.bpm;
-                            _private.patternDurationInMS = Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, _private.patternDurationInBeats) * 1000;
-                            _private.recordingDurationInMS = _private.patternDurationInMS;
-                            _private.recordingDurationInBeats = _private.patternDurationInBeats;
-                            if (_private.includeLeadin) {
-                                _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
-                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
-                            }
-                            if (_private.selectedChannel.channelAudioType === "synth") {
-                                _private.playbackStopDurationInBeats = _private.recordingDurationInBeats - Zynthbox.PlayGridManager.syncTimer.scheduleAheadAmount;
-                                //_private.playbackStopDurationInMS = _private.recordingDurationInMS - (Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, Zynthbox.PlayGridManager.syncTimer.scheduleAheadAmount) * 1000);
-                                _private.playbackStopDurationInMS = _private.recordingDurationInMS - (Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, 6) * 1000);
-                            } else {
-                                _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
-                                _private.playbackStopDurationInMS = _private.recordingDurationInMS;
-                            }
+                            let patternDurationBar = Math.floor(_private.patternDurationInBeats / 128);
+                            let patternDurationBeat = Math.floor((_private.patternDurationInBeats - (patternDurationBar * 128)) / 32);
+                            let patternDurationTick =  (_private.patternDurationInBeats - (patternDurationBar * 128 + patternDurationBeat * 32)) * patternSubbeatToTickMultiplier;
+                            let songDuration = _private.patternDurationInBeats * patternSubbeatToTickMultiplier;
+                            // Set the length of the new sketch's default segment to the duration of the pattern to bounce, and set the segment to play that pattern
+                            let segment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(0);
+                            let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
+                            let clip = _private.selectedChannel.getClipsModelByPart(_private.partIndex).getClip(sceneIndices[_private.trackName]);
+                            console.log("Adding the clip", clip, clip.col, clip.part, "to the first segment", segment);
+                            segment.addClip(clip);
+                            segment.barLength = patternDurationBar;
+                            segment.beatLength = patternDurationBeat;
+                            segment.tickLength = patternDurationTick;
                             if (_private.includeFadeout) {
-                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
-                                _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
+                                // Add the fadeout to the song as an empty segment (of we have a fadeout) (after segment 0)
+                                let segment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(1);
+                                segment.barLength = patternDurationBar;
+                                segment.beatLength = patternDurationBeat;
+                                segment.tickLength = patternDurationTick;
+                                songDuration = songDuration + _private.patternDurationInBeats * patternSubbeatToTickMultiplier;
                             }
-                            // Startrecordingandplaythethingletsgo!
-                            _private.cumulativeBeats = 0;
+                            if (_private.includeLeadin) {
+                                // Add the leadin to the song as a segment, and set the segment to play that pattern (if we have a leadin) (as a new segment 0)
+                                let segment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(0);
+                                segment.barLength = patternDurationBar;
+                                segment.beatLength = patternDurationBeat;
+                                segment.tickLength = patternDurationTick;
+                                segment.addClip(clip);
+                                songDuration = songDuration + _private.patternDurationInBeats * patternSubbeatToTickMultiplier;
+                            }
+                            // Now we're ready to get under way, mark ourselves as very extremely busy
                             _private.isRecording = true;
-                            var sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
-                            var clip = _private.selectedChannel.clipsModel.getClip(sceneIndices[_private.trackName]);
-                            zynqtgui.sketchpad.recordingSource = "internal"
-                            zynqtgui.sketchpad.recordingChannel = ""
-                            clip.queueRecording();
-                            Zynthbox.MidiRecorder.startRecording(_private.pattern.midiChannel, true);
-                            _private.sequence.startSequencePlayback();
+                            // Force the next start to be in song mode
+                            zynqtgui.forceSongMode = true;
+                            // Set up to record (with a useful filename, and just the channel we want)
+                            Zynthbox.AudioLevels.setChannelToRecord(_private.selectedChannel.id, true);
+                            Zynthbox.AudioLevels.setChannelFilenamePrefix(_private.selectedChannel.id, zynqtgui.sketchpad.get_channel_recording_filename(_private.selectedChannel));
+                            // Schedule us to start audio recording
+                            Zynthbox.AudioLevels.scheduleStartRecording(0);
+                            // Schedule us to start midi recording at the same point
+                            Zynthbox.MidiRecorder.scheduleStartRecording(0, _private.selectedChannel.id);
+                            // Schedule us to stop recording at the end of the song (duration)
+                            console.log("Schedule stopping both midi and audio recordings at", songDuration, "ticks");
+                            Zynthbox.AudioLevels.scheduleStopRecording(songDuration);
+                            Zynthbox.MidiRecorder.scheduleStopRecording(songDuration, _private.selectedChannel.id);
+                            // Schedule us to start playback at the same point
+                            Zynthbox.SyncTimer.scheduleTimerCommand(0, 1);
                         }
                     }
                 }
@@ -143,68 +166,90 @@ Zynthian.Popup {
             Connections {
                 enabled: _private.isRecording
                 target: Zynthbox.PlayGridManager
+                property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 1
                 onMetronomeBeat128thChanged: {
-                    _private.cumulativeBeats = _private.cumulativeBeats + 1;
-                    if (_private.recordingDurationInBeats > _private.cumulativeBeats) {
-                        // set progress based on what the thing is actually doing
-                        _private.bounceProgress = _private.cumulativeBeats/_private.recordingDurationInBeats;
-                        if (_private.playbackStopDurationInBeats < _private.cumulativeBeats) {
-                            console.log("Fadeout reached, disconnecting playback at cumulative beat position", _private.cumulativeBeats);
-                            _private.sequence.disconnectSequencePlayback();
-                            // Minor hackery, this just ensure the above only happens once
-                            _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
-                        }
-                    } else {
+                    // While recording, check each beat whether we have reached the end of playback, and once we have, and we are done recording and all that, pull things out and clean up
+                    _private.bounceProgress = Math.min(1, Zynthbox.SegmentHandler.playhead / totalDuration);
+                    if ((Zynthbox.PlayGridManager.metronomeActive && Zynthbox.MidiRecorder.isRecording && Zynthbox.AudioLevels.isRecording) == false) {
+                        // Playback has stopped (we've reached the end of the song) - that means we should no longer be recording
                         _private.isRecording = false;
-                        _private.bounceProgress = 0;
-                        var clip = zynqtgui.sketchpad.clipToRecord;
-                        if (clip) {
-                            Zynthbox.MidiRecorder.stopRecording();
-                            clip.stopRecording();
-                            clip.metadataMidiRecording = Zynthbox.MidiRecorder.base64Midi();
-                        }
-                        zynqtgui.sketchpad.stopAllPlayback();
-                        _private.sequence.stopSequencePlayback();
-                        Zynthbox.PlayGridManager.stopMetronome();
-                        zynqtgui.song_arranger.stop();
-                        zynqtgui.sketchpad.resetMetronome();
-                        // Reset solo to whatever it was before we started working
-                        _private.sequence.soloPattern = _private.previousSolo;
-                        // Work out where the start and end points should be for the loop
-                        var startTime = 0; // startTime is in seconds
-                        var loopLength = _private.patternDurationInBeats; // loop length is in numbers of beats
-                        if (_private.includeLeadin) {
-                            if (_private.includeLeadinInLoop) {
-                                // Leave the start point at 0 and just increase the loopLength by the pattern duration
-                                loopLength = loopLength + _private.patternDurationInBeats;
-                            } else {
-                                // Leave the loopLength alone and just move the start point
-                                startTime = startTime + _private.patternDurationInMS;
+                        // Save metadata into the newly created recordings
+                        let recordingFilenames = Zynthbox.AudioLevels.recordingFilenames();
+                        let filenameIndex = _private.selectedChannel.id + 2;
+                        let filename = recordingFilenames[filenameIndex];
+                        if (filename.length > 0) {
+                            console.log("Successfully recorded a new sound file into", filename, "- now building metadata");
+                            let metadata = {
+                                "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm
+                            };
+                            if (_private.selectedChannel) { // by all rights this should not be possible, but... best safe
+                                metadata["ZYNTHBOX_ACTIVELAYER"] = _private.selectedChannel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
+                                metadata["ZYNTHBOX_AUDIO_TYPE"] = _private.selectedChannel.channelAudioType; // The audio type of this channel
+                                if (_private.selectedChannel.channelAudioType === "sample-trig" || _private.selectedChannel.channelAudioType === "sample-slice") {
+                                    // Store the sample data, if we've been playing in a patterny sample mode
+                                    metadata["ZYNTHBOX_SAMPLES"] = _private.selectedChannel.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
+                                }
                             }
-                        }
-                        if (_private.includeFadeout && _private.includeFadeoutInLoop) {
-                            // Whatever the start time is, end time should be moved by the pattern loopLength
-                            loopLength = loopLength + _private.patternDurationInBeats;
-                        }
-                        // TODO Loop point 2 would allow us to have a start-at-0, loop-from-first-round, loop-until-fadeout, stop-at-end option (for a very clean recording which does play-into-loop-with-fadeout for playback)
-                        while (clip.duration == 0) {
-                            // wait a moment before we go on...
-                            console.log("No clip duration yet...");
-                        }
-                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long, and the clip says it is", clip.duration, "seconds long");
-                        // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
-                        if (loopLength % Zynthbox.PlayGridManager.syncTimer.getMultiplier() === 0) {
-                            clip.snapLengthToBeat = true;
+                            metadata["ZYNTHBOX_MIDI_RECORDING"] = Zynthbox.MidiRecorder.base64TrackMidi(filenameIndex - 2);
+                            // Set up the loop points in the new recording
+                            let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
+                            var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
+                            // Reset this to beats (rather than pattern subbeats)
+                            let patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
+                            let patternDurationInMS = Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, patternDurationInBeats * patternSubbeatToTickMultiplier) * 1000;
+                            patternDurationInBeats = patternDurationInBeats / 32;
+                            let startPosition = 0.0; // This is in seconds
+                            let loopDelta = 0.0; // This is in beats (not pattern subbeats)
+                            // TODO Loop point 2 would allow us to have a start-at-0, loop-from-first-round, loop-until-fadeout, stop-at-end option (for a very clean recording which does play-into-loop-with-fadeout for playback)
+                            let loopDelta2 = 0.0; // This is in beats (not pattern subbeats) - relative to stop point, any position further back than loopDelta would be ignored
+                            let playbackLength = patternDurationInBeats; // This is in beats (not pattern subbeats)
+                            if (_private.includeLeadin) {
+                                if (_private.includeLeadinInLoop) {
+                                    // We have a leadin, that is included in the loop (not really a common case)
+                                    playbackLength = playbackLength + patternDurationInBeats;
+                                } else {
+                                    // We have a lead-in, which is not included in the loop (so the loop start position is after the leadin)
+                                    loopDelta = loopDelta + patternDurationInBeats;
+                                }
+                            }
+                            if (_private.includeFadeout) {
+                                if (_private.includeFadeoutInLoop) {
+                                    // We have a fadeout, and we want it included in the loop
+                                    playbackLength = playbackLength + patternDurationInBeats;
+                                } else {
+                                    // We have a fadeout, that we do not want included in the loop
+                                    loopDelta2 = loopDelta2 + patternDurationInBeats;
+                                    // Once we've got loopDelta2 implemented, uncomment this next line so we can have the tail
+                                    // playbackLength = playbackLength + patternDurationInBeats;
+                                }
+                            }
+                            metadata["ZYNTHBOX_STARTPOSITION"] = startPosition;
+                            metadata["ZYNTHBOX_LENGTH"] = playbackLength;
+                            metadata["ZYNTHBOX_LOOPDELTA"] = loopDelta;
+                            metadata["ZYNTHBOX_LOOPDELTA2"] = loopDelta2;
+                            // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
+                            metadata["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = (Math.floor(playbackLength) === playbackLength);
+                            // Actually write the metadata to the recording
+                            _private.filePropertiesHelper.writeMetadata(filename, metadata);
+                            console.log("Wrote metadata:", JSON.stringify(metadata));
+                            console.log("New sample starts at", startPosition, "seconds, has a playback length of", playbackLength, "beats, with a pattern length of", patternDurationInMS, "ms and loop that starts at", loopDelta, "second loop point", loopDelta2, "beats back from the stop point, and a pattern length of", patternDurationInBeats, "beats");
                         } else {
-                            clip.snapLengthToBeat = false;
+                            console.log("Failed to get recording!");
                         }
-                        // Set the new sample's start and end points
-                        clip.startPosition = (startTime / 1000) + Math.max(0, clip.duration - (_private.recordingDurationInMS / 1000));
-                        clip.length = loopLength / Zynthbox.PlayGridManager.syncTimer.getMultiplier();
+                        // Set the newly recorded file as the current slot's loop clip
+                        let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
+                        let clip = _private.selectedChannel.getClipsModelByPart(_private.partIndex).getClip(sceneIndices[_private.trackName]);
+                        clip.set_path(filename, true);
+                        console.log("...and the clip says it is", clip.duration, "seconds long");
                         // Set channel mode to loop
                         _private.selectedChannel.channelAudioType = "sample-loop";
+                        // Clean up the temporary segments model
+                        let ourSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = _private.previouslySelectedSegmentsModel;
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.removeSegmentsModel(ourSegmentsModel);
                         // Close out and we're done
                         root.close();
+                        // Just reset back to -1 so we're ready to bounce again
                         _private.bounceProgress = -1;
                     }
                 }

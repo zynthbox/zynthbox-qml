@@ -530,7 +530,7 @@ Rectangle {
                                             icon.name: bounceButtonLayout.shouldBounce ? "go-next" : "go-previous"
                                             onClicked: {
                                                 if (bounceButtonLayout.shouldBounce) {
-                                                    bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel);
+                                                    bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                                                 } else if (bounceButtonLayout.shouldUnbounce) {
                                                     // TODO Actually implement unbouncing functionality, dependent on what's contained in the sketch
                                                     sketchUnbouncer.unbounce(waveformContainer.clip, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);

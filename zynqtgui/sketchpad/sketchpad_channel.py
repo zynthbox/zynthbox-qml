@@ -925,7 +925,7 @@ class sketchpad_channel(QObject):
     # If explicit slot_row is not set then selected slot row is used
     def setFxToChain(self, layer, slot_row=-1):
 
-        if slot_row is -1:
+        if slot_row == -1:
             slot_row = self.__selected_fx_slot_row
 
         old_layer = self.__chained_fx[slot_row]
@@ -1530,7 +1530,7 @@ class sketchpad_channel(QObject):
                 "sampledata": ""
                 }
             if sample is not None and sample.path is not None and len(sample.path) > 0:
-                thisSample["filename"] = sample.filename()
+                thisSample["filename"] = sample.filename
                 with open(sample.path, "rb") as file:
                     thisSample["sampledata"] = base64.b64encode(file.read())
             encodedSampleData[index] = thisSample

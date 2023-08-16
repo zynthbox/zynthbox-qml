@@ -4137,6 +4137,20 @@ class zynthian_gui(QObject):
     ignoreNextModeButtonPress = Property(bool, get_ignoreNextModeButtonPress, set_ignoreNextModeButtonPress, notify=ignoreNextModeButtonPressChanged)
     ### END Property ignoreNextModeButtonPress
 
+    ### Property ignoreNextMetronomeButtonPress
+    def get_ignoreNextMetronomeButtonPress(self):
+        return self.__ignoreNextMetronomeButtonPress
+
+    def set_ignoreNextMetronomeButtonPress(self, val):
+        if self.__ignoreNextMetronomeButtonPress != val:
+            self.__ignoreNextMetronomeButtonPress = val
+            self.ignoreNextMetronomeButtonPressChanged.emit()
+
+    ignoreNextMetronomeButtonPressChanged = Signal()
+
+    ignoreNextMetronomeButtonPress = Property(bool, get_ignoreNextMetronomeButtonPress, set_ignoreNextMetronomeButtonPress, notify=ignoreNextMetronomeButtonPressChanged)
+    ### END Property ignoreNextMetronomeButtonPress
+
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
     deferred_loading_timer_start = Signal()

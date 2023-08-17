@@ -736,13 +736,15 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.channelAudioType === "synth"
-
+            visible: root.selectedChannel.channelAudioType === "synth" && zynqtgui.curlayerEngineName.length > 0
+            text: synthButton.updateSoundName();
             // Open preset screen on clicking this synth button
-            onClicked: zynqtgui.current_screen_id = "preset"
-
-            text: {
-                synthButton.updateSoundName();
+            onClicked: {
+                if (zynqtgui.curlayerIsFX) {
+                    zynqtgui.show_screen("effect_preset")
+                } else {
+                    zynqtgui.show_screen("preset")
+                }
             }
 
             Connections {
@@ -751,39 +753,26 @@ Kirigami.AbstractApplicationWindow {
                     synthButton.updateSoundName();
                 }
             }
-
             Timer {
                 id: synthButtonSoundNameThrottle
                 interval: 0; repeat: false; running: false;
                 onTriggered: {
-                    var text = "";
-
-                    if (root.selectedChannel) {
-                        for (var id in root.selectedChannel.chainedSounds) {
-                            if (root.selectedChannel.chainedSounds[id] >= 0 &&
-                                root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
-                                text = zynqtgui.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
-                                break;
-                            }
-                        }
-                    }
-
-                    synthButton.text = text == "" ? qsTr("Sounds") : text;
+                    synthButton.text = zynqtgui.curlayerEngineName.length > 0 ? zynqtgui.curlayerEngineName : "";
                 }
             }
             function updateSoundName() {
                 synthButtonSoundNameThrottle.restart();
             }
 
-            SessionDashboard.SoundsDialog {
-                id: soundsDialog
-                width: Screen.width
-                height: Screen.height - synthButton.height - Kirigami.Units.gridUnit
-                onVisibleChanged: {
-                    x = synthButton.mapFromGlobal(0, 0).x
-                    y = synthButton.height + Kirigami.Units.smallSpacing
-                }
-            }
+//            SessionDashboard.SoundsDialog {
+//                id: soundsDialog
+//                width: Screen.width
+//                height: Screen.height - synthButton.height - Kirigami.Units.gridUnit
+//                onVisibleChanged: {
+//                    x = synthButton.mapFromGlobal(0, 0).x
+//                    y = synthButton.height + Kirigami.Units.smallSpacing
+//                }
+//            }
         }
         Zynthian.BreadcrumbButton {
             id: presetButton
@@ -791,18 +780,12 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-
-            // Open synth edit page whjen preset button is clicked
+            visible: root.selectedChannel.channelAudioType === "synth" && synthButton.visible
             onClicked: {
-                if (root.selectedChannel) {
-                    zynqtgui.fixed_layers.activate_index(root.selectedChannel.connectedSound)
-                    zynqtgui.control.single_effect_engine = null;
-                    zynqtgui.current_screen_id = "control";
-                    zynqtgui.forced_screen_back = "sketchpad"
-                }
+                // Open synth edit page whjen preset button is clicked
+                zynqtgui.current_screen_id = "control";
+                zynqtgui.forced_screen_back = "sketchpad"
             }
-
-            visible: root.selectedChannel.channelAudioType === "synth"
 
             Connections {
                 target: zynqtgui.fixed_layers
@@ -817,20 +800,7 @@ Kirigami.AbstractApplicationWindow {
                 id: presetButtonTextThrottle
                 interval: 0; running: false; repeat: false;
                 onTriggered: {
-                    var text = "";
-
-                    if (root.selectedChannel) {
-                        for (var id in root.selectedChannel.chainedSounds) {
-                            if (root.selectedChannel.chainedSounds[id] >= 0 &&
-                                root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
-                                text = zynqtgui.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]);
-                                text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
-                                break;
-                            }
-                        }
-                    }
-
-                    presetButton.text = text == "" ? qsTr("Presets") : text;
+                    presetButton.text = zynqtgui.curlayerPresetName.length > 0 ? zynqtgui.curlayerPresetName : qsTr("Presets");
                 }
             }
         }

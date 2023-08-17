@@ -1530,7 +1530,9 @@ class zynthian_gui(QObject):
         self.active_midi_channel_changed.emit()
         self.screens["main_layers_view"].sync_index_from_curlayer()
         self.screens["snapshot"].schedule_save_last_state_snapshot()
-
+        self.curlayerEngineNameChanged.emit()
+        self.curlayerPresetNameChanged.emit()
+        self.curlayerIsFXChanged.emit()
 
     def restore_curlayer(self):
         if self._curlayer:
@@ -4147,6 +4149,42 @@ class zynthian_gui(QObject):
 
     ignoreNextMetronomeButtonPress = Property(bool, get_ignoreNextMetronomeButtonPress, set_ignoreNextMetronomeButtonPress, notify=ignoreNextMetronomeButtonPressChanged)
     ### END Property ignoreNextMetronomeButtonPress
+
+    ### Property curlayerEngineName
+    def get_curlayerEngineName(self):
+        try:
+            return self.curlayer.engine.name.replace("Jalv/", "")
+        except:
+            return ""
+
+    curlayerEngineNameChanged = Signal()
+
+    curlayerEngineName = Property(str, get_curlayerEngineName, notify=curlayerEngineNameChanged)
+    ### END Property curlayerEngineName
+
+    ### Property curlayerPresetName
+    def get_curlayerPresetName(self):
+        try:
+            return self.curlayer.preset_name
+        except:
+            return ""
+
+    curlayerPresetNameChanged = Signal()
+
+    curlayerPresetName = Property(str, get_curlayerPresetName, notify=curlayerPresetNameChanged)
+    ### END Property curlayerPresetName
+
+    ### Property curlayerIsFX
+    def get_curlayerIsFX(self):
+        try:
+            return self.curlayer.engine.type == "Audio Effect"
+        except:
+            return False
+
+    curlayerIsFXChanged = Signal()
+
+    curlayerIsFX = Property(bool, get_curlayerIsFX, notify=curlayerIsFXChanged)
+    ### END Property curlayerIsFX
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

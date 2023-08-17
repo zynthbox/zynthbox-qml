@@ -184,7 +184,8 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
         self.__last_auto_activated_index = -1
 
     def auto_activate_selected_index(self):
-        if self.__last_auto_activated_index != self.index:
+        # Auto activate selected index if current screen is self and not already activated
+        if self.zynqtgui.get_current_screen_id() != None and self.zynqtgui.get_current_screen() == self and self.__last_auto_activated_index != self.index:
             self.select(self.index)
             self.select_action(self.index, 'S')
             self.__last_auto_activated_index = self.index

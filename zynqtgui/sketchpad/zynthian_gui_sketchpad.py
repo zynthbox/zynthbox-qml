@@ -119,7 +119,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__current_beat__ = -1
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
-        self.metronome_running_refcount = 0
         self.__sketchpad_basepath__ = Path("/zynthian/zynthian-my-data/sketchpads/my-sketchpads/")
         self.__clips_queue__: list[sketchpad_clip] = []
         self.is_recording = False
@@ -165,6 +164,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.metronome_clip_tock.setLength(1, 120);
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)
         Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.metronomeEnabledChanged)
+        Zynthbox.SyncTimer.instance().timerRunningChanged.connect(self.metronome_running_changed)
 
         Path('/zynthian/zynthian-my-data/sketchpads/default-sketchpads').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sketchpads/my-sketchpads').mkdir(exist_ok=True, parents=True)
@@ -558,7 +558,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.stopAllPlayback()
                 self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
                 self.zynqtgui.screens["song_arranger"].stop()
-                self.resetMetronome()
             except:
                 pass
 
@@ -657,7 +656,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.stopAllPlayback()
             self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
             self.zynqtgui.screens["song_arranger"].stop()
-            self.resetMetronome()
 
             # Rename temp sketchpad folder to the user defined name
             Path(self.__sketchpad_basepath__ / 'temp').rename(self.__sketchpad_basepath__ / name)
@@ -722,7 +720,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.stopAllPlayback()
                 self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
                 self.zynqtgui.screens["song_arranger"].stop()
-                self.resetMetronome()
             except:
                 pass
 
@@ -790,7 +787,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.stopAllPlayback()
         self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
         self.zynqtgui.screens["song_arranger"].stop()
-        self.resetMetronome()
 
         self.__song__ = sketchpad_song.sketchpad_song(sketchpad_folder, version, self)
         self.song_changed.emit()
@@ -941,6 +937,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             Zynthbox.AudioLevels.instance().stopRecording()
             Zynthbox.AudioLevels.instance().clearRecordPorts()
 
+    # Called by SyncTimer to ensure the current scene gets started as expected
+    # To actually start playback, call start_metronome_request, or manually call SyncTimer::scheduleStartPlayback
     @Slot(None)
     def startPlayback(self):
         if not self.is_recording or \
@@ -948,59 +946,23 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex,
                                                 self.__song__.scenesModel.selectedTrackIndex)
 
-        self.start_metronome_request()
-
     def start_metronome_request(self):
-        self.metronome_running_refcount += 1
-
-        logging.debug(f"Start Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
-
-        if self.metronome_running_refcount == 1:
-            if self.metronome_schedule_stop:
-                # Metronome is already running and scheduled to stop.
-                # Do not start timer again and remove stop schedule
-                self.metronome_schedule_stop = False
-            else:
-                Zynthbox.SyncTimer.instance().start()
-                self.metronome_running_changed.emit()
+        logging.debug(f"Start Metronome Request : while timer is running:{self.isMetronomeRunning}")
+        if self.isMetronomeRunning == False:
+            Zynthbox.SyncTimer.instance().scheduleStartPlayback(0)
 
     def stop_metronome_request(self):
-        if self.metronome_running_refcount == 1:
-            self.metronome_schedule_stop = True
-
-        self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)
-
-        logging.debug(f"Stop Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
-
-    @Slot(None)
-    def resetMetronome(self):
-        if self.metronome_running_refcount > 0:
-            logging.info(f"Resetting metronome")
-            self.metronome_running_refcount = 0
-            self.metronome_schedule_stop = True
+        logging.debug(f"Stop Metronome Request : while timer is running:{self.isMetronomeRunning}")
+        if self.isMetronomeRunning == True:
+            Zynthbox.SyncTimer.instance().scheduleStopPlayback(0)
 
     def metronome_update(self, beat):
+        self.__current_bar__ = math.floor(Zynthbox.SyncTimer.instance().cumulativeBeat() / (Zynthbox.SyncTimer.instance().getMultiplier() * 4))
         self.__current_beat__ = beat
-
-        # Immediately stop clips when scheduled to stop
-        if self.metronome_schedule_stop:
-            logging.debug(f"Stopping timer as it was scheduled to stop.")
-            Zynthbox.SyncTimer.instance().stop()
-
-            self.__current_beat__ = -1
-            self.__current_bar__ = -1
-            self.current_beat_changed.emit()
-            self.current_bar_changed.emit()
-            self.metronome_schedule_stop = False
-            self.metronome_running_changed.emit()
-        else:
-            if self.__current_beat__ == 0:
-                self.__current_bar__ += 1
-                if self.ongoingCountIn > 0:
-                    self.ongoingCountIn -= 1
-                self.current_bar_changed.emit()
-
-            self.current_beat_changed.emit()
+        self.current_bar_changed.emit()
+        self.current_beat_changed.emit()
+        if self.ongoingCountIn > 0:
+            self.ongoingCountIn -= 1
 
     def load_recorded_file_to_clip(self):
         if self.recordingType == "audio":
@@ -1077,12 +1039,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     @Property(bool, notify=metronome_running_changed)
     def isMetronomeRunning(self):
-        if self.metronome_running_refcount > 0:
-            return True
-        elif self.metronome_running_refcount == 0 and self.metronome_schedule_stop:
-            return True
-        else:
-            return False
+        return Zynthbox.SyncTimer.instance().timerRunning()
 
     @Slot(QObject)
     def toggleFromClipsToRecord(self, clip):

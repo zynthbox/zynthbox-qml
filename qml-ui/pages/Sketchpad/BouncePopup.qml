@@ -140,21 +140,25 @@ Zynthian.Popup {
                             }
                             // Now we're ready to get under way, mark ourselves as very extremely busy
                             _private.isRecording = true;
-                            // Force the next start to be in song mode
-                            zynqtgui.forceSongMode = true;
                             // Set up to record (with a useful filename, and just the channel we want)
                             Zynthbox.AudioLevels.setChannelToRecord(_private.selectedChannel.id, true);
                             Zynthbox.AudioLevels.setChannelFilenamePrefix(_private.selectedChannel.id, zynqtgui.sketchpad.get_channel_recording_filename(_private.selectedChannel));
-                            // Schedule us to start audio recording
-                            Zynthbox.AudioLevels.scheduleStartRecording(0);
+                            // Schedule us to start audio recording two ticks into the future
+                            // Four ticks because we need to wait for...
+                            // - the start command to be interpreted
+                            // - song mode to set playback on for the first segment
+                            // - the first events from that segment to be submitted for playback
+                            // - the note actually hitting the synth and making noises
+                            let waitForStart = 4;
+                            Zynthbox.AudioLevels.scheduleStartRecording(waitForStart);
                             // Schedule us to start midi recording at the same point
-                            Zynthbox.MidiRecorder.scheduleStartRecording(0, _private.selectedChannel.id);
+                            Zynthbox.MidiRecorder.scheduleStartRecording(waitForStart, _private.selectedChannel.id);
+                            // Schedule us to start playback one step back from the recordings (to allow playback to actually begin), in song mode, with no changes to start position and duration
+                            Zynthbox.SyncTimer.scheduleStartPlayback(0, true, 0, 0)
                             // Schedule us to stop recording at the end of the song (duration)
-                            console.log("Schedule stopping both midi and audio recordings at", songDuration, "ticks");
-                            Zynthbox.AudioLevels.scheduleStopRecording(songDuration);
-                            Zynthbox.MidiRecorder.scheduleStopRecording(songDuration, _private.selectedChannel.id);
-                            // Schedule us to start playback at the same point
-                            Zynthbox.SyncTimer.scheduleTimerCommand(0, 1);
+                            console.log("Schedule stopping both midi and audio recordings in", songDuration + waitForStart, "ticks");
+                            Zynthbox.AudioLevels.scheduleStopRecording(songDuration + waitForStart);
+                            Zynthbox.MidiRecorder.scheduleStopRecording(songDuration + waitForStart, _private.selectedChannel.id);
                         }
                     }
                 }
@@ -164,15 +168,27 @@ Zynthian.Popup {
                 property bool includeFadeoutInLoop: false
             }
             Connections {
+                target: Zynthbox.AudioLevels
                 enabled: _private.isRecording
-                target: Zynthbox.PlayGridManager
+                onIsRecordingChanged: {
+                    if (Zynthbox.AudioLevels.isRecording) {
+                        endOfRecordingTimer.start();
+                    }
+                }
+            }
+            Timer {
+                id: endOfRecordingTimer
+                // enabled: _private.isRecording
+                // target: Zynthbox.PlayGridManager
                 property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 1
-                onMetronomeBeat128thChanged: {
+                interval: 50; repeat: true; running: false;
+                onTriggered: {
                     // While recording, check each beat whether we have reached the end of playback, and once we have, and we are done recording and all that, pull things out and clean up
                     _private.bounceProgress = Math.min(1, Zynthbox.SegmentHandler.playhead / totalDuration);
-                    if ((Zynthbox.PlayGridManager.metronomeActive && Zynthbox.MidiRecorder.isRecording && Zynthbox.AudioLevels.isRecording) == false) {
+                    if (Zynthbox.PlayGridManager.metronomeActive == false && Zynthbox.MidiRecorder.isRecording == false &&  Zynthbox.AudioLevels.isRecording == false) {
                         // Playback has stopped (we've reached the end of the song) - that means we should no longer be recording
                         _private.isRecording = false;
+                        endOfRecordingTimer.stop();
                         // Save metadata into the newly created recordings
                         let recordingFilenames = Zynthbox.AudioLevels.recordingFilenames();
                         let filenameIndex = _private.selectedChannel.id + 2;

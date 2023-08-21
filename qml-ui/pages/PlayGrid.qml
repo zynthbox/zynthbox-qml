@@ -642,17 +642,16 @@ don't want to have to dig too far...
         onRemovedHardwareOutputDevice: {
             applicationWindow().showPassiveNotification("Removed Midi Output Device: " + humanReadableName);
         }
-        onPleaseStartPlayback: {
-            Zynthian.CommonUtils.startMetronomeAndPlayback();
-        }
-        onPleaseStopPlayback: {
-            Zynthian.CommonUtils.stopMetronomeAndPlayback();
-        }
     }
     Binding {
         target: Zynthbox.PlayGridManager
         property: "zlDashboard"
         value: zynqtgui.session_dashboard
+    }
+    Binding {
+        target: Zynthbox.PlayGridManager
+        property: "zlSketchpad"
+        value: zynqtgui.sketchpad
     }
     Binding {
         target: Zynthbox.SegmentHandler

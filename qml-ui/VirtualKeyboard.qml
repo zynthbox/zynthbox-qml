@@ -87,7 +87,6 @@ Item {
             anchors.fill: parent
             onClicked: {
                 Qt.inputMethod.hide()
-                applicationWindow().forceActiveFocus()
             }
         }
 
@@ -121,6 +120,13 @@ Item {
             bottom: parent.bottom
         }
         height: 250
+        onVisibleChanged: {
+            // If z is not set after making keyboard visible then it goes below overlay
+            Qt.callLater(function() {
+                inputPanel.z = 0
+                inputPanel.z = 99999999
+            })
+        }
 
         onHeightChanged: resizeKeyboard();
         onWidthChanged: resizeKeyboard();

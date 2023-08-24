@@ -27,6 +27,7 @@ import logging
 import os
 import tempfile
 import traceback
+from json import JSONEncoder
 from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, QSortFilterProxyModel, Qt, Slot
@@ -177,12 +178,31 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(str, str)
     def saveSound(self, filename, category):
-        final_name = self.zynqtgui.layer.save_curlayer_to_file(str(self.__my_sounds_path__ / filename), category)
+        file_name = str(self.__my_sounds_path__ / filename)
+        track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        # Only store layers from snapshot as sounds
+        snapshot = {
+            'layers': self.zynqtgui.layer.generate_snapshot(track)['layers']
+        }
 
-        if final_name is not None:
+        try:
+            final_name = file_name.split(".")[0] + "." + str(len(snapshot["layers"])) + ".sound"
+            saveToPath = Path(final_name)
+            final_name = saveToPath.name
+            saveToPath = saveToPath.parent
+            saveToPath.mkdir(parents=True, exist_ok=True)
+
+            if category not in ["0", "*"]:
+                snapshot["category"] = category
+
+            f = open(saveToPath / final_name, "w")
+            f.write(JSONEncoder().encode(snapshot))
+            f.flush()
+            os.fsync(f.fileno())
+            f.close()
             logging.info(f"Saved sound file to {str(self.__my_sounds_path__ / filename)}")
-        else:
-            logging.error("Error saving sound file")
+        except Exception as e:
+            logging.error(f"Error saving sound file : {str(e)}")
 
         self.load_sounds_model()
 

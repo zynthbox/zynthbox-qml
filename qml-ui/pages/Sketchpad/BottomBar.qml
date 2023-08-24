@@ -147,10 +147,14 @@ Rectangle {
 
                 Item {
                     Layout.fillWidth: true
+                    visible: !(zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern")
                 }
 
                 QQC2.Label {
                     visible: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
+                    Layout.fillWidth: true
+                    elide: Text.ElideMiddle
+                    horizontalAlignment: Text.AlignRight
                     text: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.path
                             ? qsTr("Sample (0): %1").arg(zynqtgui.bottomBarControlObj.path.split('/').pop())
                             : qsTr("No File Loaded")

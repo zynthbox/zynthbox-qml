@@ -1568,7 +1568,7 @@ class sketchpad_channel(QObject):
         if self.connectedSound == -1:
             self.__sound_json_snapshot__ = ""
         else:
-            self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.export_multichannel_snapshot(self.connectedSound))
+            self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.generate_snapshot(self))
 
         # logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 

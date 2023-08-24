@@ -492,14 +492,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__song__.channelsModel.getChannel(tid).set_layers_snapshot(channel_layers_snapshot)
         self.__song__.schedule_save()
 
-    @Slot(int)
-    def restoreLayersFromChannel(self, tid):
-        if tid < 0 or tid >= self.__song__.channelsModel.count:
-            return
-        for i in range(5, 10):
-            if i in self.zynqtgui.screens['layer'].layer_midi_map:
-                self.zynqtgui.screens['layer'].remove_root_layer(self.zynqtgui.screens['layer'].root_layers.index(self.zynqtgui.screens['layer'].layer_midi_map[i]), True)
-        self.zynqtgui.screens['layer'].load_channels_snapshot(self.__song__.channelsModel.getChannel(tid).get_layers_snapshot(), 5, 9)
+#    @Slot(int)
+#    def restoreLayersFromChannel(self, tid):
+#        if tid < 0 or tid >= self.__song__.channelsModel.count:
+#            return
+#        for i in range(5, 10):
+#            if i in self.zynqtgui.screens['layer'].layer_midi_map:
+#                self.zynqtgui.screens['layer'].remove_root_layer(self.zynqtgui.screens['layer'].root_layers.index(self.zynqtgui.screens['layer'].layer_midi_map[i]), True)
+#        self.zynqtgui.screens['layer'].load_channels_snapshot(self.__song__.channelsModel.getChannel(tid).get_layers_snapshot(), 5, 9)
 
     @Signal
     def ongoingCountInChanged(self):
@@ -836,12 +836,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # but not necessary to change to selected channel's synth.
         # Hence make sure to update curLayer before doing operations depending upon curLayer
         self.zynqtgui.screens["layers_for_channel"].do_activate_midich_layer()
-        layers_snapshot = None
-
-        if self.zynqtgui.curlayer is not None:
-            layers_snapshot = self.zynqtgui.screens["layer"].export_multichannel_snapshot(self.zynqtgui.curlayer.midi_chan)
-
         channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        layers_snapshot = self.zynqtgui.layer.generate_snapshot(channel)
         self.set_clip_to_record(clip)
 
         if clip.isChannelSample:
@@ -971,13 +967,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 
+            currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+
             try:
-                layer = self.zynqtgui.screens["layer"].export_multichannel_snapshot(self.zynqtgui.curlayer.midi_chan)
+                layer = self.zynqtgui.layer.generate_snapshot(currentChannel)
                 logging.debug(f"### Channel({self.zynqtgui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
             except:
                 layer = None
-
-            currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
 
             self.clip_to_record.set_path(self.clip_to_record_path, False)
             if layer is not None:

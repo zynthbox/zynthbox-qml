@@ -212,20 +212,21 @@ Zynthian.Popup {
                             var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                             // Reset this to beats (rather than pattern subbeats)
                             let patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
-                            let patternDurationInMS = Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, patternDurationInBeats * patternSubbeatToTickMultiplier) * 1000;
+                            let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
                             patternDurationInBeats = patternDurationInBeats / 32;
                             let startPosition = 0.0; // This is in seconds
-                            let loopDelta = 0.0; // This is in beats (not pattern subbeats)
+                            let loopDelta = 0.0; // This is in seconds
                             // TODO Loop point 2 would allow us to have a start-at-0, loop-from-first-round, loop-until-fadeout, stop-at-end option (for a very clean recording which does play-into-loop-with-fadeout for playback)
-                            let loopDelta2 = 0.0; // This is in beats (not pattern subbeats) - relative to stop point, any position further back than loopDelta would be ignored
+                            let loopDelta2 = 0.0; // This is in seconds - relative to stop point, any position further back than loopDelta would be ignored
                             let playbackLength = patternDurationInBeats; // This is in beats (not pattern subbeats)
                             if (_private.includeLeadin) {
+                                // We start playback at the start of the recording, so we need to increase the playback duration to include both the main recording, and the leadin
+                                playbackLength = playbackLength + patternDurationInBeats;
                                 if (_private.includeLeadinInLoop) {
                                     // We have a leadin, that is included in the loop (not really a common case)
-                                    playbackLength = playbackLength + patternDurationInBeats;
                                 } else {
                                     // We have a lead-in, which is not included in the loop (so the loop start position is after the leadin)
-                                    loopDelta = loopDelta + patternDurationInBeats;
+                                    loopDelta = loopDelta + patternDurationInSeconds;
                                 }
                             }
                             if (_private.includeFadeout) {
@@ -234,7 +235,7 @@ Zynthian.Popup {
                                     playbackLength = playbackLength + patternDurationInBeats;
                                 } else {
                                     // We have a fadeout, that we do not want included in the loop
-                                    loopDelta2 = loopDelta2 + patternDurationInBeats;
+                                    loopDelta2 = loopDelta2 + patternDurationInSeconds;
                                     // Once we've got loopDelta2 implemented, uncomment this next line so we can have the tail
                                     // playbackLength = playbackLength + patternDurationInBeats;
                                 }
@@ -248,7 +249,7 @@ Zynthian.Popup {
                             // Actually write the metadata to the recording
                             _private.filePropertiesHelper.writeMetadata(filename, metadata);
                             console.log("Wrote metadata:", JSON.stringify(metadata));
-                            console.log("New sample starts at", startPosition, "seconds, has a playback length of", playbackLength, "beats, with a pattern length of", patternDurationInMS, "ms and loop that starts at", loopDelta, "second loop point", loopDelta2, "beats back from the stop point, and a pattern length of", patternDurationInBeats, "beats");
+                            console.log("New sample starts at", startPosition, "seconds, has a playback length of", playbackLength, "beats, with a pattern length of", patternDurationInSeconds, "s and loop that starts at", loopDelta, "seconds, second loop point", loopDelta2, "seconds back from the stop point, and a pattern length of", patternDurationInBeats, "beats");
                         } else {
                             console.log("Failed to get recording!");
                         }

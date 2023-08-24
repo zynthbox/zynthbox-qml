@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 #******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
-# 
+#
 # Zynthian GUI Layer Selector Class
-# 
+#
 # Copyright (C) 2015-2016 Fernando Moyano <jofemodo@zynthian.org>
 #
 #******************************************************************************
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of
@@ -1334,11 +1334,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
     # Snapshot Save & Load
     #----------------------------------------------------------------------------
 
-    def save_snapshot(self, fpath):
-        if self.zynqtgui.isShuttingDown:
-            logging.info("Not saving snapshot when shutting down")
-            return
-
+    # Generate snapshot json for track if supplied otherwise generate snapshot of all tracks
+    # track : Supply a sketchpad_track instance to generate snapshot for that specific track otherswise generate snapshot of all tracks if None is passed
+    def generate_snapshot(self, track=None):
         try:
             snapshot={
                 'index':self.index,
@@ -1354,7 +1352,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
             #Layers info
             for layer in self.layers:
-                snapshot['layers'].append(layer.get_snapshot())
+                if track is None or (track is not None and layer.midi_chan in track.chainedSounds):
+                    snapshot['layers'].append(layer.get_snapshot())
 
             if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
                 snapshot['layers'].append(self.amixer_layer.get_snapshot())
@@ -1379,14 +1378,19 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 }
                 snapshot['note_range'].append(info)
 
-            #JSON Encode
-            json=JSONEncoder().encode(snapshot)
-            logging.info(f"Saving snapshot {fpath}")
-            # logging.debug(json)
-
+            return snapshot
         except Exception as e:
             logging.error("Can't generate snapshot: %s" % e)
-            return False
+            return None
+
+    def save_snapshot(self, fpath):
+        if self.zynqtgui.isShuttingDown:
+            logging.info("Not saving snapshot when shutting down")
+            return
+
+        json = JSONEncoder().encode(self.generate_snapshot())
+        logging.info(f"Saving snapshot {fpath}")
+        # logging.debug(json)
 
         try:
             with open(fpath,"w") as fh:
@@ -1587,8 +1591,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
         return True
 
-    # snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
-    # All restored channels will be cloned among themselves
+#    # snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
+#    # All restored channels will be cloned among themselves
     def load_channels_snapshot(self, snapshot, from_channel, to_channel, channels_mapping = {}):
         if not isinstance(snapshot, dict):
             return []
@@ -1598,11 +1602,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
             return []
         if not isinstance(snapshot["layers"], list):
             return []
-        self.zynqtgui.start_loading()
+#        self.zynqtgui.start_loading()
 
         restored_layers = []
-        restored_channels = []
-        restored_jacknames = []
+#        restored_channels = []
+#        restored_jacknames = []
 
         # for layer_data in snapshot["layers"]:
         #     if "midi_chan" in layer_data and "engine_nick" in layer_data:
@@ -1616,121 +1620,122 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 if str(midi_chan) in channels_mapping:
                     midi_chan = int(channels_mapping[str(midi_chan)])
                 if midi_chan >= from_channel and midi_chan <= to_channel:
-                    for i in range(from_channel, to_channel + 1):
-                        if i in self.layer_midi_map and midi_chan in self.layer_midi_map:
-                            self.remove_clone_midi(i, midi_chan)
-                            self.remove_clone_midi(midi_chan, i)
+#                    for i in range(from_channel, to_channel + 1):
+#                        if i in self.layer_midi_map and midi_chan in self.layer_midi_map:
+#                            self.remove_clone_midi(i, midi_chan)
+#                            self.remove_clone_midi(midi_chan, i)
 
                     logging.debug(f"### Restoring engine : {layer_data['engine_nick']}")
                     engine = self.zynqtgui.screens['engine'].start_engine(layer_data['engine_nick'])
-                    new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui)
+                    slot_index = layer_data['slot_index'] if "slot_index" in layer_data else -1
+                    new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index)
                     new_layer.restore_snapshot_1(layer_data)
                     new_layer.restore_snapshot_2(layer_data)
+                    if engine.type == "Audio Effect":
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.midi_chan).setFxToChain(new_layer, slot_index)
                     sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
                     for layer in sublayers:
                         layer.set_midi_chan(midi_chan)
                     self.layers.append(new_layer)
                     restored_layers.append(new_layer)
-                    restored_channels.append(new_layer.midi_chan)
-                    restored_jacknames.append(new_layer.get_jackname())
-        # try to map the jacknames of therestored channels with what it was snapshotted
-        snapshotted_jacknames = []
-        if 'audio_routing' in snapshot:
-            for jackname in snapshot['audio_routing']:
-                if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
-                for out in snapshot['audio_routing'][jackname]:
-                    if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
-        if 'midi_routing' in snapshot:
-            for jackname in snapshot['midi_routing']:
-                if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
-                for out in snapshot['midi_routing'][jackname]:
-                    if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
-        restored_jacknames.sort()
-        snapshotted_jacknames.sort()
-        jacknames_r_s_map = {}
-        jacknames_s_r_map = {}
-        for rj in restored_jacknames:
-            rjsize = len(rj)
-            basename = rj[:rjsize - 3]
-            for sj in snapshotted_jacknames:
-                if basename == sj[:rjsize - 3]:
-                    jacknames_r_s_map[rj] = sj
-                    jacknames_s_r_map[sj] = rj
-                    snapshotted_jacknames.remove(sj)
-                    break
+#                    restored_channels.append(new_layer.midi_chan)
+#                    restored_jacknames.append(new_layer.get_jackname())
+#        # try to map the jacknames of therestored channels with what it was snapshotted
+#        snapshotted_jacknames = []
+#        if 'audio_routing' in snapshot:
+#            for jackname in snapshot['audio_routing']:
+#                if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
+#                for out in snapshot['audio_routing'][jackname]:
+#                    if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
+#        if 'midi_routing' in snapshot:
+#            for jackname in snapshot['midi_routing']:
+#                if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
+#                for out in snapshot['midi_routing'][jackname]:
+#                    if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
+#        restored_jacknames.sort()
+#        snapshotted_jacknames.sort()
+#        jacknames_r_s_map = {}
+#        jacknames_s_r_map = {}
+#        for rj in restored_jacknames:
+#            rjsize = len(rj)
+#            basename = rj[:rjsize - 3]
+#            for sj in snapshotted_jacknames:
+#                if basename == sj[:rjsize - 3]:
+#                    jacknames_r_s_map[rj] = sj
+#                    jacknames_s_r_map[sj] = rj
+#                    snapshotted_jacknames.remove(sj)
+#                    break
 
-        if 'audio_routing' in snapshot:
-            for layer in restored_layers:
-                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
-                if layer.get_jackname() in jacknames_r_s_map:
-                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
-                    if mapped_source_jackname in snapshot['audio_routing']:
-                        mapped_out_jacknames = []
-                        for name in snapshot['audio_routing'][mapped_source_jackname]:
-                            if name in jacknames_s_r_map:
-                                mapped_out_jacknames.append(jacknames_s_r_map[name])
-                        if len(mapped_out_jacknames) > 0:
-                            layer.set_audio_out(mapped_out_jacknames)
-                        else:
-                            layer.reset_audio_out()
-                else:
-                    layer.reset_audio_out()
-        if 'midi_routing' in snapshot:
-            for layer in restored_layers:
-                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
-                if layer.get_jackname() in jacknames_r_s_map:
-                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
-                    if mapped_source_jackname in snapshot['midi_routing']:
-                        mapped_out_jacknames = []
-                        for name in snapshot['midi_routing'][mapped_source_jackname]:
-                            if name in jacknames_s_r_map:
-                                mapped_out_jacknames.append(jacknames_s_r_map[name])
-                        if len(mapped_out_jacknames) > 0:
-                            layer.set_midi_out(mapped_out_jacknames)
+#        if 'audio_routing' in snapshot:
+#            for layer in restored_layers:
+#                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
+#                if layer.get_jackname() in jacknames_r_s_map:
+#                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
+#                    if mapped_source_jackname in snapshot['audio_routing']:
+#                        mapped_out_jacknames = []
+#                        for name in snapshot['audio_routing'][mapped_source_jackname]:
+#                            if name in jacknames_s_r_map:
+#                                mapped_out_jacknames.append(jacknames_s_r_map[name])
+#                        if len(mapped_out_jacknames) > 0:
+#                            layer.set_audio_out(mapped_out_jacknames)
+#                        else:
+#                            layer.reset_audio_out()
+#                else:
+#                    layer.reset_audio_out()
+#        if 'midi_routing' in snapshot:
+#            for layer in restored_layers:
+#                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
+#                if layer.get_jackname() in jacknames_r_s_map:
+#                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
+#                    if mapped_source_jackname in snapshot['midi_routing']:
+#                        mapped_out_jacknames = []
+#                        for name in snapshot['midi_routing'][mapped_source_jackname]:
+#                            if name in jacknames_s_r_map:
+#                                mapped_out_jacknames.append(jacknames_s_r_map[name])
+#                        if len(mapped_out_jacknames) > 0:
+#                            layer.set_midi_out(mapped_out_jacknames)
 
-        if 'audio_capture' in snapshot:
-            for layer in restored_layers:
-                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
-                if layer.get_jackname() in jacknames_r_s_map:
-                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
-                    if mapped_source_jackname in snapshot['audio_capture']:
-                        mapped_out_jacknames = []
-                        for name in snapshot['audio_capture'][mapped_source_jackname]:
-                            if name in jacknames_s_r_map:
-                                mapped_out_jacknames.append(jacknames_s_r_map[name])
-                        if len(mapped_out_jacknames) > 0:
-                            layer.set_audio_in(mapped_out_jacknames)
-                        else:
-                            layer.reset_audio_in()
-                else:
-                    layer.reset_audio_in()
-        else:
-            for layer in restored_layers:
-                layer.reset_audio_in()
+#        if 'audio_capture' in snapshot:
+#            for layer in restored_layers:
+#                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
+#                if layer.get_jackname() in jacknames_r_s_map:
+#                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
+#                    if mapped_source_jackname in snapshot['audio_capture']:
+#                        mapped_out_jacknames = []
+#                        for name in snapshot['audio_capture'][mapped_source_jackname]:
+#                            if name in jacknames_s_r_map:
+#                                mapped_out_jacknames.append(jacknames_s_r_map[name])
+#                        if len(mapped_out_jacknames) > 0:
+#                            layer.set_audio_in(mapped_out_jacknames)
+#                        else:
+#                            layer.reset_audio_in()
+#                else:
+#                    layer.reset_audio_in()
+#        else:
+#            for layer in restored_layers:
+#                layer.reset_audio_in()
 
-        if 'note_range' in snapshot:
-            new_roots = self.get_fxchain_roots()
-            i = 0
-            for layer in restored_layers:
-                if i < len(snapshot['note_range']) and layer in new_roots:
-                    zyncoder.lib_zyncoder.set_midi_filter_note_range(layer.midi_chan, snapshot['note_range'][i]['note_low'], snapshot['note_range'][i]['note_high'], snapshot['note_range'][i]['octave_trans'], snapshot['note_range'][i]['halftone_trans'])
-                    i += 1
+#        if 'note_range' in snapshot:
+#            new_roots = self.get_fxchain_roots()
+#            i = 0
+#            for layer in restored_layers:
+#                if i < len(snapshot['note_range']) and layer in new_roots:
+#                    zyncoder.lib_zyncoder.set_midi_filter_note_range(layer.midi_chan, snapshot['note_range'][i]['note_low'], snapshot['note_range'][i]['note_high'], snapshot['note_range'][i]['octave_trans'], snapshot['note_range'][i]['halftone_trans'])
+#                    i += 1
 
-        #TODO: always clone?
-        for i in restored_channels:
-            self.add_midichannel_to_channel(i)
-            for j in restored_channels:
-                if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
-                    zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
+#        #TODO: always clone?
+#        for i in restored_channels:
+#            self.add_midichannel_to_channel(i)
+#            for j in restored_channels:
+#                if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
+#                    zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
 
-
-        self.zynqtgui.zynautoconnect_midi()
-        self.zynqtgui.zynautoconnect_audio()
+        self.zynqtgui.zynautoconnect(True)
 
         self.fill_list()
-        if len(restored_channels) > 0:
-            self.activate_midichan_layer(restored_channels[0])
-        self.zynqtgui.stop_loading()
+#        if len(restored_channels) > 0:
+#            self.activate_midichan_layer(restored_channels[0])
+#        self.zynqtgui.stop_loading()
         return restored_layers
 
 
@@ -1801,26 +1806,26 @@ class zynthian_gui_layer(zynthian_gui_selector):
             logging.error(e)
             return []
 
-    @Slot(str)
-    def load_soundset_from_file(self, file_name):
-        try:
-            if file_name.startswith("/"):
-                actualPath = Path(file_name)
-            else:
-                actualPath = Path(self.__soundsets_basepath__ + file_name)
-            f = open(actualPath, "r")
-            for i in range(5):
-                self.remove_midichan_layer(i)
-            layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
-            if len(layers) > 0:
-                try:
-                    self.activate_index(root_layers.index(layers[0]))
-                except:
-                    self.activate_index(0)
-            else:
-                self.activate_index(0)
-        except Exception as e:
-            logging.error(e)
+#    @Slot(str)
+#    def load_soundset_from_file(self, file_name):
+#        try:
+#            if file_name.startswith("/"):
+#                actualPath = Path(file_name)
+#            else:
+#                actualPath = Path(self.__soundsets_basepath__ + file_name)
+#            f = open(actualPath, "r")
+#            for i in range(5):
+#                self.remove_midichan_layer(i)
+#            layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
+#            if len(layers) > 0:
+#                try:
+#                    self.activate_index(root_layers.index(layers[0]))
+#                except:
+#                    self.activate_index(0)
+#            else:
+#                self.activate_index(0)
+#        except Exception as e:
+#            logging.error(e)
 
     @Slot(str, result='QVariantList')
     def load_layer_channels_from_json(self, json_data):
@@ -1857,9 +1862,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
         return result
 
 
-    @Slot(str, 'QVariantMap')
-    def load_layer_from_json(self, json_data, channels_mapping):
-        self.load_channels_snapshot(JSONDecoder().decode(json_data), 0, 16, channels_mapping)
+#    @Slot(str, 'QVariantMap')
+#    def load_layer_from_json(self, json_data, channels_mapping):
+#        self.load_channels_snapshot(JSONDecoder().decode(json_data), 0, 16, channels_mapping)
 
     @Slot(str, 'QVariantMap')
     def load_layer_from_file(self, file_name, channels_mapping):
@@ -1878,44 +1883,44 @@ class zynthian_gui_layer(zynthian_gui_selector):
         except Exception as e:
             logging.error(e)
 
-    @Slot(int, result=str)
-    def layer_as_json(self, midi_channel):
-        return JSONEncoder().encode(self.export_multichannel_snapshot(midi_channel))
+#    @Slot(int, result=str)
+#    def layer_as_json(self, midi_channel):
+#        return JSONEncoder().encode(self.export_multichannel_snapshot(midi_channel))
 
-    def export_multichannel_snapshot(self, midi_chan):
-        channels = [midi_chan]
-        for i in range(16):
-            if zyncoder.lib_zyncoder.get_midi_filter_clone(midi_chan, i):
-                channels.append(i)
-        if channels:
-            return self.export_channels_snapshot(channels)
-        else:
-            return {}
+#    def export_multichannel_snapshot(self, midi_chan):
+#        channels = [midi_chan]
+#        for i in range(16):
+#            if zyncoder.lib_zyncoder.get_midi_filter_clone(midi_chan, i):
+#                channels.append(i)
+#        if channels:
+#            return self.export_channels_snapshot(channels)
+#        else:
+#            return {}
 
-    def export_channels_snapshot(self, channels):
-        if not isinstance(channels, list):
-            return
-        snapshot = {"layers": [], "note_range": [], "audio_routing": {}, "midi_routing": {}, "audio_capture": {}}
-        midi_chans = []
-        # Double iteration because many layers can be on the same channel (one instrument + arbitrary effects)
-        for layer in self.layers:
-            if layer.midi_chan in channels:
-                snapshot["layers"].append(layer.get_snapshot())
-                snapshot["audio_routing"][layer.get_jackname()] = layer.get_audio_out()
-                snapshot["midi_routing"][layer.get_jackname()] = layer.get_midi_out()
-                snapshot["audio_capture"][layer.get_jackname()] = layer.get_audio_in()
-                if not layer.midi_chan in midi_chans:
-                    midi_chans.append(layer.midi_chan)
-        for i in midi_chans:
-            #Note-range info
-            info = {
-                'note_low': zyncoder.lib_zyncoder.get_midi_filter_note_low(i),
-                'note_high': zyncoder.lib_zyncoder.get_midi_filter_note_high(i),
-                'octave_trans': zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i),
-                'halftone_trans': zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
-            }
-            snapshot['note_range'].append(info)
-        return snapshot
+#    def export_channels_snapshot(self, channels):
+#        if not isinstance(channels, list):
+#            return
+#        snapshot = {"layers": [], "note_range": [], "audio_routing": {}, "midi_routing": {}, "audio_capture": {}}
+#        midi_chans = []
+#        # Double iteration because many layers can be on the same channel (one instrument + arbitrary effects)
+#        for layer in self.layers:
+#            if layer.midi_chan in channels:
+#                snapshot["layers"].append(layer.get_snapshot())
+#                snapshot["audio_routing"][layer.get_jackname()] = layer.get_audio_out()
+#                snapshot["midi_routing"][layer.get_jackname()] = layer.get_midi_out()
+#                snapshot["audio_capture"][layer.get_jackname()] = layer.get_audio_in()
+#                if not layer.midi_chan in midi_chans:
+#                    midi_chans.append(layer.midi_chan)
+#        for i in midi_chans:
+#            #Note-range info
+#            info = {
+#                'note_low': zyncoder.lib_zyncoder.get_midi_filter_note_low(i),
+#                'note_high': zyncoder.lib_zyncoder.get_midi_filter_note_high(i),
+#                'octave_trans': zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i),
+#                'halftone_trans': zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
+#            }
+#            snapshot['note_range'].append(info)
+#        return snapshot
 
 
     @Slot(str, result=bool)
@@ -1946,59 +1951,59 @@ class zynthian_gui_layer(zynthian_gui_selector):
         return os.path.isfile(actualPath)
 
 
-    @Slot(str, result=str)
-    def save_curlayer_to_file(self, file_name, category="0"):
-        try:
-            if self.zynqtgui.curlayer is None:
-                return
-            n_layers = 1
-            for i in range(16):
-                if self.zynqtgui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zynqtgui.curlayer.midi_chan, i):
-                    n_layers += 1
-            final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
-            if final_name.startswith("/"):
-                saveToPath = Path(final_name)
-                final_name = saveToPath.name
-                saveToPath = saveToPath.parent
-            else:
-                saveToPath = Path(self.__sounds_basepath__ + final_name)
-            saveToPath.mkdir(parents=True, exist_ok=True)
+#    @Slot(str, result=str)
+#    def save_curlayer_to_file(self, file_name, category="0"):
+#        try:
+#            if self.zynqtgui.curlayer is None:
+#                return
+#            n_layers = 1
+#            for i in range(16):
+#                if self.zynqtgui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zynqtgui.curlayer.midi_chan, i):
+#                    n_layers += 1
+#            final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
+#            if final_name.startswith("/"):
+#                saveToPath = Path(final_name)
+#                final_name = saveToPath.name
+#                saveToPath = saveToPath.parent
+#            else:
+#                saveToPath = Path(self.__sounds_basepath__ + final_name)
+#            saveToPath.mkdir(parents=True, exist_ok=True)
 
-            sound_json = self.export_multichannel_snapshot(self.zynqtgui.curlayer.midi_chan)
-            if category not in ["0", "*"]:
-                sound_json["category"] = category
+#            sound_json = self.export_multichannel_snapshot(self.zynqtgui.curlayer.midi_chan)
+#            if category not in ["0", "*"]:
+#                sound_json["category"] = category
 
-            f = open(saveToPath / final_name, "w")
-            f.write(JSONEncoder().encode(sound_json)) #TODO: get cloned midi channels
-            f.flush()
-            os.fsync(f.fileno())
-            f.close()
+#            f = open(saveToPath / final_name, "w")
+#            f.write(JSONEncoder().encode(sound_json)) #TODO: get cloned midi channels
+#            f.flush()
+#            os.fsync(f.fileno())
+#            f.close()
 
-            return final_name
-        except Exception as e:
-            logging.error(e)
-            return None
+#            return final_name
+#        except Exception as e:
+#            logging.error(e)
+#            return None
 
-    @Slot(str)
-    def save_soundset_to_file(self, file_name):
-        try:
-            final_name = file_name
-            if not final_name.endswith(".soundset"):
-                final_name += ".soundset"
-            if final_name.startswith("/"):
-                saveToPath = Path(final_name)
-                final_name = saveToPath.name
-                saveToPath = saveToPath.parent
-            else:
-                saveToPath = Path(self.__soundsets_basepath__ + final_name)
-            saveToPath.mkdir(parents=True, exist_ok=True)
-            f = open(saveToPath + final_name, "w")
-            f.write(JSONEncoder().encode(self.export_channels_snapshot(list(range(0, 5)))))
-            f.flush()
-            os.fsync(f.fileno())
-            f.close()
-        except Exception as e:
-            logging.error(e)
+#    @Slot(str)
+#    def save_soundset_to_file(self, file_name):
+#        try:
+#            final_name = file_name
+#            if not final_name.endswith(".soundset"):
+#                final_name += ".soundset"
+#            if final_name.startswith("/"):
+#                saveToPath = Path(final_name)
+#                final_name = saveToPath.name
+#                saveToPath = saveToPath.parent
+#            else:
+#                saveToPath = Path(self.__soundsets_basepath__ + final_name)
+#            saveToPath.mkdir(parents=True, exist_ok=True)
+#            f = open(saveToPath + final_name, "w")
+#            f.write(JSONEncoder().encode(self.export_channels_snapshot(list(range(0, 5)))))
+#            f.flush()
+#            os.fsync(f.fileno())
+#            f.close()
+#        except Exception as e:
+#            logging.error(e)
 
 
     @Slot(None)

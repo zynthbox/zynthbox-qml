@@ -384,7 +384,9 @@ class zynthian_engine(zynthian_basic_engine):
 
 
     def del_layer(self, layer):
-        self.layers.remove(layer)
+        try:
+            self.layers.remove(layer)
+        except: pass
         layer.jackname = None
 
 

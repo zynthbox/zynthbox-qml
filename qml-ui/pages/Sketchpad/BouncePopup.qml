@@ -141,6 +141,11 @@ Zynthian.Popup {
                             // Now we're ready to get under way, mark ourselves as very extremely busy
                             _private.isRecording = true;
                             // Set up to record (with a useful filename, and just the channel we want)
+                            for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
+                                Zynthbox.AudioLevels.setChannelToRecord(trackIndex, false);
+                            }
+                            Zynthbox.AudioLevels.setRecordGlobalPlayback(false);
+                            Zynthbox.AudioLevels.setShouldRecordPorts(false);
                             Zynthbox.AudioLevels.setChannelToRecord(_private.selectedChannel.id, true);
                             Zynthbox.AudioLevels.setChannelFilenamePrefix(_private.selectedChannel.id, zynqtgui.sketchpad.get_channel_recording_filename(_private.selectedChannel));
                             // Schedule us to start audio recording two ticks into the future

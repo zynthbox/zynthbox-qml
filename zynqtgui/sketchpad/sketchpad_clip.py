@@ -73,7 +73,6 @@ class sketchpad_clip(QObject):
         self.audioSource = None
         self.audio_metadata = None
         self.recording_basepath = song.sketchpad_folder
-        self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketchpad_folder) / 'wav'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
@@ -767,11 +766,7 @@ class sketchpad_clip(QObject):
             if self.audioSource is None:
                 return
 
-            if self.__started_solo__:
-                self.__song__.get_metronome_manager().stop_metronome_request()
-
             self.__is_playing__ = False
-            self.__started_solo__ = False
             self.__is_playing_changed__.emit()
 
             # self.audioSource.stop()
@@ -779,12 +774,6 @@ class sketchpad_clip(QObject):
             Zynthbox.SyncTimer.instance().queueClipToStopOnChannel(self.audioSource, self.channel.id)
 
             self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
-
-    @Slot(None)
-    def playSolo(self):
-        self.__started_solo__ = True
-        self.play()
-        self.__song__.get_metronome_manager().start_metronome_request()
 
     def reset_beat_count(self):
         self.__current_beat__ = -1

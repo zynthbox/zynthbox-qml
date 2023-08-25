@@ -221,7 +221,7 @@ Rectangle {
                             zynqtgui.bottomBarControlObj.stop();
                         } else {
                             console.log("Playing Sound Loop")
-                            zynqtgui.bottomBarControlObj.playSolo();
+                            zynqtgui.bottomBarControlObj.play();
                         }
                     }
                 }

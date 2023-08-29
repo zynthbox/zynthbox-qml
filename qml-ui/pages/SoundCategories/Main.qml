@@ -413,7 +413,7 @@ Zynthian.ScreenPage {
         Rectangle {
             Layout.fillWidth: false
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 24
             color: Kirigami.Theme.backgroundColor
 
             ColumnLayout {
@@ -442,49 +442,102 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: 2
                 }
 
-                ListView {
+                RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    spacing: content.rowSpacing
-                    flickableDirection: Flickable.VerticalFlick
-                    orientation: ListView.Vertical
-                    clip: true
-                    model: root.visible
-                            ? soundButtonGroup.checkedButton != null &&
-                              soundButtonGroup.checkedButton.checked
-                                ? zynqtgui.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                                : root.channel.chainedSoundsNames
-                            : null
 
-                    delegate: Item {
-                        width: ListView.view.width
-                        height: (ListView.view.height - ListView.view.spacing * 4) / 5
+                    ListView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        spacing: content.rowSpacing
+                        flickableDirection: Flickable.VerticalFlick
+                        orientation: ListView.Vertical
+                        clip: true
+                        model: root.visible
+                                ? soundButtonGroup.checkedButton != null &&
+                                  soundButtonGroup.checkedButton.checked
+                                    ? zynqtgui.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
+                                    : root.channel.chainedSoundsNames
+                                : null
 
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: parent.width - Kirigami.Units.gridUnit * 2
-                            height: Kirigami.Units.gridUnit * 2
+                        delegate: Item {
+                            width: ListView.view.width
+                            height: (ListView.view.height - ListView.view.spacing * 4) / 5
 
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            color: Kirigami.Theme.backgroundColor
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width - Kirigami.Units.gridUnit * 2
+                                height: Kirigami.Units.gridUnit * 2
 
-                            border.color: "#ff999999"
-                            border.width: 1
-                            radius: 4
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: Kirigami.Theme.backgroundColor
 
-                            QQC2.Label {
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    left: parent.left
-                                    right: parent.right
-                                    leftMargin: Kirigami.Units.gridUnit*0.5
-                                    rightMargin: Kirigami.Units.gridUnit*0.5
+                                border.color: "#ff999999"
+                                border.width: 1
+                                radius: 4
+
+                                QQC2.Label {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        right: parent.right
+                                        leftMargin: Kirigami.Units.gridUnit*0.5
+                                        rightMargin: Kirigami.Units.gridUnit*0.5
+                                    }
+                                    horizontalAlignment: Text.AlignLeft
+                                    text: modelData
+
+                                    elide: "ElideRight"
                                 }
-                                horizontalAlignment: Text.AlignLeft
-                                text: modelData
+                            }
+                        }
+                    }
 
-                                elide: "ElideRight"
+                    ListView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        spacing: content.rowSpacing
+                        flickableDirection: Flickable.VerticalFlick
+                        orientation: ListView.Vertical
+                        clip: true
+                        model: root.visible
+                                ? soundButtonGroup.checkedButton != null &&
+                                  soundButtonGroup.checkedButton.checked
+                                    ? zynqtgui.sound_categories.getFxNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
+                                    : root.channel.chainedFxNames
+                                : null
+
+                        delegate: Item {
+                            width: ListView.view.width
+                            height: (ListView.view.height - ListView.view.spacing * 4) / 5
+
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width - Kirigami.Units.gridUnit * 2
+                                height: Kirigami.Units.gridUnit * 2
+
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: Kirigami.Theme.backgroundColor
+
+                                border.color: "#ff999999"
+                                border.width: 1
+                                radius: 4
+
+                                QQC2.Label {
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        right: parent.right
+                                        leftMargin: Kirigami.Units.gridUnit*0.5
+                                        rightMargin: Kirigami.Units.gridUnit*0.5
+                                    }
+                                    horizontalAlignment: Text.AlignLeft
+                                    text: modelData
+
+                                    elide: "ElideRight"
+                                }
                             }
                         }
                     }

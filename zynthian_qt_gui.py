@@ -4493,6 +4493,7 @@ if __name__ == "__main__":
 
     logging.info("REGISTERING QML TYPES")
     qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")
+    Zynthbox.Plugin.instance().registerTypes(engine, "io.zynthbox.components")
 
     logging.info("STARTING ZYNTHIAN-UI ...")
     zynthian_gui_config.zynqtgui = zynqtgui = zynthian_gui()
@@ -4533,7 +4534,6 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty("zynqtgui", zynqtgui)
 
     def load_qml():
-        Zynthbox.Plugin.instance().registerTypes(engine, "io.zynthbox.components")
 
         zynqtgui.currentTaskMessage = f"Loading pages"
         engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))

@@ -34,7 +34,7 @@ import json
 import os
 
 from pathlib import Path
-from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
+from PySide2.QtCore import Qt, QTimer, QMetaObject, Property, QObject, Signal, Slot
 from .sketchpad_sketch import sketchpad_sketch
 from .sketchpad_sketches_model import sketchpad_sketches_model
 from .sketchpad_scenes_model import sketchpad_scenes_model
@@ -262,7 +262,7 @@ class sketchpad_song(QObject):
     @Slot(None)
     def schedule_save(self):
         if self.__is_loading__ is False:
-            self.__save_timer__.start()
+            QMetaObject.invokeMethod(self.__save_timer__, "start", Qt.QueuedConnection)
 
     def restore(self, load_history):
         self.__is_loading__ = True

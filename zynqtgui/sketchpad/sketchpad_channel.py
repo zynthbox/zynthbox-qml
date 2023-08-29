@@ -450,7 +450,7 @@ class sketchpad_channel(QObject):
             # If run_in_thread is set to False, directly call the method
             # This will allow startup process to wait till all ports are updated before displaying splash screen
             if run_in_thread:
-                self.update_jack_port_timer.start()
+                QMetaObject.invokeMethod(self.update_jack_port_timer, "start", Qt.QueuedConnection)
             else:
                 self.do_update_jack_port(run_in_thread)
 
@@ -1207,7 +1207,7 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def updateChainedSoundsInfo(self):
-        self.__chained_sounds_info_updater.start()
+        QMetaObject.invokeMethod(self.__chained_sounds_info_updater, "start", Qt.QueuedConnection)
 
     chainedSoundsInfoChanged = Signal()
 

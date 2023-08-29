@@ -157,20 +157,32 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         res = []
 
         for layer in metadata:
-            if "engine_type" in layer:
-                if layer["engine_type"] != "Audio Effect":
-                    if "preset_name" in layer:
-                        res.append(f"{layer['name']} > {layer['preset_name']}")
-                    else:
-                        res.append(layer['name'])
-            else:
-                res.append(layer['name'])
+            if "engine_type" in layer and layer["engine_type"] != "Audio Effect":
+                if "preset_name" in layer and layer['preset_name'] is not None and layer['preset_name'] != "None":
+                    res.append(f"{layer['name']} > {layer['preset_name']}")
+                else:
+                    res.append(layer['name'])
 
         if len(res) < 5:
             for i in range(5 - len(res)):
                 res.append("")
 
         return res[:5]
+
+    # Return an array of 5 elements with fx names if available or empty string
+    @Slot(str, result='QVariantList')
+    def getFxNamesFromSoundFile(self, path):
+        metadata = self.zynqtgui.layer.sound_metadata_from_file(path)
+        res = ["", "", "", "", ""]
+
+        for layer in metadata:
+            if "engine_type" in layer and "slot_index" in layer and layer["engine_type"] == "Audio Effect":
+                if "preset_name" in layer and layer['preset_name'] is not None and layer['preset_name'] != "None":
+                    res[layer["slot_index"]] = f"{layer['name']} > {layer['preset_name']}"
+                else:
+                    res[layer["slot_index"]] = layer['name']
+
+        return res
 
     @Slot(str, result=bool)
     def checkIfSoundFileExists(self, filename):

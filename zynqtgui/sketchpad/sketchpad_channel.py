@@ -979,11 +979,16 @@ class sketchpad_channel(QObject):
 
     ### Property chainedFxNames
     def get_chainedFxNames(self):
-        return [self.__chained_fx[0].engine.name if self.__chained_fx[0] is not None else "",
-                self.__chained_fx[1].engine.name if self.__chained_fx[1] is not None else "",
-                self.__chained_fx[2].engine.name if self.__chained_fx[2] is not None else "",
-                self.__chained_fx[3].engine.name if self.__chained_fx[3] is not None else "",
-                self.__chained_fx[4].engine.name if self.__chained_fx[4] is not None else ""]
+        names = []
+        for fx in self.chainedFx:
+            try:
+                if fx.preset_name is not None and fx.preset_name != "None":
+                    names.append(f"{fx.engine.name.replace('Jalv/', '')} > {fx.preset_name}")
+                else:
+                    names.append(fx.engine.name.replace('Jalv/', ''))
+            except:
+                names.append("")
+        return names
 
     chainedFxNames = Property('QStringList', get_chainedFxNames, notify=chainedFxChanged)
     ### END Property chainedFxNames

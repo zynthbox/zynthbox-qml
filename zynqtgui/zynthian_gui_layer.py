@@ -1781,6 +1781,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     item["midi_chan"] = layer_data["midi_chan"]
                 else:
                     item["midi_chan"] = -1
+                if "slot_index" in layer_data:
+                    item["slot_index"] = layer_data["slot_index"]
                 if "bank_name" in layer_data:
                     item["bank_name"] = layer_data["bank_name"]
                 if "preset_name" in layer_data:

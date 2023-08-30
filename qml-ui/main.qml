@@ -1020,8 +1020,8 @@ Kirigami.AbstractApplicationWindow {
             onTimerMessage: {
                 // if parameter is 1, this message is for us
                 if (parameter === 1) {
-                    countinBeatLabel.text = parameter2;
-                    countinBarLabel.text = parameter3;
+                    countinBeatLabel.text = 5 - parameter2;
+                    countinBarLabel.text = parameter4 + 1 - parameter3;
                     countinTimer.interval = bigParameter;
                     countinTimer.restart();
                     countInOverlay.visible = true;
@@ -1035,9 +1035,6 @@ Kirigami.AbstractApplicationWindow {
                 countInOverlay.visible = false;
             }
         }
-        // visible: zynqtgui.sketchpad.countInBars > 0 &&
-        //          zynqtgui.sketchpad.ongoingCountIn > 0 &&
-        //          zynqtgui.sketchpad.isRecording
         z: 9999999
         color: "#cc000000"
 
@@ -1046,13 +1043,11 @@ Kirigami.AbstractApplicationWindow {
             QQC2.Label {
                 id: countinBeatLabel
                 font.pointSize: 35
-                // text: zynqtgui.sketchpad.ongoingCountIn
             }
             QQC2.Label {
                 id: countinBarLabel
                 Layout.alignment: Qt.AlignBottom
                 Layout.bottomMargin: 8
-                // text: "/" + (4 - zynqtgui.sketchpad.currentBeat)
             }
         }
     }

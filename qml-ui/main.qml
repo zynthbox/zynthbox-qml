@@ -1014,22 +1014,45 @@ Kirigami.AbstractApplicationWindow {
         id: countInOverlay
         parent: root.contentItem.parent
         anchors.fill: parent
-        visible: zynqtgui.sketchpad.countInBars > 0 &&
-                 zynqtgui.sketchpad.ongoingCountIn > 0 &&
-                 zynqtgui.sketchpad.isRecording
+        visible: false
+        Connections {
+            target: Zynthbox.SyncTimer
+            onTimerMessage: {
+                // if parameter is 1, this message is for us
+                if (parameter === 1) {
+                    countinBeatLabel.text = parameter2;
+                    countinBarLabel.text = parameter3;
+                    countinTimer.interval = bigParameter;
+                    countinTimer.restart();
+                    countInOverlay.visible = true;
+                }
+            }
+        }
+        Timer {
+            id: countinTimer
+            running: false; repeat: false;
+            onTriggered: {
+                countInOverlay.visible = false;
+            }
+        }
+        // visible: zynqtgui.sketchpad.countInBars > 0 &&
+        //          zynqtgui.sketchpad.ongoingCountIn > 0 &&
+        //          zynqtgui.sketchpad.isRecording
         z: 9999999
         color: "#cc000000"
 
         RowLayout {
             anchors.centerIn: parent
             QQC2.Label {
+                id: countinBeatLabel
                 font.pointSize: 35
-                text: zynqtgui.sketchpad.ongoingCountIn
+                // text: zynqtgui.sketchpad.ongoingCountIn
             }
             QQC2.Label {
+                id: countinBarLabel
                 Layout.alignment: Qt.AlignBottom
                 Layout.bottomMargin: 8
-                text: "/" + (4 - zynqtgui.sketchpad.currentBeat)
+                // text: "/" + (4 - zynqtgui.sketchpad.currentBeat)
             }
         }
     }

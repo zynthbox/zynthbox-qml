@@ -20,10 +20,15 @@ function startMetronomeAndPlayback() {
             playInSongMode = true;
         }
 
-        if (playInSongMode) {
-            Zynthbox.SyncTimer.scheduleStartPlayback(0, true, 0, 0);
+        if (zynqtgui.sketchpad.ongoingCountIn > 0) {
+            zynqtgui.sketchpad.ongoingCountIn = 0;
+            Zynthbox.SyncTimer.startWithCountin(zynqtgui.sketchpad.countInBars, playInSongMode);
         } else {
-            Zynthbox.SyncTimer.scheduleStartPlayback(0);
+            if (playInSongMode) {
+                Zynthbox.SyncTimer.scheduleStartPlayback(0, true, 0, 0);
+            } else {
+                Zynthbox.SyncTimer.scheduleStartPlayback(0);
+            }
         }
     }
 }

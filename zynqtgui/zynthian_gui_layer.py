@@ -642,6 +642,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
         self.zynqtgui.screens['fixed_layers'].select_action(midich)
         if not self.zynqtgui.screens['bank'].get_show_top_sounds():
             self.zynqtgui.screens['bank'].select_action(0)
+        self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
 
     def remove_layer(self, i, stop_unused_engines=True):
         if i>=0 and i<len(self.layers):

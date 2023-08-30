@@ -186,12 +186,14 @@ class sketchpad_channel(QObject):
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
+        self.chainedFxNamesChanged.emit()
 
     def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
+        self.chainedFxNamesChanged.emit()
 
     def cache_bank_preset_lists(self):
         # Back up curlayer
@@ -920,6 +922,7 @@ class sketchpad_channel(QObject):
             self.update_sound_snapshot_json()
             self.__song__.schedule_save()
             self.chainedFxChanged.emit()
+            self.chainedFxNamesChanged.emit()
 
     # Add or replace a fx layer at slot_row to fx chain
     # If explicit slot_row is not set then selected slot row is used
@@ -949,6 +952,7 @@ class sketchpad_channel(QObject):
 
         self.__chained_fx[slot_row] = layer
         self.chainedFxChanged.emit()
+        self.chainedFxNamesChanged.emit()
 
     @Slot()
     def removeSelectedFxFromChain(self):
@@ -960,6 +964,7 @@ class sketchpad_channel(QObject):
                     self.__chained_fx[self.__selected_fx_slot_row] = None
 
                     self.chainedFxChanged.emit()
+                    self.chainedFxNamesChanged.emit()
         #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
         #            self.zynqtgui.layer_effects.fx_layer = None
         #            self.zynqtgui.layer_effects.fill_list()
@@ -990,7 +995,9 @@ class sketchpad_channel(QObject):
                 names.append("")
         return names
 
-    chainedFxNames = Property('QStringList', get_chainedFxNames, notify=chainedFxChanged)
+    chainedFxNamesChanged = Signal()
+
+    chainedFxNames = Property('QStringList', get_chainedFxNames, notify=chainedFxNamesChanged)
     ### END Property chainedFxNames
 
     ### Property connectedSound

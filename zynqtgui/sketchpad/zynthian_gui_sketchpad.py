@@ -909,7 +909,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     logging.debug(f"Adding record port : {port}")
                     Zynthbox.AudioLevels.instance().addRecordPort(port[0], port[1])
 
-            Zynthbox.AudioLevels.instance().startRecording()
+            if do_countin:
+                Zynthbox.AudioLevels.instance().scheduleStartRecording(self.ongoingCountIn * 4 * Zynthbox.SyncTimer.instance().getMultiplier())
+            else:
+                Zynthbox.AudioLevels.instance().startRecording()
 
         self.isRecording = True
 

@@ -52,7 +52,7 @@ Zynthian.DialogQuestion {
 
         // If there's notes in the pattern, ask first
         replacePattern.hasExistingData = _private.pattern !== null && _private.pattern.hasNotes;
-        replacePattern.sketchHasData = _private.clip !== null && _private.clip.metadataMidiRecording !== null && _private.clip.metadataMidiRecording.length > 10;
+        replacePattern.sketchHasData = _private.clip !== null && ((_private.clip.metadataMidiRecording !== null && _private.clip.metadataMidiRecording.length > 10) || (_private.clip.metadataPatternJson !== null && _private.clip.metadataPatternJson.length > 5));
         replacePattern.checked = !replacePattern.hasExistingData;
         // If there is synth information in the sketch, ask first
         replaceSounds.hasExistingData = _private.channel !== null && _private.channel.getChannelSoundSnapshotJson().length > 10;
@@ -87,11 +87,8 @@ Zynthian.DialogQuestion {
                 property QtObject channel
                 property int slot
                 property QtObject audioSource: clip ? Zynthbox.PlayGridManager.getClipById(clip.cppObjId) : null
-                // onAudioSourceChanged: console.log("Audio source:", audioSource)
                 property QtObject sequence: track !== "" ? Zynthbox.PlayGridManager.getSequenceModel(track) : null
-                // onSequenceChanged: console.log("Sequence:", sequence)
                 property QtObject pattern: sequence && channel ? sequence.getByPart(channel.id, slot) : null
-                // onPatternChanged: console.log("Pattern:", pattern, "from channel and part", channel.id, slot)
                 function performUnbounce() {
                     if (clip.metadataAudioType === "sample-trig") {
                         console.log("Sketch was recorded via sample-trig, so switch to that");
@@ -103,11 +100,16 @@ Zynthian.DialogQuestion {
                         console.log("Weird audio type:", clip.metadataAudioType);
                     }
                     if (replacePattern.sketchHasData && replacePattern.checked) {
-                        console.log("Replace the slot's pattern content");
-                        // Load the recording into the global recorder track
-                        Zynthbox.MidiRecorder.loadTrackFromBase64Midi(_private.clip.metadataMidiRecording, -1);
-                        // Apply that newly loaded recording to the pattern
-                        Zynthbox.MidiRecorder.applyToPattern(_private.pattern);
+                        if (_private.clip.metadataPatternJson !== null && _private.clip.metadataPatternJson.length > 5) {
+                            console.log("Replace the slot's pattern content with the stored pattern");
+                            _private.pattern.setFromJson(_private.clip.metadataPatternJson)
+                        } else {
+                            console.log("Replace the slot's pattern content by reconstructing from recorded midi");
+                            // Load the recording into the global recorder track
+                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(_private.clip.metadataMidiRecording, -1);
+                            // Apply that newly loaded recording to the pattern
+                            Zynthbox.MidiRecorder.applyToPattern(_private.pattern);
+                        }
                     }
                     if (replaceSamples.sketchHasData && replaceSamples.checked) {
                         console.log("Replace the channel's sample selection");
@@ -118,6 +120,9 @@ Zynthian.DialogQuestion {
                         _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadataActiveLayer)
                     }
                     _private.clip = null;
+                    _private.channel = null;
+                    _private.slot = -1;
+                    _private.track = "";
                 }
             }
         }

@@ -43,6 +43,7 @@ Zynthian.Popup {
     }
 
     parent: QQC2.Overlay.overlay
+    height: Kirigami.Units.gridUnit * 15
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: _private.bounceProgress === -1 ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
@@ -64,8 +65,9 @@ Zynthian.Popup {
         return returnValue;
     }
 
-    ColumnLayout {
-        implicitHeight: Kirigami.Units.gridUnit * 40
+    contentItem: ColumnLayout {
+        anchors.fill: parent
+        implicitHeight: Kirigami.Units.gridUnit * 50
         implicitWidth: Kirigami.Units.gridUnit * 30
         Kirigami.Heading {
             Layout.fillWidth: true
@@ -201,7 +203,8 @@ Zynthian.Popup {
                         if (filename.length > 0) {
                             console.log("Successfully recorded a new sound file into", filename, "- now building metadata");
                             let metadata = {
-                                "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm
+                                "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
+                                "ZYNTHBOX_PATTERN_JSON": _private.pattern.toJson()
                             };
                             if (_private.selectedChannel) { // by all rights this should not be possible, but... best safe
                                 metadata["ZYNTHBOX_ACTIVELAYER"] = _private.selectedChannel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
@@ -302,37 +305,61 @@ Zynthian.Popup {
             wrapMode: Text.Wrap
             text: "Bounce the audio from the pattern in " + (_private.selectedChannel ? _private.selectedChannel.name : "") + " to a wave file, assign that recording as the channel's loop sample, and set the channel to loop mode.";
         }
-        QQC2.CheckBox {
+        GridLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Include lead-in"
-            checked: _private.includeLeadin
-            onClicked: { _private.includeLeadin = !_private.includeLeadin; }
-        }
-        QQC2.CheckBox {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            enabled: _private.includeLeadin
-            opacity: enabled ? 1 : 0.5
-            text: "Include lead-in in loop"
-            checked: _private.includeLeadinInLoop
-            onClicked: { _private.includeLeadinInLoop = !_private.includeLeadinInLoop; }
-        }
-        QQC2.CheckBox {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Include fade-out"
-            checked: _private.includeFadeout
-            onClicked: { _private.includeFadeout = !_private.includeFadeout; }
-        }
-        QQC2.CheckBox {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            enabled: _private.includeFadeout
-            opacity: enabled ? 1 : 0.5
-            text: "Include fade-out in loop"
-            checked: _private.includeFadeoutInLoop
-            onClicked: { _private.includeFadeoutInLoop = !_private.includeFadeoutInLoop; }
+            columns: 3
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                checked: _private.includeLeadin
+                text: "Record Lead-in"
+                onClicked: {
+                    _private.includeLeadin = !_private.includeLeadin;
+                }
+            }
+            Rectangle {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.rowSpan: 2
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: "Main Recording"
+                }
+                color: "transparent"
+                border {
+                    width: 1
+                    color: Kirigami.Units.textColor
+                }
+            }
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                checked: _private.includeFadeout
+                text: "Record Fade-out"
+                onClicked: {
+                    _private.includeFadeout = !_private.includeFadeout;
+                }
+            }
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                checked: _private.includeLeadinInLoop
+                enabled: _private.includeLeadin
+                opacity: enabled ? 1 : 0.5
+                text: "Include in loop"
+                onClicked: {
+                    _private.includeLeadinInLoop = !_private.includeLeadinInLoop;
+                }
+            }
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                checked: _private.includeFadeoutInLoop
+                enabled: _private.includeFadeout
+                opacity: enabled ? 1 : 0.5
+                text: "Include in loop"
+                onClicked: {
+                    _private.includeFadeoutInLoop = !_private.includeFadeoutInLoop;
+                }
+            }
         }
         QQC2.ProgressBar {
             Layout.fillWidth: true

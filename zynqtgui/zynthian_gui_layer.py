@@ -113,6 +113,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     logging.debug(f"Error resetting volume : {str(e)}")
 
             logging.debug(layer.preset_index)
+            self.emit_layer_preset_changed(layer)
             self.zynqtgui.screens['control'].show()
             self.fill_list()
             self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
@@ -142,6 +143,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     logging.debug(f"Error resetting volume : {str(e)}")
 
             logging.debug(layer.preset_index)
+            self.emit_layer_preset_changed(layer)
             self.zynqtgui.screens['control'].show()
             self.fill_list()
             self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
@@ -171,6 +173,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         logging.debug(f"Error resetting volume : {str(e)}")
 
                 logging.debug(layer.preset_index)
+                self.emit_layer_preset_changed(layer)
                 self.zynqtgui.screens['control'].show()
                 self.fill_list()
                 self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
@@ -639,10 +642,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
             self.zynqtgui.show_screen(self.__page_after_layer_creation)
         else:
             self.zynqtgui.show_modal(self.__page_after_layer_creation)
-        self.zynqtgui.screens['fixed_layers'].select_action(midich)
+        if midich is not None and midich >= 0:
+            self.zynqtgui.screens['fixed_layers'].select_action(midich)
         if not self.zynqtgui.screens['bank'].get_show_top_sounds():
             self.zynqtgui.screens['bank'].select_action(0)
         self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
+        self.zynqtgui.set_curlayer(layer)
 
     def remove_layer(self, i, stop_unused_engines=True):
         if i>=0 and i<len(self.layers):
@@ -2161,6 +2166,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
     def get_page_after_layer_creation(self):
         return self.__page_after_layer_creation;
 
+    def emit_layer_preset_changed(self, layer):
+        try:
+            index = self.layers.index(layer)
+        except:
+            index = -1
+
+        if index >= 0:
+            self.layerPresetChanged.emit(index)
 
     engine_nick_changed = Signal()
     page_after_layer_creation_changed = Signal()
@@ -2172,6 +2185,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
     layer_created = Signal(int)
     layer_deleted = Signal(int)
     snapshotLoaded = Signal()
+
+    # Arg 1 : Index of layer as in zynqtgui.layer.layers whose preset is being changed
+    layerPresetChanged = Signal(int)
 
 
 #------------------------------------------------------------------------------

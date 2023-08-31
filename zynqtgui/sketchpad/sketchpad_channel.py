@@ -103,6 +103,8 @@ class sketchpad_channel(QObject):
         self.__chained_sounds_info_updater.setSingleShot(True)
         self.__chained_sounds_info_updater.timeout.connect(self.chainedSoundsInfoChanged.emit)
 
+        self.zynqtgui.layer.layerPresetChanged.connect(self.layerPresetChangedHandler)
+
         # Load engine config
         try:
             with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
@@ -153,6 +155,11 @@ class sketchpad_channel(QObject):
         self.zynqtgui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
         # Update filter controllers when booting is complete
         self.zynqtgui.isBootingCompleteChanged.connect(self.update_filter_controllers)
+
+    def layerPresetChangedHandler(self, layer_index):
+        layer = self.zynqtgui.layer.layers[layer_index]
+        if layer in self.chainedFx:
+            self.chainedFxNamesChanged.emit()
 
     @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, partNum):

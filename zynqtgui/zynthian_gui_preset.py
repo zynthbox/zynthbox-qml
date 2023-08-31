@@ -227,6 +227,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
                 logging.debug(f"Error resetting volume : {str(e)}")
 
             self.zynqtgui.curlayer.set_preset(i)
+            self.zynqtgui.layer.emit_layer_preset_changed(self.zynqtgui.curlayer)
 
             if selected_channel is not None and prev_volume is not None:
                 try:

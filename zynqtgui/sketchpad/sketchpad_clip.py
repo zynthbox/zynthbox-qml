@@ -960,6 +960,24 @@ class sketchpad_clip(QObject):
 
     metadataMidiRecording = Property(str, get_metadata_midi_recording, set_metadata_midi_recording, notify=metadata_midi_recording_changed)
 
+    def get_metadata_pattern_json(self):
+        try:
+            if self.audio_metadata is not None:
+                return str(self.audio_metadata["ZYNTHBOX_PATTERN_JSON"][0])
+        except Exception as e:
+            logging.debug(f"Error retrieving from metadata : {str(e)}")
+        return None
+
+    @Slot(str)
+    def set_metadata_pattern_json(self, patter_as_json):
+        self.write_metadata("ZYNTHBOX_PATTERN_JSON", [str(patter_as_json)])
+        self.metadata_pattern_json_changed.emit()
+
+    @Signal
+    def metadata_pattern_json_changed(self):
+        pass
+
+    metadataPatternJson = Property(str, get_metadata_pattern_json, set_metadata_pattern_json, notify=metadata_pattern_json_changed)
     def recordingDir(self):
         if self.wav_path.exists():
             return str(self.wav_path)

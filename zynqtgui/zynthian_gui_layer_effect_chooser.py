@@ -103,16 +103,17 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
     #                self.zynqtgui.screens['layer'].replace_layer_index = None
 
     #                self.zynqtgui.screens['main_layers_view'].fill_list()
-                    if self.midi_mode:
-                        self.zynqtgui.show_screen("layer_midi_effect_chooser")
-                    else:
-                        self.zynqtgui.show_screen("layer_effect_chooser")
+#                    if self.midi_mode:
+#                        self.zynqtgui.show_screen("layer_midi_effect_chooser")
+#                    else:
+#                        self.zynqtgui.show_screen("layer_effect_chooser")
 
                     self.zynqtgui.screens["fixed_layers"].fill_list()
                     self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
                 except Exception as e:
                     logging.exception(e)
 
+                self.zynqtgui.currentTaskMessage = ""
                 QTimer.singleShot(2000, self.zynqtgui.end_long_task)
 
             self.zynqtgui.currentTaskMessage = f"Adding FX {self.list_data[i][0]}"

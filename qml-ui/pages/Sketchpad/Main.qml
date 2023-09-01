@@ -94,22 +94,22 @@ Zynthian.ScreenPage {
             var fxPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][slot]
 
             function valueSetter(value) {
-                fxPassthroughClient.dryWetMixAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
+                fxPassthroughClient.dryWetMixAmount = Zynthian.CommonUtils.clamp(value, 0, 2)
                 applicationWindow().showOsd({
                     parameterName: "fxlayer_volume",
                     description: qsTr("%1 Dry/Wet Mix").arg(fxName),
                     start: 0,
-                    stop: 1,
+                    stop: 2,
                     step: 0.01,
-                    defaultValue: null,
+                    defaultValue: 1.0,
                     currentValue: fxPassthroughClient.dryWetMixAmount,
-                    startLabel: "0",
-                    stopLabel: "1",
-                    valueLabel: qsTr("%1").arg(fxPassthroughClient.dryWetMixAmount.toFixed(2)),
+                    startLabel: " ",
+                    stopLabel: " ",
+                    valueLabel: qsTr("%1% Wet / %2% Dry").arg((Math.min(1.0, fxPassthroughClient.dryWetMixAmount)*100).toFixed(0)).arg((Math.min(1, 2-fxPassthroughClient.dryWetMixAmount)*100).toFixed(0)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
-                    showResetToDefault: false,
-                    showVisualZero: false
+                    showResetToDefault: true,
+                    showVisualZero: true
                 })
             }
             valueSetter(fxPassthroughClient.dryWetMixAmount + sign * 0.01)

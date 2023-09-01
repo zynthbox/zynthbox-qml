@@ -857,7 +857,8 @@ Rectangle {
                                             radius: 4
 
                                             Rectangle {
-                                                width: fxRowDelegate.fxPassthroughClient && fxRowDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * fxRowDelegate.fxPassthroughClient.dryWetMixAmount : 0
+                                                // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                                                width: fxRowDelegate.fxPassthroughClient && fxRowDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(fxRowDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                                                 anchors {
                                                     left: parent.left
                                                     top: parent.top
@@ -897,7 +898,8 @@ Rectangle {
                                                     if (fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0 && mouse.x - fxDelegateMouseArea.initialMouseX != 0) {
                                                         var newVal = Zynthian.CommonUtils.clamp(mouse.x / fxRowDelegate.width, 0, 1);
                                                         fxDelegateMouseArea.dragHappened = true;
-                                                        fxRowDelegate.fxPassthroughClient.dryWetMixAmount = newVal;
+                                                        // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                                                        fxRowDelegate.fxPassthroughClient.dryWetMixAmount = Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2);
                                                     }
                                                 }
                                                 onClicked: fxRowDelegate.switchToThisSlot()

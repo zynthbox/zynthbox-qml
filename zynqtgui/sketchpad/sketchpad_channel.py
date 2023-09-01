@@ -83,8 +83,8 @@ class sketchpad_channel(QObject):
         self.route_through_global_fx = True
         self.__channel_synth_ports = []
         self.__dry_amount = 100
-        self.__wet_fx_1_amount = 100
-        self.__wet_fx_2_amount = 100
+        self.__wet_fx_1_amount = 0
+        self.__wet_fx_2_amount = 0
         self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
 

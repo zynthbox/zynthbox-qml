@@ -1007,8 +1007,8 @@ class zynthian_gui(QObject):
             (reverb_engine, reverb_controller)
         ]
 
-        self.global_fx_engines[0][1].value = 10
-        self.global_fx_engines[1][1].value = 10
+        self.global_fx_engines[0][1].value = 100
+        self.global_fx_engines[1][1].value = 100
 
     # ---------------------------------------------------------------------------
     # OSC Management

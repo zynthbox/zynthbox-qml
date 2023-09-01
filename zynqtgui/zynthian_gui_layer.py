@@ -601,6 +601,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
                 layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
 
+            # Set preset to 0 explicitly as it does not seem to do that
+            layer.set_preset(0)
+
             if not zyngine.type == "Audio Effect":
                 self.add_midichannel_to_channel(midich, position_in_channel)
 
@@ -646,6 +649,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
             self.zynqtgui.screens['fixed_layers'].select_action(midich)
         if not self.zynqtgui.screens['bank'].get_show_top_sounds():
             self.zynqtgui.screens['bank'].select_action(0)
+
+        self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()
         self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
         self.zynqtgui.set_curlayer(layer)
 

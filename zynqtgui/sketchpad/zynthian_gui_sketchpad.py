@@ -37,7 +37,7 @@ from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
 from PySide2.QtCore import QMetaObject, Qt, Property, QObject, QTimer, Signal, Slot
-from PySide2.QtGui import QColor
+from PySide2.QtGui import QColor, QGuiApplication
 from ..zynthian_gui_multi_controller import MultiController
 from . import sketchpad_clip, sketchpad_song
 from .. import zynthian_qt_gui_base
@@ -909,18 +909,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     logging.debug(f"Adding record port : {port}")
                     Zynthbox.AudioLevels.instance().addRecordPort(port[0], port[1])
 
-            if do_countin:
-                Zynthbox.AudioLevels.instance().scheduleStartRecording(self.ongoingCountIn * 4 * Zynthbox.SyncTimer.instance().getMultiplier())
-            else:
-                Zynthbox.AudioLevels.instance().startRecording()
-
         self.isRecording = True
 
     @Slot(None)
     def stopRecording(self):
         if self.clip_to_record is not None and self.isRecording:
             self.isRecording = False
-            self.stopAudioRecording()
+            while Zynthbox.AudioLevels.instance().isRecording() or Zynthbox.MidiRecorder.instance().isRecording():
+                QGuiApplication.instance().processEvents()
+            Zynthbox.AudioLevels.instance().clearRecordPorts()
+            self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentMidiChannel()))
             self.load_recorded_file_to_clip()
 
             self.set_clip_to_record(None)
@@ -929,12 +927,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             self.clips_to_record.clear()
             self.clipsToRecordChanged.emit()
-
-    @Slot()
-    def stopAudioRecording(self):
-        if Zynthbox.AudioLevels.instance().isRecording():
-            Zynthbox.AudioLevels.instance().stopRecording()
-            Zynthbox.AudioLevels.instance().clearRecordPorts()
 
     # Called by SyncTimer to ensure the current scene gets started as expected
     # To actually start playback, call start_metronome_request, or manually call SyncTimer::scheduleStartPlayback
@@ -965,7 +957,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     def load_recorded_file_to_clip(self):
         if self.recordingType == "audio":
-            logging.info(f"Loading recorded wav to clip({self.clip_to_record})")
+            logging.info(f"Loading recorded wav to ({self.clip_to_record_path}) clip({self.clip_to_record})")
 
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")

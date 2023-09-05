@@ -321,15 +321,14 @@ Zynthian.Popup {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.rowSpan: 2
                 QQC2.Label {
                     anchors.centerIn: parent
                     text: "Main Recording"
                 }
-                color: "transparent"
+                color: Kirigami.Theme.highlightColor
                 border {
                     width: 1
-                    color: Kirigami.Units.textColor
+                    color: Kirigami.Theme.textColor
                 }
             }
             Zynthian.PlayGridButton {
@@ -348,6 +347,20 @@ Zynthian.Popup {
                 text: "Include in loop"
                 onClicked: {
                     _private.includeLeadinInLoop = !_private.includeLeadinInLoop;
+                }
+            }
+            Rectangle {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: "Main Loop"
+                }
+                color: Kirigami.Theme.highlightColor
+                border {
+                    width: 1
+                    color: Kirigami.Theme.textColor
                 }
             }
             Zynthian.PlayGridButton {

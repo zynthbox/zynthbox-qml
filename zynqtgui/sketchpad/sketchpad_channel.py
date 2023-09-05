@@ -79,6 +79,7 @@ class sketchpad_channel(QObject):
         self.__selected_fx_slot_row = 0
         self.__selected_part__ = 0
         self.__externalMidiChannel__ = -1
+        self.__externalCaptureVolume__ = 0;
         self.__sound_json_snapshot__ = ""
         self.route_through_global_fx = True
         self.__channel_synth_ports = []
@@ -278,6 +279,14 @@ class sketchpad_channel(QObject):
     def save_bank(self):
         bank_dir = Path(self.bankDir)
 
+        # If there's a sample bank there already, get rid of it (we could also check
+        # to make sure we only do this if there's no samples at the same time, but
+        # we're writing that out anyway anyway, so... no good reason for that)
+        if (bank_dir / 'sample-bank.json').exists():
+            os.remove(bank_dir / 'sample-bank.json')
+            if len(os.listdir(bank_dir)) == 0:
+                os.removedirs(bank_dir)
+
         obj = []
         for sample in self.__samples__:
             if sample.path is not None and len(sample.path) > 0:
@@ -356,6 +365,7 @@ class sketchpad_channel(QObject):
                 "channelAudioType": self.__channel_audio_type__,
                 "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
+                "externalCaptureVolume" : self.__externalCaptureVolume__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
                 "layers_snapshot": self.__layers_snapshot,
                 "keyzone_mode": self.__keyzone_mode__,
@@ -387,6 +397,8 @@ class sketchpad_channel(QObject):
                 self.set_channel_audio_type(self.__channel_audio_type__, True)
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
+            if "externalCaptureVolume" in obj:
+                self.set_externalCaptureVolume(obj["externalCaptureVolume"])
             if "clips" in obj:
                 for x in range(0, 5):
                     self.__clips_model__[x].deserialize(obj["clips"][x], x)
@@ -1367,7 +1379,22 @@ class sketchpad_channel(QObject):
     externalMidiChannelChanged = Signal()
 
     externalMidiChannel = Property(int, get_externalMidiChannel, set_externalMidiChannel, notify=externalMidiChannelChanged)
-    ### END Property selectedPart
+    ### END Property externalMidiChannel
+
+    ### BEGIN Property externalCaptureVolume
+    def get_externalCaptureVolume(self):
+        return self.__externalCaptureVolume__
+
+    def set_externalCaptureVolume(self, newVolume):
+        if newVolume != self.__externalCaptureVolume__:
+            self.__externalCaptureVolume__ = newVolume
+            self.externalMidiChannelChanged.emit()
+
+    externalCaptureVolumeChanged = Signal()
+
+    # This is on a scale from 0 (no sound should happen) to 1 (all the sound please)
+    externalCaptureVolume = Property(float, get_externalCaptureVolume, set_externalCaptureVolume, notify=externalCaptureVolumeChanged)
+    ### END Property externalCaptureVolume
 
     ### Property selectedPartNames
     def get_selectedPartNames(self):

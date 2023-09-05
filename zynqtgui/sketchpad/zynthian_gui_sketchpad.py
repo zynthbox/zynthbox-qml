@@ -155,6 +155,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
         self.__last_selected_obj = last_selected_obj_dto(self)
+        self.__sketchpad_loading_in_progress = False
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
         self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)
@@ -463,6 +464,20 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     lastSelectedObj = Property(QObject, get_lastSelectedObj, constant=True)
     ### END Property lastSelectedObj
 
+    ### BEGIN Property sketchpadLoadingInProgress
+    def get_sketchpadLoadingInProgress(self):
+        return self.__sketchpad_loading_in_progress
+
+    def set_sketchpadLoadingInProgress(self, value):
+        if self.__sketchpad_loading_in_progress != value:
+            self.__sketchpad_loading_in_progress = value
+            self.sketchpadLoadingInProgressChanged.emit()
+
+    sketchpadLoadingInProgressChanged = Signal()
+
+    sketchpadLoadingInProgress = Property(QObject, get_sketchpadLoadingInProgress, set_sketchpadLoadingInProgress, notify=sketchpadLoadingInProgressChanged)
+    ### END Property sketchpadLoadingInProgress
+
     @Signal
     def metronomeEnabledChanged(self):
         pass
@@ -630,15 +645,18 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if cb is not None:
                 cb()
 
+            self.sketchpadLoadingInProgress = False
+            self.zynqtgui.zynautoconnect()
+
             if self.zynqtgui.isBootingComplete:
                 self.zynqtgui.currentTaskMessage = "Finalizing"
 
-            self.zynqtgui.zynautoconnect()
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.currentTaskMessage = "Creating New Sketchpad"
         self.longOperationIncrement()
+        self.sketchpadLoadingInProgress = True
         self.zynqtgui.do_long_task(task)
 
     @Slot(None)
@@ -745,6 +763,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             else:
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
                 self.zynqtgui.currentTaskMessage = "Loading sketchpad"
+                self.sketchpadLoadingInProgress = True
                 self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_history)
                 self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(str(sketchpad_path))
 
@@ -772,10 +791,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if cb is not None:
                     cb()
 
+                self.sketchpadLoadingInProgress = False
+                self.zynqtgui.zynautoconnect()
+
                 if self.zynqtgui.isBootingComplete:
                     self.zynqtgui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
-                self.zynqtgui.zynautoconnect()
                 QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.currentTaskMessage = "Loading Sketchpad"

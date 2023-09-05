@@ -460,9 +460,11 @@ def midi_autoconnect(force=False):
 def audio_autoconnect(force=False):
     global force_next_autoconnect
 
-    if not zynthian_gui_config.zynqtgui.isBootingComplete:
+    if not zynthian_gui_config.zynqtgui.isBootingComplete or zynthian_gui_config.zynqtgui.sketchpad.sketchpadLoadingInProgress:
         # If Booting is not complete, do not run autoconnect
+        # If a sketchpad is being loaded do not run autoconnect
         # Autoconnect will be explicitly called once after booting is complete
+        logging.debug("Skipping audio_autoconnect")
         return
 
     if not force:

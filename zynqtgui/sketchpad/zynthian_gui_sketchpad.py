@@ -633,6 +633,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if self.zynqtgui.isBootingComplete:
                 self.zynqtgui.currentTaskMessage = "Finalizing"
 
+            self.zynqtgui.zynautoconnect()
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
@@ -774,6 +775,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if self.zynqtgui.isBootingComplete:
                     self.zynqtgui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
+                self.zynqtgui.zynautoconnect()
                 QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.currentTaskMessage = "Loading Sketchpad"

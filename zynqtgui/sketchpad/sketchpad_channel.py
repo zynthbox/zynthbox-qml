@@ -121,6 +121,7 @@ class sketchpad_channel(QObject):
             self.__samples__.append(newSample)
 
         self.__channel_audio_type__ = "synth"
+        self.__channel_routing_style__ = "standard"
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
 
@@ -363,6 +364,7 @@ class sketchpad_channel(QObject):
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "channelAudioType": self.__channel_audio_type__,
+                "channelRoutingStyle": self.__channel_routing_style__,
                 "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
@@ -395,6 +397,10 @@ class sketchpad_channel(QObject):
             if "channelAudioType" in obj:
                 self.__channel_audio_type__ = obj["channelAudioType"]
                 self.set_channel_audio_type(self.__channel_audio_type__, True)
+            if "channelRoutingStyle" in obj:
+                self.set_channel_routing_style(obj["channelRoutingStyle"], True)
+            else:
+                self.set_channel_routing_style("standard", True)
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "externalCaptureVolume" in obj:
@@ -1066,7 +1072,7 @@ class sketchpad_channel(QObject):
     muted = Property(bool, get_muted, set_muted, notify=mutedChanged)
     ### End Property muted
 
-    ### Property channelAudioType
+    ### BEGIN Property channelAudioType
     # Possible values : "synth", "sample-loop", "sample-trig", "sample-slice", "external"
     # For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth" or "external"
     # TODO : Later implement it properly with model and enums
@@ -1101,6 +1107,23 @@ class sketchpad_channel(QObject):
 
     channelAudioType = Property(str, get_channel_audio_type, set_channel_audio_type, notify=channel_audio_type_changed)
     ### END Property channelAudioType
+
+    ### BEGIN Property channelRoutingStyle
+    # Possible values : "standard", "one-to-one"
+    # Standard routes all audio through a serial lane of all effects (so e.g. synth or sample slot 3 will be routed to fx slot 1, which in turn is passed through fx slot 2, and so on, and the final fx through the global fx)
+    # One-to-one routes each individual lane to a separate lane (each containing one effect, so e.g. synth or sample slot 3 routes to fx slot 3, and from there to the global fx)
+    def get_channel_routing_style(self):
+        return self.__channel_routing_style__
+
+    def set_channel_routing_style(self, newRoutingStyle, force_set=False):
+        if force_set or newRoutingStyle != self.__channel_routing_style__:
+            self.__channel_routing_style__ = newRoutingStyle
+            self.channel_routing_style_changed.emit()
+
+    channel_routing_style_changed = Signal()
+
+    channelRoutingStyle = Property(str, get_channel_routing_style, set_channel_routing_style, notify=channel_routing_style_changed)
+    ### END Property channelRoutingStyle
 
     ### BEGIN Property channelTypeDisplayName
     def get_channelTypeDisplayName(self):

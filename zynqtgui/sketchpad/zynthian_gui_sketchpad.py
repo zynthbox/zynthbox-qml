@@ -706,6 +706,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                 str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
             self.__song__.save(False)
+            self.zynqtgui.session_dashboard.set_selected_channel(0, force_set=True)
             self.song_changed.emit()
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)

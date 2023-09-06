@@ -277,196 +277,211 @@ Zynthian.Dialog {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            contentItem: ColumnLayout {
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+            contentItem: ListView {
+                id: filesListView
 
-                    color: "#11000000"
-                    border.width: 1
-                    border.color: "#22000000"
+                focus: true
+                onCurrentIndexChanged: {
+                    positionViewAtIndex(currentIndex, ListView.Contain);
+                    filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
+                }
+                Layout.leftMargin: 8
+                clip: true
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 4
-                        anchors.rightMargin: 4
+                property var selectedModelData: null
 
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            text: qsTr("Filename")
+                function selectItem(model) {
+                    console.log(model.fileName, model.filePath, model.index)
+                    root.currentFileInfo = model;
+                    if (model.fileIsDir) {
+                        var path = model.filePath;
+
+                        if (path.endsWith("/")) {
+                            path = path.slice(0, path.length - 1);
                         }
 
-                        QQC2.Label {
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                            Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                        folderModel.folder = path;
+                        filesListView.currentIndex = 0;
+                    } else {
+                        filesListView.selectedModelData = model;
+                        if (root.saveMode) {
+                            namedFile.text = model.fileName;
+                        }
+                        root.filesListView.currentIndex = model.index;
+                    }
+                }
+
+                QQC2.Label {
+                    id: noFilesMessage
+                    parent: filesListView
+                    anchors.centerIn: parent
+                    visible: filesListView.count === 0
+                    text: qsTr("There are no files present")
+                    QQC2.Label {
+                        anchors {
+                            top: parent.bottom
+                            margins: Kirigami.Units.largeSpacing
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                        function getHelp(folderName) {
+                            if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
+                                return qsTr("When you use Get New Sounds, you will be able to find them here");
+                            } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
+                                return qsTr("This is where you should store your own sounds");
+                            } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/community-soundsets") {
+                                return qsTr("When you use Get New Soundsets, you will be able to find them here");
+                            } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
+                                return qsTr("This is where you should store your own soundsets");
+                            } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/community-sequences") {
+                                return qsTr("When you use Get New Sequences, you will be able to find them here");
+                            } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
+                                return qsTr("This is where you should store sequences you create");
+                            }
+                            return "";
+                        }
+                        text: getHelp(folderModel.folder)
+                    }
+                }
+
+                headerPositioning: ListView.PullBackHeader
+                header: Rectangle {
+                    width: ListView.view.width
+                    height: Kirigami.Units.gridUnit*2
+                    z: 2
+                    color: "#110000"
+
+                    ColumnLayout {
+                        spacing: 0
+                        anchors.fill: parent
+
+                        RowLayout {
+                            Layout.fillWidth: true
                             Layout.fillHeight: true
-                            text: qsTr("Duration")
+                            spacing: Kirigami.Units.gridUnit
+
+                            Kirigami.Icon {
+                                Layout.preferredWidth: parent.height
+                                Layout.maximumWidth: parent.height
+                                Layout.fillHeight: true
+                                Layout.margins: 8
+                                source: "file-library-symbolic"
+                            }
+
+                            RowLayout {
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    text: qsTr("Filename")
+                                }
+
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                                    Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                    Layout.fillHeight: true
+                                    text: qsTr("Duration")
+                                }
+                            }
+                        }
+
+                        Kirigami.Separator {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 1
                         }
                     }
                 }
 
-                ListView {
-                    id: filesListView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    focus: true
-                    onCurrentIndexChanged: {
+                model: FolderListModel {
+                    id: folderModel
+                    caseSensitive: false
+                    showDirs: true
+                    showDirsFirst: true
+                    showDotAndDotDot: false
+                    onFolderChanged: {
+                        if (root.saveMode) {
+                            filesListView.currentIndex = -1;
+                        } else {
+                            filesListView.currentIndex = 0;
+                        }
                         filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
                     }
-                    Layout.leftMargin: 8
-                    clip: true
+                }
+                delegate: Rectangle {
+                    property var fileProperties: Helpers.FilePropertiesHelper {
+                        filePath: model.filePath
+                    }
 
-                    property var selectedModelData: null
-
-                    function selectItem(model) {
-                        console.log(model.fileName, model.filePath, model.index)
-                        root.currentFileInfo = model;
-                        if (model.fileIsDir) {
-                            var path = model.filePath;
-
-                            if (path.endsWith("/")) {
-                                path = path.slice(0, path.length - 1);
-                            }
-
-                            folderModel.folder = path;
-                            filesListView.currentIndex = 0;
-                        } else {
-                            filesListView.selectedModelData = model;
-                            if (root.saveMode) {
-                                namedFile.text = model.fileName;
-                            }
-                            root.filesListView.currentIndex = model.index;
+                    id: fileListDelegate
+                    width: ListView.view.width
+                    height: Kirigami.Units.gridUnit*2
+                    z: 1
+                    color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
+                    property bool isCurrentItem: ListView.isCurrentItem
+                    onIsCurrentItemChanged: {
+                        if (isCurrentItem) {
+                            root.currentFileInfo = model;
                         }
                     }
 
-                    QQC2.Label {
-                        id: noFilesMessage
-                        parent: filesListView
-                        anchors.centerIn: parent
-                        visible: filesListView.count === 0
-                        text: qsTr("There are no files present")
-                        QQC2.Label {
-                            anchors {
-                                top: parent.bottom
-                                margins: Kirigami.Units.largeSpacing
-                                horizontalCenter: parent.horizontalCenter
-                            }
-                            function getHelp(folderName) {
-                                if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
-                                    return qsTr("When you use Get New Sounds, you will be able to find them here");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
-                                    return qsTr("This is where you should store your own sounds");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/community-soundsets") {
-                                    return qsTr("When you use Get New Soundsets, you will be able to find them here");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
-                                    return qsTr("This is where you should store your own soundsets");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/community-sequences") {
-                                    return qsTr("When you use Get New Sequences, you will be able to find them here");
-                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
-                                    return qsTr("This is where you should store sequences you create");
+                    function selectItem() {
+                        filesListView.selectItem(model)
+                    }
+
+                    ColumnLayout {
+                        spacing: 0
+                        anchors.fill: parent
+
+                        RowLayout {
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            spacing: Kirigami.Units.gridUnit
+
+                            Kirigami.Icon {
+                                Layout.preferredWidth: parent.height
+                                Layout.maximumWidth: parent.height
+                                Layout.fillHeight: true
+                                Layout.margins: 8
+
+                                source: {
+                                    if (model.fileIsDir) {
+                                        return "folder-symbolic"
+                                    }
+                                    else if (model.filePath.endsWith(".wav")) {
+                                        return "folder-music-symbolic"
+                                    } else {
+                                        return "file-catalog-symbolic"
+                                    }
                                 }
-                                return "";
                             }
-                            text: getHelp(folderModel.folder)
-                        }
-                    }
-
-
-                    model: FolderListModel {
-                        id: folderModel
-                        caseSensitive: false
-                        showDirs: true
-                        showDirsFirst: true
-                        showDotAndDotDot: false
-                        onFolderChanged: {
-                            if (root.saveMode) {
-                                filesListView.currentIndex = -1;
-                            } else {
-                                filesListView.currentIndex = 0;
-                            }
-                            filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
-                        }
-                    }
-                    delegate: Rectangle {
-                        property var fileProperties: Helpers.FilePropertiesHelper {
-                            filePath: model.filePath
-                        }
-
-                        id: fileListDelegate
-                        width: ListView.view.width
-                        height: Kirigami.Units.gridUnit*2
-                        color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
-                        property bool isCurrentItem: ListView.isCurrentItem
-                        onIsCurrentItemChanged: {
-                            if (isCurrentItem) {
-                                root.currentFileInfo = model;
-                            }
-                        }
-
-                        function selectItem() {
-                            filesListView.selectItem(model)
-                        }
-
-                        ColumnLayout {
-                            spacing: 0
-                            anchors.fill: parent
 
                             RowLayout {
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                spacing: Kirigami.Units.gridUnit
-
-                                Kirigami.Icon {
-                                    Layout.preferredWidth: parent.height
-                                    Layout.maximumWidth: parent.height
+                                QQC2.Label {
+                                    Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.margins: 8
-
-                                    source: {
-                                        if (model.fileIsDir) {
-                                            return "folder-symbolic"
-                                        }
-                                        else if (model.filePath.endsWith(".wav")) {
-                                            return "folder-music-symbolic"
-                                        } else {
-                                            return "file-catalog-symbolic"
-                                        }
-                                    }
+                                    text: model.fileName
                                 }
 
-                                RowLayout {
-                                    QQC2.Label {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        text: model.fileName
-                                    }
-
-                                    QQC2.Label {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                                        Layout.maximumWidth: Kirigami.Units.gridUnit*8
-                                        Layout.fillHeight: true
-                                        text: fileProperties.fileMetadata.isWav
-                                                ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))
-                                                : ""
-                                    }
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                                    Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                    Layout.fillHeight: true
+                                    text: fileProperties.fileMetadata.isWav
+                                            ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))
+                                            : ""
                                 }
-                            }
-
-                            Kirigami.Separator {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 1
                             }
                         }
 
-                        MouseArea {
-                            id: mouseArea
-                            anchors.fill: parent
-                            onClicked: fileListDelegate.selectItem()
+                        Kirigami.Separator {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 1
                         }
+                    }
+
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        onClicked: fileListDelegate.selectItem()
                     }
                 }
             }

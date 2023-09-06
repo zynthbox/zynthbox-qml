@@ -29,6 +29,7 @@ import tempfile
 import traceback
 import taglib
 import json
+import os
 import logging
 import Zynthbox
 
@@ -701,6 +702,22 @@ class sketchpad_clip(QObject):
 
     path = Property(str, path, set_path, notify=path_changed)
     filename = Property(str, filename, notify=path_changed)
+
+    # Copies the file to the given location
+    # To perform a true save-as, to copyTo(someFilename), and then setPath(someFilename)
+    @Slot(str, result=bool)
+    def copyTo(self, copyToFilename):
+        if self.audioSource is not None:
+            if os.path.exists(self.audioSource.getFilePath()):
+                if shutil.copy2(self.audioSource.getFilePath(), copyToFilename):
+                    return True
+                else:
+                    logging.error(f"Failed to copy {self.audioSource.getFilePath()} to {copyToFilename}")
+            else:
+                logging.error(f"Attempted to copy non-existent file {self.audioSource.getFilePath()} to {copyToFilename}")
+        else:
+            logging.error(f"Attempted to copy a clip with no audio source to {copyToFilename}")
+        return False
 
     def progress_changed_cb(self):
         self.__progress__ = self.audioSource.progress()

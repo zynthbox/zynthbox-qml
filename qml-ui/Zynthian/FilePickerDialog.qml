@@ -49,6 +49,7 @@ Zynthian.Dialog {
 
     property alias listCurrentIndex: filesListView.currentIndex
     property alias listCount: filesListView.count
+    readonly property alias selectedFile: filesListView.selectedModelData
 
     property var cuiaCallback: function (cuia) {
         var result = true;
@@ -129,9 +130,13 @@ Zynthian.Dialog {
     height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : Math.round(header.Window.height * 0.8)
     z: 999999999
 
-    onAccepted: filesListView.selectedModelData = null
-    onRejected: filesListView.selectedModelData = null
-    onDiscarded: filesListView.selectedModelData = null
+    onOpenedChanged: {
+        if (opened) {
+            filesListView.selectedModelData = null;
+            namedFile.text = "";
+            filesListView.currentIndex = -1;
+        }
+    }
 
     header: ColumnLayout{
         spacing: 8
@@ -172,10 +177,6 @@ Zynthian.Dialog {
                 }
             }
         }
-    }
-    onVisibleChanged: {
-        namedFile.text = "";
-        filesListView.currentIndex = -1;
     }
     footer: QQC2.Control {
         leftPadding: root.leftPadding

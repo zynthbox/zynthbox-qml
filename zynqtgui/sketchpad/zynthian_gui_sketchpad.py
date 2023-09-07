@@ -782,6 +782,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
                 # Update volume controls
                 self.zynqtgui.fixed_layers.fill_list()
+                self.zynqtgui.session_dashboard.set_selected_channel(0, force_set=True)
                 self.song_changed.emit()
 
                 # Connect all jack ports of respective channel after jack client initialization is done.

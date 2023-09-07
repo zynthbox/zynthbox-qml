@@ -105,7 +105,7 @@ GridLayout {
             onControlObjChanged: waveFormThrottle.restart()
         }
         Connections {
-            target: waveBar.controlObj
+            target: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("path") ? waveBar.controlObj : null
             onPath_changed: waveFormThrottle.restart()
         }
         Component.onCompleted: {

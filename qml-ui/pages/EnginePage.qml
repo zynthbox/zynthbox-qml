@@ -197,7 +197,7 @@ Zynthian.ScreenPage {
                         onClicked: {
                             zynqtgui.engine.current_index = index;
                             zynqtgui.engine.activate_index(index);
-                            delegate.itemActivated(delegate.screenId, index);
+                            root.itemActivated(root.screenId, index);
                         }
 
                         contentItem: ColumnLayout {

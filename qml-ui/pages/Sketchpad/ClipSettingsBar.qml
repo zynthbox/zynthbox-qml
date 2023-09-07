@@ -133,7 +133,7 @@ ColumnLayout {
             text: qsTr("Gain (dB)")
             controlObj: root.controlObj ? Zynthbox.PlayGridManager.getClipById(root.controlObj.cppObjId) : null
             controlProperty: "gainAbsolute"
-            valueString: root.controlObj ? root.controlObj.gain.toFixed(1) : 0
+            valueString: root.controlObj && root.controlObj.gain ? root.controlObj.gain.toFixed(1) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5

@@ -79,7 +79,10 @@ class sketchpad_clip(QObject):
         self.__slices__ = 16
         self.__enabled__ = False
         self.channel = None
-        self.__lane = 0
+        self.__lane__ = part_index
+        # Just in case, fix up the lane so it's something sensible (we have five lanes, so...)
+        if self.__lane__ < 0 or self.__lane__ > 4:
+            self.__lane__ = 0
 
         self.__autoStopTimer__ = QTimer()
         self.__autoStopTimer__.setSingleShot(True)
@@ -459,11 +462,11 @@ class sketchpad_clip(QObject):
     part = Property(int, part, constant=True)
 
     def lane(self):
-        return self.__lane
+        return self.__lane__
 
     def set_lane(self, lane: int):
-        if self.__lane != lane:
-            self.__lane = lane
+        if self.__lane__ != lane:
+            self.__lane__ = lane
             if self.audioSource is not None:
                 self.audioSource.setLaneAffinity(lane)
             self.lane_changed.emit()
@@ -632,7 +635,7 @@ class sketchpad_clip(QObject):
             self.audioSource.deleteLater()
 
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
-        self.audioSource.setLaneAffinity(self.__lane)
+        self.audioSource.setLaneAffinity(self.__lane__)
         if self.clipChannel is not None and self.__song__.isLoading == False:
             self.clipChannel.channelAudioType = "sample-loop"
         self.cppObjIdChanged.emit()

@@ -42,7 +42,7 @@ from . import zynthian_gui_config
 from . import zynthian_gui_selector
 from zyngine import zynthian_layer
 
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer
 
 #------------------------------------------------------------------------------
 # Zynthian Layer Selection GUI Class
@@ -601,8 +601,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
                 layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
 
-            # Set preset to 0 explicitly as it does not seem to do that
-            layer.set_preset(0)
+            self.zynqtgui.set_curlayer(layer)
+            self.zynqtgui.bank.fill_list_actual()
+            self.zynqtgui.preset.fill_list_actual()
 
             if not zyngine.type == "Audio Effect":
                 self.add_midichannel_to_channel(midich, position_in_channel)
@@ -650,9 +651,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
         if not self.zynqtgui.screens['bank'].get_show_top_sounds():
             self.zynqtgui.screens['bank'].select_action(0)
 
-        self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()
-        self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
         self.zynqtgui.set_curlayer(layer)
+        layer.set_preset(0)
+
+        def emit_names_changed():
+            self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()
+            self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
+
+        QTimer.singleShot(500, emit_names_changed)
 
     def remove_layer(self, i, stop_unused_engines=True):
         if i>=0 and i<len(self.layers):

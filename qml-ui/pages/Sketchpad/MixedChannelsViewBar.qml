@@ -947,6 +947,7 @@ Rectangle {
                                 Connections {
                                     target: root.selectedChannel
                                     onChannel_audio_type_changed: waveformThrottle.restart()
+                                    onSelectedSlotRowChanged: waveformThrottle.restart()
                                 }
                                 Connections {
                                     target: zynqtgui.sketchpad

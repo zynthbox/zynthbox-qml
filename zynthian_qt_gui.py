@@ -3912,7 +3912,7 @@ class zynthian_gui(QObject):
             if self.dialogStack[-1] is dialog:
                 updateOpened = True
             else:
-                logging.warning("The dialog we just tried to pop from the list is not at the top of the stack. We still removed it, but there is likely something wrong if this happens.")
+                logging.warning(f"The dialog ({dialog.objectName()}) we just tried to pop from the list is not at the top of the stack. We still removed it, but there is likely something wrong if this happens.")
             self.dialogStack.remove(dialog)
             if len(self.dialogStack) > 0:
                 self.set_openedDialog(self.dialogStack[-1])

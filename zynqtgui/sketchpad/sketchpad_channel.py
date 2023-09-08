@@ -1012,7 +1012,7 @@ class sketchpad_channel(QObject):
         names = []
         for fx in self.chainedFx:
             try:
-                if fx.preset_name is not None and fx.preset_name != "None":
+                if fx.preset_name is not None and fx.preset_name != "None" and fx.preset_name != "":
                     names.append(f"{fx.engine.name.replace('Jalv/', '')} > {fx.preset_name}")
                 else:
                     names.append(fx.engine.name.replace('Jalv/', ''))

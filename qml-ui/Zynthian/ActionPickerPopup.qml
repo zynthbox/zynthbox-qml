@@ -126,8 +126,8 @@ Zynthian.Popup {
                 enabled: modelData != null && modelData.hasOwnProperty("enabled") ? modelData.enabled : true
                 invertBorderColor: true
                 onClicked: {
-                    modelData.trigger();
                     component.close();
+                    modelData.trigger();
                 }
                 Rectangle {
                     anchors {

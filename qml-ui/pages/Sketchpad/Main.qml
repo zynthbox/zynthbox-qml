@@ -538,22 +538,6 @@ Zynthian.ScreenPage {
         }
 
         switch (cuia) {
-            case "SELECT_UP":
-                var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
-                if (root.selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
-                    zynqtgui.layer.selectPrevPreset(selectedMidiChannel);
-                    infoBar.updateInfoBar();
-                }
-                return true;
-
-            case "SELECT_DOWN":
-                var selectedMidiChannel = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
-                if (root.selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
-                    zynqtgui.layer.selectNextPreset(selectedMidiChannel);
-                    infoBar.updateInfoBar();
-                }
-                return true;
-
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":

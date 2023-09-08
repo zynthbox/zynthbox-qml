@@ -252,18 +252,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
             # Try to set created synth engine's volume to max
             try:
-                logging.info(f"Setting synth volume to max when initializing")
-                self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value = \
-                    self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value_max
+                logging.debug("Setting synth volume to max when initializing")
+                self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value = self.zynqtgui.fixed_layers.volumeControllers[self.midi_chan].value_max
             except:
-                logging.error(f"Error setting synth volume to max when initializing")
-
-            # Try to set created synth engine's preset to 0
-            try:
-                logging.info(f"Setting synth preset to 0 when initializing")
-                self.zynqtgui.layer.selectPreset(self.midi_chan, 0)
-            except:
-                logging.error(f"Error setting synth preset to 0 when initializing")
+                logging.error("Error setting synth volume to max when initializing")
 
     def select_by_engine(self, eng):
         for i, val in enumerate(self.list_data):

@@ -91,10 +91,10 @@ Zynthian.Card {
                 pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(selectedMidiChannel, -1)
                 return true;
             case "KNOB3_UP":
-                zynqtgui.layer.selectNextPreset(selectedMidiChannel);
+                //zynqtgui.layer.selectNextPreset(selectedMidiChannel);
                 return true
             case "KNOB3_DOWN":
-                zynqtgui.layer.selectPrevPreset(selectedMidiChannel);
+                //zynqtgui.layer.selectPrevPreset(selectedMidiChannel);
                 return true
             default:
                 return false;

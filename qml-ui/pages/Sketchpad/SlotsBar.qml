@@ -756,6 +756,7 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: sketchPickerPopup
+        objectName: "sketchPickerPopup"
         columns: 2
         property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
         actions: [
@@ -767,7 +768,6 @@ Rectangle {
                     samplePickerDialog.clipToSave = sketchPickerPopup.sketch;
                     samplePickerDialog.saveMode = true;
                     samplePickerDialog.open();
-                    samplePickerPopup.close();
                 }
             },
             QQC2.Action {
@@ -782,7 +782,6 @@ Rectangle {
                 onTriggered: {
                     loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir
                     loopPickerDialog.open()
-                    sketchPickerPopup.close()
                 }
             },
             QQC2.Action {
@@ -791,7 +790,6 @@ Rectangle {
                     samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
                     samplePickerDialog.saveMode = false;
                     samplePickerDialog.open()
-                    sketchPickerPopup.close()
                 }
             },
             QQC2.Action {
@@ -799,14 +797,12 @@ Rectangle {
                 onTriggered: {
                     bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
                     bankPickerDialog.open()
-                    sketchPickerPopup.close()
                 }
             },
             QQC2.Action {
                 text: qsTr("Download Samples")
                 onTriggered: {
                     zynqtgui.current_modal_screen_id = "sample_downloader"
-                    sketchPickerPopup.close()
                 }
             }
         ]
@@ -834,6 +830,7 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: samplePickerPopup
+        objectName: "samplePickerPopup"
         columns: 2
         actions: [
             QQC2.Action {
@@ -844,7 +841,6 @@ Rectangle {
                     samplePickerDialog.clipToSave = root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow];
                     samplePickerDialog.saveMode = true;
                     samplePickerDialog.open();
-                    samplePickerPopup.close();
                 }
             },
             QQC2.Action {
@@ -860,7 +856,6 @@ Rectangle {
                     samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir;
                     samplePickerDialog.saveMode = false;
                     samplePickerDialog.open();
-                    samplePickerPopup.close();
                 }
             },
             QQC2.Action {
@@ -869,7 +864,6 @@ Rectangle {
                     samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
                     samplePickerDialog.saveMode = false;
                     samplePickerDialog.open();
-                    samplePickerPopup.close();
                 }
             },
             QQC2.Action {
@@ -877,14 +871,12 @@ Rectangle {
                 onTriggered: {
                     bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks';
                     bankPickerDialog.open();
-                    samplePickerPopup.close();
                 }
             },
             QQC2.Action {
                 text: qsTr("Download Samples")
                 onTriggered: {
                     zynqtgui.current_modal_screen_id = "sample_downloader";
-                    samplePickerPopup.close();
                 }
             }
         ]

@@ -656,6 +656,7 @@ Zynthian.BasePlayGrid {
                     id: drumsGridItem
                     model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
                     positionalVelocity: _private.positionalVelocity
+                    showChosenPads: drumPad.channelIsLoopType === false
                     playgrid: component
                     onRemoveNote: {
                         component.ignoreNextBack = true;

@@ -37,6 +37,7 @@ ColumnLayout {
     id: component
     property QtObject model
     property bool positionalVelocity
+    property bool showChosenPads: true
     property Item playgrid
     signal removeNote(QtObject note)
     signal notePressAndHold(QtObject note)
@@ -57,8 +58,8 @@ ColumnLayout {
                     property bool weAreChosen: component.playgrid.heardNotes.indexOf(note) > -1
                         || (component.playgrid.mostRecentlyPlayedNote && note && component.playgrid.mostRecentlyPlayedNote.midiNote === note.midiNote)
                         || (typeof(component.playgrid.mostRecentlyPlayedNote) === "undefined" && component.playgrid.heardNotes.length === 0 && component.playgrid.currentRowUniqueNotes.indexOf(note) > -1)
-                    backgroundColor: weAreChosen ? noteColor : Kirigami.Theme.textColor
-                    playingBackgroundColor: weAreChosen ? tintedNoteColor : noteColor
+                    backgroundColor: component.showChosenPads && weAreChosen ? noteColor : Kirigami.Theme.textColor
+                    playingBackgroundColor: component.showChosenPads && weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false
                     visualPressAndHold: note !== null
                     onPressAndHold: {

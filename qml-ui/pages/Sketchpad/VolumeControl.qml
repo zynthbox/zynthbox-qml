@@ -64,8 +64,6 @@ Rectangle {
                 background: Rectangle {
                     x: slider.leftPadding
                     y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                    implicitWidth: 8
-                    implicitHeight: parent.height
                     width: 8
                     height: slider.availableHeight
                     radius: 2

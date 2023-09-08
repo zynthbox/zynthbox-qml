@@ -25,7 +25,8 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
+import QtQml 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
@@ -863,6 +864,7 @@ Zynthian.BasePlayGrid {
                             value: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
                             when: drumpadLoopVisualiser.visible
                             delayed: true
+                            restoreMode: Binding.RestoreBinding
                         }
                         property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex) : null
                         Zynthian.SampleVisualiser {

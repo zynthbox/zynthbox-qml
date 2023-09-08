@@ -1,4 +1,5 @@
-import QtQuick 2.10
+import QtQuick 2.15
+import QtQml 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
@@ -40,6 +41,7 @@ Item {
         value: component.sample
         when: component.visible
         delayed: true
+        restoreMode: Binding.RestoreBinding
     }
     Binding {
         target: _private
@@ -60,6 +62,7 @@ Item {
             value: _private.sample ? _private.sample.path : ""
             when: parent.visible
             delayed: true
+            restoreMode: Binding.RestoreBinding
         }
 
         visible: component.visible && _private.sample && _private.sample.path && _private.sample.path.length > 0

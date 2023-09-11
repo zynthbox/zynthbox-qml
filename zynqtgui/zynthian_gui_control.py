@@ -554,7 +554,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         else:
             # Always set visible to false otherwise it interferes with global knobs
             # Always set index to -1 otherwise it takes control of global knobs
-            self.zgui_controllers.append(zynthian_gui_controller(-1, ctrl, self))
+            self.zgui_controllers.append(zynthian_gui_controller(-1, ctrl, self, True))
             self.controllers_count_changed.emit()
         self.zgui_controllers_map[ctrl]=self.zgui_controllers[i]
 
@@ -564,7 +564,7 @@ class zynthian_gui_control(zynthian_gui_selector):
             self.zgui_custom_controllers[i].set_visible(False)
             self.zgui_custom_controllers[i].config(ctrl)
         else:
-            self.zgui_custom_controllers.append(zynthian_gui_controller(-1, ctrl, self))
+            self.zgui_custom_controllers.append(zynthian_gui_controller(-1, ctrl, self, True))
         self.zgui_custom_controllers_map[ctrl]=self.zgui_custom_controllers[i]
 
 

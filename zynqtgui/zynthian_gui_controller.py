@@ -49,7 +49,7 @@ import traceback
 
 class zynthian_gui_controller(QObject):
 
-    def __init__(self, indx, zctrl, parent=None):
+    def __init__(self, indx, zctrl, parent=None, is_engine_controller=False):
         super(zynthian_gui_controller, self).__init__(parent)
         self.zynqtgui = zynthian_gui_config.zynqtgui
         self.zctrl=None
@@ -69,6 +69,7 @@ class zynthian_gui_controller(QObject):
         self.ctrl_value_print=None
         self.__visible = True
         self.custom_encoder_speed = 0
+        self.is_engine_controller = is_engine_controller
 
 
         self.ctrl_midi_bind=None
@@ -497,6 +498,9 @@ class zynthian_gui_controller(QObject):
                     #logging.error("set_value_zyncoder {} {} ({}, {}) => {}".format(self, self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
             self.calculate_plot_values()
             self.value_changed.emit()
+            if self.is_engine_controller:
+                logging.debug(f"Controller value changed: {v}. Saving last state snapshot")
+                self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
             return True
 
 

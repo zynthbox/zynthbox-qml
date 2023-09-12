@@ -1119,6 +1119,9 @@ class sketchpad_channel(QObject):
         if force_set or newRoutingStyle != self.__channel_routing_style__:
             self.__channel_routing_style__ = newRoutingStyle
             self.channel_routing_style_changed.emit()
+            self.zynqtgui.zynautoconnect();
+            if force_set == False:
+                self.__song__.schedule_save()
 
     channel_routing_style_changed = Signal()
 

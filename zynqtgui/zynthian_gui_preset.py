@@ -461,7 +461,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         if not self.zynqtgui.curlayer.show_fav_presets:
             self.zynqtgui.curlayer.show_fav_presets = True
             self.set_select_path()
-            self.update_list()
+            self.fill_list_actual()
             self.show_only_favorites_changed.emit()
             if self.zynqtgui.curlayer.get_preset_name():
                 self.zynqtgui.curlayer.set_preset_by_name(self.zynqtgui.curlayer.get_preset_name())
@@ -471,7 +471,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         if self.zynqtgui.curlayer and self.zynqtgui.curlayer.show_fav_presets:
             self.zynqtgui.curlayer.show_fav_presets = False
             self.set_select_path()
-            self.update_list()
+            self.fill_list_actual()
             self.show_only_favorites_changed.emit()
             if self.zynqtgui.curlayer.get_preset_name():
                 self.zynqtgui.curlayer.set_preset_by_name(self.zynqtgui.curlayer.get_preset_name())

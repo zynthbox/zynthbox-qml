@@ -496,6 +496,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     layer.reset_audio_out()
                     layer.reset_audio_in()
                 layer.set_engine(zyngine);
+                # Update bank and preset cache since engine has changed
+                layer.load_bank_list(force=True)
+                layer.load_preset_list(force=True)
                 self.zynqtgui.screens['engine'].stop_unused_engines()
                 # initialize the bank
                 self.zynqtgui.screens['bank'].show()

@@ -44,7 +44,7 @@ Zynthian.DialogQuestion {
             _private.selectedChannel.channelRoutingStyle = _private.newRoutingStyle;
         }
     }
-    height: Kirigami.Units.gridUnit * 25
+    height: Kirigami.Units.gridUnit * 18
     width: Kirigami.Units.gridUnit * 35
     acceptText: qsTr("Select")
     rejectText: qsTr("Back")
@@ -92,15 +92,20 @@ Zynthian.DialogQuestion {
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            QQC2.Label {
-                anchors.centerIn: parent
-                visible: _private.newRoutingStyle === "standard"
-                text: "Image describing serial audio routing"
-            }
-            QQC2.Label {
-                anchors.centerIn: parent
-                visible: _private.newRoutingStyle === "one-to-one"
-                text: "Image describing one-to-one audio routing"
+            Image {
+                anchors {
+                    fill: parent;
+                    margins: Kirigami.Units.largeSpacing;
+                }
+                fillMode: Image.PreserveAspectFit
+                source: {
+                    if (_private.newRoutingStyle === "standard") {
+                        return "../../../img/routing-style-serial.png";
+                    } else if (_private.newRoutingStyle === "one-to-one") {
+                        return "../../../img/routing-style-one-to-one.png";
+                    }
+                    return "";
+                }
             }
         }
     }

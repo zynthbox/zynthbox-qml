@@ -135,12 +135,12 @@ class zynthian_layer:
     # ---------------------------------------------------------------------------
 
 
-    def load_bank_list(self):
+    def load_bank_list(self, force=False):
         # Calling self.engine.get_bank_list() causes quite some file reads.
         # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
         # Instead of reading files every run, cache the list data.
         # Since bank data of a synth should not change while the application is running, it should be fairly safe to cache the data
-        if len(self.bank_list_cache) == 0:
+        if len(self.bank_list_cache) == 0 or force:
             self.bank_list_cache = self.engine.get_bank_list(self)
 
         if len(self.engine.get_preset_favs(self)) > 0:
@@ -203,7 +203,7 @@ class zynthian_layer:
     # ---------------------------------------------------------------------------
 
 
-    def load_preset_list(self):
+    def load_preset_list(self, force=True):
         preset_list = []
 
         if self.show_fav_presets:
@@ -218,7 +218,7 @@ class zynthian_layer:
                 # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
                 # Instead of reading files every run, cache the list data.
                 # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-                if bank_name not in self.preset_list_cache:
+                if bank_name not in self.preset_list_cache or force:
                     self.preset_list_cache[bank_name] = self.engine.get_preset_list(self.bank_info)
                 preset_list = preset_list + self.preset_list_cache[bank_name].copy()
             except Exception as e:

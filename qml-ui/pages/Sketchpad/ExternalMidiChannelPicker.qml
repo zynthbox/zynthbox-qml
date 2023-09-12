@@ -68,7 +68,7 @@ Zynthian.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: qsTr("Pick External Midi Channel For Channel %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+            text: qsTr("Pick External Midi Channel For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
  
             QtObject {
                 id: _private

@@ -37,6 +37,14 @@ Zynthian.Dialog {
      * The body of the dialog (shown in a Qt Quick Components Label)
      */
     property string text
+    /**
+     * The string used for the accept button
+     */
+    property string acceptText: qsTr("Yes")
+    /**
+     * The string used for the reject button
+     */
+    property string rejectText: qsTr("No")
 
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
@@ -75,7 +83,7 @@ Zynthian.Dialog {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
-            text: qsTr("No")
+            text: component.rejectText
             onClicked: {
                 component.reject();
             }
@@ -84,7 +92,7 @@ Zynthian.Dialog {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
-            text: qsTr("Yes")
+            text: component.acceptText
             onClicked: {
                 component.accept();
             }

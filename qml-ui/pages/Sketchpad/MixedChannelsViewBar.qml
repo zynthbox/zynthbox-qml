@@ -300,6 +300,10 @@ Rectangle {
         id: bouncePopup
     }
 
+    RoutingStylePicker {
+        id: routingStylePicker
+    }
+
     GridLayout {
         rows: 1
         anchors.fill: parent
@@ -469,6 +473,38 @@ Rectangle {
 //                                            Layout.preferredWidth: Kirigami.Units.gridUnit
 //                                        }
 //                                    }
+
+                                    RowLayout {
+                                        Layout.fillHeight: true
+                                        visible: ["synth", "sample-trig", "sample-slice", "sample-loop"].indexOf(root.selectedChannel.channelAudioType) >= 0
+                                        QQC2.Label {
+                                            Layout.fillHeight: true
+                                            text: qsTr("Routing")
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            onClicked: {
+                                                routingStylePicker.pickRoutingStyle(root.selectedChannel);
+                                            }
+                                            text: {
+                                                if (root.selectedChannel) {
+                                                    if (root.selectedChannel.channelRoutingStyle === "standard") {
+                                                        return qsTr("Serial");
+                                                    } else if (root.selectedChannel.channelRoutingStyle === "one-to-one") {
+                                                        return qsTr("One-to-One");
+                                                    } else {
+                                                        return qsTr("Unknown");
+                                                    }
+                                                }
+                                                return ""
+                                            }
+                                        }
+                                        Item {
+                                            Layout.fillWidth: false
+                                            Layout.fillHeight: false
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit
+                                        }
+                                    }
 
                                     RowLayout {
                                         Layout.fillHeight: true

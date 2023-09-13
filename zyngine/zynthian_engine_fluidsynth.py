@@ -308,6 +308,11 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         if layer.part_i is not None:
             midich = layer.get_midi_chan()
             router_chan_cmd = "router_chan {0} {0} 0 {1}".format(midich, layer.part_i)
+            # FIXME : If router is not set to 0-15 first then it does not make sound
+            #         Find a proper reason why this is needed and make a fix for it
+            self.proc_cmd("router_begin note")
+            self.proc_cmd("router_chan 0 15 0 0")
+            self.proc_cmd("router_end")
             self.proc_cmd("router_begin note")
             self.proc_cmd(router_chan_cmd)
             self.proc_cmd("router_end")

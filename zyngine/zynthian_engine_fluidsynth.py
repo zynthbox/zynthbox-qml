@@ -69,7 +69,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # Config variables
     # ---------------------------------------------------------------------------
 
-    fs_options = "-o synth.midi-bank-select=mma -o synth.cpu-cores=3 -o synth.polyphony=64 -o midi.jack.id='fluidsynth' -o audio.jack.id='fluidsynth' -o audio.jack.multi='yes' -o synth.audio-groups=8  -o synth.audio-channels=8"
+    fs_options = "-o synth.midi-bank-select=mma -o synth.cpu-cores=3 -o synth.polyphony=64 -o midi.jack.id='fluidsynth' -o audio.jack.id='fluidsynth' -o audio.jack.multi='yes'"
 
     soundfont_dirs=[
         ('EX', zynthian_engine.ex_data_dir + "/soundfonts/sf2"),
@@ -88,13 +88,6 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         self.jackname = "fluidsynth"
 
         self.options['drop_pc']=True
-
-        if "Pi 4" in os.environ.get("RBPI_VERSION"):
-            n_fxgrp = 8
-        else:
-            n_fxgrp = 2
-
-        self.fs_options += " -o synth.effects-groups={}".format(n_fxgrp)
 
         self.command = "fluidsynth -a jack -m jack -g 1 -j {}".format(self.fs_options)
         self.command_prompt = "\n> "
@@ -308,11 +301,11 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         if layer.part_i is not None:
             midich = layer.get_midi_chan()
             router_chan_cmd = "router_chan {0} {0} 0 {1}".format(midich, layer.part_i)
-            # FIXME : If router is not set to 0-15 first then it does not make sound
-            #         Find a proper reason why this is needed and make a fix for it
-            self.proc_cmd("router_begin note")
-            self.proc_cmd("router_chan 0 15 0 0")
-            self.proc_cmd("router_end")
+#            # FIXME : If router is not set to 0-15 first then it does not make sound
+#            #         Find a proper reason why this is needed and make a fix for it
+#            self.proc_cmd("router_begin note")
+#            self.proc_cmd("router_chan 0 15 0 0")
+#            self.proc_cmd("router_end")
             self.proc_cmd("router_begin note")
             self.proc_cmd(router_chan_cmd)
             self.proc_cmd("router_end")

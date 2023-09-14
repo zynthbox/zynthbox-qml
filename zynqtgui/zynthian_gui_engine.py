@@ -275,6 +275,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
             else:
                 if eng=="SF":
                     eng="SF/{}".format(self.zyngine_counter)
+                elif eng=="FS":
+                    eng="FS/{}".format(self.zyngine_counter)
                 self.zyngines[eng]=zynthian_engine_class(self.zynqtgui)
 
         self.zyngine_counter+=1

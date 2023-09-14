@@ -69,7 +69,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # Config variables
     # ---------------------------------------------------------------------------
 
-    fs_options = "-o synth.midi-bank-select=mma -o synth.cpu-cores=3 -o synth.polyphony=64 -o midi.jack.id='fluidsynth' -o audio.jack.id='fluidsynth' -o audio.jack.multi='yes'"
+    fs_options = "-o synth.midi-bank-select=mma -o synth.cpu-cores=3 -o synth.polyphony=64 -o audio.jack.multi='yes'"
 
     soundfont_dirs=[
         ('EX', zynthian_engine.ex_data_dir + "/soundfonts/sf2"),
@@ -85,11 +85,11 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         super().__init__(zynqtgui)
         self.name = "FluidSynth"
         self.nickname = "FS"
-        self.jackname = "fluidsynth"
+        self.jackname = f"fluidsynth-{self.zynqtgui.layer.get_jackname_count('fluidsynth')}"
 
         self.options['drop_pc']=True
 
-        self.command = "fluidsynth -a jack -m jack -g 1 -j {}".format(self.fs_options)
+        self.command = f"fluidsynth -a jack -m jack -g 1 -o midi.jack.id='{self.jackname}' -o audio.jack.id='{self.jackname}' {self.fs_options}"
         self.command_prompt = "\n> "
 
         self.start()
@@ -119,7 +119,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def add_layer(self, layer):
         self.layers.append(layer)
-        layer.jackname = None
+#        layer.jackname = None
         layer.part_i=None
         self.setup_router(layer)
 
@@ -299,13 +299,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def set_layer_midi_routes(self, layer):
         if layer.part_i is not None:
-            midich = layer.get_midi_chan()
-            router_chan_cmd = "router_chan {0} {0} 0 {1}".format(midich, layer.part_i)
-#            # FIXME : If router is not set to 0-15 first then it does not make sound
-#            #         Find a proper reason why this is needed and make a fix for it
-#            self.proc_cmd("router_begin note")
-#            self.proc_cmd("router_chan 0 15 0 0")
-#            self.proc_cmd("router_end")
+            router_chan_cmd = "router_chan 0 0 0 {0}".format(layer.part_i)
             self.proc_cmd("router_begin note")
             self.proc_cmd(router_chan_cmd)
             self.proc_cmd("router_end")

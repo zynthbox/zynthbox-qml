@@ -85,7 +85,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         super().__init__(zynqtgui)
         self.name = "FluidSynth"
         self.nickname = "FS"
-        self.jackname = f"fluidsynth-{self.zynqtgui.layer.get_jackname_count('fluidsynth')}"
+        self.jackname = self.get_next_jackname("fluidsynth")
 
         self.options['drop_pc']=True
 

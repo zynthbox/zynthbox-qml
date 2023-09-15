@@ -181,8 +181,15 @@ Rectangle {
             case "KNOB3_UP":
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
+                    let slotMax = 4;
+                    if (root.selectedChannel.channelAudioType === "external") {
+                        slotMax = 1;
+                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                        slotMax = 0;
+                    }
+                    let fxSlotMax = 4;
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                        if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                        if (zynqtgui.sketchpad.lastSelectedObj.value === slotMax) {
                             // if we're on the last slot, select the first fx slot
                             fxRepeater.itemAt(0).switchToThisSlot(true);
                         } else {
@@ -190,7 +197,7 @@ Rectangle {
                             synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
                         }
                     } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                        if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                        if (zynqtgui.sketchpad.lastSelectedObj.value === fxSlotMax) {
                             // if we're on the last fx slot, select the first slot
                             synthRepeater.itemAt(0).switchToThisSlot(true);
                         } else {
@@ -207,10 +214,17 @@ Rectangle {
             case "KNOB3_DOWN":
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
+                    let slotMax = 4;
+                    if (root.selectedChannel.channelAudioType === "external") {
+                        slotMax = 1;
+                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                        slotMax = 0;
+                    }
+                    let fxSlotMax = 4;
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
                             // if we're on the first slot, select the last fx slot
-                            fxRepeater.itemAt(4).switchToThisSlot(true);
+                            fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
                         } else {
                             // otherwise select the previous slot
                             synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
@@ -218,14 +232,14 @@ Rectangle {
                     } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                         if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
                             // if we're on the first fx slot, select the last slot
-                            synthRepeater.itemAt(4).switchToThisSlot(true);
+                            synthRepeater.itemAt(slotMax).switchToThisSlot(true);
                         } else {
                             // otherwise select the previous fx slot
                             fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
                         }
                     } else {
                         // select the last fx
-                        fxRepeater.itemAt(4).switchToThisSlot(true);
+                        fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
                     }
                     returnValue = true;
                 }

@@ -301,11 +301,11 @@ class zynthian_controller(QObject):
             # Send feedback to MIDI controllers
             try:
                 if self.midi_learn_cc:
-                    pass
+                    Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + self.midi_chan, self.midi_cc, mval)
                     # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_learn_chan,self.midi_learn_cc,mval)
                     #logging.debug("Controller feedback '{}' (learn) => CH{}, CC{}, Val={}".format(self.symbol,self.midi_learn_chan,self.midi_learn_cc,mval))
                 elif self.midi_cc:
-                    pass
+                    Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + self.midi_chan, self.midi_cc, mval)
                     # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_chan,self.midi_cc,mval)
                     #logging.debug("Controller feedback '{}' => CH{}, CC{}, Val={}".format(self.symbol,self.midi_chan,self.midi_cc,mval))
 

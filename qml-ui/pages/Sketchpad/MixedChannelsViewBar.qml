@@ -599,6 +599,14 @@ Rectangle {
                                     target: synthRepeater
                                     property: "synthData"
                                     delayed: true
+                                    function humanReadableClientName(clientName) {
+                                        if (clientName === "") {
+                                            return qsTr("None");
+                                        } else if (clientName === "system") {
+                                            return qsTr("Mic In");
+                                        }
+                                        return clientName;
+                                    }
                                     value: root.selectedChannel.channelAudioType === "synth"
                                                 ? root.selectedChannel.chainedSoundsNames
                                                 : root.selectedChannel.channelAudioType === "sample-trig" ||
@@ -611,7 +619,12 @@ Rectangle {
                                                            root.selectedChannel.getClipsModelByPart(3).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex),
                                                            root.selectedChannel.getClipsModelByPart(4).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)]
                                                         : root.selectedChannel.channelAudioType === "external"
-                                                            ? [qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""), null, null, null, null]
+                                                            ? [
+                                                                qsTr("Capture: %1").arg(root.selectedChannel ? humanReadableClientName(root.selectedChannel.externalAudioSource) : ""),
+                                                                qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""),
+                                                                null,
+                                                                null,
+                                                                null]
                                                             : [null, null, null, null, null]
 
                                 }
@@ -623,8 +636,7 @@ Rectangle {
                                     property var synthData: [null, null, null, null, null]
                                     delegate: Rectangle {
                                         id: slotDelegate
-                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                                   root.selectedChannel.channelAudioType === "external"
+                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-slice"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
 
@@ -644,7 +656,7 @@ Rectangle {
                                                 root.selectedChannel.selectedSlotRow = index
                                             } else {
                                                 if (root.selectedChannel.channelAudioType === "external") {
-                                                    // If channel type is external, then it has only 1 slot visible
+                                                    // If channel type is external, then it has 2 slots visible
                                                     // and the respective selectedSlotRow is already selected. Hence directly handle item click
                                                     if (!onlyFocus) {
                                                         bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
@@ -694,12 +706,12 @@ Rectangle {
                                             border.color: "#ff999999"
                                             border.width: 1
                                             radius: 4
-                                            // For loop, slice and external modes only first slot is visible.
+                                            // For slice mode only first slot is visible.
+                                            // For external mode the first two slots are visible
                                             // For other modes all slots are visible
-                                            enabled: root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                     root.selectedChannel.channelAudioType === "external"
-                                                        ? index === 0
-                                                        : true
+                                            enabled: (root.selectedChannel.channelAudioType !== "sample-slice" && root.selectedChannel.channelAudioType !== "external") ||
+                                                     (root.selectedChannel.channelAudioType === "sample-slice" && index === 0) ||
+                                                     (root.selectedChannel.channelAudioType === "external" && (index === 0 || index === 1))
                                             opacity: enabled ? 1 : 0
                                             visible: enabled
 

@@ -266,11 +266,18 @@ Rectangle {
             }
         } else if (type === "external") {
             console.log("handleItemClick : External")
-
-            externalMidiChannelPicker.pickChannel(root.selectedChannel);
+            switch (root.selectedChannel.selectedSlotRow) {
+                case 0:
+                    externalAudioSourcePicker.pickChannel(root.selectedChannel);
+                    break;
+                case 1:
+                default:
+                    externalMidiChannelPicker.pickChannel(root.selectedChannel);
+                    break;
+            }
         }
     }
-    
+
     GridLayout {
         rows: 1
         anchors.fill: parent
@@ -886,6 +893,9 @@ Rectangle {
         id: layerSetupDialog
     }
 
+    ExternalAudioSourcePicker {
+        id: externalAudioSourcePicker
+    }
     ExternalMidiChannelPicker {
         id: externalMidiChannelPicker
     }

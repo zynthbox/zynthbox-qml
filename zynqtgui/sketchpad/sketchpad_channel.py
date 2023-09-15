@@ -79,7 +79,8 @@ class sketchpad_channel(QObject):
         self.__selected_fx_slot_row = 0
         self.__selected_part__ = 0
         self.__externalMidiChannel__ = -1
-        self.__externalCaptureVolume__ = 0;
+        self.__externalCaptureVolume__ = 0
+        self.__externalAudioSource__ = ""
         self.__sound_json_snapshot__ = ""
         self.route_through_global_fx = True
         self.__channel_synth_ports = []
@@ -368,6 +369,7 @@ class sketchpad_channel(QObject):
                 "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
+                "externalAudioSource": self.__externalAudioSource__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
                 "layers_snapshot": self.__layers_snapshot,
                 "keyzone_mode": self.__keyzone_mode__,
@@ -1423,6 +1425,22 @@ class sketchpad_channel(QObject):
     # This is on a scale from 0 (no sound should happen) to 1 (all the sound please)
     externalCaptureVolume = Property(float, get_externalCaptureVolume, set_externalCaptureVolume, notify=externalCaptureVolumeChanged)
     ### END Property externalCaptureVolume
+
+    ### BEGIN Property externalAudioSource
+    def get_externalAudioSource(self):
+        return self.__externalAudioSource__
+
+    def set_externalAudioSource(self, newAudioSource):
+        if newAudioSource != self.__externalAudioSource__:
+            self.__externalAudioSource__ = newAudioSource
+            self.externalAudioSourceChanged.emit()
+            self.zynqtgui.zynautoconnect()
+            self.__song__.schedule_save()
+
+    externalAudioSourceChanged = Signal()
+
+    externalAudioSource = Property(str, get_externalAudioSource, set_externalAudioSource, notify=externalAudioSourceChanged)
+    ### END Property externalAudioSource
 
     ### Property selectedPartNames
     def get_selectedPartNames(self):

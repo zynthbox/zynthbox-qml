@@ -584,33 +584,27 @@ def audio_autoconnect(force=False):
         except: pass
     # END Connect SamplerSynth's global effected to the global effects passthrough
 
-    # logging.info("Clear out any connections FXPassthrough might already have")
-    # BEGIN Clear out any connections FXPassthrough might already have
+    # logging.info("Clear out any connections ChannelPassthrough and FXPassthrough might already have")
+    # BEGIN Clear out any connections ChannelPassthrough and FXPassthrough might already have
     try:
-        fxpassthrough_in_ports = jclient.get_ports("FXPassthrough", is_audio=True, is_input=True, is_output=False)
-        fxpassthrough_out_ports = jclient.get_ports("FXPassthrough", is_audio=True, is_input=False, is_output=True)
-
-        # Disconnect all FXPassthrough ports first
-        for port in fxpassthrough_in_ports:
+        # Disconnect all FXPassthrough ports
+        passthrough_ports = jclient.get_ports("FXPassthrough", is_audio=True)
+        # Also disconnect all the ChannelPassthrough ports
+        passthrough_ports.extend(jclient.get_ports("ChannelPassthrough", is_audio=True))
+        for port in passthrough_ports:
             for connected_port in jclient.get_all_connections(port):
                 # logging.info(f"Disonnecting {connected_port} from {port}")
                 try:
                     jclient.disconnect(connected_port, port)
                 except: pass
-        for port in fxpassthrough_out_ports:
-            for connected_port in jclient.get_all_connections(port):
-                # logging.info(f"Disonnecting {port} from {connected_port}")
-                try:
-                    jclient.disconnect(port, connected_port)
-                except: pass
     except Exception as e:
-        logging.debug(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during passthrough connection clearing. Reported error: {e}")
+        logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during passthrough connection clearing. Reported error: {e}")
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True;
         release_lock()
         return
-    # END Clear out any connections FXPassthrough might already have
+    # END Clear out any connections ChannelPassthrough and FXPassthrough might already have
 
     # logging.info("Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on ChannelPassthrough and FXPassthrough")
     # BEGIN Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on ChannelPassthrough and FXPassthrough
@@ -627,6 +621,21 @@ def audio_autoconnect(force=False):
                         channelInputLanes = [1, 2, 3, 4, 5]
                     for laneId in range(0, 5):
                         laneInputs = jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-input", is_audio=True, is_output=False, is_input=True)
+                        # BEGIN Handle external inputs for external mode channels
+                        # only hook up the first lane, doesn't make super lots of sense otherwise
+                        if laneId == 0 and channel.channelAudioType == "external":
+                            # logging.info(f"Channel {channelId} is external with the audio source {channel.externalAudioSource}")
+                            if len(channel.externalAudioSource) > 0:
+                                if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
+                                try:
+                                    externalSourcePorts = jclient.get_ports(name_pattern=f"{channel.externalAudioSource}:", is_audio=True, is_output=True, is_input=False)
+                                    # logging.info(f"External source ports: {externalSourcePorts}")
+                                    if len(externalSourcePorts) < 2:
+                                        externalSourcePorts.append(externalSourcePorts[0])
+                                    for port in zip(externalSourcePorts, laneInputs):
+                                        jclient.connect(port[0], port[1])
+                                except: pass
+                        # END Handle external inputs for external mode channels
                         # BEGIN Handle sample slots
                         samplerOutputPorts = jclient.get_ports(name_pattern=f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}", is_audio=True, is_output=True, is_input=False)
                         sample = channel.samples[laneId]
@@ -634,7 +643,7 @@ def audio_autoconnect(force=False):
                         if sample.audioSource is not None or (loopSample and loopSample.audioSource is not None):
                             # Connect sampler ports if there's a sample or loop in the given slot
                             if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
-                            logging.info(f"Connecting {samplerOutputPorts} to {laneInputs}")
+                            # logging.info(f"Connecting {samplerOutputPorts} to {laneInputs}")
                             for port in zip(samplerOutputPorts, laneInputs):
                                 try:
                                     # Make sure this is the only connection we've got
@@ -644,12 +653,6 @@ def audio_autoconnect(force=False):
                                         except: pass
                                     # logging.info(f"Connecting {port[0]} to {port[1]}")
                                     jclient.connect(port[0], port[1])
-                                except: pass
-                        else:
-                            # Otherwise disconnect the sampler port for that slot
-                            for port in zip(samplerOutputPorts, laneInputs):
-                                try:
-                                    jclient.disconnect(port[0], port[1])
                                 except: pass
                         # END Handle sample slots
                         # BEGIN Handle synth slots
@@ -709,8 +712,6 @@ def audio_autoconnect(force=False):
                             try:
                                 if laneHasInput[channelInputLanes[laneId]]:
                                     jclient.connect(port[1], port[0])
-                                else:
-                                    jclient.disconnect(port[1], port[0])
                             except: pass
                         # END Connect lane to its relevant FX or GlobalPlayback input port (or disconnect if there's no audio input)
                         # BEGIN Connect ChannelPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX

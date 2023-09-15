@@ -39,18 +39,27 @@ Zynthian.DialogQuestion {
         open();
     }
 
-    function cuiaCallback(cuia) {
+    property var cuiaCallback: function(cuia) {
         var returnValue = root.opened;
+        console.log("ExternalAudioSourcePicker cuia:", cuia);
         switch (cuia) {
+        case "KNOB3_UP":
+            _private.newAudioSource = "system";
+            returnValue = true;
+            break;
+        case "KNOB3_DOWN":
+            _private.newAudioSource = "";
+            returnValue = true;
+            break;
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            root.close();
+            root.reject();
             returnValue = true;
             break;
         case "SWITCH_SELECT_SHORT":
             // pick the currently selected channel and close
-            root.close();
+            root.accept();
             returnValue = true;
             break;
         }

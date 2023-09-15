@@ -299,7 +299,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def set_layer_midi_routes(self, layer):
         if layer.part_i is not None:
-            router_chan_cmd = "router_chan 0 0 0 {0}".format(layer.part_i)
+            router_chan_cmd = "router_chan 0 15 0 {0}".format(layer.part_i)
             self.proc_cmd("router_begin note")
             self.proc_cmd(router_chan_cmd)
             self.proc_cmd("router_end")

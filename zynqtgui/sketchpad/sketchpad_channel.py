@@ -190,7 +190,6 @@ class sketchpad_channel(QObject):
     def chained_sounds_changed_handler(self):
         self.cache_bank_preset_lists()
         self.update_filter_controllers()
-        self.zynqtgui.zynautoconnect()
         self.occupiedSlotsChanged.emit()
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()

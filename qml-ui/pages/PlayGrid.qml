@@ -643,6 +643,38 @@ don't want to have to dig too far...
             applicationWindow().showPassiveNotification("Removed Midi Output Device: " + humanReadableName);
         }
     }
+    Connections {
+        target: Zynthbox.MidiRouter
+        onMidiMessage: {
+            if (port == 2 && 191 < byte1 && byte1 < 208) {
+                let midiChannel = byte1 - 192;
+                let delta = byte2 - 64;
+                if (delta > 0) {
+                    let selectedChannel = applicationWindow().selectedChannel;
+                    while (delta > 0) {
+                        if (selectedChannel.channelAudioType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                            selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                            selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                        }
+                        delta = delta - 1;
+                    }
+                    Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
+                } else if (delta < 0) {
+                    let selectedChannel = applicationWindow().selectedChannel;
+                    while (delta < 0) {
+                        if (selectedChannel.channelAudioType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                            selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                            selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                        }
+                        delta = delta + 1;
+                    }
+                    Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
+                }
+            }
+        }
+    }
     Binding {
         target: Zynthbox.PlayGridManager
         property: "zlDashboard"

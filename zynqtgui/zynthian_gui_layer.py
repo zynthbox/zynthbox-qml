@@ -540,9 +540,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     self.layers.append(layer)
                     self.layer_created.emit(midich)
 
-            self.zynqtgui.zynautoconnect()
-            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
-
             if select:
                 self.fill_list()
                 root_layer = self.get_fxchain_root(layer)
@@ -572,6 +569,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
             self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
 
         QTimer.singleShot(500, emit_names_changed)
+        self.zynqtgui.zynautoconnect(True)
+        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
     def remove_layer(self, i, stop_unused_engines=True):
         if i>=0 and i<len(self.layers):

@@ -839,8 +839,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(None)
     def stopAllPlayback(self):
-        for channel_index in range(self.__song__.channelsModel.count):
-            self.__song__.channelsModel.getChannel(channel_index).stopAllClips()
+        if self.__song__ is not None and self.__song__.channelsModel is not None:
+            for channel_index in range(self.__song__.channelsModel.count):
+                try:
+                    self.__song__.channelsModel.getChannel(channel_index).stopAllClips()
+                except: pass
 
     @Slot(QObject,result=str)
     def get_channel_recording_filename(self, channel):

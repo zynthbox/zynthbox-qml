@@ -62,11 +62,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__mixer_timer.setSingleShot(True)
         self.__mixer_timer.timeout.connect(self.update_mixers)
 
-        self.__fill_throttle = QTimer()
-        self.__fill_throttle.setInterval(1)
-        self.__fill_throttle.setSingleShot(True)
-        self.__fill_throttle.timeout.connect(self.fill_list_actual)
-
         # Load engine config
         try:
             with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
@@ -79,9 +74,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     def fill_list(self):
-        self.__fill_throttle.start()
-
-    def fill_list_actual(self):
         self.list_data=[]
         self.list_metadata=[]
 

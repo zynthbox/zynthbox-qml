@@ -60,19 +60,10 @@ class zynthian_gui_bank(zynthian_gui_selector):
         self.__show_top_sounds = False
         self.auto_next_screen = False
         self.__list_data_cache = {}
-
-        self.__fill_throttle = QTimer()
-        self.__fill_throttle.setInterval(1)
-        self.__fill_throttle.setSingleShot(True)
-        self.__fill_throttle.timeout.connect(self.fill_list_actual)
-
         self.show()
 
 
     def fill_list(self):
-        self.__fill_throttle.start()
-
-    def fill_list_actual(self):
         self.list_data = []
 
         if not self.zynqtgui.curlayer:

@@ -260,13 +260,13 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.curlayer = self.zynqtgui.layer.layer_midi_map[midi_channel]
                 logging.debug(f"Caching midi channel : channel({midi_channel}), layer({self.zynqtgui.curlayer})")
                 self.zynqtgui.currentTaskMessage = f"Caching bank/preset lists for Channel {self.name}"
-                self.zynqtgui.bank.fill_list_actual()
-                self.zynqtgui.preset.fill_list_actual()
+                self.zynqtgui.bank.fill_list()
+                self.zynqtgui.preset.fill_list()
 
         # Restore curlayer
         self.zynqtgui.curlayer = curlayer
-        self.zynqtgui.bank.fill_list_actual()
-        self.zynqtgui.preset.fill_list_actual()
+        self.zynqtgui.bank.fill_list()
+        self.zynqtgui.preset.fill_list()
 
     def update_filter_controllers(self):
         for index, midi_channel in enumerate(self.chainedSounds):

@@ -1480,6 +1480,9 @@ Zynthian.ScreenPage {
                                             stepSize: 1
                                             from: 0
                                             to: 100
+                                            onValueChanged: {
+                                                applicationWindow().channels[index].wetFx1Amount = value;
+                                            }
                                         }
 
                                         ColumnLayout {
@@ -1505,6 +1508,9 @@ Zynthian.ScreenPage {
                                                 stepSize: 1
                                                 from: 0
                                                 to: 100
+                                                onValueChanged: {
+                                                    applicationWindow().channels[index].wetFx2Amount = value;
+                                                }
                                             }
                                         }
                                     }

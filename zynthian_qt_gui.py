@@ -718,7 +718,7 @@ class zynthian_gui(QObject):
                     logging.debug(f"Selection first action for screen : {screen}")
                     screen.select_action(0)
                     QGuiApplication.instance().processEvents()
-        except: pass
+        except Exception as e: logging.exception(f"Error processing screen : {e}")
     ### END SHOW SCREEN QUEUE
 
     ### Global controller and selector
@@ -1504,7 +1504,7 @@ class zynthian_gui(QObject):
         )
         self.current_modal_screen_id_changed.emit()
 
-    def set_curlayer(self, layer, save=False):
+    def set_curlayer(self, layer, save=False, queue=True):
         if layer is not None:
             if save:
                 self._curlayer = self.curlayer
@@ -1518,9 +1518,17 @@ class zynthian_gui(QObject):
             self.curlayer = None
         self.screens["fixed_layers"].sync_index_from_curlayer()
         self.screens["layers_for_channel"].sync_index_from_curlayer()
-        self.add_screen_to_show_queue(self.screens["bank"], False, True)
-        self.add_screen_to_show_queue(self.screens["preset"], False, True)
-        self.add_screen_to_show_queue(self.screens["control"], False, True)
+        if queue:
+            self.add_screen_to_show_queue(self.screens["bank"], False, True)
+            self.add_screen_to_show_queue(self.screens["preset"], False, True)
+            self.add_screen_to_show_queue(self.screens["control"], False, True)
+        else:
+            self.screens["bank"].fill_list_actual()
+            self.screens["preset"].fill_list_actual()
+            self.screens["control"].fill_list_actual()
+            self.screens["bank"].show()
+            self.screens["preset"].show()
+            self.screens["control"].show()
         self.control.selectedColumn = 0
         if self.curlayer:
             self.screens["midi_key_range"].config(self.curlayer.midi_chan)

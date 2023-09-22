@@ -479,98 +479,98 @@ class zynthian_gui_layer(zynthian_gui_selector):
             logging.exception(e)
 
     def add_layer_midich(self, midich, select=True):
-        if self.add_layer_eng:
-            zyngine = self.zynqtgui.screens['engine'].start_engine(self.add_layer_eng)
-            self.add_layer_eng = None
-            position_in_channel = -1
-            for i, element in enumerate(self.zynqtgui.screens['layers_for_channel'].list_data):
-                if midich == element[1]:
-                    position_in_channel = i
-                    break
+        try:
+            if self.add_layer_eng:
+                zyngine = self.zynqtgui.screens['engine'].start_engine(self.add_layer_eng)
+                self.add_layer_eng = None
+                position_in_channel = -1
+                for i, element in enumerate(self.zynqtgui.screens['layers_for_channel'].list_data):
+                    if midich == element[1]:
+                        position_in_channel = i
+                        break
 
-            if self.layer_index_replace_engine != None and len(self.layers) > self.index:
-                layer = self.root_layers[self.layer_index_replace_engine]
-                # The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted
-                if layer.engine.type != zyngine.type:
-                    layer.set_midi_out([])
-                    layer.reset_audio_out()
-                    layer.reset_audio_in()
-                layer.set_engine(zyngine);
-                # Update bank and preset cache since engine has changed
-                layer.load_bank_list(force=True)
-                layer.load_preset_list(force=True)
-                self.zynqtgui.screens['engine'].stop_unused_engines()
-                # initialize the bank
-                self.zynqtgui.screens['bank'].show()
-                if not self.zynqtgui.screens['bank'].get_show_top_sounds():
-                    self.zynqtgui.screens['bank'].select_action(0)
-            else:
-                # When creating zynthian_layer, if engine is an audio effect, stores the channel id instead of midi channel
-                channel = midich
-                slot_index = -1
-                if zyngine.type=="Audio Effect":
-                    channel = self.zynqtgui.session_dashboard.selectedChannel
-                    slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel).selectedFxSlotRow
-
-                layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
-
-            self.zynqtgui.set_curlayer(layer)
-            self.zynqtgui.bank.fill_list_actual()
-            self.zynqtgui.preset.fill_list_actual()
-
-            if not zyngine.type == "Audio Effect":
-                self.add_midichannel_to_channel(midich, position_in_channel)
-
-            # Try to connect Audio Effects ...
-            if len(self.layers)>0 and layer.engine.type=="Audio Effect":
-                # setFxToChain will handle adding layer to self.layers if a new fx is created or replace new layer with an old one
-                self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer)
-            # Try to connect MIDI tools ...
-            elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
-                if self.replace_layer_index is not None:
-                    self.replace_on_midichain(layer)
+                if self.layer_index_replace_engine != None and len(self.layers) > self.index:
+                    layer = self.root_layers[self.layer_index_replace_engine]
+                    # The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted
+                    if layer.engine.type != zyngine.type:
+                        layer.set_midi_out([])
+                        layer.reset_audio_out()
+                        layer.reset_audio_in()
+                    layer.set_engine(zyngine);
+                    # Update bank and preset cache since engine has changed
+                    layer.load_bank_list(force=True)
+                    layer.load_preset_list(force=True)
+                    self.zynqtgui.screens['engine'].stop_unused_engines()
+                    # initialize the bank
+                    self.zynqtgui.screens['bank'].show()
+                    if not self.zynqtgui.screens['bank'].get_show_top_sounds():
+                        self.zynqtgui.screens['bank'].select_action(0)
                 else:
-                    self.add_to_midichain(layer, self.layer_chain_parallel)
+                    # When creating zynthian_layer, if engine is an audio effect, stores the channel id instead of midi channel
+                    channel = midich
+                    slot_index = -1
+                    if zyngine.type=="Audio Effect":
+                        channel = self.zynqtgui.session_dashboard.selectedChannel
+                        slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel).selectedFxSlotRow
+
+                    layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
+
+                self.zynqtgui.set_curlayer(layer, queue=False)
+
+                if not zyngine.type == "Audio Effect":
+                    self.add_midichannel_to_channel(midich, position_in_channel)
+
+                # Try to connect Audio Effects ...
+                if len(self.layers)>0 and layer.engine.type=="Audio Effect":
+                    # setFxToChain will handle adding layer to self.layers if a new fx is created or replace new layer with an old one
+                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer)
+                # Try to connect MIDI tools ...
+                elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
+                    if self.replace_layer_index is not None:
+                        self.replace_on_midichain(layer)
+                    else:
+                        self.add_to_midichain(layer, self.layer_chain_parallel)
+                        if layer not in self.layers:
+                            self.layers.append(layer)
+                            self.layer_created.emit(midich)
+                # New root layer
+                else:
                     if layer not in self.layers:
                         self.layers.append(layer)
                         self.layer_created.emit(midich)
-            # New root layer
+
+                if select:
+                    self.fill_list()
+                    root_layer = self.get_fxchain_root(layer)
+                    try:
+                        self.index = self.root_layers.index(root_layer)
+                        self.layer_control(layer)
+                        self.current_index_changed.emit()
+                        self.zynqtgui.screens['preset'].select_action(self.zynqtgui.screens['preset'].current_index)
+                    except Exception as e:
+                        logging.error(e)
+                        self.zynqtgui.show_screen('layer')
+            self.layer_index_replace_engine = None
+            if self.__page_after_layer_creation in self.zynqtgui.non_modal_screens:
+                self.zynqtgui.show_screen(self.__page_after_layer_creation)
             else:
-                if layer not in self.layers:
-                    self.layers.append(layer)
-                    self.layer_created.emit(midich)
+                self.zynqtgui.show_modal(self.__page_after_layer_creation)
+            if midich is not None and midich >= 0:
+                self.zynqtgui.screens['fixed_layers'].select_action(midich)
+            if not self.zynqtgui.screens['bank'].get_show_top_sounds():
+                self.zynqtgui.screens['bank'].select_action(0)
 
-            if select:
-                self.fill_list()
-                root_layer = self.get_fxchain_root(layer)
-                try:
-                    self.index = self.root_layers.index(root_layer)
-                    self.layer_control(layer)
-                    self.current_index_changed.emit()
-                    self.zynqtgui.screens['preset'].select_action(self.zynqtgui.screens['preset'].current_index)
-                except Exception as e:
-                    logging.error(e)
-                    self.zynqtgui.show_screen('layer')
-        self.layer_index_replace_engine = None
-        if self.__page_after_layer_creation in self.zynqtgui.non_modal_screens:
-            self.zynqtgui.show_screen(self.__page_after_layer_creation)
-        else:
-            self.zynqtgui.show_modal(self.__page_after_layer_creation)
-        if midich is not None and midich >= 0:
-            self.zynqtgui.screens['fixed_layers'].select_action(midich)
-        if not self.zynqtgui.screens['bank'].get_show_top_sounds():
-            self.zynqtgui.screens['bank'].select_action(0)
+            layer.set_preset(0)
 
-        self.zynqtgui.set_curlayer(layer)
-        layer.set_preset(0)
+            def emit_names_changed():
+                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()
+                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
 
-        def emit_names_changed():
-            self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()
-            self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
-
-        QTimer.singleShot(500, emit_names_changed)
-        self.zynqtgui.zynautoconnect(True)
-        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+            QTimer.singleShot(500, emit_names_changed)
+            self.zynqtgui.zynautoconnect(True)
+            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+        except Exception as e:
+            logging.exception(f"Error adding engine : {e}")
 
     def remove_layer(self, i, stop_unused_engines=True):
         if i>=0 and i<len(self.layers):

@@ -115,6 +115,7 @@ Zynthian.Card {
             delegate: Rectangle {
                 id: soundDelegate
 
+                property int slotIndex: index
                 property int chainedSound: root.chainedSounds[index]
                 property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[soundDelegate.chainedSound] ? Zynthbox.Plugin.synthPassthroughClients[soundDelegate.chainedSound] : null
 
@@ -290,7 +291,7 @@ Zynthian.Card {
                                 if (soundDelegate.chainedSound >= 0 && root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound) && mouse.x - synthMouseArea.initialMouseX != 0) {
                                     var newVal = Zynthian.CommonUtils.clamp(mouse.x / synthSlot.width, 0, 1)
                                     synthMouseArea.dragHappened = true
-                                    soundDelegate.synthPassthroughClient.dryAmount = newVal
+                                    root.selectedChannel.set_passthroughValue("synthPassthrough", soundDelegate.slotIndex, "dryAmount", newVal)
                                 }
                             }
                             onClicked: {

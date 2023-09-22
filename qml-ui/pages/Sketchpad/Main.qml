@@ -94,7 +94,7 @@ Zynthian.ScreenPage {
             var fxPassthroughClient = Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][slot]
 
             function valueSetter(value) {
-                fxPassthroughClient.dryWetMixAmount = Zynthian.CommonUtils.clamp(value, 0, 2)
+                root.selectedChannel.set_passthroughValue("fxPassthrough", slot, "dryWetMixAmount", Zynthian.CommonUtils.clamp(value, 0, 2))
                 applicationWindow().showOsd({
                     parameterName: "fxlayer_volume",
                     description: qsTr("%1 Dry/Wet Mix").arg(fxName),
@@ -129,9 +129,17 @@ Zynthian.ScreenPage {
             synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel]
             synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
         } catch(e) {}
+        chainedSounds = root.selectedChannel.chainedSounds;
+        var slot = -1;
+        for (let i = 0; i < 5; ++i) {
+            if (chainedSounds[i] = midiChannel) {
+                slot = i;
+                break;
+            }
+        }
 
         function valueSetter(value) {
-            synthPassthroughClient.dryAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
+            root.selectedChannel.set_Value("synthPassthrough", slot, "dryAmount", Zynthian.CommonUtils.clamp(value, 0, 1))
             applicationWindow().showOsd({
                 parameterName: "layer_volume",
                 description: qsTr("%1 Volume").arg(synthName),

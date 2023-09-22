@@ -693,7 +693,7 @@ Rectangle {
                         from: 0
                         to: 1
                         onMoved: {
-                            synthPassthroughClient.dryAmount = value;
+                            root.selectedChannel.set_passthroughValue("synthPassthrough", root.selectedSlotRow, "dryAmount", value);
                         }
                     }
                 }

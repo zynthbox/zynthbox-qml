@@ -49,11 +49,18 @@ Zynthian.ScreenPage {
         try {
             synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
         } catch(e) {}
-
+        chainedSounds = root.selectedChannel.chainedSounds;
+        var slot = -1;
+        for (let i = 0; i < 5; ++i) {
+            if (chainedSounds[i] = midiChannel) {
+                slot = i;
+                break;
+            }
+        }
 
         function valueSetter(value) {
             if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
-                synthPassthroughClient.dryAmount = Zynthian.CommonUtils.clamp(value, 0, 1)
+                root.selectedChannel.set_passthroughValue("synthPassthrough", slot, "dryAmount", Zynthian.CommonUtils.clamp(value, 0, 1));
                 applicationWindow().showOsd({
                     parameterName: "layer_volume",
                     description: qsTr("%1 Volume").arg(synthName),

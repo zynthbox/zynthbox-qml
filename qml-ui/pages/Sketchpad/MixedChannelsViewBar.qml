@@ -653,6 +653,7 @@ Rectangle {
                                         property bool highlighted: root.selectedChannel.channelAudioType === "sample-slice"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
+                                        property int slotIndex: index
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
@@ -806,7 +807,7 @@ Rectangle {
                                                     if (root.selectedChannel.channelAudioType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
-                                                        delegate.synthPassthroughClient.dryAmount = newVal;
+                                                        root.selectedChannel.set_passthroughValue("synthPassthrough", slotDelegate.slotIndex, "dryAmount", newVal)
                                                     } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0 && delegate.sample && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
@@ -961,7 +962,7 @@ Rectangle {
                                                         var newVal = Zynthian.CommonUtils.clamp(mouse.x / fxRowDelegate.width, 0, 1);
                                                         fxDelegateMouseArea.dragHappened = true;
                                                         // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                                        fxRowDelegate.fxPassthroughClient.dryWetMixAmount = Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2);
+                                                        root.selectedChannel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
                                                     }
                                                 }
                                                 onClicked: fxRowDelegate.switchToThisSlot()

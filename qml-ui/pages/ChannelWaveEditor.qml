@@ -337,11 +337,11 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             text: qsTr("General")
                             enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
+                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
                             MouseArea {
                                 anchors.fill: parent;
                                 enabled: component.selectedClipHasWav
-                                onClicked: clipSettingsSectionView.currentItem = clipSettingsBar
+                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsBar }
                             }
                         }
                         QQC2.Button {
@@ -349,11 +349,11 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             text: qsTr("Envelope")
                             enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
+                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
                             MouseArea {
                                 anchors.fill: parent;
                                 enabled: component.selectedClipHasWav
-                                onClicked: clipSettingsSectionView.currentItem = clipSettingsADSR
+                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsADSR }
                             }
                         }
                         QQC2.Button {
@@ -362,11 +362,11 @@ Zynthian.ScreenPage {
                             text: qsTr("Granular")
                             visible: zynqtgui.graineratorEnabled
                             enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
+                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
                             MouseArea {
                                 anchors.fill: parent;
                                 enabled: component.selectedClipHasWav
-                                onClicked: clipSettingsSectionView.currentItem = clipSettingsGrainerator
+                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsGrainerator }
                             }
                         }
                         QQC2.Button {
@@ -374,11 +374,11 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             text: qsTr("Clip Info")
                             enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
+                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
                             MouseArea {
                                 anchors.fill: parent;
                                 enabled: component.selectedClipHasWav
-                                onClicked: clipSettingsSectionView.currentItem = clipSettingsInfoView
+                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
                             }
                         }
                     }

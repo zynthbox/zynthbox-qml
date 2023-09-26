@@ -1630,7 +1630,7 @@ Zynthian.BasePlayGrid {
                                                             color: soundButton.borderColor
                                                         }
                                                         color: soundButton.backgroundColor
-                                                        property bool sampleVisible: parent.visible && (patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination || patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination)
+                                                        property bool sampleVisible: parent.visible && patternsMenuItem.thisPattern != null && (patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination || patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination)
                                                         property QtObject channel: null
                                                         Binding {
                                                             target: patternPopupSampleVisualiser
@@ -1727,7 +1727,7 @@ Zynthian.BasePlayGrid {
                                                         id: patternPopupLoopVisualiser
                                                         Layout.fillWidth: true
                                                         Layout.fillHeight: true
-                                                        visible: parent.visible && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
+                                                        visible: parent.visible && patternsMenuItem.thisPattern != null && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
                                                         property QtObject channel: null
                                                         Binding {
                                                             target: patternPopupLoopVisualiser
@@ -1746,7 +1746,7 @@ Zynthian.BasePlayGrid {
                                                     Image {
                                                         Layout.fillHeight: true
                                                         Layout.fillWidth: true
-                                                        visible: parent.visible && patternsMenuItem.thisPattern.noteDestination !== Zynthbox.PatternModel.SampleLoopedDestination
+                                                        visible: parent.visible && patternsMenuItem.thisPattern != null && patternsMenuItem.thisPattern.noteDestination !== Zynthbox.PatternModel.SampleLoopedDestination
                                                         asynchronous: true
                                                         source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
                                                         Rectangle {

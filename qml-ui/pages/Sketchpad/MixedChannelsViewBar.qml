@@ -1088,7 +1088,7 @@ Rectangle {
                                                 color: Kirigami.Theme.positiveTextColor
                                                 opacity: 0.6
                                                 width: Kirigami.Units.smallSpacing
-                                                x: (waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width
+                                                x: waveformContainer.clip != null ? (waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width : 0
                                             }
 
                                             // End loop line
@@ -1101,7 +1101,7 @@ Rectangle {
                                                 color: Kirigami.Theme.neutralTextColor
                                                 opacity: 0.6
                                                 width: Kirigami.Units.smallSpacing
-                                                x: ((((60/Zynthbox.SyncTimer.bpm) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width)
+                                                x: waveformContainer.clip != null ? ((((60/Zynthbox.SyncTimer.bpm) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width) : 0
                                             }
 
                                             // Progress line
@@ -1110,10 +1110,10 @@ Rectangle {
                                                     top: parent.top
                                                     bottom: parent.bottom
                                                 }
-                                                visible: root.visible && waveformContainer.clip.isPlaying
+                                                visible: root.visible && waveformContainer.clip != null && waveformContainer.clip.isPlaying
                                                 color: Kirigami.Theme.highlightColor
                                                 width: Kirigami.Units.smallSpacing
-                                                x: visible ? waveformContainer.clip.progress/waveformContainer.clip.duration * parent.width : 0
+                                                x: visible && waveformContainer.clip != null ? waveformContainer.clip.progress/waveformContainer.clip.duration * parent.width : 0
                                             }
 
                                             // SamplerSynth progress dots

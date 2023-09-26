@@ -96,7 +96,7 @@ Zynthian.Stack {
         "sound_categories",
         "engine",
         "song_manager",
-        "channel_wave_editor",
+//        "channel_wave_editor",
         "sketchpad",
     ]
     property string currentPage: ""

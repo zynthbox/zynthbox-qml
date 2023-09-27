@@ -159,7 +159,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
         if self.zynqtgui.curlayer.set_bank(i):
             #self.zynqtgui.screens['preset'].disable_only_favs()
-            self.zynqtgui.screens['preset'].fill_list_actual()
+            self.zynqtgui.screens['preset'].fill_list()
             if self.auto_next_screen:
                 self.next_action
             else:

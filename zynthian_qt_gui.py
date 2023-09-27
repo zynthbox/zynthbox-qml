@@ -1523,9 +1523,9 @@ class zynthian_gui(QObject):
             self.add_screen_to_show_queue(self.screens["preset"], False, True)
             self.add_screen_to_show_queue(self.screens["control"], False, True)
         else:
-            self.screens["bank"].fill_list_actual()
-            self.screens["preset"].fill_list_actual()
-            self.screens["control"].fill_list_actual()
+            self.screens["bank"].fill_list()
+            self.screens["preset"].fill_list()
+            self.screens["control"].fill_list()
             self.screens["bank"].show()
             self.screens["preset"].show()
             self.screens["control"].show()

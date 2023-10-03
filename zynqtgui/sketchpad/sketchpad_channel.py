@@ -181,7 +181,7 @@ class sketchpad_channel(QObject):
             for i in range(0, 5):
                 passthroughValues.append({
                     "panAmount": self.__initial_pan__,
-                    "dryAmount": 100,
+                    "dryAmount": 1,
                     "wetFx1Amount": 0,
                     "wetFx2Amount": 0,
                 })
@@ -191,7 +191,7 @@ class sketchpad_channel(QObject):
             for i in range(0, 5):
                 passthroughValues.append({
                     "panAmount": self.__initial_pan__,
-                    "dryAmount": 100,
+                    "dryAmount": 1,
                 })
             audioTypeValues["synthPassthrough"] = passthroughValues
             # FX Passthrough defaults

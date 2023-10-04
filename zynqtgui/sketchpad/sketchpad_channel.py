@@ -1584,6 +1584,8 @@ class sketchpad_channel(QObject):
         if self.__audioTypeSettings__[self.audioTypeKey()]["channelPassthrough"][0]["dryAmount"] != value or force_set is True:
             self.__audioTypeSettings__[self.audioTypeKey()]["channelPassthrough"][0]["dryAmount"] = value
             self.dryAmountChanged.emit()
+            if force_set is False:
+                self.__song__.schedule_save()
 
     dryAmountChanged = Signal()
 
@@ -1609,6 +1611,8 @@ class sketchpad_channel(QObject):
         if self.__audioTypeSettings__[self.audioTypeKey()]["channelPassthrough"][0]["wetFx1Amount"] != value or force_set is True:
             self.__audioTypeSettings__[self.audioTypeKey()]["channelPassthrough"][0]["wetFx1Amount"] = value
             self.wetFx1AmountChanged.emit()
+            if force_set is False:
+                self.__song__.schedule_save()
 
     wetFx1AmountChanged = Signal()
 
@@ -1632,6 +1636,8 @@ class sketchpad_channel(QObject):
         if self.__audioTypeSettings__[self.audioTypeKey()]["channelPassthrough"][0]["wetFx2Amount"] != value or force_set is True:
             self.__audioTypeSettings__[self.audioTypeKey()]["channelPassthrough"][0]["wetFx2Amount"] = value
             self.wetFx2AmountChanged.emit()
+            if force_set is False:
+                self.__song__.schedule_save()
 
     wetFx2AmountChanged = Signal()
 
@@ -1670,6 +1676,7 @@ class sketchpad_channel(QObject):
                 # logging.info(f"Changing pan/dry amounts for {self.__id__} lane {laneId} from {synthPassthroughClient.panAmount()} and {synthPassthroughClient.dryAmount()} from {panAmount} to {dryAmount}")
                 synthPassthroughClient.setPanAmount(panAmount)
                 synthPassthroughClient.setDryAmount(dryAmount)
+                self.__song__.schedule_save()
 
     @Slot(None)
     def clearSynthPassthroughForEmptySlots(self):
@@ -1680,6 +1687,7 @@ class sketchpad_channel(QObject):
                 if self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] < 1:
                     self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] = self.__initial_pan__
                     self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] = 1
+                    self.__song__.schedule_save()
                     shouldEmitChanged = True
         if shouldEmitChanged:
             self.synthPassthroughMixingChanged.emit()
@@ -1717,6 +1725,7 @@ class sketchpad_channel(QObject):
             # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
             fxPassthroughClient.setPanAmount(panAmount)
             fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+            self.__song__.schedule_save()
 
     @Slot(None)
     def clearFxPassthroughForEmtpySlots(self):
@@ -1727,6 +1736,7 @@ class sketchpad_channel(QObject):
                     self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
                     self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = -1
                     shouldEmitChanged = True
+                    self.__song__.schedule_save()
         if shouldEmitChanged:
             self.fxPassthroughMixingChanged.emit()
 

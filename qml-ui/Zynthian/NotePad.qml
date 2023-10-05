@@ -202,13 +202,22 @@ Item {
                             velocityValue = slidePoint.pressure > 0.99999 ? 127 : Math.floor(slidePoint.pressure * 127);
                         }
                         slidePoint.playingNote = component.note;
-                        Zynthbox.PlayGridManager.setNoteOn(slidePoint.playingNote, velocityValue);
-                        component.notePlayed(slidePoint.playingNote, velocityValue);
+                        if (slidePoint.playingNote.isPlaying === false) {
+                            slidePoint.playingNote.setOn(velocityValue);
+                            component.notePlayed(slidePoint.playingNote, velocityValue);
+                        }
                         component.focus = true;
                         slidePoint.updateInsideBounds();
                         longPressTimer.restart();
                     } else {
-                        Zynthbox.PlayGridManager.setNoteOff(slidePoint.playingNote);
+                        if (slidePoint.playingNote && slidePoint.playingNote.isPlaying) {
+                            // console.log("We've got a playing note set, turn that off");
+                            slidePoint.playingNote.setOff();
+                        } else if (component.note.isPlaying) {
+                            // console.log("We don't have a playing note, but our set note is on for whatever reason, so... turn that off?");
+                            component.note.setOff();
+                        }
+                        slidePoint.playingNote = undefined;
                         Zynthbox.PlayGridManager.pitch = 0;
                         Zynthbox.PlayGridManager.modulation = 0;
                         component.pressingAndHolding = false;

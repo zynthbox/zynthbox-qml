@@ -201,18 +201,14 @@ Item {
                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 127, so...
                             velocityValue = slidePoint.pressure > 0.99999 ? 127 : Math.floor(slidePoint.pressure * 127);
                         }
-                        playingNote = component.note;
-                        if (component.note.midiChannel < 15) {
-                            Zynthbox.PlayGridManager.setNoteOn(playingNote, velocityValue)
-                        }
-                        component.notePlayed(playingNote, velocityValue);
+                        slidePoint.playingNote = component.note;
+                        Zynthbox.PlayGridManager.setNoteOn(slidePoint.playingNote, velocityValue);
+                        component.notePlayed(slidePoint.playingNote, velocityValue);
                         component.focus = true;
-                        updateInsideBounds();
+                        slidePoint.updateInsideBounds();
                         longPressTimer.restart();
                     } else {
-                        if (component.note.midiChannel < 15) {
-                            Zynthbox.PlayGridManager.setNoteOff(playingNote)
-                        }
+                        Zynthbox.PlayGridManager.setNoteOff(slidePoint.playingNote);
                         Zynthbox.PlayGridManager.pitch = 0;
                         Zynthbox.PlayGridManager.modulation = 0;
                         component.pressingAndHolding = false;

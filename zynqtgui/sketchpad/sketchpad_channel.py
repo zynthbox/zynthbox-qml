@@ -199,7 +199,8 @@ class sketchpad_channel(QObject):
             for i in range(0, 5):
                 passthroughValues.append({
                     "panAmount": self.__initial_pan__,
-                    "dryWetMixAmount": 1,
+                    # For synth, default is to have 100% dry and 100% wet mixed. For other cases it is -1
+                    "dryWetMixAmount": 1 if audioType == "synth" else -1,
                 })
             audioTypeValues["fxPassthrough"] = passthroughValues
             mixingValues[audioType] = audioTypeValues

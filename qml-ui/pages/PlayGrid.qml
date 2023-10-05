@@ -629,22 +629,13 @@ don't want to have to dig too far...
      */
 
     Connections {
-        target: Zynthbox.SyncTimer
-        onAddedHardwareInputDevice: {
-            applicationWindow().showPassiveNotification("New Midi Input Detected: " + humanReadableName);
-        }
-        onRemovedHardwareInputDevice: {
-            applicationWindow().showPassiveNotification("Removed Midi Input Device: " + humanReadableName);
-        }
-        onAddedHardwareOutputDevice: {
-            applicationWindow().showPassiveNotification("New Midi Output Detected: " + humanReadableName);
-        }
-        onRemovedHardwareOutputDevice: {
-            applicationWindow().showPassiveNotification("Removed Midi Output Device: " + humanReadableName);
-        }
-    }
-    Connections {
         target: Zynthbox.MidiRouter
+        onAddedHardwareDevice: {
+            applicationWindow().showPassiveNotification("Device connected: " + humanReadableName);
+        }
+        onRemovedHardwareDevice: {
+            applicationWindow().showPassiveNotification("Device removed: " + humanReadableName);
+        }
         onMidiMessage: {
             if (port == 2 && 191 < byte1 && byte1 < 208) {
                 let midiChannel = byte1 - 192;

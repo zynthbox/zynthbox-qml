@@ -566,7 +566,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True):
         def task():
-
             self.zynqtgui.currentTaskMessage = "Stopping playback"
 
             try:
@@ -650,6 +649,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             if self.zynqtgui.isBootingComplete:
                 self.zynqtgui.currentTaskMessage = "Finalizing"
+
+            # Schedule a save sketchpad file is available after creating a new sketchpad
+            self.song.schedule_save()
 
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)

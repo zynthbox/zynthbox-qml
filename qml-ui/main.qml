@@ -544,11 +544,12 @@ Kirigami.AbstractApplicationWindow {
                     text: zynqtgui.sketchpad.song.name
                 }
 
-//                QQC2.Label {
-//                    Layout.alignment: Qt.AlignHCenter
-//                    font.pointSize: 10
-//                    text: zynqtgui.sketchpad.song.scenesModel.selectedTrackName + "ˬ"
-//                }
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    font.pointSize: 10
+                    visible: zynqtgui.sketchpad.song.hasUnsavedChanges
+                    text: "(*)"
+                }
             }
 
 

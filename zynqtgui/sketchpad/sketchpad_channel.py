@@ -960,7 +960,8 @@ class sketchpad_channel(QObject):
             self.update_jack_port()
 
         self.update_sound_snapshot_json()
-        self.__song__.schedule_save()
+        if self.zynqtgui.isBootingComplete:
+            self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
 
     chained_sounds_changed = Signal()

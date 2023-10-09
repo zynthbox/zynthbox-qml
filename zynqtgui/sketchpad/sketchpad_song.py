@@ -160,8 +160,9 @@ class sketchpad_song(QObject):
         cache_dir.mkdir(parents=True, exist_ok=True)
 
         if self.isTemp or not cache:
-            self.hasUnsavedChanges = False
             if not self.isTemp:
+                # Since sketchpad is not temp and this is not a cache save hence set hasUnsavedChanges to False
+                self.hasUnsavedChanges = False
                 # Clear previous history and remove cache files if not temp
                 with open(self.sketchpad_folder + self.__initial_name__ + ".sketchpad.json", "r+") as f:
                     obj = json.load(f)
@@ -182,6 +183,9 @@ class sketchpad_song(QObject):
                     f.truncate()
                     f.flush()
                     os.fsync(f.fileno())
+            else:
+                # Since sketchpad is temp hence set hasUnsavedChanges to True
+                self.hasUnsavedChanges = True
 
             filename = self.__name__ + ".sketchpad.json"
             self.__initial_name__ = self.name
@@ -286,7 +290,11 @@ class sketchpad_song(QObject):
                             self.hasUnsavedChanges = True
                     else:
                         logging.info("Not loading History")
-                        self.hasUnsavedChanges = False
+                        # If sketchpad is temp then set hasUnsavedChanges to True otherwise set ot to False as it has no history
+                        if self.isTemp:
+                            self.hasUnsavedChanges = True
+                        else:
+                            self.hasUnsavedChanges = False
                         for history in sketchpad["history"]:
                             try:
                                 Path(cache_dir / (history + ".sketchpad.json")).unlink()

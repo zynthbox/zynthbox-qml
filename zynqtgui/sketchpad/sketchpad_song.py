@@ -78,6 +78,7 @@ class sketchpad_song(QObject):
         # The octave is -1 indexed, as we operate with C4 == midi note 60, so this makes our default a key of C2
         self.__octave__ = 2
         self.__play_channel_solo = -1
+        self.__hasUnsavedChanges__ = False
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -159,6 +160,7 @@ class sketchpad_song(QObject):
         cache_dir.mkdir(parents=True, exist_ok=True)
 
         if self.isTemp or not cache:
+            self.hasUnsavedChanges = False
             if not self.isTemp:
                 # Clear previous history and remove cache files if not temp
                 with open(self.sketchpad_folder + self.__initial_name__ + ".sketchpad.json", "r+") as f:
@@ -210,6 +212,7 @@ class sketchpad_song(QObject):
 
             self.versions_changed.emit()
         else:
+            self.hasUnsavedChanges = True
             filename = self.__initial_name__ + ".sketchpad.json"
 
             # Handle saving to cache
@@ -280,8 +283,10 @@ class sketchpad_song(QObject):
                         logging.info("Loading History")
                         with open(cache_dir / (sketchpad["history"][-1] + ".sketchpad.json"), "r") as f_cache:
                             sketchpad = json.load(f_cache)
+                            self.hasUnsavedChanges = True
                     else:
                         logging.info("Not loading History")
+                        self.hasUnsavedChanges = False
                         for history in sketchpad["history"]:
                             try:
                                 Path(cache_dir / (history + ".sketchpad.json")).unlink()
@@ -662,6 +667,20 @@ class sketchpad_song(QObject):
 
     isLoading = Property(bool, get_isLoading, notify=isLoadingChanged)
     ### END Property isLoading
+
+    ### BEGIN Property hasUnsavedChanges
+    def get_hasUnsavedChanges(self):
+        return self.__hasUnsavedChanges__
+
+    def set_hasUnsavedChanges(self, val):
+        if self.__hasUnsavedChanges__ != val:
+            self.__hasUnsavedChanges__ = val
+            self.hasUnsavedChangesChanged.emit()
+
+    hasUnsavedChangesChanged = Signal()
+
+    hasUnsavedChanges = Property(bool, get_hasUnsavedChanges, set_hasUnsavedChanges, notify=hasUnsavedChangesChanged)
+    ### END Property hasUnsavedChanges
 
     def stop(self):
         for i in range(0, self.__parts_model__.count):

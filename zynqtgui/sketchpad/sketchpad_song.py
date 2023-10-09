@@ -135,9 +135,6 @@ class sketchpad_song(QObject):
         self.__is_loading__ = False
         self.isLoadingChanged.emit()
 
-        # Schedule a save after a sketchpad loads/restores to ensure sketchpad file is available after creating a new sketchpad
-        self.schedule_save()
-
     def to_be_deleted(self):
         self.__to_be_deleted__ = True
 

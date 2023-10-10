@@ -963,19 +963,25 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def stopRecording(self):
         if self.clip_to_record is not None and self.isRecording:
-            self.isRecording = False
-            while Zynthbox.AudioLevels.instance().isRecording() or Zynthbox.MidiRecorder.instance().isRecording():
-                QGuiApplication.instance().processEvents()
-            Zynthbox.AudioLevels.instance().clearRecordPorts()
-            self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentMidiChannel()))
-            self.load_recorded_file_to_clip()
+            if Zynthbox.AudioLevels.instance().isRecording() == False and Zynthbox.MidiRecorder.instance().isRecording() == False:
+                self.isRecording = False
+                Zynthbox.AudioLevels.instance().clearRecordPorts()
+                self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentMidiChannel()))
+                self.load_recorded_file_to_clip()
 
-            self.set_clip_to_record(None)
-            self.clip_to_record_path = None
-            self.__last_recording_type__ = ""
+                self.set_clip_to_record(None)
+                self.clip_to_record_path = None
+                self.__last_recording_type__ = ""
 
-            self.clips_to_record.clear()
-            self.clipsToRecordChanged.emit()
+                self.clips_to_record.clear()
+                self.clipsToRecordChanged.emit()
+            else:
+                if self.__stopRecordingRetrier__ is None:
+                    self.__stopRecordingRetrier__ = QTimer(self)
+                    self.__stopRecordingRetrier__.setInterval(50)
+                    self.__stopRecordingRetrier__.setSingleShot(True)
+                    self.__stopRecordingRetrier__.timeout.connect(self.stopRecording)
+                self.__stopRecordingRetrier__.start()
 
     # Called by SyncTimer to ensure the current scene gets started as expected
     # To actually start playback, call start_metronome_request, or manually call SyncTimer::scheduleStartPlayback

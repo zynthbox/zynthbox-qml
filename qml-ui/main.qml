@@ -40,6 +40,7 @@ Kirigami.AbstractApplicationWindow {
 
     readonly property Item currentPage: pageStack.currentItem
     readonly property Item playGrids: playGridsRepeater
+    readonly property QtObject virtualKeyboard: virtualKeyboardLoader.item
 
     property bool headerVisible: true
     property var channels: [

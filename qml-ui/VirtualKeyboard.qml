@@ -100,6 +100,10 @@ Item {
             verticalAlignment: "AlignVCenter"
             selectByMouse: true
             inputMethodHints: root.focusedTextField ? root.focusedTextField.inputMethodHints : 0
+            onTextChanged: {
+                root.focusedTextField.text = textfield.text
+            }
+
             onAccepted: {
                 // When temporary textfield is accepted, set text property of original focused textfield to
                 // this one and hide VK

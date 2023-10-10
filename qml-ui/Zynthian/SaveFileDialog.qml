@@ -28,7 +28,23 @@ Zynthian.Dialog {
     height: Kirigami.Units.gridUnit * 10
     onVisibleChanged : {
         cancelSaveButton.forceActiveFocus();
+
+        if (!visible) {
+            applicationWindow().virtualKeyboard.comment = ""
+        }
     }
+    onConflictChanged: {
+        if (visible) {
+            applicationWindow().virtualKeyboard.comment = Qt.binding(function() {
+                if (saveDialog.conflict) {
+                    return saveDialog.conflictText
+                } else {
+                    return ""
+                }
+            })
+        }
+    }
+
     Timer {
         id: delayKeyboardTimer
         interval: 300

@@ -27,6 +27,7 @@ import QtQuick 2.6
 import QtQuick.VirtualKeyboard 2.2
 
 import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Layouts 1.15
 import org.kde.kirigami 2.4 as Kirigami
 
 Item {
@@ -36,6 +37,7 @@ Item {
     // This is to make sure we always have the reference to original textfield that was focused
     // as when VK opens, focus is moved to a temporary textfield
     property QtObject focusedTextField: null
+    property string comment: ""
 
     visible: Qt.inputMethod.visible
 
@@ -54,6 +56,8 @@ Item {
                     // If VK is not visible, delete reference of last focused textfield
                     root.focusedTextField = null
                     applicationWindow().forceActiveFocus()
+                    // Reset comment on close
+                    root.comment = ""
                 }
             })
         }
@@ -90,26 +94,38 @@ Item {
             }
         }
 
-        QQC2.TextField {
-            id: textfield
-
+        ColumnLayout {
             anchors.centerIn: parent
             width: parent.width * 0.4
-            height: Kirigami.Units.gridUnit * 3
-            horizontalAlignment: "AlignHCenter"
-            verticalAlignment: "AlignVCenter"
-            selectByMouse: true
-            inputMethodHints: root.focusedTextField ? root.focusedTextField.inputMethodHints : 0
-            onTextChanged: {
-                root.focusedTextField.text = textfield.text
+
+            QQC2.TextField {
+                id: textfield
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                horizontalAlignment: "AlignHCenter"
+                verticalAlignment: "AlignVCenter"
+                selectByMouse: true
+                inputMethodHints: root.focusedTextField ? root.focusedTextField.inputMethodHints : 0
+                onTextChanged: {
+                    root.focusedTextField.text = textfield.text
+                }
+
+                onAccepted: {
+                    // When temporary textfield is accepted, set text property of original focused textfield to
+                    // this one and hide VK
+                    root.focusedTextField.text = textfield.text
+                    Qt.inputMethod.hide()
+                    applicationWindow().forceActiveFocus()
+                }
             }
 
-            onAccepted: {
-                // When temporary textfield is accepted, set text property of original focused textfield to
-                // this one and hide VK
-                root.focusedTextField.text = textfield.text
-                Qt.inputMethod.hide()
-                applicationWindow().forceActiveFocus()
+            Kirigami.Heading {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                horizontalAlignment: QQC2.Label.AlignHCenter
+                verticalAlignment: QQC2.Label.AlignVCenter
+                level: 3
+                text: root.comment
             }
         }
     }

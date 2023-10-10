@@ -25,7 +25,7 @@ Zynthian.Dialog {
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
     width: Kirigami.Units.gridUnit * 15
-    height: Kirigami.Units.gridUnit * 8
+    height: Kirigami.Units.gridUnit * 10
     onVisibleChanged : {
         cancelSaveButton.forceActiveFocus();
     }

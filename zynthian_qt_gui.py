@@ -441,7 +441,7 @@ class zynthian_gui(QObject):
         self.__current_task_message = ""
         self.__recent_task_messages = queue.Queue()
         self.__show_current_task_message = True
-        self.currentTaskMessageChanged.connect(self.save_currentTaskMessage, Qt.QueuedConnection)
+        self.currentTaskMessageChanged.connect(self.save_currentTaskMessage)
         self.currentTaskMessage = f"Starting Zynthbox QML"
         self.__master_volume = self.get_initialMasterVolume()
 
@@ -2915,7 +2915,7 @@ class zynthian_gui(QObject):
         if self.loading < 1:
             self.loading = 1
         self.is_loading_changed.emit()
-        # FIXME Apparently needs bot hthe timer *and* processEvents for qml to actually receive the signal before the sync loading is done
+        # FIXME Apparently needs both the timer *and* processEvents for qml to actually receive the signal before the sync loading is done
         self.deferred_loading_timer_start.emit()
         QGuiApplication.instance().processEvents(QEventLoop.AllEvents, 1000)
         self.is_loading_changed.emit()
@@ -4016,7 +4016,6 @@ class zynthian_gui(QObject):
             self.__current_task_message = value
             self.__recent_task_messages.put(value)
             self.currentTaskMessageChanged.emit()
-            QGuiApplication.instance().processEvents()
 
     currentTaskMessageChanged = Signal()
 

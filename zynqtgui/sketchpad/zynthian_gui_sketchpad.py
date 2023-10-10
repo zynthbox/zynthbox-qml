@@ -656,10 +656,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zynqtgui.currentTaskMessage = "Creating New Sketchpad"
-        self.longOperationIncrement()
-        self.sketchpadLoadingInProgress = True
-        self.zynqtgui.do_long_task(task)
+        def confirmNewSketchpad(params=None):
+            self.zynqtgui.currentTaskMessage = "Creating New Sketchpad"
+            self.longOperationIncrement()
+            self.sketchpadLoadingInProgress = True
+            self.zynqtgui.do_long_task(task)
+
+        if self.zynqtgui.isBootingComplete and self.song.hasUnsavedChanges:
+            self.zynqtgui.show_confirm("You have unsaved changes. Do you really want to continue?", confirmNewSketchpad)
+        else:
+            confirmNewSketchpad()
 
     @Slot(None)
     def saveSketchpad(self):

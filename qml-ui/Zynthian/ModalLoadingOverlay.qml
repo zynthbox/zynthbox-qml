@@ -27,6 +27,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 //NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
 Rectangle {
@@ -36,9 +37,9 @@ Rectangle {
     z: 999999
     color: Qt.rgba(0, 0,0, 0.8)
 
-    QQC2.BusyIndicator {
+    PlasmaComponents.BusyIndicator {
         anchors.centerIn: parent
-        running: root.open
+        visible: root.open
         width: Kirigami.Units.gridUnit * 3
         height: width
     }

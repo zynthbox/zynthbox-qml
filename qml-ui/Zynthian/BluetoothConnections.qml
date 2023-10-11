@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.bluezqt 1.0 as BluezQt
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 Item {
     id: component

@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
@@ -386,7 +387,7 @@ Zynthian.Popup {
                 value: 4
                 from: 0
                 to: 128
-                QQC2.BusyIndicator {
+                PlasmaComponents.BusyIndicator {
                     anchors {
                         left: parent.right
                         leftMargin: Kirigami.Units.smallSpacing
@@ -416,7 +417,7 @@ Zynthian.Popup {
                 value: 4
                 from: 0
                 to: 128
-                QQC2.BusyIndicator {
+                PlasmaComponents.BusyIndicator {
                     anchors {
                         left: parent.right
                         leftMargin: Kirigami.Units.smallSpacing

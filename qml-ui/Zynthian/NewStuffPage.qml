@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.newstuff 1.0 as NewStuff
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import Zynthian 1.0 as Zynthian
 
@@ -322,7 +323,7 @@ Zynthian.SelectorPage {
                     }
                 }
             }
-            QQC2.BusyIndicator {
+            PlasmaComponents.BusyIndicator {
                 id: busyInstallingStuff
                 anchors {
                     horizontalCenter: parent.horizontalCenter;
@@ -368,7 +369,7 @@ Zynthian.SelectorPage {
                 bottomMargin: -Kirigami.Units.largeSpacing
             }
         }
-        QQC2.BusyIndicator {
+        PlasmaComponents.BusyIndicator {
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 top: parent.top

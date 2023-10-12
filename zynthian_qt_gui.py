@@ -330,7 +330,7 @@ class zynthian_gui_status_data(QObject):
 # Zynthian Main GUI Class
 # -------------------------------------------------------------------------------
 
-
+recent_task_messages = queue.SimpleQueue()
 class zynthian_gui(QObject):
 
     screens_sequence = (
@@ -431,6 +431,11 @@ class zynthian_gui(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui, self).__init__(parent)
 
+        self.exit_flag = False
+        self.bootsplash_thread = Thread(target=self.bootsplash_worker, args=())
+        self.bootsplash_thread.daemon = True # thread will exit with the program
+        self.bootsplash_thread.start()
+
         self.bpmBeforePressingMetronome = 0
         self.volumeBeforePressingMetronome = 0
         self.metronomeVolumeBeforePressingMetronome = 0
@@ -439,9 +444,7 @@ class zynthian_gui(QObject):
         self.__ignoreNextModeButtonPress = False
         self.__ignoreNextMetronomeButtonPress = False
         self.__current_task_message = ""
-        self.__recent_task_messages = queue.Queue()
         self.__show_current_task_message = True
-        self.currentTaskMessageChanged.connect(self.save_currentTaskMessage, Qt.QueuedConnection)
         self.currentTaskMessage = f"Starting Zynthbox QML"
         self.__master_volume = self.get_initialMasterVolume()
 
@@ -544,14 +547,6 @@ class zynthian_gui(QObject):
         # HACK: in order to start the timer from the proper thread
         self.current_modal_screen_id_changed.connect(self.info_timer.start, Qt.QueuedConnection)
         self.current_qml_page_prop = None
-
-        #FIXME HACK: this spams is_loading_changed on the proper thread until the ui gets it, can it be done properly?
-        self.deferred_loading_timer = QTimer(self)
-        self.deferred_loading_timer.setInterval(0)
-        self.deferred_loading_timer.setSingleShot(False)
-        self.deferred_loading_timer_start.connect(self.deferred_loading_timer.start)
-        self.deferred_loading_timer_stop.connect(self.deferred_loading_timer.stop)
-        self.deferred_loading_timer.timeout.connect(self.is_loading_changed)
 
         self.curlayer = None
         self._curlayer = None
@@ -662,14 +657,6 @@ class zynthian_gui(QObject):
 
         # Set channelsModActive to true when channel 5-10 is active
         self.channelsModActive = self.session_dashboard.selectedChannel >= 5
-
-    @Slot(None)
-    def save_currentTaskMessage(self):
-        while self.__recent_task_messages.empty() is False:
-            theMessage = self.__recent_task_messages.get()
-            if ((hasattr(self, "__booting_complete__") and not self.__booting_complete__) or not hasattr(self, "__booting_complete__")) and bootlog_fifo is not None and len(theMessage) > 0:
-                os.write(bootlog_fifo, f"{theMessage}\n".encode())
-            self.__recent_task_messages.task_done()
 
     ### SHOW SCREEN QUEUE
     '''
@@ -2904,6 +2891,21 @@ class zynthian_gui(QObject):
         if watchdog_process is not None:
             watchdog_process.kill()
 
+    def bootsplash_worker(self):
+        bootsplash_fifo = None
+        if not Path("/tmp/bootlog.fifo").exists():
+            os.mkfifo("/tmp/bootlog.fifo")
+        while not self.exit_flag:
+            try:
+                if bootsplash_fifo is None:
+                    bootsplash_fifo = os.open("/tmp/bootlog.fifo", os.O_WRONLY)
+
+                bootsplashEntry = recent_task_messages.get()
+                if len(bootsplashEntry) > 0:
+                    os.write(bootsplash_fifo, f"{bootsplashEntry}\n".encode())
+            except Exception as e:
+                logging.error(e)
+
     def start_loading_thread(self):
         self.loading_thread = Thread(target=self.loading_refresh, args=())
         self.loading_thread.daemon = True  # thread dies with the program
@@ -2914,11 +2916,10 @@ class zynthian_gui(QObject):
         self.loading = self.loading + 1
         if self.loading < 1:
             self.loading = 1
+        self.currentTaskMessage = "Please wait"
+        recent_task_messages.put("command:show")
         self.is_loading_changed.emit()
-        # FIXME Apparently needs bot hthe timer *and* processEvents for qml to actually receive the signal before the sync loading is done
-        self.deferred_loading_timer_start.emit()
-        QGuiApplication.instance().processEvents(QEventLoop.AllEvents, 1000)
-        self.is_loading_changed.emit()
+        QGuiApplication.instance().processEvents()
         # logging.debug("START LOADING %d" % self.loading)
 
     @Slot(None)
@@ -2928,14 +2929,16 @@ class zynthian_gui(QObject):
             self.loading = 0
 
         if self.loading == 0:
-            self.deferred_loading_timer_stop.emit()
+            recent_task_messages.put("command:hide")
             self.is_loading_changed.emit()
+            QGuiApplication.instance().processEvents()
         # logging.debug("STOP LOADING %d" % self.loading)
 
     def reset_loading(self):
-        self.is_loading_changed.emit()
-        self.deferred_loading_timer_stop.emit()
+        recent_task_messages.put("command:hide")
         self.loading = 0
+        self.is_loading_changed.emit()
+        QGuiApplication.instance().processEvents()
 
     def get_is_loading(self):
         return self.loading > 0
@@ -3381,16 +3384,13 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
-        global bootlog_fifo
-
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
 
         #os.sched_setaffinity(os.getpid(), [3])
 
-        if bootlog_fifo is not None:
-            os.write(bootlog_fifo, "play-extro\n".encode())
+        recent_task_messages.put("command:play-extro")
 
         self.setMaxAlsaVolume()
 
@@ -3671,6 +3671,8 @@ class zynthian_gui(QObject):
             self.longTaskStarted.emit()
 
         self.__long_task_count__ += 1
+        if self.__long_task_count__ > 0:
+            recent_task_messages.put("command:show")
 
         QTimer.singleShot(2000, cb)
 
@@ -3680,9 +3682,9 @@ class zynthian_gui(QObject):
 
         # Emit long task ended only if all task has ended
         if self.__long_task_count__ == 0:
-            self.showCurrentTaskMessage = True
             self.currentTaskMessage = ""
             self.longTaskEnded.emit()
+            recent_task_messages.put("command:hide")
 
     longTaskStarted = Signal()
     longTaskEnded = Signal()
@@ -3951,8 +3953,6 @@ class zynthian_gui(QObject):
         return self.__booting_complete__
 
     def set_isBootingComplete(self, value):
-        global bootlog_fifo
-
         if self.__booting_complete__ != value:
             self.__booting_complete__ = value
             self.isBootingCompleteChanged.emit()
@@ -4012,9 +4012,9 @@ class zynthian_gui(QObject):
         return self.__current_task_message
 
     def set_currentTaskMessage(self, value):
-        if value != self.__current_task_message and self.showCurrentTaskMessage:
+        if value != self.__current_task_message:
             self.__current_task_message = value
-            self.__recent_task_messages.put(value)
+            recent_task_messages.put(value)
             self.currentTaskMessageChanged.emit()
             QGuiApplication.instance().processEvents()
 
@@ -4022,20 +4022,6 @@ class zynthian_gui(QObject):
 
     currentTaskMessage = Property(str, get_currentTaskMessage, set_currentTaskMessage, notify=currentTaskMessageChanged)
     ### END Property currentTaskMessage
-
-    ### Property showCurrentTaskMessage
-    def get_showCurrentTaskMessage(self):
-        return self.__show_current_task_message
-
-    def set_showCurrentTaskMessage(self, value):
-        if value != self.__show_current_task_message:
-            self.__show_current_task_message = value
-            self.showCurrentTaskMessageChanged.emit()
-
-    showCurrentTaskMessageChanged = Signal()
-
-    showCurrentTaskMessage = Property(bool, get_showCurrentTaskMessage, set_showCurrentTaskMessage, notify=showCurrentTaskMessageChanged)
-    ### END Property showCurrentTaskMessage
 
     ### Property passiveNotification
     def get_passiveNotification(self):
@@ -4196,8 +4182,6 @@ class zynthian_gui(QObject):
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
-    deferred_loading_timer_start = Signal()
-    deferred_loading_timer_stop = Signal()
     is_loading_changed = Signal()
     status_info_changed = Signal()
     current_qml_page_changed = Signal()
@@ -4438,19 +4422,8 @@ def delete_window():
 # GUI & Synth Engine initialization
 # ------------------------------------------------------------------------------
 
-def open_bootlog_fifo():
-    global bootlog_fifo
-
-    bootlog_fifo = os.open("/tmp/bootlog.fifo", os.O_WRONLY)
-
 if __name__ == "__main__":
     boot_start = timer()
-    bootlog_fifo = None
-
-    if not Path("/tmp/bootlog.fifo").exists():
-        os.mkfifo("/tmp/bootlog.fifo")
-
-    threading.Thread(target=open_bootlog_fifo).start()
 
     # Start rainbow led process
     rainbow_led_process = Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "rainbow"))

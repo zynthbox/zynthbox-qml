@@ -990,28 +990,6 @@ Kirigami.AbstractApplicationWindow {
         onRejected: zynqtgui.confirm.reject()
     }
 
-    Zynthian.ModalLoadingOverlay {
-        parent: root.contentItem.parent
-        anchors.fill: parent
-        z: 9999999
-    }
-
-    Zynthian.ModalLoadingOverlay {
-        id: alternateLoadingOverlay
-        parent: root.contentItem.parent
-        anchors.fill: parent
-        open: false
-        z: 9999999
-
-        QQC2.Label {
-            width: parent.width * 0.4
-            text: zynqtgui.currentTaskMessage
-            horizontalAlignment: "AlignHCenter"
-            x: parent.width/2 - width/2
-            y: parent.height - height - Kirigami.Units.gridUnit * 4
-        }
-    }
-
     Rectangle {
         id: countInOverlay
         parent: root.contentItem.parent
@@ -1078,20 +1056,12 @@ Kirigami.AbstractApplicationWindow {
         onPassiveNotificationChanged: {
             applicationWindow().showPassiveNotification(zynqtgui.passiveNotification, 1500)
         }
-        onLongTaskStarted: {
-            alternateLoadingOverlay.open = true;
-        }
-        onLongTaskEnded: {
-            alternateLoadingOverlay.open = false;
-        }
     }
 
     Connections {
         target: Zynthbox.PlayGridManager
         onTaskMessage: {
-            Qt.callLater(function() {
-                zynqtgui.playgrid.setCurrentTaskMessage(message);
-            })
+            zynqtgui.playgrid.setCurrentTaskMessage(message);
         }
     }
     Repeater {

@@ -20,6 +20,7 @@ class BootLogInterface(QObject):
         self.__boot_log = ""
         self.__boot_log_file = None
 
+        self.__bootCompleted = False
         self.exit_flag = False
         logging.error("Setting thread")
         self.check_boot_log_thread = Thread(target=self.check_boot_log_timeout, args=())
@@ -36,17 +37,24 @@ class BootLogInterface(QObject):
 
                 data = self.__boot_log_file.readline()[:-1].strip()
 
-                if data == "exit":
-                    logging.debug("Received exit command. Cleaning up and exiting")
-                    self.bootLog = "Startup completed"
-                    self.exit_flag = True
-                    QGuiApplication.quit()
-                elif data == "play-extro":
-                    logging.debug("Received play-extro command. Playing extro video")
-                    self.playExtroAndExit.emit()
+                if data.startswith("command:"):
+                    if data == "command:exit":
+                        logging.debug("Received exit command. Cleaning up and exiting")
+                        self.bootLog = "Shutting down"
+                        self.exit_flag = True
+                        QGuiApplication.quit()
+                    elif data == "command:play-extro":
+                        logging.debug("Received play-extro command. Playing extro video")
+                        self.bootLog = ""
+                        self.playExtroAndHide.emit()
+                    elif data == "command:show":
+                        self.showBootlog.emit()
+                    elif data == "command:hide" and self.bootCompleted:
+                        self.bootLog = ""
+                        self.hideBootlog.emit()
                 elif len(data) > 0:
                     self.bootLog = data
-            time.sleep(0.05)
+            time.sleep(0.1)
         if self.__boot_log_file is not None:
             self.__boot_log_file.close()
 
@@ -65,7 +73,20 @@ class BootLogInterface(QObject):
     bootLog = Property(str, get_bootLog, set_bootLog, notify=bootLogChanged)
     ### END Property bootLog
 
-    playExtroAndExit = Signal()
+    ### Property bootCompleted
+    def get_bootCompleted(self):
+        return self.__bootCompleted
+    def set_bootCompleted(self, bootCompleted):
+        if self.__bootCompleted != bootCompleted:
+            self.__bootCompleted = bootCompleted
+            self.bootCompletedChanged.emit()
+    bootCompletedChanged = Signal()
+    bootCompleted = Property(bool, get_bootCompleted, set_bootCompleted, notify=bootCompletedChanged)
+    ### END Property bootCompleted
+
+    playExtroAndHide = Signal()
+    showBootlog = Signal()
+    hideBootlog = Signal()
 
 
 if __name__ == "__main__":

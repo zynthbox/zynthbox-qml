@@ -8,7 +8,8 @@ QQC2.ApplicationWindow {
     id: root
 
     property int dotCount: 0
-    property bool displayLoadingText: true
+    property url extroVideo: Qt.resolvedUrl("/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4")
+    property bool displayLoadingText: bootLogInterface.bootLog !== "" && videoPlayer.source != root.extroVideo
 
     flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "#00000000"
@@ -18,11 +19,16 @@ QQC2.ApplicationWindow {
     maximumWidth: width
     maximumHeight: height
 
+    Rectangle {
+        anchors.fill: parent;
+        color: "black"
+    }
+
     Timer {
         id: dotTimer
         interval: 1000
         repeat: true
-        running: true
+        running: root.visible
         onTriggered: {
             root.dotCount = root.dotCount+1 > 3 ? 0 : root.dotCount + 1;
         }
@@ -36,6 +42,7 @@ QQC2.ApplicationWindow {
         fillMode: VideoOutput.Stretch
         flushMode: VideoOutput.LastFrame
         source: "/usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mp4"
+        visible: videoPlayer.playbackState == MediaPlayer.PlayingState
     }
 
     RowLayout {
@@ -45,7 +52,7 @@ QQC2.ApplicationWindow {
         QQC2.Label {
             font.pointSize: 40
             color: "white"
-            text: qsTr("Loading")
+            text: bootLogInterface.bootCompleted ? qsTr("Please Wait") : qsTr("Loading")
         }
         QQC2.Label {
             Layout.preferredWidth: 20
@@ -68,15 +75,22 @@ QQC2.ApplicationWindow {
 
     Connections {
         target: bootLogInterface
-        function onPlayExtroAndExit(test) {
+        function onPlayExtroAndHide() {
             videoPlayer.stop()
-            root.displayLoadingText = false
-            videoPlayer.source = "/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4"
+            videoPlayer.source = root.extroVideo
             videoPlayer.loops = 1
             videoPlayer.stopped.connect(function() {
-                Qt.quit()
+                root.visible = false;
+                videoPlayer.source = "";
+                bootLogInterface.bootCompleted = true;
             })
             videoPlayer.play()
+        }
+        function onShowBootlog() {
+            root.visible = true;
+        }
+        function onHideBootlog() {
+            root.visible = false;
         }
     }
 }

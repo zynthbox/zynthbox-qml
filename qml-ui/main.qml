@@ -927,7 +927,7 @@ Kirigami.AbstractApplicationWindow {
     footer: Zynthian.ActionBar {
         z: 999999
         currentPage: root.currentPage
-        visible: root.controlsVisible
+        visible: root.visible && root.controlsVisible
         height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2.5)
     }
     Component.onCompleted: {

@@ -313,7 +313,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                             for i in range(5 - len(new_chained_sounds)):
                                 new_chained_sounds.append(-1)
 
-                        self.zynqtgui.currentTaskMessage = f"Loading selected sounds in channel `{channel.name}`"
+                        self.zynqtgui.currentTaskMessage = f"Loading selected sounds in Track {channel.name}"
                         self.zynqtgui.layer.load_layer_from_file(filepath, new_channels_map)
 
                         channel.chainedSounds = new_chained_sounds

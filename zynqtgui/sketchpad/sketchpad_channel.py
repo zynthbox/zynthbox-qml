@@ -260,7 +260,7 @@ class sketchpad_channel(QObject):
                 # Change curlayer to synth's layer and fill back/preset list
                 self.zynqtgui.curlayer = self.zynqtgui.layer.layer_midi_map[midi_channel]
                 logging.debug(f"Caching midi channel : channel({midi_channel}), layer({self.zynqtgui.curlayer})")
-                self.zynqtgui.currentTaskMessage = f"Caching bank/preset lists for Channel {self.name}"
+                self.zynqtgui.currentTaskMessage = f"Caching bank/preset lists for Track {self.name}"
                 self.zynqtgui.bank.fill_list()
                 self.zynqtgui.preset.fill_list()
 
@@ -517,7 +517,7 @@ class sketchpad_channel(QObject):
             logging.debug("Booting in progress. Ignoring port update request")
             # QTimer.singleShot(1000, self.update_jack_port)
         else:
-            self.zynqtgui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
+            self.zynqtgui.currentTaskMessage = f"Updating jack ports for Track `{self.name}`"
 
             # If run_in_thread is set to False, directly call the method
             # This will allow startup process to wait till all ports are updated before displaying splash screen
@@ -925,7 +925,7 @@ class sketchpad_channel(QObject):
 
             zynqtgui.end_long_task()
 
-        self.zynqtgui.currentTaskMessage = f"Removing chained sound at slot `{self.selectedSlotRow + 1}` from channel `{self.name}`"
+        self.zynqtgui.currentTaskMessage = f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}"
         zynqtgui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
@@ -1032,7 +1032,7 @@ class sketchpad_channel(QObject):
 
                 QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zynqtgui.currentTaskMessage = f"Removing chained fx at slot `{self.selectedFxSlotRow + 1}` from channel `{self.name}`"
+        self.zynqtgui.currentTaskMessage = f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}"
         self.zynqtgui.do_long_task(task)
 
     chainedFxChanged = Signal()

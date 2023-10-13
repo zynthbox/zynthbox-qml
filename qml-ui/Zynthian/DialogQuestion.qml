@@ -84,6 +84,7 @@ Zynthian.Dialog {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
             text: component.rejectText
+            visible: text !== ""
             onClicked: {
                 component.reject();
             }
@@ -93,6 +94,7 @@ Zynthian.Dialog {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
             text: component.acceptText
+            visible: text !== ""
             onClicked: {
                 component.accept();
             }

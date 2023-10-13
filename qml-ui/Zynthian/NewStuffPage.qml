@@ -39,12 +39,14 @@ Zynthian.SelectorPage {
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
+            case "KNOB3_DOWN":
             case "SELECT_UP":
                 if (selector.current_index > 0) {
                     selector.current_index -= 1
                 }
                 return true;
 
+            case "KNOB3_UP":
             case "SELECT_DOWN":
                 if (selector.current_index < mainView.count - 1) {
                     selector.current_index += 1
@@ -66,14 +68,6 @@ Zynthian.SelectorPage {
     Component.onCompleted: {
         selector.newstuff_model = newStuffModel;
     }
-    Connections {
-        target: applicationWindow()
-        onCurrentPageChanged: {
-            if (applicationWindow().currentPage.screenId !== component.screenId) {
-                applicationWindow().pageStack.layers.currentItem.pop()
-            }
-        }
-    }
     NewStuff.Engine {
         id: newStuffEngine
         property bool isLoading: false
@@ -90,7 +84,8 @@ Zynthian.SelectorPage {
             newStuffEngine.message = "";
         }
         onErrorMessage: {
-            zynqtgui.comfirm.show(message)
+            errorPopup.text = message;
+            errorPopup.open();
         }
     }
     NewStuff.ItemsModel {
@@ -102,7 +97,11 @@ Zynthian.SelectorPage {
             enabled: proxyView.currentItem && (proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DeletedStatus))
             text: proxyView.currentItem ? (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install")) : ""
             onTriggered: {
-                newStuffModel.installItem(proxyView.currentIndex);
+                if (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus) {
+                    newStuffModel.updateItem(proxyView.currentIndex);
+                } else {
+                    newStuffModel.installItem(proxyView.currentIndex, 1);
+                }
             }
         },
         Kirigami.Action {
@@ -390,5 +389,11 @@ Zynthian.SelectorPage {
             text: newStuffEngine.message
             width: paintedWidth
         }
+    }
+    Zynthian.DialogQuestion {
+        id: errorPopup
+        rejectText: ""
+        acceptText: qsTr("OK")
+        title: qsTr("An error occurred")
     }
 }

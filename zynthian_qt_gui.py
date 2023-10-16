@@ -3392,7 +3392,7 @@ class zynthian_gui(QObject):
 
         recent_task_messages.put("command:play-extro")
 
-        self.setMaxAlsaVolume()
+        self.audio_settings.setAllControllersToMaxValue()
 
         # Display sketchpad page and run set_selector at last before hiding splash
         # to ensure knobs work fine
@@ -3632,36 +3632,6 @@ class zynthian_gui(QObject):
     def osd(self):
         return self.__osd
 
-    def setMaxAlsaVolume(self):
-        # Read jack2.service file to find selected card name
-        with open("/etc/systemd/system/jack2.service", "r") as f:
-            data = f.read()
-
-            # Get jackd command line args
-            args = re.search("\nExecStart=(.*)", data).group(1).split(" ")
-
-            # Discard everything before first occurrence of -d
-            while args.pop(0) != "-d":
-                continue
-
-            # Find next -d or -P
-            while True:
-                option = args.pop(0)
-                if option == "-d" or option == "-P":
-                    raw_dev = args.pop(0)
-                    audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
-                    break
-
-        try:
-            accepted_mixer_names = ["Master", "Headphone", "HDMI", "Digital"];
-            card = alsaaudio.cards().index(audio_device)
-            for mixer_name in alsaaudio.mixers(card):
-                if mixer_name in accepted_mixer_names:
-                    alsaaudio.Mixer(mixer_name, 0, card).setvolume(100)
-                    break
-        except Exception as e:
-            logging.error(f"Error setting ALSA volume to maximum : {str(e)}")
-    
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):
         logging.debug("### Start long task")
@@ -4111,7 +4081,7 @@ class zynthian_gui(QObject):
 
     ### Property initialMasterVolume
     def get_initialMasterVolume(self):
-        return 35
+        return 100
 
     initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
     ### END Property initialMasterVolume

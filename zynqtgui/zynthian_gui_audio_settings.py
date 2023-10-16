@@ -77,9 +77,9 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.zynqtgui):
             #self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=self.ctrl_list)
         self.zctrls = self.zynthian_mixer.get_controllers_dict(None)
 
-        # Try setting Headphones initial value to 70% (approx 0dB mark in gui) when instantiating class
+        # Try setting Headphones initial value to 100% when instantiating class
         try:
-            self.zctrls["Headphones"].set_value(self.zctrls["Headphones"].value_max * 0.7)
+            self.zctrls["Headphones"].set_value(self.zctrls["Headphones"].value_max)
         except:
             pass
 
@@ -128,3 +128,13 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.zynqtgui):
             if self.zctrls[name].get_value() != new_value:
                 self.zctrls[name].set_value(new_value)
                 self.channels_changed_timer.start()
+
+    def setAllControllersToMaxValue(self):
+        for ctrl in self.zctrls:
+            try:
+                zctrl = self.zctrls[ctrl]
+                zctrl.set_value(zctrl.value_max)
+            except Exception as e:
+                logging.error(f"Error setting ALSA mixer zctrl volume to maximum : {str(e)}")
+
+        self.channels_changed.emit()

@@ -49,7 +49,7 @@ Zynthian.Popup {
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
-                if (_private.currentIndex > -1) {
+                if (_private.currentIndex > -1 && component.actions[_private.currentIndex].enabled) {
                     component.actions[_private.currentIndex].trigger();
                     component.close();
                 }
@@ -57,12 +57,22 @@ Zynthian.Popup {
                 break;
             case "SELECT_DOWN":
             case "KNOB3_UP":
-                _private.currentIndex = (_private.currentIndex + 1 === component.actions.length) ? 0 : _private.currentIndex + 1;
+                while (true) {
+                    _private.currentIndex = (_private.currentIndex + 1 === component.actions.length) ? 0 : _private.currentIndex + 1;
+                    if (component.actions[_private.currentIndex].enabled) {
+                        break;
+                    }
+                }
                 result = true;
                 break;
             case "SELECT_UP":
             case "KNOB3_DOWN":
-                _private.currentIndex = (_private.currentIndex === 0) ? component.actions.length - 1 : _private.currentIndex - 1;
+                while (true) {
+                    _private.currentIndex = (_private.currentIndex === 0) ? component.actions.length - 1 : _private.currentIndex - 1;
+                    if (component.actions[_private.currentIndex].enabled) {
+                        break;
+                    }
+                }
                 result = true;
                 break;
             case "NAVIGATE_LEFT":
@@ -125,6 +135,7 @@ Zynthian.Popup {
                 visible: modelData != null && modelData.hasOwnProperty("visible") ? modelData.visible : true
                 enabled: modelData != null && modelData.hasOwnProperty("enabled") ? modelData.enabled : true
                 invertBorderColor: true
+                opacity: enabled ? 1 : 0.3
                 onClicked: {
                     component.close();
                     modelData.trigger();

@@ -765,6 +765,7 @@ Rectangle {
         id: sketchPickerPopup
         objectName: "sketchPickerPopup"
         columns: 2
+        rows: 4
         property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
         actions: [
             QQC2.Action {
@@ -782,6 +783,20 @@ Rectangle {
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
                     sketchPickerPopup.sketch && sketchPickerPopup.sketch.clear()
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Unbounce To Pattern")
+                enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
+                property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadataMidiRecording != null && sketchPickerPopup.sketch.metadataMidiRecording.length > 10
+                onTriggered: {
+                    sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                }
+            },
+            QQC2.Action {
+                text: ""
+                enabled: false
+                onTriggered: {
                 }
             },
             QQC2.Action {
@@ -838,23 +853,39 @@ Rectangle {
     Zynthian.ActionPickerPopup {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
+        property QtObject sketch: root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow]
         columns: 2
+        rows: 4
         actions: [
             QQC2.Action {
                 text: qsTr("Save As...")
-                enabled: root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].cppObjId !== -1
+                enabled: samplePickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
                     samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
-                    samplePickerDialog.clipToSave = root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow];
+                    samplePickerDialog.clipToSave = samplePickerPopup.sketch;
                     samplePickerDialog.saveMode = true;
                     samplePickerDialog.open();
                 }
             },
             QQC2.Action {
                 text: qsTr("Remove")
-                enabled: root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].cppObjId !== -1
+                enabled: samplePickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
-                    root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].clear()
+                    samplePickerPopup.sketch.clear()
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Unbounce To Pattern")
+                enabled: samplePickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
+                property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && samplePickerPopup.sketch && samplePickerPopup.sketch.metadataMidiRecording != null && samplePickerPopup.sketch.metadataMidiRecording.length > 10
+                onTriggered: {
+                    sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                }
+            },
+            QQC2.Action {
+                text: ""
+                enabled: false
+                onTriggered: {
                 }
             },
             QQC2.Action {
@@ -887,6 +918,10 @@ Rectangle {
                 }
             }
         ]
+    }
+
+    SketchUnbouncer {
+        id: sketchUnbouncer
     }
 
     Zynthian.LayerSetupDialog {

@@ -204,7 +204,9 @@ Zynthian.Popup {
                             console.log("Successfully recorded a new sound file into", filename, "- now building metadata");
                             let metadata = {
                                 "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
-                                "ZYNTHBOX_PATTERN_JSON": _private.pattern.toJson()
+                                "ZYNTHBOX_PATTERN_JSON": _private.pattern.toJson(),
+                                "ZYNTHBOX_AUDIOTYPESETTINGS": _private.selectedChannel.getAudioTypeSettings(),
+                                "ZYNTHBOX_ROUTING_STYLE": _private.selectedChannel.channelRoutingStyle
                             };
                             if (_private.selectedChannel) { // by all rights this should not be possible, but... best safe
                                 metadata["ZYNTHBOX_ACTIVELAYER"] = _private.selectedChannel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording

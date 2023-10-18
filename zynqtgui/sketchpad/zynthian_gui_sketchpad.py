@@ -1028,6 +1028,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
             self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.channelAudioType])
             self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+            self.clip_to_record.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [currentChannel.getAudioTypeSettings()])
+            self.clip_to_record.write_metadata("ZYNTHBOX_ROUTING_STYLE", [currentChannel.channelRoutingStyle])
             if (currentChannel.channelAudioType == "sample-trig" or currentChannel.channelAudioType == "sample-slice"):
                 self.clip_to_record.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 

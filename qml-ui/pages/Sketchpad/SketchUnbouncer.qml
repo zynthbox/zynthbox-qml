@@ -117,7 +117,9 @@ Zynthian.DialogQuestion {
                     }
                     if (replaceSounds.sketchHasData && replaceSounds.checked) {
                         console.log("Replace the channel's current sound setup with what's stored in the sketch");
-                        _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadataActiveLayer)
+                        _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadataActiveLayer);
+                        _private.channel.setAudioTypeSettings(_private.clip.metadataAudioTypeSettings);
+                        _private.channel.audioRoutingStyle = _private.clip.metadataRoutingStyle;
                     }
                     _private.clip = null;
                     _private.channel = null;

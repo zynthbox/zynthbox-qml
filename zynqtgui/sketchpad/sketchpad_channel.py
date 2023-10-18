@@ -1766,6 +1766,26 @@ class sketchpad_channel(QObject):
     ### END fxPassthrough properties
     ### END Passthrough properties
 
+    ### BEGIN Audio Type Settings getter and setter
+    @Slot(None,result=str)
+    def getAudioTypeSettings(self):
+        return json.dumps(self.__audioTypeSettings__)
+
+    @Slot(str)
+    def setAudioTypeSettings(self, audioTypeSettings):
+        try:
+            self.__audioTypeSettings__ = json.loads(audioTypeSettings)
+            self.volume_changed.emit()
+            self.panChanged.emit()
+            self.dryAmountChanged.emit()
+            self.wetFx1AmountChanged.emit()
+            self.wetFx2AmountChanged.emit()
+            self.synthPassthroughMixingChanged.emit()
+            self.fxPassthroughMixingChanged.emit()
+        except Exception as e:
+            logging.error(f"Error restoring the audio type settings from given json: {e} - the json passed to this function was: \n{audioTypeSettings}")
+    ### END Audio Type Settings getter and setter
+
     ### Begin property filterCutoffControllers
     def get_filterCutoffControllers(self):
         return self.__filter_cutoff_controllers

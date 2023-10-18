@@ -931,6 +931,44 @@ class sketchpad_clip(QObject):
     sketchContainsSamples = Property(bool, get_sketchContainsSamples, notify=samples_data_changed)
     ### END Property sketchContainsSamples
 
+    ### BEGIN Property metadataAudioTypeSettings
+    def get_metadataAudioTypeSettings(self):
+        if self.audio_metadata is not None:
+            try:
+                return json.loads(self.audio_metadata["ZYNTHBOX_AUDIOTYPESETTINGS"][0])
+            except:
+                pass
+        return ""
+
+    def set_metadataAudioTypeSettings(self, audioTypeSettings):
+        if self.get_metadataAudioTypeSettings() != audioTypeSettings:
+            self.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [str(audioTypeSettings)])
+            self.metadataAudioTypeSettingsChanged.emit()
+
+    metadataAudioTypeSettingsChanged = Signal()
+
+    metadataAudioTypeSettings = Property(str, get_metadataAudioTypeSettings, set_metadataAudioTypeSettings, notify=metadataAudioTypeSettingsChanged)
+    ### END Property metadataAudioTypeSettings
+
+    ### BEGIN Property metadataRoutingStyle
+    def get_metadataRoutingStyle(self):
+        if self.audio_metadata is not None:
+            try:
+                return json.loads(self.audio_metadata["ZYNTHBOX_ROUTING_STYLE"][0])
+            except Exception as e:
+                pass
+        return ""
+
+    def set_metadataRoutingStyle(self, routingStyle):
+        if self.get_metadataRoutingStyle() != routingStyle:
+            self.write_metadata("ZYNTHBOX_ROUTING_STYLE", [str(routingStyle)])
+            self.metadataRoutingStyleChanged.emit()
+
+    metadataRoutingStyleChanged = Signal()
+
+    metadataRoutingStyle = Property(str, get_metadataRoutingStyle, set_metadataRoutingStyle, notify=metadataRoutingStyleChanged)
+    ### END Property metadataRoutingStyle
+
     @Signal
     def sec_per_beat_changed(self):
         pass

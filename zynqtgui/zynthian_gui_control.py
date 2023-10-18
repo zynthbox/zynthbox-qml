@@ -155,6 +155,16 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__selected_channel_changed_handler_timer.timeout.connect(self.__selected_channel_changed_handler_timer_timeout)
         self.__selected_channel_changed_handler_timer.start()
 
+        self.__fill_list_throttle__ = QTimer(self)
+        self.__fill_list_throttle__.setInterval(1)
+        self.__fill_list_throttle__.setSingleShot(True)
+        self.__fill_list_throttle__.timeout.connect(self.fill_list_actual)
+
+        self.__mode_control_throttle__ = QTimer(self)
+        self.__mode_control_throttle__.setInterval(1)
+        self.__mode_control_throttle__.setSingleShot(True)
+        self.__mode_control_throttle__.timeout.connect(self.set_mode_control_actual)
+
         # xyselect mode vars
         self.xyselect_mode=False
         self.x_zctrl=None
@@ -303,53 +313,58 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.set_controller_screen()
 
     def fill_list(self):
+        self.__fill_list_throttle__.start()
+
+    @Slot()
+    def fill_list_actual(self):
         self.list_data = []
         self.__all_controls = []
-        self.all_controls_changed.emit()
 
-        if not self.zynqtgui.curlayer:
-            logging.info("Can't fill control screen list for None layer!")
-            return
+        if self.zynqtgui.curlayer:
+            self.layers = self.zynqtgui.screens['layer'].get_fxchain_layers()
+            # If no FXChain layers, then use the curlayer itself
+            if self.layers is None or len(self.layers)==0:
+                self.layers = [self.zynqtgui.curlayer]
 
-        self.layers = self.zynqtgui.screens['layer'].get_fxchain_layers()
-        # If no FXChain layers, then use the curlayer itself
-        if self.layers is None or len(self.layers)==0:
-            self.layers = [self.zynqtgui.curlayer]
+            midichain_layers = self.zynqtgui.screens['layer'].get_midichain_layers()
+            if midichain_layers is not None and len(midichain_layers)>1:
+                try:
+                    midichain_layers.remove(self.zynqtgui.curlayer)
+                except:
+                    pass
+                self.layers += midichain_layers
 
-        midichain_layers = self.zynqtgui.screens['layer'].get_midichain_layers()
-        if midichain_layers is not None and len(midichain_layers)>1:
-            try:
-                midichain_layers.remove(self.zynqtgui.curlayer)
-            except:
-                pass
-            self.layers += midichain_layers
+            i = 0
+            for layer in self.layers:
+                if self.__single_effect_engine != None and layer.engine.nickname != self.__single_effect_engine:
+                    continue
+                j = 0
+                if self.__single_effect_engine == None and len(self.layers) > 1:
+                    self.list_data.append((None,None,"> {}".format(layer.engine.name.split("/")[-1])))
+                for cscr in layer.get_ctrl_screens():
+                    self.list_data.append((cscr,i,cscr,layer,j))
 
-        i = 0
-        for layer in self.layers:
-            if self.__single_effect_engine != None and layer.engine.nickname != self.__single_effect_engine:
-                continue
-            j = 0
-            if self.__single_effect_engine == None and len(self.layers) > 1:
-                self.list_data.append((None,None,"> {}".format(layer.engine.name.split("/")[-1])))
-            for cscr in layer.get_ctrl_screens():
-                self.list_data.append((cscr,i,cscr,layer,j))
-
-                if layer == self.zynqtgui.curlayer:
-                    for index, ctrl in enumerate(layer.get_ctrl_screens()[cscr]):
-                        self.__all_controls.append({
-                            "engine": layer.engine.name.split("/")[-1],
-                            "control_screen": cscr,
-                            "index": index,
-                            "control": ctrl
-                        })
-                i += 1
-                j += 1
-        if self.__single_effect_engine == None:
-            self.index = self.zynqtgui.curlayer.get_active_screen_index()
+                    if layer == self.zynqtgui.curlayer:
+                        for index, ctrl in enumerate(layer.get_ctrl_screens()[cscr]):
+                            self.__all_controls.append({
+                                "engine": layer.engine.name.split("/")[-1],
+                                "control_screen": cscr,
+                                "index": index,
+                                "control": ctrl
+                            })
+                    i += 1
+                    j += 1
+            if self.__single_effect_engine == None:
+                self.index = self.zynqtgui.curlayer.get_active_screen_index()
+            else:
+                self.index = 0
+            if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
+                self.index = 1
         else:
+            logging.info("Current layer is empty - updating controls to match")
+            self.layers = []
             self.index = 0
-        if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
-            self.index = 1
+
         super().fill_list()
         self.all_controls_changed.emit()
 
@@ -601,6 +616,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
     def set_mode_control(self):
+        self.__mode_control_throttle__.start()
+
+    @Slot()
+    def set_mode_control_actual(self):
         self.mode='control'
         if self.zselector: self.zselector.hide()
         self.set_controller_screen()

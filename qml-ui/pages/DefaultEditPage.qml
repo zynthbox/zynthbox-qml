@@ -169,24 +169,28 @@ RowLayout {
                         property var control: null
                         property alias controllerLoader: controllerLoader
 
-                        function updateControl() {
-                            controlDelegate.control = Qt.binding(function() {
-                                // Do not use all_controls property here in js as it will slow things down if array is large enough
-                                // Instead fetch the required controls as required
-                                return zynqtgui.current_screen_id === "control"
-                                       && root.selectedChannel.channelHasSynth
-                                        ? zynqtgui.control.getAllControlAt(controlDelegate.allControlsIndex)
-                                        : null
-                            })
+                        Timer {
+                            id: controlUpdater
+                            interval: 1; repeat: false; running: false;
+                            onTriggered: {
+                                controlDelegate.control = Qt.binding(function() {
+                                    // Do not use all_controls property here in js as it will slow things down if array is large enough
+                                    // Instead fetch the required controls as required
+                                    return zynqtgui.current_screen_id === "control"
+                                        && root.selectedChannel.channelHasSynth
+                                            ? zynqtgui.control.getAllControlAt(controlDelegate.allControlsIndex)
+                                            : null
+                                })
+                            }
                         }
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        Component.onCompleted: controlDelegate.updateControl()
+                        Component.onCompleted: controlUpdater.restart()
 
                         Connections {
                             target: zynqtgui.control
-                            onAll_controlsChanged: controlDelegate.updateControl()
+                            onAll_controlsChanged: controlUpdater.restart()
                         }
 
                         Zynthian.ControllerLoader {

@@ -572,21 +572,12 @@ Rectangle {
                                     RowLayout {
                                         id: bounceButtonLayout
                                         Layout.fillHeight: true
-                                        property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && waveformContainer.clip && waveformContainer.clip.metadataMidiRecording != null && waveformContainer.clip.metadataMidiRecording.length > 10
-                                        property bool shouldBounce: root.selectedChannel.channelAudioType !== "sample-loop" && root.selectedChannel.channelAudioType !== "external"
-                                        visible: shouldBounce || shouldUnbounce
+                                        visible: root.selectedChannel.channelAudioType !== "sample-loop" && root.selectedChannel.channelAudioType !== "external"
                                         QQC2.Button {
-                                            text: bounceButtonLayout.shouldBounce ? qsTr("Bounce To Sketch") : (bounceButtonLayout.shouldUnbounce ? qsTr("Unbounce To Pattern") : "")
-                                            icon.name: bounceButtonLayout.shouldBounce ? "go-next" : "go-previous"
+                                            text: qsTr("Bounce To Sketch")
+                                            icon.name: "go-next"
                                             onClicked: {
-                                                if (bounceButtonLayout.shouldBounce) {
-                                                    bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
-                                                } else if (bounceButtonLayout.shouldUnbounce) {
-                                                    sketchUnbouncer.unbounce(waveformContainer.clip, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
-                                                }
-                                            }
-                                            SketchUnbouncer {
-                                                id: sketchUnbouncer
+                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                                             }
                                         }
                                         Item {

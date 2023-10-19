@@ -124,6 +124,11 @@ Zynthian.DialogQuestion {
                     _private.slot = -1;
                     _private.patternSlot = -1;
                     _private.track = "";
+
+                    // In case we unbounced to a different sketchpad track, switch to that one
+                    zynqtgui.session_dashboard.selectedChannel = _private.channel.id;
+                    // Similarly, if we unbounced to another slot, update the current one there as well
+                    zynqtgui.channel.selectedPart = _private.slot;
                 }
             }
         }

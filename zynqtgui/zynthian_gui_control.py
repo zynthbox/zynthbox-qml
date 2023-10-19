@@ -155,16 +155,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__selected_channel_changed_handler_timer.timeout.connect(self.__selected_channel_changed_handler_timer_timeout)
         self.__selected_channel_changed_handler_timer.start()
 
-        self.__fill_list_throttle__ = QTimer(self)
-        self.__fill_list_throttle__.setInterval(1)
-        self.__fill_list_throttle__.setSingleShot(True)
-        self.__fill_list_throttle__.timeout.connect(self.fill_list_actual)
-
-        self.__mode_control_throttle__ = QTimer(self)
-        self.__mode_control_throttle__.setInterval(1)
-        self.__mode_control_throttle__.setSingleShot(True)
-        self.__mode_control_throttle__.timeout.connect(self.set_mode_control_actual)
-
         # xyselect mode vars
         self.xyselect_mode=False
         self.x_zctrl=None
@@ -313,10 +303,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.set_controller_screen()
 
     def fill_list(self):
-        self.__fill_list_throttle__.start()
-
-    @Slot()
-    def fill_list_actual(self):
         self.list_data = []
         self.__all_controls = []
 
@@ -616,10 +602,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
     def set_mode_control(self):
-        self.__mode_control_throttle__.start()
-
-    @Slot()
-    def set_mode_control_actual(self):
         self.mode='control'
         if self.zselector: self.zselector.hide()
         self.set_controller_screen()

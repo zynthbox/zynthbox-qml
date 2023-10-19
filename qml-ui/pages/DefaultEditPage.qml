@@ -171,7 +171,7 @@ RowLayout {
 
                         Timer {
                             id: controlUpdater
-                            interval: 1; repeat: false; running: false;
+                            interval: 0; repeat: false; running: false;
                             onTriggered: {
                                 controlDelegate.control = Qt.binding(function() {
                                     // Do not use all_controls property here in js as it will slow things down if array is large enough

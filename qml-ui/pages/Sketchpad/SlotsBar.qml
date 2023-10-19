@@ -786,7 +786,7 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Unbounce To Pattern")
+                text: qsTr("Unbounce...")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
                 property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadataMidiRecording != null && sketchPickerPopup.sketch.metadataMidiRecording.length > 10
                 onTriggered: {
@@ -875,7 +875,7 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Unbounce To Pattern")
+                text: qsTr("Unbounce...")
                 enabled: samplePickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
                 property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && samplePickerPopup.sketch && samplePickerPopup.sketch.metadataMidiRecording != null && samplePickerPopup.sketch.metadataMidiRecording.length > 10
                 onTriggered: {

@@ -4,3 +4,4 @@ ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=669
 XdgTargetDir=plasma/desktoptheme
 Uncompress=always
+RemoveDeadEntries=true

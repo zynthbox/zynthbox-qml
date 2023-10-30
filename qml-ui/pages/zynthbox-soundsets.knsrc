@@ -4,3 +4,4 @@ ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=681
 AbsoluteInstallPath=/zynthian/zynthian-my-data/soundsets/community-soundsets/
 Uncompress=never
+RemoveDeadEntries=true

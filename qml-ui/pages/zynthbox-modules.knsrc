@@ -4,3 +4,4 @@ ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=671
 XdgTargetDir=zynthian/modules
 Uncompress=always
+RemoveDeadEntries=true

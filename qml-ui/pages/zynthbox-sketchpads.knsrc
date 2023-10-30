@@ -4,3 +4,4 @@ ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=679
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sketchpads/community-sketchpads/
 Uncompress=always
+RemoveDeadEntries=true

@@ -4,3 +4,4 @@ ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=678
 AbsoluteInstallPath=/zynthian/zynthian-my-data/samples/community-samples/
 Uncompress=archive
+RemoveDeadEntries=true

@@ -4,3 +4,4 @@ ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=670
 XdgTargetDir=zynthian/playgrids
 Uncompress=always
+RemoveDeadEntries=true

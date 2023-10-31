@@ -579,8 +579,16 @@ Zynthian.BasePlayGrid {
     Connections {
         target: Zynthbox.MidiRouter
         enabled: component.isVisible && !Zynthbox.PlayGridManager.metronomeActive
-        onNoteChanged: {
-            if (port == 0 && midiChannel === _private.activePatternModel.midiChannel) {
+        onMidiMessage: {
+            if (port == 0 && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3 && 127 < byte1 && byte1 < 160) {
+                let midiChannel = byte1 - 127;
+                let setOn = false;
+                if (byte1 > 143) {
+                    midiChannel = byte1 - 143;
+                    setOn = true;
+                }
+                let midiNote = byte2;
+                let velocity = byte3;
                 if (setOn == true) {
                     if (component.noteListeningActivations === 0) {
                         // Clear the current state, in case there's something there (otherwise things look a little weird)

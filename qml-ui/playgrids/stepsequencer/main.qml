@@ -239,6 +239,7 @@ Zynthian.BasePlayGrid {
     property var heardNotes: []
     property var heardVelocities: []
     property var currentRowUniqueNotes: []
+    property var currentRowUniqueMidiNotes: []
     property var currentBarNotes: []
     property var currentBankNotes: []
 
@@ -485,6 +486,10 @@ Zynthian.BasePlayGrid {
         }
         function updateUniqueCurrentRowNotes() {
             component.currentRowUniqueNotes = activePatternModel.uniqueRowNotes(activeBar + bankOffset);
+            component.currentRowUniqueMidiNotes = [];
+            for (var noteIndex = 0; noteIndex < component.currentRowUniqueNotes.length; ++noteIndex) {
+                component.currentRowUniqueMidiNotes.push(component.currentRowUniqueNotes[noteIndex].midiNote);
+            }
             var currentBarNotes = [];
             var currentBankNotes = [];
             for (var bar = 0; bar < _private.activePatternModel.availableBars; ++bar) {

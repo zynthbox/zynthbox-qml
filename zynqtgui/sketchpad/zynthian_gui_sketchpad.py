@@ -156,6 +156,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.init_should_load_last_state = False
         self.__last_selected_obj = last_selected_obj_dto(self)
         self.__sketchpad_loading_in_progress = False
+        self.__stopRecordingRetrier__ = None
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
         self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)

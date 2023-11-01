@@ -78,7 +78,22 @@ class zynthian_layer:
 
         self.reset_zs3()
 
-        self.engine.add_layer(self)
+        # Some engines (for example LinuxSampler) in some rare cases fails to add a layer.
+        # Hence try to handle those rare cases and try again before giving up
+        restart_count = 0
+        layer_added = False
+        while not layer_added:
+            try:
+                self.engine.add_layer(self)
+                layer_added = True
+            except Exception as e:
+                restart_count += 1
+                logging.error(f"Can't add layer to engine {self.engine.name} : {e}")
+                logging.debug(f"Engine {self.engine.name} Add Layer Restart Count : {restart_count}")
+                if restart_count >= 5:
+                    # Retried 5 times but failed. Force restart the entire application
+                    self.zynqtgui.exit(102)
+
         self.refresh_controllers()
 
 

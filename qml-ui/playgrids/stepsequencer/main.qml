@@ -624,7 +624,10 @@ Zynthian.BasePlayGrid {
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
                 } else if (component.noteListeningActivations < 0) {
-                    console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                    // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
+                    // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
+                    // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
+                    // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
                     component.noteListeningActivations = 0;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];

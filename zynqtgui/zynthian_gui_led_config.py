@@ -187,7 +187,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.channel = None
         self.button_config = {}
         self.update_botton_colors_timer = QTimer()
-        self.update_botton_colors_timer.setInterval(1)
+        self.update_botton_colors_timer.setInterval(0)
         self.update_botton_colors_timer.setSingleShot(True)
         self.update_botton_colors_timer.timeout.connect(self.update_button_colors_actual)
 

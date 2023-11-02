@@ -186,6 +186,10 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
         self.channel = None
         self.button_config = {}
+        self.update_botton_colors_timer = QTimer()
+        self.update_botton_colors_timer.setInterval(1)
+        self.update_botton_colors_timer.setSingleShot(True)
+        self.update_botton_colors_timer.timeout.connect(self.update_button_colors_actual)
 
         self.button_menu = 0
         self.button_1 = 1
@@ -323,6 +327,12 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
     @Slot()
     def update_button_colors(self):
+        self.update_botton_colors_timer.start()
+
+    @Slot()
+    def update_button_colors_actual(self):
+        import traceback
+        traceback.print_stack()
         logging.debug("Updating LEDs")
 
         if self.zynqtgui.sketchpad.song is not None and (self.channel is None or (self.channel is not None and self.channel.id != self.zynqtgui.session_dashboard.selectedChannel)):

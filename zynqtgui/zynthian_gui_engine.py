@@ -72,7 +72,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
             ["ZY", ("ZynAddSubFX", "ZynAddSubFX - Synthesizer", "MIDI Synth", None, zynthian_engine_zynaddsubfx, True)],
             ["FS", ("FluidSynth", "FluidSynth - SF2 Player", "MIDI Synth", None, zynthian_engine_fluidsynth, True)],
             ["SF", ("Sfizz", "Sfizz - SFZ Player", "MIDI Synth", None, zynthian_engine_sfizz, True)],
-            ["LS", ("LinuxSampler", "LinuxSampler - SFZ/GIG Player", "MIDI Synth", None, zynthian_engine_linuxsampler, True)],
+#            ["LS", ("LinuxSampler", "LinuxSampler - SFZ/GIG Player", "MIDI Synth", None, zynthian_engine_linuxsampler, True)],
             ["BF", ("setBfree", "setBfree - Hammond Emulator", "MIDI Synth", None, zynthian_engine_setbfree, True)],
             ["AE", ("Aeolus", "Aeolus - Pipe Organ Emulator", "MIDI Synth", None, zynthian_engine_aeolus, True)],
             ['PD', ("PureData", "PureData - Visual Programming", "Special", None, zynthian_engine_puredata, True)],

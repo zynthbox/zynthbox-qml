@@ -156,7 +156,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.init_should_load_last_state = False
         self.__last_selected_obj = last_selected_obj_dto(self)
         self.__sketchpad_loading_in_progress = False
-        self.__stopRecordingRetrier__ = None
+        self.__stopRecordingRetrier__ = QTimer(self)
+        self.__stopRecordingRetrier__.setInterval(50)
+        self.__stopRecordingRetrier__.setSingleShot(True)
+        self.__stopRecordingRetrier__.timeout.connect(self.stopRecording)
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
         self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)
@@ -974,11 +977,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.clips_to_record.clear()
                 self.clipsToRecordChanged.emit()
             else:
-                if self.__stopRecordingRetrier__ is None:
-                    self.__stopRecordingRetrier__ = QTimer(self)
-                    self.__stopRecordingRetrier__.setInterval(50)
-                    self.__stopRecordingRetrier__.setSingleShot(True)
-                    self.__stopRecordingRetrier__.timeout.connect(self.stopRecording)
+                logging.debug("Recording not yet stopped. Retrying in a bit.")
                 self.__stopRecordingRetrier__.start()
 
     # Called by SyncTimer to ensure the current scene gets started as expected

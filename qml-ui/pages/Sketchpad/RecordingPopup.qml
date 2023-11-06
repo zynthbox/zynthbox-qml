@@ -93,7 +93,7 @@ Zynthian.Popup {
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    closePolicy: !zynqtgui.sketchpad.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
+    closePolicy: zynqtgui.sketchpad.isRecording ? QQC2.Popup.NoAutoClose : (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside)
     width: parent.width * 0.95
     height: parent.height * 0.95
     leftPadding: 0
@@ -157,7 +157,7 @@ Zynthian.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: false
-            text: selectedChannel ? qsTr("Record Channel %1 - Clip %2").arg(selectedChannel.name).arg(selectedChannel.selectedSlotRow + 1) : ""
+            text: root.selectedChannel ? qsTr("Record Channel %1 - Clip %2").arg(root.selectedChannel.name).arg(root.selectedChannel.selectedSlotRow + 1) : ""
         }
         Rectangle {
             Layout.fillWidth: true

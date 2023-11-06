@@ -1941,17 +1941,21 @@ class zynthian_gui(QObject):
                 self.__start_playback_on_metronome_release = True
             else:
                 # Toggle play/stop with play CUIA action
-                if not zl.isMetronomeRunning:
-                    self.run_start_metronome_and_playback.emit()
-                else:
+                if zl.isMetronomeRunning:
                     self.run_stop_metronome_and_playback.emit()
+                else:
+                    self.run_start_metronome_and_playback.emit()
         elif cuia == "ZL_STOP":
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "START_RECORD":
             if self.recording_popup_active or self.metronomeButtonPressed:
                 zl = self.screens["sketchpad"]
-                if not zl.isRecording:
+                if zl.isRecording:
+                    # Some Clip is currently being recorded
+                    logging.info("Some Clip is currently being recorded. Stopping record")
+                    self.run_stop_metronome_and_playback.emit()
+                else:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
                     channel = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
@@ -1966,10 +1970,6 @@ class zynthian_gui(QObject):
                     logging.info(f"Recording Clip : {clip}")
                     clip.queueRecording()
                     self.run_start_metronome_and_playback.emit()
-                else:
-                    # Some Clip is currently being recorded
-                    logging.info("Some Clip is currently being recorded. Stopping record")
-                    self.run_stop_metronome_and_playback.emit()
             else:
                 self.displayRecordingPopup.emit()
 

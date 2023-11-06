@@ -36,6 +36,7 @@ import "private" as Private
 
 Zynthian.SelectorPage {
     id: component
+    property bool isVisible: zynqtgui.current_screen_id === component.screenId
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
@@ -63,29 +64,44 @@ Zynthian.SelectorPage {
      * Qt.resolvedUrl("zynqtgui-themes.knsrc").toString().slice(7)
      * (that is, we need it fully resolved, but not as a url, so without the file:// part)
      */
-    property alias configFile: newStuffEngine.configFile
+    property string configFile
 
     Component.onCompleted: {
         selector.newstuff_model = newStuffModel;
     }
-    NewStuff.Engine {
-        id: newStuffEngine
-        property bool isLoading: false
-        property string message
+    onIsVisibleChanged: {
+        if (component.isVisible) {
+            component.newStuffEngine = Qt.createQmlObject("
+            import QtQuick 2.10
+            import org.kde.newstuff 1.0 as NewStuff
+            NewStuff.Engine { configFile: \"%1\" }".arg(component.configFile), component, "newStuffEngineDynamicCreator");
+        } else if (component.newStuffEngine !== null) {
+            console.debug("The following QObject:connect error(s) are expected, as the object attempted to be connected to is being destroyed.");
+            component.newStuffEngine.destroy();
+            component.newStuffEngine = null;
+        }
+    }
+    property QtObject newStuffEngine: null
+    property bool isLoading: false
+    property string message
+    Connections {
+        target: newStuffEngine
         onMessage: {
             applicationWindow().showPassiveNotification(message);
         }
         onBusyMessage: {
             if (!isLoading) { isLoading = true; }
-            newStuffEngine.message = message;
+            component.message = message;
         }
         onIdleMessage: {
             if (isLoading) { isLoading = false; }
-            newStuffEngine.message = "";
+            component.message = "";
         }
         onErrorMessage: {
-            errorPopup.text = message;
-            errorPopup.open();
+            if (newStuffEngine.configFile != "") {
+                errorPopup.text = message;
+                errorPopup.open();
+            }
         }
     }
     NewStuff.ItemsModel {
@@ -355,7 +371,7 @@ Zynthian.SelectorPage {
             margins: Kirigami.Units.largeSpacing
         }
         height: Kirigami.Units.gridUnit * 5
-        visible: newStuffEngine.isLoading;
+        visible: component.isLoading;
         Zynthian.Card {
             anchors {
                 top: parent.top
@@ -386,7 +402,7 @@ Zynthian.SelectorPage {
                 bottom: parent.bottom
                 bottomMargin: Kirigami.Units.largeSpacing
             }
-            text: newStuffEngine.message
+            text: component.message
             width: paintedWidth
         }
     }

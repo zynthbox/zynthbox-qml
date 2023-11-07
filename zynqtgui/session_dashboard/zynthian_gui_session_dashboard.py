@@ -92,7 +92,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         return "sketchpad"
 
     def layer_created(self, index):
-       QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+        QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
     def fx_layers_changed(self):
         logging.debug(f"FX Layer Changed")
@@ -107,6 +107,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
         if selected_channel is not None:
             selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
+            selected_channel.update_jack_port()
         self.zynqtgui.screens['sketchpad'].song.channelsModel.connected_sounds_count_changed.emit()
         # self.set_selected_channel(self.selectedChannel, True)
 

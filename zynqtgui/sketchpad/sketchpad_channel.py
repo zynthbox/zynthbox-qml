@@ -243,6 +243,7 @@ class sketchpad_channel(QObject):
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
         self.chainedFxNamesChanged.emit()
+        self.chainedSoundsAcceptedChannelsChanged.emit()
 
     def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()
@@ -1803,6 +1804,34 @@ class sketchpad_channel(QObject):
 
     filterResonanceControllers = Property("QVariantList", get_filterResonanceControllers, notify=filterResonanceControllersChanged)
     ### End property filterResonanceControllers
+
+    ### Begin property chainedSoundsAcceptedChannels
+    """
+    This property will let the MidiRouter/Synctimer know what input channels the engine is listening to
+    For MPE purpose, the synth engines needs to accept notes from any channel. But not all synth allows doing that
+    For example, ZynAddSubFX does not support accepting midi notes from multiple channels.
+    """
+    def get_chainedSoundsAcceptedChannels(self):
+        accepted_channels = []
+
+        for index, midichannel in enumerate(self.chainedSounds):
+            channels = []
+            if midichannel >= 0 and self.checkIfLayerExists(midichannel):
+                engine = self.zynqtgui.layer.layer_midi_map[midichannel].engine
+                if engine.nickname.split("/")[0] == "ZY":
+                    # ZynAddSubFX engine does not support notes from multiple channels. It only accepts notes from the midi channel it is assigned
+                    channels = [midichannel]
+                else:
+                    # Other engines accepts notes from any midi channel
+                    channels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+            accepted_channels.append(channels)
+
+        return accepted_channels
+
+    chainedSoundsAcceptedChannelsChanged = Signal()
+
+    chainedSoundsAcceptedChannels = Property("QVariantList", get_chainedSoundsAcceptedChannels, notify=chainedSoundsAcceptedChannelsChanged)
+    ### End property chainedSoundsAcceptedChannels
 
     @Slot(int)
     def selectPreviousSynthPreset(self, slot_index):

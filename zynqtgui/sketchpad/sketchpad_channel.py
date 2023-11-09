@@ -551,7 +551,7 @@ class sketchpad_channel(QObject):
 
             for port_name in jack_basenames:
                 port_names = []
-                ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
+                ports = [x.name for x in sketchpad_channel.jclient.get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
 
                 for port in zip(ports, [f"AudioLevels:Channel{self.id + 1}-left_in", f"AudioLevels:Channel{self.id + 1}-right_in"]):
                     port_names.append(port[0])

@@ -355,7 +355,7 @@ Zynthian.ScreenPage {
                         height: 1
                         width: 1
                         y: 0
-                        x: component.visible && segmentsRepeater.totalDuration > 0 ? parent.width * Math.min(1, Zynthbox.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                        x: component.visible && Zynthbox.SegmentHandler.duration > 0 ? parent.width * Math.min(1, Zynthbox.SegmentHandler.playhead / Zynthbox.SegmentHandler.duration) : 0
                         Rectangle {
                             anchors {
                                 bottom: parent.top

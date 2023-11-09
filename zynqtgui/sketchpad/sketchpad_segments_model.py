@@ -44,6 +44,7 @@ class sketchpad_segments_model(QAbstractListModel):
         self.totalBeatDurationThrottle.setInterval(1)
         self.totalBeatDurationThrottle.setSingleShot(True)
         self.totalBeatDurationThrottle.timeout.connect(self.totalReset)
+        self.countChanged.connect(self.totalBeatDurationThrottle.start)
         self.countChangedThrottle = QTimer()
         self.countChangedThrottle.setInterval(1)
         self.countChangedThrottle.setSingleShot(True)

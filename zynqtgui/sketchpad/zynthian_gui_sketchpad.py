@@ -599,6 +599,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
                 logging.info(f"Loading new sketchpad from community sketchpad : {str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)}")
 
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/",
+                                                                  base_sketchpad_path.stem.replace(".sketchpad", ""), self)
+                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
+                    str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
+
                 # Load sketchpad snapshot if available or else load default snapshot
                 snapshot_path = f"{str(self.__sketchpad_basepath__ / new_sketchpad_name / 'soundsets')}/{base_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
                 if Path(snapshot_path).exists():
@@ -610,10 +615,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     self.zynqtgui.currentTaskMessage = "Loading snapshot"
                     self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/",
-                                                                  base_sketchpad_path.stem.replace(".sketchpad", ""), self)
-                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
-                    str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
                 self.song_changed.emit()
                 self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
             else:

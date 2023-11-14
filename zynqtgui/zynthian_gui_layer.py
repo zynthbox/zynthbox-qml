@@ -532,12 +532,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         self.add_to_midichain(layer, self.layer_chain_parallel)
                         if layer not in self.layers:
                             self.layers.append(layer)
-                            self.layer_created.emit(midich)
+                        # Always emit layer created for both created layer or replaced layer
+                        self.layer_created.emit(midich)
                 # New root layer
                 else:
                     if layer not in self.layers:
                         self.layers.append(layer)
-                        self.layer_created.emit(midich)
+                    # Always emit layer created for both created layer or replaced layer
+                    self.layer_created.emit(midich)
 
                 if select:
                     self.fill_list()

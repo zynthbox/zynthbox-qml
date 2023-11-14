@@ -113,6 +113,7 @@ class sketchpad_channel(QObject):
         self.__chained_sounds_info_updater.timeout.connect(self.chainedSoundsInfoChanged.emit)
 
         self.zynqtgui.layer.layerPresetChanged.connect(self.layerPresetChangedHandler)
+        self.zynqtgui.layer.layer_created.connect(self.layerCreatedHandler)
 
         # Load engine config
         try:
@@ -210,6 +211,10 @@ class sketchpad_channel(QObject):
         layer = self.zynqtgui.layer.layers[layer_index]
         if layer in self.chainedFx:
             self.chainedFxNamesChanged.emit()
+
+    def layerCreatedHandler(self, midichannel):
+        if midichannel in self.chainedSounds:
+            self.chainedSoundsAcceptedChannelsChanged.emit()
 
     @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, partNum):

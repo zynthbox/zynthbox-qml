@@ -568,7 +568,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             return f"{name}-{counter}"
 
     @Slot(None)
-    def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True):
+    def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True, force=False):
         def task():
             self.zynqtgui.currentTaskMessage = "Stopping playback"
 
@@ -666,7 +666,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.sketchpadLoadingInProgress = True
             self.zynqtgui.do_long_task(task)
 
-        if self.zynqtgui.isBootingComplete and self.song.hasUnsavedChanges:
+        if not force and self.zynqtgui.isBootingComplete and self.song.hasUnsavedChanges:
             self.zynqtgui.show_confirm("You have unsaved changes. Do you really want to continue?", confirmNewSketchpad)
         else:
             confirmNewSketchpad()
@@ -776,7 +776,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
                 self.zynqtgui.currentTaskMessage = "Creating new sketchpad from community sketchpad"
                 # newSketchpad will handle loading snapshot based on the value of load_snapshot
-                self.newSketchpad(sketchpad, _cb, load_snapshot=load_snapshot)
+                self.newSketchpad(sketchpad, _cb, load_snapshot=load_snapshot, force=True)
             else:
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
                 self.zynqtgui.currentTaskMessage = "Loading sketchpad"

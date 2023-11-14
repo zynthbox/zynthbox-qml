@@ -50,6 +50,7 @@ Zynthian.Dialog {
     property alias listCurrentIndex: filesListView.currentIndex
     property alias listCount: filesListView.count
     readonly property alias selectedFile: filesListView.selectedModelData
+    property var folderInfoStrings: {}
 
     property var cuiaCallback: function (cuia) {
         var result = true;
@@ -387,6 +388,58 @@ Zynthian.Dialog {
                         Kirigami.Separator {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 1
+                        }
+                    }
+                }
+
+                footerPositioning: ListView.OverlayFooter
+                footer: Item {
+                    width: ListView.view.width
+                    height: fileListFooterLayout.height
+                    visible: folderInfoLabel.text !== ""
+                    z: 3
+                    Rectangle {
+                        anchors {
+                            fill: parent
+                            margins: 1
+                        }
+                        color: "#110000"
+                    }
+
+                    ColumnLayout {
+                        id: fileListFooterLayout
+                        spacing: 0
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            right: parent.right
+                            margins: 2
+                        }
+                        Kirigami.Separator {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 1
+                        }
+                        QQC2.Label {
+                            id: folderInfoLabel
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
+                            horizontalAlignment: Text.AlignHCenter
+                            Connections {
+                                target: folderModel
+                                onFolderChanged: {
+                                    let foundOne = false;
+                                    for (const folder in root.folderInfoStrings) {
+                                        if (folderModel.folder.toString().startsWith(folder)) {
+                                            folderInfoLabel.text = root.folderInfoStrings[folder];
+                                            foundOne = true;
+                                            break;
+                                        }
+                                    }
+                                    if (foundOne === false) {
+                                        folderInfoLabel.text = "";
+                                    }
+                                }
+                            }
                         }
                     }
                 }

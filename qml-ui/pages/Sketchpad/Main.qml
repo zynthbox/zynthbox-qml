@@ -881,6 +881,9 @@ Zynthian.ScreenPage {
         folderModel {
             nameFilters: ["*.sketchpad.json"]
         }
+        folderInfoStrings: {
+            "file:///zynthian/zynthian-my-data/sketchpads/community-sketchpads": qsTr("When you open a Community Sketch, it gets copied over to my-sketches under the same name (or with a numbered suffix if you already have something there - we'll not overwrite other sketchpads)")
+        }
         onFileSelected: {
             console.log("Selected Sketchpad : " + file.fileName + "("+ file.filePath +")")
             zynqtgui.sketchpad.loadSketchpad(file.filePath, false)

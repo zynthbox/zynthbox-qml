@@ -69,8 +69,19 @@ ColumnLayout {
                 color: Kirigami.Theme.textColor
                 source: partDelegate.clip ? partDelegate.clip.path : ""
 
-                visible: root.visible && root.channel.channelAudioType === "sample-loop" &&
-                         partDelegate.clipHasWav
+                visible: root.visible && root.channel.channelAudioType === "sample-loop" && partDelegate.clipHasWav
+                // Progress line
+                Rectangle {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
+                    visible: parent.visible && cppClipObject && cppClipObject.isPlaying
+                    color: Kirigami.Theme.highlightColor
+                    width: Kirigami.Units.smallSpacing
+                    x: cppClipObject ? cppClipObject.position * parent.width : 0
+                }
             }
             Image {
                 anchors.fill: parent

@@ -916,25 +916,21 @@ class sketchpad_channel(QObject):
 
     @Slot(int)
     def remove_and_unchain_sound(self, chan, cb=None):
-        zynqtgui = self.__song__.get_metronome_manager().zynqtgui
-
         def task():
-            zynqtgui.screens['layers_for_channel'].fill_list()
-
-            zynqtgui.layer.remove_root_layer(chan)
+            self.zynqtgui.screens['layers_for_channel'].fill_list()
+            layer_to_delete = self.zynqtgui.layer.layer_midi_map[chan]
+            self.zynqtgui.layer.remove_root_layer(self.zynqtgui.layer.root_layers.index(layer_to_delete))
             self.select_correct_layer()
             self.__song__.schedule_save()
             self.chained_sounds_changed.emit()
-
             if cb is not None:
                 cb()
-
-            zynqtgui.end_long_task()
-
+            self.zynqtgui.end_long_task()
         self.zynqtgui.currentTaskMessage = f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}"
-        zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
+        logging.debug(f"set_chained_sounds : {sounds}")
         update_jack_ports = True
 
         # Stop all playing notes

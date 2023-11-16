@@ -35,7 +35,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 
 Item {
     id: component
-    property bool opened: sequenceFilePicker.opened || loadedSequenceOptionsPicker.opened || loadedPatternOptionsPicker.opened || channelPicker.opened
+    property bool opened: sequenceFilePicker.opened || loadedSequenceOptionsPicker.opened || loadedPatternOptionsPicker.opened || trackPicker.opened
     property int topPadding: Kirigami.Units.largeSpacing
     property int leftPadding: Kirigami.Units.largeSpacing
     property int rightPadding: Kirigami.Units.largeSpacing
@@ -107,8 +107,8 @@ Item {
                     } else if (loadedPatternOptionsRepeater.opened) {
                         loadedPatternOptionsRepeater.accept();
                         result = true;
-                    } else if (channelPicker.opened) {
-                        channelPicker.close();
+                    } else if (trackPicker.opened) {
+                        trackPicker.close();
                         result = true;
                     }
                     break;
@@ -121,8 +121,8 @@ Item {
                     } else if (loadedPatternOptionsRepeater.opened) {
                         loadedPatternOptionsRepeater.reject();
                         result = true;
-                    } else if (channelPicker.opened) {
-                        channelPicker.close();
+                    } else if (trackPicker.opened) {
+                        trackPicker.close();
                         result = true;
                     }
                     break;
@@ -278,9 +278,7 @@ Item {
     Zynthian.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
-        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
-        width: component.Window.width
+        width: component.Window.width - Kirigami.Units.largeSpacing * 2
         height: Math.round(component.Window.height * 0.8)
         z: 999999999
         modal: true
@@ -291,6 +289,7 @@ Item {
             Layout.topMargin: 12
         }
         contentItem: ColumnLayout {
+            property bool singlePatternImport: false
             Repeater {
                 id: loadedSequenceOptionsRepeater
                 model: loadedSequenceOptionsPicker.loadedSequence
@@ -332,14 +331,12 @@ Item {
     Zynthian.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
-        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
-        width: component.Window.width
+        width: component.Window.width - Kirigami.Units.largeSpacing * 2
         height: Math.round(component.Window.height * 0.3)
         z: 999999999
         modal: true
         header: Kirigami.Heading {
-            text: qsTr("Loading Single Pattern: Pick Options")
+            text: qsTr("Loading Pattern: Pick Options")
             font.pointSize: 16
             Layout.leftMargin: 12
             Layout.topMargin: 12
@@ -347,6 +344,7 @@ Item {
         contentItem: ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            property bool singlePatternImport: true
             Repeater {
                 id: loadedPatternOptionsRepeater
                 model: loadedPatternOptionsPicker.loadedPattern ? [loadedPatternOptionsPicker.loadedPattern] : []
@@ -368,7 +366,7 @@ Item {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
-                    text: qsTr("Load && Apply")
+                    text: qsTr("Load and Apply")
                     onClicked: loadedPatternOptionsPicker.accept()
                 }
             }
@@ -397,39 +395,17 @@ Item {
             // Only import a pattern object that is actually enabled
             if (theItem.importPattern) {
                 // As we're importing to the global sequence, operate on the pattern in the appropriate position
-                var globalPattern = globalSequence.get(theItem.importIndex);
-
-                // First, remove this pattern from whatever channel it was associated with, if any
-                var foundChannel = null;
-                var foundIndex = -1;
-                for(var i = 0; i < zynqtgui.sketchpad.song.channelsModel.count; ++i) {
-                    var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(i);
-                    if (channel && channel.connectedPattern === theItem.importIndex) {
-                        foundChannel = channel;
-                        foundIndex = i;
-                        break;
-                    }
-                }
-                if (foundIndex > -1) {
-                    foundChannel.connectedPattern = -1;
-                }
-                console.log("Importing", theItem.patternObject, "into", globalPattern, "originally on channel", foundChannel);
+                var importToPattern = globalSequence.getByPart(theItem.targetTrackIndex, theItem.targetPartIndex);
+                console.log("Importing", theItem.patternObject, "into", importToPattern);
 
                 // Now apply our loaded pattern onto the global one
-                globalPattern.cloneOther(theItem.patternObject);
+                importToPattern.cloneOther(theItem.patternObject);
 
-                // Then associate this pattern with the channel we requested, if requested
-                if (theItem.associatedChannelIndex > -1) {
-                    var channelToAssociate = zynqtgui.sketchpad.song.channelsModel.getChannel(theItem.associatedChannelIndex);
-                    channelToAssociate.connectedPattern = theItem.importIndex;
-                    console.log("Newly associated channel is", channelToAssociate);
-
-                    // Finally, actually import the sound if requested
-                    var jsonToLoad = theItem.patternObject.layerData;
-                    if (jsonToLoad.length > 0 && theItem.importSound) {
-                        channelToAssociate = zynqtgui.sketchpad.song.channelsModel.getChannel(theItem.associatedChannelIndex);
-                        channelToAssociate.setChannelSoundFromSnapshotJson(jsonToLoad)
-                    }
+                // Finally, actually import the sound if requested
+                var jsonToLoad = theItem.patternObject.layerData;
+                if (jsonToLoad.length > 0 && theItem.importSound) {
+                    var channelToAssociate = zynqtgui.sketchpad.song.channelsModel.getChannel(theItem.targetTrackIndex);
+                    channelToAssociate.setChannelSoundFromSnapshotJson(jsonToLoad);
                 }
             }
         }
@@ -441,16 +417,16 @@ Item {
             id: patternOptionsRoot
             Layout.fillWidth: true
             property QtObject patternObject: model.pattern === undefined ? modelData : model.pattern
-            property var destinationChannels: []
             property bool importPattern: patternObject.enabled
             property bool importSound: false
-            property int associatedChannelIndex: 6 + model.index
-            property QtObject associatedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(patternOptionsRoot.associatedChannelIndex)
-            property int importIndex: model.index
+            property int targetTrackIndex: zynqtgui.session_dashboard.selectedChannel
+            property QtObject targetTrack: zynqtgui.sketchpad.song.channelsModel.getChannel(patternOptionsRoot.targetTrackIndex)
+            property int targetPartIndex: parent.singlePatternImport ? targetTrack.selectedPart : model.index
             property var soundInfo: patternObject.layerData.length > 0 ? zynqtgui.layer.sound_metadata_from_json(patternObject.layerData) : [];
             RowLayout {
                 Layout.fillWidth: true
                 QQC2.CheckBox {
+                    visible: patternOptionsRoot.parent.singlePatternImport === false
                     checked: patternOptionsRoot.importPattern
                     onClicked: {
                         patternOptionsRoot.importPattern = !patternOptionsRoot.importPattern
@@ -462,44 +438,44 @@ Item {
                     enabled: patternOptionsRoot.importPattern
                     text: "Pattern " + (model.index + 1)
                 }
-                QQC2.ComboBox {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 1
-                    enabled: patternOptionsRoot.importPattern
-                    model: ["Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5"]
-                    currentIndex: patternOptionsRoot.importIndex
-                    onCurrentIndexChanged: {
-                        console.log(patternOptionsRoot.patternObject, patternOptionsRoot.importIndex, currentIndex);
-                        if (currentIndex === -1) {
-                            patternOptionsRoot.importIndex = currentIndex;
-                        }
-                    }
-                    popup.z: 1999999999
-                }
                 QQC2.Button {
-                    id: importToChannel
+                    id: importToTrack
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                    text: patternOptionsRoot.associatedChannelIndex > -1 && patternOptionsRoot.associatedChannelIndex < 12
-                        ? qsTr("Import to Channel %1").arg(patternOptionsRoot.associatedChannel.name)
+                    text: patternOptionsRoot.targetTrackIndex > -1 && patternOptionsRoot.targetTrackIndex < 10
+                        ? qsTr("Import to Track %1").arg(patternOptionsRoot.targetTrack.name)
                         : qsTr("Pick Channel Association")
                     enabled: patternOptionsRoot.importPattern
-                    property bool pickingChannel: false
+                    property bool pickingTrack: false
                     onClicked: {
-                        pickingChannel = true;
-                        channelPicker.associatedChannelIndex = patternOptionsRoot.associatedChannelIndex;
-                        channelPicker.open()
+                        pickingTrack = true;
+                        trackPicker.targetTrackIndex = patternOptionsRoot.targetTrackIndex;
+                        trackPicker.open()
                     }
                     Connections {
-                        target: channelPicker;
+                        target: trackPicker;
                         onVisibleChanged: {
-                            if (importToChannel.pickingChannel === true && channelPicker.visible === false && patternOptionsRoot.associatedChannelIndex !== channelPicker.associatedChannelIndex) {
-                                patternOptionsRoot.associatedChannelIndex = channelPicker.associatedChannelIndex;
-                                importToChannel.pickingChannel = false;
+                            if (importToTrack.pickingTrack === true && trackPicker.visible === false && patternOptionsRoot.targetTrackIndex !== trackPicker.targetTrackIndex) {
+                                patternOptionsRoot.targetTrackIndex = trackPicker.targetTrackIndex;
+                                importToTrack.pickingTrack = false;
                                 // TODO Should we maybe set the sound destination to whereever the channel is pointed if that's a thing already, or...?
                             }
                         }
                     }
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 1
+                    enabled: patternOptionsRoot.importPattern
+                    model: ["Slot a", "Slot b", "Slot c", "Slot d", "Slot e"]
+                    currentIndex: patternOptionsRoot.targetPartIndex
+                    onCurrentIndexChanged: {
+                        console.log(patternOptionsRoot.patternObject, patternOptionsRoot.targetPartIndex, currentIndex);
+                        if (currentIndex === -1) {
+                            patternOptionsRoot.targetPartIndex = currentIndex;
+                        }
+                    }
+                    popup.z: 1999999999
                 }
                 QQC2.CheckBox {
                     id: importSoundCheck
@@ -518,18 +494,18 @@ Item {
     }
 
     Zynthian.Popup {
-        id: channelPicker
+        id: trackPicker
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
         x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.8)
         z: 1999999999
-        property int associatedChannelIndex: -1
+        property int targetTrackIndex: -1
         ColumnLayout {
             anchors.fill: parent
             Kirigami.Heading {
                 Layout.fillWidth: true
-                text: qsTr("Pick Channel To Import Pattern Into")
+                text: qsTr("Pick Track To Import Pattern Into")
             }
             GridLayout {
                 Layout.fillHeight: true
@@ -539,15 +515,12 @@ Item {
                     model: zynqtgui.sketchpad.song.channelsModel
                     delegate: Zynthian.PlayGridButton {
                         Layout.fillWidth: true
-                        Layout.preferredWidth: channelPicker.width / 4
+                        Layout.preferredWidth: trackPicker.width / 4
                         Layout.fillHeight: true
-                        text: (channelPicker.associatedChannelIndex === model.id ? qsTr("Current") : "") + "\n\n" +
-                            (model.channel.connectedPattern > -1
-                                ? qsTr("Replace pattern on:\nChannel %1").arg(model.name)
-                                : qsTr("Import to:\nChannel %1").arg(model.name))
+                        text: qsTr("Import to:\nTrack %1").arg(model.name)
                         onClicked: {
-                            channelPicker.associatedChannelIndex = model.id
-                            channelPicker.close();
+                            trackPicker.targetTrackIndex = model.id
+                            trackPicker.close();
                         }
                     }
                 }
@@ -558,19 +531,13 @@ Item {
                     property QtObject backAction: Kirigami.Action {
                         text: "Back"
                         onTriggered: {
-                            channelPicker.close();
+                            trackPicker.close();
                         }
                     }
                     property list<QtObject> contextualActions: [
                         Kirigami.Action {},
                         Kirigami.Action {},
-                        Kirigami.Action {
-                            text: qsTr("Unassign")
-                            onTriggered: {
-                                channelPicker.associatedChannelIndex = -1
-                                channelPicker.close();
-                            }
-                        }
+                        Kirigami.Action {}
                     ]
                 }
             }

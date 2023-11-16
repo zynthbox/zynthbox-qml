@@ -79,7 +79,7 @@ ColumnLayout {
                     property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
                     visible: parent.visible && cppClipObject && cppClipObject.isPlaying
                     color: Kirigami.Theme.highlightColor
-                    width: Kirigami.Units.smallSpacing
+                    width: 1
                     x: cppClipObject ? cppClipObject.position * parent.width : 0
                 }
             }

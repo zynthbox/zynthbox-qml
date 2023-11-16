@@ -52,17 +52,17 @@ Zynthian.BasePlayGrid {
     persist: ["positionalVelocity"]
     additionalActions: [
         Kirigami.Action {
-            text: qsTr("Load Sequence or Pattern...")
+            text: qsTr("Load Pattern...")
             onTriggered: {
                 sequenceLoader.loadSequenceFromFile(_private.sequence.objectName);
             }
         },
-        Kirigami.Action {
-            text: qsTr("Export Sequence...")
-            onTriggered: {
-                sequenceLoader.saveSequenceToFile(_private.sequence.objectName);
-            }
-        },
+        // Kirigami.Action {
+        //     text: qsTr("Export Sequence...")
+        //     onTriggered: {
+        //         sequenceLoader.saveSequenceToFile(_private.sequence.objectName);
+        //     }
+        // },
         Kirigami.Action {
            text: qsTr("Export Current Pattern...")
            onTriggered: {
@@ -70,7 +70,7 @@ Zynthian.BasePlayGrid {
            }
         },
         Kirigami.Action {
-            text: qsTr("Get New Sequences...")
+            text: qsTr("Get New Patterns...")
             onTriggered: {
                 zynqtgui.show_modal("sequence_downloader")
             }

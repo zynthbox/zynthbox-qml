@@ -50,7 +50,7 @@ Zynthian.Dialog {
     property alias listCurrentIndex: filesListView.currentIndex
     property alias listCount: filesListView.count
     readonly property alias selectedFile: filesListView.selectedModelData
-    property var folderInfoStrings: {}
+    property var folderInfoStrings: ({})
 
     property var cuiaCallback: function (cuia) {
         var result = true;

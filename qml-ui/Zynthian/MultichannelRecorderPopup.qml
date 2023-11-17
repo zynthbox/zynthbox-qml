@@ -54,8 +54,8 @@ Zynthian.Popup {
                     }
                 }
             } else if (channel.channelAudioType === "sample-loop") {
-                for (var loopIndex = 0; loopIndex < 10; ++loopIndex) {
-                    if (channel.clipsModel.getClip(loopIndex).cppObjId > -1) {
+                for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
+                    if (channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
@@ -69,6 +69,10 @@ Zynthian.Popup {
                 }
             } else {
                 // Assume external channels shouldn't be recorded, as they are not going to make internal noises
+                if (channel.externalAudioSource.length > 0) {
+                    // ...except if they're set to listen to external audio
+                    shouldRecord = true;
+                }
             }
             Zynthbox.AudioLevels.setChannelToRecord(channelIndex, shouldRecord);
         }
@@ -146,7 +150,7 @@ Zynthian.Popup {
                     // Set the filenames for each channel (never mind whether they're being recorded or not, it doesn't hurt)
                     var date = new Date();
                     var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
-                    Zynthbox.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-");
+                    Zynthbox.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-" + song.name);
                     baseRecordingLocation = baseRecordingLocation + "/channel-";
                     for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                         var channel = _private.song.channelsModel.getChannel(channelIndex);
@@ -159,8 +163,8 @@ Zynthian.Popup {
                                 }
                             }
                         } else if (channel.channelAudioType === "sample-loop") {
-                            for (var loopIndex = 0; loopIndex < 10; ++loopIndex) {
-                                var clip = channel.clipsModel.getClip(loopIndex);
+                            for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
+                                var clip = channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                                 if (clip.cppObjId > -1) {
                                     // We pick the name of whatever the first loop is here, just so we've got one
                                     soundIndication = clip.path.split("/").pop();

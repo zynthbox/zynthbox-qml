@@ -52,9 +52,20 @@ Zynthian.Dialog {
     height: Kirigami.Units.gridUnit * 10
     parent: QQC2.Overlay.overlay
 
+    property var selectedButton: rejectButton
     property var cuiaCallback: function(cuia) {
         var result = component.opened;
         switch (cuia) {
+            case "KNOB3_DOWN":
+            case "NAVIGATE_LEFT":
+                component.selectedButton = rejectButton
+                result = true;
+                break;
+            case "KNOB3_UP":
+            case "NAVIGATE_RIGHT":
+                component.selectedButton = acceptButton
+                result = true;
+                break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
@@ -62,7 +73,7 @@ Zynthian.Dialog {
                 result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
-                component.accept();
+                component.selectedButton.clicked()
                 result = true;
                 break;
         }
@@ -79,24 +90,46 @@ Zynthian.Dialog {
         text: component.text
     }
     footer: RowLayout {
-        QQC2.Button {
+        PlayGridButton {
+            id: rejectButton
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignCenter
             text: component.rejectText
             visible: text !== ""
+            invertBorderColor: true
             onClicked: {
-                component.reject();
+                component.reject()
+            }
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -5
+                color: "transparent"
+                border.width: 2
+                border.color: Kirigami.Theme.textColor
+                opacity: component.selectedButton === rejectButton ? 0.7 : 0
             }
         }
-        QQC2.Button {
+        PlayGridButton {
+            id: acceptButton
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignCenter
             text: component.acceptText
             visible: text !== ""
+            invertBorderColor: true
             onClicked: {
-                component.accept();
+                component.accept()
+            }
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -5
+                color: "transparent"
+                border.width: 2
+                border.color: Kirigami.Theme.textColor
+                opacity: component.selectedButton === acceptButton ? 0.7 : 0
             }
         }
     }

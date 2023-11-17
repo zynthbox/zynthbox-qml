@@ -419,10 +419,14 @@ Item {
             property QtObject patternObject: model.pattern === undefined ? modelData : model.pattern
             property bool importPattern: patternObject.enabled
             property bool importSound: false
-            property int targetTrackIndex: zynqtgui.session_dashboard.selectedChannel
+            property int targetTrackIndex: -1
             property QtObject targetTrack: zynqtgui.sketchpad.song.channelsModel.getChannel(patternOptionsRoot.targetTrackIndex)
-            property int targetPartIndex: parent.singlePatternImport ? targetTrack.selectedPart : model.index
+            property int targetPartIndex: -1
             property var soundInfo: patternObject.layerData.length > 0 ? zynqtgui.layer.sound_metadata_from_json(patternObject.layerData) : [];
+            Component.onCompleted: {
+                targetTrackIndex = zynqtgui.session_dashboard.selectedChannel;
+                targetPartIndex = parent.singlePatternImport ? targetTrack.selectedPart : model.index;
+            }
             RowLayout {
                 Layout.fillWidth: true
                 QQC2.CheckBox {
@@ -471,7 +475,7 @@ Item {
                     currentIndex: patternOptionsRoot.targetPartIndex
                     onCurrentIndexChanged: {
                         console.log(patternOptionsRoot.patternObject, patternOptionsRoot.targetPartIndex, currentIndex);
-                        if (currentIndex === -1) {
+                        if (currentIndex > -1) {
                             patternOptionsRoot.targetPartIndex = currentIndex;
                         }
                     }

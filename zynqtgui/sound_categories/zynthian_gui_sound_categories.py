@@ -223,7 +223,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         self.loadSoundFromFile(sound.path)
 
     @Slot(int, str)
-    def loadChannelSoundFromJson(self, channelIndex, soundJson):
+    def loadChannelSoundFromJson(self, channelIndex, soundJson, run_autoconnect=False):
         tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".Ch{channelIndex+1}.sound", delete=False)
         sound_path = tempSoundJson.name
 
@@ -235,10 +235,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         finally:
             tempSoundJson.close()
 
-        self.loadSoundFromFile(sound_path, channelIndex)
+        self.loadSoundFromFile(sound_path, channelIndex, run_autoconnect)
 
     @Slot(str)
-    def loadSoundFromFile(self, filepath, channelIndex=-1):
+    def loadSoundFromFile(self, filepath, channelIndex=-1, run_autoconnect=False):
         def task():
             logging.debug(f"### Loading sound : {filepath}")
 
@@ -335,6 +335,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                     # If there are no sounds in curent channel, immediately do post removal task
                     post_removal_task()
 
+            if run_autoconnect:
+                self.zynqtgui.zynautoconnect()
             self.zynqtgui.end_long_task()
 
         self.zynqtgui.currentTaskMessage = "Loading sound"

@@ -1964,7 +1964,7 @@ class sketchpad_channel(QObject):
 
     @Slot(str, result=None)
     def setChannelSoundFromSnapshotJson(self, snapshot):
-        self.zynqtgui.sound_categories.loadChannelSoundFromJson(self.id, snapshot)
+        self.zynqtgui.sound_categories.loadChannelSoundFromJson(self.id, snapshot, True)
 
     @Slot(str)
     def setCurlayerByType(self, type):

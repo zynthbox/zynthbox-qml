@@ -228,6 +228,10 @@ Item {
             }
         }
         filesListView.delegate: Kirigami.BasicListItem {
+            // This function is required by cuiaCallback in FilePickerDialog to allow SWITCH_SELECT to work
+            function selectItem() {
+                sequenceFilePicker.filesListView.selectItem(model)
+            }
             width: ListView.view.width
             highlighted: ListView.isCurrentItem
             property bool isCurrentItem: ListView.isCurrentItem

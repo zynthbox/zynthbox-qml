@@ -25,6 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtMultimedia 5.15 as QMM
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.newstuff 1.0 as NewStuff
@@ -108,6 +109,10 @@ Zynthian.SelectorPage {
         id: newStuffModel
         engine: newStuffEngine
     }
+    QMM.Audio {
+        id: previewPlayer
+        autoLoad: false
+    }
     contextualActions: [
         Kirigami.Action {
             enabled: proxyView.currentItem && (proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DeletedStatus))
@@ -125,6 +130,21 @@ Zynthian.SelectorPage {
             text: proxyView.currentItem ? qsTr("Remove") : ""
             onTriggered: {
                 newStuffModel.uninstallItem(proxyView.currentIndex);
+            }
+        },
+        Kirigami.Action {
+            enabled: previewRunning || (proxyView.currentItem && proxyView.currentIndex > -1 && proxyView.currentItem.hasPreview)
+            text: previewRunning ? qsTr("Stop Preview") : (enabled ? qsTr("Play Preview") : "")
+            property bool previewRunning: previewPlayer.playbackState === QMM.Audio.PlayingState
+            onTriggered: {
+                if (previewRunning) {
+                    previewPlayer.stop();
+                } else {
+                    if (previewPlayer.source != proxyView.currentItem.previewUrl) {
+                        previewPlayer.source = proxyView.currentItem.previewUrl;
+                    }
+                    previewPlayer.play();
+                }
             }
         }
     ]
@@ -231,9 +251,21 @@ Zynthian.SelectorPage {
             property int status: model.status;
             property string name: model.name;
             property string summary: model.summary;
+            property string previewUrl
             // ...etc for the various roles. Would be nice if we could use the .index and .data functions
             // so we could just slap this info into the normal delegate, that way we wouldn't need this
             // proxy, but oh well, it's cheap enough, so...
+            property bool hasPreview: previewUrl.length > 0
+            Component.onCompleted: {
+                previewUrl = "";
+                for (let linkIndex = 0; linkIndex < model.downloadLinks.length; ++linkIndex) {
+                    let downloadLink = model.downloadLinks[linkIndex];
+                    if (downloadLink.descriptionLink.endsWith(".wav")) {
+                        previewUrl = downloadLink.descriptionLink;
+                        break;
+                    }
+                }
+            }
 
             // We're using this as our de-facto single-item view, so just make these the full size of the ListView
             width: ListView.view.width

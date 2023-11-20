@@ -29,6 +29,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import org.kde.plasma.components 3.0 as PlasmaComponents
+import "../pages"
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
@@ -122,6 +123,9 @@ Zynthian.Popup {
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: _private.recordingProgress === -1 ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
+    ExportedSongDetailsDialog {
+        id: exportedSongDetailsDialog
+    }
     ColumnLayout {
         implicitHeight: Kirigami.Units.gridUnit * 48
         implicitWidth: Kirigami.Units.gridUnit * 64
@@ -252,6 +256,12 @@ Zynthian.Popup {
                             }
                             _private.filePropertiesHelper.writeMetadata(filename, metadata);
                         }
+                    }
+                }
+                onIsRecordingChanged: {
+                    if (!_private.isRecording) {
+                        // Recording finished. Display recorded file details
+                        exportedSongDetailsDialog.open()
                     }
                 }
             }

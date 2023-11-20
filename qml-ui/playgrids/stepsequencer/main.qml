@@ -50,32 +50,32 @@ Zynthian.BasePlayGrid {
     }
     property bool isVisible: ["playgrid"].indexOf(zynqtgui.current_screen_id) >= 0
     persist: ["positionalVelocity"]
-    additionalActions: [
-        Kirigami.Action {
-            text: qsTr("Load Pattern...")
-            onTriggered: {
-                sequenceLoader.loadSequenceFromFile(_private.sequence.objectName);
-            }
-        },
-        // Kirigami.Action {
-        //     text: qsTr("Export Sequence...")
-        //     onTriggered: {
-        //         sequenceLoader.saveSequenceToFile(_private.sequence.objectName);
-        //     }
-        // },
-        Kirigami.Action {
-           text: qsTr("Export Current Pattern...")
-           onTriggered: {
-               sequenceLoader.savePatternToFile();
-           }
-        },
-        Kirigami.Action {
-            text: qsTr("Get New Patterns...")
-            onTriggered: {
-                zynqtgui.show_modal("sequence_downloader")
-            }
-        }
-    ]
+    // additionalActions: [
+    //     Kirigami.Action {
+    //         text: qsTr("Load Pattern...")
+    //         onTriggered: {
+    //             sequenceLoader.loadSequenceFromFile(_private.sequence.objectName);
+    //         }
+    //     },
+    //     // Kirigami.Action {
+    //     //     text: qsTr("Export Sequence...")
+    //     //     onTriggered: {
+    //     //         sequenceLoader.saveSequenceToFile(_private.sequence.objectName);
+    //     //     }
+    //     // },
+    //     Kirigami.Action {
+    //        text: qsTr("Export Current Pattern...")
+    //        onTriggered: {
+    //            sequenceLoader.savePatternToFile();
+    //        }
+    //     },
+    //     Kirigami.Action {
+    //         text: qsTr("Get New Patterns...")
+    //         onTriggered: {
+    //             zynqtgui.show_modal("sequence_downloader")
+    //         }
+    //     }
+    // ]
 
     property bool ignoreNextBack: false
     cuiaCallback: function(cuia) {
@@ -94,9 +94,9 @@ Zynthian.BasePlayGrid {
         }
         var returnValue = false;
 
-        if (sequenceLoader.opened) {
-            returnValue = sequenceLoader.cuiaCallback(cuia);
-        }
+        // if (sequenceLoader.opened) {
+        //     returnValue = sequenceLoader.cuiaCallback(cuia);
+        // }
 
         if (returnValue === false) {
             var channelDelta = zynqtgui.channelsModActive ? 5 : 0
@@ -652,9 +652,9 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    Zynthian.SequenceLoader {
-        id: sequenceLoader
-    }
+    // Zynthian.SequenceLoader {
+    //     id: sequenceLoader
+    // }
 
     // Drum Grid Component
     Component {

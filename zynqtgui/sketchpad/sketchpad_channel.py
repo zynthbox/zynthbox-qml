@@ -93,6 +93,12 @@ class sketchpad_channel(QObject):
         self.channel_audio_type_changed.connect(self.handleAudioTypeSettingsChanged)
         self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots)
         self.chainedFxChanged.connect(self.clearFxPassthroughForEmtpySlots)
+        self.zynaddsubfx_midi_output = None
+        self.zynaddsubfx_midi_input = None
+        self.zynaddubfx_heuristic_connect_timer = QTimer(self)
+        self.zynaddubfx_heuristic_connect_timer.setSingleShot(True)
+        self.zynaddubfx_heuristic_connect_timer.setInterval(2000)
+        self.zynaddubfx_heuristic_connect_timer.timeout.connect(self.zynaddubfx_heuristic_connect)
 
         self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
@@ -1118,6 +1124,33 @@ class sketchpad_channel(QObject):
         logging.debug(f"Setting Audio Type : {type}, {self.__channel_audio_type__}")
 
         if force_set or type != self.__channel_audio_type__:
+            # Heuristic to fix a problem with ZynAddSubFX :
+            # While switching channel_audio_type for a couple of times, ZynAddSubFX goes completely berserk
+            # and causes jack to become unresponsive and hence causing everything to go out-of-order
+            # Testing suggests ZynAddSubFX does not like handling midi events it does not quite know about.
+            # During testing it was noticed that if ZynAddSubFX was disconnected before changing channel_audio_type
+            # and reconnected on complete it does not cause the aforementioned issue. Hence make sure to
+            # do the disconnect-connect dance when changing channel_audio_type only to the ZynAddSubFX synth if the
+            # track has one
+            self.zynaddsubfx_midi_input = None
+            self.zynaddsubfx_midi_output = None
+            for midichannel in self.chainedSounds:
+                if midichannel >= 0 and self.checkIfLayerExists(midichannel):
+                    engine = self.zynqtgui.layer.layer_midi_map[midichannel].engine
+                    if engine.name == "ZynAddSubFX":
+                        try:
+                            self.zynaddsubfx_midi_input = sketchpad_channel.jclient.get_ports(engine.jackname, is_input=True, is_midi=True)[0]
+                            self.zynaddsubfx_midi_output = f"ZLRouter:Zynthian-Channel{midichannel}"
+                        except:
+                            self.zynaddsubfx_midi_input = None
+                            self.zynaddsubfx_midi_output = None
+                        break
+            if self.zynaddsubfx_midi_output is not None and self.zynaddsubfx_midi_input is not None:
+                logging.debug(f"ZynAddSubFX Heuristic : Disconnect {self.zynaddsubfx_midi_output} {self.zynaddsubfx_midi_input}")
+                try:
+                    sketchpad_channel.jclient.disconnect(self.zynaddsubfx_midi_output, self.zynaddsubfx_midi_input)
+                except: pass
+
             self.__channel_audio_type__ = type
             self.channel_audio_type_changed.emit()
 
@@ -1137,6 +1170,14 @@ class sketchpad_channel(QObject):
             if force_set == False:
                 self.__song__.schedule_save()
             self.update_jack_port()
+            self.zynaddubfx_heuristic_connect_timer.start()
+
+    def zynaddubfx_heuristic_connect(self):
+        if self.zynaddsubfx_midi_output is not None and self.zynaddsubfx_midi_input is not None:
+            logging.debug(f"ZynAddSubFX Heuristic : Connect {self.zynaddsubfx_midi_output} {self.zynaddsubfx_midi_input}")
+            try:
+                sketchpad_channel.jclient.connect(self.zynaddsubfx_midi_output, self.zynaddsubfx_midi_input)
+            except: pass
 
     channel_audio_type_changed = Signal()
 

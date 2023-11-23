@@ -133,6 +133,7 @@ Zynthian.SelectorPage {
             }
         },
         Kirigami.Action {
+            id: previewAction
             enabled: previewRunning || (proxyView.currentItem && proxyView.currentIndex > -1 && proxyView.currentItem.hasPreview)
             text: previewRunning ? qsTr("Stop Preview") : (enabled ? qsTr("Play Preview") : "")
             property bool previewRunning: previewPlayer.playbackState === QMM.Audio.PlayingState
@@ -323,6 +324,30 @@ Zynthian.SelectorPage {
                                 height: Kirigami.Units.iconSizes.smallMedium;
                                 width: height;
                                 source: "vcs-normal";
+                            }
+                        }
+                        Rectangle {
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.bottom
+                            }
+                            height: Kirigami.Units.largeSpacing
+                            visible: previewAction.previewRunning && previewPlayer.duration > 0
+                            color: "white"
+                            Rectangle {
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    right: parent.right
+                                    margins: 1
+                                }
+                                width: previewPlayer.duration > 0 ? (parent.width * previewPlayer.position / previewPlayer.duration) - 2 : 0
+                                color: "white"
+                                border {
+                                    width: 1
+                                    color: "black"
+                                }
                             }
                         }
                     }

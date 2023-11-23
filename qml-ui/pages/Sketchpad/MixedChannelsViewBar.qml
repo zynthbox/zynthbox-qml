@@ -508,7 +508,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: ["synth", "sample-trig", "sample-slice", "sample-loop"].indexOf(root.selectedChannel.channelAudioType) >= 0
+                                        visible: ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
                                         QQC2.Label {
                                             Layout.fillHeight: true
                                             text: qsTr("Routing")

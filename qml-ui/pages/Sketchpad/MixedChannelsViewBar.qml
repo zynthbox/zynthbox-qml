@@ -182,16 +182,23 @@ Rectangle {
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
                     let slotMax = 4;
+                    let fxSlotMax = 4;
                     if (root.selectedChannel.channelAudioType === "external") {
                         slotMax = 1;
                     } else if (root.selectedChannel.channelAudioType === "sample-slice") {
                         slotMax = 0;
+                    } else if (root.selectedChannel.channelAudioType === "sample-loop") {
+                        fxSlotMax = -1;
                     }
-                    let fxSlotMax = 4;
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (zynqtgui.sketchpad.lastSelectedObj.value === slotMax) {
-                            // if we're on the last slot, select the first fx slot
-                            fxRepeater.itemAt(0).switchToThisSlot(true);
+                            if (fxSlotMax > -1) {
+                                // if we're on the last slot, select the first fx slot
+                                fxRepeater.itemAt(0).switchToThisSlot(true);
+                            } else {
+                                // If we're not showing the fx row, select the first synth slot
+                                synthRepeater.itemAt(0).switchToThisSlot(true);
+                            }
                         } else {
                             // otherwise select the next slot
                             synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
@@ -215,16 +222,22 @@ Rectangle {
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
                     let slotMax = 4;
+                    let fxSlotMax = 4;
                     if (root.selectedChannel.channelAudioType === "external") {
                         slotMax = 1;
                     } else if (root.selectedChannel.channelAudioType === "sample-slice") {
                         slotMax = 0;
+                    } else if (root.selectedChannel.channelAudioType === "sample-loop") {
+                        fxSlotMax = -1;
                     }
-                    let fxSlotMax = 4;
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
-                            // if we're on the first slot, select the last fx slot
-                            fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
+                            if (fxSlotMax > -1) {
+                                // if we're on the first slot, select the last fx slot
+                                fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
+                            } else {
+                                synthRepeater.itemAt(slotMax).switchToThisSlot(true);
+                            }
                         } else {
                             // otherwise select the previous slot
                             synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
@@ -238,8 +251,13 @@ Rectangle {
                             fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
                         }
                     } else {
-                        // select the last fx
-                        fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
+                        if (fxSlotMax > -1) {
+                            // select the last fx
+                            fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
+                        } else {
+                            // if we're not using the fx row, select the last synth slot
+                            synthRepeater.itemAt(slotMax).switchToThisSlot(true);
+                        }
                     }
                     returnValue = true;
                 }
@@ -898,6 +916,10 @@ Rectangle {
                                             }
                                             root.selectedChannel.setCurlayerByType("fx")
                                         }
+                                        // Show fx slots for all modes except sketch
+                                        enabled: root.selectedChannel.channelAudioType !== "sample-loop"
+                                        opacity: enabled ? 1 : 0
+                                        visible: enabled
 
                                         Rectangle {
                                             anchors.fill: parent

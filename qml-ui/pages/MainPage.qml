@@ -238,7 +238,7 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            text: qsTr("Get New Modules")
+            text: qsTr("Get New Apps")
             onTriggered: zynqtgui.show_modal("module_downloader")
         },
         Kirigami.Action {

@@ -151,8 +151,8 @@ Zynthian.SelectorPage {
             }
         },
         Kirigami.Action {
-            enabled: component.showUseThis && (proxyView.currentIem && proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus))
-            text: component.useThisLabel
+            enabled: component.showUseThis && (proxyView.currentItem && proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus))
+            text: enabled ? component.useThisLabel : ""
             onTriggered: {
                 component.useThis(proxyView.currentItem.installedFiles);
             }

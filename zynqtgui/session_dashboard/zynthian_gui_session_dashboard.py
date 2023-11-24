@@ -53,10 +53,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         super(zynthian_gui_session_dashboard, self).__init__('Session', parent)
         logging.info(f"Initializing Session Dashboard")
         self.__sessionStartTime = datetime.now()
-        self.__sessions_base_dir__ = Path("/zynthian/zynthian-my-data/sessions/")
+        self.__sessions_base_dir__ = Path("/zynthian/zynthian-my-data/")
         self.__save_timer__ = QTimer(self)
         self.__session_sketchpads_model__ = session_dashboard_session_sketchpads_model(self)
-        self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
+        self.__cache_json_path__ = self.__sessions_base_dir__ / ".session-cache.json"
         self.__visible_channels_start__ = 0
         self.__visible_channels_end__ = 5
         self.__last_selected_sketchpad__ = None

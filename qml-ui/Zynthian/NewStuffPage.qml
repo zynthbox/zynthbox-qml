@@ -59,13 +59,31 @@ Zynthian.SelectorPage {
         return false;
     }
     /**
-     * The configuration file path - this requires the full path, which usually means
-     * something like the following, if the file is in the same directory as the calling
-     * component:
+     * \brief The configuration file path
+     * This requires the full path, which usually means something like the following, if
+     * the file is in the same directory as the calling component:
      * Qt.resolvedUrl("zynqtgui-themes.knsrc").toString().slice(7)
      * (that is, we need it fully resolved, but not as a url, so without the file:// part)
      */
     property string configFile
+    /**
+     * \brief Shows the Use This button for installed entries
+     * When clicked, the useThis signal will be fired
+     * To use a different string on the button, set useThisLabel to something else
+     */
+    property bool showUseThis: false
+    /**
+     * \brief The label for the Use This button
+     */
+    property string useThisLabel: qsTr("Use This")
+    /**
+     * \brief Signal fired to say something should be done with the list of files
+     * The parameter installedFiles forwards the list of files for a newstuff entry,
+     * and contains all the installed files from that entry.
+     * You likely also want to go back from the page upon performing the action,
+     * which can be done by calling zynqtgui.callable_ui_action("SWITCH_BACK_SHORT")
+     */
+    signal useThis(var installedFiles);
 
     Component.onCompleted: {
         selector.newstuff_model = newStuffModel;
@@ -133,19 +151,10 @@ Zynthian.SelectorPage {
             }
         },
         Kirigami.Action {
-            id: previewAction
-            enabled: previewRunning || (proxyView.currentItem && proxyView.currentIndex > -1 && proxyView.currentItem.hasPreview)
-            text: previewRunning ? qsTr("Stop Preview") : (enabled ? qsTr("Play Preview") : "")
-            property bool previewRunning: previewPlayer.playbackState === QMM.Audio.PlayingState
+            enabled: component.showUseThis && (proxyView.currentIem && proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus))
+            text: component.useThisLabel
             onTriggered: {
-                if (previewRunning) {
-                    previewPlayer.stop();
-                } else {
-                    if (previewPlayer.source != proxyView.currentItem.previewUrl) {
-                        previewPlayer.source = proxyView.currentItem.previewUrl;
-                    }
-                    previewPlayer.play();
-                }
+                component.useThis(proxyView.currentItem.installedFiles);
             }
         }
     ]
@@ -249,9 +258,11 @@ Zynthian.SelectorPage {
             positionViewAtIndex(currentIndex, ListView.Beginning);
         }
         delegate: Item {
+            id: proxyViewDelegate
             property int status: model.status;
             property string name: model.name;
             property string summary: model.summary;
+            property var installedFiles: model.installedFiles;
             property string previewUrl
             // ...etc for the various roles. Would be nice if we could use the .index and .data functions
             // so we could just slap this info into the normal delegate, that way we wouldn't need this
@@ -326,27 +337,57 @@ Zynthian.SelectorPage {
                                 source: "vcs-normal";
                             }
                         }
-                        Rectangle {
+                        RowLayout {
+                            visible: proxyViewDelegate.hasPreview
                             anchors {
                                 left: parent.left
                                 right: parent.right
                                 bottom: parent.bottom
                             }
-                            height: Kirigami.Units.largeSpacing
-                            visible: previewAction.previewRunning && previewPlayer.duration > 0
-                            color: "white"
-                            Rectangle {
-                                anchors {
-                                    top: parent.top
-                                    left: parent.left
-                                    right: parent.right
-                                    margins: 1
+                            height: Kirigami.Units.iconSizes.medium
+                            Kirigami.Icon {
+                                Layout.fillHeight: true
+                                Layout.minimumWidth: height
+                                Layout.maximumWidth: height
+                                source: previewPlayer.source == proxyViewDelegate.previewUrl && previewPlayer.playbackState === QMM.Audio.PlayingState ? "media-playback-stop" : "media-playback-start"
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (previewPlayer.source == proxyViewDelegate.previewUrl && previewPlayer.playbackState === QMM.Audio.PlayingState) {
+                                            previewPlayer.stop();
+                                        } else {
+                                            if (previewPlayer.source != proxyViewDelegate.previewUrl) {
+                                                previewPlayer.stop();
+                                                previewPlayer.source = proxyViewDelegate.previewUrl;
+                                            }
+                                            previewPlayer.play();
+                                        }
+                                    }
                                 }
-                                width: previewPlayer.duration > 0 ? (parent.width * previewPlayer.position / previewPlayer.duration) - 2 : 0
-                                color: "white"
-                                border {
-                                    width: 1
-                                    color: "black"
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                Rectangle {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width
+                                    height: Kirigami.Units.largeSpacing
+                                    visible: previewPlayer.playbackState === QMM.Audio.PlayingState && previewPlayer.duration > 0
+                                    color: "white"
+                                    Rectangle {
+                                        anchors {
+                                            top: parent.top
+                                            left: parent.left
+                                            right: parent.right
+                                            margins: 1
+                                        }
+                                        width: previewPlayer.duration > 0 ? (parent.width * previewPlayer.position / previewPlayer.duration) - 2 : 0
+                                        color: "white"
+                                        border {
+                                            width: 1
+                                            color: "black"
+                                        }
+                                    }
                                 }
                             }
                         }

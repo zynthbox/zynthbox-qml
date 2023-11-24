@@ -567,6 +567,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             return f"{name}-{counter}"
 
+    @Slot(str)
+    def newSketchpadFromFolder(self, sketchpadFolder):
+        justTheFiles = [f for f in os.listdir(sketchpadFolder) if os.path.isfile(os.path.join(sketchpadFolder, f))]
+        for aFile in justTheFiles:
+            if aFile.endswith(".sketchpad.json"):
+                self.newSketchpad(os.path.join(sketchpadFolder, aFile))
+                break
+
     @Slot(None)
     def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True, force=False):
         def task():

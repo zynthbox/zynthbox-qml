@@ -2192,11 +2192,11 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     text: _private.sequence
                         ? _private.sequence.soloPatternObject
-                            ? "Chan" + (_private.sequence.soloPatternObject.channelIndex + 1) + "\n"
+                            ? "Track" + (_private.sequence.soloPatternObject.channelIndex + 1) + "\n"
                                 + "SOLO\n"
                                 + (_private.sequence.soloPatternObject.channelIndex + 1) + _private.sequence.soloPatternObject.partName
                             : _private.activePatternModel
-                                ? "Chan" + (_private.activePatternModel.channelIndex + 1) + "\n"
+                                ? "Track" + (_private.activePatternModel.channelIndex + 1) + "\n"
                                     + "Clip"
                                     + (_private.activePatternModel.channelIndex + 1) + _private.activePatternModel.partName
                                 : "(no\npat\ntern)"

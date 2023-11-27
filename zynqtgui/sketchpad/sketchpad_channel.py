@@ -1860,9 +1860,10 @@ class sketchpad_channel(QObject):
             channels = []
             if midichannel >= 0 and self.checkIfLayerExists(midichannel):
                 engine = self.zynqtgui.layer.layer_midi_map[midichannel].engine
-                if engine.nickname.split("/")[0] == "ZY":
+                engine_nickname = engine.nickname.split("/")[0]
+                if engine_nickname in ["ZY", "BF"]:
                     # ZynAddSubFX engine does not support notes from multiple channels. It only accepts notes from the midi channel it is assigned
-                    channels = [midichannel]
+                    channels = [layer.midi_chan for layer in engine.layers]
                 else:
                     # Other engines accepts notes from any midi channel
                     channels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]

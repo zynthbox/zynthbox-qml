@@ -105,7 +105,7 @@ Zynthian.ScreenPage {
                     currentValue: fxPassthroughClient.dryWetMixAmount,
                     startLabel: " ",
                     stopLabel: " ",
-                    valueLabel: qsTr("%1% Wet / %2% Dry").arg((Math.min(1.0, fxPassthroughClient.dryWetMixAmount)*100).toFixed(0)).arg((Math.min(1, 2-fxPassthroughClient.dryWetMixAmount)*100).toFixed(0)),
+                    valueLabel: qsTr("%1% Dry / %2% Wet").arg((Math.min(1, 2-fxPassthroughClient.dryWetMixAmount)*100).toFixed(0)).arg((Math.min(1.0, fxPassthroughClient.dryWetMixAmount)*100).toFixed(0)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -984,7 +984,7 @@ Zynthian.ScreenPage {
 //                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         text: root.showOccupiedSlotsHeader
                                 ? qsTr("Inputs")
-                                : qsTr("Outputs")
+                                : qsTr("Track State")
                         onPressed: {
 //                            root.displayTrackButtons = !root.displayTrackButtons
 //                            bottomStack.slotsBar.channelButton.checked = true

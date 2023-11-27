@@ -990,7 +990,9 @@ class sketchpad_clip(QObject):
     def get_metadataBPM(self):
         try:
             if self.audio_metadata is not None:
-                return int(self.audio_metadata["ZYNTHBOX_BPM"][0])
+                # Sometimes bpm is stored as float like 120.0 which is causing int() to throw an exception
+                # So first convert it to float and then to int to avoid the problem
+                return int(float(self.audio_metadata["ZYNTHBOX_BPM"][0]))
         except Exception as e:
             logging.debug(f"Error retrieving from metadata : {str(e)}")
 

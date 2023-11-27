@@ -78,7 +78,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         if self.visibleCategory == "modules":
             # Main Apps
-            self.list_data.append((self.sketchpad, 0, "Sketchpad"))
+            self.list_data.append((self.sketchpad, 0, "Clips"))
             self.list_metadata.append({"icon":"../../img/clipsview.svg"})
 
             self.list_data.append((self.playgrid, 0, "Playground"))

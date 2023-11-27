@@ -1178,6 +1178,9 @@ class zynthian_gui(QObject):
         # Initialize OSC
         self.osc_init()
 
+        # Initialize midi config
+        self.init_midi()
+
         ###
         # Initial snapshot loading needs to be done here before starting the threads in below this block
         # Not loading the snapshots here causes a crash. It is not yet known where and why the crash happens.

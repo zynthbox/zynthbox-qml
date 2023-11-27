@@ -254,7 +254,7 @@ class zynthian_engine_setbfree(zynthian_engine):
     def set_bank(self, layer, bank):
         if not self.manuals_config:
             self.manuals_config = bank
-            self.layers[0].load_bank_list()
+            self.layers[0].load_bank_list(force=True)
             self.layers[0].reset_bank()
             return False
 
@@ -268,7 +268,7 @@ class zynthian_engine_setbfree(zynthian_engine):
             logging.info("Upper Layer in chan {}".format(midi_chans[0]))
             i = 0
             self.layers[i].bank_name = "Upper"
-            self.layers[i].load_bank_list()
+            self.layers[i].load_bank_list(force=True)
             self.layers[i].set_bank(0)
 
             # Extra layers
@@ -280,7 +280,7 @@ class zynthian_engine_setbfree(zynthian_engine):
                         logging.info("Lower Manual Layer in chan {}".format(midi_chans[1]))
                         self.zynqtgui.screens['layer'].add_layer_midich(midi_chans[1], False)
                         self.layers[i].bank_name = "Lower"
-                        self.layers[i].load_bank_list()
+                        self.layers[i].load_bank_list(force=True)
                         self.layers[i].set_bank(0)
 
                     except Exception as e:
@@ -297,7 +297,7 @@ class zynthian_engine_setbfree(zynthian_engine):
                         logging.info("Pedal Layer in chan {}".format(midi_chans[2]))
                         self.zynqtgui.screens['layer'].add_layer_midich(midi_chans[2], False)
                         self.layers[i].bank_name = "Pedals"
-                        self.layers[i].load_bank_list()
+                        self.layers[i].load_bank_list(force=True)
                         self.layers[i].set_bank(0)
 
                     except Exception as e:

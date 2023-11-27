@@ -156,7 +156,7 @@ Zynthian.Popup {
                             // - song mode to set playback on for the first segment
                             // - the first events from that segment to be submitted for playback
                             // - the note actually hitting the synth and making noises
-                            let waitForStart = 4;
+                            let waitForStart = 0;
                             Zynthbox.AudioLevels.scheduleStartRecording(waitForStart);
                             // Schedule us to start midi recording at the same point
                             Zynthbox.MidiRecorder.scheduleStartRecording(waitForStart, _private.selectedChannel.id);

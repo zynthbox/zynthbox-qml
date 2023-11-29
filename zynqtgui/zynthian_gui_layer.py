@@ -434,14 +434,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
         if eng=='MD':
             self.add_layer_midich(None)
 
-        elif eng=='AE':
-            self.add_layer_midich(0, False)
-            self.add_layer_midich(1, False)
-            self.add_layer_midich(2, False)
-            self.add_layer_midich(3, False)
-            self.fill_list()
-            self.index=len(self.layers)-4
-            self.layer_control()
+#        elif eng=='AE':
+#            self.add_layer_midich(0, False)
+#            self.add_layer_midich(1, False)
+#            self.add_layer_midich(2, False)
+#            self.add_layer_midich(3, False)
+#            self.fill_list()
+#            self.index=len(self.layers)-4
+#            self.layer_control()
 
 #        elif midi_chan is None:
 #            self.replace_layer_index=None
@@ -562,7 +562,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
             if not self.zynqtgui.screens['bank'].get_show_top_sounds():
                 self.zynqtgui.screens['bank'].select_action(0)
 
-            layer.set_preset(0)
+            try:
+                layer.set_preset(0)
+            except Exception as e:
+                logging.exception(f"Error while trying to set preset to 0 when creating engine : {e}")
 
             def emit_names_changed():
                 self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()

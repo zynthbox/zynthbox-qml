@@ -62,7 +62,7 @@ def customSort(item1, item2):
 class zynthian_gui_engine(zynthian_gui_selector):
 
     single_layer_engines = ["BF", "MD", "PT", "PD", "AE", "CS"]
-    check_channels_engines = ["AE"]
+    check_channels_engines = []
 
     @classmethod
     def init_engine_info(cls):

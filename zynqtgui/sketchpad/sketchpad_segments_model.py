@@ -23,6 +23,7 @@
 #
 # ******************************************************************************
 import logging
+import math
 
 from PySide2.QtCore import QAbstractListModel, QObject, Qt, QTimer, Property, Signal, Slot
 from zynqtgui import zynthian_gui_config
@@ -119,12 +120,93 @@ class sketchpad_segments_model(QAbstractListModel):
         if segment_index == -1:
             segment_index = len(self.__segments)
         newSegment = sketchpad_segment(self.__sketch, self, self.__song)
+        newSegment.barLengthChanged.connect(self.totalBeatDurationThrottle.start)
+        newSegment.beatLengthChanged.connect(self.totalBeatDurationThrottle.start)
         self.__segments.insert(segment_index, newSegment)
         self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()
         if not self.__song.isLoading:
             self.__song.schedule_save()
         return newSegment
+
+    # Ensure that a position given in beats exists (that is, that a segment exists which stops at that position)
+    # The return value is the index of the position of the segment which stops at the given position
+    # Note that if the given split position is 0 (that is, the start of the song), the returned index is -1
+    # This may well seem reasonable when explained (any segment at position 0 would almost certainly not stop
+    # at position 0), but it seems reasonable to make explicit.
+    @Slot(float, result=int)
+    def ensure_split(self, splitPosition):
+        positionEnsured = False
+        segmentIndex = -1
+        logging.error(f"Checking for split position {splitPosition}")
+        if splitPosition == 0:
+            # logging.error("This is position zero, that'll always exist")
+            positionEnsured = True
+        else:
+            totalPosition = 0
+            for segment in self.__segments:
+                segmentIndex = segmentIndex + 1
+                # logging.error(f"Checking position {segmentIndex}")
+                segmentLength = (segment.barLength * 4) + segment.beatLength
+                if totalPosition + segmentLength == splitPosition:
+                    # logging.error(f"Position already exists, great!")
+                    # This is the best possible case - then the position already exists
+                    positionEnsured = True
+                    break
+                elif totalPosition + segmentLength > splitPosition:
+                    # The least best case - we need to split a segment into two
+                    # First create the new segment, and give it a length far enough back that it starts at the position we want the split to be at
+                    newSegmentLength = (totalPosition + segmentLength) - splitPosition
+                    newSegmentBarLength = math.floor(newSegmentLength / 4)
+                    newSegmentBeatLength = newSegmentLength - (newSegmentBarLength * 4)
+                    newSegment = self.new_segment(segmentIndex + 1)
+                    newSegment.barLength = newSegmentBarLength
+                    newSegment.beatLength = newSegmentBeatLength
+                    # Also ensure that the new segment has all the same clips the one we're splitting had
+                    newSegment.clear_clips()
+                    for clip in segment.clips.copy():
+                        newSegment.addClip(clip)
+                    # Now adjust the existing segment so that the new segment ends up stopping where the old one used to, and the old one stops at our split position
+                    oldSegmentLength = segmentLength - newSegmentLength
+                    oldSegmentBarLength = math.floor(oldSegmentLength / 4)
+                    oldSegmentBeatLength = oldSegmentLength - (oldSegmentBarLength * 4)
+                    segment.barLength = oldSegmentBarLength
+                    segment.beatLength = oldSegmentBeatLength
+                    positionEnsured = True
+                    logging.error(f"The position exists inside the current segment which ends at {totalPosition + segmentLength}, split that segment in two segments with durations {oldSegmentLength} and {newSegmentLength}")
+                    break
+                totalPosition = totalPosition + segmentLength
+            if positionEnsured == False:
+                # logging.error("This position is further ahead than the end of the last position, so create a new segment and set the duration as expected")
+                # In case we reached this position, we will need to add a new segment at the end, and
+                # set its end point to the position we need, so the position exists as a stop
+                newSegmentLength = splitPosition - totalPosition
+                newSegmentBarLength = math.floor(newSegmentLength / 4)
+                newSegmentBeatLength = newSegmentLength - (newSegmentBarLength * 4)
+                newSegment = self.new_segment();
+                newSegment.barLength = newSegmentBarLength
+                newSegment.beatLength = newSegmentBeatLength
+                segmentIndex = segmentIndex + 1
+                positionEnsured = True
+        totalPosition = 0;
+        for segment in self.__segments:
+            logging.error(f"segment {segment} at position {totalPosition} has duration {(segment.barLength * 4) + segment.beatLength} beats, with {len(segment.clips)} clips")
+            totalPosition = totalPosition + (segment.barLength * 4) + segment.beatLength
+        logging.error(f"Final segment ends at {totalPosition}")
+        return segmentIndex
+
+    # Position a clip to be played from start_position until end_position (as given in beats), creating any splits as required to make that possible
+    @Slot(QObject, float, float)
+    def insert_clip(self, clip, start_position, end_position):
+        # Firstly, make sure that there are at least splits to work with
+        firstSegmentIndex = self.ensure_split(start_position) + 1
+        lastSegmentIndex = self.ensure_split(end_position)
+        logging.error(f"Insert clip into segments from {firstSegmentIndex} to {lastSegmentIndex} inclusive given start and end positions of {start_position} and {end_position}")
+        # Then add the clip to all segments in the now-known range
+        for segmentIndex in range(firstSegmentIndex, lastSegmentIndex + 1):
+            logging.error(f"Adding clip to segment {segmentIndex}")
+            segment = self.__segments[segmentIndex]
+            segment.addClip(clip)
 
     # Removes the given segment from the list of segments
     # Returns the segment which was removed from the list

@@ -175,6 +175,8 @@ Zynthian.Popup {
                                     soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
                                     if (soundIndication.endsWith(".clip")) {
                                         soundIndication = soundIndication.substring(0, soundIndication.length - 5);
+                                    } else if (soundIndication.endsWith(".sketch")) {
+                                        soundIndication = soundIndication.substring(0, soundIndication.length - 7);
                                     }
                                     break;
                                 }
@@ -188,6 +190,8 @@ Zynthian.Popup {
                                     soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
                                     if (soundIndication.endsWith(".clip")) {
                                         soundIndication = soundIndication.substring(0, soundIndication.length - 5);
+                                    } else if (soundIndication.endsWith(".sketch")) {
+                                        soundIndication = soundIndication.substring(0, soundIndication.length - 7);
                                     }
                                     break;
                                 }

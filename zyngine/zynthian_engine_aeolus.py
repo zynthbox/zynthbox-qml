@@ -178,6 +178,8 @@ class zynthian_engine_aeolus(zynthian_engine):
         self.options['midi_chan']=False
         self.options['drop_pc']=True
 
+        self.selected_instrument = 0
+
         if self.config_remote_display():
             self.proc_start_sleep = 3
             self.command_prompt = None
@@ -282,6 +284,24 @@ class zynthian_engine_aeolus(zynthian_engine):
         for manual in cls.instrument:
             chans.append(manual['chan'])
         return chans
+
+    def set_selected_instrument(self, instrument):
+        # Selected instrument can be 0 to 3 inclusive
+        if 0 <= instrument <= 3:
+            self.selected_instrument = instrument
+
+            # Inform others that controls and acceptedChannels changed as selected instrument got changed
+            try:
+                self.layers[0].refresh_controllers()
+                self.zynqtgui.control.fill_list()
+                for sketchpad_channel_id in range(10):
+                    channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(sketchpad_channel_id)
+                    if self.layers[0].midi_chan in channel.chainedSounds:
+                        channel.chainedSoundsAcceptedChannelsChanged.emit()
+            except Exception as e:
+                logging.exception(f"Error trying set selected instrument of Aeolus engine : {e}")
+        else:
+            logging.error("Cannot change to instrument outside range 0 <= instrument <= 3")
 
     #----------------------------------------------------------------------------
     # Bank Managament
@@ -409,7 +429,7 @@ class zynthian_engine_aeolus(zynthian_engine):
     def get_controllers_dict(self, layer):
         #Find ctrl list for layer's group
         for group in self.instrument:
-            if group['chan']==layer.midi_chan:
+            if group['chan']==self.selected_instrument:
                 self._ctrls=group['ctrls']
                 self._ctrl_screens=group['ctrl_screens']
                 return super().get_controllers_dict(layer)

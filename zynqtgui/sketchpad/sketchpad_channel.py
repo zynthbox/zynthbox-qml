@@ -1865,7 +1865,12 @@ class sketchpad_channel(QObject):
                 # The following engines does not support notes from multiple channels. It only accepts notes from the midi channel it is assigned
                 non_mpe_engines = ["ZY", "BF", "AE"]
                 if engine_nickname in non_mpe_engines:
-                    channels = [layer.midi_chan for layer in engine.layers]
+                    if engine_nickname == "AE":
+                        # Aeolus engine has 4 instruments and accepts notes only on those channels 0 to 3 inclusive
+                        # So set accepted channel to selected instrument
+                        channels = [engine.selected_instrument]
+                    else:
+                        channels = [layer.midi_chan for layer in engine.layers]
                 else:
                     # Other engines accepts notes from any midi channel
                     channels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]

@@ -369,7 +369,7 @@ class sketchpad_song(QObject):
         # logging.error(clip)
         return clip
 
-    @Slot(int, int, result=QObject)
+    @Slot(int, int, int, result=QObject)
     def getClipByPart(self, channel: int, sketchpad: int, part: int):
         # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
         if channel >= self.__channels_model__.count:

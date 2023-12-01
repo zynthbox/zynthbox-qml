@@ -37,8 +37,20 @@ Zynthian.Popup {
     id: root
     function bounce(trackName, channel, partIndex) {
         _private.trackName = trackName;
-        _private.selectedChannel = channel;
-        _private.partIndex = partIndex;
+        if (channel === null) {
+            _private.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+        } else {
+            _private.selectedChannel = channel;
+        }
+        _private.selectedPartIndex = partIndex;
+        if (_private.selectedPartIndex > -1) {
+            _private.bounceLevel = 2;
+        } else {
+            _private.selectedPartIndex = _private.selectedChannel.selectedPart;
+            _private.bounceLevel = 1;
+        }
+        _private.sequence = Zynthbox.PlayGridManager.getSequenceModel(_private.trackName);
+        _private.checkCanBounceTimer.restart();
         open();
     }
 
@@ -72,106 +84,285 @@ Zynthian.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Bounce To Audio"
+            text: "Bounce To Sketch"
  
             QtObject {
                 id: _private
                 property string trackName
                 property QtObject selectedChannel
-                property int partIndex
+                property int selectedPartIndex
                 property double bounceProgress: -1
 
                 property QtObject sequence: null
                 property QtObject pattern: null
-                property int previousSolo
-                property int patternDurationInMS
-                property int patternDurationInBeats
-                property int recordingDurationInMS
-                property int playbackStopDurationInMS
-                property int recordingDurationInBeats
-                property int playbackStopDurationInBeats
+
+                property bool canBounce: false
+                property string cannotBounceReason: ""
+                onBounceLevelChanged: {
+                    checkCanBounceTimer.restart();
+                }
+                property QtObject checkCanBounceTimer: Timer {
+                    interval: 50; running: false; repeat: false;
+                    onTriggered: {
+                        if (_private.bounceLevel === 2) {
+                            let pattern = _private.sequence.getByPart(_private.selectedChannel.id, _private.selectedPartIndex);
+                            if (pattern.hasNotes) {
+                                checkSketchpadTrackSounds(_private.selectedChannel);
+                            } else {
+                                _private.canBounce = false;
+                                _private.cannotBounceReason = qsTr("There are no notes in this part's pattern, so there is nothing to bounce.");
+                            }
+                        } else if (_private.bounceLevel === 1) {
+                            let atLeastOnePatternHasNotes = false;
+                            for (let partIndex = 0; partIndex < 5; ++partIndex) {
+                                let pattern = _private.sequence.getByPart(_private.selectedChannel.id, partIndex);
+                                if (pattern.hasNotes) {
+                                    atLeastOnePatternHasNotes = true;
+                                    break;
+                                }
+                            }
+                            if (atLeastOnePatternHasNotes) {
+                                checkSketchpadTrackSounds(_private.selectedChannel);
+                            } else {
+                                _private.canBounce = false;
+                                _private.cannotBounceReason = qsTr("There are no notes in any of this track's patterns, so there is nothing to bounce.");
+                            }
+                        } else {
+                            let atLeastOneTrackCanBounce = false;
+                            for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
+                                let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
+                                let atLeastOnePatternHasNotes = false;
+                                for (let partIndex = 0; partIndex < 5; ++partIndex) {
+                                    let pattern = _private.sequence.getByPart(trackIndex, partIndex);
+                                    if (pattern.hasNotes) {
+                                        atLeastOnePatternHasNotes = true;
+                                        break;
+                                    }
+                                }
+                                if (atLeastOnePatternHasNotes) {
+                                    checkSketchpadTrackSounds(sketchpadTrack);
+                                    if (_private.canBounce) {
+                                        // At least one thing can be bounced, so pop out now
+                                        atLeastOneTrackCanBounce = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (atLeastOneTrackCanBounce) {
+                                _private.canBounce = true;
+                            } else {
+                                _private.canBounce = false;
+                                _private.cannotBounceReason = qsTr("There is nothing in this sketchpad that needs bouncing. To be able to bounce, you will need to add notes to the patterns on tracks which have sounds defined (either synths, samples, or controlling and capturing an external device).");
+                            }
+                        }
+                    }
+                    function checkSketchpadTrackSounds(sketchpadTrack) {
+                        if (sketchpadTrack.channelAudioType === "synth") {
+                            let hasSound = false;
+                            for (let soundIndex = 0; soundIndex < sketchpadTrack.chainedSounds.length; ++soundIndex) {
+                                if (sketchpadTrack.chainedSounds[soundIndex] > -1) {
+                                    hasSound = true;
+                                    break;
+                                }
+                            }
+                            if (hasSound) {
+                                _private.canBounce = true;
+                            } else {
+                                _private.canBounce = false;
+                                _private.cannotBounceReason = qsTr("There are no synth engines on this track");
+                            }
+                        } else if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
+                            let hasSound = false;
+                            for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
+                                if (sketchpadTrack.samples[sampleIndex].cppObjId > -1) {
+                                    hasSound = true;
+                                    break;
+                                }
+                            }
+                            if (hasSound) {
+                                _private.canBounce = true;
+                            } else {
+                                _private.canBounce = false;
+                                _private.cannotBounceReason = qsTr("There are no samples on this track, which is set to Sample mode.");
+                            }
+                        } else if (sketchpadTrack.channelAudioType === "sample-loop") {
+                            _private.canBounce = false;
+                            _private.cannotBounceReason = qsTr("This track is already a sketch, so it cannot be bounced further.");
+                        } else if (sketchpadTrack.channelAudioType === "external") {
+                            if (sketchpadTrack.externalAudioSource.length > 0) {
+                                _private.canBounce = true;
+                            } else {
+                                _private.canBounce = false;
+                                _private.cannotBounceReason = qsTr("This track is set to control an external device, but is not set to capture any incoming audio, so there is no way we can bounce things.");
+                            }
+                        }
+                    }
+                }
+
                 property bool isRecording: false
                 property int cumulativeBeats
+                // bounce levels: 0 for bouncing everything, 1 to bounce current track, 2 to bounce current track's current part
+                property int bounceLevel: 1
                 property int previouslySelectedSegmentsModel: -1
                 property var filePropertiesHelper: Helpers.FilePropertiesHelper { }
+                property var clipDetails: []
+                property var partNames: ["a", "b", "c", "d", "e"];
                 function performBounce() {
                     // Now everything is locked down, set up the temporary song that we'll be using to perform the playback
-                    _private.sequence = Zynthbox.PlayGridManager.getSequenceModel(_private.trackName)
                     if (_private.sequence) {
-                        _private.pattern = _private.sequence.getByPart(_private.selectedChannel.connectedPattern, _private.selectedChannel.selectedPart);
-                        if (_private.pattern) {
-                            _private.bounceProgress = 0;
-                            console.log("Bouncing on channel with ID", _private.selectedChannel.id)
-                            // Create a new song for us to use temporarily
-                            _private.previouslySelectedSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
-                            let newSegmentsModelIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.newSegmentsModel();
-                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = newSegmentsModelIndex;
-                            // Assemble the duration of time we want to be recording for
-                            var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
-                            var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
-                            _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
-                            let patternDurationBar = Math.floor(_private.patternDurationInBeats / 128);
-                            let patternDurationBeat = Math.floor((_private.patternDurationInBeats - (patternDurationBar * 128)) / 32);
-                            let patternDurationTick =  (_private.patternDurationInBeats - (patternDurationBar * 128 + patternDurationBeat * 32)) * patternSubbeatToTickMultiplier;
-                            let songDuration = _private.patternDurationInBeats * patternSubbeatToTickMultiplier;
-                            // Set the length of the new sketch's default segment to the duration of the pattern to bounce, and set the segment to play that pattern
-                            let segment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(0);
-                            let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
-                            let clip = _private.selectedChannel.getClipsModelByPart(_private.partIndex).getClip(sceneIndices[_private.trackName]);
-                            console.log("Adding the clip", clip, clip.col, clip.part, "to the first segment", segment);
-                            segment.addClip(clip);
-                            segment.barLength = patternDurationBar;
-                            segment.beatLength = patternDurationBeat;
-                            segment.tickLength = patternDurationTick;
-                            if (_private.includeFadeout) {
-                                // Add the fadeout to the song as an empty segment (of we have a fadeout) (after segment 0)
-                                let segment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(1);
-                                segment.barLength = patternDurationBar;
-                                segment.beatLength = patternDurationBeat;
-                                segment.tickLength = patternDurationTick;
-                                songDuration = songDuration + _private.patternDurationInBeats * patternSubbeatToTickMultiplier;
+                        // Logic for full-sketchpadTrack/full-sketchpad bouncing:
+                        // - Go through all sketchpad tracks (if there is not one selected, otherwise just that one)
+                        // - Go through all parts in each track (if there is not one selected, otherwise just that one)
+                        // - Create information required to bounce each of these parts and add them to a list (clipDetails), except where the patterns have no notes defined (sorry to those intending to re-create 4'33'')
+                        // - Create a new segments model (remembering what the previously selected one was, so we can restore that later)
+                        // - Create a segment for each of the parts we build information for earlier, using segment_model's insert_clip and ensure_position functions
+                        // - Using SyncTimer's time command bundling functionality
+                        //   - add recording start and stop commands to the timer, according to the information built above
+                        //   - also add an "all sound off" midi message at the same position as any recording-stop, to avoid any long tails bleeding into the next recording
+                        // - Bounce progress done vya playback progress of the temporary "song"
+                        // - Only do metadata writing once all recording is completed, to avoid unnecessary overhead (add in a "finishing up" message to tell the user about this, too)
+                        let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 };
+                        let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
+                        let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
+
+                        // Put all of the clips we want to perform a bounce on into a big list
+                        let sketchpadTracksToBounce = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+                        if (_private.bounceLevel > 0) {
+                            sketchpadTracksToBounce = [_private.selectedChannel.id];
+                        }
+                        let partsToBounce = [0, 1, 2, 3, 4];
+                        if (_private.bounceLevel == 2) {
+                            partsToBounce = [_private.selectedPartIndex];
+                        }
+                        _private.clipDetails = [];
+                        for (let sketchpadTrackIndex = 0; sketchpadTrackIndex < sketchpadTracksToBounce.length; ++sketchpadTrackIndex) {
+                            let sketchpadTrackId = sketchpadTracksToBounce[sketchpadTrackIndex];
+                            let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(sketchpadTrackId);
+                            if (sketchpadTrack.channelAudioType === "synth" || sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice" || (sketchpadTrack.channelAudioType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
+                                let soundIndication = "(unknown)";
+                                if (sketchpadTrack.channelAudioType === "synth") {
+                                    for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
+                                        if (sketchpadTrack.chainedSounds[soundIndex] > -1) {
+                                            soundIndication = sketchpadTrack.connectedSoundName.replace(/([^a-z0-9]+)/gi, '-');
+                                            break;
+                                        }
+                                    }
+                                } else if (sketchpadTrack.channelAudioType === "sample-loop") {
+                                    for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
+                                        var clip = sketchpadTrack.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                        if (clip.cppObjId > -1) {
+                                            // We pick the name of whatever the first loop is here, just so we've got one
+                                            soundIndication = clip.path.split("/").pop();
+                                            soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
+                                            if (soundIndication.endsWith(".clip")) {
+                                                soundIndication = soundIndication.substring(0, soundIndication.length - 5);
+                                            } else if (soundIndication.endsWith(".sketch")) {
+                                                soundIndication = soundIndication.substring(0, soundIndication.length - 7);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                } else if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
+                                    for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
+                                        var clip = sketchpadTrack.samples[sampleIndex];
+                                        if (clip.cppObjId > -1) {
+                                            // We pick the name of whatever the first sample is here, just so we've got one
+                                            soundIndication = clip.path.split("/").pop();
+                                            soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
+                                            if (soundIndication.endsWith(".clip")) {
+                                                soundIndication = soundIndication.substring(0, soundIndication.length - 5);
+                                            } else if (soundIndication.endsWith(".sketch")) {
+                                                soundIndication = soundIndication.substring(0, soundIndication.length - 7);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    soundIndication = "external";
+                                }
+                                let previousStopRecordingPosition = 0;
+                                for (let partIndex = 0; partIndex < partsToBounce.length; ++partIndex) {
+                                    let pattern = _private.sequence.getByPart(sketchpadTrackId, partsToBounce[partIndex]);
+                                    if (pattern.hasNotes) {
+                                        let patternDurationInPatternSubbeats = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
+                                        let patternRepeatCount = 1; // How long are the tails expected (we just start with 1 here, until we work out how to properly expose this)
+                                        let includeLeadin = _private.includeLeadin ? 1 : 0;
+                                        let includeMainLoop = 1; // The main part can't be disabled anyway, so this is just a 1
+                                        let includeFadeout = _private.includeFadeout ? 1 : 0;
+                                        let recordingPrefix = zynqtgui.sketchpad.song.sketchpadFolder + "wav/part" + (sketchpadTrackIndex + 1) + _private.partNames[partIndex];
+                                        let recordingSuffix = "-" + soundIndication + ".sketch.wav";
+                                        let theDetails = {
+                                            "startPosition": previousStopRecordingPosition,
+                                            "stopPlaybackPosition": previousStopRecordingPosition + (patternSubbeatToTickMultiplier * patternDurationInPatternSubbeats * patternRepeatCount * (includeLeadin + includeMainLoop)),
+                                            "stopRecordingPosition": previousStopRecordingPosition + (patternSubbeatToTickMultiplier * patternDurationInPatternSubbeats * patternRepeatCount * (includeLeadin + includeMainLoop + includeFadeout)),
+                                            "pattern": pattern,
+                                            "sketchpadTrackId": sketchpadTrackId,
+                                            "partId": partsToBounce[partIndex],
+                                            "sceneId": sceneIndices[_private.trackName],
+                                            "recordingPrefix": recordingPrefix,
+                                            "recordingSuffix": recordingSuffix,
+                                            "recordingFilename": ""
+                                        };
+                                        _private.clipDetails.push(theDetails);
+                                        previousStopRecordingPosition = theDetails["stopRecordingPosition"];
+                                    }
+                                }
                             }
-                            if (_private.includeLeadin) {
-                                // Add the leadin to the song as a segment, and set the segment to play that pattern (if we have a leadin) (as a new segment 0)
-                                let segment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(0);
-                                segment.barLength = patternDurationBar;
-                                segment.beatLength = patternDurationBeat;
-                                segment.tickLength = patternDurationTick;
-                                segment.addClip(clip);
-                                songDuration = songDuration + _private.patternDurationInBeats * patternSubbeatToTickMultiplier;
-                            }
-                            // Now we're ready to get under way, mark ourselves as very extremely busy
+                        }
+                        if (_private.clipDetails.length > 0) {
+                            // About to actually set off, so mark ourselves as extremely busy
                             _private.isRecording = true;
-                            // Set up to record (with a useful filename, and just the channel we want)
+                            _private.bounceProgress = 0;
+                            // Turn off all recording that might have been set up already (there shouldn't be any, but...)
                             for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                                 Zynthbox.AudioLevels.setChannelToRecord(trackIndex, false);
                             }
                             Zynthbox.AudioLevels.setRecordGlobalPlayback(false);
                             Zynthbox.AudioLevels.setShouldRecordPorts(false);
-                            Zynthbox.AudioLevels.setChannelToRecord(_private.selectedChannel.id, true);
-                            Zynthbox.AudioLevels.setChannelFilenamePrefix(_private.selectedChannel.id, zynqtgui.sketchpad.get_channel_recording_filename(_private.selectedChannel));
+                            // Set up a bundle of timer commands to match all of the clips we are starting and stopping
+                            Zynthbox.SyncTimer.startTimerCommandBundle();
                             // Schedule us to start audio recording two ticks into the future
                             // Four ticks because we need to wait for...
-                            // - the start command to be interpreted
-                            // - song mode to set playback on for the first segment
+                            // - the start command to be interpreted and song mode to set playback on for the first segment
                             // - the first events from that segment to be submitted for playback
-                            // - the note actually hitting the synth and making noises
-                            let waitForStart = 0;
-                            Zynthbox.AudioLevels.scheduleStartRecording(waitForStart);
-                            // Schedule us to start midi recording at the same point
-                            Zynthbox.MidiRecorder.scheduleStartRecording(waitForStart, _private.selectedChannel.id);
+                            let waitForStart = 1;
+                            // Iterate over all the selected clips, and use segment_model's ability to just throw clips at it
+                            // and ensure their positions exist across the entire given range to add the clips where they
+                            // should go in the song
+                            // Create a new song for us to use temporarily
+                            _private.previouslySelectedSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
+                            let newSegmentsModelIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.newSegmentsModel();
+                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = newSegmentsModelIndex;
+                            for (let clipDetailsIndex = 0; clipDetailsIndex < _private.clipDetails.length; ++clipDetailsIndex) {
+                                let details = _private.clipDetails[clipDetailsIndex];
+                                let clip = zynqtgui.sketchpad.song.getClipByPart(details["sketchpadTrackId"], details["sceneId"], details["partId"]);
+                                // Add the clip itself
+                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.insert_clip(clip, details["startPosition"] / Zynthbox.SyncTimer.getMultiplier(), details["stopPlaybackPosition"] / Zynthbox.SyncTimer.getMultiplier());
+                                // Now just make sure there's also a matching position to keep playing and then stop the recording
+                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.ensure_split(details["stopRecordingPosition"] / Zynthbox.SyncTimer.getMultiplier());
+                                details["recordingFilename"] = Zynthbox.AudioLevels.scheduleChannelRecorderStart(details["startPosition"] + waitForStart, details["sketchpadTrackId"], details["recordingPrefix"], details["recordingSuffix"]);
+                                Zynthbox.AudioLevels.scheduleChannelRecorderStop(details["stopRecordingPosition"] + waitForStart, details["sketchpadTrackId"]);
+                                // Ensure we're outputting a stop-all-sounds message on the track as well, so we can be sure that there's no long tails sneaking into the next recording on that track
+                                for (let midichannel = 0; midichannel < 16; ++midichannel) {
+                                    Zynthbox.SyncTimer.scheduleTimerCommand(details["stopRecordingPosition"], 100, details["sketchpadTrackId"], 176 + midichannel, 120, undefined, -1);
+                                }
+                                console.log("Start", details["startPosition"], "stop playback", details["stopPlaybackPosition"], "stop recording", details["stopRecordingPosition"], "for file", details["recordingFilename"]);
+                            }
                             // Schedule us to start playback one step back from the recordings (to allow playback to actually begin), in song mode, with no changes to start position and duration
                             Zynthbox.SyncTimer.scheduleStartPlayback(0, true, 0, 0)
-                            // Schedule us to stop recording at the end of the song (duration)
-                            console.log("Schedule stopping both midi and audio recordings in", songDuration + waitForStart, "ticks");
-                            Zynthbox.AudioLevels.scheduleStopRecording(songDuration + waitForStart);
-                            Zynthbox.MidiRecorder.scheduleStopRecording(songDuration + waitForStart, _private.selectedChannel.id);
+                            // Finally submit the timer command bundle, starting the bounce process
+                            Zynthbox.SyncTimer.endTimerCommandBundle();
+                        } else {
+                            console.log("Oh dear, there are no clips to bounce, so... no bouncing for you!");
+                            // message box out that there's nothing to do like whaaaat?!
+                            // e.g. "The options you have selected have resulted in there being nothing to bounce."
+                            //FIXME Also we should endeavour to not end up here, really, just not let people push the bounce button if there's nothing to do (how do we reasonably do that without it getting expensive?)
                         }
                     }
                 }
-                property bool includeLeadin: false
+                property bool includeLeadin: true
                 property bool includeLeadinInLoop: false
-                property bool includeFadeout: false
+                property bool includeFadeout: true
                 property bool includeFadeoutInLoop: false
             }
             Connections {
@@ -191,37 +382,37 @@ Zynthian.Popup {
                 interval: 50; repeat: true; running: false;
                 onTriggered: {
                     // While recording, check each beat whether we have reached the end of playback, and once we have, and we are done recording and all that, pull things out and clean up
-                    _private.bounceProgress = Math.min(1, Zynthbox.SegmentHandler.playhead / totalDuration);
-                    if (Zynthbox.PlayGridManager.metronomeActive == false && Zynthbox.MidiRecorder.isRecording == false &&  Zynthbox.AudioLevels.isRecording == false) {
+                    if (Zynthbox.PlayGridManager.metronomeActive == true) {
+                        _private.bounceProgress = Math.min(1, Zynthbox.SegmentHandler.playhead / totalDuration);
+                    } else if (Zynthbox.AudioLevels.isRecording == false) {
                         // Playback has stopped (we've reached the end of the song) - that means we should no longer be recording
                         _private.isRecording = false;
+                        _private.bounceProgress = 1;
                         endOfRecordingTimer.stop();
                         // Save metadata into the newly created recordings
-                        let recordingFilenames = Zynthbox.AudioLevels.recordingFilenames();
-                        let filenameIndex = _private.selectedChannel.id + 2;
-                        let filename = recordingFilenames[filenameIndex];
-                        if (filename.length > 0) {
+                        for (let clipDetailsIndex = 0; clipDetailsIndex < _private.clipDetails.length; ++clipDetailsIndex) {
+                            let details = _private.clipDetails[clipDetailsIndex];
+                            let filename = details["recordingFilename"];
                             console.log("Successfully recorded a new sound file into", filename, "- now building metadata");
+                            let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(details["sketchpadTrackId"]);
+                            let pattern = details["pattern"];
                             let metadata = {
                                 "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
-                                "ZYNTHBOX_PATTERN_JSON": _private.pattern.toJson(),
-                                "ZYNTHBOX_AUDIOTYPESETTINGS": _private.selectedChannel.getAudioTypeSettings(),
-                                "ZYNTHBOX_ROUTING_STYLE": _private.selectedChannel.channelRoutingStyle
+                                "ZYNTHBOX_PATTERN_JSON": pattern.toJson(),
+                                "ZYNTHBOX_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
+                                "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.channelRoutingStyle,
+                                "ZYNTHBOX_ACTIVELAYER": sketchpadTrack.getChannelSoundSnapshotJson(), // The layer setup which produced the sounds in this recording
+                                "ZYNTHBOX_AUDIO_TYPE": sketchpadTrack.channelAudioType, // The audio type of this channel
                             };
-                            if (_private.selectedChannel) { // by all rights this should not be possible, but... best safe
-                                metadata["ZYNTHBOX_ACTIVELAYER"] = _private.selectedChannel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
-                                metadata["ZYNTHBOX_AUDIO_TYPE"] = _private.selectedChannel.channelAudioType; // The audio type of this channel
-                                if (_private.selectedChannel.channelAudioType === "sample-trig" || _private.selectedChannel.channelAudioType === "sample-slice") {
-                                    // Store the sample data, if we've been playing in a patterny sample mode
-                                    metadata["ZYNTHBOX_SAMPLES"] = _private.selectedChannel.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
-                                }
+                            if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
+                                // Store the sample data, if we've been playing in a patterny sample mode
+                                metadata["ZYNTHBOX_SAMPLES"] = sketchpadTrack.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
                             }
-                            metadata["ZYNTHBOX_MIDI_RECORDING"] = Zynthbox.MidiRecorder.base64TrackMidi(filenameIndex - 2);
                             // Set up the loop points in the new recording
                             let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                             var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                             // Reset this to beats (rather than pattern subbeats)
-                            let patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
+                            let patternDurationInBeats = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
                             let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
                             patternDurationInBeats = patternDurationInBeats / 32;
                             let startPosition = 0.0; // This is in seconds
@@ -260,16 +451,15 @@ Zynthian.Popup {
                             _private.filePropertiesHelper.writeMetadata(filename, metadata);
                             console.log("Wrote metadata:", JSON.stringify(metadata));
                             console.log("New sample starts at", startPosition, "seconds, has a playback length of", playbackLength, "beats, with a pattern length of", patternDurationInSeconds, "s and loop that starts at", loopDelta, "seconds, second loop point", loopDelta2, "seconds back from the stop point, and a pattern length of", patternDurationInBeats, "beats");
-                        } else {
-                            console.log("Failed to get recording!");
+                            // Set the newly recorded file as the current slot's loop clip
+                            let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
+                            let clip = sketchpadTrack.getClipsModelByPart(details["partId"]).getClip(details["sceneId"]);
+                            clip.set_path(filename, true);
+                            console.log("...and the clip says it is", clip.duration, "seconds long");
+                            // Set channel mode to loop
+                            sketchpadTrack.channelAudioType = "sample-loop";
                         }
-                        // Set the newly recorded file as the current slot's loop clip
-                        let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
-                        let clip = _private.selectedChannel.getClipsModelByPart(_private.partIndex).getClip(sceneIndices[_private.trackName]);
-                        clip.set_path(filename, true);
-                        console.log("...and the clip says it is", clip.duration, "seconds long");
-                        // Set channel mode to loop
-                        _private.selectedChannel.channelAudioType = "sample-loop";
+
                         // Clean up the temporary segments model
                         let ourSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
                         zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = _private.previouslySelectedSegmentsModel;
@@ -285,9 +475,9 @@ Zynthian.Popup {
                 target: root
                 onOpenedChanged: {
                     if (!root.opened) {
-                        _private.includeLeadin = false;
+                        _private.includeLeadin = true;
                         _private.includeLeadinInLoop = false;
-                        _private.includeFadeout = false;
+                        _private.includeFadeout = true;
                         _private.includeFadeoutInLoop = false;
                     }
                 }
@@ -300,12 +490,48 @@ Zynthian.Popup {
             color: Kirigami.Theme.textColor
             opacity: 0.5
         }
+        RowLayout {
+            Layout.fillWidth: true
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                enabled: _private.bounceProgress === -1
+                checked: _private.bounceLevel === 0
+                text: qsTr("Bounce Sketchpad")
+                onClicked: {
+                    _private.bounceLevel = 0;
+                }
+            }
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                enabled: _private.bounceProgress === -1
+                checked: _private.bounceLevel === 1
+                text: qsTr("Bounce Track")
+                onClicked: {
+                    _private.bounceLevel = 1;
+                }
+            }
+            Zynthian.PlayGridButton {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+                enabled: _private.bounceProgress === -1
+                checked: _private.bounceLevel === 2
+                text: qsTr("Bounce Part")
+                onClicked: {
+                    _private.bounceLevel = 2;
+                }
+            }
+        }
         QQC2.Label {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             wrapMode: Text.Wrap
-            text: "Bounce the audio from the pattern in " + (_private.selectedChannel ? _private.selectedChannel.name : "") + " to a wave file, assign that recording as the channel's loop sample, and set the channel to loop mode.";
+            text: _private.canBounce
+                    ? _private.bounceLevel === 0
+                        ? qsTr("Bounce the audio of all parts of all tracks which have something to bounce to sketches, put those bounced sketches into their equivalent parts, and set all the tracks that had things to bounce to Sketch mode.")
+                        : _private.bounceLevel === 1
+                            ? qsTr("Bounce the audio from all parts of track %1 to sketches, and assign those recordings as the sketches in their equivalent parts, and sets the track to Sketch mode.").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+                            : qsTr("Bounce the audio from part %1 of track %2 to a sketch, then put the bounced sketch into the equivalent sketch slot, and set the track to Sketch mode. Remember to bounce the rest of the parts if you want to keep those.").arg(_private.selectedPartIndex > -1 ? _private.partNames[_private.selectedPartIndex] : "").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+                    : _private.cannotBounceReason
         }
         GridLayout {
             Layout.fillWidth: true
@@ -313,6 +539,7 @@ Zynthian.Popup {
             columns: 3
             Zynthian.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
+                enabled: _private.bounceProgress === -1
                 checked: _private.includeLeadin
                 text: "Record Lead-in"
                 onClicked: {
@@ -335,6 +562,7 @@ Zynthian.Popup {
             }
             Zynthian.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
+                enabled: _private.bounceProgress === -1
                 checked: _private.includeFadeout
                 text: "Record Fade-out"
                 onClicked: {
@@ -344,7 +572,7 @@ Zynthian.Popup {
             Zynthian.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 checked: _private.includeLeadinInLoop
-                enabled: _private.includeLeadin
+                enabled: _private.bounceProgress === -1 && _private.includeLeadin
                 opacity: enabled ? 1 : 0.5
                 text: "Include in loop"
                 onClicked: {
@@ -368,7 +596,7 @@ Zynthian.Popup {
             Zynthian.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 checked: _private.includeFadeoutInLoop
-                enabled: _private.includeFadeout
+                enabled: _private.bounceProgress === -1 && _private.includeFadeout
                 opacity: enabled ? 1 : 0.5
                 text: "Include in loop"
                 onClicked: {
@@ -382,6 +610,12 @@ Zynthian.Popup {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             opacity: _private.bounceProgress > -1 ? 1 : 0.3
             value: _private.bounceProgress
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            visible: _private.bounceProgress === 1 ? 1 : 0
+            horizontalAlignment: Text.AlignHCenter
+            text: qsTr("Please wait, finishing up...");
         }
         Rectangle {
             Layout.fillWidth: true
@@ -409,7 +643,7 @@ Zynthian.Popup {
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: "Bounce"
-                enabled: _private.bounceProgress === -1
+                enabled: _private.canBounce && _private.bounceProgress === -1
                 onClicked: {
                     _private.performBounce();
                 }

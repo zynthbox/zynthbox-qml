@@ -280,12 +280,12 @@ class sketchpad_segment(QObject):
                 self.addClip(scene_clip)
 
     @Slot(QObject)
-    def copyFrom(self, dest_segment):
-        self.barLength = dest_segment.barLength
-        self.beatLength = dest_segment.beatLength
+    def copyFrom(self, origin_segment):
+        self.barLength = origin_segment.barLength
+        self.beatLength = origin_segment.beatLength
         self.clear_clips()
 
-        for clip in dest_segment.clips.copy():
+        for clip in origin_segment.clips.copy():
             self.addClip(clip)
 
     @Slot()

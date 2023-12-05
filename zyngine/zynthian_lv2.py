@@ -147,7 +147,8 @@ def generate_plugins_config_file(refresh=True):
                 'TYPE': get_plugin_type(plugin).value,
                 'CLASS': re.sub(' Plugin', '', str(plugin.get_class().get_label())),
                 'ENABLED': is_plugin_enabled(name),
-                'UI': is_plugin_ui(plugin)
+                'UI': is_plugin_ui(plugin),
+                'BUNDLE_URI': str(plugin.get_bundle_uri())
             }
 
         plugins = OrderedDict(sorted(genplugins.items()))

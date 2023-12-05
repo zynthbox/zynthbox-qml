@@ -344,7 +344,7 @@ class zynthian_gui_control(zynthian_gui_selector):
                 self.index = self.zynqtgui.curlayer.get_active_screen_index()
             else:
                 self.index = 0
-            if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
+            if self.index > -1 and len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
                 self.index = 1
         else:
             logging.info("Current layer is empty - updating controls to match")
@@ -493,7 +493,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.zgui_custom_controllers=[]
 
         #Get screen info
-        if self.index < len(self.list_data):
+        if self.index > -1 and self.index < len(self.list_data):
             screen_info = self.list_data[self.index]
             screen_title = screen_info[2]
             if len(screen_info) > 3:

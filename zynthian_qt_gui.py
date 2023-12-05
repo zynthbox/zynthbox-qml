@@ -1513,6 +1513,7 @@ class zynthian_gui(QObject):
             self.add_screen_to_show_queue(self.screens["preset"], False, True)
             self.add_screen_to_show_queue(self.screens["control"], False, True)
         else:
+            self.curlayer.refresh_controllers()
             self.screens["bank"].fill_list()
             self.screens["preset"].fill_list()
             self.screens["control"].fill_list()

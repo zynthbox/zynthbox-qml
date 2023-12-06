@@ -332,6 +332,10 @@ Rectangle {
         id: bouncePopup
     }
 
+    TrackUnbouncer {
+        id: trackUnbouncer
+    }
+
     RoutingStylePicker {
         id: routingStylePicker
     }
@@ -595,7 +599,24 @@ Rectangle {
                                             text: qsTr("Bounce To Sketch")
                                             icon.name: "go-next"
                                             onClicked: {
-                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, -1);
+                                            }
+                                        }
+                                        Item {
+                                            Layout.fillWidth: false
+                                            Layout.fillHeight: false
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit
+                                        }
+                                    }
+                                    RowLayout {
+                                        id: unbounceButtonLayout
+                                        Layout.fillHeight: true
+                                        visible: root.selectedChannel.channelAudioType === "sample-loop"
+                                        QQC2.Button {
+                                            text: qsTr("Unbounce Track")
+                                            icon.name: "go-previous"
+                                            onClicked: {
+                                                trackUnbouncer.unbounce(root.selectedChannel.id);
                                             }
                                         }
                                         Item {

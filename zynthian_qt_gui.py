@@ -77,6 +77,7 @@ from zynqtgui.zynthian_gui_song_player import zynthian_gui_song_player
 from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
 from zynqtgui.utils import file_properties_helper
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugins_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
@@ -1166,8 +1167,10 @@ class zynthian_gui(QObject):
         self.screens["sketchpad_copier"] = zynthian_gui_sketchpad_copier(self)
 
         self.screens["led_config"] = zynthian_gui_led_config(self)
-
         self.screens["bluetooth_config"] = zynthian_gui_bluetooth_config(self)
+
+        # Instantiate Plugin helper
+        self.__zynthbox_plugins_helper = zynthbox_plugins_helper(self)
 
         # Add the OSD handler
         self.__osd = zynthian_osd(self)
@@ -3636,6 +3639,9 @@ class zynthian_gui(QObject):
     def osd(self):
         return self.__osd
 
+    def zynthbox_plugins_helper(self):
+        return self.__zynthbox_plugins_helper
+
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):
         logging.debug("### Start long task")
@@ -4198,6 +4204,7 @@ class zynthian_gui(QObject):
     led_config = Property(QObject, led_config, constant=True)
     bluetooth_config = Property(QObject, bluetooth_config, constant=True)
     osd = Property(QObject, osd, constant=True)
+    zynthbox_plugins_helper = Property(QObject, zynthbox_plugins_helper, constant=True)
 
     current_screen_id = Property(
         str,

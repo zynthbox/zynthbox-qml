@@ -1561,12 +1561,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
 #                            self.remove_clone_midi(i, midi_chan)
 #                            self.remove_clone_midi(midi_chan, i)
 
-                    logging.debug(f"### Restoring engine : {layer_data['engine_nick']}")
-                    engine = self.zynqtgui.screens['engine'].start_engine(layer_data['engine_nick'])
-                    slot_index = layer_data['slot_index'] if "slot_index" in layer_data else -1
+                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
+                    logging.debug(f"### Restoring engine : {layer_snapshot['engine_nick']}")
+                    engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
+                    slot_index = layer_snapshot['slot_index'] if "slot_index" in layer_snapshot else -1
                     new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index)
-                    new_layer.restore_snapshot_1(layer_data)
-                    new_layer.restore_snapshot_2(layer_data)
+                    new_layer.restore_snapshot_1(layer_snapshot)
+                    new_layer.restore_snapshot_2(layer_snapshot)
                     if engine.type == "Audio Effect":
                         self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.midi_chan).setFxToChain(new_layer, slot_index)
                     sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
@@ -1710,21 +1711,22 @@ class zynthian_gui_layer(zynthian_gui_selector):
             data = []
             layers = JSONDecoder().decode(snapshot)
             for layer_data in layers["layers"]:
-                #if not layer_data["midi_chan"] in data:
-                    #data[layer_data["midi_chan"]] = []
-                item = {"name": layer_data["engine_name"].split("/")[-1]}
-                if "midi_chan" in layer_data:
-                    item["midi_chan"] = layer_data["midi_chan"]
+                layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
+                #if not layer_snapshot["midi_chan"] in data:
+                    #data[layer_snapshot["midi_chan"]] = []
+                item = {"name": layer_snapshot["engine_name"].split("/")[-1]}
+                if "midi_chan" in layer_snapshot:
+                    item["midi_chan"] = layer_snapshot["midi_chan"]
                 else:
                     item["midi_chan"] = -1
-                if "slot_index" in layer_data:
-                    item["slot_index"] = layer_data["slot_index"]
-                if "bank_name" in layer_data:
-                    item["bank_name"] = layer_data["bank_name"]
-                if "preset_name" in layer_data:
-                    item["preset_name"] = layer_data["preset_name"]
-                if "engine_type" in layer_data:
-                    item["engine_type"] = layer_data["engine_type"]
+                if "slot_index" in layer_snapshot:
+                    item["slot_index"] = layer_snapshot["slot_index"]
+                if "bank_name" in layer_snapshot:
+                    item["bank_name"] = layer_snapshot["bank_name"]
+                if "preset_name" in layer_snapshot:
+                    item["preset_name"] = layer_snapshot["preset_name"]
+                if "engine_type" in layer_snapshot:
+                    item["engine_type"] = layer_snapshot["engine_type"]
                 data.append(item)
             return data
         except Exception as e:

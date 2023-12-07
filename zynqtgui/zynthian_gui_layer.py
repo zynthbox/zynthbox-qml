@@ -1287,20 +1287,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
             #Layers info
             for layer in self.layers:
                 if track is None or (track is not None and layer.midi_chan in track.chainedSounds):
-                    layer_snapshot = layer.get_snapshot()
-
-                    # Handle Plugin ID substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
-                    if layer.engine.nickname.startswith("JV/"):
-                        plugin_name = layer.engine.nickname.split("/")[1]
-                        if plugin_name in self.zynqtgui.zynthbox_plugins_helper.plugins_by_name:
-                            plugin_id = self.zynqtgui.zynthbox_plugins_helper.plugins_by_name[plugin_name].plugin_id
-                            logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin_id}")
-                            layer_snapshot["engine_name"] = f"{layer_snapshot['engine_name'].split('/')[0]}/{plugin_id}"
-                            layer_snapshot["engine_nick"] = f"{layer_snapshot['engine_nick'].split('/')[0]}/{plugin_id}"
-                        else:
-                            logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
-
-                    snapshot['layers'].append(layer_snapshot)
+                    snapshot['layers'].append(self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(layer.get_snapshot()))
 
 
             if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
@@ -1382,21 +1369,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         snapshot['amixer_layer'] = lss
                     del(snapshot['layers'][i])
                 else:
-                    # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
-                    if lss["engine_nick"].startswith("JV/"):
-                        plugin_id = lss["engine_nick"].split("/")[1]
-                        if plugin_id.startswith("ZBP-"):
-                            if plugin_id in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id:
-                                plugin_name = self.zynqtgui.zynthbox_plugins_helper.plugins_by_id[plugin_id].plugin_name
-                                logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_name}")
-                                layer_snapshot["engine_name"] = f"{lss['engine_name'].split('/')[0]}/{plugin_name}"
-                                layer_snapshot["engine_nick"] = f"{lss['engine_nick'].split('/')[0]}/{plugin_name}"
-                            else:
-                                logging.error("FATAL ERROR : Stored plugin id is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
-
-                    slot_index = lss['slot_index'] if "slot_index" in lss else -1
-                    engine=self.zynqtgui.screens['engine'].start_engine(lss['engine_nick'])
-                    layer = zynthian_layer(engine,lss['midi_chan'], self.zynqtgui, slot_index)
+                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
+                    slot_index = layer_snapshot['slot_index'] if "slot_index" in layer_snapshot else -1
+                    engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
+                    layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, slot_index)
                     self.layers.append(layer)
                     if engine.type == "Audio Effect":
                         self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer, slot_index)

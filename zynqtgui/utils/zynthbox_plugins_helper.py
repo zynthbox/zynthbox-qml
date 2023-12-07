@@ -25,6 +25,7 @@
 
 
 import json
+import logging
 from PySide2.QtCore import QObject
 
 
@@ -62,3 +63,37 @@ class zynthbox_plugins_helper(QObject):
             plugin = zynthbox_plugin(key, plugins_json[key], self)
             self.plugins_by_id[key] = plugin
             self.plugins_by_name[plugins_json[key]["plugin_name"]] = plugin
+
+    def update_layer_snapshot_plugin_name_to_id(self, snapshot):
+        """
+        Translate plugin name to plugin id in the layer snapshot
+        """
+        # Handle Plugin ID substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
+        if snapshot["engine_nick"].startswith("JV/"):
+            plugin_name = snapshot["engine_nick"].split("/")[1]
+            if plugin_name in self.plugins_by_name:
+                plugin_id = self.plugins_by_name[plugin_name].plugin_id
+                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin_id}")
+                snapshot["engine_name"] = f"{snapshot['engine_name'].split('/')[0]}/{plugin_id}"
+                snapshot["engine_nick"] = f"{snapshot['engine_nick'].split('/')[0]}/{plugin_id}"
+            else:
+                logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+        return snapshot
+
+    def update_layer_snapshot_plugin_id_to_name(self, snapshot):
+        """
+        Translate plugin id to plugin name in the layer snapshot
+        """
+        # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
+        if snapshot["engine_nick"].startswith("JV/"):
+            plugin_id = snapshot["engine_nick"].split("/")[1]
+            if plugin_id.startswith("ZBP-"):
+                if plugin_id in self.plugins_by_id:
+                    plugin_name = self.plugins_by_id[plugin_id].plugin_name
+                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_name}")
+                    snapshot["engine_name"] = f"{snapshot['engine_name'].split('/')[0]}/{plugin_name}"
+                    snapshot["engine_nick"] = f"{snapshot['engine_nick'].split('/')[0]}/{plugin_name}"
+                else:
+                    logging.error("FATAL ERROR : Stored plugin id is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
+        return snapshot
+

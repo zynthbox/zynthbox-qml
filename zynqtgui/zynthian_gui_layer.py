@@ -1287,7 +1287,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
             #Layers info
             for layer in self.layers:
                 if track is None or (track is not None and layer.midi_chan in track.chainedSounds):
-                    snapshot['layers'].append(layer.get_snapshot())
+                    layer_snapshot = layer.get_snapshot()
+
+                    # Handle Plugin ID substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
+                    if layer.engine.nickname.startswith("JV/"):
+                        plugin_name = layer.engine.nickname.split("/")[1]
+                        if plugin_name in self.zynqtgui.zynthbox_plugins_helper.plugins_by_name:
+                            plugin_id = self.zynqtgui.zynthbox_plugins_helper.plugins_by_name[plugin_name].plugin_id
+                            logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin_id}")
+                            layer_snapshot["engine_name"] = f"{layer_snapshot['engine_name'].split('/')[0]}/{plugin_id}"
+                            layer_snapshot["engine_nick"] = f"{layer_snapshot['engine_nick'].split('/')[0]}/{plugin_id}"
+                        else:
+                            logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+
+                    snapshot['layers'].append(layer_snapshot)
+
 
             if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
                 snapshot['layers'].append(self.amixer_layer.get_snapshot())
@@ -1368,6 +1382,18 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         snapshot['amixer_layer'] = lss
                     del(snapshot['layers'][i])
                 else:
+                    # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
+                    if lss["engine_nick"].startswith("JV/"):
+                        plugin_id = lss["engine_nick"].split("/")[1]
+                        if plugin_id.startswith("ZBP-"):
+                            if plugin_id in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id:
+                                plugin_name = self.zynqtgui.zynthbox_plugins_helper.plugins_by_id[plugin_id].plugin_name
+                                logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_name}")
+                                layer_snapshot["engine_name"] = f"{lss['engine_name'].split('/')[0]}/{plugin_name}"
+                                layer_snapshot["engine_nick"] = f"{lss['engine_nick'].split('/')[0]}/{plugin_name}"
+                            else:
+                                logging.error("FATAL ERROR : Stored plugin id is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
+
                     slot_index = lss['slot_index'] if "slot_index" in lss else -1
                     engine=self.zynqtgui.screens['engine'].start_engine(lss['engine_nick'])
                     layer = zynthian_layer(engine,lss['midi_chan'], self.zynqtgui, slot_index)
@@ -1674,33 +1700,33 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
 
-    @Slot(str, result="QVariantList")
-    def soundset_metadata_from_file(self, file_name):
-        try:
-            if file_name.startswith("/"):
-                actualPath = Path(file_name)
-            else:
-                actualPath = Path(self.__soundsets_basepath__ + file_name)
-            f = open(actualPath, "r")
-            snapshot = JSONDecoder().decode(f.read())
-            data = []
-            for layer_data in snapshot["layers"]:
-                #if not layer_data["midi_chan"] in data:
-                    #data[layer_data["midi_chan"]] = []
-                item = {"name": layer_data["engine_name"].split("/")[-1]}
-                if "midi_chan" in layer_data:
-                    item["midi_chan"] = layer_data["midi_chan"]
-                else:
-                    item["midi_chan"] = -1
-                if "bank_name" in layer_data:
-                    item["bank_name"] = layer_data["bank_name"]
-                if "preset_name" in layer_data:
-                    item["preset_name"] = layer_data["preset_name"]
-                data.append(item)
-            return data
-        except Exception as e:
-            logging.error(e)
-            return []
+#    @Slot(str, result="QVariantList")
+#    def soundset_metadata_from_file(self, file_name):
+#        try:
+#            if file_name.startswith("/"):
+#                actualPath = Path(file_name)
+#            else:
+#                actualPath = Path(self.__soundsets_basepath__ + file_name)
+#            f = open(actualPath, "r")
+#            snapshot = JSONDecoder().decode(f.read())
+#            data = []
+#            for layer_data in snapshot["layers"]:
+#                #if not layer_data["midi_chan"] in data:
+#                    #data[layer_data["midi_chan"]] = []
+#                item = {"name": layer_data["engine_name"].split("/")[-1]}
+#                if "midi_chan" in layer_data:
+#                    item["midi_chan"] = layer_data["midi_chan"]
+#                else:
+#                    item["midi_chan"] = -1
+#                if "bank_name" in layer_data:
+#                    item["bank_name"] = layer_data["bank_name"]
+#                if "preset_name" in layer_data:
+#                    item["preset_name"] = layer_data["preset_name"]
+#                data.append(item)
+#            return data
+#        except Exception as e:
+#            logging.error(e)
+#            return []
 
     @Slot(str, result='QVariantList')
     def sound_metadata_from_json(self, snapshot):

@@ -42,9 +42,18 @@ Zynthian.Dialog {
      */
     property string acceptText: qsTr("Yes")
     /**
+     * Whether or not the accept button is enabled
+     */
+    property alias acceptEnabled: acceptButton.enabled
+    /**
      * The string used for the reject button
      */
     property string rejectText: qsTr("No")
+    /**
+     * Whether or not the reject button is enabled
+     * @note You probably don't want to actually disable this, but the property is here for symmetry
+     */
+    property alias rejectEnabled: rejectButton.enabled
 
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
@@ -73,7 +82,9 @@ Zynthian.Dialog {
                 result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
-                component.selectedButton.clicked()
+                if (component.selectedButton.enabled) {
+                    component.selectedButton.clicked();
+                }
                 result = true;
                 break;
         }

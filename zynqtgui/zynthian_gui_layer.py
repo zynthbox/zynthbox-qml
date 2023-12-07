@@ -1315,7 +1315,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
             return snapshot
         except Exception as e:
-            logging.error("Can't generate snapshot: %s" % e)
+            logging.exception(f"Can't generate snapshot: {str(e)}")
             return None
 
     def save_snapshot(self, fpath):

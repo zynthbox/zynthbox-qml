@@ -55,7 +55,7 @@ Zynthian.Popup {
     }
 
     parent: QQC2.Overlay.overlay
-    height: Kirigami.Units.gridUnit * 15
+    height: Kirigami.Units.gridUnit * 25
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: _private.bounceProgress === -1 ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
@@ -79,12 +79,11 @@ Zynthian.Popup {
 
     contentItem: ColumnLayout {
         anchors.fill: parent
-        implicitHeight: Kirigami.Units.gridUnit * 50
+        implicitHeight: Kirigami.Units.gridUnit * 25
         implicitWidth: Kirigami.Units.gridUnit * 30
         Kirigami.Heading {
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Bounce To Sketch"
+            text: qsTr("Bounce To Sketch")
  
             QtObject {
                 id: _private
@@ -285,7 +284,7 @@ Zynthian.Popup {
                                     let pattern = _private.sequence.getByPart(sketchpadTrackId, partsToBounce[partIndex]);
                                     if (pattern.hasNotes) {
                                         let patternDurationInPatternSubbeats = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
-                                        let patternRepeatCount = 1; // How long are the tails expected (we just start with 1 here, until we work out how to properly expose this)
+                                        let patternRepeatCount = _private.patternRepeatCount; // How long are the tails expected (we just start with 1 here, until we work out how to properly expose this)
                                         let includeLeadin = _private.includeLeadin ? 1 : 0;
                                         let includeMainLoop = 1; // The main part can't be disabled anyway, so this is just a 1
                                         let includeFadeout = _private.includeFadeout ? 1 : 0;
@@ -364,6 +363,7 @@ Zynthian.Popup {
                 property bool includeLeadinInLoop: false
                 property bool includeFadeout: true
                 property bool includeFadeoutInLoop: false
+                property int patternRepeatCount: 1
             }
             Connections {
                 target: Zynthbox.AudioLevels
@@ -479,6 +479,7 @@ Zynthian.Popup {
                         _private.includeLeadinInLoop = false;
                         _private.includeFadeout = true;
                         _private.includeFadeoutInLoop = false;
+                        _private.patternRepeatCount = 1;
                     }
                 }
             }
@@ -492,6 +493,7 @@ Zynthian.Popup {
         }
         RowLayout {
             Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit / 2
             Zynthian.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 enabled: _private.bounceProgress === -1
@@ -522,9 +524,10 @@ Zynthian.Popup {
         }
         QQC2.Label {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2.5
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             wrapMode: Text.Wrap
+            verticalAlignment: Text.AlignVTop
             text: _private.canBounce
                     ? _private.bounceLevel === 0
                         ? qsTr("Bounce the audio of all parts of all tracks which have something to bounce to sketches, put those bounced sketches into their equivalent parts, and set all the tracks that had things to bounce to Sketch mode.")
@@ -533,9 +536,67 @@ Zynthian.Popup {
                             : qsTr("Bounce the audio from part %1 of track %2 to a sketch, then put the bounced sketch into the equivalent sketch slot, and set the track to Sketch mode. Remember to bounce the rest of the parts if you want to keep those.").arg(_private.selectedPartIndex > -1 ? _private.partNames[_private.selectedPartIndex] : "").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
                     : _private.cannotBounceReason
         }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            QQC2.Label {
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                text: qsTr("To ensure your bounce handles long note sustains, you can increase the number of times the pattern is repeated for each of the loop sections here:")
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+                Layout.maximumHeight: Kirigami.Units.iconSizes.large
+                Layout.preferredHeight: Kirigami.Units.gridUnit
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+                Zynthian.PlayGridButton {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: false
+                    Layout.minimumWidth: Kirigami.Units.iconSizes.large
+                    Layout.maximumWidth: Kirigami.Units.iconSizes.large
+                    icon.name: "list-remove-symbolic"
+                    enabled: _private.patternRepeatCount > 1
+                    onClicked: {
+                        _private.patternRepeatCount = _private.patternRepeatCount - 1;
+                    }
+                }
+                QQC2.Label {
+                    Layout.fillHeight: true
+                    text: qsTr("Repeat pattern %1 times").arg(_private.patternRepeatCount)
+                }
+                Zynthian.PlayGridButton {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: false
+                    Layout.minimumWidth: Kirigami.Units.iconSizes.large
+                    Layout.maximumWidth: Kirigami.Units.iconSizes.large
+                    icon.name: "list-add-symbolic"
+                    onClicked: {
+                        _private.patternRepeatCount = _private.patternRepeatCount + 1;
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+            }
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
         GridLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit
             columns: 3
             Zynthian.PlayGridButton {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
@@ -606,7 +667,6 @@ Zynthian.Popup {
         }
         QQC2.ProgressBar {
             Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             opacity: _private.bounceProgress > -1 ? 1 : 0.3
             value: _private.bounceProgress

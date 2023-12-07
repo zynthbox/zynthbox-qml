@@ -97,6 +97,27 @@ class zynthbox_plugins_helper(QObject):
                 snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, plugin.plugin_id)
             else:
                 logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+        elif snapshot["engine_nick"] == "FS":
+            # Fluidsynth stores the plugin name in a few places
+            # 1. bank_name: `<plugin name>`
+            # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
+            # 3. bank_info[2]: `<plugin name>`
+            # 4. bank_info[4]: stem from plugin path
+            # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
+            # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
+            plugin_name = snapshot["bank_name"]
+            if f"sf2/{plugin_name}" in self.plugins_by_name:
+                plugin = self.plugins_by_name[f"sf2/{plugin_name}"]
+                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin.plugin_id}")
+                snapshot["bank_name"] = plugin.plugin_id
+                snapshot["bank_info"][0] = plugin.plugin_id
+                snapshot["bank_info"][2] = plugin.plugin_id
+                snapshot["bank_info"][4] = plugin.plugin_id
+                snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, plugin.plugin_id)
+                snapshot["preset_info"][3] = plugin.plugin_id
+            else:
+                logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+
         return snapshot
 
     def update_layer_snapshot_plugin_id_to_name(self, snapshot):
@@ -132,6 +153,27 @@ class zynthbox_plugins_helper(QObject):
                     snapshot["bank_info"][2] = snapshot["bank_name"]
                     snapshot["bank_info"][4] = plugin.plugin_name
                     snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.plugin_id, plugin.path)
+                else:
+                    logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
+        elif snapshot["engine_nick"] == "FS":
+            # Fluidsynth stores the plugin name in a few places
+            # 1. bank_name: `<plugin name>`
+            # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
+            # 3. bank_info[2]: `<plugin name>`
+            # 4. bank_info[4]: Filename `<plugin_name>.sf2` from plugin path
+            # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
+            # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
+            plugin_id = snapshot["bank_name"]
+            if plugin_id.startswith("ZBP-"):
+                if plugin_id in self.plugins_by_id:
+                    plugin = self.plugins_by_id[plugin_id]
+                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.plugin_name}")
+                    snapshot["bank_name"] = plugin.plugin_name
+                    snapshot["bank_info"][0] = plugin.path
+                    snapshot["bank_info"][2] = plugin.plugin_name
+                    snapshot["bank_info"][4] = plugin.path.split("/")[-1]
+                    snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.plugin_id, plugin.path)
+                    snapshot["preset_info"][3] = plugin.path
                 else:
                     logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
 

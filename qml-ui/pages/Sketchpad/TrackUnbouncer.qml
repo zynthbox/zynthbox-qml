@@ -54,6 +54,7 @@ Zynthian.DialogQuestion {
     }
     title: qsTr("Unbounce Track?")
     acceptText: qsTr("Unbounce")
+    acceptEnabled: (_private.soundSourceSketch > -1)
     rejectText: qsTr("Back")
     contentItem: ColumnLayout {
         QQC2.Label {

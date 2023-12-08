@@ -26,6 +26,7 @@
 
 import json
 import logging
+from pathlib import Path
 from PySide2.QtCore import QObject
 
 
@@ -178,4 +179,49 @@ class zynthbox_plugins_helper(QObject):
                     logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
 
         return snapshot
+
+    def generate_plugins_json(self):
+        """
+        Calling this method will generate a plugins.json file in zynthbox-qml/config/plugins.json
+        This is not to be automated and only invoked manually when plugin.json is requried to be rebuilt
+        """
+
+        plugin_count = 0
+        plugins = {}
+
+        # Read lv2 plugins and add to list
+        with open("/zynthian/config/jalv/plugins.json", "r") as f:
+            lv2 = json.load(f)
+            for plugin_name in lv2:
+                plugins[f"ZBP_{plugin_count:05d}"] = {
+                    "name": plugin_name,
+                    "path": lv2[plugin_name]["BUNDLE_URI"].replace("file://", ""),
+                    "type": "lv2",
+                    "version_added": 1
+                }
+                plugin_count += 1
+
+        # Read sf2 plugins and add to list
+        for plugin in Path("/zynthian/zynthian-data/soundfonts/sf2").glob("*.sf2"):
+            plugins[f"ZBP_{plugin_count:05d}"] = {
+                "name": str(plugin).split("/")[-1].replace(".sf2", ""),
+                "path": "/zynthian/zynthian-data/soundfonts/sf2/" + str(plugin).split("/")[-1],
+                "type": "sf2",
+                "version_added": 1
+            }
+            plugin_count += 1
+
+        # Read sfz plugins and add to list
+        for plugin in Path("/zynthian/zynthian-data/soundfonts/sfz").iterdir():
+            if plugin.is_dir():
+                plugins[f"ZBP_{plugin_count:05d}"] = {
+                    "name": str(plugin).split("/")[-1],
+                    "path": "/zynthian/zynthian-data/soundfonts/sfz/" + str(plugin).split("/")[-1],
+                    "type": "sfz",
+                    "version_added": 1
+                }
+                plugin_count += 1
+
+        with open("/zynthian/zynthbox-qml/config/plugins.json", "w") as f:
+            json.dump(plugins, f)
 

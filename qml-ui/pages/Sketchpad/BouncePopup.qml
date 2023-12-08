@@ -527,7 +527,7 @@ Zynthian.Popup {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2.5
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             wrapMode: Text.Wrap
-            verticalAlignment: Text.AlignVTop
+            verticalAlignment: Text.AlignTop
             text: _private.canBounce
                     ? _private.bounceLevel === 0
                         ? qsTr("Bounce the audio of all parts of all tracks which have something to bounce to sketches, put those bounced sketches into their equivalent parts, and set all the tracks that had things to bounce to Sketch mode.")

@@ -65,7 +65,6 @@ Rectangle {
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
 
-
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
@@ -1249,7 +1248,7 @@ Rectangle {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
                                         font.pointSize: 9
-                                        text: qsTr("Clip : %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(root.selectedChannel.selectedSlotRow + 97))
+                                        text: qsTr("Clip : %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(root.selectedChannel.selectedPart + 97))
                                     }
 
                                     Rectangle {
@@ -1266,8 +1265,7 @@ Rectangle {
                                         Image {
                                             id: patternVisualiser
 
-                                            visible: root.selectedChannel &&
-                                                     root.selectedChannel.connectedPattern >= 0
+                                            visible: root.pattern != null
 
                                             anchors {
                                                 fill: parent
@@ -1299,12 +1297,9 @@ Rectangle {
                                                 anchors.fill:parent
                                                 onClicked: {
                                                     if (patternContainer.showPattern) {
-                                                        var screenBack = zynqtgui.current_screen_id;
                                                         zynqtgui.current_modal_screen_id = "playgrid";
                                                         zynqtgui.forced_screen_back = "sketchpad";
                                                         Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", Zynthbox.PlayGridManager.sequenceEditorIndex);
-                                                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
-                                                        sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
                                                     }
                                                 }
                                             }

@@ -137,14 +137,10 @@ Zynthian.DialogQuestion {
                                     let hasSynthSlotDetails = false;
                                     let synthSlotDetails = ["","","","",""];
                                     let fxSlotDetails = ["","","","",""];
-                                    let layersData = JSON.parse(sketch.metadataActiveLayer);
-                                    for (let layerIndex = 0; layerIndex < layersData.layers.length; ++layerIndex) {
-                                        let layerData = layersData.layers[layerIndex];
-                                        let engineName = layerData["engine_name"];
-                                        if (engineName.startsWith("Jalv/")) {
-                                            engineName = engineName.slice(5);
-                                        }
-                                        let layerDetails = qsTr("%1 (%2)").arg(engineName).arg(layerData["preset_name"]);
+                                    let layersData = zynqtgui.layer.sound_metadata_from_json(sketch.metadataActiveLayer);
+                                    for (let layerIndex = 0; layerIndex < layersData.length; ++layerIndex) {
+                                        let layerData = layersData[layerIndex];
+                                        let layerDetails = qsTr("%1 (%2)").arg(layerData["engine_name"]).arg(layerData["preset_name"]);
                                         if (layerData["engine_type"] === "MIDI Synth") {
                                             if (-1 < layerData["slot_index"] && layerData["slot_index"] < 5) {
                                                 synthSlotDetails[layerData["slot_index"]] = layerDetails;

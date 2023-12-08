@@ -26,6 +26,7 @@
 
 import json
 import logging
+from string import Template
 from pathlib import Path
 from PySide2.QtCore import QObject
 
@@ -36,11 +37,14 @@ class zynthbox_plugin(QObject):
     """
     def __init__(self, key, plugin_details, parent=None):
         super(zynthbox_plugin, self).__init__(parent)
-        self.plugin_id = key
+        self.id = key
+        self.name = plugin_details["name"]
         self.path = plugin_details["path"]
-        self.plugin_name = plugin_details["plugin_name"]
-        self.plugin_type = plugin_details["plugin_type"]
+        self.type = plugin_details["type"]
         self.version_added = plugin_details["version_added"]
+        self.substitution_map = {}
+        for key in plugin_details:
+            self.substitution_map[f"{self.id}_{key}"] = plugin_details[key]
 
 
 class zynthbox_plugins_helper(QObject):
@@ -63,7 +67,7 @@ class zynthbox_plugins_helper(QObject):
         for key in plugins_json:
             plugin = zynthbox_plugin(key, plugins_json[key], self)
             self.plugins_by_id[key] = plugin
-            self.plugins_by_name[f"{plugins_json[key]['plugin_type']}/{plugins_json[key]['plugin_name']}"] = plugin
+            self.plugins_by_name[f"{plugins_json[key]['type']}/{plugins_json[key]['name']}"] = plugin
 
     def update_layer_snapshot_plugin_name_to_id(self, snapshot):
         """
@@ -74,10 +78,11 @@ class zynthbox_plugins_helper(QObject):
             # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
             plugin_name = snapshot["engine_nick"].split("/")[1]
             if f"lv2/{plugin_name}" in self.plugins_by_name:
-                plugin_id = self.plugins_by_name[f"lv2/{plugin_name}"].plugin_id
+                plugin_id = self.plugins_by_name[f"lv2/{plugin_name}"].id
                 logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin_id}")
-                snapshot["engine_name"] = f"{snapshot['engine_name'].split('/')[0]}/{plugin_id}"
-                snapshot["engine_nick"] = f"{snapshot['engine_nick'].split('/')[0]}/{plugin_id}"
+                snapshot["plugin_id"] = plugin_id
+                snapshot["engine_name"] = "{0}/${{{1}_name}}".format(snapshot['engine_name'].split('/')[0], plugin_id)
+                snapshot["engine_nick"] = "{0}/${{{1}_name}}".format(snapshot['engine_nick'].split('/')[0], plugin_id)
             else:
                 logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
         elif snapshot["engine_nick"] == "SF":
@@ -90,12 +95,13 @@ class zynthbox_plugins_helper(QObject):
             plugin_name = snapshot["bank_name"].split("/")[1]
             if f"sfz/{plugin_name}" in self.plugins_by_name:
                 plugin = self.plugins_by_name[f"sfz/{plugin_name}"]
-                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin.plugin_id}")
-                snapshot["bank_name"] = f"{snapshot['bank_name'].split('/')[0]}/{plugin.plugin_id}"
-                snapshot["bank_info"][0] = plugin.plugin_id
+                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin.id}")
+                snapshot["plugin_id"] = plugin.id
+                snapshot["bank_name"] = "{0}/${{{1}_name}}".format(snapshot['bank_name'].split('/')[0], plugin.id)
+                snapshot["bank_info"][0] = "${{{0}_path}}".format(plugin.id)
                 snapshot["bank_info"][2] = snapshot["bank_name"]
-                snapshot["bank_info"][4] = plugin.plugin_id
-                snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, plugin.plugin_id)
+                snapshot["bank_info"][4] = "${{{0}_name}}".format(plugin.id)
+                snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, "${{{0}_path}}".format(plugin.id))
             else:
                 logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
         elif snapshot["engine_nick"] == "FS":
@@ -109,13 +115,14 @@ class zynthbox_plugins_helper(QObject):
             plugin_name = snapshot["bank_name"]
             if f"sf2/{plugin_name}" in self.plugins_by_name:
                 plugin = self.plugins_by_name[f"sf2/{plugin_name}"]
-                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin.plugin_id}")
-                snapshot["bank_name"] = plugin.plugin_id
-                snapshot["bank_info"][0] = plugin.plugin_id
-                snapshot["bank_info"][2] = plugin.plugin_id
-                snapshot["bank_info"][4] = plugin.plugin_id
-                snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, plugin.plugin_id)
-                snapshot["preset_info"][3] = plugin.plugin_id
+                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin.id}")
+                snapshot["plugin_id"] = plugin.id
+                snapshot["bank_name"] = "${{{0}_name}}".format(plugin.id)
+                snapshot["bank_info"][0] = "${{{0}_path}}".format(plugin.id)
+                snapshot["bank_info"][2] = "${{{0}_name}}".format(plugin.id)
+                snapshot["bank_info"][4] = "${{{0}_name}}.sf2".format(plugin.id)
+                snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, "${{{0}_path}}".format(plugin.id))
+                snapshot["preset_info"][3] = "${{{0}_path}}".format(plugin.id)
             else:
                 logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
 
@@ -127,14 +134,14 @@ class zynthbox_plugins_helper(QObject):
         """
         # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
         if snapshot["engine_nick"].startswith("JV/"):
-            plugin_id = snapshot["engine_nick"].split("/")[1]
-            if plugin_id.startswith("ZBP-"):
+            if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
+                plugin_id = snapshot["plugin_id"]
                 if plugin_id in self.plugins_by_id:
                     # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
-                    plugin_name = self.plugins_by_id[plugin_id].plugin_name
-                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin_name}")
-                    snapshot["engine_name"] = f"{snapshot['engine_name'].split('/')[0]}/{plugin_name}"
-                    snapshot["engine_nick"] = f"{snapshot['engine_nick'].split('/')[0]}/{plugin_name}"
+                    plugin = self.plugins_by_id[plugin_id]
+                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.name}")
+                    snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin.substitution_map)
+                    snapshot["engine_nick"] = Template(snapshot["engine_nick"]).substitute(plugin.substitution_map)
                 else:
                     logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
         elif snapshot["engine_nick"] == "SF":
@@ -144,16 +151,16 @@ class zynthbox_plugins_helper(QObject):
             # 3. bank_info[2]: same as bank_name
             # 4. bank_info[4]: `<plugin name>`
             # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
-            plugin_id = snapshot["bank_name"].split("/")[1]
-            if plugin_id.startswith("ZBP-"):
+            if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
+                plugin_id = snapshot["plugin_id"]
                 if plugin_id in self.plugins_by_id:
                     plugin = self.plugins_by_id[plugin_id]
-                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.plugin_name}")
-                    snapshot["bank_name"] = f"{snapshot['bank_name'].split('/')[0]}/{plugin.plugin_name}"
-                    snapshot["bank_info"][0] = plugin.path
-                    snapshot["bank_info"][2] = snapshot["bank_name"]
-                    snapshot["bank_info"][4] = plugin.plugin_name
-                    snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.plugin_id, plugin.path)
+                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.name}")
+                    snapshot["bank_name"] = Template(snapshot["bank_name"]).substitute(plugin.substitution_map)
+                    snapshot["bank_info"][0] = Template(snapshot["bank_info"][0]).substitute(plugin.substitution_map)
+                    snapshot["bank_info"][2] = Template(snapshot["bank_info"][2]).substitute(plugin.substitution_map)
+                    snapshot["bank_info"][4] = Template(snapshot["bank_info"][4]).substitute(plugin.substitution_map)
+                    snapshot["preset_info"][0] = Template(snapshot["preset_info"][0]).substitute(plugin.substitution_map)
                 else:
                     logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
         elif snapshot["engine_nick"] == "FS":
@@ -164,17 +171,17 @@ class zynthbox_plugins_helper(QObject):
             # 4. bank_info[4]: Filename `<plugin_name>.sf2` from plugin path
             # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
             # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
-            plugin_id = snapshot["bank_name"]
-            if plugin_id.startswith("ZBP-"):
+            if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
+                plugin_id = snapshot["plugin_id"]
                 if plugin_id in self.plugins_by_id:
                     plugin = self.plugins_by_id[plugin_id]
-                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.plugin_name}")
-                    snapshot["bank_name"] = plugin.plugin_name
-                    snapshot["bank_info"][0] = plugin.path
-                    snapshot["bank_info"][2] = plugin.plugin_name
-                    snapshot["bank_info"][4] = plugin.path.split("/")[-1]
-                    snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.plugin_id, plugin.path)
-                    snapshot["preset_info"][3] = plugin.path
+                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.name}")
+                    snapshot["bank_name"] = Template(snapshot["bank_name"]).substitute(plugin.substitution_map)
+                    snapshot["bank_info"][0] = Template(snapshot["bank_info"][0]).substitute(plugin.substitution_map)
+                    snapshot["bank_info"][2] = Template(snapshot["bank_info"][2]).substitute(plugin.substitution_map)
+                    snapshot["bank_info"][4] = Template(snapshot["bank_info"][4]).substitute(plugin.substitution_map)
+                    snapshot["preset_info"][0] = Template(snapshot["preset_info"][0]).substitute(plugin.substitution_map)
+                    snapshot["preset_info"][3] = Template(snapshot["preset_info"][3]).substitute(plugin.substitution_map)
                 else:
                     logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
 

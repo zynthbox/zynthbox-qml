@@ -2936,13 +2936,15 @@ class zynthian_gui(QObject):
             self.loading = 0
 
         if self.loading == 0:
-            recent_task_messages.put("command:hide")
+            if self.__long_task_count__ == 0:
+                recent_task_messages.put("command:hide")
             self.is_loading_changed.emit()
             QGuiApplication.instance().processEvents()
         # logging.debug("STOP LOADING %d" % self.loading)
 
     def reset_loading(self):
-        recent_task_messages.put("command:hide")
+        if self.__long_task_count__ == 0:
+            recent_task_messages.put("command:hide")
         self.loading = 0
         self.is_loading_changed.emit()
         QGuiApplication.instance().processEvents()
@@ -3664,7 +3666,8 @@ class zynthian_gui(QObject):
         if self.__long_task_count__ == 0:
             self.currentTaskMessage = ""
             self.longTaskEnded.emit()
-            recent_task_messages.put("command:hide")
+            if self.loading == 0:
+                recent_task_messages.put("command:hide")
 
     longTaskStarted = Signal()
     longTaskEnded = Signal()

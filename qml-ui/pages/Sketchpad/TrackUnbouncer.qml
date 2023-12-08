@@ -47,11 +47,6 @@ Zynthian.DialogQuestion {
             console.log("Can't unbounce if there's no selected sound source, so we should be disabling the accept button in that case... which we need the ability to do first.");
         }
     }
-    onOpenedChanged: {
-        if (component.opened === false) {
-            _private.sketchpadTrackId = -1;
-        }
-    }
     title: qsTr("Unbounce Track?")
     acceptText: qsTr("Unbounce")
     acceptEnabled: (_private.soundSourceSketch > -1)
@@ -140,7 +135,7 @@ Zynthian.DialogQuestion {
                                     let layersData = zynqtgui.layer.sound_metadata_from_json(sketch.metadataActiveLayer);
                                     for (let layerIndex = 0; layerIndex < layersData.length; ++layerIndex) {
                                         let layerData = layersData[layerIndex];
-                                        let layerDetails = qsTr("%1 (%2)").arg(layerData["engine_name"]).arg(layerData["preset_name"]);
+                                        let layerDetails = qsTr("%1 (%2)").arg(layerData["name"]).arg(layerData["preset_name"]);
                                         if (layerData["engine_type"] === "MIDI Synth") {
                                             if (-1 < layerData["slot_index"] && layerData["slot_index"] < 5) {
                                                 synthSlotDetails[layerData["slot_index"]] = layerDetails;
@@ -226,7 +221,10 @@ Zynthian.DialogQuestion {
                     zynqtgui.currentTaskMessage = qsTr("Unbouncing Track %1").arg(_private.sketchpadTrack.name);
                     // - eat all input if we're unbouncing
                     // - Clear samples
-                    _private.sketchpadTrack.clear();
+                    for (let sampleSlotIndex = 0;  sampleSlotIndex < 5; ++sampleSlotIndex) {
+                        let sample = _private.sketchpadTrack.samples[sampleSlotIndex];
+                        sample.clear();
+                    }
                     // - Pick out the specific clip selected for sound source
                     let originSketch = _private.sketches[_private.soundSourceSketch];
                     //   - Set track channelAudioType to match ZYNTHBOX_AUDIO_TYPE (clip.metadataAudioType)
@@ -260,8 +258,8 @@ Zynthian.DialogQuestion {
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
                         }
                     }
-                    // - close dialog
-                    component.close();
+                    // - Clean up after ourselves
+                    _private.sketchpadTrackId = -1;
                     // - End long-running task
                     zynqtgui.stop_loading();
                 }

@@ -123,28 +123,31 @@ class sketchpad_clip(QObject):
 
         self.path_changed.connect(self.zynqtgui.zynautoconnect_audio)
 
-    # A helper method to generate unique name when copying a clip file into a folder
+    # A helper method to generate unique name when copying a wave file into a folder
     # Arg file : Full Path of file to be copied
     # Arg copy_dir : Full Path of destination dir where the file will be copied
-    # Returns : An unique filename as string in the format f"{file_basename}-{counter}.clip.wav"
+    # Returns : An unique filename as string in the format f"{file_basename}-{counter}.{category}.wav" (where category is either "clip" or "sketch")
     @staticmethod
     def generate_unique_filename(file, copy_dir):
         file_path = Path(file)
         copy_dir_path = Path(copy_dir)
         counter = 1
 
-        # Find the base filename excluding .clip.wav
-        file_basename = file_path.name.split(".wav")[0].split(".clip")[0]
+        # Find the base filename excluding our suffix (sketch.wav or .clip.wav)
+        categoryPrefix = "clip"
+        if file_path.endswith(".sketch.wav"):
+            categoryPrefix = "sketch"
+        file_basename = file_path.name.split(".wav")[0].split(f".{categoryPrefix}")[0]
         # Remove the `counter` part from the string if exists
         file_basename = re.sub('-\d*$', '', file_basename)
 
-        if not (copy_dir_path / f"{file_basename}.clip.wav").exists():
-            return f"{file_basename}.clip.wav"
+        if not (copy_dir_path / f"{file_basename}.{categoryPrefix}.wav").exists():
+            return f"{file_basename}.{categoryPrefix}.wav"
         else:
-            while Path(copy_dir_path / f"{file_basename}-{counter}.clip.wav").exists():
+            while Path(copy_dir_path / f"{file_basename}-{counter}.{categoryPrefix}.wav").exists():
                 counter += 1
 
-            return f"{file_basename}-{counter}.clip.wav"
+            return f"{file_basename}-{counter}.{categoryPrefix}.wav"
 
     def className(self):
         return "sketchpad_clip"

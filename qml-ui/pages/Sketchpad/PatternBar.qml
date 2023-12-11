@@ -93,7 +93,7 @@ GridLayout {
             Layout.fillHeight: true
             smooth: false
 
-            visible: controlObj != null && controlObj.clipChannel != null && controlObj.clipChannel.connectedPattern >= 0
+            visible: controlObj != null && controlObj.clipChannel != null && root.pattern != null
             source: root.pattern && controlObj.clipChannel ? root.pattern.thumbnailUrl : ""
             Rectangle { // Progress
                 anchors {

@@ -511,15 +511,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__song__.channelsModel.getChannel(tid).set_layers_snapshot(channel_layers_snapshot)
         self.__song__.schedule_save()
 
-#    @Slot(int)
-#    def restoreLayersFromChannel(self, tid):
-#        if tid < 0 or tid >= self.__song__.channelsModel.count:
-#            return
-#        for i in range(5, 10):
-#            if i in self.zynqtgui.screens['layer'].layer_midi_map:
-#                self.zynqtgui.screens['layer'].remove_root_layer(self.zynqtgui.screens['layer'].root_layers.index(self.zynqtgui.screens['layer'].layer_midi_map[i]), True)
-#        self.zynqtgui.screens['layer'].load_channels_snapshot(self.__song__.channelsModel.getChannel(tid).get_layers_snapshot(), 5, 9)
-
     @Signal
     def ongoingCountInChanged(self):
         pass

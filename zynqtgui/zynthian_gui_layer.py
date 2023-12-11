@@ -1529,7 +1529,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 #    # snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
 #    # All restored channels will be cloned among themselves
-    def load_channels_snapshot(self, snapshot, from_channel, to_channel, channels_mapping = {}):
+    def load_channels_snapshot(self, snapshot, channels_mapping = {}):
         if not isinstance(snapshot, dict):
             return []
         if not isinstance(channels_mapping, dict):
@@ -1538,141 +1538,30 @@ class zynthian_gui_layer(zynthian_gui_selector):
             return []
         if not isinstance(snapshot["layers"], list):
             return []
-#        self.zynqtgui.start_loading()
 
         restored_layers = []
-#        restored_channels = []
-#        restored_jacknames = []
-
-        # for layer_data in snapshot["layers"]:
-        #     if "midi_chan" in layer_data and "engine_nick" in layer_data:
-        #         midi_chan = layer_data["midi_chan"]
-        #         if midi_chan in self.layer_midi_map:
-        #                 self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
         for layer_data in snapshot["layers"]:
             if "midi_chan" in layer_data and "engine_nick" in layer_data:
                 midi_chan = layer_data["midi_chan"]
 
                 if str(midi_chan) in channels_mapping:
                     midi_chan = int(channels_mapping[str(midi_chan)])
-                if midi_chan >= from_channel and midi_chan <= to_channel:
-#                    for i in range(from_channel, to_channel + 1):
-#                        if i in self.layer_midi_map and midi_chan in self.layer_midi_map:
-#                            self.remove_clone_midi(i, midi_chan)
-#                            self.remove_clone_midi(midi_chan, i)
-
-                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
-                    logging.debug(f"### Restoring engine : {layer_snapshot['engine_nick']}")
-                    engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
-                    slot_index = layer_snapshot['slot_index'] if "slot_index" in layer_snapshot else -1
-                    new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index)
-                    new_layer.restore_snapshot_1(layer_snapshot)
-                    new_layer.restore_snapshot_2(layer_snapshot)
-                    if engine.type == "Audio Effect":
-                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.midi_chan).setFxToChain(new_layer, slot_index)
-                    sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
-                    for layer in sublayers:
-                        layer.set_midi_chan(midi_chan)
-                    self.layers.append(new_layer)
-                    restored_layers.append(new_layer)
-#                    restored_channels.append(new_layer.midi_chan)
-#                    restored_jacknames.append(new_layer.get_jackname())
-#        # try to map the jacknames of therestored channels with what it was snapshotted
-#        snapshotted_jacknames = []
-#        if 'audio_routing' in snapshot:
-#            for jackname in snapshot['audio_routing']:
-#                if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
-#                for out in snapshot['audio_routing'][jackname]:
-#                    if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
-#        if 'midi_routing' in snapshot:
-#            for jackname in snapshot['midi_routing']:
-#                if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
-#                for out in snapshot['midi_routing'][jackname]:
-#                    if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
-#        restored_jacknames.sort()
-#        snapshotted_jacknames.sort()
-#        jacknames_r_s_map = {}
-#        jacknames_s_r_map = {}
-#        for rj in restored_jacknames:
-#            rjsize = len(rj)
-#            basename = rj[:rjsize - 3]
-#            for sj in snapshotted_jacknames:
-#                if basename == sj[:rjsize - 3]:
-#                    jacknames_r_s_map[rj] = sj
-#                    jacknames_s_r_map[sj] = rj
-#                    snapshotted_jacknames.remove(sj)
-#                    break
-
-#        if 'audio_routing' in snapshot:
-#            for layer in restored_layers:
-#                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
-#                if layer.get_jackname() in jacknames_r_s_map:
-#                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
-#                    if mapped_source_jackname in snapshot['audio_routing']:
-#                        mapped_out_jacknames = []
-#                        for name in snapshot['audio_routing'][mapped_source_jackname]:
-#                            if name in jacknames_s_r_map:
-#                                mapped_out_jacknames.append(jacknames_s_r_map[name])
-#                        if len(mapped_out_jacknames) > 0:
-#                            layer.set_audio_out(mapped_out_jacknames)
-#                        else:
-#                            layer.reset_audio_out()
-#                else:
-#                    layer.reset_audio_out()
-#        if 'midi_routing' in snapshot:
-#            for layer in restored_layers:
-#                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
-#                if layer.get_jackname() in jacknames_r_s_map:
-#                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
-#                    if mapped_source_jackname in snapshot['midi_routing']:
-#                        mapped_out_jacknames = []
-#                        for name in snapshot['midi_routing'][mapped_source_jackname]:
-#                            if name in jacknames_s_r_map:
-#                                mapped_out_jacknames.append(jacknames_s_r_map[name])
-#                        if len(mapped_out_jacknames) > 0:
-#                            layer.set_midi_out(mapped_out_jacknames)
-
-#        if 'audio_capture' in snapshot:
-#            for layer in restored_layers:
-#                #Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
-#                if layer.get_jackname() in jacknames_r_s_map:
-#                    mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
-#                    if mapped_source_jackname in snapshot['audio_capture']:
-#                        mapped_out_jacknames = []
-#                        for name in snapshot['audio_capture'][mapped_source_jackname]:
-#                            if name in jacknames_s_r_map:
-#                                mapped_out_jacknames.append(jacknames_s_r_map[name])
-#                        if len(mapped_out_jacknames) > 0:
-#                            layer.set_audio_in(mapped_out_jacknames)
-#                        else:
-#                            layer.reset_audio_in()
-#                else:
-#                    layer.reset_audio_in()
-#        else:
-#            for layer in restored_layers:
-#                layer.reset_audio_in()
-
-#        if 'note_range' in snapshot:
-#            new_roots = self.get_fxchain_roots()
-#            i = 0
-#            for layer in restored_layers:
-#                if i < len(snapshot['note_range']) and layer in new_roots:
-#                    zyncoder.lib_zyncoder.set_midi_filter_note_range(layer.midi_chan, snapshot['note_range'][i]['note_low'], snapshot['note_range'][i]['note_high'], snapshot['note_range'][i]['octave_trans'], snapshot['note_range'][i]['halftone_trans'])
-#                    i += 1
-
-#        #TODO: always clone?
-#        for i in restored_channels:
-#            self.add_midichannel_to_channel(i)
-#            for j in restored_channels:
-#                if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
-#                    zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
-
+                layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
+                logging.debug(f"### Restoring engine : {layer_snapshot['engine_nick']}")
+                engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
+                slot_index = layer_snapshot['slot_index'] if "slot_index" in layer_snapshot else -1
+                new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index)
+                new_layer.restore_snapshot_1(layer_snapshot)
+                new_layer.restore_snapshot_2(layer_snapshot)
+                if engine.type == "Audio Effect":
+                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.midi_chan).setFxToChain(new_layer, slot_index)
+                sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
+                for layer in sublayers:
+                    layer.set_midi_chan(midi_chan)
+                self.layers.append(new_layer)
+                restored_layers.append(new_layer)
         self.zynqtgui.zynautoconnect(True)
-
         self.fill_list()
-#        if len(restored_channels) > 0:
-#            self.activate_midichan_layer(restored_channels[0])
-#        self.zynqtgui.stop_loading()
         return restored_layers
 
 
@@ -1746,27 +1635,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
             logging.error(e)
             return []
 
-#    @Slot(str)
-#    def load_soundset_from_file(self, file_name):
-#        try:
-#            if file_name.startswith("/"):
-#                actualPath = Path(file_name)
-#            else:
-#                actualPath = Path(self.__soundsets_basepath__ + file_name)
-#            f = open(actualPath, "r")
-#            for i in range(5):
-#                self.remove_midichan_layer(i)
-#            layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
-#            if len(layers) > 0:
-#                try:
-#                    self.activate_index(root_layers.index(layers[0]))
-#                except:
-#                    self.activate_index(0)
-#            else:
-#                self.activate_index(0)
-#        except Exception as e:
-#            logging.error(e)
-
     @Slot(str, result='QVariantList')
     def load_layer_channels_from_json(self, json_data):
         result = []
@@ -1801,11 +1669,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
             logging.error(e)
         return result
 
-
-#    @Slot(str, 'QVariantMap')
-#    def load_layer_from_json(self, json_data, channels_mapping):
-#        self.load_channels_snapshot(JSONDecoder().decode(json_data), 0, 16, channels_mapping)
-
     @Slot(str, 'QVariantMap')
     def load_layer_from_file(self, file_name, channels_mapping):
         try:
@@ -1814,8 +1677,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
             else:
                 actualPath = Path(self.__sounds_basepath__ + file_name)
             f = open(actualPath, "r")
-            logging.info(f"### Loading layers from file")
-            layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
+            logging.info("### Loading layers from file")
+            layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), channels_mapping)
             logging.debug(f"### Loaded layers : {layers}")
             for layer in layers:
                 logging.debug(f"#### Loaded layer {layer.engine.name} on channel {layer.midi_chan}")

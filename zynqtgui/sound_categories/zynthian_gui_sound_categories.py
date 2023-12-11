@@ -26,7 +26,7 @@ import json
 import logging
 import os
 import tempfile
-import traceback
+import json
 from json import JSONEncoder
 from pathlib import Path
 
@@ -241,13 +241,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     def loadSoundFromFile(self, filepath, channelIndex=-1, run_autoconnect=False):
         def task():
             logging.debug(f"### Loading sound : {filepath}")
+            with open(filepath, "r") as f:
+                sound_json = json.load(f)
 
             if channelIndex == -1:
                 channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
             else:
                 channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channelIndex)
 
-            source_channels = self.zynqtgui.layer.load_layer_channels_from_file(filepath)
+            source_channels = self.zynqtgui.layer.load_layer_channels_from_json(sound_json)
             free_layers = channel.getFreeLayers()
             used_layers = []
 
@@ -255,7 +257,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                 if i >= 0 and channel.checkIfLayerExists(i):
                     used_layers.append(i)
 
-            logging.debug(f"### Before Removing")
+            logging.debug("### Before Removing")
             logging.debug(f"# Selected Channel         : {self.zynqtgui.session_dashboard.selectedChannel}")
             logging.debug(f"# Source Channels        : {source_channels}")
             logging.debug(f"# Free Layers            : {free_layers}")
@@ -263,6 +265,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
             logging.debug(f"# Source Channels Count  : {len(source_channels)}")
             logging.debug(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
+            logging.debug(f"# Sound json             : {sound_json}")
 
             # Check if count of channels required to load sound is available or not
             # Available count of channels : used layers by current channel (will get replaced) + free layers
@@ -288,43 +291,31 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                     else:
                         # Repopulate after removing current channel layers
                         free_layers = channel.getFreeLayers()
-
-                        # New channels map's both key and value should be string
-                        # That is how load_layer_from_file method expects the values
-                        new_channels_map = {}
-
-                        logging.debug(f"### After Removing")
-                        logging.debug(f"# Source Channels        : {source_channels}")
-                        logging.debug(f"# Free Layers            : {free_layers}")
-                        logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
-
-                        for index, _channel in enumerate(source_channels):
-                            new_channels_map[f"{_channel}"] = f"{free_layers[index]}"
-
-                        logging.debug(f"# Channel map for loading sound : {new_channels_map}")
-
                         # Populate new chained sounds and update channel
-                        new_chained_sounds = []
+                        new_chained_sounds = [-1, -1, -1, -1, -1]
 
-                        for key, val in new_channels_map.items():
-                            new_chained_sounds.append(int(val))
-
-                        if len(new_chained_sounds) < 5:
-                            for i in range(5 - len(new_chained_sounds)):
-                                new_chained_sounds.append(-1)
+                        # Iterate over all the layers in sound_json and update midi_chan such as
+                        # - In case of a MIDI Synth, it is a new free layer
+                        # - In case of an Audio Effect, it is the track id
+                        for index, _ in enumerate(sound_json["layers"]):
+                            if sound_json["layers"][index]["engine_type"] == "MIDI Synth":
+                                sound_json["layers"][index]["midi_chan"] = free_layers[index]
+                                new_chained_sounds[sound_json["layers"][index]["slot_index"]] = free_layers[index]
+                            elif sound_json["layers"][index]["engine_type"] == "Audio Effect":
+                                sound_json["layers"][index]["midi_chan"] = channel.id
 
                         self.zynqtgui.currentTaskMessage = f"Loading selected sounds in Track {channel.name}"
-                        self.zynqtgui.layer.load_layer_from_file(filepath, new_channels_map)
+                        self.zynqtgui.layer.load_channels_snapshot(sound_json)
 
                         channel.chainedSounds = new_chained_sounds
 
                         # Repopulate after loading sound
                         free_layers = channel.getFreeLayers()
 
-                        logging.debug(f"### After Loading")
+                        logging.debug("### After Loading")
                         logging.debug(f"# Free Layers            : {free_layers}")
-                        logging.debug(f"# New Chained Sounds     : {new_chained_sounds}")
                         logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
+                        logging.debug(f"# Sound json             : {sound_json}")
 
                 if len(used_layers) > 0:
                     # Remove all current sounds from channel

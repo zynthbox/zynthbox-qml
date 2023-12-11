@@ -38,6 +38,8 @@ Item {
     property string text
     property bool highlightOctaveStart: true
     signal notePlayed(QtObject note, int velocity);
+    signal noteOn(QtObject note, int velocity);
+    signal noteOff(QtObject note);
 
     // Pitch is -8192 to 8191 inclusive
     property int pitchValue: Math.max(-8192, Math.min(slidePoint.slideX * 8192 / width, 8191))
@@ -202,21 +204,16 @@ Item {
                             velocityValue = slidePoint.pressure > 0.99999 ? 127 : Math.floor(slidePoint.pressure * 127);
                         }
                         slidePoint.playingNote = component.note;
-                        if (slidePoint.playingNote.isPlaying === false) {
-                            slidePoint.playingNote.setOn(velocityValue);
-                            component.notePlayed(slidePoint.playingNote, velocityValue);
-                        }
+                        slidePoint.playingNote.setOn(velocityValue);
+                        component.notePlayed(slidePoint.playingNote, velocityValue);
+                        component.noteOn(slidePoint.playingNote, velocityValue);
                         component.focus = true;
                         slidePoint.updateInsideBounds();
                         longPressTimer.restart();
                     } else {
-                        if (slidePoint.playingNote && slidePoint.playingNote.isPlaying) {
-                            // console.log("We've got a playing note set, turn that off");
-                            slidePoint.playingNote.setOff();
-                        } else if (component.note.isPlaying) {
-                            // console.log("We don't have a playing note, but our set note is on for whatever reason, so... turn that off?");
-                            component.note.setOff();
-                        }
+                        // console.log("We've got a playing note set, turn that off");
+                        slidePoint.playingNote.setOff();
+                        component.noteOff(slidePoint.playingNote);
                         slidePoint.playingNote = undefined;
                         Zynthbox.PlayGridManager.pitch = 0;
                         Zynthbox.PlayGridManager.modulation = 0;

@@ -32,6 +32,7 @@ import base64
 import logging
 import collections
 import jack
+import json
 from collections import OrderedDict
 from json import JSONEncoder, JSONDecoder
 from pathlib import Path
@@ -483,11 +484,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
             if self.add_layer_eng:
                 zyngine = self.zynqtgui.screens['engine'].start_engine(self.add_layer_eng)
                 self.add_layer_eng = None
-                position_in_channel = -1
-                for i, element in enumerate(self.zynqtgui.screens['layers_for_channel'].list_data):
-                    if midich == element[1]:
-                        position_in_channel = i
-                        break
+                slot_index = -1
 
                 if self.layer_index_replace_engine != None and len(self.layers) > self.index:
                     layer = self.root_layers[self.layer_index_replace_engine]
@@ -508,17 +505,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 else:
                     # When creating zynthian_layer, if engine is an audio effect, stores the channel id instead of midi channel
                     channel = midich
-                    slot_index = -1
                     if zyngine.type=="Audio Effect":
                         channel = self.zynqtgui.session_dashboard.selectedChannel
                         slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel).selectedFxSlotRow
+                    elif zyngine.type=="MIDI Synth":
+                        for i, element in enumerate(self.zynqtgui.screens['layers_for_channel'].list_data):
+                            if midich == element[1]:
+                                slot_index = i
+                                break
 
                     layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
 
                 self.zynqtgui.set_curlayer(layer, queue=False)
 
                 if not zyngine.type == "Audio Effect":
-                    self.add_midichannel_to_channel(midich, position_in_channel)
+                    self.add_midichannel_to_channel(midich, slot_index)
 
                 # Try to connect Audio Effects ...
                 if len(self.layers)>0 and layer.engine.type=="Audio Effect":
@@ -1286,8 +1287,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
             #Layers info
             for layer in self.layers:
-                if track is None or (track is not None and layer.midi_chan in track.chainedSounds):
-                    snapshot['layers'].append(self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(layer.get_snapshot()))
+                if track is None or (track is not None and layer.engine.type == "MIDI Synth" and layer.midi_chan in track.chainedSounds) or (track is not None and layer.engine.type == "Audio Effect" and layer.midi_chan == track.id):
+                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(layer.get_snapshot())
+                    if layer_snapshot["engine_type"] == "MIDI Synth" and layer_snapshot["slot_index"] == -1:
+                        if self.zynqtgui.sketchpad.song is not None and self.zynqtgui.sketchpad.song.channelsModel is not None:
+                            for channel_id in range(10):
+                                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id)
+                                if layer_snapshot['midi_chan'] in channel.chainedSounds:
+                                    layer_snapshot["slot_index"] = channel.chainedSounds.index(layer_snapshot['midi_chan'])
+                    snapshot['layers'].append(layer_snapshot)
 
 
             if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
@@ -1370,7 +1378,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     del(snapshot['layers'][i])
                 else:
                     layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
-                    slot_index = layer_snapshot['slot_index'] if "slot_index" in layer_snapshot else -1
+                    slot_index = -1
+                    if "slot_index" in layer_snapshot and layer_snapshot["slot_index"] != -1:
+                        slot_index = layer_snapshot['slot_index']
+                    else:
+                        if self.zynqtgui.sketchpad.song is not None and self.zynqtgui.sketchpad.song.channelsModel is not None:
+                            for channel_id in range(10):
+                                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id)
+                                if layer_snapshot['engine_type'] == "MIDI Synth" and layer_snapshot['midi_chan'] in channel.chainedSounds:
+                                    slot_index = channel.chainedSounds.index(layer_snapshot['midi_chan'])
                     engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
                     layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, slot_index)
                     self.layers.append(layer)
@@ -1636,10 +1652,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
             return []
 
     @Slot(str, result='QVariantList')
-    def load_layer_channels_from_json(self, json_data):
+    def load_layer_channels_from_json(self, snapshot):
         result = []
         try:
-            snapshot = JSONDecoder().decode(json_data)
             if not isinstance(snapshot, dict):
                 return
             if not "layers" in snapshot:
@@ -1647,12 +1662,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
             if not isinstance(snapshot["layers"], list):
                 return
             for layer_data in snapshot["layers"]:
-                if "midi_chan" in layer_data:
+                if "midi_chan" in layer_data and layer_data["engine_type"] == "Audio Effect":
                     midi_chan = layer_data['midi_chan']
                     if not midi_chan in result:
                         result.append(midi_chan)
         except Exception as e:
-            logging.error("Attempted to load from json data. Reported error was {} and the data was {}".format(e, json_data));
+            logging.error("Attempted to load from json data. Reported error was {} and the data was {}".format(e, snapshot));
         return result
 
     @Slot(str, result='QVariantList')
@@ -1664,7 +1679,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
             else:
                 actualPath = Path(self.__sounds_basepath__ + file_name)
             f = open(actualPath, "r")
-            result = self.load_layer_channels_from_json(f.read())
+            result = self.load_layer_channels_from_json(json.load(f))
         except Exception as e:
             logging.error(e)
         return result

@@ -105,12 +105,12 @@ Zynthian.BasePlayGrid {
                 case "START_RECORD":
                     if (_private.activePatternModel.recordLive) {
                         _private.activePatternModel.recordLive = false;
-                        if (Zynthbox.PlayGridManager.metronomeActive) {
+                        if (Zynthbox.SyncTimer.timerRunning) {
                             Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         }
                     } else {
                         _private.activePatternModel.recordLive = true;
-                        if (!Zynthbox.PlayGridManager.metronomeActive) {
+                        if (Zynthbox.SyncTimer.timerRunning === false) {
                             Zynthian.CommonUtils.startMetronomeAndPlayback();
                         }
                     }
@@ -235,7 +235,6 @@ Zynthian.BasePlayGrid {
 
     property var mostRecentlyPlayedNote
     property var mostRecentNoteVelocity
-    property bool listenForNotes: false
     property var heardNotes: []
     property var heardVelocities: []
     property var currentRowUniqueNotes: []
@@ -561,77 +560,62 @@ Zynthian.BasePlayGrid {
                 }
             }
         }
-        onMostRecentlyChangedNotesChanged: {
-            if (component.listenForNotes && _private.activePatternModel) {
-                var mostRecentNoteData = Zynthbox.PlayGridManager.mostRecentlyChangedNotes[Zynthbox.PlayGridManager.mostRecentlyChangedNotes.length - 1];
-                if (mostRecentNoteData.channel == _private.activePatternModel.midiChannel) {
-                    // Same channel, that makes us friends!
-                    // Create a new note based on the new thing that just arrived, but only if it's an on note
-                    if (mostRecentNoteData.type == "note_on") {
-                        var newNote = component.getNote(mostRecentNoteData.note, mostRecentNoteData.channel);
-                        var existingIndex = component.heardNotes.indexOf(newNote);
-                        if (existingIndex > -1) {
-                            component.heardNotes.splice(existingIndex, 1);
-                            component.heardVelocities.splice(existingIndex, 1);
-                        }
-                        component.heardNotes.push(newNote);
-                        component.heardVelocities.push(mostRecentNoteData.velocity);
-                    }
-                }
-            }
-        }
     }
     Connections {
         target: Zynthbox.MidiRouter
-        enabled: component.isVisible && !Zynthbox.PlayGridManager.metronomeActive
+        enabled: component.isVisible
         onMidiMessage: {
-            if (port == 0 && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3 && 127 < byte1 && byte1 < 160) {
-                let midiChannel = byte1 - 127;
-                let setOn = false;
-                if (byte1 > 143) {
-                    midiChannel = byte1 - 143;
-                    setOn = true;
-                }
-                let midiNote = byte2;
-                let velocity = byte3;
-                if (setOn == true) {
-                    if (component.noteListeningActivations === 0) {
-                        // Clear the current state, in case there's something there (otherwise things look a little weird)
-                        component.heardNotes = [];
-                        component.heardVelocities = [];
-                        component.mostRecentlyPlayedNote = undefined;
+            if (Zynthbox.SyncTimer.timerRunning) {
+                // This is handled by the DrumsGrid
+            } else {
+                if (port == 0 && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3 && 127 < byte1 && byte1 < 160) {
+                    // let midiChannel = byte1 - 127;
+                    let setOn = false;
+                    if (byte1 > 143) {
+                        // midiChannel = byte1 - 143;
+                        setOn = true;
                     }
-                    // Count up one tick for a note on message
-                    component.noteListeningActivations = component.noteListeningActivations + 1;
-                    // Create a new note based on the new thing that just arrived, but only if it's an on note
-                    var newNote = component.getNote(midiNote, midiChannel);
-                    var existingIndex = component.noteListeningNotes.indexOf(newNote);
-                    if (existingIndex > -1) {
-                        component.noteListeningNotes.splice(existingIndex, 1);
-                        component.noteListeningVelocities.splice(existingIndex, 1);
+                    let midiNote = byte2;
+                    let velocity = byte3;
+                    if (setOn == true) {
+                        if (component.noteListeningActivations === 0) {
+                            // Clear the current state, in case there's something there (otherwise things look a little weird)
+                            component.heardNotes = [];
+                            component.heardVelocities = [];
+                            component.mostRecentlyPlayedNote = undefined;
+                        }
+                        // Count up one tick for a note on message
+                        component.noteListeningActivations = component.noteListeningActivations + 1;
+                        // Create a new note based on the new thing that just arrived, but only if it's an on note
+                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, sketchpadTrack);
+                        var existingIndex = component.noteListeningNotes.indexOf(newNote);
+                        if (existingIndex > -1) {
+                            component.noteListeningNotes.splice(existingIndex, 1);
+                            component.noteListeningVelocities.splice(existingIndex, 1);
+                        }
+                        component.noteListeningNotes.push(newNote);
+                        component.noteListeningVelocities.push(velocity);
+                    } else if (setOn == false) {
+                        // Count down one for a note off message
+                        component.noteListeningActivations = component.noteListeningActivations - 1;
                     }
-                    component.noteListeningNotes.push(newNote);
-                    component.noteListeningVelocities.push(velocity);
-                } else if (setOn == false) {
-                    // Count down one for a note off message
-                    component.noteListeningActivations = component.noteListeningActivations - 1;
-                }
-                if (component.noteListeningActivations === 0) {
-                    // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
                     component.heardNotes = component.noteListeningNotes;
                     component.heardVelocities = component.noteListeningVelocities;
-                    component.mostRecentlyPlayedNote = undefined;
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                } else if (component.noteListeningActivations < 0) {
-                    // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
-                    // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
-                    // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
-                    // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
-                    component.noteListeningActivations = 0;
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                    component.mostRecentlyPlayedNote = undefined;
+                    if (component.noteListeningActivations === 0) {
+                        // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
+                        component.mostRecentlyPlayedNote = undefined;
+                        component.noteListeningNotes = [];
+                        component.noteListeningVelocities = [];
+                    } else if (component.noteListeningActivations < 0) {
+                        // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
+                        // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
+                        // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
+                        // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                        component.noteListeningActivations = 0;
+                        component.noteListeningNotes = [];
+                        component.noteListeningVelocities = [];
+                        component.mostRecentlyPlayedNote = undefined;
+                    }
                 }
             }
         }
@@ -691,11 +675,6 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                             }
-                        }
-                    }
-                    onNotePressAndHold: {
-                        if (note) {
-                            noteSettingsPopup.showSettings(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [note.midiNote]);
                         }
                     }
                 }
@@ -2230,49 +2209,23 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    icon.name: component.listenForNotes
-                        ? "dialog-ok"
-                        : (component.mostRecentlyPlayedNote == undefined && component.heardNotes.length == 0) ? "" : "edit-clear-locationbar-ltr"
-                    text: component.listenForNotes
-                        ? "List-\nening"
-                        : "Note:\n" + (component.heardNotes.length == 0
-                            ? (component.mostRecentlyPlayedNote == undefined
-                                ? "(all)"
-                                : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
-                            : (component.heardNotes.length == 1
-                                ? component.heardNotes[0].name + (component.heardNotes[0].octave - 1)
-                                : component.heardNotes.length + " ♫"))
-                    visualPressAndHold: true
+                    icon.name: (component.mostRecentlyPlayedNote == undefined && component.heardNotes.length == 0) ? "" : "edit-clear-locationbar-ltr"
+                    text: "Note:\n" + (component.heardNotes.length == 0
+                        ? (component.mostRecentlyPlayedNote == undefined
+                            ? "(all)"
+                            : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
+                        : (component.heardNotes.length == 1
+                            ? component.heardNotes[0].name + (component.heardNotes[0].octave - 1)
+                            : component.heardNotes.length + " ♫"))
                     onClicked: {
-                        if (!pressingAndHolding) {
-                            if (zynqtgui.backButtonPressed && _private.activePatternModel) {
-                                component.ignoreNextBack = true;
-                                _private.activePatternModel.clear();
-                            } else {
-                                if (component.listenForNotes) {
-                                    component.listenForNotes = false;
-                                    if (component.heardNotes.length === 1) {
-                                        component.mostRecentlyPlayedNote = component.heardNotes[0];
-                                        component.mostRecentNoteVelocity = component.heardVelocities[0];
-                                        component.heardNotes = [];
-                                        component.heardVelocities = [];
-                                    } else {
-                                        component.mostRecentlyPlayedNote = undefined;
-                                    }
-                                } else {
-                                    component.mostRecentlyPlayedNote = undefined;
-                                    component.heardNotes = [];
-                                    component.heardVelocities = [];
-                                }
-                            }
+                        if (zynqtgui.backButtonPressed && _private.activePatternModel) {
+                            component.ignoreNextBack = true;
+                            _private.activePatternModel.clear();
+                        } else {
+                            component.mostRecentlyPlayedNote = undefined;
+                            component.heardNotes = [];
+                            component.heardVelocities = [];
                         }
-                    }
-                    onPressAndHold: {
-                        // Clear the existing notes when starting listening
-                        component.mostRecentlyPlayedNote = undefined;
-                        component.heardNotes = [];
-                        component.heardVelocities = [];
-                        component.listenForNotes = true;
                     }
                 }
                 Zynthian.PlayGridButton {

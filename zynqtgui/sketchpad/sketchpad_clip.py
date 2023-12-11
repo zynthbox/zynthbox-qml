@@ -135,7 +135,7 @@ class sketchpad_clip(QObject):
 
         # Find the base filename excluding our suffix (sketch.wav or .clip.wav)
         categoryPrefix = "clip"
-        if file_path.endswith(".sketch.wav"):
+        if str(file_path).endswith(".sketch.wav"):
             categoryPrefix = "sketch"
         file_basename = file_path.name.split(".wav")[0].split(f".{categoryPrefix}")[0]
         # Remove the `counter` part from the string if exists

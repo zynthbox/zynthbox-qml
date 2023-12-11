@@ -280,7 +280,6 @@ QQC2.AbstractButton {
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
                      channel.channelAudioType !== "sample-loop" &&
-                     channel.connectedPattern >= 0 &&
                      sequence.isPlaying &&
                      root.pattern.hasNotes
             color: Kirigami.Theme.textColor

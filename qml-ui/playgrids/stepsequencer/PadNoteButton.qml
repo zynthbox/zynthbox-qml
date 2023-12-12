@@ -41,7 +41,6 @@ QQC2.Button {
     property QtObject note
     property int padNoteRow: component.patternModel ? activeBar + component.patternModel.bankOffset : 0
     property int padNoteIndex
-    property var mostRecentlyPlayedNote
     property bool isCurrent: false
     property int currentSubNote: -1
     property alias subNoteCount: padSubNoteRepeater.count
@@ -67,7 +66,7 @@ QQC2.Button {
         Binding {
             target: padNoteRect
             property: "shouldChange"
-            value: (component.playgrid.mostRecentlyPlayedNote || component.playgrid.heardNotes.length > 0) ? true : false
+            value: (component.playgrid.heardNotes.length > 0) ? true : false
             delayed: true
         }
         MultiPointTouchArea {
@@ -122,26 +121,6 @@ QQC2.Button {
                                             }
                                             component.currentSubNote = -1;
                                             component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
-                                        } else if (component.playgrid.mostRecentlyPlayedNote) {
-                                            var aNoteData = {
-                                                velocity: component.playgrid.mostRecentNoteVelocity,
-                                                note: component.playgrid.mostRecentlyPlayedNote.midiNote,
-                                                channel: component.playgrid.mostRecentlyPlayedNote.midiChannel
-                                            }
-
-                                            var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, aNoteData["note"]);
-                                            if (subNoteIndex > -1) {
-                                                component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex)
-                                                subNoteIndex = subNoteIndex - 1;
-                                            } else {
-                                                subNoteIndex = component.patternModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
-                                                component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
-                                                if (component.patternModel.defaultNoteDuration > 0) {
-                                                    component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.defaultNoteDuration);
-                                                }
-                                            }
-                                            component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
-                                            component.currentSubNote = subNoteIndex;
                                         }
                                     } else {
                                         component.tapped(-1);
@@ -178,7 +157,7 @@ QQC2.Button {
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
                     Layout.maximumHeight: Layout.minimumHeight
-                    property bool currentGlobalPick: (component.playgrid.heardNotes.length > 0 && component.playgrid.heardNotes.indexOf(subNote) > 0) || typeof(component.mostRecentlyPlayedNote) === "undefined" || (component.mostRecentlyPlayedNote && subNote && component.mostRecentlyPlayedNote.midiNote === subNote.midiNote)
+                    property bool currentGlobalPick: (component.playgrid.heardNotes.length > 0 && component.playgrid.heardNotes.indexOf(subNote) > 0) || component.playgrid.heardNotes.length === 0
                     opacity: currentGlobalPick ? 1 : 0.3
                     MultiPointTouchArea {
                         enabled: !padNoteRect.shouldChange

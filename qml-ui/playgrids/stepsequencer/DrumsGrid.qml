@@ -58,7 +58,6 @@ ColumnLayout {
                 component.playgrid.heardVelocities = component.noteListeningVelocities;
                 if (component.noteListeningActivations === 0) {
                     // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
-                    component.playgrid.mostRecentlyPlayedNote = undefined;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
                     component.noteListeningStartedDuringPlayback = false;
@@ -67,7 +66,6 @@ ColumnLayout {
                     component.noteListeningActivations = 0;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
-                    component.playgrid.mostRecentlyPlayedNote = undefined;
                     component.noteListeningStartedDuringPlayback = false;
                 }
             }
@@ -87,8 +85,7 @@ ColumnLayout {
                     property color noteColor: note ? zynqtgui.theme_chooser.noteColors[note.midiNote] : ""
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
                     property bool weAreChosen: component.playgrid.heardNotes.indexOf(note) > -1
-                        || (component.playgrid.mostRecentlyPlayedNote && note && component.playgrid.mostRecentlyPlayedNote.midiNote === note.midiNote)
-                        || (typeof(component.playgrid.mostRecentlyPlayedNote) === "undefined" && component.playgrid.heardNotes.length === 0 && component.playgrid.currentRowUniqueMidiNotes.indexOf(note.midiNote) > -1)
+                        || (component.playgrid.heardNotes.length === 0 && component.playgrid.currentRowUniqueMidiNotes.indexOf(note.midiNote) > -1)
                     backgroundColor: component.showChosenPads && weAreChosen ? noteColor : Kirigami.Theme.textColor
                     playingBackgroundColor: component.showChosenPads && weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false
@@ -99,7 +96,6 @@ ColumnLayout {
                                 // Clear the current state, in case there's something there (otherwise things look a little weird)
                                 component.playgrid.heardNotes = [];
                                 component.playgrid.heardVelocities = [];
-                                component.playgrid.mostRecentlyPlayedNote = undefined;
                             }
                             // Count up one tick for a note on message
                             component.noteListeningActivations = component.noteListeningActivations + 1;

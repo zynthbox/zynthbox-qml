@@ -128,8 +128,6 @@ Zynthian.BasePlayGrid {
                             component.hidePatternsMenu();
                         } else if (_private.hasSelection) {
                             _private.deselectSelectedItem();
-                        } else if (component.mostRecentlyPlayedNote) {
-                            component.mostRecentlyPlayedNote = undefined;
                         } else if (component.heardNotes.length > 0) {
                             component.heardNotes = [];
                             component.heardVelocities = [];
@@ -233,8 +231,6 @@ Zynthian.BasePlayGrid {
     property bool showPatternSettings: false
     signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter);
 
-    property var mostRecentlyPlayedNote
-    property var mostRecentNoteVelocity
     property var heardNotes: []
     property var heardVelocities: []
     property var currentRowUniqueNotes: []
@@ -261,7 +257,6 @@ Zynthian.BasePlayGrid {
                     case "availableBars":
                     case "activeBar":
                     case "layer":
-                    case "mostRecentlyPlayedNote":
                     case "bankOffset":
                         // Just do nothing, we already updated the thing by setting the property
                         break;
@@ -584,7 +579,6 @@ Zynthian.BasePlayGrid {
                         // Clear the current state, in case there's something there (otherwise things look a little weird)
                         component.heardNotes = [];
                         component.heardVelocities = [];
-                        component.mostRecentlyPlayedNote = undefined;
                         if (Zynthbox.SyncTimer.timerRunning) {
                             component.listeningStartedDuringPlayback = true;
                         }
@@ -608,7 +602,6 @@ Zynthian.BasePlayGrid {
                 component.heardVelocities = component.noteListeningVelocities;
                 if (component.noteListeningActivations === 0) {
                     // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
-                    component.mostRecentlyPlayedNote = undefined;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
                     component.listeningStartedDuringPlayback = false;
@@ -620,7 +613,6 @@ Zynthian.BasePlayGrid {
                     component.noteListeningActivations = 0;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
-                    component.mostRecentlyPlayedNote = undefined;
                     component.listeningStartedDuringPlayback = false;
                 }
             }
@@ -630,18 +622,6 @@ Zynthian.BasePlayGrid {
     property int noteListeningActivations: 0
     property var noteListeningNotes: []
     property var noteListeningVelocities: []
-
-    onMostRecentlyPlayedNoteChanged:{
-        updateActivePatternMPN.restart();
-    }
-    Timer {
-        id: updateActivePatternMPN
-        repeat: false
-        interval: 0
-        onTriggered: {
-            component.setPatternProperty("mostRecentlyPlayedNote", component.mostRecentlyPlayedNote);
-        }
-    }
 
     // Zynthian.SequenceLoader {
     //     id: sequenceLoader
@@ -906,14 +886,6 @@ Zynthian.BasePlayGrid {
                                 }
                                 component.heardNotes = stepNotes;
                                 component.heardVelocities = stepVelocities;
-                                if (component.heardNotes.length === 1) {
-                                    component.mostRecentlyPlayedNote = component.heardNotes[0];
-                                    component.mostRecentNoteVelocity = component.heardVelocities[0];
-                                    component.heardNotes = [];
-                                    component.heardVelocities = [];
-                                } else {
-                                    component.mostRecentlyPlayedNote = undefined;
-                                }
                                 stepSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                 if (noteSettings.visible) {
                                     noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
@@ -1137,7 +1109,6 @@ Zynthian.BasePlayGrid {
                                 playgrid: component
                                 patternModel: _private.activePatternModel
                                 activeBar:_private.activeBar
-                                mostRecentlyPlayedNote: component.mostRecentlyPlayedNote
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
                                 note: visible && _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
@@ -2216,11 +2187,9 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    icon.name: (component.mostRecentlyPlayedNote == undefined && component.heardNotes.length == 0) ? "" : "edit-clear-locationbar-ltr"
+                    icon.name: (component.heardNotes.length == 0) ? "" : "edit-clear-locationbar-ltr"
                     text: "Note:\n" + (component.heardNotes.length == 0
-                        ? (component.mostRecentlyPlayedNote == undefined
-                            ? "(all)"
-                            : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
+                        ? "(all)"
                         : (component.heardNotes.length == 1
                             ? component.heardNotes[0].name + (component.heardNotes[0].octave - 1)
                             : component.heardNotes.length + " ♫"))
@@ -2229,7 +2198,6 @@ Zynthian.BasePlayGrid {
                             component.ignoreNextBack = true;
                             _private.activePatternModel.clear();
                         } else {
-                            component.mostRecentlyPlayedNote = undefined;
                             component.heardNotes = [];
                             component.heardVelocities = [];
                         }
@@ -2237,10 +2205,9 @@ Zynthian.BasePlayGrid {
                 }
                 Zynthian.PlayGridButton {
                     id: defaultNoteSettingsButton
-                    text: component.mostRecentlyPlayedNote === undefined && component.heardNotes.length === 0
+                    text: component.heardNotes.length === 0
                         ? (component.currentBarNotes.length === 0 ? "-" : component.currentBarNotes.length) + " in\nBar"
                         : "%1\n%2".arg(noteLength).arg(velocity)
-                    // enabled: component.mostRecentlyPlayedNote !== undefined
                     property var stepNames: {
                         0: component.stepDurationName,
                         1: "1/128th",
@@ -2265,7 +2232,7 @@ Zynthian.BasePlayGrid {
                         : defaultNoteSettingsButton.stepNames.hasOwnProperty(_private.activePatternModel.defaultNoteDuration)
                             ? defaultNoteSettingsButton.stepNames[_private.activePatternModel.defaultNoteDuration]
                             : _private.activePatternModel.defaultNoteDuration + "/128th"
-                    property string velocity: component.mostRecentlyPlayedNote === undefined ? "" : "Vel " + component.mostRecentNoteVelocity
+                    property string velocity: component.heardVelocities.length === 0 ? "" : "Vel " + component.heardVelocities[0]
                     onClicked: {
                         if (component.heardNotes.length > 0) {
                             var filter = []
@@ -2273,8 +2240,6 @@ Zynthian.BasePlayGrid {
                                 filter.push(component.heardNotes[i].midiNote);
                             }
                             component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter);
-                        } else if (component.mostRecentlyPlayedNote !== undefined) {
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [component.mostRecentlyPlayedNote.midiNote]);
                         } else {
                             component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, []);
                         }

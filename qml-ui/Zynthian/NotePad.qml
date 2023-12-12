@@ -43,7 +43,11 @@ Item {
 
     // Pitch is -8192 to 8191 inclusive
     property int pitchValue: Math.max(-8192, Math.min(slidePoint.slideX * 8192 / width, 8191))
-    onPitchValueChanged: Zynthbox.PlayGridManager.pitch = pitchValue
+    onPitchValueChanged: {
+        if (slidePoint.playingNote) {
+            slidePoint.playingNote.sendPitchChange(pitchValue);
+        }
+    }
     property int modulationValue: Math.max(-127, Math.min(slidePoint.slideY * 127 / width, 127))
     onModulationValueChanged: Zynthbox.PlayGridManager.modulation = modulationValue;
 
@@ -214,8 +218,8 @@ Item {
                         // console.log("We've got a playing note set, turn that off");
                         slidePoint.playingNote.setOff();
                         component.noteOff(slidePoint.playingNote);
+                        slidePoint.playingNote.sendPitchChange(0);
                         slidePoint.playingNote = undefined;
-                        Zynthbox.PlayGridManager.pitch = 0;
                         Zynthbox.PlayGridManager.modulation = 0;
                         component.pressingAndHolding = false;
                         longPressTimer.stop();

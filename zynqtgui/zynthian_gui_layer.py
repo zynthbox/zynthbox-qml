@@ -503,28 +503,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     if not self.zynqtgui.screens['bank'].get_show_top_sounds():
                         self.zynqtgui.screens['bank'].select_action(0)
                 else:
-                    # When creating zynthian_layer, if engine is an audio effect, stores the channel id instead of midi channel
-                    channel = midich
+                    track_index = self.zynqtgui.session_dashboard.selectedChannel
                     if zyngine.type=="Audio Effect":
-                        channel = self.zynqtgui.session_dashboard.selectedChannel
-                        slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel).selectedFxSlotRow
+                        midich = 15
+                        slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedFxSlotRow
                     elif zyngine.type=="MIDI Synth":
-                        for i, element in enumerate(self.zynqtgui.screens['layers_for_channel'].list_data):
-                            if midich == element[1]:
-                                slot_index = i
-                                break
+                        slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedSlotRow
 
-                    layer = zynthian_layer(zyngine, channel, self.zynqtgui, slot_index)
+                    layer = zynthian_layer(zyngine, midich, self.zynqtgui, slot_index, track_index)
 
                 self.zynqtgui.set_curlayer(layer, queue=False)
-
-                if not zyngine.type == "Audio Effect":
-                    self.add_midichannel_to_channel(midich, slot_index)
 
                 # Try to connect Audio Effects ...
                 if len(self.layers)>0 and layer.engine.type=="Audio Effect":
                     # setFxToChain will handle adding layer to self.layers if a new fx is created or replace new layer with an old one
-                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer)
+                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
                 # Try to connect MIDI tools ...
                 elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
                     if self.replace_layer_index is not None:
@@ -568,11 +561,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
             except Exception as e:
                 logging.exception(f"Error while trying to set preset to 0 when creating engine : {e}")
 
-            def emit_names_changed():
-                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedSoundsNamesChanged.emit()
-                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chainedFxNamesChanged.emit()
+            def emit_sounds_changed():
+                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chained_sounds_changed.emit()
 
-            QTimer.singleShot(500, emit_names_changed)
+            QTimer.singleShot(500, emit_sounds_changed)
             self.zynqtgui.zynautoconnect(True)
             self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
         except Exception as e:
@@ -1377,21 +1369,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         snapshot['amixer_layer'] = lss
                     del(snapshot['layers'][i])
                 else:
-                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
-                    slot_index = -1
-                    if "slot_index" in layer_snapshot and layer_snapshot["slot_index"] != -1:
-                        slot_index = layer_snapshot['slot_index']
-                    else:
-                        if self.zynqtgui.sketchpad.song is not None and self.zynqtgui.sketchpad.song.channelsModel is not None:
-                            for channel_id in range(10):
-                                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id)
-                                if layer_snapshot['engine_type'] == "MIDI Synth" and layer_snapshot['midi_chan'] in channel.chainedSounds:
-                                    slot_index = channel.chainedSounds.index(layer_snapshot['midi_chan'])
+                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)                    
+                    slot_index = layer_snapshot['slot_index']
+                    track_index = layer_snapshot['track_index']
                     engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
-                    layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, slot_index)
+                    layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, slot_index, track_index)
                     self.layers.append(layer)
                     if engine.type == "Audio Effect":
-                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer, slot_index)
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer, slot_index)
                 i += 1
 
             # Finally, stop all unused engines
@@ -1565,12 +1550,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
                 logging.debug(f"### Restoring engine : {layer_snapshot['engine_nick']}")
                 engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
-                slot_index = layer_snapshot['slot_index'] if "slot_index" in layer_snapshot else -1
-                new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index)
+                slot_index = layer_snapshot['slot_index']
+                track_index = layer_snapshot['track_index']
+                new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index, track_index)
                 new_layer.restore_snapshot_1(layer_snapshot)
                 new_layer.restore_snapshot_2(layer_snapshot)
                 if engine.type == "Audio Effect":
-                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.midi_chan).setFxToChain(new_layer, slot_index)
+                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setFxToChain(new_layer, slot_index)
                 sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
                 for layer in sublayers:
                     layer.set_midi_chan(midi_chan)
@@ -1894,34 +1880,34 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         zyncoder.lib_zyncoder.set_midi_filter_clone(chan1, chan2, 1)
 
 
-    @Slot(int, int)
-    def copy_midichan_layer(self, from_midichan: int, to_midichan: int):
-        if from_midichan < 0 or to_midichan < 0:
-            return
-        if from_midichan in self.layer_midi_map:
-            self.zynqtgui.start_loading()
-            # If there was anything in that midi chan, remove it
-            if to_midichan in self.layer_midi_map:
-                self.remove_root_layer(self.root_layers.index(self.layer_midi_map[to_midichan]), True)
-            layer_to_copy = self.layer_midi_map[from_midichan]
-            logging.debug("COPYING {} {}".format(from_midichan, to_midichan))
-            engine = self.zynqtgui.screens['engine'].start_engine(layer_to_copy.engine.nickname)
-            new_layer = zynthian_layer(engine, to_midichan, self.zynqtgui)
-            #new_layer.set_bank(layer_to_copy.bank_index)
-            snapshot = layer_to_copy.get_snapshot()
-            new_layer.restore_snapshot_1(snapshot)
-            new_layer.restore_snapshot_2(snapshot)
-            sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
-            for layer in sublayers:
-                layer.set_midi_chan(to_midichan)
-            self.zynqtgui.zynautoconnect_midi()
-            new_layer.reset_audio_out()
-            self.layers.append(new_layer)
-            self.add_midichannel_to_channel(to_midichan)
-            self.layer_created.emit(to_midichan)
+    # @Slot(int, int)
+    # def copy_midichan_layer(self, from_midichan: int, to_midichan: int):
+    #     if from_midichan < 0 or to_midichan < 0:
+    #         return
+    #     if from_midichan in self.layer_midi_map:
+    #         self.zynqtgui.start_loading()
+    #         # If there was anything in that midi chan, remove it
+    #         if to_midichan in self.layer_midi_map:
+    #             self.remove_root_layer(self.root_layers.index(self.layer_midi_map[to_midichan]), True)
+    #         layer_to_copy = self.layer_midi_map[from_midichan]
+    #         logging.debug("COPYING {} {}".format(from_midichan, to_midichan))
+    #         engine = self.zynqtgui.screens['engine'].start_engine(layer_to_copy.engine.nickname)
+    #         new_layer = zynthian_layer(engine, to_midichan, self.zynqtgui)
+    #         #new_layer.set_bank(layer_to_copy.bank_index)
+    #         snapshot = layer_to_copy.get_snapshot()
+    #         new_layer.restore_snapshot_1(snapshot)
+    #         new_layer.restore_snapshot_2(snapshot)
+    #         sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
+    #         for layer in sublayers:
+    #             layer.set_midi_chan(to_midichan)
+    #         self.zynqtgui.zynautoconnect_midi()
+    #         new_layer.reset_audio_out()
+    #         self.layers.append(new_layer)
+    #         self.add_midichannel_to_channel(to_midichan)
+    #         self.layer_created.emit(to_midichan)
 
-            self.fill_list()
-            self.zynqtgui.stop_loading()
+    #         self.fill_list()
+    #         self.zynqtgui.stop_loading()
 
 
     def get_midi_profile_state(self):

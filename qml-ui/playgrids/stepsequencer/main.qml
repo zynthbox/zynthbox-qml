@@ -577,6 +577,11 @@ Zynthian.BasePlayGrid {
                     component.noteListeningVelocities = [];
                     component.listeningStartedDuringPlayback = false;
                 }
+            } if (size === 3 && byte2 === 0x7B && sketchpadTrack === _private.activePatternModel.midiChannel) {
+                component.noteListeningActivations = 0;
+                component.noteListeningNotes = [];
+                component.noteListeningVelocities = [];
+                component.listeningStartedDuringPlayback = false;
             }
         }
     }

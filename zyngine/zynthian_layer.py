@@ -38,11 +38,12 @@ class zynthian_layer:
     # ---------------------------------------------------------------------------
 
 
-    def __init__(self, engine, midi_chan, zynqtgui=None, slot_index=-1):
+    def __init__(self, engine, midi_chan, zynqtgui=None, slot_index=-1, track_index=-1):
         self.zynqtgui = zynqtgui
         self.engine = engine
         self.midi_chan = midi_chan
         self.slot_index = slot_index
+        self.track_index = track_index
 
         self.jackname = None
         self.audio_out = ["system:playback_1", "system:playback_2"]
@@ -498,6 +499,7 @@ class zynthian_layer:
             'engine_nick': self.engine.nickname,
             'engine_type': self.engine.type,
             'midi_chan': self.midi_chan,
+            'track_index': self.track_index,
             'slot_index': self.slot_index,
             'bank_index': self.bank_index,
             'bank_name': self.bank_name,

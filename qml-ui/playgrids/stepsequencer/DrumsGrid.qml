@@ -84,8 +84,9 @@ ColumnLayout {
                     text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
                     property color noteColor: note ? zynqtgui.theme_chooser.noteColors[note.midiNote] : ""
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
-                    property bool weAreChosen: (component.playgrid.heardNotes.length > 0 && component.playgrid.heardNotes.indexOf(note) > -1)
-                        || (component.playgrid.currentRowUniqueMidiNotes.indexOf(note.midiNote) > -1)
+                    property bool weAreChosen: component.playgrid.heardNotes.length > 0
+                        ? component.playgrid.heardNotes.indexOf(note) > -1
+                        : component.playgrid.currentRowUniqueMidiNotes.indexOf(note.midiNote) > -1
                     backgroundColor: component.showChosenPads && weAreChosen ? noteColor : Kirigami.Theme.textColor
                     playingBackgroundColor: component.showChosenPads && weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false

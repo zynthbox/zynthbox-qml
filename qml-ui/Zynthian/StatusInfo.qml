@@ -30,6 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
+import "private" as Private
 
 MouseArea {
     id: root
@@ -560,6 +561,69 @@ MouseArea {
                     text: qsTr("Stop Playback")
                     onClicked: {
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                    }
+                }
+                RowLayout {
+                    Layout.columnSpan: 3
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.largeSpacing * 2
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    QQC2.Label {
+                        Layout.fillHeight: true
+                        text: qsTr("DSP Load:")
+                    }
+                    Item {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Private.CardBackground {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                right: parent.right
+                                margins: 1
+                            }
+                            height: Kirigami.Units.largeSpacing * 2
+                            Rectangle {
+                                anchors {
+                                    fill: parent
+                                    margins: 1
+                                }
+                                color: "green"
+                                Rectangle {
+                                    anchors {
+                                        fill: parent
+                                        leftMargin: parent.width * 2 / 3
+                                    }
+                                    color: "yellow"
+                                    Rectangle {
+                                        anchors {
+                                            fill: parent
+                                            leftMargin: parent.width * 2 / 3
+                                        }
+                                        color: "red"
+                                    }
+                                }
+                            }
+                            Rectangle {
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                    margins: 1
+                                }
+                                width: zynqtgui.globalPopupOpened ? (parent.width - 2) * (1 - Zynthbox.MidiRouter.processingLoad) : 0
+                                color: Kirigami.Theme.backgroundColor
+                            }
+                            QQC2.Label {
+                                anchors {
+                                    fill: parent
+                                    margins: 2
+                                }
+                                text: zynqtgui.globalPopupOpened ? qsTr("%1%").arg((100 * Zynthbox.MidiRouter.processingLoad).toFixed(1)) : ""
+                                font.pixelSize: height
+                            }
+                        }
                     }
                 }
             }

@@ -614,6 +614,15 @@ Zynthian.ScreenPage {
 
                 return true
 
+            case "KNOB0_TOUCHED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                    root.updateSelectedChannelVolume(0, true)
+                }
+                returnValue = true;
+                break;
+            case "KNOB0_RELEASED":
+                returnValue = true;
+                break;
             case "KNOB0_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
                     root.updateSelectedChannelVolume(1, true)
@@ -624,18 +633,36 @@ Zynthian.ScreenPage {
                     root.updateSelectedChannelVolume(-1, true)
                 }
                 return true
+            case "KNOB1_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB1_RELEASED":
+                returnValue = true;
+                break;
             case "KNOB1_UP":
                 // Do nothing
                 return true
             case "KNOB1_DOWN":
                 // Do nothing
                 return true
+            case "KNOB2_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB2_RELEASED":
+                returnValue = true;
+                break;
             case "KNOB2_UP":
                 // Do nothing
                 return true
             case "KNOB2_DOWN":
                 // Do nothing
                 return true
+            case "KNOB3_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB3_RELEASED":
+                returnValue = true;
+                break;
             case "KNOB3_UP":
                 zynqtgui.session_dashboard.selectedChannel = Zynthian.CommonUtils.clamp(zynqtgui.session_dashboard.selectedChannel + 1, 0, 9)
                 return true

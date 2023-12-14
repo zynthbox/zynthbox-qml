@@ -103,6 +103,30 @@ Rectangle {
                 }
                 returnValue = true;
                 break;
+            case "KNOB0_TOUCHED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
+                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    returnValue = true;
+                }
+                break;
+            case "KNOB0_RELEASED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    // Do nothing
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                    returnValue = true;
+                }
+                break;
             case "KNOB0_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.channelAudioType == "synth") {
@@ -133,6 +157,26 @@ Rectangle {
                     returnValue = true;
                 }
                 break;
+            case "KNOB1_TOUCHED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                    returnValue = true;
+                }
+                break;
+            case "KNOB1_RELEASED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    // Do nothing
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                    returnValue = true;
+                }
+                break;
             case "KNOB1_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.channelAudioType == "synth") {
@@ -149,6 +193,26 @@ Rectangle {
                     if (root.selectedChannel.channelAudioType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                    returnValue = true;
+                }
+                break;
+            case "KNOB2_TOUCHED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType == "synth") {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                    }
+                    returnValue = true;
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    // Do nothing
+                    returnValue = true;
+                }
+                break;
+            case "KNOB2_RELEASED":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    // Do nothing
                     returnValue = true;
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                     // Do nothing
@@ -174,6 +238,18 @@ Rectangle {
                     returnValue = true;
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                     // Do nothing
+                    returnValue = true;
+                }
+                break;
+            case "KNOB3_TOUCHED":
+                if (zynqtgui.modeButtonPressed) {
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    returnValue = true;
+                }
+                break;
+            case "KNOB3_RELEASED":
+                if (zynqtgui.modeButtonPressed) {
+                    zynqtgui.ignoreNextModeButtonPress = true;
                     returnValue = true;
                 }
                 break;

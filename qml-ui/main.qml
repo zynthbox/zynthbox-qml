@@ -66,6 +66,24 @@ Kirigami.AbstractApplicationWindow {
                 zynqtgui.sketchpad.metronomeEnabled = !zynqtgui.sketchpad.metronomeEnabled
                 result = true;
                 break;
+            case "KNOB0_TOUCHED":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelVolume(0)
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
+                    root.updateMetronomeVolume(0)
+                    result = true;
+                }
+                break;
+            case "KNOB0_RELEASED":
+                if (zynqtgui.altButtonPressed) {
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
+                    result = true;
+                }
+                break;
             case "KNOB0_UP":
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelVolume(1)
@@ -83,6 +101,23 @@ Kirigami.AbstractApplicationWindow {
                 } else if (zynqtgui.metronomeButtonPressed) {
                     zynqtgui.ignoreNextMetronomeButtonPress = true
                     root.updateMetronomeVolume(-1)
+                    result = true;
+                }
+                break;
+            case "KNOB1_TOUCHED":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelDelaySend(0)
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
+                    result = true;
+                }
+                break;
+            case "KNOB1_RELEASED":
+                if (zynqtgui.altButtonPressed) {
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     result = true;
                 }
                 break;
@@ -106,6 +141,23 @@ Kirigami.AbstractApplicationWindow {
                     result = true;
                 }
                 break;
+            case "KNOB2_TOUCHED":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateSelectedChannelReverbSend(0)
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
+                    result = true;
+                }
+                break;
+            case "KNOB2_RELEASED":
+                if (zynqtgui.altButtonPressed) {
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
+                    result = true;
+                }
+                break;
             case "KNOB2_UP":
                 if (zynqtgui.altButtonPressed) {
                     root.updateSelectedChannelReverbSend(1)
@@ -123,6 +175,24 @@ Kirigami.AbstractApplicationWindow {
                 } else if (zynqtgui.metronomeButtonPressed) {
                     zynqtgui.ignoreNextMetronomeButtonPress = true
                     // root.updateGlobalReverbFXAmount(-1)
+                    result = true;
+                }
+                break;
+            case "KNOB3_TOUCHED":
+                if (zynqtgui.altButtonPressed) {
+                    root.updateMasterVolume(0);
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
+                    root.updateSketchpadBpm(0)
+                    result = true;
+                }
+                break;
+            case "KNOB3_RELEASED":
+                if (zynqtgui.altButtonPressed) {
+                    result = true;
+                } else if (zynqtgui.metronomeButtonPressed) {
+                    zynqtgui.ignoreNextMetronomeButtonPress = true
                     result = true;
                 }
                 break;

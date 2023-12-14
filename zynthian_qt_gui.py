@@ -478,6 +478,10 @@ class zynthian_gui(QObject):
         self.__left_button_pressed__ = False
         self.__down_button_pressed__ = False
         self.__right_button_pressed__ = False
+        self.__knob0touched__ = False
+        self.__knob1touched__ = False
+        self.__knob2touched__ = False
+        self.__knob3touched__ = False
         self.__global_popup_opened__ = False
         self.__passive_notification = ""
         self.__splash_stopped = False
@@ -2138,6 +2142,14 @@ class zynthian_gui(QObject):
                     self.downButtonPressed = True
                 elif i == 27:
                     self.rightButtonPressed = True
+                elif i == 31: # KNOB_0
+                    self.knob0Touched = True
+                elif i == 30: # KNOB_1
+                    self.knob1Touched = True
+                elif i == 32: # KNOB_2
+                    self.knob2Touched = True
+                elif i == 33: # KNOB_3 (big knob)
+                    self.knob3Touched = True
 
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
@@ -2174,6 +2186,14 @@ class zynthian_gui(QObject):
                     self.downButtonPressed = False
                 elif i == 27:
                     self.rightButtonPressed = False
+                elif i == 31: # KNOB_0
+                    self.knob0Touched = False
+                elif i == 30: # KNOB_1
+                    self.knob1Touched = False
+                elif i == 32: # KNOB_2
+                    self.knob2Touched = False
+                elif i == 33: # KNOB_3 (big knob)
+                    self.knob3Touched = False
 
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
@@ -3878,6 +3898,78 @@ class zynthian_gui(QObject):
 
     rightButtonPressed = Property(bool, get_right_button_pressed, set_right_button_pressed, notify=right_button_pressed_changed)
     ### END Property rightButtonPressed
+
+    ### Property knob0Touched
+    def get_knob0touched(self):
+        return self.__knob0touched__
+
+    def set_knob0touched(self, touched):
+        if self.__knob0touched__ != touched:
+            self.__knob0touched__ = touched
+            self.knob0touched_changed.emit()
+            if touched:
+                self.callable_ui_action("KNOB0_TOUCHED")
+            else:
+                self.callable_ui_action("KNOB0_RELEASED")
+
+    knob0touched_changed = Signal()
+
+    knob0Touched = Property(bool, get_knob0touched, set_knob0touched, notify=knob0touched_changed)
+    ### END Property knob0Touched
+
+    ### Property knob1Touched
+    def get_knob1touched(self):
+        return self.__knob1touched__
+
+    def set_knob1touched(self, touched):
+        if self.__knob1touched__ != touched:
+            self.__knob1touched__ = touched
+            self.knob1touched_changed.emit()
+            if touched:
+                self.callable_ui_action("KNOB1_TOUCHED")
+            else:
+                self.callable_ui_action("KNOB1_RELEASED")
+
+    knob1touched_changed = Signal()
+
+    knob1Touched = Property(bool, get_knob1touched, set_knob1touched, notify=knob1touched_changed)
+    ### END Property knob1Touched
+
+    ### Property knob2Touched
+    def get_knob2touched(self):
+        return self.__knob2touched__
+
+    def set_knob2touched(self, touched):
+        if self.__knob2touched__ != touched:
+            self.__knob2touched__ = touched
+            self.knob2touched_changed.emit()
+            if touched:
+                self.callable_ui_action("KNOB2_TOUCHED")
+            else:
+                self.callable_ui_action("KNOB2_RELEASED")
+
+    knob2touched_changed = Signal()
+
+    knob2Touched = Property(bool, get_knob2touched, set_knob2touched, notify=knob2touched_changed)
+    ### END Property knob2Touched
+
+    ### Property knob3Touched
+    def get_knob3touched(self):
+        return self.__knob3touched__
+
+    def set_knob3touched(self, touched):
+        if self.__knob3touched__ != touched:
+            self.__knob3touched__ = touched
+            self.knob3touched_changed.emit()
+            if touched:
+                self.callable_ui_action("KNOB3_TOUCHED")
+            else:
+                self.callable_ui_action("KNOB3_RELEASED")
+
+    knob3touched_changed = Signal()
+
+    knob3Touched = Property(bool, get_knob3touched, set_knob3touched, notify=knob3touched_changed)
+    ### END Property knob3Touched
 
     ### Property openedDialog
     def get_openedDialog(self):

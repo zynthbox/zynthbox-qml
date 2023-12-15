@@ -482,6 +482,14 @@ class zynthian_gui(QObject):
         self.__knob1touched__ = False
         self.__knob2touched__ = False
         self.__knob3touched__ = False
+        self.knob0touched_changed.connect(self.anyKnobTouched_changed, Qt.QueuedConnection)
+        self.knob1touched_changed.connect(self.anyKnobTouched_changed, Qt.QueuedConnection)
+        self.knob2touched_changed.connect(self.anyKnobTouched_changed, Qt.QueuedConnection)
+        self.knob3touched_changed.connect(self.anyKnobTouched_changed, Qt.QueuedConnection)
+        self.knob0touched_changed.connect(self.knob0StateCuiaEmitter, Qt.QueuedConnection)
+        self.knob1touched_changed.connect(self.knob1StateCuiaEmitter, Qt.QueuedConnection)
+        self.knob2touched_changed.connect(self.knob2StateCuiaEmitter, Qt.QueuedConnection)
+        self.knob3touched_changed.connect(self.knob3StateCuiaEmitter, Qt.QueuedConnection)
         self.__global_popup_opened__ = False
         self.__passive_notification = ""
         self.__splash_stopped = False
@@ -724,6 +732,34 @@ class zynthian_gui(QObject):
                 self.callable_ui_action(f"KNOB{knob_index}_UP")
             else:
                 self.callable_ui_action(f"KNOB{knob_index}_DOWN")
+
+    @Slot(None)
+    def knob0StateCuiaEmitter(self):
+        if self.__knob0touched__ == True:
+            self.callable_ui_action(f"KNOB0_TOUCHED")
+        else:
+            self.callable_ui_action(f"KNOB0_RELEASED")
+
+    @Slot(None)
+    def knob1StateCuiaEmitter(self):
+        if self.__knob1touched__ == True:
+            self.callable_ui_action(f"KNOB1_TOUCHED")
+        else:
+            self.callable_ui_action(f"KNOB1_RELEASED")
+
+    @Slot(None)
+    def knob2StateCuiaEmitter(self):
+        if self.__knob2touched__ == True:
+            self.callable_ui_action(f"KNOB2_TOUCHED")
+        else:
+            self.callable_ui_action(f"KNOB2_RELEASED")
+
+    @Slot(None)
+    def knob3StateCuiaEmitter(self):
+        if self.__knob3touched__ == True:
+            self.callable_ui_action(f"KNOB3_TOUCHED")
+        else:
+            self.callable_ui_action(f"KNOB3_RELEASED")
 
     def set_selector(self):
         if not self.isBootingComplete:
@@ -3899,6 +3935,15 @@ class zynthian_gui(QObject):
     rightButtonPressed = Property(bool, get_right_button_pressed, set_right_button_pressed, notify=right_button_pressed_changed)
     ### END Property rightButtonPressed
 
+    ### Property anyKnobTouched
+    def get_anyKnobTouched(self):
+        return self.__knob0touched__ or self.__knob1touched__ or self.__knob2touched__ or self.__knob3touched__
+
+    anyKnobTouched_changed = Signal()
+
+    anyKnobTouched = Property(bool, get_anyKnobTouched, notify=anyKnobTouched_changed)
+    ### END Property anyKnobTouched
+
     ### Property knob0Touched
     def get_knob0touched(self):
         return self.__knob0touched__
@@ -3907,10 +3952,6 @@ class zynthian_gui(QObject):
         if self.__knob0touched__ != touched:
             self.__knob0touched__ = touched
             self.knob0touched_changed.emit()
-            if touched:
-                self.callable_ui_action("KNOB0_TOUCHED")
-            else:
-                self.callable_ui_action("KNOB0_RELEASED")
 
     knob0touched_changed = Signal()
 
@@ -3925,10 +3966,6 @@ class zynthian_gui(QObject):
         if self.__knob1touched__ != touched:
             self.__knob1touched__ = touched
             self.knob1touched_changed.emit()
-            if touched:
-                self.callable_ui_action("KNOB1_TOUCHED")
-            else:
-                self.callable_ui_action("KNOB1_RELEASED")
 
     knob1touched_changed = Signal()
 
@@ -3943,10 +3980,6 @@ class zynthian_gui(QObject):
         if self.__knob2touched__ != touched:
             self.__knob2touched__ = touched
             self.knob2touched_changed.emit()
-            if touched:
-                self.callable_ui_action("KNOB2_TOUCHED")
-            else:
-                self.callable_ui_action("KNOB2_RELEASED")
 
     knob2touched_changed = Signal()
 
@@ -3961,10 +3994,6 @@ class zynthian_gui(QObject):
         if self.__knob3touched__ != touched:
             self.__knob3touched__ = touched
             self.knob3touched_changed.emit()
-            if touched:
-                self.callable_ui_action("KNOB3_TOUCHED")
-            else:
-                self.callable_ui_action("KNOB3_RELEASED")
 
     knob3touched_changed = Signal()
 

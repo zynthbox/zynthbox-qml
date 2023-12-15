@@ -701,12 +701,12 @@ def audio_autoconnect(force=False):
                         if channel.channelRoutingStyle == "standard":
                             for index, fxlayer in enumerate(channel.chainedFx):
                                 if fxlayer is not None:
-                                    portsToConnect = jclient.get_ports(f"FXPassthrough:Channel{channel.id + 1}-lane{index + 1}", is_audio=True, is_output=False, is_input=True)
+                                    portsToConnect = jclient.get_ports(f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}", is_audio=True, is_output=False, is_input=True)
                                     break
                         # In one-to-one mode, check if the matching fx slot for a sound slot has an effect in it, and if there is one, route to it
                         elif channel.channelRoutingStyle == "one-to-one":
                             if channel.chainedFx[laneId] is not None:
-                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}", is_audio=True, is_output=False, is_input=True)
+                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId]}:Channel{channelId + 1}", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(laneOutputs)):
                             # The order of the ports is uncommonly reversed here, to ensure we can use cycle() without causing trouble
                             try:
@@ -766,7 +766,7 @@ def audio_autoconnect(force=False):
                         # The FX Passthrough should be placed first and then the fx client name
                         for index, fxlayer in enumerate(channel.chainedFx):
                             if fxlayer is not None:
-                                fx_client_names = fx_client_names + [f"FXPassthrough:Channel{channel.id + 1}-lane{index + 1}", fxlayer.get_jackname()]
+                                fx_client_names = fx_client_names + [f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}", fxlayer.get_jackname()]
 
                         # Create final client names list, with the client names as it should be connected in order,
                         # and only add that list to the process list if there are actually any effects in the list
@@ -777,7 +777,7 @@ def audio_autoconnect(force=False):
                         for laneId in range(0, 5):
                             fxlayer = channel.chainedFx[laneId]
                             if fxlayer is not None:
-                                lane_client_names = [f"FXPassthrough:Channel{channel.id + 1}-lane{laneId + 1}", fxlayer.get_jackname(), "GlobalPlayback"]
+                                lane_client_names = [f"FXPassthrough-lane{laneId + 1}:Channel{channel.id + 1}", fxlayer.get_jackname(), "GlobalPlayback"]
                                 process_list.append(lane_client_names)
 
                     # logging.debug(f"# Output client names : {process_list}")
@@ -800,7 +800,7 @@ def audio_autoconnect(force=False):
                             #    Scenario 1 : There are no FX in channel
                             #                 Then the final client list would be empty
                             #    Scenario 2 : There is one or more FX Client
-                            #                 Then the final client list would be : [FXPassthrough:ChannelX-laneY -> FX](There will be a set of passthrough + fx for each fx client) -> GlobalPlayback
+                            #                 Then the final client list would be : [FXPassthrough-laneY:ChannelX -> FX](There will be a set of passthrough + fx for each fx client) -> GlobalPlayback
                             # In any of the scenarios the last port, GlobalPlayback, does not need to be connected to anything else. Hence do not process GlobalPlayback
                             # For all other clients, check if the client is an FXPassthrough.
                             # If the client is not a FXPassthrough, then it means it can either be a Channelpassthrough or an FX. So connect it's output to the next client

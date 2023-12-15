@@ -61,10 +61,19 @@ Zynthian.Popup {
             isHeld = false;
         }
     }
+    property bool anyKnobTouched: zynqtgui.anyKnobTouched
+    onAnyKnobTouchedChanged: {
+        if (component.anyKnobTouched == false && hideTimer.running === false) {
+            hideTimer.stop();
+            if (component.opened) {
+                component.close();
+            }
+        }
+    }
     Connections {
         target: zynqtgui.osd
         onUpdate: {
-            if (!hideTimer.isHeld) {
+            if (hideTimer.isHeld === false && component.anyKnobTouched === false) {
                 hideTimer.restart();
             }
             component.open();

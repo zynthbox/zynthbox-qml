@@ -77,6 +77,9 @@ class sketchpad_segments_model(QAbstractListModel):
         if len(self.__segments) == 0:
             self.new_segment()
 
+        self.__selected_segment_index = 0
+        self.selectedSegmentIndexChanged.emit()
+
         self.endResetModel()
 
     def data(self, index, role=None):
@@ -110,6 +113,9 @@ class sketchpad_segments_model(QAbstractListModel):
         segment.beatLengthChanged.connect(self.totalBeatDurationThrottle.start)
         self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()
+        if self.__selected_segment_index >= segment_index:
+            self.__selected_segment_index = self.__selected_segment_index + 1
+        self.selectedSegmentIndexChanged.emit()
         if not self.__song.isLoading:
             self.__song.schedule_save()
 
@@ -125,6 +131,7 @@ class sketchpad_segments_model(QAbstractListModel):
         self.__segments.insert(segment_index, newSegment)
         self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()
+        self.selectedSegmentIndexChanged.emit()
         if not self.__song.isLoading:
             self.__song.schedule_save()
         return newSegment
@@ -216,6 +223,9 @@ class sketchpad_segments_model(QAbstractListModel):
         self.__segments.pop(segment_index)
         self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()
+        if self.__selected_segment_index >= len(self.__segments):
+            self.__selected_segment_index = len(self.__segments) - 1
+            self.selectedSegmentIndexChanged.emit()
         if not self.__song.isLoading:
             self.__song.schedule_save()
         return segment

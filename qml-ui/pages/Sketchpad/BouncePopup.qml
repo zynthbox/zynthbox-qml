@@ -320,11 +320,11 @@ Zynthian.Popup {
                             Zynthbox.AudioLevels.setShouldRecordPorts(false);
                             // Set up a bundle of timer commands to match all of the clips we are starting and stopping
                             Zynthbox.SyncTimer.startTimerCommandBundle();
-                            // Schedule us to start audio recording two ticks into the future
-                            // Four ticks because we need to wait for...
-                            // - the start command to be interpreted and song mode to set playback on for the first segment
-                            // - the first events from that segment to be submitted for playback
-                            let waitForStart = 1;
+                            // Don't wait to schedule the start of recording into the future
+                            // It used to be the case we needed to wait for playback to start and events being delivered for the first step, but that is no longer the case
+                            // Leaving the variable here in case we need it later, and it causes no trouble, but if things just keep working as expected, it'd probably be
+                            // worth just getting rid of it at some point.
+                            let waitForStart = 0;
                             // Iterate over all the selected clips, and use segment_model's ability to just throw clips at it
                             // and ensure their positions exist across the entire given range to add the clips where they
                             // should go in the song

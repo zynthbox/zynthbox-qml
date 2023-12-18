@@ -454,7 +454,7 @@ Zynthian.Popup {
                             // Set the newly recorded file as the current slot's loop clip
                             let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
                             let clip = sketchpadTrack.getClipsModelByPart(details["partId"]).getClip(details["sceneId"]);
-                            clip.set_path(filename, true);
+                            clip.set_path(filename, false);
                             console.log("...and the clip says it is", clip.duration, "seconds long");
                             // Set channel mode to loop
                             sketchpadTrack.channelAudioType = "sample-loop";

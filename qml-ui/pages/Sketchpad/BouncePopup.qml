@@ -288,7 +288,7 @@ Zynthian.Popup {
                                         let includeLeadin = _private.includeLeadin ? 1 : 0;
                                         let includeMainLoop = 1; // The main part can't be disabled anyway, so this is just a 1
                                         let includeFadeout = _private.includeFadeout ? 1 : 0;
-                                        let recordingPrefix = zynqtgui.sketchpad.song.sketchpadFolder + "wav/part" + (sketchpadTrackIndex + 1) + _private.partNames[partIndex];
+                                        let recordingPrefix = zynqtgui.sketchpad.song.sketchpadFolder + "wav/part" + (sketchpadTrackId + 1) + _private.partNames[partIndex];
                                         let recordingSuffix = "-" + soundIndication + ".sketch.wav";
                                         let theDetails = {
                                             "startPosition": previousStopRecordingPosition,

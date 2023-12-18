@@ -232,7 +232,9 @@ class sketchpad_segments_model(QAbstractListModel):
 
     @Slot(QObject, result=int)
     def segment_index(self, segment: sketchpad_segment):
-        return self.__segments.index(segment)
+        if segment in self.__segments:
+            return self.__segments.index(segment)
+        return -1
 
     ### Property count
     def get_count(self):

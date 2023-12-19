@@ -274,7 +274,7 @@ class sketchpad_segments_model(QAbstractListModel):
 
     ### Property selectedSegment
     def get_selectedSegment(self):
-        return self.__segments[self.__selected_segment_index]
+        return self.get_segment(self.__selected_segment_index)
 
     selectedSegment = Property(QObject, get_selectedSegment, notify=selectedSegmentIndexChanged)
     ### END Property selectedSegment

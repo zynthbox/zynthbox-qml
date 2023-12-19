@@ -83,7 +83,7 @@ Zynthian.Dialog {
             Zynthbox.AudioLevels.recordGlobalPlayback = true;
         } else {
             // No song mode, just play the current scene, with the longest pattern duration as the duration
-            var sequence = Zynthbox.PlayGridManager.getSequenceModel(song.scenesModel.selectedTrackName)
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel(song.scenesModel.selectedSequenceName)
             var longestPatternDuration = 0;
             // Assemble the duration of time we want to be recording for
             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }

@@ -1469,7 +1469,7 @@ Zynthian.ScreenPage {
                                     }
 
                                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                    sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+                                    sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
@@ -1667,8 +1667,8 @@ Zynthian.ScreenPage {
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
                                 // Copy pattern
-                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
+                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destChannel.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
                                 destPattern.cloneOther(sourcePattern)
 
                                 root.copySourceObj = null
@@ -1684,8 +1684,8 @@ Zynthian.ScreenPage {
                                     for (var i=0; i<sourceChannel.clipsModel.count; i++) {
                                         var sourceClip = sourceChannel.parts[part].getClip(i)
                                         var destClip = destChannel.parts[part].getClip(i)
-                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, part)
-                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, part)
+                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, part)
+                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, part)
 
                                         destPattern.cloneOther(sourcePattern)
                                     }
@@ -1702,8 +1702,8 @@ Zynthian.ScreenPage {
 
                                 for (var i=0; i<root.song.channelsModel.count; i++) {
                                     var channel = root.song.channelsModel.getChannel(i)
-                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(root.copySourceObj.value + 1)).getByPart(channel.id, channel.selectedPart)
-                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedTrackName).getByPart(channel.id, channel.selectedPart)
+                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(root.copySourceObj.value === 0 ? "global" : ("global"+(root.copySourceObj.value + 1))).getByPart(channel.id, channel.selectedPart)
+                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByPart(channel.id, channel.selectedPart)
 
                                     destPattern.cloneOther(sourcePattern)
                                 }
@@ -1718,8 +1718,8 @@ Zynthian.ScreenPage {
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
                                 // Copy pattern
-                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
+                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
                                 destPattern.cloneOther(sourcePattern)
 
                                 root.copySourceObj = null
@@ -1753,7 +1753,7 @@ Zynthian.ScreenPage {
                                 // Try clearing pattern if exists.
                                 try {
                                     if (zynqtgui.sketchpad.lastSelectedObj.value.connectedPattern >= 0) {
-                                        Zynthbox.PlayGridManager.getSequenceModel("T"+(root.song.scenesModel.selectedTrackIndex + 1)).getByPart(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedPart).clear()
+                                        Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByPart(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedPart).clear()
                                     }
                                 } catch(e) {}
                             }

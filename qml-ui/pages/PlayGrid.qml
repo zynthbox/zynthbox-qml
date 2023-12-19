@@ -714,7 +714,7 @@ don't want to have to dig too far...
                     id: channelPartSceneDelegate
                     property QtObject sceneClip: model.clip
                     property int sceneIndex: model.index
-                    property string connectedSequenceName: "T" + (model.index + 1)
+                    property string connectedSequenceName: model.index === 0 ? "global" : "global" + (model.index + 1)
                     property QtObject sequence: null
                     property int sequenceIndex: model.index;
                     property QtObject pattern: sequence && sequence.count > 0 ? channelPartSceneDelegate.sequence.getByPart(baseChannelDelegate.channelIndex, channelPartDelegate.partIndex) : null;

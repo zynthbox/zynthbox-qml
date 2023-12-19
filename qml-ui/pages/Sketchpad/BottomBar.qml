@@ -135,7 +135,7 @@ Rectangle {
                         case "bottombar-controltype-part":
                             return qsTr("PART: %1").arg(text);
     //                    case "bottombar-controltype-pattern":
-    //                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+    //                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
     //                        var pattern = sequence.getByPart(zynqtgui.bottomBarControlObj.clipChannel.connectedPattern, 0)
     //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:

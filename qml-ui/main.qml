@@ -227,7 +227,7 @@ Kirigami.AbstractApplicationWindow {
         return result
     }
 
-    property QtObject sequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+    property QtObject sequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -937,7 +937,7 @@ Kirigami.AbstractApplicationWindow {
             id: globalRecordButton
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+            property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
             onClicked: {
                 if (zynqtgui.current_screen_id === "playgrid") {
                     zynqtgui.callable_ui_action("START_RECORD");

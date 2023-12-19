@@ -77,7 +77,7 @@ Item {
      */
     function savePatternToFile(patternName) {
         if (patternName == undefined || patternName == "") {
-            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
             if (sequence.activePattern > -1) {
                 sequenceFilePicker.patternName = sequence.activePatternObject.objectName;
             }
@@ -388,7 +388,7 @@ Item {
     }
 
     function applyLoadedSequence(repeaterObject) {
-        var globalSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+        var globalSequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
         if (repeaterObject.model.hasOwnProperty("patterns")) {
             // Then it's a sequence, and we should apply all the options from the sequence as well (even if it's not much)
             var sequenceModel = repeaterObject.model;

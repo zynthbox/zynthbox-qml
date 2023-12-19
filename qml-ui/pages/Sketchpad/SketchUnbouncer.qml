@@ -58,7 +58,7 @@ Zynthian.DialogQuestion {
         QQC2.Label {
             Layout.fillWidth: true
             wrapMode: Text.Wrap
-            text: qsTr("Performing an unbounce may overwrite some of the existing things on Track %1. Untick the options you don't want to overwrite and then tap yes, or just tap no to not unbounce.").arg(_private.track)
+            text: qsTr("Performing an unbounce may overwrite some of the existing things on Track %1. Untick the options you don't want to overwrite and then tap yes, or just tap no to not unbounce.").arg(_private.channel.id + 1)
             QtObject {
                 id: _private
                 property QtObject clip

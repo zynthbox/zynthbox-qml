@@ -184,7 +184,7 @@ Rectangle {
             zynqtgui.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
 
             if (root.selectedSlotRowItem.channel.connectedPattern >= 0) {
-                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
+                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
                 pattern.midiChannel = root.selectedSlotRowItem.channel.connectedSound;
             }
         }
@@ -790,7 +790,7 @@ Rectangle {
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
                 property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadataMidiRecording != null && sketchPickerPopup.sketch.metadataMidiRecording.length > 10
                 onTriggered: {
-                    sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                    sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                 }
             },
             QQC2.Action {
@@ -879,7 +879,7 @@ Rectangle {
                 enabled: samplePickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
                 property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && samplePickerPopup.sketch && samplePickerPopup.sketch.metadataMidiRecording != null && samplePickerPopup.sketch.metadataMidiRecording.length > 10
                 onTriggered: {
-                    sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                    sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                 }
             },
             QQC2.Action {

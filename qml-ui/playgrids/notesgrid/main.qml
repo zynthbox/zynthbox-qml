@@ -52,7 +52,7 @@ Zynthian.BasePlayGrid {
 
     QtObject {
         id: _private
-        property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName)
+        property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
         property QtObject alternativeModel: currentSequence && currentSequence.activePatternObject && currentSequence.activePatternObject.noteDestination == Zynthbox.PatternModel.SampleSlicedDestination
             ? currentSequence.activePatternObject.clipSliceNotes
             : null

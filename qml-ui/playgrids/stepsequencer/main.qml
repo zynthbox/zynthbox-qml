@@ -434,7 +434,7 @@ Zynthian.BasePlayGrid {
         }
         function adoptSequence() {
             console.log("Adopting the scene sequence");
-            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
             if (_private.sequence != sequence) {
                 console.log("Scene has changed, switch places!");
                 _private.sequence = sequence;

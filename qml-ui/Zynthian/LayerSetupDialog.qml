@@ -74,7 +74,7 @@ Zynthian.ActionPickerPopup {
         interval: 200
         onTriggered: {
             if (root.selectedChannel.connectedPattern >= 0) {
-                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
                 pattern.midiChannel = root.selectedChannel.connectedSound;
             }
         }

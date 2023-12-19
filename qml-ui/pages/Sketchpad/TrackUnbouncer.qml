@@ -240,7 +240,7 @@ Zynthian.DialogQuestion {
                         _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadataSamples);
                     }
                     // - Run through the track's patterns
-                    let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName);
+                    let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
                     for (let partIndex = 0; partIndex < 5; ++partIndex) {
                         let pattern = sequence.getByPart(_private.sketchpadTrack.id, partIndex);
                     //   - Clear the existing pattern and reset it to defaults

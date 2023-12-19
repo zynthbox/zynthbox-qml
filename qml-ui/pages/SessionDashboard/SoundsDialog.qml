@@ -125,7 +125,7 @@ Zynthian.Dialog {
 //                soundsDialog.selectedChannel.chainedSounds = [-1,-1,-1,-1, -1]
                 soundsDialog.selectedChannel.clearChainedSoundsWithoutCloning();
 //                if (soundsDialog.selectedChannel.connectedPattern >= 0) {
-//                    var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+//                    var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
 //                    seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
 //                }
                 soundsDialog.accept();
@@ -313,7 +313,7 @@ Zynthian.Dialog {
                         soundsDialog.selectedChannel.selectSound(index);
 
                         if (soundsDialog.selectedChannel.connectedPattern >= 0) {
-                            var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+                            var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
                             seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
                         }
 

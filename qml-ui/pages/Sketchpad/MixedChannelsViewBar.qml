@@ -62,7 +62,7 @@ Rectangle {
         selectedChannelThrottle.restart()
     }
 
-    property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedTrackName) : null
+    property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
 
     Layout.fillWidth: true
@@ -674,7 +674,7 @@ Rectangle {
                                             text: qsTr("Bounce To Sketch")
                                             icon.name: "go-next"
                                             onClicked: {
-                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedTrackName, root.selectedChannel, -1);
+                                                bouncePopup.bounce(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, -1);
                                             }
                                         }
                                         Item {

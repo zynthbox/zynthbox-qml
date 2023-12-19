@@ -179,6 +179,15 @@ class sketchpad_scenes_model(QAbstractListModel):
     selectedTrackName = Property(str, get_selected_track_name, notify=selected_track_name_changed)
     ### END Property selectedTrackName
 
+    ### Property selectedSequenceName
+    # Convenience property for the name of the sequence matching the currently selected track
+    def get_selected_sequence_name(self):
+        if self.__selected_track_index__ == 0:
+            return "global"
+        return f"global{self.__selected_track_index__ + 1}"
+    selectedSequenceName = Property(str, get_selected_sequence_name, notify=selected_track_name_changed)
+    ### END Property selectedSequenceName
+
     ### Property selectedSceneName
     def get_selected_scene_name(self):
         return chr(self.__selected_scene_index__ + 65)

@@ -23,19 +23,14 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
-import QtMultimedia 5.15 as QMM
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import org.kde.newstuff 1.0 as NewStuff
-import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import Zynthian 1.0 as Zynthian
 
-import "private" as Private
-
-Zynthian.SelectorPage {
+Zynthian.ScreenPage {
     id: component
     property bool isVisible: zynqtgui.current_screen_id === component.screenId
 
@@ -43,15 +38,15 @@ Zynthian.SelectorPage {
         switch (cuia) {
             case "KNOB3_DOWN":
             case "SELECT_UP":
-                if (selector.current_index > 0) {
-                    selector.current_index -= 1
+                if (contentLoader.item && contentLoader.item.currentIndex > 0) {
+                    contentLoader.item.currentIndex -= 1;
                 }
                 return true;
 
             case "KNOB3_UP":
             case "SELECT_DOWN":
-                if (selector.current_index < mainView.count - 1) {
-                    selector.current_index += 1
+                if (contentLoader.item && contentLoader.item.currentIndex < contentLoader.item.count - 1) {
+                    contentLoader.item.currentIndex += 1;
                 }
                 return true;
         }
@@ -85,429 +80,84 @@ Zynthian.SelectorPage {
      */
     signal useThis(var installedFiles);
 
-    Component.onCompleted: {
-        selector.newstuff_model = newStuffModel;
-    }
     onIsVisibleChanged: {
-        if (component.isVisible) {
-            component.newStuffEngine = Qt.createQmlObject("
-            import QtQuick 2.10
-            import org.kde.newstuff 1.0 as NewStuff
-            NewStuff.Engine { configFile: \"%1\" }".arg(component.configFile), component, "newStuffEngineDynamicCreator");
-        } else if (component.newStuffEngine !== null) {
-            console.debug("The following QObject:connect error(s) are expected, as the object attempted to be connected to is being destroyed.");
-            component.newStuffEngine.destroy();
-            component.newStuffEngine = null;
-        }
+        engineUpdater.restart();
     }
-    property QtObject newStuffEngine: null
-    property bool isLoading: false
-    property string message
+    property bool connectionChecked: false
+    property bool hasStoreConnection: false
+    property string connectionErrorDescription: ""
     Connections {
-        target: newStuffEngine
-        onMessage: {
-            applicationWindow().showPassiveNotification(message);
-        }
-        onBusyMessage: {
-            if (!isLoading) { isLoading = true; }
-            component.message = message;
-        }
-        onIdleMessage: {
-            if (isLoading) { isLoading = false; }
-            component.message = "";
-        }
-        onErrorMessage: {
-            if (newStuffEngine.configFile != "") {
-                errorPopup.text = message;
-                errorPopup.open();
-            }
+        target: zynqtgui.sketchpad_downloader // We just need any, and this one's kind of a base we can assume will exist
+        onStoreConnectionStateChecked: {
+            component.connectionErrorDescription = message;
+            component.hasStoreConnection = state;
+            component.connectionChecked = true;
+            engineUpdater.restart();
         }
     }
-    NewStuff.ItemsModel {
-        id: newStuffModel
-        engine: newStuffEngine
-    }
-    QMM.Audio {
-        id: previewPlayer
-        autoLoad: false
-    }
-    contextualActions: [
-        Kirigami.Action {
-            enabled: proxyView.currentItem && (proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DeletedStatus))
-            text: proxyView.currentItem ? (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install")) : ""
-            onTriggered: {
-                if (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus) {
-                    newStuffModel.updateItem(proxyView.currentIndex);
+    Timer {
+        id: engineUpdater
+        running: false; repeat: false; interval: 10
+        onTriggered: {
+            if (component.isVisible) {
+                if (component.connectionChecked) {
+                    if (component.hasStoreConnection) {
+                        contentLoader.setSource("private/NewStuffPageContents.qml", {"showUseThis": component.showUseThis, "useThisLabel": component.useThisLabel, "configFile": component.configFile});
+                    }
                 } else {
-                    newStuffModel.installItem(proxyView.currentIndex, 1);
+                    zynqtgui.sketchpad_downloader.checkStoreConnection();
                 }
-            }
-        },
-        Kirigami.Action {
-            enabled: proxyView.currentItem && (proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus))
-            text: proxyView.currentItem ? qsTr("Remove") : ""
-            onTriggered: {
-                newStuffModel.uninstallItem(proxyView.currentIndex);
-            }
-        },
-        Kirigami.Action {
-            enabled: component.showUseThis && (proxyView.currentItem && proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus))
-            text: enabled ? component.useThisLabel : ""
-            onTriggered: {
-                component.useThis(proxyView.currentItem.installedFiles);
-            }
-        }
-    ]
-    Component {
-        id: newStuffDelegate
-        QQC2.ItemDelegate {
-            id: nsDelegate
-            width: ListView.view.width
-            topPadding: Kirigami.Units.largeSpacing
-            leftPadding: Kirigami.Units.largeSpacing
-            bottomPadding: Kirigami.Units.largeSpacing
-            rightPadding: Kirigami.Units.largeSpacing
-            highlighted: ListView.view.activeFocus
-            onClicked: {
-                selector.current_index = index;
-            }
-            background: Private.DelegateBackground {
-                delegate: nsDelegate
-            }
-            contentItem: RowLayout {
-                Item {
-                    Layout.fillHeight: true
-                    Layout.maximumWidth: height
-                    Layout.minimumWidth: height
-                    Kirigami.Icon {
-                        anchors.fill: parent;
-                        visible: previewImage.status != Image.Ready;
-                        source: "viewimage";
-                    }
-                    Image {
-                        id: previewImage
-                        anchors.fill: parent;
-                        asynchronous: true;
-                        smooth: true;
-                        fillMode: Image.PreserveAspectFit;
-                        source: model.previewsSmall.length > 0 ? model.previewsSmall[0] : "viewimage";
-                    }
-                }
-                QQC2.Label {
-                    Layout.fillWidth: true
-                    elide: Text.ElideRight
-                    text: model.name
-                }
-                QQC2.Label {
-                    visible: installedBadge.visible
-                    text: "Installed"
-                }
-                QQC2.Label {
-                    visible: updateAvailableBadge.visible
-                    text: "Update Available"
-                }
-                Kirigami.Icon {
-                    id: installedBadge;
-                    visible: model.status == NewStuff.ItemsModel.InstalledStatus;
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: height
-                    source: "vcs-normal";
-                }
-                Kirigami.Icon {
-                    id: updateAvailableBadge;
-                    visible: model.status == NewStuff.ItemsModel.UpdateableStatus;
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: height
-                    source: "vcs-update-required";
-                }
+            } else if (component.newStuffEngine !== null) {
+                contentLoader.source = "";
+                component.connectionChecked = false;
             }
         }
     }
-    Private.SelectorViewBackground {
+    contextualActions: contentLoader.status == Loader.Ready ? contentLoader.item.contextualActions : []
+    contentItem: Item {
         anchors.fill: parent
-        ListView {
-            id: mainView
-            anchors {
-                fill: parent;
-                margins: Kirigami.Units.largeSpacing
-                rightMargin: proxyView.width + Kirigami.Units.smallSpacing + Kirigami.Units.largeSpacing
-            }
-            model: newStuffModel
-            currentIndex: selector.current_index
-            delegate: newStuffDelegate
-            clip: true
-            onCurrentIndexChanged: {
-                positionViewAtIndex(currentIndex, ListView.Contain);
-            }
-        }
-    }
-    ListView {
-        id: proxyView
-        anchors {
-            top: view.top
-            right: view.right
-            bottom: view.bottom
-        }
-        width: component.width / 3
-        interactive: false
-        pixelAligned: true
-        clip: true
-        model: newStuffModel
-        currentIndex: selector.current_index
-        onCurrentIndexChanged: {
-            positionViewAtIndex(currentIndex, ListView.Beginning);
-        }
-        delegate: Item {
-            id: proxyViewDelegate
-            property int status: model.status;
-            property string name: model.name;
-            property string summary: model.summary;
-            property var installedFiles: model.installedFiles;
-            property string previewUrl
-            // ...etc for the various roles. Would be nice if we could use the .index and .data functions
-            // so we could just slap this info into the normal delegate, that way we wouldn't need this
-            // proxy, but oh well, it's cheap enough, so...
-            property bool hasPreview: previewUrl.length > 0
-            Component.onCompleted: {
-                previewUrl = "";
-                for (let linkIndex = 0; linkIndex < model.downloadLinks.length; ++linkIndex) {
-                    let downloadLink = model.downloadLinks[linkIndex];
-                    if (downloadLink.descriptionLink.endsWith(".wav")) {
-                        previewUrl = downloadLink.descriptionLink;
-                        break;
-                    }
-                }
-            }
-
-            // We're using this as our de-facto single-item view, so just make these the full size of the ListView
-            width: ListView.view.width
-            height: ListView.view.height
-            Zynthian.Card {
-                anchors.fill: parent;
-                ColumnLayout {
-                    opacity: busyInstallingStuff.running ? 0.3 : 1
-                    anchors {
-                        fill: parent;
-                        margins: Kirigami.Units.largeSpacing;
-                    }
-                    Item {
-                        id: previewContainer;
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Kirigami.Icon {
-                            anchors {
-                                fill: parent;
-                                margins: Kirigami.Units.smallSpacing;
-                            }
-                            visible: previewImage.status != Image.Ready;
-                            source: "viewimage";
-                        }
-                        Image {
-                            id: previewImage;
-                            anchors {
-                                fill: parent;
-                                margins: Kirigami.Units.smallSpacing;
-                            }
-                            verticalAlignment: Image.AlignTop
-                            asynchronous: true;
-                            fillMode: Image.PreserveAspectFit;
-                            source: model.previews.length > 0 ? model.previews[0] : "";
-                            Kirigami.Icon {
-                                id: updateAvailableBadge;
-                                visible: model.status == NewStuff.ItemsModel.UpdateableStatus;
-                                anchors {
-                                    top: parent.top;
-                                    right: parent.right;
-                                    margins: -Kirigami.Units.smallSpacing;
-                                }
-                                height: Kirigami.Units.iconSizes.smallMedium;
-                                width: height;
-                                source: "vcs-update-required";
-                            }
-                            Kirigami.Icon {
-                                id: installedBadge;
-                                visible: model.status == NewStuff.ItemsModel.InstalledStatus;
-                                anchors {
-                                    top: parent.top;
-                                    right: parent.right;
-                                    margins: -Kirigami.Units.smallSpacing;
-                                }
-                                height: Kirigami.Units.iconSizes.smallMedium;
-                                width: height;
-                                source: "vcs-normal";
-                            }
-                        }
-                        RowLayout {
-                            visible: proxyViewDelegate.hasPreview
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.bottom
-                            }
-                            height: Kirigami.Units.iconSizes.medium
-                            Kirigami.Icon {
-                                Layout.fillHeight: true
-                                Layout.minimumWidth: height
-                                Layout.maximumWidth: height
-                                source: previewPlayer.source == proxyViewDelegate.previewUrl && previewPlayer.playbackState === QMM.Audio.PlayingState ? "media-playback-stop" : "media-playback-start"
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        if (previewPlayer.source == proxyViewDelegate.previewUrl && previewPlayer.playbackState === QMM.Audio.PlayingState) {
-                                            previewPlayer.stop();
-                                        } else {
-                                            if (previewPlayer.source != proxyViewDelegate.previewUrl) {
-                                                previewPlayer.stop();
-                                                previewPlayer.source = proxyViewDelegate.previewUrl;
-                                            }
-                                            previewPlayer.play();
-                                        }
-                                    }
-                                }
-                            }
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                Rectangle {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width
-                                    height: Kirigami.Units.largeSpacing
-                                    visible: previewPlayer.playbackState === QMM.Audio.PlayingState && previewPlayer.duration > 0
-                                    color: "white"
-                                    Rectangle {
-                                        anchors {
-                                            top: parent.top
-                                            left: parent.left
-                                            right: parent.right
-                                            margins: 1
-                                        }
-                                        width: previewPlayer.duration > 0 ? (parent.width * previewPlayer.position / previewPlayer.duration) - 2 : 0
-                                        color: "white"
-                                        border {
-                                            width: 1
-                                            color: "black"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        text: model.summary
-                        wrapMode: Text.Wrap
-                        maximumLineCount: 5
-                        elide: Text.ElideRight
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        visible: model.status == NewStuff.ItemsModel.UpdateableStatus
-                        text: qsTr("<strong>Update Available</strong>")
-                        elide: Text.ElideRight
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        visible: model.version.length > 0
-                        text: model.status == NewStuff.ItemsModel.UpdateableStatus
-                            ? qsTr("Version %1 (installed %2)").arg(model.updateVersion).arg(model.version)
-                            : qsTr("Version %1").arg(model.version)
-                        elide: Text.ElideRight
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        text: model.status == NewStuff.ItemsModel.UpdateableStatus
-                            ? qsTr("Released on %1\nInstalled release: %2").arg(model.updateReleaseDate.toLocaleDateString()).arg(model.releaseDate.toLocaleDateString())
-                            : qsTr("Released on %1").arg(model.releaseDate.toLocaleDateString())
-                        elide: Text.ElideRight
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        text: qsTr("By %1").arg(model.author["name"])
-                    }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        QQC2.Label {
-                            text: qsTr("Rated as")
-                        }
-                        Zynthian.Rating {
-                            Layout.fillWidth: true
-                            rating: model.rating
-                        }
-                    }
-                }
-            }
-            PlasmaComponents.BusyIndicator {
-                id: busyInstallingStuff
-                anchors {
-                    horizontalCenter: parent.horizontalCenter;
-                    bottom: parent.verticalCenter
-                    bottomMargin: Kirigami.Units.largeSpacing
-                }
-                height: Kirigami.Units.gridUnit * 3
-                width: height
-                visible: model.status == NewStuff.ItemsModel.InstallingStatus || model.status == NewStuff.ItemsModel.UpdatingStatus;
-                running: visible;
-                background: Item {} // Quiet some warnings
-                QQC2.Label {
-                    anchors {
-                        horizontalCenter: parent.horizontalCenter
-                        top: parent.bottom
-                        topMargin: Kirigami.Units.largeSpacing
-                    }
-                    text: (model.status == NewStuff.ItemsModel.InstallingStatus) ? "Installing" : ((model.status == NewStuff.ItemsModel.UpdatingStatus) ? "Updating" : "");
-                    width: paintedWidth;
-                }
-            }
-        }
-    }
-    Item {
-        id: busyWithEngineStuff
-        anchors {
-            bottom: view.bottom
-            right: view.right
-            left: view.left
-            margins: Kirigami.Units.largeSpacing
-        }
-        height: Kirigami.Units.gridUnit * 5
-        visible: component.isLoading;
         Zynthian.Card {
-            anchors {
-                top: parent.top
-                left: busyWithEngineStuffLabel.left
-                right: busyWithEngineStuffLabel.right
-                bottom: parent.bottom
-                topMargin: -Kirigami.Units.largeSpacing
-                leftMargin: -Kirigami.Units.gridUnit * 2.5
-                rightMargin: -Kirigami.Units.gridUnit * 2.5
-                bottomMargin: -Kirigami.Units.largeSpacing
+            anchors.centerIn: parent
+            height: Kirigami.Units.gridUnit * 10
+            width: Kirigami.Units.gridUnit * 15
+            visible: component.connectionChecked === true && component.hasStoreConnection === false
+            ColumnLayout {
+                anchors.fill: parent
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    text: qsTr("No Network Connection")
+                }
+                QQC2.Label {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
+                    text: qsTr("Sorry, you seem to have no network connection right now. Either plug in a network cable, or connect to a wifi network, and then come back here to try again.\n%1").arg(component.connectionErrorDescription)
+                }
             }
         }
-        PlasmaComponents.BusyIndicator {
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: parent.top
-                topMargin: Kirigami.Units.largeSpacing
-            }
-            height: Kirigami.Units.gridUnit * 3
-            width: height
-            running: parent.visible;
-            background: Item {} // Quiet some warnings
+        Loader {
+            id: contentLoader
+            anchors.fill: parent
+            // asynchronous: true
         }
-        QQC2.Label {
-            id: busyWithEngineStuffLabel
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                bottom: parent.bottom
-                bottomMargin: Kirigami.Units.largeSpacing
-            }
-            text: component.message
-            width: paintedWidth
+        Connections {
+            target: contentLoader.item
+            onUseThis: component.useThis(installedFiles)
         }
-    }
-    Zynthian.DialogQuestion {
-        id: errorPopup
-        rejectText: ""
-        acceptText: qsTr("OK")
-        title: qsTr("An error occurred")
+        Binding {
+            target: contentLoader.item
+            property: "showUseThis"
+            value: component.showUseThis
+        }
+        Binding {
+            target: contentLoader.item
+            property: "useThisLabel"
+            value: component.useThisLabel
+        }
+        Binding {
+            target: contentLoader.item
+            property: "configFile"
+            value: component.configFile
+        }
     }
 }

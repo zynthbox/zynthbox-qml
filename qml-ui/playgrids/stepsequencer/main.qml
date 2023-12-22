@@ -295,10 +295,10 @@ Zynthian.BasePlayGrid {
                 if (_private.activePatternModel) {
                     _private.associatedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.channelIndex);
                     _private.associatedChannelIndex =  _private.activePatternModel.channelIndex;
+                    Qt.callLater(_private.updateUniqueCurrentRowNotes)
                 } else {
                     _private.updateChannel();
                 }
-                Qt.callLater(_private.updateUniqueCurrentRowNotes)
             }
         }
 

@@ -24,6 +24,7 @@
 #******************************************************************************
 
 
+import copy
 import json
 import logging
 from string import Template
@@ -69,10 +70,11 @@ class zynthbox_plugins_helper(QObject):
             self.plugins_by_id[key] = plugin
             self.plugins_by_name[f"{plugins_json[key]['type']}/{plugins_json[key]['name']}"] = plugin
 
-    def update_layer_snapshot_plugin_name_to_id(self, snapshot):
+    def update_layer_snapshot_plugin_name_to_id(self, source_snapshot):
         """
         Translate plugin name to plugin id in the layer snapshot
         """
+        snapshot = copy.deepcopy(source_snapshot)
         # Handle Plugin ID substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
         if snapshot["engine_nick"].startswith("JV/"):
             # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
@@ -128,10 +130,11 @@ class zynthbox_plugins_helper(QObject):
 
         return snapshot
 
-    def update_layer_snapshot_plugin_id_to_name(self, snapshot):
+    def update_layer_snapshot_plugin_id_to_name(self, source_snapshot):
         """
         Translate plugin id to plugin name in the layer snapshot
         """
+        snapshot = copy.deepcopy(source_snapshot)
         # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
         if snapshot["engine_nick"].startswith("JV/"):
             if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):

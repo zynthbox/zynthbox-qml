@@ -300,9 +300,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                         for index, _ in enumerate(sound_json["layers"]):
                             if sound_json["layers"][index]["engine_type"] == "MIDI Synth":
                                 sound_json["layers"][index]["midi_chan"] = free_layers[index]
+                                sound_json["layers"][index]["track_index"] = channel.id
                                 new_chained_sounds[sound_json["layers"][index]["slot_index"]] = free_layers[index]
                             elif sound_json["layers"][index]["engine_type"] == "Audio Effect":
-                                sound_json["layers"][index]["midi_chan"] = channel.id
+                                sound_json["layers"][index]["track_index"] = channel.id
 
                         self.zynqtgui.currentTaskMessage = f"Loading selected sounds in Track {channel.name}"
                         self.zynqtgui.layer.load_channels_snapshot(sound_json)

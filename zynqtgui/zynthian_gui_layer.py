@@ -1279,14 +1279,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
             #Layers info
             for layer in self.layers:
-                if track is None or (track is not None and layer.engine.type == "MIDI Synth" and layer.midi_chan in track.chainedSounds) or (track is not None and layer.engine.type == "Audio Effect" and layer.midi_chan == track.id):
+                if track is None or (track is not None and layer.track_index == track.id):
                     layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(layer.get_snapshot())
-                    if layer_snapshot["engine_type"] == "MIDI Synth" and layer_snapshot["slot_index"] == -1:
-                        if self.zynqtgui.sketchpad.song is not None and self.zynqtgui.sketchpad.song.channelsModel is not None:
-                            for channel_id in range(10):
-                                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id)
-                                if layer_snapshot['midi_chan'] in channel.chainedSounds:
-                                    layer_snapshot["slot_index"] = channel.chainedSounds.index(layer_snapshot['midi_chan'])
                     snapshot['layers'].append(layer_snapshot)
 
 

@@ -957,7 +957,7 @@ class sketchpad_clip(QObject):
     def get_metadataRoutingStyle(self):
         if self.audio_metadata is not None:
             try:
-                return json.loads(self.audio_metadata["ZYNTHBOX_ROUTING_STYLE"][0])
+                return self.audio_metadata["ZYNTHBOX_ROUTING_STYLE"][0]
             except Exception as e:
                 pass
         return ""

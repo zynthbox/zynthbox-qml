@@ -1408,14 +1408,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
             i = 0
             for lss in snapshot['layers']:
                 self.zynqtgui.currentTaskMessage = "Restoring bank and presets"
-                self.layers[i].restore_snapshot_1(lss)
+                layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
+                self.layers[i].restore_snapshot_1(layer_snapshot)
                 i += 1
 
             # Restore layer state, step 2 => Restore Controllers Status
             i = 0
             for lss in snapshot['layers']:
                 self.zynqtgui.currentTaskMessage = "Restoring controller status"
-                self.layers[i].restore_snapshot_2(lss)
+                layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
+                self.layers[i].restore_snapshot_2(layer_snapshot)
                 i += 1
 
             #Set Audio Routing

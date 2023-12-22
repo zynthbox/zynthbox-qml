@@ -3,9 +3,9 @@
 #******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 # 
-# Zynthian GUI Option Selector Class for KNewStuff downloaders
+# Zynthian GUI Class for KNewStuff downloaders
 # 
-# Copyright (C) 2021 Marco Martin <mart@kde.org>
+# Copyright (C) 2023 Dan Leinir Turthra Jensen <admin@leinir.dk>
 #
 #******************************************************************************
 # 
@@ -28,74 +28,46 @@ import logging
 import os
 from pathlib import Path
 
+import requests
+import threading
+
 from PySide2.QtCore import Qt, Property, Signal, Slot, QObject
 
 # Zynthian specific modules
-from . import zynthian_gui_selector
+from . import zynthian_qt_gui_base
 
 #------------------------------------------------------------------------------
-# Zynthian Listing effects for active layer GUI Class
+# UI class for helping with store access
 #------------------------------------------------------------------------------
 
-class zynthian_gui_newstuff(zynthian_gui_selector):
+class zynthian_gui_newstuff(zynthian_qt_gui_base.zynqtgui):
 
     def __init__(self, parent = None):
-        super(zynthian_gui_newstuff, self).__init__('Download', parent)
+        super(zynthian_gui_newstuff, self).__init__(parent)
 
-        self.audiofx_layer = None
-        self.audiofx_layers = None
-        self.newstuff_model_changed.connect(self.fill_list)
-        self.newstuff_model_data = None
+    def show(self):
+        pass
 
-        self.current_index_changed.connect(self.set_selector)
+    def refresh_loading(self):
+        pass
 
-    def fill_list(self):
-        self.list_data=[]
-        if self.newstuff_model_data:
-            if self.newstuff_model_data.rowCount() > 0:
-                for index in range(self.newstuff_model_data.rowCount()):
-                    entry_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
-                    # 285 is StatusRole in NewStuff's model
-                    entry_status = 0 #int(self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0), 285))
-                    # element 0 is action_id
-                    # element 1 is entry_index
-                    # element 2 is the display role
-                    self.list_data.append((entry_status,index,entry_name))
+    @Slot(None)
+    def checkStoreConnection(self):
+        def task(zynqtgui, channel):
+            try:
+                reply = requests.head("https://api.kde-look.org/")
+                reply.raise_for_status()
+                self.storeConnectionStateChecked.emit(True, "")
+            except requests.HTTPError as e:
+                self.storeConnectionStateChecked.emit(False, f"The store's server returned an error: {e.response.status_code} - {e.response.reason}")
+            except requests.ConnectionError:
+                self.storeConnectionStateChecked.emit(False, "No internet connection available")
+            except Exception as e:
+                self.storeConnectionStateChecked.emit(False, f"Unknown error occurred while checking the internet connection: {e}")
 
-        super().fill_list()
+        worker_thread = threading.Thread(target=task, args=(self.zynqtgui, self))
+        worker_thread.start()
 
-    def update_list(self):
-        self.fill_list()
-        self.set_selector()
-
-    def select_action(self, i, t='S'):
-        if i < 0 or i >= len(self.list_data):
-            return
-
-        self.select(i)
-
-    def set_select_path(self):
-        self.select_path = "Download"
-        super().set_select_path()
-
-    def get_newstuff_model(self):
-        return self.newstuff_model_data
-
-    def background_model_deleted(self):
-        self.newstuff_model_data = None
-        self.newstuff_model_changed.emit()
-
-    def set_newstuff_model(self,new_model):
-        self.newstuff_model_data = new_model
-        self.newstuff_model_data.rowsInserted.connect(self.update_list)
-        self.newstuff_model_data.rowsRemoved.connect(self.update_list)
-        self.newstuff_model_data.dataChanged.connect(self.update_list)
-        self.newstuff_model_data.modelReset.connect(self.update_list)
-        self.newstuff_model_data.destroyed.connect(self.background_model_deleted)
-        self.newstuff_model_changed.emit()
-
-    newstuff_model_changed = Signal()
-
-    newstuff_model = Property(QObject, get_newstuff_model, set_newstuff_model, notify = newstuff_model_changed)
+    storeConnectionStateChecked = Signal(bool, str, arguments=["state","message"])
 
 #------------------------------------------------------------------------------

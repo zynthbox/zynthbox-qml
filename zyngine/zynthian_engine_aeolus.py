@@ -173,7 +173,7 @@ class zynthian_engine_aeolus(zynthian_engine):
         super().__init__(zynqtgui)
         self.name = "Aeolus"
         self.nickname = "AE"
-        self.jackname = "aeolus"
+        self.jackname = self.get_next_jackname("aeolus")
 
         self.options['midi_chan']=False
         self.options['drop_pc']=True
@@ -183,10 +183,10 @@ class zynthian_engine_aeolus(zynthian_engine):
         if self.config_remote_display():
             self.proc_start_sleep = 3
             self.command_prompt = None
-            self.command = "aeolus"
+            self.command = f"aeolus -N {self.jackname}"
         else:
             self.command_prompt = "\nAeolus>"
-            self.command = "aeolus -t"
+            self.command = f"aeolus -t -N {self.jackname}"
 
         self.get_current_config()
 

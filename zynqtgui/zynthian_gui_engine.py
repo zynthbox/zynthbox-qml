@@ -61,7 +61,7 @@ def customSort(item1, item2):
 @initializator
 class zynthian_gui_engine(zynthian_gui_selector):
 
-    single_layer_engines = ["BF", "MD", "PT", "PD", "AE", "CS"]
+    single_layer_engines = ["BF", "MD", "PT", "PD", "CS"]
     check_channels_engines = []
 
     @classmethod
@@ -277,6 +277,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
                     eng="SF/{}".format(self.zyngine_counter)
                 elif eng=="FS":
                     eng="FS/{}".format(self.zyngine_counter)
+                elif eng=="AE":
+                    eng="AE/{}".format(self.zyngine_counter)
                 self.zyngines[eng]=zynthian_engine_class(self.zynqtgui)
 
         self.zyngine_counter+=1

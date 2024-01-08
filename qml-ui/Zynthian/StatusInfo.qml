@@ -365,8 +365,8 @@ MouseArea {
         visible: zynqtgui.globalPopupOpened
         y: parent.height
         x: parent.width - width
-        width: Kirigami.Units.gridUnit * 20
-        height: Kirigami.Units.gridUnit * 25
+        width: Kirigami.Units.gridUnit * 24
+        height: Kirigami.Units.gridUnit * 28
         onClosed: zynqtgui.globalPopupOpened = false
         contentItem: Item {
             GridLayout {
@@ -376,6 +376,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: SketchpadDial {
                         id: volumeDial
                         text: qsTr("Volume")
@@ -394,6 +395,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: ColumnLayout {
                         visible: false // Hide scale for now
                         SketchpadMultiSwitch {
@@ -416,6 +418,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: SketchpadDial {
                         id: bpmDial
                         text: qsTr("BPM")
@@ -460,16 +463,34 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    contentItem: SketchpadDial {
-                        text: qsTr("Delay")
-                        controlObj: zynqtgui.delayController
-                        controlProperty: "value"
-                        valueString: qsTr("%1%").arg(dial.value)
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    contentItem: ColumnLayout {
+                        SketchpadDial {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                            text: qsTr("Delay")
+                            controlObj: zynqtgui.delayController
+                            controlProperty: "value"
+                            valueString: qsTr("%1%").arg(dial.value)
 
-                        dial {
-                            stepSize: zynqtgui.delayController.step_size
-                            from: zynqtgui.delayController.value_min
-                            to: zynqtgui.delayController.value_max
+                            dial {
+                                stepSize: zynqtgui.delayController.step_size
+                                from: zynqtgui.delayController.value_min
+                                to: zynqtgui.delayController.value_max
+                            }
+                            onClicked: {
+                                console.log("Switch to edit page for global thing, pre-sepect fx1")
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit
+                            text: "Preset Name"
+                            onClicked: {
+                                // Show the preset picker for global FX, with fx1 selected
+                            }
                         }
                     }
                 }
@@ -477,6 +498,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                     contentItem: ColumnLayout {
                         visible: false // Hide BT for now
                         Layout.alignment: Qt.AlignVCenter
@@ -509,23 +531,43 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    contentItem: SketchpadDial {
-                        text: qsTr("Reverb")
-                        controlObj: zynqtgui.reverbController
-                        controlProperty: "value"
-                        valueString: qsTr("%1%").arg(dial.value)
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    contentItem: ColumnLayout {
+                        SketchpadDial {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                            text: qsTr("Reverb")
+                            controlObj: zynqtgui.reverbController
+                            controlProperty: "value"
+                            valueString: qsTr("%1%").arg(dial.value)
 
-                        dial {
-                            stepSize: zynqtgui.reverbController.step_size
-                            from: zynqtgui.reverbController.value_min
-                            to: zynqtgui.reverbController.value_max
+                            dial {
+                                stepSize: zynqtgui.reverbController.step_size
+                                from: zynqtgui.reverbController.value_min
+                                to: zynqtgui.reverbController.value_max
+                            }
+                            onClicked: {
+                                console.log("Switch to edit page for global thing, pre-sepect fx2")
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit
+                            text: "Preset Name"
+                            onClicked: {
+                                // Show the preset picker for global FX, with fx2 selected
+                            }
                         }
                     }
                 }
 
                 Card {
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
                     contentItem: RowLayout {
                         Layout.alignment: Qt.AlignLeft
                         QQC2.Label {
@@ -551,6 +593,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
                     text: qsTr("Stop All Notes")
                     onClicked: zynqtgui.callable_ui_action("ALL_NOTES_OFF")
                 }
@@ -558,15 +601,17 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
                     text: qsTr("Stop Playback")
                     onClicked: {
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
                     }
                 }
+
                 RowLayout {
                     Layout.columnSpan: 3
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.largeSpacing * 2
+                    Layout.preferredHeight: Kirigami.Units.largeSpacing
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     QQC2.Label {

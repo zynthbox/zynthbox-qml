@@ -322,7 +322,7 @@ Zynthian.BasePlayGrid {
             //filterRowEnd: activeBar
         //}
 
-        onActivePatternChanged:{
+        onActivePatternModelChanged:{
             updateChannel();
             while (hasSelection) {
                 deselectSelectedItem();
@@ -442,10 +442,11 @@ Zynthian.BasePlayGrid {
         }
         function updateUniqueCurrentRowNotes() {
             component.currentRowUniqueNotes = activePatternModel.uniqueRowNotes(activeBar + bankOffset);
-            component.currentRowUniqueMidiNotes = [];
+            let tempCurrentRowUniqueMidiNotes = [];
             for (var noteIndex = 0; noteIndex < component.currentRowUniqueNotes.length; ++noteIndex) {
-                component.currentRowUniqueMidiNotes.push(component.currentRowUniqueNotes[noteIndex].midiNote);
+                tempCurrentRowUniqueMidiNotes.push(component.currentRowUniqueNotes[noteIndex].midiNote);
             }
+            component.currentRowUniqueMidiNotes = tempCurrentRowUniqueMidiNotes;
             var currentBarNotes = [];
             var currentBankNotes = [];
             for (var bar = 0; bar < _private.activePatternModel.availableBars; ++bar) {
@@ -1110,14 +1111,18 @@ Zynthian.BasePlayGrid {
                                     sequencerPad.note = null;
                                     if (_private.activePatternModel) {
                                         sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                        _private.updateChannel();
+                                        sequencerPad.doUpdate = false;
+                                    } else {
+                                        sequencerPad.doUpdate = true;
+                                        sequencerPadNoteApplicator.restart();
                                     }
-                                    Qt.callLater(_private.updateUniqueCurrentRowNotes)
                                 }
                                 Timer {
                                     id: sequencerPadNoteApplicator
                                     repeat: false; running: false; interval: 1
                                     onTriggered: {
-                                        if (root.visible) {
+                                        if (component.isVisible) {
                                             sequencerPad.updatePadNote();
                                         } else {
                                             sequencerPad.doUpdate = true;
@@ -1131,9 +1136,18 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                                 Connections {
+                                    target: component
+                                    onIsVisibleChanged: {
+                                        if (component.isVisible) {
+                                            sequencerPad.doUpdate = true;
+                                            sequencerPadNoteApplicator.restart();
+                                        }
+                                    }
+                                }
+                                Connections {
                                     target: _private
                                     onSequenceChanged: sequencerPadNoteApplicator.restart();
-                                    onActivePatternChanged: sequencerPadNoteApplicator.restart();
+                                    onActivePatternModelChanged: sequencerPadNoteApplicator.restart();
                                     onActiveBarChanged: sequencerPadNoteApplicator.restart();
                                     onBankOffsetChanged: sequencerPadNoteApplicator.restart();
                                 }

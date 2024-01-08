@@ -14,6 +14,7 @@ ColumnLayout {
     property string controlProperty
     property real buttonStepSize
     signal pressed(var mouse)
+    signal clicked()
     signal doubleClicked()
     onControlObjChanged: {
         if (controlObj && controlObj[controlProperty]) {
@@ -89,6 +90,9 @@ ColumnLayout {
                 }
                 onDoubleClicked: {
                     root.doubleClicked();
+                }
+                onClicked: {
+                    root.clicked();
                 }
             }
         }

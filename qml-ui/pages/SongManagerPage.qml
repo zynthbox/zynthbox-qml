@@ -676,11 +676,11 @@ Zynthian.ScreenPage {
                 onClicked: {
                     segmentRemover.open();
                 }
-                Zynthian.DialogQuestion {
+                Zynthian.ActionPickerPopup {
                     id: segmentRemover
-                    title: qsTr("Remove This Segment?")
-                    text: qsTr("Are you sure you wish to remove this segment?\n\nThis action cannot be undone.")
-                    onAccepted: {
+                    rows: 1
+                    columns: 3
+                    function doRemove() {
                         if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count === 1) {
                             // If there's only this single segment, don't actually delete it, just clear it
                             zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clear();
@@ -695,6 +695,40 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
+                    actions: [
+                        QQC2.Action {
+                            text: qsTr("Remove Segment,\nAdd Duration To Previous")
+                            enabled: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex > 0
+                            onTriggered: {
+                                let totalBeatDuration = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.beatLength + (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.barLength * 4);
+                                let previousSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 1);
+                                for (let beat = 0; beat < totalBeatDuration; ++beat) {
+                                    _private.changeBeatLength(previousSegment, true);
+                                }
+                                segmentRemover.doRemove();
+                                // Since we're merging with the previous, that is really the one that'll be of interest next, so... select that
+                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 1;
+                            }
+                        },
+                        QQC2.Action {
+                            text: qsTr("Just Remove Segment")
+                            onTriggered: {
+                                segmentRemover.doRemove();
+                            }
+                        },
+                        QQC2.Action {
+                            text: qsTr("Remove Segment,\nAdd Duration To Next")
+                            enabled: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count - 1
+                            onTriggered: {
+                                let totalBeatDuration = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.beatLength + (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.barLength * 4);
+                                let nextSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
+                                for (let beat = 0; beat < totalBeatDuration; ++beat) {
+                                    _private.changeBeatLength(nextSegment, true);
+                                }
+                                segmentRemover.doRemove();
+                            }
+                        }
+                    ]
                 }
             }
         }

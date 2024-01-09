@@ -87,6 +87,9 @@ Zynthian.ScreenPage {
                 returnValue = true;
                 break;
         }
+        if (returnValue) {
+            zynqtgui.ignoreNextModeButtonPress = true;
+        }
         return returnValue;
     }
     QtObject {
@@ -102,26 +105,76 @@ Zynthian.ScreenPage {
             }
         }
         function knob0Up() {
-            segmentDetails.selectedSegment.barLength += 1;
+            if (zynqtgui.modeButtonPressed) {
+                let nextSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
+                if (nextSegment != null && nextSegment.barLength > 0) {
+                    for (let i = 0; i < 4; ++i) {
+                        changeBeatLength(segmentDetails.selectedSegment, true);
+                        changeBeatLength(nextSegment, false);
+                    }
+                }
+            } else {
+                segmentDetails.selectedSegment.barLength += 1;
+            }
         }
         function knob0Down() {
-            if (segmentDetails.selectedSegment.barLength > 0) {
-                segmentDetails.selectedSegment.barLength -= 1;
+            if (zynqtgui.modeButtonPressed) {
+                let nextSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
+                if (nextSegment != null && segmentDetails.selectedSegment.barLength > 0) {
+                    for (let i = 0; i < 4; ++i) {
+                        changeBeatLength(segmentDetails.selectedSegment, false);
+                        changeBeatLength(nextSegment, true);
+                    }
+                }
+            } else {
+                if (segmentDetails.selectedSegment.barLength > 0) {
+                    segmentDetails.selectedSegment.barLength -= 1;
+                }
             }
         }
         function knob1Up() {
-            if (segmentDetails.selectedSegment.beatLength < 3) {
-                segmentDetails.selectedSegment.beatLength += 1;
+            if (zynqtgui.modeButtonPressed) {
+                let nextSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
+                if (nextSegment != null && (nextSegment.barLength > 0 || nextSegment.beatLength > 0)) {
+                    changeBeatLength(segmentDetails.selectedSegment, true);
+                    changeBeatLength(nextSegment, false);
+                }
+            } else {
+                changeBeatLength(segmentDetails.selectedSegment, true);
             }
         }
         function knob1Down() {
-            if (segmentDetails.selectedSegment.beatLength > 0) {
-                segmentDetails.selectedSegment.beatLength -= 1;
+            if (zynqtgui.modeButtonPressed) {
+                let nextSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
+                if (nextSegment != null && (segmentDetails.selectedSegment.barLength > 0 || segmentDetails.selectedSegment.beatLength > 0)) {
+                    changeBeatLength(segmentDetails.selectedSegment, false);
+                    changeBeatLength(nextSegment, true);
+                }
+            } else {
+                changeBeatLength(segmentDetails.selectedSegment, false);
             }
         }
         function knob2Up() {
         }
         function knob2Down() {
+        }
+        function changeBeatLength(segment, increase=true) {
+            if (increase) {
+                if (segment.beatLength < 3) {
+                    segment.beatLength += 1;
+                } else {
+                    segment.barLength += 1;
+                    segment.beatLength = 0;
+                }
+            } else {
+            if (segment.beatLength > 0) {
+                segment.beatLength -= 1;
+            } else if (segment.barLength > 0) {
+                segment.barLength -= 1;
+                segment.beatLength = 3;
+            }
+
+            }
         }
     }
 

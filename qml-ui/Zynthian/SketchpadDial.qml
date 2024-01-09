@@ -16,6 +16,7 @@ ColumnLayout {
     signal pressed(var mouse)
     signal clicked()
     signal doubleClicked()
+    property alias action: actionButton.action
     onControlObjChanged: {
         if (controlObj && controlObj[controlProperty]) {
             dial.value = controlObj[controlProperty]
@@ -117,6 +118,12 @@ ColumnLayout {
                 dial.moved()
             }
         }
+    }
+
+    QQC2.Button {
+        id: actionButton
+        Layout.fillWidth: true
+        visible: action !== null
     }
 
     QQC2.Label {

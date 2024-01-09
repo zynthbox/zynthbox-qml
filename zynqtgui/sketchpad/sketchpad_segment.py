@@ -39,6 +39,7 @@ class sketchpad_segment(QObject):
         self.__beat_length = 0
         self.__tick_length = 0
         self.__clips = []
+        self.__restartClips = []
 
         self.__segment_model = segment_model
         self.__segment_model.countChanged.connect(self.segmentIdChanged.emit)
@@ -69,6 +70,13 @@ class sketchpad_segment(QObject):
                     "col": clip.col,
                     "part": clip.part
                 } for clip in self.__clips
+            ],
+            "restartClips": [
+                {
+                    "row": clip.row,
+                    "col": clip.col,
+                    "part": clip.part
+                } for clip in self.__restartClips
             ]
         }
 
@@ -86,6 +94,9 @@ class sketchpad_segment(QObject):
         if "clips" in obj:
             for clip in obj["clips"]:
                 self.__clips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
+        if "restartClips" in obj:
+            for clip in obj["restartClips"]:
+                self.__restartClips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
 
     def sync_clips_for_channel_audio_type_change(self):
         # When any of the channel changes channelAudioType, this method will be called to adjust.
@@ -214,6 +225,31 @@ class sketchpad_segment(QObject):
     clips = Property('QVariantList', get_clips, set_clips, notify=clipsChanged)
     ### END Property clips
 
+    ### BEGIN Property restartClips
+    @Slot(QObject, result=bool)
+    def restartClip(self, clip:QObject):
+        return clip in self.__restartClips
+
+    @Slot(QObject, bool, result=None)
+    def setRestartClip(self, clip:QObject, restart:bool):
+        if restart == True and clip not in self.__restartClips:
+            self.addClip(clip)
+            self.__restartClips.append(clip)
+            self.restartClipsChanged.emit()
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
+        elif restart == False and clip in self.__restartClips:
+            self.__restartClips.remove(clip)
+            self.restartClipsChanged.emit()
+            if self.zynqtgui.sketchpad.song is not None:
+                self.zynqtgui.sketchpad.song.schedule_save()
+
+    def get_restartClips(self):
+        return self.__restartClips
+    restartClipsChanged = Signal()
+    restartClips = Property("QVariantList", get_restartClips, notify=restartClipsChanged)
+    ### END Property restartClips
+
     @Slot(QObject, result=None)
     def addClip(self, clip):
         """
@@ -250,6 +286,7 @@ class sketchpad_segment(QObject):
             self.__clips.remove(clip)
             self.zynqtgui.sketchpad.song.sketchesModel.clipRemoved.emit(self.__sketch.sketchId, self.segmentId, clip)
             self.clipsChanged.emit()
+            self.setRestartClip(clip, False)
 
             if self.zynqtgui.sketchpad.song is not None:
                 self.zynqtgui.sketchpad.song.schedule_save()

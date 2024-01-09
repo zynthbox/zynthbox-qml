@@ -463,12 +463,11 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                     contentItem: ColumnLayout {
                         SketchpadDial {
                             Layout.fillHeight: true
                             Layout.fillWidth: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                             text: qsTr("Delay")
                             controlObj: zynqtgui.delayController
                             controlProperty: "value"
@@ -482,14 +481,11 @@ MouseArea {
                             onClicked: {
                                 console.log("Switch to edit page for global thing, pre-sepect fx1")
                             }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit
-                            text: "Preset Name"
-                            onClicked: {
-                                // Show the preset picker for global FX, with fx1 selected
+                            action: QQC2.Action {
+                                text: "Preset Name"
+                                onTriggered: {
+                                    // Show the preset picker for global FX, with fx1 selected
+                                }
                             }
                         }
                     }
@@ -498,7 +494,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                     contentItem: ColumnLayout {
                         visible: false // Hide BT for now
                         Layout.alignment: Qt.AlignVCenter
@@ -531,12 +527,11 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                     contentItem: ColumnLayout {
                         SketchpadDial {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                             text: qsTr("Reverb")
                             controlObj: zynqtgui.reverbController
                             controlProperty: "value"
@@ -550,14 +545,11 @@ MouseArea {
                             onClicked: {
                                 console.log("Switch to edit page for global thing, pre-sepect fx2")
                             }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit
-                            text: "Preset Name"
-                            onClicked: {
-                                // Show the preset picker for global FX, with fx2 selected
+                            action: QQC2.Action {
+                                text: "Preset Name"
+                                onTriggered: {
+                                    // Show the preset picker for global FX, with fx1 selected
+                                }
                             }
                         }
                     }

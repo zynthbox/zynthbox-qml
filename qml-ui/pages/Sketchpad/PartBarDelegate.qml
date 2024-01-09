@@ -37,7 +37,11 @@ ColumnLayout {
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
             function handleItemClick() {
                 if (root.songMode) {
-                    zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
+                    if (zynqtgui.altButtonPressed) {
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.setRestartClip(partDelegate.clip, !zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(partDelegate.clip));
+                    } else {
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip);
+                    }
                 } else {
                     partDelegate.clip.enabled = !partDelegate.clip.enabled;
                     root.channel.selectedPart = index;
@@ -134,16 +138,28 @@ ColumnLayout {
                     text: root.visible ? partDelegate.clip.path.split("/").pop() : ""
                 }
             }
+            Kirigami.Icon {
+                anchors {
+                    left: parent.left
+                    bottom: parent.bottom
+                    margins: Kirigami.Units.smallSpacing
+                }
+                height: Kirigami.Units.largeSpacing
+                width: Kirigami.Units.largeSpacing
+                visible: root.songMode && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClips && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(partDelegate.clip)
+                source: "media-skip-backward-symbolic"
+            }
             MouseArea {
                 id: mouseArea
                 anchors.fill: parent
                 onClicked: partDelegate.handleItemClick()
                 onPressAndHold: {
-                    partDelegate.clip.enabled = true;
-                    root.channel.selectedPart = index;
-                    root.channel.selectedSlotRow = index;
-
-                    if (!root.songMode) {
+                    if (root.songMode) {
+                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.setRestartClip(partDelegate.clip, !zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(partDelegate.clip));
+                    } else {
+                        partDelegate.clip.enabled = true;
+                        root.channel.selectedPart = index;
+                        root.channel.selectedSlotRow = index;
                         zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                         zynqtgui.bottomBarControlObj = root.channel.sceneClip;
                         bottomStack.slotsBar.bottomBarButton.checked = true;

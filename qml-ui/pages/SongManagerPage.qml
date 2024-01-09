@@ -636,6 +636,27 @@ Zynthian.ScreenPage {
                 }
             }
             QQC2.Button {
+                text: qsTr("Split In Half")
+                Layout.fillWidth: true
+                onClicked: {
+                    let totalBeatDuration = segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength;
+                    let halfBeatDuration = Math.floor(totalBeatDuration / 2);
+                    let unevenSplit = (totalBeatDuration - (halfBeatDuration * 2)) > 0;
+                    let halfBarDuration = Math.floor(halfBeatDuration / 4);
+                    halfBeatDuration = halfBeatDuration - (halfBarDuration * 4);
+                    let newSegment = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
+                    newSegment.barLength = halfBarDuration;
+                    newSegment.beatLength = halfBeatDuration;
+                    newSegment.clips = segmentDetails.selectedSegment.clips;
+                    // Not copying across restartClips to the new segment (since we want to leave the perceived playback alone, so we need to not restart anything)
+                    segmentDetails.selectedSegment.barLength = halfBarDuration;
+                    segmentDetails.selectedSegment.beatLength = halfBeatDuration;
+                    if (unevenSplit) {
+                        _private.changeBeatLength(segmentDetails.selectedSegment, true);
+                    }
+                }
+            }
+            QQC2.Button {
                 text: qsTr("Add After")
                 Layout.fillWidth: true
                 onClicked: {

@@ -91,8 +91,8 @@ class sketchpad_channel(QObject):
         self.synthPassthroughMixingChanged.connect(self.handleSynthPassthroughMixingChanged)
         self.fxPassthroughMixingChanged.connect(self.handleFxPassthroughMixingChanged)
         self.channel_audio_type_changed.connect(self.handleAudioTypeSettingsChanged)
-        self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots)
-        self.chainedFxChanged.connect(self.clearFxPassthroughForEmtpySlots)
+        self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
+        self.chainedFxChanged.connect(self.clearFxPassthroughForEmtpySlots, Qt.QueuedConnection)
         self.zynaddsubfx_midi_output = None
         self.zynaddsubfx_midi_input = None
         self.zynaddubfx_heuristic_connect_timer = QTimer(self)
@@ -454,6 +454,7 @@ class sketchpad_channel(QObject):
             if "audioTypeSettings" in obj:
                 self.__audioTypeSettings__.update(obj["audioTypeSettings"])
             self.handleAudioTypeSettingsChanged()
+            logging.error("Audio type settings changing handled")
             if "channelRoutingStyle" in obj:
                 self.set_channel_routing_style(obj["channelRoutingStyle"], True)
             else:
@@ -1725,17 +1726,20 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def clearSynthPassthroughForEmptySlots(self):
-        shouldEmitChanged = False
-        for laneId in range(0, 5):
-            if self.__chained_sounds__[laneId] == -1:
-                # If there is no synth in this, check to see if we've got anything set for the two values, and if so, reset them to defaults
-                if self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] < 1:
-                    self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] = self.__initial_pan__
-                    self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] = 1
-                    self.__song__.schedule_save()
-                    shouldEmitChanged = True
-        if shouldEmitChanged:
-            self.synthPassthroughMixingChanged.emit()
+        # Don't clear the values while loading (firstly we don't need to, we just loaded them,
+        # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
+        if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
+            shouldEmitChanged = False
+            for laneId in range(0, 5):
+                if self.__chained_sounds__[laneId] == -1:
+                    # If there is no synth in this, check to see if we've got anything set for the two values, and if so, reset them to defaults
+                    if self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] < 1:
+                        self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] = self.__initial_pan__
+                        self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] = 1
+                        self.__song__.schedule_save()
+                        shouldEmitChanged = True
+            if shouldEmitChanged:
+                self.synthPassthroughMixingChanged.emit()
 
     def get_synthPassthrough0pan(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"]
     def get_synthPassthrough0dry(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"]
@@ -1774,16 +1778,19 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def clearFxPassthroughForEmtpySlots(self):
-        shouldEmitChanged = False
-        for laneId in range(0, 5):
-            if self.__chained_fx[laneId] is None:
-                if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] > -1:
-                    self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
-                    self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = -1
-                    shouldEmitChanged = True
-                    self.__song__.schedule_save()
-        if shouldEmitChanged:
-            self.fxPassthroughMixingChanged.emit()
+        # Don't clear the values while loading (firstly we don't need to, we just loaded them,
+        # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
+        if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
+            shouldEmitChanged = False
+            for laneId in range(0, 5):
+                if self.__chained_fx[laneId] is None:
+                    if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] > -1:
+                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
+                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = -1
+                        shouldEmitChanged = True
+                        self.__song__.schedule_save()
+            if shouldEmitChanged:
+                self.fxPassthroughMixingChanged.emit()
 
     def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][0]["panAmount"]
     def get_fxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][0]["dryWetMixAmount"]

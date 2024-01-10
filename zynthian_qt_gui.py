@@ -1029,9 +1029,9 @@ class zynthian_gui(QObject):
         reverb_controller.add_control(reverb_engine.get_lv2_controllers_dict()["dry_wet"])
         reverb_layer = zynthian_layer(reverb_engine, -1, self)
 
-        # global_fx_engines is a list of a set of 2 elements.
-        # 1st element of the set is the engine instance
-        # 2nd element of the set is the zynthian controller to control fx
+        # global_fx_engines is a list of lists of 3 elements.
+        # 1st element of the list is the engine instance
+        # 2nd element of the list is the zynthian controller to control fx
         # 3rd element of the list is the layer
         self.global_fx_engines = [
             [delay_engine, delay_controller, delay_layer],

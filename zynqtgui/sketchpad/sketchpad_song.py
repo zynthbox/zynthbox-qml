@@ -265,7 +265,7 @@ class sketchpad_song(QObject):
 
     @Slot(None)
     def schedule_save(self):
-        if self.__is_loading__ is False:
+        if self.__is_loading__ == False:
             QMetaObject.invokeMethod(self.__save_timer__, "start", Qt.QueuedConnection)
 
     def restore(self, load_history):

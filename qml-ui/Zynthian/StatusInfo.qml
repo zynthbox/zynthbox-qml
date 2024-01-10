@@ -377,17 +377,21 @@ MouseArea {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
-                    contentItem: SketchpadDial {
-                        id: volumeDial
-                        text: qsTr("Volume")
-                        controlObj: zynqtgui
-                        controlProperty: "masterVolume"
-                        valueString: qsTr("%1%").arg(dial.value)
+                    contentItem: ColumnLayout {
+                        SketchpadDial {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            id: volumeDial
+                            text: qsTr("Volume")
+                            controlObj: zynqtgui
+                            controlProperty: "masterVolume"
+                            valueString: qsTr("%1%").arg(dial.value)
 
-                        dial {
-                            stepSize: 1
-                            from: 0
-                            to: 100
+                            dial {
+                                stepSize: 1
+                                from: 0
+                                to: 100
+                            }
                         }
                     }
                 }
@@ -419,41 +423,45 @@ MouseArea {
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
-                    contentItem: SketchpadDial {
-                        id: bpmDial
-                        text: qsTr("BPM")
-                        controlObj: Zynthbox.SyncTimer
-                        controlProperty: "bpm"
+                    contentItem: ColumnLayout {
+                        SketchpadDial {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            id: bpmDial
+                            text: qsTr("BPM")
+                            controlObj: Zynthbox.SyncTimer
+                            controlProperty: "bpm"
 
-                        dial {
-                            stepSize: 1
-                            from: 50
-                            to: 200
-                        }
-
-                        onPressed: registerTap();
-                        property int bpm: 0
-                        property var timestamps: []
-                        function registerTap() {
-                            var newStamp = Date.now();
-                            if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
-                                // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
-                                bpmDial.timestamps = [];
-                                bpm = 0;
+                            dial {
+                                stepSize: 1
+                                from: 50
+                                to: 200
                             }
-                            bpmDial.timestamps.push(newStamp);
-                            if (bpmDial.timestamps.length > 1) {
-                                var differences = [];
-                                for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
-                                    differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
+
+                            onPressed: registerTap();
+                            property int bpm: 0
+                            property var timestamps: []
+                            function registerTap() {
+                                var newStamp = Date.now();
+                                if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
+                                    // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
+                                    bpmDial.timestamps = [];
+                                    bpm = 0;
                                 }
-                                var sum = 0;
-                                for (var i = 0; i < differences.length; ++i) {
-                                    sum += differences[i];
+                                bpmDial.timestamps.push(newStamp);
+                                if (bpmDial.timestamps.length > 1) {
+                                    var differences = [];
+                                    for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
+                                        differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
+                                    }
+                                    var sum = 0;
+                                    for (var i = 0; i < differences.length; ++i) {
+                                        sum += differences[i];
+                                    }
+                                    var average = sum / differences.length;
+                                    bpmDial.bpm = 60000 / average;
+                                    Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                                 }
-                                var average = sum / differences.length;
-                                bpmDial.bpm = 60000 / average;
-                                Zynthbox.SyncTimer.setBpm(bpmDial.bpm)
                             }
                         }
                     }
@@ -463,7 +471,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: ColumnLayout {
                         SketchpadDial {
                             Layout.fillHeight: true
@@ -479,14 +487,17 @@ MouseArea {
                                 to: zynqtgui.delayController.value_max
                             }
                             onClicked: {
-                                console.log("Switch to edit page for global thing, pre-sepect fx1")
+                                zynqtgui.editGlobalFX(0);
+                                popup.close();
                             }
-                            action: QQC2.Action {
-                                text: "Preset Name"
-                                onTriggered: {
-                                    // Show the preset picker for global FX, with fx1 selected
-                                }
-                            }
+                            // Apparently neither of our two global fx picks have presets defined, so... never mind showing the button
+                            // action: QQC2.Action {
+                            //     text: "Preset Name"
+                            //     onTriggered: {
+                            //         zynqtgui.selectGlobalFXPreset(0);
+                            //         popup.close();
+                            //     }
+                            // }
                         }
                     }
                 }
@@ -494,7 +505,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: ColumnLayout {
                         visible: false // Hide BT for now
                         Layout.alignment: Qt.AlignVCenter
@@ -527,7 +538,7 @@ MouseArea {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: ColumnLayout {
                         SketchpadDial {
                             Layout.fillWidth: true
@@ -543,14 +554,17 @@ MouseArea {
                                 to: zynqtgui.reverbController.value_max
                             }
                             onClicked: {
-                                console.log("Switch to edit page for global thing, pre-sepect fx2")
+                                zynqtgui.editGlobalFX(1);
+                                popup.close();
                             }
-                            action: QQC2.Action {
-                                text: "Preset Name"
-                                onTriggered: {
-                                    // Show the preset picker for global FX, with fx1 selected
-                                }
-                            }
+                            // Apparently neither of our two global fx picks have presets defined, so... never mind showing the button
+                            // action: QQC2.Action {
+                            //     text: "Preset Name"
+                            //     onTriggered: {
+                            //         zynqtgui.selectGlobalFXPreset(1);
+                            //         popup.close();
+                            //     }
+                            // }
                         }
                     }
                 }

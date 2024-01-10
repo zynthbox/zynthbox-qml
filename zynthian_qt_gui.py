@@ -91,7 +91,7 @@ import zynconf
 import zynautoconnect
 from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
-from zyngine import zynthian_controller, zynthian_zcmidi
+from zyngine import zynthian_controller, zynthian_zcmidi, zynthian_layer
 from zyngine import zynthian_midi_filter
 
 # from zyngine import zynthian_engine_transport
@@ -1024,19 +1024,34 @@ class zynthian_gui(QObject):
         reverb_engine = self.engine.start_engine("JV/Roomy")
         delay_controller = MultiController(self)
         delay_controller.add_control(delay_engine.get_lv2_controllers_dict()["LEVEL"])
+        delay_layer = zynthian_layer(delay_engine, -1, self)
         reverb_controller = MultiController(self)
         reverb_controller.add_control(reverb_engine.get_lv2_controllers_dict()["dry_wet"])
+        reverb_layer = zynthian_layer(reverb_engine, -1, self)
 
         # global_fx_engines is a list of a set of 2 elements.
         # 1st element of the set is the engine instance
         # 2nd element of the set is the zynthian controller to control fx
+        # 3rd element of the list is the layer
         self.global_fx_engines = [
-            (delay_engine, delay_controller),
-            (reverb_engine, reverb_controller)
+            [delay_engine, delay_controller, delay_layer],
+            [reverb_engine, reverb_controller, reverb_layer]
         ]
 
         self.global_fx_engines[0][1].value = 100
         self.global_fx_engines[1][1].value = 100
+
+    @Slot(int, result=None)
+    def selectGlobalFXPreset(self, fxSlot):
+        if -1 < fxSlot and fxSlot < len(self.global_fx_engines):
+            self.set_curlayer(self.global_fx_engines[fxSlot][2])
+            self.show_screen("effect_preset")
+
+    @Slot(int, result=None)
+    def editGlobalFX(self, fxSlot):
+        if -1 < fxSlot and fxSlot < len(self.global_fx_engines):
+            self.set_curlayer(self.global_fx_engines[fxSlot][2])
+            self.show_screen("control")
 
     # ---------------------------------------------------------------------------
     # OSC Management

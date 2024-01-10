@@ -71,11 +71,13 @@ ColumnLayout {
                 anchors.fill: parent
                 preventStealing: true
                 property real startY
+                property real startX
                 property real startValue
                 property real startDiff
                 onPressed: {
                     root.pressed(mouse);
                     startY = mouse.y;
+                    startX = mouse.x;
                     startValue = dial.value
                     // Calculate difference from floored value to apply when writing final value
                     startDiff = startValue - (Math.floor(startValue/dial.stepSize)*dial.stepSize)
@@ -89,11 +91,13 @@ ColumnLayout {
                     dial.value = floored+startDiff
                     dial.moved()
                 }
+                onReleased: {
+                    if (Math.abs(startY - mouse.y) < 5 && Math.abs(startX - mouse.x) < 5 && mouse.x > -1 && mouse.y > -1 && mouse.x < dialMouse.width && mouse.y < dialMouse.height) {
+                        root.clicked();
+                    }
+                }
                 onDoubleClicked: {
                     root.doubleClicked();
-                }
-                onClicked: {
-                    root.clicked();
                 }
             }
         }

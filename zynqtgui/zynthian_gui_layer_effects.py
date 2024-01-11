@@ -74,8 +74,12 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
         if self.midi_mode:
             self.fx_layers = self.zynqtgui.screens['layer'].get_midichain_layers(self.zynqtgui.curlayer)
         else:
-            self.fx_layers = self.zynqtgui.screens['layer'].get_fxchain_layers(self.zynqtgui.curlayer)
-        if self.fx_layers and len(self.fx_layers) > 0 and self.zynqtgui.curlayer in self.fx_layers:
+            # This code used to work very differently, but as we're manually controlling the effect listings... let's do it this way instead
+            # self.fx_layers = self.zynqtgui.screens['layer'].get_fxchain_layers(self.zynqtgui.curlayer)
+            self.fx_layers = []
+            if self.zynqtgui.curlayer is not None:
+                self.fx_layers.append(self.zynqtgui.curlayer)
+        if self.midi_mode and self.fx_layers and len(self.fx_layers) > 0 and self.zynqtgui.curlayer in self.fx_layers:
             self.fx_layers.remove(self.zynqtgui.curlayer)
 
         if self.fx_layers != None and len(self.fx_layers) > 0:

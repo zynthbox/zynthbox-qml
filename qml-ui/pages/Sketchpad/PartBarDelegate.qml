@@ -12,7 +12,7 @@ ColumnLayout {
     id: root
     property QtObject channel
     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
-    property QtObject sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+    property QtObject sequence: zynqtgui.isBootingComplete && zynqtgui.sketchpad.song && zynqtgui.sketchpad.song.isLoading == false ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
     property QtObject selectedComponent

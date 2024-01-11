@@ -1239,27 +1239,6 @@ class zynthian_gui(QObject):
         # Initialize midi config
         self.init_midi()
 
-        ###
-        # Initial snapshot loading needs to be done here before starting the threads in below this block
-        # Not loading the snapshots here causes a crash. It is not yet known where and why the crash happens.
-        # When booting, snapshot loading occurs here based on what sketchpad is loaded.
-        # For other cases sketchpad handles loading correct snapshot
-        #
-        # If sketchpad is loading an existing sketch, load last state snapshot to let eh euser keep working on synths
-        # between restarts
-        # Otherwise load a default snapshot as a new sketch wil be created
-        ###
-        if self.screens["sketchpad"].init_should_load_last_state:
-            if not self.screens["snapshot"].load_last_state_snapshot():
-                # Try loading default snapshot if loading last_state snapshot fails
-                if not self.screens["snapshot"].load_default_snapshot():
-                    # Show error if loading default snapshot fails
-                    logging.error("Error loading default snapshot")
-        else:
-            if not self.screens["snapshot"].load_default_snapshot():
-                # Show error if loading default snapshot fails
-                logging.error("Error loading default snapshot")
-
         # Start polling threads
         self.start_polling()
         self.start_loading_thread()
@@ -4635,19 +4614,22 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty("zynqtgui", zynqtgui)
 
     def load_qml():
+        if zynqtgui.sketchpad.sketchpadLoadingInProgress:
+            logging.debug("Sketchpad Loading is still in progress. Delay loading qml")
+            QTimer.singleShot(1000, load_qml)
+        else:
+            zynqtgui.currentTaskMessage = "Loading pages"
+            engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
 
-        zynqtgui.currentTaskMessage = f"Loading pages"
-        engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
+            if not engine.rootObjects() or not app.topLevelWindows():
+                sys.exit(-1)
 
-        if not engine.rootObjects() or not app.topLevelWindows():
-            sys.exit(-1)
+            # assuming there is one and only one window for now
+            zynthian_gui_config.top = app.topLevelWindows()[0]
+            zynthian_gui_config.app = app
 
-        # assuming there is one and only one window for now
-        zynthian_gui_config.top = app.topLevelWindows()[0]
-        zynthian_gui_config.app = app
-
-        # Norify isExternalActive changed when top window active value changes
-        zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())
+            # Norify isExternalActive changed when top window active value changes
+            zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())
 
     # Delay loading qml to let zynqtgui complete it's init sequence
     # Without the delay, UI sometimes doest start when `systemctl restart zynthian` is ran

@@ -218,7 +218,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.layers_for_channel.fill_list()
             self.zynqtgui.session_dashboard.set_selected_channel(0, True)
             self.__is_init_in_progress__ = False
-            logging.info(f"Sketchpad Initialization Complete")
+            logging.info("Sketchpad Initialization Complete")
 
             self.zynqtgui.zynautoconnect(True)
 
@@ -229,16 +229,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         if sketchpad is not None:
             logging.debug(f"### Checking Sketchpad : {sketchpad} : exists({Path(sketchpad).exists()}) ")
         else:
-            logging.debug(f"### Checking Sketchpad : sketchpad is none ")
+            logging.debug("### Checking Sketchpad : sketchpad is none ")
 
         if sketchpad is not None and Path(sketchpad).exists():
-            self.loadSketchpad(sketchpad, True, False, _cb)
-            # Existing sketch found. Tell zynthian_qt_gui to load last_state snapshot
-            self.init_should_load_last_state = True
+            # Existing sketch found. last_state snapshot after loading sketchpad
+            self.loadSketchpad(sketchpad, load_history=True, load_snapshot=False, cb=_cb, load_last_state_snapshot=True)
         else:
-            self.newSketchpad(None, _cb, load_snapshot=False)
-            # Existing sketch not found. Tell zynthian_qt_gui to load default snapshot
-            self.init_should_load_last_state = False
+            # Existing sketch not found. Load default snapshot after loading sketchpad
+            self.newSketchpad(base_sketchpad=None, cb=_cb, load_snapshot=False, load_last_state_snapshot=True)
 
     def switch_select(self, t):
         pass
@@ -567,7 +565,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 break
 
     @Slot(None)
-    def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True, force=False):
+    def newSketchpad(self, base_sketchpad=None, cb=None, load_snapshot=True, force=False, load_last_state_snapshot=False):
         def task():
             self.zynqtgui.currentTaskMessage = "Stopping playback"
 
@@ -620,6 +618,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 logging.info(f"Creating New Sketchpad")
                 self.zynqtgui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
 
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
+
                 # When zynqtgui is starting, it will load last_state or default snapshot
                 # based on the value of self.init_should_load_last_state
                 # Do not load snapshot again otherwise it will create multiple processes for same synths
@@ -628,8 +628,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                         logging.info(f"Loading default snapshot")
                         self.zynqtgui.currentTaskMessage = "Loading snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+                if load_last_state_snapshot:
+                    if not self.zynqtgui.screens["snapshot"].load_default_snapshot():
+                        # Show error if loading default snapshot fails
+                        logging.error("Error loading default snapshot")
 
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
                 self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
                     str(self.__sketchpad_basepath__ / 'temp' / 'Sketchpad-1.sketchpad.json'))
 
@@ -745,7 +748,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.do_long_task(task)
 
     @Slot(str, bool)
-    def loadSketchpad(self, sketchpad, load_history, load_snapshot=True, cb=None):
+    def loadSketchpad(self, sketchpad, load_history, load_snapshot=True, cb=None, load_last_state_snapshot=False):
         def task():
             logging.info(f"Loading sketchpad : {sketchpad}")
 
@@ -795,6 +798,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                         logging.info(f"Loading default snapshot")
                         self.zynqtgui.currentTaskMessage = "Loading snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+                if load_last_state_snapshot:
+                    if not self.zynqtgui.screens["snapshot"].load_last_state_snapshot():
+                        # Try loading default snapshot if loading last_state snapshot fails
+                        if not self.zynqtgui.screens["snapshot"].load_default_snapshot():
+                            # Show error if loading default snapshot fails
+                            logging.error("Error loading default snapshot")
 
                 # Update volume controls
                 self.zynqtgui.fixed_layers.fill_list()

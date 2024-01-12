@@ -1017,17 +1017,19 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
-        logging.debug(f"Initializing global FX engines")
+        logging.debug("Initializing global FX engines")
         self.currentTaskMessage = "Initializing Global FX Engines"
 
         delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
-        reverb_engine = self.engine.start_engine("JV/Roomy")
-        delay_controller = MultiController(self)
-        delay_controller.add_control(delay_engine.get_lv2_controllers_dict()["LEVEL"])
         delay_layer = zynthian_layer(delay_engine, -1, self)
-        reverb_controller = MultiController(self)
-        reverb_controller.add_control(reverb_engine.get_lv2_controllers_dict()["dry_wet"])
+        delay_controller = MultiController(self)
+        delay_controller.add_control(delay_layer.controllers_dict["LEVEL"])
+        delay_controller.value_changed.connect(self.snapshot.schedule_save_last_state_snapshot)
+        reverb_engine = self.engine.start_engine("JV/Roomy")
         reverb_layer = zynthian_layer(reverb_engine, -1, self)
+        reverb_controller = MultiController(self)
+        reverb_controller.add_control(reverb_layer.controllers_dict["dry_wet"])
+        reverb_controller.value_changed.connect(self.snapshot.schedule_save_last_state_snapshot)
 
         # global_fx_engines is a list of lists of 3 elements.
         # 1st element of the list is the engine instance

@@ -1017,6 +1017,20 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
+        def handle_delay_change():
+            self.snapshot.schedule_save_last_state_snapshot()
+            if self.curlayer == self.global_fx_engines[0][2]:
+                zctrl = self.global_fx_engines[0][2].controllers_dict["LEVEL"]
+                if zctrl in self.control.zgui_custom_controllers_map:
+                    self.control.zgui_custom_controllers_map[zctrl].zctrl_sync()
+
+        def handle_reverb_change():
+            self.snapshot.schedule_save_last_state_snapshot()
+            if self.curlayer == self.global_fx_engines[1][2]:
+                zctrl = self.global_fx_engines[1][2].controllers_dict["dry_wet"]
+                if zctrl in self.control.zgui_custom_controllers_map:
+                    self.control.zgui_custom_controllers_map[zctrl].zctrl_sync()
+
         logging.debug("Initializing global FX engines")
         self.currentTaskMessage = "Initializing Global FX Engines"
 
@@ -1024,12 +1038,13 @@ class zynthian_gui(QObject):
         delay_layer = zynthian_layer(delay_engine, -1, self)
         delay_controller = MultiController(self)
         delay_controller.add_control(delay_layer.controllers_dict["LEVEL"])
-        delay_controller.value_changed.connect(self.snapshot.schedule_save_last_state_snapshot)
+        delay_controller.value_changed.connect(handle_delay_change)
+
         reverb_engine = self.engine.start_engine("JV/Roomy")
         reverb_layer = zynthian_layer(reverb_engine, -1, self)
         reverb_controller = MultiController(self)
         reverb_controller.add_control(reverb_layer.controllers_dict["dry_wet"])
-        reverb_controller.value_changed.connect(self.snapshot.schedule_save_last_state_snapshot)
+        reverb_controller.value_changed.connect(handle_reverb_change)
 
         # global_fx_engines is a list of lists of 3 elements.
         # 1st element of the list is the engine instance

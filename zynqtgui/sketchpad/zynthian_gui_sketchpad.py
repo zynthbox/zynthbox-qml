@@ -615,7 +615,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.song_changed.emit()
                 self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
             else:
-                logging.info(f"Creating New Sketchpad")
+                logging.info("Creating New Sketchpad")
+
+                # Reset global fx to 100%
+                self.zynqtgui.global_fx_engines[0][1].value = self.zynqtgui.global_fx_engines[0][1].value_max
+                self.zynqtgui.global_fx_engines[1][1].value = self.zynqtgui.global_fx_engines[1][1].value_max
+
                 self.zynqtgui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
 
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)

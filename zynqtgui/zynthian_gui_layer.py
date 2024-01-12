@@ -1268,6 +1268,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
             snapshot={
                 'index':self.index,
                 'layers':[],
+                'global_fx': [
+                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[0][2].get_snapshot()),
+                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[1][2].get_snapshot())
+                ],
                 'clone':[],
                 'note_range':[],
                 'audio_capture': self.get_audio_capture(),
@@ -1351,6 +1355,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
             #Clean all layers, but don't stop unused engines
             self.remove_all_layers(False)
 
+            # If global fx is stored in snapshot restore global fx state from snapshot
+            if "global_fx" in snapshot and len(snapshot["global_fx"]) == 2:
+                global_fx0_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(snapshot["global_fx"][0])
+                self.zynqtgui.global_fx_engines[0][2].restore_snapshot_1(global_fx0_snapshot)
+                self.zynqtgui.global_fx_engines[0][2].restore_snapshot_2(global_fx0_snapshot)
+                global_fx1_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(snapshot["global_fx"][1])
+                self.zynqtgui.global_fx_engines[1][2].restore_snapshot_1(global_fx1_snapshot)
+                self.zynqtgui.global_fx_engines[1][2].restore_snapshot_2(global_fx1_snapshot)
+
             # Reusing Jalv engine instances raise problems (audio routing & jack names, etc..),
             # so we stop Jalv engines!
             self.zynqtgui.screens['engine'].stop_unused_jalv_engines()
@@ -1363,7 +1376,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         snapshot['amixer_layer'] = lss
                     del(snapshot['layers'][i])
                 else:
-                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)                    
+                    layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
                     slot_index = layer_snapshot['slot_index']
                     track_index = layer_snapshot['track_index']
                     engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])

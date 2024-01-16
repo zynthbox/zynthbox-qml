@@ -683,6 +683,11 @@ don't want to have to dig too far...
         property: "song"
         value: zynqtgui.sketchpad.song
     }
+    Binding {
+        target: Zynthbox.PlayfieldManager
+        property: "sketchpad"
+        value: zynqtgui.sketchpad.song
+    }
     // Our basic structure is logically scene contains channels which contain patterns, and accessing them is done through the song's inverted-structure channels model
     // the channels contain clips models (each of which holds information for all channel/part combinations for that channel), and each clip in that model holds the data pertaining to one scene/part/channel
     // there is further a set of sequence models which are partnered each to a scene, and inside each sequence is a pattern, which is paired with a channel

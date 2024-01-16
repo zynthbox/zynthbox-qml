@@ -378,10 +378,11 @@ class sketchpad_song(QObject):
         channel = self.__channels_model__.getChannel(channel)
         # logging.error(channel.clipsModel.count)
 
-        if sketchpad >= channel.getClipsModelByPart(part).count:
+        clipsModel = channel.getClipsModelByPart(part)
+        if sketchpad >= clipsModel.count:
             return None
 
-        clip = channel.getClipsModelByPart(part).getClip(sketchpad)
+        clip = clipsModel.getClip(sketchpad)
         # logging.error(clip)
         return clip
 

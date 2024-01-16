@@ -35,6 +35,7 @@ ColumnLayout {
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
             property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
+            property QtObject cppClipObject: root.visible && root.channel.channelAudioType === "sample-loop" && partDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
             function handleItemClick() {
                 if (root.songMode) {
                     if (zynqtgui.altButtonPressed) {
@@ -53,6 +54,18 @@ ColumnLayout {
                 }
 
                 root.clicked()
+            }
+            property bool clipPlaying: root.channel.channelAudioType === "sample-loop"
+                ? partDelegate.cppClipObject ? partDelegate.cppClipObject.isPlaying : false
+                : partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+            property int nextBarState: -1
+            Connections {
+                target: Zynthbox.PlayfieldManager
+                onPlayfieldStateChanged: function(sketchpadSong, sketchpadTrack, clip, position) {
+                    if (sketchpadSong === 0 && sketchpadTrack === root.channel.id && clip === partDelegate.partIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                        partDelegate;nextBarState = Zynthbox.PlayfieldManager.clipPlaystate(sketchpadSong, sketchpadTrack, clip, Zynthbox.PlayfieldManager.NextBarPosition);
+                    }
+                }
             }
 
             Layout.fillWidth: true
@@ -80,11 +93,10 @@ ColumnLayout {
                         top: parent.top
                         bottom: parent.bottom
                     }
-                    property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
-                    visible: parent.visible && cppClipObject && cppClipObject.isPlaying
+                    visible: parent.visible && partDelegate.cppClipObject && partDelegate.cppClipObject.isPlaying
                     color: Kirigami.Theme.highlightColor
                     width: 1
-                    x: cppClipObject ? cppClipObject.position * parent.width : 0
+                    x: partDelegate.cppClipObject ? partDelegate.cppClipObject.position * parent.width : 0
                 }
             }
             Image {
@@ -148,6 +160,30 @@ ColumnLayout {
                 width: Kirigami.Units.largeSpacing
                 visible: root.songMode && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClips && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(partDelegate.clip)
                 source: "media-skip-backward-symbolic"
+            }
+            Kirigami.Icon {
+                anchors {
+                    left: parent.left
+                    bottom: parent.bottom
+                    margins: Kirigami.Units.smallSpacing
+                }
+                height: Kirigami.Units.largeSpacing
+                width: Kirigami.Units.largeSpacing
+                // Visible if we are not in song mode, we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
+                visible: root.songMode === false && Zynthbox.SyncTimer.timerRunning && partDelegate.clipPlaying === false && partDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                source: "media-playback-start-symbolic"
+            }
+            Kirigami.Icon {
+                anchors {
+                    left: parent.left
+                    bottom: parent.bottom
+                    margins: Kirigami.Units.smallSpacing
+                }
+                height: Kirigami.Units.largeSpacing
+                width: Kirigami.Units.largeSpacing
+                // Visible if we are not in song mode, we are running playback, the clip is playing, and we are going to stop the clip at the top of the next bar
+                visible: root.songMode === false && Zynthbox.SyncTimer.timerRunning && partDelegate.clipPlaying === true && partDelegate.nextBarState == Zynthbox.PlayfieldManager.StoppedState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                source: "media-playback-stop-symbolic"
             }
             MouseArea {
                 id: mouseArea

@@ -56,8 +56,8 @@ ColumnLayout {
                 root.clicked()
             }
             property bool clipPlaying: root.channel.channelAudioType === "sample-loop"
-                ? partDelegate.cppClipObject ? partDelegate.cppClipObject.isPlaying : false
-                : partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+                ? partDelegate.cppClipObject ? partDelegate.cppClipObject.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
+                : partDelegate.pattern ? partDelegate.pattern.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
             property int nextBarState: -1
             Connections {
                 target: Zynthbox.PlayfieldManager

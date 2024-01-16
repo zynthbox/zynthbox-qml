@@ -49,7 +49,6 @@ class sketchpad_clip(QObject):
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__part_index__ = part_index
-        self.__is_playing__ = False
         self.__initial_length__ = 4
         self.__length__ = self.__initial_length__
         self.__initial_start_position__ = 0.0
@@ -328,10 +327,6 @@ class sketchpad_clip(QObject):
     def should_sync_changed(self):
         pass
 
-    @Signal
-    def __is_playing_changed__(self):
-        pass
-
     def playable(self):
         return True
     playable = Property(bool, playable, constant=True)
@@ -352,10 +347,18 @@ class sketchpad_clip(QObject):
         return False
     nameEditable = Property(bool, constant=True)
 
-    def isPlaying(self):
-        return self.__is_playing__
-    isPlaying = Property(bool, isPlaying, notify=__is_playing_changed__)
+    # BEGIN Property isPlaying
+    @Signal
+    def is_playing_changed(self):
+        pass
 
+    def get_isPlaying(self):
+        if self.audioSource is None:
+            return False
+        return self.audioSource.isPlaying
+
+    isPlaying = Property(bool, get_isPlaying, notify=is_playing_changed)
+    # END Property isPlaying
 
     @Signal
     def arranger_bar_positions_changed(self):
@@ -635,9 +638,15 @@ class sketchpad_clip(QObject):
         except Exception as e:
             logging.debug(f"Not connected : {str(e)}")
         if self.audioSource is not None:
+            try:
+                self.audioSource.isPlayingChanged.disconnect(self.is_playing_changed.emit)
+            except:
+                # Not being able to disconnect in this case will invariably mean the signal was already disconnected (somehow)
+                pass
             self.audioSource.deleteLater()
 
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
+        self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
         self.audioSource.setLaneAffinity(self.__lane__)
         if self.clipChannel is not None and self.__song__.isLoading == False:
             self.clipChannel.channelAudioType = "sample-loop"
@@ -646,7 +655,6 @@ class sketchpad_clip(QObject):
         self.__read_metadata__()
 
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
-        self.__is_playing__ = False
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
         self.audioSource.setLooping(bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True)))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
@@ -701,6 +709,7 @@ class sketchpad_clip(QObject):
         self.path_changed.emit()
         self.sound_data_changed.emit()
         self.duration_changed.emit()
+        self.is_playing_changed.emit()
         if self.is_channel_sample:
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
 
@@ -734,7 +743,7 @@ class sketchpad_clip(QObject):
         pass
 
     def get_audioLevel(self):
-        if self.__is_playing__:
+        if self.isPlaying:
             return self.__audio_level__
         else:
             return -200
@@ -759,44 +768,31 @@ class sketchpad_clip(QObject):
 
     @Slot(None)
     def play(self):
-        if not self.__is_playing__:
+        # if not self.isPlaying:
             # We will now allow playing multiple parts of a sample-loop channel and hence do not stop other clips in part when playing
             # if self.channel is not None:
             #     clipsModel = self.channel.clipsModel
             #
             #     for clip_index in range(0, clipsModel.count):
             #         clip: sketchpad_clip = clipsModel.getClip(clip_index)
-            #         logging.debug(f"Channel({self.channel}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+            #         logging.debug(f"Channel({self.channel}), Clip({clip}: isPlaying({clip.isPlaying}))")
             #
-            #         if clip.__is_playing__:
+            #         if clip.isPlaying:
             #             clip.stop()
 
-            if self.audioSource is None:
-                return
-
-            self.__is_playing__ = True
-            self.__is_playing_changed__.emit()
-
-            if self.clipChannel is not None and self.clipChannel.channelAudioType == "sample-loop":
-                logging.info(f"Playing Clip {self}")
-                Zynthbox.SyncTimer.instance().queueClipToStartOnChannel(self.audioSource, self.channel.id)
+        if self.channel is not None:
+            # logging.info(f"Setting Clip To Play at the top of the next bar {self}")
+            Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.PlayingState)
 
     @Slot(None)
     def stop(self):
-        if self.__is_playing__:
+        # logging.info(f"Setting Clip to Stop at the top of the next bar {self}")
+        Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState)
+        if self.isPlaying:
             self.reset_beat_count()
 
-            if self.audioSource is None:
-                return
-
-            self.__is_playing__ = False
-            self.__is_playing_changed__.emit()
-
-            # self.audioSource.stop()
-            logging.info(f"Stopping Clip {self}")
-            Zynthbox.SyncTimer.instance().queueClipToStopOnChannel(self.audioSource, self.channel.id)
-
-            self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
+            if self.audioSource is not None:
+                self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 
     def reset_beat_count(self):
         self.__current_beat__ = -1
@@ -1054,8 +1050,6 @@ class sketchpad_clip(QObject):
             self.audioSource.play(loop)
             self.__autoStopTimer__.setInterval(self.duration * 1000)
             self.__autoStopTimer__.start()
-            self.__is_playing__ = True
-            self.__is_playing_changed__.emit()
 
     # Only use this to do things like previewing the audio. Use play and stop above to control the playback properly
     @Slot(None)
@@ -1063,8 +1057,6 @@ class sketchpad_clip(QObject):
         if self.audioSource is not None:
             self.__autoStopTimer__.stop()
             self.audioSource.stop()
-            self.__is_playing__ = False
-            self.__is_playing_changed__.emit()
 
     @Slot(None)
     def saveMetadata(self):

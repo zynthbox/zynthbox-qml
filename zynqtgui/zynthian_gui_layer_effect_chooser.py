@@ -69,9 +69,12 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
         if self.zynqtgui.screens[self.effects_screen].fx_layer != None:
             for i, item in enumerate(self.list_data):
-                if item[0] == self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer):
-                    self.select(i)
-                    return
+                try:
+                    if item[0] == self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer):
+                        self.select(i)
+                        return
+                except Exception as e:
+                    pass #logging.exception(e)
 
                 self.select(0)
         else:
@@ -128,8 +131,11 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
     def set_select_path(self):
         self.select_path = ''
-        if self.zynqtgui.screens[self.effects_screen].fx_layer != None:
-            self.select_path = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][0]
+        try:
+            if self.zynqtgui.screens[self.effects_screen].fx_layer != None:
+                self.select_path = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][0]
+        except Exception as e:
+            pass #logging.exception(e)
         self.selector_path_changed.emit()
         self.selector_path_element_changed.emit()
 

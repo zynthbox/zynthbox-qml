@@ -63,14 +63,17 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
             self.reset_index = False
         super().show()
 
-        if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.get_current_screen_id() != 'effect_types':
-            cat = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
-            for i, item in enumerate(self.list_data):
-                if item[2] == cat:
-                    self.activate_index(i)
-                    return
-        if self.zynqtgui.screens[self.effect_chooser_screen].single_category == "    ":
-            self.zynqtgui.screens[self.effect_chooser_screen].single_category == self.list_data[0][0]
+        try:
+            if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.get_current_screen_id() != 'effect_types':
+                cat = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
+                for i, item in enumerate(self.list_data):
+                    if item[2] == cat:
+                        self.activate_index(i)
+                        return
+            if self.zynqtgui.screens[self.effect_chooser_screen].single_category == "    ":
+                self.zynqtgui.screens[self.effect_chooser_screen].single_category == self.list_data[0][0]
+        except Exception as e:
+            pass #logging.exception(e)
         self.zynqtgui.screens[self.effect_chooser_screen].show()
 
 
@@ -97,10 +100,12 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
         self.select_path = ''
         self.select_path_element = ''
 
-        if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.curlayer != None:
-            self.select_path_element = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
-            self.select_path = self.zynqtgui.curlayer.get_basepath() + " Audio-FX > " + str(self.select_path_element)
-
+        try:
+            if self.zynqtgui.screens[self.effects_screen].fx_layer != None and self.zynqtgui.curlayer != None:
+                self.select_path_element = self.engine_info[self.zynqtgui.screens[self.effects_screen].fx_layer.engine.get_path(self.zynqtgui.screens[self.effects_screen].fx_layer)][3]
+                self.select_path = self.zynqtgui.curlayer.get_basepath() + " Audio-FX > " + str(self.select_path_element)
+        except Exception as e:
+            pass #logging.exception(e)
         self.selector_path_changed.emit()
         self.selector_path_element_changed.emit()
 

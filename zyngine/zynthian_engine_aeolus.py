@@ -336,7 +336,6 @@ class zynthian_engine_aeolus(zynthian_engine):
             self.zynqtgui.zynautoconnect_midi(True)
             self.zynqtgui.zynautoconnect_audio()
             self.layers[0].load_bank_list(force=True)
-            self.layers[0].reset_bank()
             
             if not res:
                 return False

@@ -121,6 +121,9 @@ ColumnLayout {
     //}
     property string stepDurationName: component.patternModel ? noteLengthNames[component.patternModel.noteLength] : ""
 
+    readonly property int parameterPageCount: 3
+    property int currenParameterPageIndex: 0
+
     onVisibleChanged: {
         if (!visible) {
             patternModel = null;
@@ -219,7 +222,11 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: "Velocity"
+            text: component.currenParameterPageIndex === 0
+                ? "Velocity"
+                : component.currenParameterPageIndex === 1
+                    ? "Probability"
+                    : "Ratchet Style"
             Zynthian.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
@@ -238,7 +245,11 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: "Length"
+            text: component.currenParameterPageIndex === 0
+                ? "Length"
+                : component.currenParameterPageIndex === 1
+                    ? ""
+                    : "Ratchet Count"
             Zynthian.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
@@ -257,7 +268,11 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: "Position"
+            text: component.currenParameterPageIndex === 0
+                ? "Position"
+                : component.currenParameterPageIndex === 1
+                    ? ""
+                    : "Ratchet Probability"
             Zynthian.KnobIndicator {
                 anchors {
                     left: parent.horizontalCenter
@@ -268,6 +283,22 @@ ColumnLayout {
                 width: height
                 visible: component.currentSubNote === -1
                 knobId: 2
+            }
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                width: height
+                text: qsTr("%1/%2").arg(component.currenParameterPageIndex + 1).arg(component.parameterPageCount)
+                onClicked: {
+                    if (component.currenParameterPageIndex + 1 < component.parameterPageCount) {
+                        component.currenParameterPageIndex = component.currenParameterPageIndex + 1;
+                    } else {
+                        component.currenParameterPageIndex = 0;
+                    }
+                }
             }
         }
     }
@@ -475,9 +506,11 @@ ColumnLayout {
                                         }
                                     }
                                 }
+                                // BEGIN Page 1 (Velocity, Length, Position)
                                 StepSettingsParamDelegate {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 0
                                     model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
                                     paramIndex: subnoteDelegate.subnoteIndex
                                     paramName: "velocity"
@@ -496,6 +529,7 @@ ColumnLayout {
                                 StepSettingsParamDelegate {
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 0
                                     model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
                                     paramIndex: subnoteDelegate.subnoteIndex
                                     paramName: "duration"
@@ -536,6 +570,7 @@ ColumnLayout {
                                     id: delayParamDelegate
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 0
                                     model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
                                     paramIndex: subnoteDelegate.subnoteIndex
                                     paramName: "delay"
@@ -587,6 +622,104 @@ ColumnLayout {
                                         contentScrollView.contentItem.interactive = !pressed;
                                     }
                                 }
+                                // END Page 1 (Velocity, Length, Position)
+                                // BEGIN Page 2 (Probability, ???, ???)
+                                StepSettingsParamDelegate {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 1
+                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
+                                    paramIndex: subnoteDelegate.subnoteIndex
+                                    paramName: "probability"
+                                    paramDefaultString: "100%"
+                                    paramValueSuffix: "%"
+                                    paramDefault: 100
+                                    paramMin: 0
+                                    paramMax: 100
+                                    scrollWidth: 101
+                                    knobId: 1
+                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
+                                    onPressedChanged: {
+                                        contentScrollView.contentItem.interactive = !pressed;
+                                    }
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 1
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 1
+                                }
+                                // END Page 2 (Probability, ???, Swing)
+                                // BEGIN Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
+                                StepSettingsParamDelegate {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 2
+                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
+                                    paramIndex: subnoteDelegate.subnoteIndex
+                                    paramName: "ratchet-style"
+                                    paramDefaultString: "Split Step, Overlap"
+                                    paramValueSuffix: ""
+                                    paramDefault: 0
+                                    paramMin: 0
+                                    paramMax: 3
+                                    scrollWidth: 4
+                                    paramList: [0, 1, 2, 3]
+                                    paramNames: {
+                                        0: "Split Step, Overlap",
+                                        1: "Split Step, Choke",
+                                        2: "Split Length, Overlap",
+                                        3: "Split Length, Choke",
+                                    }
+                                    knobId: 1
+                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
+                                    onPressedChanged: {
+                                        contentScrollView.contentItem.interactive = !pressed;
+                                    }
+                                }
+                                StepSettingsParamDelegate {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 2
+                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
+                                    paramIndex: subnoteDelegate.subnoteIndex
+                                    paramName: "ratchet-count"
+                                    paramDefaultString: "0"
+                                    paramValueSuffix: ""
+                                    paramDefault: 0
+                                    paramMin: 0
+                                    paramMax: 12
+                                    scrollWidth: 13
+                                    knobId: 2
+                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
+                                    onPressedChanged: {
+                                        contentScrollView.contentItem.interactive = !pressed;
+                                    }
+                                }
+                                StepSettingsParamDelegate {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    visible: component.currenParameterPageIndex === 2
+                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
+                                    paramIndex: subnoteDelegate.subnoteIndex
+                                    paramName: "ratchet-probability"
+                                    paramDefaultString: "100%"
+                                    paramValueSuffix: "%"
+                                    paramDefault: 100
+                                    paramMin: 0
+                                    paramMax: 100
+                                    scrollWidth: 101
+                                    knobId: 3
+                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
+                                    onPressedChanged: {
+                                        contentScrollView.contentItem.interactive = !pressed;
+                                    }
+                                }
+                                // END Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
                             }
                         }
                     }

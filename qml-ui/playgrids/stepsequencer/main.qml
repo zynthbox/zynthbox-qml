@@ -275,6 +275,7 @@ Zynthian.BasePlayGrid {
 
         // Properties inherent to the active pattern (set these through _private.sequence.setPatternProperty(_private.activePattern, ...))
         property int noteLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.noteLength : 0
+        property int swing: sequence && sequence.activePatternObject ? sequence.activePatternObject.swing : 0
         property int layer: sequence && sequence.activePatternObject ? sequence.activePatternObject.layer : 0
         property var availableBars: sequence && sequence.activePatternObject ? sequence.activePatternObject.availableBars : 0
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
@@ -642,18 +643,101 @@ Zynthian.BasePlayGrid {
                     Layout.minimumHeight: parent.height / 5; 
                     Layout.maximumHeight: parent.height / 5;
                     color:"transparent"
+                    readonly property int parameterPageIndex: stepSettings.visible
+                        ? stepSettings.currenParameterPageIndex
+                        : noteSettings.visible
+                            ? noteSettings.currenParameterPageIndex
+                            : 0
                     Connections {
                         target: _private
                         onGoLeft: drumPadRepeater.goPrevious();
                         onGoRight: drumPadRepeater.goNext();
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
-                        onKnob0Up: drumPadRepeater.velocityUp();
-                        onKnob0Down: drumPadRepeater.velocityDown();
-                        onKnob1Up: drumPadRepeater.durationUp();
-                        onKnob1Down: drumPadRepeater.durationDown();
-                        onKnob2Up: drumPadRepeater.delayUp();
-                        onKnob2Down: drumPadRepeater.delayDown();
+                        onKnob0Up: {
+                            switch (drumPad.parameterPageIndex) {
+                                case 2:
+                                    drumPadRepeater.ratchetStyleUp();
+                                    break;
+                                case 1:
+                                    drumPadRepeater.probabilityUp();
+                                    break;
+                                case 0:
+                                default:
+                                    drumPadRepeater.velocityUp();
+                                    break;
+                            }
+                        }
+                        onKnob0Down: {
+                            switch (drumPad.parameterPageIndex) {
+                                case 2:
+                                    drumPadRepeater.ratchetStyleDown();
+                                    break;
+                                case 1:
+                                    drumPadRepeater.probabilityDown();
+                                    break;
+                                case 0:
+                                default:
+                                    drumPadRepeater.velocityDown();
+                                    break;
+                            }
+                        }
+                        onKnob1Up: {
+                            switch (drumPad.parameterPageIndex) {
+                                case 2:
+                                    drumPadRepeater.ratchetCountUp();
+                                    break;
+                                case 1:
+                                    // drumPadRepeater.
+                                    break;
+                                case 0:
+                                default:
+                                    drumPadRepeater.durationUp();
+                                    break;
+                            }
+                        }
+                        onKnob1Down: {
+                            switch (drumPad.parameterPageIndex) {
+                                case 2:
+                                    drumPadRepeater.ratchetCountDown();
+                                    break;
+                                case 1:
+                                    // drumPadRepeater.
+                                    break;
+                                case 0:
+                                default:
+                                    drumPadRepeater.durationDown();
+                                    break;
+                            }
+                        }
+                        onKnob2Up: {
+                            switch (drumPad.parameterPageIndex) {
+                                case 2:
+                                    drumPadRepeater.ratchetProbabilityUp();
+                                    break;
+                                case 1:
+                                    // drumPadRepeater.
+                                    break;
+                                case 0:
+                                default:
+                                    drumPadRepeater.delayUp();
+                                    break;
+                            }
+                        }
+                        onKnob2Down: {
+                            switch (drumPad.parameterPageIndex) {
+                                case 2:
+                                    drumPadRepeater.ratchetProbabilityDown();
+                                    break;
+                                case 1:
+                                    // drumPadRepeater.
+                                    break;
+                                case 0:
+                                default:
+                                    drumPadRepeater.delayDown();
+                                    break;
+                            }
+                        }
                     }
                     Connections {
                         target: stepSettings
@@ -1064,6 +1148,30 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                             }
+                            function probabilityUp() {
+                                changeValue("probability", 1, 0, 100, 100);
+                            }
+                            function probabilityDown() {
+                                changeValue("probability", -1, 0, 100, 100);
+                            }
+                            function ratchetStyleUp() {
+                                changeValue("ratchet-style", 1, 0, 3, 0);
+                            }
+                            function ratchetStyleDown() {
+                                changeValue("ratchet-style", -1, 0, 3, 0);
+                            }
+                            function ratchetCountUp() {
+                                changeValue("ratchet-count", 1, 0, 12, 0);
+                            }
+                            function ratchetCountDown() {
+                                changeValue("ratchet-count", -1, 0, 12, 0);
+                            }
+                            function ratchetProbabilityUp() {
+                                changeValue("ratchet-probability", 1, 0, 100, 100);
+                            }
+                            function ratchetProbabilityDown() {
+                                changeValue("ratchet-probability", -1, 0, 100, 100);
+                            }
                             PadNoteButton {
                                 id: sequencerPad
                                 Layout.fillHeight: true
@@ -1257,6 +1365,7 @@ Zynthian.BasePlayGrid {
                                     QQC2.Label {
                                         id:noteLengthLabel
                                         Layout.alignment: Qt.AlignHCenter
+                                        horizontalAlignment: Text.AlignHCenter
                                         text: {
                                             var text = "speed:\n"
                                             switch(_private.noteLength) {
@@ -1297,13 +1406,36 @@ Zynthian.BasePlayGrid {
                                 ColumnLayout {
                                     Zynthian.PlayGridButton {
                                         text: "+"
+                                        enabled: _private.swing < 99
+                                        onClicked: {
+                                            _private.sequence.setPatternProperty(_private.activePattern, "swing", _private.swing + 1)
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        Layout.alignment: Qt.AlignHCenter
+                                        horizontalAlignment: Text.AlignHCenter
+                                        Layout.preferredHeight: noteLengthLabel.height
+                                        text: "swing:\n" + _private.swing + "%"
+                                    }
+
+                                    Zynthian.PlayGridButton {
+                                        text:"-"
+                                        enabled: _private.swing > 0
+                                        onClicked: {
+                                            _private.sequence.setPatternProperty(_private.activePattern, "swing", _private.swing - 1);
+                                        }
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    Zynthian.PlayGridButton {
+                                        text: "+"
                                         enabled: _private.availableBars < 8
                                         onClicked: {
                                             _private.sequence.setPatternProperty(_private.activePattern, "availableBars", _private.availableBars + 1)
                                         }
                                     }
                                     QQC2.Label {
-                                        id:barsLabel
                                         Layout.alignment: Qt.AlignHCenter
                                         Layout.preferredHeight: noteLengthLabel.height
                                         text: _private.availableBars + " Bars"

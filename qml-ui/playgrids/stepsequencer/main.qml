@@ -1416,6 +1416,40 @@ Zynthian.BasePlayGrid {
                                         horizontalAlignment: Text.AlignHCenter
                                         Layout.preferredHeight: noteLengthLabel.height
                                         text: "swing:\n" + _private.swing + "%"
+                                        MultiPointTouchArea {
+                                            anchors.fill: parent
+                                            touchPoints: [
+                                                TouchPoint {
+                                                    id: swingSlidePoint;
+                                                    property double increment: 1
+                                                    property double slideIncrement: 1
+                                                    property double upperBound: 99
+                                                    property double lowerBound: 0
+                                                    property int resetValue: 0
+                                                    property var currentValue: undefined
+                                                    property var pressedTime: undefined
+                                                    onPressedChanged: {
+                                                        if (pressed) {
+                                                            pressedTime = Date.now();
+                                                            currentValue = _private.swing;
+                                                        } else {
+                                                            // Only reset if we are asked to, have no meaningful changes to the value, and the timing was reasonably
+                                                            // a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                                            if (Math.abs(_private.swing - currentValue) < swingSlidePoint.increment && (Date.now() - pressedTime) < 300) {
+                                                                _private.swing = swingSlidePoint.resetValue;
+                                                            }
+                                                            currentValue = undefined;
+                                                        }
+                                                    }
+                                                    onYChanged: {
+                                                        if (pressed && currentValue !== undefined) {
+                                                            var delta = -(swingSlidePoint.y - swingSlidePoint.startY) * swingSlidePoint.slideIncrement;
+                                                            _private.swing = Math.min(Math.max(currentValue + delta, swingSlidePoint.lowerBound), swingSlidePoint.upperBound);
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
                                     }
 
                                     Zynthian.PlayGridButton {

@@ -509,7 +509,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
         #Setup GUI Controllers
         if self.zcontrollers:
-            logging.debug("SET CONTROLLER SCREEN {}".format(screen_title))
+            # logging.debug("SET CONTROLLER SCREEN {}".format(screen_title))
             #Configure zgui_controllers
             i=0
             for ctrl in self.zcontrollers:

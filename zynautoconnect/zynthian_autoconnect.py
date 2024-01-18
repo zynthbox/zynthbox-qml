@@ -464,7 +464,7 @@ def audio_autoconnect(force=False):
         # If Booting is not complete, do not run autoconnect
         # If a sketchpad is being loaded do not run autoconnect
         # Autoconnect will be explicitly called once after booting is complete
-        logging.debug("Skipping audio_autoconnect")
+        # logging.debug("Skipping audio_autoconnect")
         return
 
     if not force:
@@ -924,13 +924,15 @@ def audio_autoconnect(force=False):
         try:
             jclient.connect(port[0], port[1])
         except:
-            logging.debug("Error connecting ports")
+            #logging.debug("Error connecting ports")
+            pass
 
     for port in zip(globalPlaybackDryOutputPorts, jclient.get_ports("AudioLevels:SystemPlayback-", is_input=True, is_audio=True)):
         try:
             jclient.connect(port[0], port[1])
         except:
-            logging.debug("Error connecting ports")
+            # logging.debug("Error connecting ports")
+            pass
     ### END Connect globalPlayback ports
 
     headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)

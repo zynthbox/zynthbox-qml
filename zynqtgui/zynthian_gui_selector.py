@@ -363,7 +363,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.zynqtgui):
 
     def set_autoActivateIndexOnChange(self, value):
         if self.__auto_activate_index_on_change != value:
-            logging.debug(f"Setting autoActivateIndexOnChange : {value}")
+            # logging.debug(f"Setting autoActivateIndexOnChange : {value}")
             self.__auto_activate_index_on_change = value
             self.autoActivateIndexOnChangeChanged.emit()
 

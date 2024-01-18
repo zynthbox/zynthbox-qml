@@ -130,7 +130,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
                     self.zynqtgui.curlayer.bank_index = i
                     break
             self.select(self.zynqtgui.curlayer.get_bank_index())
-        logging.debug("BANK INDEX => %s" % self.index)
+        # logging.debug("BANK INDEX => %s" % self.index)
         super().show()
 
 

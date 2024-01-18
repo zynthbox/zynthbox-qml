@@ -1611,13 +1611,10 @@ class zynthian_gui(QObject):
                 if cur_active_chan == active_chan:
                     return
                 else:
-                    logging.debug(
-                        "ACTIVE CHAN: {} => {}".format(
-                            cur_active_chan, active_chan
-                        )
-                    )
+                    # logging.debug("ACTIVE CHAN: {} => {}".format(cur_active_chan, active_chan))
                     # if cur_active_chan>=0:
                     #     self.all_notes_off_chan(cur_active_chan)
+                    pass
 
         lib_zyncoder.set_midi_active_chan(active_chan)
         self.zynswitches_midi_setup(curlayer_chan)
@@ -4632,7 +4629,7 @@ if __name__ == "__main__":
 
     def load_qml():
         if zynqtgui.sketchpad.sketchpadLoadingInProgress:
-            logging.debug("Sketchpad Loading is still in progress. Delay loading qml")
+            # logging.debug("Sketchpad Loading is still in progress. Delay loading qml")
             QTimer.singleShot(1000, load_qml)
         else:
             zynqtgui.currentTaskMessage = "Loading pages"

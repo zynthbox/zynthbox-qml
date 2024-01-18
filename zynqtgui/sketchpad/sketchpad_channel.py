@@ -527,8 +527,9 @@ class sketchpad_channel(QObject):
     @Slot()
     def update_jack_port(self, run_in_thread=True):
         if self.zynqtgui is not None and not self.zynqtgui.get_isBootingComplete():
-            logging.debug("Booting in progress. Ignoring port update request")
+            # logging.debug("Booting in progress. Ignoring port update request")
             # QTimer.singleShot(1000, self.update_jack_port)
+            pass
         else:
             self.zynqtgui.currentTaskMessage = f"Updating jack ports for Track `{self.name}`"
 

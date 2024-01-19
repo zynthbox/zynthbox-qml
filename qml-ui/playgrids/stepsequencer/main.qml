@@ -1436,7 +1436,7 @@ Zynthian.BasePlayGrid {
                                                             // Only reset if we are asked to, have no meaningful changes to the value, and the timing was reasonably
                                                             // a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                                             if (Math.abs(_private.swing - currentValue) < swingSlidePoint.increment && (Date.now() - pressedTime) < 300) {
-                                                                _private.swing = swingSlidePoint.resetValue;
+                                                                _private.sequence.setPatternProperty(_private.activePattern, "swing", swingSlidePoint.resetValue)
                                                             }
                                                             currentValue = undefined;
                                                         }
@@ -1444,7 +1444,7 @@ Zynthian.BasePlayGrid {
                                                     onYChanged: {
                                                         if (pressed && currentValue !== undefined) {
                                                             var delta = -(swingSlidePoint.y - swingSlidePoint.startY) * swingSlidePoint.slideIncrement;
-                                                            _private.swing = Math.min(Math.max(currentValue + delta, swingSlidePoint.lowerBound), swingSlidePoint.upperBound);
+                                                            _private.sequence.setPatternProperty(_private.activePattern, "swing", Math.min(Math.max(currentValue + delta, swingSlidePoint.lowerBound), swingSlidePoint.upperBound))
                                                         }
                                                     }
                                                 }

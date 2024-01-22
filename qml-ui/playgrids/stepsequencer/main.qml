@@ -1102,25 +1102,17 @@ Zynthian.BasePlayGrid {
                                 changeValue("duration", -1, 0, 1024, 0);
                             }
                             function delayUp() {
-                                if (noteSettings.visible) {
-                                    changeValue("delay", 1, -noteSettings.stepDuration + 1, -noteSettings.stepDuration - 1, 0);
-                                } else {
-                                    var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
-                                    if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
-                                        changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
-                                    }
+                                var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
+                                    var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                    changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
                                 }
                             }
                             function delayDown() {
-                                if (noteSettings.visible) {
-                                    changeValue("delay", -1, -noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
-                                } else {
-                                    var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
-                                    if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
-                                        changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
-                                    }
+                                var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
+                                    var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                    changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
                                 }
                             }
                             function probabilityUp() {

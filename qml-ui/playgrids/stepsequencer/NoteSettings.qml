@@ -37,6 +37,8 @@ ColumnLayout {
     property QtObject patternModel: null
     property int firstBar: -1
     property int lastBar: -1
+    property int firstStep: -1
+    property int lastStep: -1
     property int currentStep: -1
     property int currentSubNote: -1
 
@@ -45,9 +47,70 @@ ColumnLayout {
     // If filled, the component only shows the subnotes whose note is contained in this list
     property var midiNoteFilter: []
 
+    function cuiaCallback(cuia) {
+        let result = true;
+        switch(cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                component.close();
+                break;
+            case "NAVIGATE_LEFT":
+                // page down
+                if (component.currenParameterPageIndex > 0) {
+                    component.currenParameterPageIndex = component.currenParameterPageIndex - 1;
+                } else {
+                    component.currenParameterPageIndex = component.parameterPageCount - 1;
+                }
+                break;
+            case "NAVIGATE_RIGHT":
+                // page up
+                if (component.currenParameterPageIndex + 1 < component.parameterPageCount) {
+                    component.currenParameterPageIndex = component.currenParameterPageIndex + 1;
+                } else {
+                    component.currenParameterPageIndex = 0;
+                }
+                break;
+            case "KNOB0_UP":
+                result = false;
+                break;
+            case "KNOB0_DOWN":
+                result = false;
+                break;
+            case "KNOB1_UP":
+                result = false;
+                break;
+            case "KNOB1_DOWN":
+                result = false;
+                break;
+            case "KNOB2_UP":
+                result = false;
+                break;
+            case "KNOB2_DOWN":
+                result = false;
+                break;
+            case "KNOB3_UP":
+                if (component.currentIndex + 1 < component.listData.length) {
+                    component.currentIndex = component.currentIndex + 1;
+                }
+                break;
+            case "KNOB3_DOWN":
+                if (component.currentIndex > 0) {
+                    component.currentIndex = component.currentIndex - 1;
+                }
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
     /**
      * \brief Get an array with all bars with steps with visible subnotes, with all indices of those subnotes as a subarray
-     * The form of the array is arrayVariable[barIndex][stepIndex][subNoteIndex];
+     * The form of the array is arrayVariable[barIndex][stepIndex][subnoteIndex];
      */
     function visibleStepIndices() {
         var steps = [];
@@ -57,10 +120,10 @@ ColumnLayout {
             for (var stepIndex = 0; stepIndex < barItem.count; ++stepIndex) {
                 var stepItem = barItem.itemAt(stepIndex);
                 var stepArray = [];
-                for(var subNoteIndex = 0; subNoteIndex < stepItem.count; ++subNoteIndex) {
-                    var subNoteItem = stepItem.itemAt(subNoteIndex);
+                for(var subnoteIndex = 0; subnoteIndex < stepItem.count; ++subnoteIndex) {
+                    var subNoteItem = stepItem.itemAt(subnoteIndex);
                     if (subNoteItem.visible) {
-                        stepArray.push(subNoteItem.subNoteIndex);
+                        stepArray.push(subNoteItem.subnoteIndex);
                     }
                 }
                 if (stepArray.length > 0) {
@@ -129,6 +192,8 @@ ColumnLayout {
             patternModel = null;
             firstBar = -1;
             lastBar = -1;
+            firstStep = -1;
+            lastStep = -1;
         }
     }
 /*
@@ -191,6 +256,62 @@ ColumnLayout {
         }
         component.refreshSubnote(row, column, subnotePosition);
     }
+    /**
+     * The data the dialog list operates on, in the form of a bunch of objects with the structure
+     * described below. The update function will fill this list, reset the current index to -1, and
+     * while filling will ensure that the note filter and the bar and step limiters are applied.
+     * {
+     *  barIndex: integer,
+     *  stepIndex: integer,
+     *  subnoteIndex: integer,
+     *  firstInStep: bool,
+     *  subnote: Note object
+     * }
+     */
+    property var listData: []
+    property int currentIndex: -1
+    property int firstDisplayedIndex: 0
+    onMidiNoteFilterChanged: updateListData()
+    onFirstBarChanged: updateListData()
+    onLastBarChanged: updateListData()
+    onFirstStepChanged: updateListData()
+    onLastStepChanged: updateListData()
+    onPatternModelChanged: updateListData()
+    onRefreshSubnote: updateListData(false)
+    function updateListData(resetViewPosition = true) {
+        if (listDataUpdater.resetViewPosition == false) {
+            listDataUpdater.resetViewPosition = resetViewPosition;
+        }
+        listDataUpdater.restart();
+    }
+    onCurrentIndexChanged: {
+        if (currentIndex === -1) {
+            if (component.firstStep > -1 && component.firstStep === component.lastStep) {
+                // If we're showing a single step, when deselecting, just re-select the step itself, but not a subnote
+                component.changeStepAndSubnote(component.firstStep, -1);
+            } else {
+                // If we're showing more than one step, deselect everything
+                component.changeStepAndSubnote(-1, -1);
+            }
+        } else {
+            let subnoteData = listData[component.currentIndex];
+            component.changeStepAndSubnote((subnoteData["barIndex"] * component.patternModel.width) + subnoteData["stepIndex"], subnoteData["subnoteIndex"]);
+            if (component.listData.length > 7) {
+                if (component.currentIndex < 3) {
+                    component.firstDisplayedIndex = 0;
+                } else if (component.currentIndex > component.listData.length - 4) {
+                    component.firstDisplayedIndex = component.listData.length - 7;
+                } else {
+                    component.firstDisplayedIndex = component.currentIndex - 3;
+                }
+            } else {
+                component.firstDisplayedIndex = 0;
+            }
+        }
+    }
+    function selectBarStepAndSubnote(barIndex, stepIndex, subnoteIndex) {
+        listDataUpdater.barStepAndSubnoteToSelect = { "barIndex": barIndex, "stepIndex": stepIndex, "subnoteIndex": subnoteIndex }
+    }
 
     RowLayout {
         Layout.fillWidth: true
@@ -209,11 +330,65 @@ ColumnLayout {
                     TouchPoint {
                         onPressedChanged: {
                             if (!pressed && x > -1 && y > -1 && x < noteHeaderLabel.width && y < noteHeaderLabel.height) {
-                                component.changeStepAndSubnote(-1, -1);
+                                component.currentIndex = -1;
                             }
                         }
                     }
                 ]
+            }
+            QtObject {
+                id: _private
+            }
+            Timer {
+                id: listDataUpdater
+                interval: 1; repeat: false; running: false;
+                property bool resetViewPosition: false
+                property var barStepAndSubnoteToSelect: { "barIndex": -1, "stepIndex": -1, "subnoteIndex": -1 }
+                onTriggered: {
+                    let newListData = [];
+                    if (component.patternModel) {
+                        let firstStep = (component.firstStep == -1 ? 0 : component.firstStep);
+                        let lastStepAndOne = (component.lastStep == -1 ? component.patternModel.width : component.lastStep + 1);
+                        for (let barIndex = component.firstBar; barIndex < component.lastBar + 1; ++barIndex) {
+                            for (let stepIndex = firstStep; stepIndex < lastStepAndOne; ++stepIndex) {
+                                let stepNote = component.patternModel.getNote(barIndex, stepIndex);
+                                let firstInStep = true;
+                                // The display order for notes wants to be higher to lower, but the subnotes
+                                // list is ordered lower to higher, so run through them backwards
+                                for (let subnoteIndex = stepNote.subnotes.length - 1; -1 < subnoteIndex; --subnoteIndex) {
+                                    let subnote = stepNote.subnotes[subnoteIndex];
+                                    if (component.midiNoteFilter.length === 0 || component.midiNoteFilter.indexOf(subnote.midiNote) > -1) {
+                                        newListData.push(
+                                            {
+                                                "barIndex": barIndex,
+                                                "stepIndex": stepIndex,
+                                                "subnoteIndex": subnoteIndex,
+                                                "firstInStep": firstInStep,
+                                                "subnote": subnote
+                                            }
+                                        );
+                                        firstInStep = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (resetViewPosition) {
+                        component.currentIndex = -1;
+                        listDataUpdater.resetViewPosition = false;
+                    }
+                    component.listData = newListData;
+                    if (barStepAndSubnoteToSelect["subnoteIndex"] > -1) {
+                        for (let listDataIndex = 0; listDataIndex < component.listData.length; ++listDataIndex) {
+                            let listDataEntry = component.listData[listDataIndex];
+                            if (listDataEntry["barIndex"] == barStepAndSubnoteToSelect["barIndex"] && listDataEntry["stepIndex"] == barStepAndSubnoteToSelect["stepIndex"] && listDataEntry["subnoteIndex"] == barStepAndSubnoteToSelect["subnoteIndex"]) {
+                                component.currentIndex = listDataIndex;
+                                break;
+                            }
+                        }
+                        barStepAndSubnoteToSelect = { "barIndex": -1, "stepIndex": -1, "subnoteIndex": -1 };
+                    }
+                }
             }
         }
         QQC2.Label {
@@ -302,428 +477,357 @@ ColumnLayout {
             }
         }
     }
-    QQC2.ScrollView {
-        id: contentScrollView
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 15
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        QQC2.ScrollBar.horizontal.policy: QQC2.ScrollBar.AlwaysOff
-        QQC2.ScrollBar.vertical.policy: QQC2.ScrollBar.AlwaysOn
-        contentWidth: width
-        clip: true
-        ColumnLayout {
-            width: contentScrollView.contentWidth
-            Repeater {
-                id: patternRepeater;
-                property int barCount: component.lastBar - component.firstBar + 1
-                model: component.patternModel ? patternRepeater.barCount : 0
-                Repeater {
-                    id: barDelegate
-                    model: component.patternModel.width
-                    // Inverting the sort order, so the entries are shown bottom-to-top
-                    property int localBarIndex: patternRepeater.barCount - index - 1
-                    property int barIndex: localBarIndex + component.firstBar
-                    ColumnLayout {
-                        id: stepDelegate
-                        property int stepIndex: model.index
-                        property bool updateForcery: true
-                        property QtObject note: updateForcery ? component.patternModel.getNote(barDelegate.barIndex, stepDelegate.stepIndex) : null
-                        visible: note && note.subnotes.length > 0
-                        Layout.fillWidth: true
-                        spacing: 0
-                        Connections {
-                            target: component
-                            onRefreshStep: {
-                                if (row === barDelegate.barIndex && column === stepDelegate.stepIndex) {
-                                    stepDelegate.updateForcery = false;
-                                    stepDelegate.updateForcery = true;
+    Repeater {
+        // Arbitrary number, because 7 elements fits nicely, and gives us three on either side
+        // of a central point, which just looks kind of nice when there's a bunch of elements
+        model: 7
+        delegate: ColumnLayout {
+            id: subnoteDelegate
+            Layout.fillWidth: true
+            property int thisDataIndex: component.firstDisplayedIndex + index
+            property var subnoteData: -1 < thisDataIndex && thisDataIndex < component.listData.length ? component.listData[thisDataIndex] : null
+            property int barIndex: subnoteData === null ? -1 : subnoteData["barIndex"]
+            property int stepIndex: subnoteData === null ? -1 : subnoteData["stepIndex"]
+            property int subnoteIndex: subnoteData === null ? -1 : subnoteData["subnoteIndex"]
+            property int firstInStep: subnoteData === null ? false : subnoteData["firstInStep"]
+            property QtObject subnote: subnoteData === null ? null : subnoteData["subnote"]
+            property bool isCurrent: component.currentIndex === thisDataIndex
+            opacity: subnote === null ? 0 : 1
+            spacing: 0
+            Item {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 1
+                Layout.maximumHeight: 1
+                z: 9999 // Put the label on top of all the things
+                opacity: subnoteDelegate.thisDataIndex === 0 || model.index === 0 || subnoteDelegate.firstInStep ? 1 : 0
+                Rectangle {
+                    anchors {
+                        bottomMargin: 2
+                        bottom: parent.top
+                        left: parent.left
+                        right: parent.right
+                    }
+                    height: 1
+                    color: Kirigami.Theme.textColor
+                }
+                QQC2.Label {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                    }
+                    width: Kirigami.Units.largeSpacing
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Kirigami.Units.gridUnit * 0.7
+                    text: (subnoteDelegate.stepIndex + 1)
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Item {
+                    id: noteDelegate
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        touchPoints: [
+                            TouchPoint {
+                                onPressedChanged: {
+                                    if (!pressed && x > -1 && y > -1 && x < noteDelegate.width && y < noteDelegate.height) {
+                                        component.currentIndex = subnoteDelegate.thisDataIndex;
+                                    }
                                 }
+                                // TODO When swiping up and down, change currentIndex accordingly (since we're no longer in a scrollview, we have to be our own scrollview, but we can also be Kind Of Smartypants about it)
+                            }
+                        ]
+                    }
+                    RowLayout {
+                        anchors {
+                            fill: parent
+                            margins: 1
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.minimumWidth: Kirigami.Units.largeSpacing
+                            Layout.maximumWidth: Kirigami.Units.largeSpacing
+                            color: subnoteDelegate.isCurrent ? Kirigami.Theme.highlightColor : "transparent"
+                        }
+                        Zynthian.PlayGridButton {
+                            Layout.fillWidth: false
+                            Layout.minimumWidth: height * 0.8
+                            Layout.maximumWidth: height * 0.8
+                            icon.name: "edit-delete"
+                            onClicked: {
+                                // This is a workaround for "this element disappeared for some reason"
+                                var rootComponent = component;
+                                if (rootComponent.currentSubNote >= subnoteDelegate.subnoteIndex) {
+                                    rootComponent.changeSubnote(rootComponent.currentSubNote - 1);
+                                }
+                                rootComponent.patternModel.removeSubnote(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex);
+                                // Now refetch the note we're displaying
+                                var theColumn = rootComponent.column;
+                                rootComponent.column = -1;
+                                rootComponent.column = theColumn;
+                                //if (rootComponent.note.subnotes.count === 0) {
+                                    //rootComponent.close();
+                                //}
                             }
                         }
-                        Item {
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.minimumWidth: height
+                            Layout.maximumWidth: height
+                            radius: height / 2
+                            color: subnoteDelegate.subnote ? zynqtgui.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
+                        }
+                        QQC2.Label {
+                            id: subnoteDelegateLabel
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 1
-                            Layout.maximumHeight: 1
-                            z: 9999 // Put the label on top of all the things
-                            visible: stepDelegateRepeater.hasVisibleNotes
-                            Rectangle {
-                                anchors {
-                                    bottomMargin: 2
-                                    bottom: parent.top
-                                    left: parent.left
-                                    right: parent.right
-                                }
-                                height: 1
-                                color: Kirigami.Theme.textColor
-                            }
-                            QQC2.Label {
-                                anchors {
-                                    top: parent.top
-                                    left: parent.left
-                                }
-                                width: Kirigami.Units.largeSpacing
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: Kirigami.Units.gridUnit * 0.7
-                                text: (stepDelegate.stepIndex + 1)
+                            Layout.fillHeight: true
+                            // anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            font.bold: true
+                            text: subnoteDelegate.subnote ? /*(subnoteDelegate.localBarIndex * component.patternModel.width + subnoteDelegate.stepIndex + 1) + ":" + */subnoteDelegate.subnote.name + (subnoteDelegate.subnote.octave - 1) : ""
+                        }
+                        Zynthian.PlayGridButton {
+                            Layout.fillWidth: false
+                            Layout.minimumWidth: height * 0.8
+                            Layout.maximumWidth: height * 0.8
+                            text: "-"
+                            // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote > 0
+                            enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote > 0 : false
+                            onClicked: {
+                                component.changeSubnotePitch(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, -1);
                             }
                         }
-                        Repeater {
-                            id: stepDelegateRepeater
-                            model: stepDelegate.note ? stepDelegate.note.subnotes.length : 0
-                            property bool hasVisibleNotes: false
-                            RowLayout {
-                                id: subnoteDelegate
-                                // Inverting the sort order, so the entries are shown bottom-to-top
-                                property int subnoteIndex: stepDelegate.note.subnotes.length - 1 - index
-                                property bool updateForcery: true
-                                property QtObject note: updateForcery ? component.patternModel.getNote(barDelegate.barIndex, stepDelegate.stepIndex) : null
-                                property QtObject subnote: subnoteDelegate.note ? subnoteDelegate.note.subnotes[subnoteIndex] : null
-                                property bool isCurrent: component.currentStep === (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex && (component.currentSubNote === -1 || subnoteDelegate.subnoteIndex === component.currentSubNote)
-                                visible: component.midiNoteFilter.length === 0 || component.midiNoteFilter.indexOf(subnote.midiNote) > -1
-                                onVisibleChanged: {
-                                    if (visible) {
-                                        stepDelegateRepeater.hasVisibleNotes = true;
-                                    }
+                        Zynthian.PlayGridButton {
+                            Layout.fillWidth: false
+                            Layout.minimumWidth: height * 0.8
+                            Layout.maximumWidth: height * 0.8
+                            text: "+"
+                            // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote < 127
+                            enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote < 127 : false
+                            onClicked: {
+                                component.changeSubnotePitch(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, 1);
+                            }
+                        }
+                        Zynthian.PlayGridButton {
+                            Layout.fillWidth: false
+                            Layout.minimumWidth: height * 0.8
+                            Layout.maximumWidth: height * 0.8
+                            icon.name: "media-playback-start-symbolic"
+                            onClicked: {
+                                var velocity = component.patternModel.subnoteMetadata(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, "velocity");
+                                if (typeof(velocity) === "undefined") {
+                                    velocity = 64;
                                 }
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                Connections {
-                                    target: component
-                                    onRefreshSubnote: {
-                                        if (row === barDelegate.barIndex && column === stepDelegate.stepIndex && subnoteIndex === subnoteDelegate.subnoteIndex) {
-                                            subnoteDelegate.updateForcery = false;
-                                            subnoteDelegate.updateForcery = true;
-                                        }
-                                    }
+                                var duration = component.patternModel.subnoteMetadata(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, "duration");
+                                if (typeof(duration) === "undefined") {
+                                    duration = component.stepDuration;
                                 }
-                                Item {
-                                    id: noteDelegate
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    MultiPointTouchArea {
-                                        anchors.fill: parent
-                                        touchPoints: [
-                                            TouchPoint {
-                                                onPressedChanged: {
-                                                    if (!pressed && x > -1 && y > -1 && x < noteDelegate.width && y < noteDelegate.height) {
-                                                        component.changeStepAndSubnote((barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex, subnoteDelegate.subnoteIndex);
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    }
-                                    RowLayout {
-                                        anchors {
-                                            fill: parent
-                                            margins: 1
-                                        }
-                                        Rectangle {
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: Kirigami.Units.largeSpacing
-                                            Layout.maximumWidth: Kirigami.Units.largeSpacing
-                                            color: subnoteDelegate.isCurrent ? Kirigami.Theme.highlightColor : "transparent"
-                                        }
-                                        Zynthian.PlayGridButton {
-                                            Layout.fillWidth: false
-                                            Layout.minimumWidth: height * 0.8
-                                            Layout.maximumWidth: height * 0.8
-                                            icon.name: "edit-delete"
-                                            onClicked: {
-                                                // This is a workaround for "this element disappeared for some reason"
-                                                var rootComponent = component;
-                                                if (rootComponent.currentSubNote >= subnoteDelegate.subnoteIndex) {
-                                                    rootComponent.changeSubnote(rootComponent.currentSubNote - 1);
-                                                }
-                                                rootComponent.patternModel.removeSubnote(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex);
-                                                // Now refetch the note we're displaying
-                                                var theColumn = rootComponent.column;
-                                                rootComponent.column = -1;
-                                                rootComponent.column = theColumn;
-                                                //if (rootComponent.note.subnotes.count === 0) {
-                                                    //rootComponent.close();
-                                                //}
-                                            }
-                                        }
-                                        Rectangle {
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: height
-                                            Layout.maximumWidth: height
-                                            radius: height / 2
-                                            color: subnoteDelegate.subnote ? zynqtgui.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
-                                        }
-                                        QQC2.Label {
-                                            id: subnoteDelegateLabel
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            // anchors.fill: parent
-                                            horizontalAlignment: Text.AlignHCenter
-                                            font.bold: true
-                                            text: subnoteDelegate.subnote ? /*(barDelegate.localBarIndex * component.patternModel.width + stepDelegate.stepIndex + 1) + ":" + */subnoteDelegate.subnote.name + (subnoteDelegate.subnote.octave - 1) : ""
-                                        }
-                                        Zynthian.PlayGridButton {
-                                            Layout.fillWidth: false
-                                            Layout.minimumWidth: height * 0.8
-                                            Layout.maximumWidth: height * 0.8
-                                            text: "-"
-                                            // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote > 0
-                                            enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote > 0 : false
-                                            onClicked: {
-                                                component.changeSubnotePitch(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, -1);
-                                            }
-                                        }
-                                        Zynthian.PlayGridButton {
-                                            Layout.fillWidth: false
-                                            Layout.minimumWidth: height * 0.8
-                                            Layout.maximumWidth: height * 0.8
-                                            text: "+"
-                                            // visible: component.midiNoteFilter.length === 0 && subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote < 127
-                                            enabled: subnoteDelegate.subnote ? subnoteDelegate.subnote.midiNote < 127 : false
-                                            onClicked: {
-                                                component.changeSubnotePitch(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, 1);
-                                            }
-                                        }
-                                        Zynthian.PlayGridButton {
-                                            Layout.fillWidth: false
-                                            Layout.minimumWidth: height * 0.8
-                                            Layout.maximumWidth: height * 0.8
-                                            icon.name: "media-playback-start-symbolic"
-                                            onClicked: {
-                                                var velocity = component.patternModel.subnoteMetadata(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, "velocity");
-                                                if (typeof(velocity) === "undefined") {
-                                                    velocity = 64;
-                                                }
-                                                var duration = component.patternModel.subnoteMetadata(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, "duration");
-                                                if (typeof(duration) === "undefined") {
-                                                    duration = component.stepDuration;
-                                                }
-                                                var delay = component.patternModel.subnoteMetadata(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, "delay");
-                                                if (typeof(delay) === "undefined") {
-                                                    delay = 0;
-                                                }
-                                                Zynthbox.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, subnoteDelegate.subnote.midiChannel, true, velocity, duration, delay);
-                                            }
-                                        }
-                                    }
+                                var delay = component.patternModel.subnoteMetadata(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex, "delay");
+                                if (typeof(delay) === "undefined") {
+                                    delay = 0;
                                 }
-                                // BEGIN Page 1 (Velocity, Length, Position)
-                                StepSettingsParamDelegate {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 0
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "velocity"
-                                    paramDefaultString: "64"
-                                    paramValueSuffix: ""
-                                    paramDefault: 64
-                                    paramMin: 0
-                                    paramMax: 127
-                                    scrollWidth: 128
-                                    knobId: 1
-                                    currentlySelected: (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex === component.currentStep && subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                StepSettingsParamDelegate {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 0
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "duration"
-                                    paramDefaultString: component.stepDurationName
-                                    paramValueSuffix: "/128"
-                                    paramDefault: undefined
-                                    paramInterpretedDefault: component.stepDuration
-                                    paramMin: 0
-                                    paramMax: 1024
-                                    scrollWidth: 128
-                                    paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, /*384,*/ 512, /*640, 768, 896,*/ 1024]
-                                    paramNames: {
-                                        0: component.stepDurationName,
-                                        1: "1/128",
-                                        2: "1/64",
-                                        4: "1/32",
-                                        8: "1/16",
-                                        16: "1/8",
-                                        32: "1/4",
-                                        64: "1/2",
-                                        96: "3/4",
-                                        128: "1",
-                                        256: "2",
-                                        384: "3",
-                                        512: "4",
-                                        640: "5",
-                                        768: "6",
-                                        896: "7",
-                                        1024: "8"
-                                    }
-                                    knobId: 2
-                                    currentlySelected: (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex === component.currentStep && subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                StepSettingsParamDelegate {
-                                    id: delayParamDelegate
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 0
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "delay"
-                                    paramDefaultString: "0 (default)"
-                                    paramValuePrefix: "+"
-                                    paramValueSuffix: "/128"
-                                    paramDefault: undefined
-                                    paramInterpretedDefault: 0
-                                    paramMin: -component.stepDuration + 1
-                                    paramMax: component.stepDuration - 1
-                                    scrollWidth: component.stepDuration
-                                    Component.onCompleted: {
-                                        var potentialValues = {
-                                            "-128": "-1",
-                                            "-96": "-3/4",
-                                            "-64": "-1/2:",
-                                            "-32": "-1/4",
-                                            "-16": "-1/8",
-                                            "-8": "-1/16",
-                                            "-4": "-1/32",
-                                            "-2": "-1/64",
-                                            "-1": "-1/128",
-                                            "0": "0 (default)",
-                                            "1": "+1/128",
-                                            "2": "+1/64",
-                                            "4": "+1/32",
-                                            "8": "+1/16",
-                                            "16": "+1/8",
-                                            "32": "+1/4",
-                                            "64": "+1/2",
-                                            "96": "+3/4",
-                                            "128": "+1"
-                                        };
-                                        var values = [];
-                                        var names = {};
-                                        for (var key in potentialValues) {
-                                            if (potentialValues.hasOwnProperty(key) && key <= delayParamDelegate.paramMax && key >= delayParamDelegate.paramMin) {
-                                                values.push(key);
-                                                names[key] = potentialValues[key];
-                                            }
-                                        }
-                                        values.sort(function(a, b) { return a - b; });
-                                        paramList = values;
-                                        paramNames = names;
-                                    }
-                                    knobId: 3
-                                    currentlySelected: (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex === component.currentStep && subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                // END Page 1 (Velocity, Length, Position)
-                                // BEGIN Page 2 (Probability, ???, ???)
-                                StepSettingsParamDelegate {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 1
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "probability"
-                                    paramDefaultString: "100%"
-                                    paramValueSuffix: "%"
-                                    paramDefault: 100
-                                    paramMin: 0
-                                    paramMax: 100
-                                    scrollWidth: 101
-                                    knobId: 1
-                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 1
-                                }
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 1
-                                }
-                                // END Page 2 (Probability, ???, Swing)
-                                // BEGIN Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
-                                StepSettingsParamDelegate {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 2
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "ratchet-style"
-                                    paramDefaultString: "Split Step, Overlap"
-                                    paramValueSuffix: ""
-                                    paramDefault: 0
-                                    paramMin: 0
-                                    paramMax: 3
-                                    scrollWidth: 4
-                                    paramList: [0, 1, 2, 3]
-                                    paramNames: {
-                                        0: "Split Step, Overlap",
-                                        1: "Split Step, Choke",
-                                        2: "Split Length, Overlap",
-                                        3: "Split Length, Choke",
-                                    }
-                                    knobId: 1
-                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                StepSettingsParamDelegate {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 2
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "ratchet-count"
-                                    paramDefaultString: "0"
-                                    paramValueSuffix: ""
-                                    paramDefault: 0
-                                    paramMin: 0
-                                    paramMax: 12
-                                    scrollWidth: 13
-                                    knobId: 2
-                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                StepSettingsParamDelegate {
-                                    Layout.fillWidth: true
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    visible: component.currenParameterPageIndex === 2
-                                    model: component.patternModel; row: barDelegate.barIndex; column: stepDelegate.stepIndex;
-                                    paramIndex: subnoteDelegate.subnoteIndex
-                                    paramName: "ratchet-probability"
-                                    paramDefaultString: "100%"
-                                    paramValueSuffix: "%"
-                                    paramDefault: 100
-                                    paramMin: 0
-                                    paramMax: 100
-                                    scrollWidth: 101
-                                    knobId: 3
-                                    currentlySelected: subnoteDelegate.subnoteIndex === component.currentSubNote
-                                    onPressedChanged: {
-                                        contentScrollView.contentItem.interactive = !pressed;
-                                    }
-                                }
-                                // END Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
+                                Zynthbox.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, subnoteDelegate.subnote.midiChannel, true, velocity, duration, delay);
                             }
                         }
                     }
                 }
+                // BEGIN Page 1 (Velocity, Length, Position)
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 0
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "velocity"
+                    paramDefaultString: "64"
+                    paramValueSuffix: ""
+                    paramDefault: 64
+                    paramMin: 0
+                    paramMax: 127
+                    scrollWidth: 128
+                    knobId: 1
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 0
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "duration"
+                    paramDefaultString: component.stepDurationName
+                    paramValueSuffix: "/128"
+                    paramDefault: undefined
+                    paramInterpretedDefault: component.stepDuration
+                    paramMin: 0
+                    paramMax: 1024
+                    scrollWidth: 128
+                    paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, /*384,*/ 512, /*640, 768, 896,*/ 1024]
+                    paramNames: {
+                        0: component.stepDurationName,
+                        1: "1/128",
+                        2: "1/64",
+                        4: "1/32",
+                        8: "1/16",
+                        16: "1/8",
+                        32: "1/4",
+                        64: "1/2",
+                        96: "3/4",
+                        128: "1",
+                        256: "2",
+                        384: "3",
+                        512: "4",
+                        640: "5",
+                        768: "6",
+                        896: "7",
+                        1024: "8"
+                    }
+                    knobId: 2
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                StepSettingsParamDelegate {
+                    id: delayParamDelegate
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 0
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "delay"
+                    paramDefaultString: "0 (default)"
+                    paramValuePrefix: "+"
+                    paramValueSuffix: "/128"
+                    paramDefault: undefined
+                    paramInterpretedDefault: 0
+                    paramMin: -component.stepDuration + 1
+                    paramMax: component.stepDuration - 1
+                    scrollWidth: component.stepDuration
+                    Component.onCompleted: {
+                        var potentialValues = {
+                            "-128": "-1",
+                            "-96": "-3/4",
+                            "-64": "-1/2:",
+                            "-32": "-1/4",
+                            "-16": "-1/8",
+                            "-8": "-1/16",
+                            "-4": "-1/32",
+                            "-2": "-1/64",
+                            "-1": "-1/128",
+                            "0": "0 (default)",
+                            "1": "+1/128",
+                            "2": "+1/64",
+                            "4": "+1/32",
+                            "8": "+1/16",
+                            "16": "+1/8",
+                            "32": "+1/4",
+                            "64": "+1/2",
+                            "96": "+3/4",
+                            "128": "+1"
+                        };
+                        var values = [];
+                        var names = {};
+                        for (var key in potentialValues) {
+                            if (potentialValues.hasOwnProperty(key) && key <= delayParamDelegate.paramMax && key >= delayParamDelegate.paramMin) {
+                                values.push(key);
+                                names[key] = potentialValues[key];
+                            }
+                        }
+                        values.sort(function(a, b) { return a - b; });
+                        paramList = values;
+                        paramNames = names;
+                    }
+                    knobId: 3
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                // END Page 1 (Velocity, Length, Position)
+                // BEGIN Page 2 (Probability, ???, ???)
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 1
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "probability"
+                    paramDefaultString: "100%"
+                    paramValueSuffix: "%"
+                    paramDefault: 100
+                    paramMin: 0
+                    paramMax: 100
+                    scrollWidth: 101
+                    knobId: 1
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 1
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 1
+                }
+                // END Page 2 (Probability, ???, Swing)
+                // BEGIN Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 2
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "ratchet-style"
+                    paramDefaultString: "Split Step, Overlap"
+                    paramValueSuffix: ""
+                    paramDefault: 0
+                    paramMin: 0
+                    paramMax: 3
+                    scrollWidth: 4
+                    paramList: [0, 1, 2, 3]
+                    paramNames: {
+                        0: "Split Step, Overlap",
+                        1: "Split Step, Choke",
+                        2: "Split Length, Overlap",
+                        3: "Split Length, Choke",
+                    }
+                    knobId: 1
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 2
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "ratchet-count"
+                    paramDefaultString: "0"
+                    paramValueSuffix: ""
+                    paramDefault: 0
+                    paramMin: 0
+                    paramMax: 12
+                    scrollWidth: 13
+                    knobId: 2
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                StepSettingsParamDelegate {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    visible: component.currenParameterPageIndex === 2
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "ratchet-probability"
+                    paramDefaultString: "100%"
+                    paramValueSuffix: "%"
+                    paramDefault: 100
+                    paramMin: 0
+                    paramMax: 100
+                    scrollWidth: 101
+                    knobId: 3
+                    currentlySelected: subnoteDelegate.isCurrent
+                }
+                // END Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)
             }
         }
     }

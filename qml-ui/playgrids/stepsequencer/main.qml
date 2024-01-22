@@ -643,11 +643,9 @@ Zynthian.BasePlayGrid {
                     Layout.minimumHeight: parent.height / 5; 
                     Layout.maximumHeight: parent.height / 5;
                     color:"transparent"
-                    readonly property int parameterPageIndex: stepSettings.visible
-                        ? stepSettings.currenParameterPageIndex
-                        : noteSettings.visible
-                            ? noteSettings.currenParameterPageIndex
-                            : 0
+                    readonly property int parameterPageIndex: noteSettings.visible
+                        ? noteSettings.currenParameterPageIndex
+                        : 0
                     Connections {
                         target: _private
                         onGoLeft: drumPadRepeater.goPrevious();
@@ -740,22 +738,12 @@ Zynthian.BasePlayGrid {
                         }
                     }
                     Connections {
-                        target: stepSettings
-                        onChangeSubnote: {
-                            var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
-                            if (seqPad) {
-                                seqPad.currentSubNote = newSubnote;
-                                Qt.callLater(drumPadRepeater.updateMostRecentFromSelection);
-                            }
-                        }
-                    }
-                    Connections {
                         target: noteSettings
                         onChangeStep: {
                             var drumPadStartStep = ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count);
                             if (newStep === -1) {
                                 var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
-                                if (seqPad.currentSubNote > -1) {
+                                if (seqPad && seqPad.currentSubNote > -1) {
                                     seqPad.currentSubNote = -1;
                                 }
                                 drumPadRepeater.selectedIndex = -1;
@@ -938,7 +926,6 @@ Zynthian.BasePlayGrid {
                                 }
                                 component.heardNotes = stepNotes;
                                 component.heardVelocities = stepVelocities;
-                                stepSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                 if (noteSettings.visible) {
                                     noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                 }
@@ -967,9 +954,6 @@ Zynthian.BasePlayGrid {
                                         } else {
                                             seqPad.currentSubNote = -1;
                                         }
-                                    }
-                                    if (stepSettings.visible) {
-                                        changeStep = false;
                                     }
                                     if (changeStep) {
                                         if (selectedIndex < _private.activeBarModelWidth - 1) {
@@ -1000,9 +984,6 @@ Zynthian.BasePlayGrid {
                                             changeStep = false;
                                         }
                                     }
-                                    if (stepSettings.visible) {
-                                        changeStep = false;
-                                    }
                                     if (changeStep) {
                                         if (selectedIndex > 0) {
                                             selectedIndex = selectedIndex - 1;
@@ -1022,9 +1003,7 @@ Zynthian.BasePlayGrid {
                             }
                             function deselectSelectedItem() {
                                 if (noteSettingsPopup.visible) {
-                                    noteSettingsPopup.close();
-                                } else if (stepSettingsPopup.visible) {
-                                    stepSettingsPopup.close();
+                                    noteSettingsPopup.close();;
                                 } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad.currentSubNote > -1) {
@@ -1041,22 +1020,22 @@ Zynthian.BasePlayGrid {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad) {
                                         if (seqPad.currentSubNote === -1) {
-                                            console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
                                             // Then we're handling the position itself
-                                            if (stepSettingsPopup.visible) {
-                                                stepSettingsPopup.close();
-                                            } else {
-                                                stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
-                                            }
+                                            // console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
+                                            noteSettingsPopup.showSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], selectedIndex, selectedIndex);
                                         } else {
-                                            console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
                                             // Then we're handling the specific subnote
-                                            if (stepSettingsPopup.visible) {
-                                                stepSettingsPopup.close();
-                                            } else {
-                                                stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                            // console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
+                                            noteSettingsPopup.showSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], selectedIndex, selectedIndex);
+                                        }
+                                    } else {
+                                        let filter = []
+                                        if (component.heardNotes.length > 0) {
+                                            for (var i = 0; i < component.heardNotes.length; ++i) {
+                                                filter.push(component.heardNotes[i].midiNote);
                                             }
                                         }
+                                        component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter);
                                     }
                                 }
                             }
@@ -1123,9 +1102,7 @@ Zynthian.BasePlayGrid {
                                 changeValue("duration", -1, 0, 1024, 0);
                             }
                             function delayUp() {
-                                if (stepSettings.visible) {
-                                    changeValue("delay", 1, -stepSettings.stepDuration + 1, stepSettings.stepDuration - 1, 0);
-                                } else if (noteSettings.visible) {
+                                if (noteSettings.visible) {
                                     changeValue("delay", 1, -noteSettings.stepDuration + 1, -noteSettings.stepDuration - 1, 0);
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
@@ -1136,9 +1113,7 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function delayDown() {
-                                if (stepSettings.visible) {
-                                    changeValue("delay", -1, -stepSettings.stepDuration + 1, stepSettings.stepDuration - 1, 0);
-                                } else if (noteSettings.visible) {
+                                if (noteSettings.visible) {
                                     changeValue("delay", -1, -noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
@@ -1203,7 +1178,7 @@ Zynthian.BasePlayGrid {
                                 }
                                 onPressAndHold: {
                                     setSelected(subNoteIndex);
-                                    stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, model.index);
+                                    noteSettingsPopup.showSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], model.index, model.index);
                                 }
                                 onCurrentSubNoteChanged: {
                                     if (drumPadRepeater.selectedIndex != model.index) {
@@ -2023,58 +1998,35 @@ Zynthian.BasePlayGrid {
                 }
             }
             Zynthian.Popup {
-                id: stepSettingsPopup
-                parent: QQC2.Overlay.overlay
-                y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-                x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-                closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
-                function showStepSettings(model, row, column) {
-                    stepSettings.model = model;
-                    stepSettings.row = row;
-                    stepSettings.column = column;
-                    stepSettingsPopup.open();
-                }
-                property var cuiaCallback: function(cuia) {
-                    // We're not handling any of the interaction in here
-                    var result = false;
-                    return result;
-                }
-                Connections {
-                    target: component
-                    onIsVisibleChanged: {
-                        if (stepSettingsPopup.opened && component.isVisible === false) {
-                            stepSettingsPopup.close();
-                        }
-                    }
-                }
-                onClosed: {
-                    stepSettings.row = -1;
-                    stepSettings.column = -1;
-                }
-                StepSettings {
-                    id: stepSettings
-                    anchors.fill: parent
-                    implicitWidth: drumPad.width - Kirigami.Units.largeSpacing * 2
-                    onClose: stepSettingsPopup.close();
-                }
-            }
-            Zynthian.Popup {
                 id: noteSettingsPopup
                 parent: QQC2.Overlay.overlay
                 y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
                 x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
                 closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
-                function showSettings(patternModel, firstBar, lastBar, midiNoteFilter) {
+                function showSettings(patternModel, firstBar, lastBar, midiNoteFilter, firstStep = -1, lastStep = -1) {
+                    let currentlySelectedBar = -1;
+                    let currentSelectedStep = -1;
+                    let currentlySelectedSubnoteIndex = -1;
+                    if (drumPadRepeater.selectedIndex > -1) {
+                        var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                        currentlySelectedBar = _private.activeBar;
+                        currentSelectedStep = seqPad.padNoteIndex;
+                        currentlySelectedSubnoteIndex = seqPad.currentSubNote;
+                        console.log("Showing selected things:", currentlySelectedBar, currentSelectedStep, currentlySelectedSubnoteIndex);
+                    }
                     noteSettings.midiNoteFilter = midiNoteFilter;
                     noteSettings.firstBar = firstBar;
                     noteSettings.lastBar = lastBar;
+                    noteSettings.firstStep = firstStep;
+                    noteSettings.lastStep = lastStep;
                     noteSettings.patternModel = patternModel;
+                    if (currentlySelectedSubnoteIndex > -1) {
+                        noteSettings.selectBarStepAndSubnote(currentlySelectedBar, currentSelectedStep, currentlySelectedSubnoteIndex)
+                    }
                     noteSettingsPopup.open();
                 }
                 property var cuiaCallback: function(cuia) {
-                    // We're not handling any of the interaction in here
-                    var result = false;
-                    return result;
+                    return noteSettings.cuiaCallback(cuia);
                 }
                 Connections {
                     target: component
@@ -2086,11 +2038,6 @@ Zynthian.BasePlayGrid {
                     onShowNoteSettingsPopup: {
                         noteSettingsPopup.showSettings(patternModel, firstBar, lastBar, midiNoteFilter);
                     }
-                }
-                onClosed: {
-                    noteSettings.patternModel = null;
-                    noteSettings.firstBar = -1;
-                    noteSettings.lastBar = -1;
                 }
                 NoteSettings {
                     id: noteSettings

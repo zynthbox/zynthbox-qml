@@ -98,7 +98,9 @@ ColumnLayout {
                 }
                 break;
             case "KNOB3_DOWN":
-                if (component.currentIndex > 0) {
+                // -1 being the "nothing selected" state, we should be able to navigate back to that state
+                // -using the knob as well (also since that's how the sequencer controls work)
+                if (component.currentIndex > -1) {
                     component.currentIndex = component.currentIndex - 1;
                 }
                 break;
@@ -106,35 +108,6 @@ ColumnLayout {
                 break;
         }
         return result;
-    }
-
-    /**
-     * \brief Get an array with all bars with steps with visible subnotes, with all indices of those subnotes as a subarray
-     * The form of the array is arrayVariable[barIndex][stepIndex][subnoteIndex];
-     */
-    function visibleStepIndices() {
-        var steps = [];
-        for (var barIndex = 0; barIndex < patternRepeater.count; ++barIndex) {
-            var barItem = patternRepeater.itemAt(barIndex);
-            var barArray = [];
-            for (var stepIndex = 0; stepIndex < barItem.count; ++stepIndex) {
-                var stepItem = barItem.itemAt(stepIndex);
-                var stepArray = [];
-                for(var subnoteIndex = 0; subnoteIndex < stepItem.count; ++subnoteIndex) {
-                    var subNoteItem = stepItem.itemAt(subnoteIndex);
-                    if (subNoteItem.visible) {
-                        stepArray.push(subNoteItem.subnoteIndex);
-                    }
-                }
-                if (stepArray.length > 0) {
-                    barArray[stepItem.stepIndex] = stepArray;
-                }
-            }
-            if (barArray.length > 0) {
-                steps[barItem.barIndex] = barArray;
-            }
-        }
-        return steps;
     }
 
     signal changeStep(int newStep)
@@ -268,7 +241,7 @@ ColumnLayout {
      *  subnote: Note object
      * }
      */
-    property var listData: []
+    property alias listData: _private.listData
     property int currentIndex: -1
     property int firstDisplayedIndex: 0
     onMidiNoteFilterChanged: updateListData()
@@ -338,6 +311,7 @@ ColumnLayout {
             }
             QtObject {
                 id: _private
+                property var listData: []
             }
             Timer {
                 id: listDataUpdater
@@ -377,10 +351,10 @@ ColumnLayout {
                         component.currentIndex = -1;
                         listDataUpdater.resetViewPosition = false;
                     }
-                    component.listData = newListData;
+                    _private.listData = newListData;
                     if (barStepAndSubnoteToSelect["subnoteIndex"] > -1) {
-                        for (let listDataIndex = 0; listDataIndex < component.listData.length; ++listDataIndex) {
-                            let listDataEntry = component.listData[listDataIndex];
+                        for (let listDataIndex = 0; listDataIndex < _private.listData.length; ++listDataIndex) {
+                            let listDataEntry = _private.listData[listDataIndex];
                             if (listDataEntry["barIndex"] == barStepAndSubnoteToSelect["barIndex"] && listDataEntry["stepIndex"] == barStepAndSubnoteToSelect["stepIndex"] && listDataEntry["subnoteIndex"] == barStepAndSubnoteToSelect["subnoteIndex"]) {
                                 component.currentIndex = listDataIndex;
                                 break;

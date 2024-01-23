@@ -122,10 +122,16 @@ RowLayout {
                 TouchPoint {
                     id: slidePoint;
                     property var currentValue: undefined
+                    property var pressedTime: undefined
                     onPressedChanged: {
                         if (pressed) {
+                            pressedTime = Date.now();
                             currentValue = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
                         } else {
+                            // Only reset if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                            if (Math.abs(component.paramValue - currentValue) < 1 && (Date.now() - pressedTime) < 300) {
+                                component.setNewValue(component.paramDefault);
+                            }
                             currentValue = undefined;
                         }
                     }

@@ -1076,15 +1076,14 @@ Zynthian.BasePlayGrid {
                                     }
                                 } else if (noteSettings.visible) {
                                     // Only do the "change all the things" if note settings is visible... could otherwise, but confusion...
-                                    var visibleStepIndices = noteSettings.visibleStepIndices();
-                                    for (var barIndex in visibleStepIndices) {
-                                        var barArray = visibleStepIndices[barIndex];
-                                        for (var stepIndex in barArray) {
-                                            var visibleSubNotes = barArray[stepIndex];
-                                            if (visibleSubNotes && visibleSubNotes.length > 0) {
-                                                changeStepValue(barIndex, stepIndex, visibleSubNotes, valueName, howMuch, minValue, maxValue, defaultValue);
-                                            }
+                                    if (noteSettings.currentIndex === -1) {
+                                        for (let entryIndex = 0; entryIndex < noteSettings.listData.length; ++entryIndex) {
+                                            let listEntry = noteSettings.listData[entryIndex];
+                                            changeStepValue(listEntry["barIndex"], listEntry["stepIndex"], [listEntry["subnoteIndex"]], valueName, howMuch, minValue, maxValue, defaultValue);
                                         }
+                                    } else {
+                                        let listEntry = noteSettings.listData[noteSettings.currentIndex];
+                                        changeStepValue(listEntry["barIndex"], listEntry["stepIndex"], [listEntry["subnoteIndex"]], valueName, howMuch, minValue, maxValue, defaultValue);
                                     }
                                 }
                             }
@@ -1102,17 +1101,25 @@ Zynthian.BasePlayGrid {
                                 changeValue("duration", -1, 0, 1024, 0);
                             }
                             function delayUp() {
-                                var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
-                                if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                    var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
-                                    changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
+                                if (noteSettings.visible) {
+                                    changeValue("delay", 1, - noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
+                                } else {
+                                    var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                    if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
+                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                        changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
+                                    }
                                 }
                             }
                             function delayDown() {
-                                var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
-                                if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                    var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
-                                    changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
+                                if (noteSettings.visible) {
+                                    changeValue("delay", -1, - noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
+                                } else {
+                                    var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                    if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
+                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                        changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
+                                    }
                                 }
                             }
                             function probabilityUp() {

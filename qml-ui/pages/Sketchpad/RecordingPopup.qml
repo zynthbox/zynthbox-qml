@@ -478,7 +478,7 @@ Zynthian.Popup {
                                     if (root.visible && root.selectedChannel != null) {
                                         if (zynqtgui.sketchpad.recordingSource === "internal") {
                                             return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                        } else if (zynqtgui.sketchpad.recordingSource === "internal") {
+                                        } else if (zynqtgui.sketchpad.recordingSource === "external") {
                                             return Zynthbox.AudioLevels.captureA
                                         } else {
                                             return -100
@@ -499,7 +499,7 @@ Zynthian.Popup {
                                     if (root.visible && root.selectedChannel != null) {
                                         if (zynqtgui.sketchpad.recordingSource === "internal") {
                                             return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                        } else if (zynqtgui.sketchpad.recordingSource === "internal") {
+                                        } else if (zynqtgui.sketchpad.recordingSource === "external") {
                                             return Zynthbox.AudioLevels.captureB
                                         } else {
                                             return -100

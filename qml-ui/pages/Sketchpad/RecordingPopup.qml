@@ -458,6 +458,56 @@ Zynthian.Popup {
                             anchors.fill: parent
                             color: Kirigami.Theme.textColor
                         }
+
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.margins: Kirigami.Units.largeSpacing
+                            spacing: Kirigami.Units.largeSpacing
+                            opacity: 0.7
+
+                            Rectangle {
+                                property real audioLevel: {
+                                    if (root.visible && root.selectedChannel != null) {
+                                        if (zynqtgui.sketchpad.recordingSource === "internal") {
+                                            return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                        } else if (zynqtgui.sketchpad.recordingSource === "internal") {
+                                            return Zynthbox.AudioLevels.captureA
+                                        } else {
+                                            return -100
+                                        }
+                                    } else {
+                                        return -100
+                                    }
+                                }
+                                Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                Layout.minimumWidth: Layout.preferredWidth
+                                Layout.maximumWidth: Layout.preferredWidth
+                                Layout.fillHeight: true
+                                color: Kirigami.Theme.highlightColor
+                                radius: 100
+                            }
+                            Rectangle {
+                                property real audioLevel: {
+                                    if (root.visible && root.selectedChannel != null) {
+                                        if (zynqtgui.sketchpad.recordingSource === "internal") {
+                                            return Zynthbox.AudioLevels.channels[root.selectedChannel.id]
+                                        } else if (zynqtgui.sketchpad.recordingSource === "internal") {
+                                            return Zynthbox.AudioLevels.captureB
+                                        } else {
+                                            return -100
+                                        }
+                                    } else {
+                                        return -100
+                                    }
+                                }
+                                Layout.preferredWidth: parent.width * Zynthian.CommonUtils.interp(audioLevel, -100, 20, 0, 1)
+                                Layout.minimumWidth: Layout.preferredWidth
+                                Layout.maximumWidth: Layout.preferredWidth
+                                Layout.fillHeight: true
+                                color: Kirigami.Theme.highlightColor
+                                radius: 100
+                            }
+                        }
                     }
 
                     QQC2.Button {

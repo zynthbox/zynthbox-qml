@@ -434,11 +434,13 @@ Zynthian.BasePlayGrid {
             model.endLongOperation();
         }
         function adoptSequence() {
-            console.log("Adopting the scene sequence");
-            var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
-            if (_private.sequence != sequence) {
-                console.log("Scene has changed, switch places!");
-                _private.sequence = sequence;
+            if (zynqtgui.isBootingComplete) {
+                console.log("Adopting the scene sequence");
+                var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+                if (_private.sequence != sequence) {
+                    console.log("Scene has changed, switch places!");
+                    _private.sequence = sequence;
+                }
             }
         }
         function updateUniqueCurrentRowNotes() {
@@ -470,7 +472,7 @@ Zynthian.BasePlayGrid {
         }
     }
     Connections {
-        target: zynqtgui.sketchpad.song.channelsModel
+        target: zynqtgui.isBootingComplete && zynqtgui.sketchpad && zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel : null
         onConnectedSoundsCountChanged: _private.updateChannel()
         onConnectedPatternsCountChanged: _private.updateChannel()
     }
@@ -480,15 +482,23 @@ Zynthian.BasePlayGrid {
         onConnectedSoundChanged: _private.updateChannel()
     }
     Connections {
-        target: zynqtgui.sketchpad
+        target: zynqtgui.isBootingComplete && zynqtgui.sketchpad && zynqtgui.sketchpad.song ? zynqtgui.sketchpad : null
         onSongChanged: {
             _private.adoptSequence();
             _private.updateChannel();
         }
     }
     Connections {
-        target: zynqtgui.sketchpad.song.scenesModel
+        target: zynqtgui.isBootingComplete && zynqtgui.sketchpad && zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.scenesModel : null
         onSelectedTrackNameChanged: Qt.callLater(_private.adoptSequence) // Makes scene change look smoother
+    }
+    Connections {
+        target: zynqtgui
+        onIsBootingCompleteChanged: {
+            if (zynqtgui.isBootingComplete) {
+                Qt.callLater(_private.adoptSequence)
+            }
+        }
     }
     // on component completed
     onInitialize: {

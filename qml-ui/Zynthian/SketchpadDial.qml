@@ -134,6 +134,7 @@ ColumnLayout {
 
     QQC2.Label {
         id: label
+        visible: text !== ""
         Layout.fillWidth: parent
         horizontalAlignment: Text.AlignHCenter
     }

@@ -99,7 +99,6 @@ Zynthian.Popup {
     rightPadding: 0
     topPadding: 0
     bottomPadding: 0
-    visible: true
     onSelectedChannelChanged: {
         if (root.selectedChannel.channelAudioType === "external") {
             zynqtgui.sketchpad.recordingSource = "external"
@@ -108,20 +107,20 @@ Zynthian.Popup {
             zynqtgui.sketchpad.recordingSource = "internal"
         }
 
-        // // Reset source combo model to selected value when channel changes
-        // for (var i=0; i<sourceComboModel.count; i++) {
-        //     if (sourceComboModel.get(i).value === zynqtgui.sketchpad.recordingSource) {
-        //         sourceCombo.currentIndex = i
-        //         break
-        //     }
-        // }
+        // Reset source combo model to selected value when channel changes
+        for (var i=0; i<sourceComboModel.count; i++) {
+            if (sourceComboModel.get(i).value === zynqtgui.sketchpad.recordingSource) {
+                sourceCombo.currentIndex = i
+                break
+            }
+        }
 
-        // for (var i=0; i<recordingChannelComboModel.count; i++) {
-        //     if (recordingChannelComboModel.get(i).value === zynqtgui.sketchpad.recordingChannel) {
-        //         recordingChannelCombo.currentIndex = i
-        //         break
-        //     }
-        // }
+        for (var i=0; i<recordingChannelComboModel.count; i++) {
+            if (recordingChannelComboModel.get(i).value === zynqtgui.sketchpad.recordingChannel) {
+                recordingChannelCombo.currentIndex = i
+                break
+            }
+        }
     }
     onOpened: {
         zynqtgui.recordingPopupActive = true
@@ -130,22 +129,6 @@ Zynthian.Popup {
         if (root.selectedChannel == null) {
             selectedChannelThrottle.restart()
         }
-
-        // // Reset recordingType combo model to selected value when dialog opens
-        // for (var i=0; i<recordingTypeComboModel.count; i++) {
-        //     if (recordingTypeComboModel.get(i).value === zynqtgui.sketchpad.recordingType) {
-        //         recordingTypeCombo.currentIndex = i
-        //         break
-        //     }
-        // }
-
-        // // Reset countIn combo model to selected value when dialog opens
-        // for (var i=0; i<countInComboModel.count; i++) {
-        //     if (countInComboModel.get(i).value === zynqtgui.sketchpad.countInBars) {
-        //         countInCombo.currentIndex = i
-        //         break
-        //     }
-        // }
     }
     onClosed: {
         zynqtgui.recordingPopupActive = false
@@ -186,6 +169,10 @@ Zynthian.Popup {
                                 Layout.alignment: Qt.AlignCenter
                                 // Explicitly set indicator implicitWidth otherwise the switch size is too small
                                 indicator.implicitWidth: Kirigami.Units.gridUnit * 3
+                                checked: zynqtgui.sketchpad.metronomeEnabled
+                                onToggled: {
+                                    zynqtgui.sketchpad.metronomeEnabled = checked
+                                }
                             }
                             QQC2.Label {
                                 Layout.fillWidth: true
@@ -205,6 +192,10 @@ Zynthian.Popup {
                                 Layout.alignment: Qt.AlignCenter
                                 // Explicitly set indicator implicitWidth otherwise the switch size is too small
                                 indicator.implicitWidth: Kirigami.Units.gridUnit * 3
+                                checked: zynqtgui.sketchpad.recordSolo
+                                onToggled: {
+                                    zynqtgui.sketchpad.recordSolo = checked
+                                }
                             }
                             QQC2.Label {
                                 Layout.fillWidth: true
@@ -223,10 +214,13 @@ Zynthian.Popup {
                                 id: countIn
                                 property int from: 0
                                 property int to: 4
-                                property int value: 0
+                                property int value: zynqtgui.sketchpad.countInBars
 
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignCenter
+                                onValueChanged: {
+                                    zynqtgui.sketchpad.countInBars = countIn.value
+                                }
 
                                 QQC2.Button {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
@@ -301,22 +295,20 @@ Zynthian.Popup {
                             Layout.fillWidth: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                             Layout.minimumHeight: Layout.preferredHeight
-                            checkable: true
-                            checked: recordingTypeSettingsStack.currentIndex === 0
+                            checked: zynqtgui.sketchpad.recordingType === "audio"
                             text: qsTr("Record Audio")
                             onClicked: {
-                                recordingTypeSettingsStack.currentIndex = 0
+                                zynqtgui.sketchpad.recordingType = "audio"
                             }
                         }
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                             Layout.minimumHeight: Layout.preferredHeight
-                            checkable: true
-                            checked: recordingTypeSettingsStack.currentIndex === 1
+                            checked: zynqtgui.sketchpad.recordingType === "midi"
                             text: qsTr("Record Midi")
                             onClicked: {
-                                recordingTypeSettingsStack.currentIndex = 1
+                                zynqtgui.sketchpad.recordingType = "midi"
                             }
                         }
                     }
@@ -324,12 +316,127 @@ Zynthian.Popup {
                         id: recordingTypeSettingsStack
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-
-                        QQC2.Label {
-                            text: "Record Audio"
+                        currentIndex: {
+                            if (zynqtgui.sketchpad.recordingType === "audio") {
+                                return 0
+                            } else if (zynqtgui.sketchpad.recordingType === "midi") {
+                                return 1
+                            } else {
+                                return -1
+                            }
                         }
-                        QQC2.Label {
-                            text: "Record Midi"
+
+                        ColumnLayout {
+                            RowLayout {
+                                Layout.fillWidth: false
+
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                                    Layout.alignment: Qt.AlignCenter
+                                    enabled: parent.enabled
+                                    text: qsTr("Source Channel")
+                                }
+                                Zynthian.ComboBox {
+                                    id: channelCombo
+
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: channelComboModel
+
+                                        ListElement { text: "Track 1"; value: 0 }
+                                        ListElement { text: "Track 2"; value: 1 }
+                                        ListElement { text: "Track 3"; value: 2 }
+                                        ListElement { text: "Track 4"; value: 3 }
+                                        ListElement { text: "Track 5"; value: 4 }
+                                        ListElement { text: "Track 6"; value: 5 }
+                                        ListElement { text: "Track 7"; value: 6 }
+                                        ListElement { text: "Track 8"; value: 7 }
+                                        ListElement { text: "Track 9"; value: 8 }
+                                        ListElement { text: "Track 10"; value: 9 }
+                                    }
+                                    textRole: "text"
+                                    currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
+                                    onActivated: {
+                                        zynqtgui.session_dashboard.selectedChannel = channelComboModel.get(index).value
+                                    }
+                                }
+
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Record Master Output")
+                                }
+                                QQC2.Switch {
+                                    Layout.alignment: Qt.AlignVCenter
+                                    implicitWidth: Kirigami.Units.gridUnit * 4
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                    checked: zynqtgui.sketchpad.recordMasterOutput
+                                    onToggled: {
+                                        zynqtgui.sketchpad.recordMasterOutput = checked
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: false
+
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Audio Source")
+                                }
+                                Zynthian.ComboBox {
+                                    id: sourceCombo
+
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: sourceComboModel
+
+                                        ListElement { text: "Internal (Active Layer)"; value: "internal" }
+                                        ListElement { text: "External (Audio In)"; value: "external" }
+                                    }
+                                    textRole: "text"
+                                    onActivated: {
+                                        zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Track")
+                                }
+                                Zynthian.ComboBox {
+                                    id: recordingChannelCombo
+
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: recordingChannelComboModel
+
+                                        ListElement { text: "Left Channel"; value: "1" }
+                                        ListElement { text: "Right Channel"; value: "2" }
+                                        ListElement { text: "Stereo"; value: "*" }
+                                    }
+                                    textRole: "text"
+                                    onActivated: {
+                                        zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
+                                    }
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            // TODO : Implement midi recording and add midi settings here
+                            QQC2.Label {
+                                text: "Record Midi"
+                            }
                         }
                     }
                 }
@@ -368,7 +475,7 @@ Zynthian.Popup {
                 Layout.rightMargin: root.spacing
                 icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                 onClicked: {
-                    // zynqtgui.callable_ui_action("START_RECORD")
+                    zynqtgui.callable_ui_action("START_RECORD")
                 }
             }
         }

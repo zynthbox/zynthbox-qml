@@ -1032,15 +1032,16 @@ class zynthian_gui(QObject):
                     self.control.zgui_custom_controllers_map[zctrl].zctrl_sync()
 
         logging.debug("Initializing global FX engines")
-        self.currentTaskMessage = "Initializing Global FX Engines"
 
-        delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
+        self.currentTaskMessage = "Initializing Global FX Engines : Delay"
+        delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st", False)
         delay_layer = zynthian_layer(delay_engine, -1, self)
         delay_controller = MultiController(self)
         delay_controller.add_control(delay_layer.controllers_dict["LEVEL"])
         delay_controller.value_changed.connect(handle_delay_change)
 
-        reverb_engine = self.engine.start_engine("JV/Roomy")
+        self.currentTaskMessage = "Initializing Global FX Engines : Reverb"
+        reverb_engine = self.engine.start_engine("JV/Roomy", False)
         reverb_layer = zynthian_layer(reverb_engine, -1, self)
         reverb_controller = MultiController(self)
         reverb_controller.add_control(reverb_layer.controllers_dict["dry_wet"])
@@ -1134,7 +1135,7 @@ class zynthian_gui(QObject):
         # self.zyntransport = zynthian_engine_transport()
 
         # Create Core UI Screens
-        self.currentTaskMessage = "Creating screen objects"
+        self.currentTaskMessage = "Creating Screen Objects"
 
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
@@ -1192,9 +1193,14 @@ class zynthian_gui(QObject):
         self.screens["network_info"] = self.screens["network"]
         self.screens["hardware"] = zynthian_gui_hardware(self)
         self.screens["test_knobs"] = zynthian_gui_test_knobs(self)
-
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
+
+        # Init GlobalFX
+        self.init_global_fx()
+
         # Create UI Apps Screens
+        self.currentTaskMessage = "Loading Application Page Backends"
+
         self.screens['alsa_mixer'] = self.screens['control']
         self.screens["audio_recorder"] = zynthian_gui_audio_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
@@ -1224,11 +1230,6 @@ class zynthian_gui(QObject):
         self.screens["sequence_downloader"] = zynthian_gui_newstuff(self)
         self.screens["sketchpad_downloader"] = zynthian_gui_newstuff(self)
 
-        ###
-        # Playgrid depends on sketchpad screen for metronome related functionalities
-        # and hence needs to be initialized after ZL page has been initialized
-        # TODO Make the metronome independant of ZL and more generic
-        ###
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
@@ -1266,9 +1267,6 @@ class zynthian_gui(QObject):
 
         # Initialize MPE Zones
         # self.init_mpe_zones(0, 2)
-
-        # Init GlobalFX
-        self.init_global_fx()
 
         # Reset channels LED state on selectedChannel change
         self.session_dashboard.selected_channel_changed.connect(self.channelsModTimerHandler)
@@ -3655,7 +3653,9 @@ class zynthian_gui(QObject):
         return self.screens["miniplaygrid"]
 
     def sketchpad(self):
-        return self.screens["sketchpad"]
+        if "sketchpad" in self.screens:
+            return self.screens["sketchpad"]
+        return None
 
     def audio_settings(self):
         return self.screens["audio_settings"]

@@ -4,7 +4,7 @@ ZYNTHIAN PROJECT: Zynthian Qt GUI
 
 Zynthian recording popup
 
-Copyright (C) 2022 Anupam Basak <anupam.basak27@gmail.com>
+Copyright (C) 2024 Anupam Basak <anupam.basak27@gmail.com>
 
 ******************************************************************************
 
@@ -25,10 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
-import QtQuick.Window 2.1
-import QtQuick.Controls.Styles 1.4
 
-import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
@@ -39,6 +36,8 @@ import Zynthian 1.0 as Zynthian
 Zynthian.Popup {
     id: root
     property QtObject selectedChannel: null
+    spacing: Kirigami.Units.gridUnit * 0.5
+
     Timer {
         id: selectedChannelThrottle
         interval: 1; running: false; repeat: false;
@@ -94,12 +93,13 @@ Zynthian.Popup {
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: zynqtgui.sketchpad.isRecording ? QQC2.Popup.NoAutoClose : (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside)
-    width: parent.width * 0.95
-    height: parent.height * 0.95
+    width: parent.width * 0.99
+    height: parent.height * 0.97
     leftPadding: 0
     rightPadding: 0
     topPadding: 0
     bottomPadding: 0
+    visible: true
     onSelectedChannelChanged: {
         if (root.selectedChannel.channelAudioType === "external") {
             zynqtgui.sketchpad.recordingSource = "external"
@@ -108,20 +108,20 @@ Zynthian.Popup {
             zynqtgui.sketchpad.recordingSource = "internal"
         }
 
-        // Reset source combo model to selected value when channel changes
-        for (var i=0; i<sourceComboModel.count; i++) {
-            if (sourceComboModel.get(i).value === zynqtgui.sketchpad.recordingSource) {
-                sourceCombo.currentIndex = i
-                break
-            }
-        }
+        // // Reset source combo model to selected value when channel changes
+        // for (var i=0; i<sourceComboModel.count; i++) {
+        //     if (sourceComboModel.get(i).value === zynqtgui.sketchpad.recordingSource) {
+        //         sourceCombo.currentIndex = i
+        //         break
+        //     }
+        // }
 
-        for (var i=0; i<recordingChannelComboModel.count; i++) {
-            if (recordingChannelComboModel.get(i).value === zynqtgui.sketchpad.recordingChannel) {
-                recordingChannelCombo.currentIndex = i
-                break
-            }
-        }
+        // for (var i=0; i<recordingChannelComboModel.count; i++) {
+        //     if (recordingChannelComboModel.get(i).value === zynqtgui.sketchpad.recordingChannel) {
+        //         recordingChannelCombo.currentIndex = i
+        //         break
+        //     }
+        // }
     }
     onOpened: {
         zynqtgui.recordingPopupActive = true
@@ -131,399 +131,253 @@ Zynthian.Popup {
             selectedChannelThrottle.restart()
         }
 
-        // Reset recordingType combo model to selected value when dialog opens
-        for (var i=0; i<recordingTypeComboModel.count; i++) {
-            if (recordingTypeComboModel.get(i).value === zynqtgui.sketchpad.recordingType) {
-                recordingTypeCombo.currentIndex = i
-                break
-            }
-        }
+        // // Reset recordingType combo model to selected value when dialog opens
+        // for (var i=0; i<recordingTypeComboModel.count; i++) {
+        //     if (recordingTypeComboModel.get(i).value === zynqtgui.sketchpad.recordingType) {
+        //         recordingTypeCombo.currentIndex = i
+        //         break
+        //     }
+        // }
 
-        // Reset countIn combo model to selected value when dialog opens
-        for (var i=0; i<countInComboModel.count; i++) {
-            if (countInComboModel.get(i).value === zynqtgui.sketchpad.countInBars) {
-                countInCombo.currentIndex = i
-                break
-            }
-        }
+        // // Reset countIn combo model to selected value when dialog opens
+        // for (var i=0; i<countInComboModel.count; i++) {
+        //     if (countInComboModel.get(i).value === zynqtgui.sketchpad.countInBars) {
+        //         countInCombo.currentIndex = i
+        //         break
+        //     }
+        // }
     }
     onClosed: {
         zynqtgui.recordingPopupActive = false
     }
     contentItem: ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.largeSpacing
+        spacing: root.spacing
 
         Kirigami.Heading {
             Layout.fillWidth: true
-            Layout.fillHeight: false
+            Layout.leftMargin: root.spacing
+            Layout.topMargin: root.spacing
             text: root.selectedChannel ? qsTr("Record Channel %1 - Clip %2").arg(root.selectedChannel.name).arg(root.selectedChannel.selectedSlotRow + 1) : ""
         }
-        Rectangle {
+        Kirigami.Separator {
             Layout.fillWidth: true
-            Layout.fillHeight: false
-            Layout.minimumHeight: 1
-            Layout.maximumHeight: 1
-            color: Kirigami.Theme.textColor
-            opacity: 0.5
         }
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             ColumnLayout {
-                Layout.fillHeight: true
                 Layout.fillWidth: true
-                enabled: !zynqtgui.sketchpad.isRecording
-                spacing: Kirigami.Units.gridUnit/2
-
-                RowLayout {
-                    Layout.fillWidth: false
-
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Recording Type")
-                    }
-
-                    Zynthian.ComboBox {
-                        id: recordingTypeCombo
-
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        model: ListModel {
-                            id: recordingTypeComboModel
-
-                            ListElement { text: "Audio"; value: "audio" }
-                            ListElement { text: "Midi"; value: "midi" }
-                        }
-                        textRole: "text"
-                        onActivated: {
-                            zynqtgui.sketchpad.recordingType = recordingTypeComboModel.get(index).value
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    visible: zynqtgui.sketchpad.recordingType === "audio"
-
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Audio Source")
-                    }
-
-                    Zynthian.ComboBox {
-                        id: sourceCombo
-
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        model: ListModel {
-                            id: sourceComboModel
-
-                            ListElement { text: "Internal (Active Layer)"; value: "internal" }
-                            ListElement { text: "External (Audio In)"; value: "external" }
-                        }
-                        textRole: "text"
-                        onActivated: {
-                            zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
-                        }
-                    }
-
-                    QQC2.Label {
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Solo")
-                    }
-
-                    QQC2.Switch {
-                        Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 4
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynqtgui.sketchpad.recordSolo
-                        onToggled: {
-                            zynqtgui.sketchpad.recordSolo = checked
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    visible: zynqtgui.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
-                             zynqtgui.sketchpad.recordingSource === "internal" // and when source is internal
-
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.alignment: Qt.AlignCenter
-                        enabled: parent.enabled
-                        text: qsTr("Source Channel")
-                    }
-
-                    Zynthian.ComboBox {
-                        id: channelCombo
-
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        model: ListModel {
-                            id: channelComboModel
-
-                            ListElement { text: "Track 1"; value: 0 }
-                            ListElement { text: "Track 2"; value: 1 }
-                            ListElement { text: "Track 3"; value: 2 }
-                            ListElement { text: "Track 4"; value: 3 }
-                            ListElement { text: "Track 5"; value: 4 }
-                            ListElement { text: "Track 6"; value: 5 }
-                            ListElement { text: "Track 7"; value: 6 }
-                            ListElement { text: "Track 8"; value: 7 }
-                            ListElement { text: "Track 9"; value: 8 }
-                            ListElement { text: "Track 10"; value: 9 }
-                        }
-                        textRole: "text"
-                        currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
-                        onActivated: {
-                            zynqtgui.session_dashboard.selectedChannel = channelComboModel.get(index).value
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    visible: zynqtgui.sketchpad.recordingType === "audio" && // Visible when recordingType is audio
-                             zynqtgui.sketchpad.recordingSource === "external" // and when source is external
-
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Track")
-                    }
-
-                    Zynthian.ComboBox {
-                        id: recordingChannelCombo
-
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        model: ListModel {
-                            id: recordingChannelComboModel
-
-                            ListElement { text: "Left Channel"; value: "1" }
-                            ListElement { text: "Right Channel"; value: "2" }
-                            ListElement { text: "Stereo"; value: "*" }
-                        }
-                        textRole: "text"
-                        onActivated: {
-                            zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Count In (Bars)")
-                    }
-
-                    Zynthian.ComboBox {
-                        id: countInCombo
-
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        model: ListModel {
-                            id: countInComboModel
-
-                            ListElement { text: "Off"; value: 0 }
-                            ListElement { text: "1"; value: 1 }
-                            ListElement { text: "2"; value: 2 }
-                            ListElement { text: "4"; value: 4 }
-                        }
-                        textRole: "text"
-                        onActivated: zynqtgui.sketchpad.countInBars = countInComboModel.get(index).value
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Record Master Output")
-                    }
-
-                    QQC2.Switch {
-                        Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 4
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynqtgui.sketchpad.recordMasterOutput
-                        onToggled: {
-                            zynqtgui.sketchpad.recordMasterOutput = checked
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Metronome")
-                    }
-
-                    QQC2.Switch {
-                        Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 4
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynqtgui.sketchpad.metronomeEnabled
-                        onToggled: {
-                            zynqtgui.sketchpad.metronomeEnabled = checked
-                        }
-                    }
-                }
-
-                // Fill up remaining space so that the above items do not center themselves vertically in parent
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
-            }
-
-            ColumnLayout {
                 Layout.fillHeight: true
-                Layout.fillWidth: false
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                Layout.leftMargin: root.spacing
 
-                Item {
+                GridLayout { // Common Settings Section
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 6
+                    Layout.maximumHeight: Layout.preferredHeight
+
+                    Zynthian.Card {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        contentItem: ColumnLayout {
+                            QQC2.Switch {
+                                Layout.fillHeight: true
+                                Layout.alignment: Qt.AlignCenter
+                                // Explicitly set indicator implicitWidth otherwise the switch size is too small
+                                indicator.implicitWidth: Kirigami.Units.gridUnit * 3
+                            }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignBottom
+                                wrapMode: QQC2.Label.WordWrap
+                                horizontalAlignment: QQC2.Label.AlignHCenter
+                                text: "Metronome"
+                            }
+                        }
+                    }
+                    Zynthian.Card {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        contentItem: ColumnLayout {
+                            QQC2.Switch {
+                                Layout.fillHeight: true
+                                Layout.alignment: Qt.AlignCenter
+                                // Explicitly set indicator implicitWidth otherwise the switch size is too small
+                                indicator.implicitWidth: Kirigami.Units.gridUnit * 3
+                            }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignBottom
+                                wrapMode: QQC2.Label.WordWrap
+                                horizontalAlignment: QQC2.Label.AlignHCenter
+                                text: "Solo"
+                            }
+                        }
+                    }
+                    Zynthian.Card {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        contentItem: ColumnLayout {
+                            RowLayout {
+                                id: countIn
+                                property int from: 0
+                                property int to: 4
+                                property int value: 0
+
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignCenter
+
+                                QQC2.Button {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                    Layout.preferredHeight: width
+                                    icon.name: "list-remove-symbolic"
+                                    enabled: countIn.value > countIn.from
+                                    onClicked: {
+                                        countIn.value = Zynthian.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
+                                    }
+                                }
+                                Rectangle {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                    Kirigami.Theme.inherit: false
+                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                    color: Kirigami.Theme.backgroundColor
+                                    border.color: "#ff999999"
+                                    border.width: 1
+                                    radius: 4
+
+                                    QQC2.Label {
+                                        anchors.centerIn: parent
+                                        text: countIn.value == 0 ? qsTr("Off") : qsTr("%1 Bar(s)").arg(countIn.value)
+                                    }
+                                }
+                                QQC2.Button {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                    Layout.preferredHeight: width
+                                    icon.name: "list-add-symbolic"
+                                    enabled: countIn.value < countIn.to
+                                    onClicked: {
+                                        countIn.value = Zynthian.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
+                                    }
+                                }
+                            }
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignBottom
+                                wrapMode: QQC2.Label.WordWrap
+                                horizontalAlignment: QQC2.Label.AlignHCenter
+                                text: "Count In (Bars)"
+                            }
+                        }
+                    }
+                    Zynthian.Card {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        contentItem: ColumnLayout {
+                            Zynthian.SketchpadDial {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                text: qsTr("BPM")
+                                controlObj: Zynthbox.SyncTimer
+                                controlProperty: "bpm"
+                                fineTuneButtonsVisible: false
+                                dial {
+                                    stepSize: 1
+                                    from: 50
+                                    to: 200
+                                }
+                            }
+                        }
+                    }
+                }
+                ColumnLayout { // Recording Type Specific Settings Section
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.topMargin: root.spacing
 
                     RowLayout {
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        spacing: Kirigami.Units.gridUnit * 2
-
-                        ColumnLayout {
-                            Extras.Gauge {
-                                Layout.fillHeight: true
-                                Layout.leftMargin: -10 // Magic number to align valuebar corectly with bottom text. TODO : Find a proper way to vertically center valuebar in gauge
-                                minimumValue: -100
-                                maximumValue: 20
-                                font.pointSize: 8
-                                value: visible
-                                       ? zynqtgui.sketchpad.recordingSource === "internal"
-                                          ? root.selectedChannel != null
-                                            ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                            : -100
-                                          : Zynthbox.AudioLevels.captureA
-                                       : -100
-                                style: GaugeStyle {
-                                    valueBar: Rectangle {
-                                        color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                        implicitWidth: 6
-                                    }
-                                    minorTickmark: null
-                                    tickmark: null
-                                    tickmarkLabel: null
-                                }
-                            }
-
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                horizontalAlignment: QQC2.Label.AlignHCenter
-                                text: qsTr("L")
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                            Layout.minimumHeight: Layout.preferredHeight
+                            checkable: true
+                            checked: recordingTypeSettingsStack.currentIndex === 0
+                            text: qsTr("Record Audio")
+                            onClicked: {
+                                recordingTypeSettingsStack.currentIndex = 0
                             }
                         }
-
-                        ColumnLayout {
-                            Extras.Gauge {
-                                Layout.fillHeight: true
-                                Layout.leftMargin: -10 // Magic number to align valuebar corectly with bottom text. TODO : Find a proper way to vertically center valuebar in gauge
-                                minimumValue: -100
-                                maximumValue: 20
-                                font.pointSize: 8
-                                value: visible
-                                        ? zynqtgui.sketchpad.recordingSource === "internal"
-                                           ? root.selectedChannel != null
-                                             ? Zynthbox.AudioLevels.channels[root.selectedChannel.id]
-                                             : -100
-                                           : Zynthbox.AudioLevels.captureB
-                                        : -100
-                                style: GaugeStyle {
-                                    valueBar: Rectangle {
-                                        color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                                        implicitWidth: 6
-                                    }
-                                    minorTickmark: null
-                                    tickmark: null
-                                    tickmarkLabel: null
-                                }
-                            }
-
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                horizontalAlignment: QQC2.Label.AlignHCenter
-                                text: qsTr("R")
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                            Layout.minimumHeight: Layout.preferredHeight
+                            checkable: true
+                            checked: recordingTypeSettingsStack.currentIndex === 1
+                            text: qsTr("Record Midi")
+                            onClicked: {
+                                recordingTypeSettingsStack.currentIndex = 1
                             }
                         }
                     }
+                    StackLayout {
+                        id: recordingTypeSettingsStack
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        QQC2.Label {
+                            text: "Record Audio"
+                        }
+                        QQC2.Label {
+                            text: "Record Midi"
+                        }
+                    }
                 }
+                RowLayout { // Post Recording Preview section
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.maximumHeight: Layout.preferredHeight
+                    spacing: root.spacing
 
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "Audio Level"
-                }
-            }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        color: "#222222"
+                        border.width: 1
+                        border.color: "#ff999999"
+                        radius: 4
 
-            ColumnLayout {
-                Layout.fillHeight: true
-                Layout.fillWidth: false
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Zynthbox.WaveFormItem {
+                            anchors.fill: parent
+                            color: Kirigami.Theme.textColor
+                        }
+                    }
 
-                QQC2.Button {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 6
-                    Layout.alignment: Qt.AlignCenter
-
-                    icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
-
-                    onClicked: {
-                        zynqtgui.callable_ui_action("START_RECORD")
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: height
+                        icon.name: "delete"
+                        icon.color: "#ffffffff"
                     }
                 }
             }
-
-            Item {
+            QQC2.Button {
                 Layout.fillHeight: true
-                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                Layout.minimumWidth: Layout.preferredWidth
+                Layout.rightMargin: root.spacing
+                icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                onClicked: {
+                    // zynqtgui.callable_ui_action("START_RECORD")
+                }
             }
         }
-
-        RowLayout {
+        QQC2.Button {
             Layout.fillWidth: true
-            Layout.fillHeight: false
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                text: qsTr("Close")
-                onClicked: {
-                    root.close()
-                }
+            text: qsTr("Close")
+            onClicked: {
+                root.close()
             }
         }
     }

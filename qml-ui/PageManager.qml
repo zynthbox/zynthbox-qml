@@ -92,12 +92,9 @@ Zynthian.Stack {
         "layers_for_channel",
         "layer_effects",
         "layer_midi_effects",
-        "playgrid",
         "sound_categories",
         "engine",
-        "song_manager",
-//        "channel_wave_editor",
-        "sketchpad",
+        "song_manager"
     ]
     property string currentPage: ""
     property var pageCache: ({})
@@ -152,7 +149,13 @@ Zynthian.Stack {
     }
 
     Component.onCompleted: {
-        // Cache all the main pages when starting up
+        // Cache all initial pages explicitly
+        zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName("playgrid")
+        root.getPage("playgrid")
+        zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName("sketchpad")
+        root.getPage("sketchpad")
+
+        // Cache all the remaining configured pages when starting up
         for (var pageIndex in root.pagesToCache) {
             var pageName = root.pagesToCache[pageIndex]
             zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)            

@@ -263,9 +263,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
                 self.select(i)
                 return
 
-    def start_engine(self, eng):
+    def start_engine(self, eng, setTaskMessage=True):
         if eng not in self.zyngines:
-            self.zynqtgui.currentTaskMessage = f"Starting engine {eng}"
+            if setTaskMessage:
+                self.zynqtgui.currentTaskMessage = f"Starting engine {eng}"
 
             info=self.engine_info[eng]
             zynthian_engine_class=info[4]

@@ -9,6 +9,7 @@ ColumnLayout {
     property alias dial: dial
     property alias text: label.text
     property alias valueString: valueLabel.text
+    property alias fineTuneButtonsVisible: fineTuneButtons.visible
 
     property QtObject controlObj
     property string controlProperty
@@ -104,6 +105,7 @@ ColumnLayout {
     }
 
     RowLayout {
+        id: fineTuneButtons
         Layout.fillWidth: parent
 
         QQC2.Button {

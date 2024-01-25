@@ -69,12 +69,20 @@ Zynthian.Popup {
             case "MODE_SWITCH_LONG":
             case "KNOB0_UP":
             case "KNOB0_DOWN":
+            case "KNOB0_TOUCHED":
+            case "KNOB0_RELEASED":
             case "KNOB1_UP":
             case "KNOB1_DOWN":
+            case "KNOB1_TOUCHED":
+            case "KNOB1_RELEASED":
             case "KNOB2_UP":
             case "KNOB2_DOWN":
+            case "KNOB2_TOUCHED":
+            case "KNOB2_RELEASED":
             case "KNOB3_UP":
             case "KNOB3_DOWN":
+            case "KNOB3_TOUCHED":
+            case "KNOB3_RELEASED":
                 returnValue = true
                 break
 

@@ -27,10 +27,8 @@ import QtQuick 2.15
 import QtQml 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
-
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
-
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
@@ -99,6 +97,25 @@ Zynthian.Popup {
             case "SWITCH_BACK_LONG":
                 root.close();
                 returnValue = true;
+                break;
+            case "START_RECORD":
+                if (zynqtgui.sketchpad.recordingType === "midi") {
+                    // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
+                    if (_private.selectedPattern.recordLive) {
+                        _private.selectedPattern.recordLive = false;
+                        Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                        zynqtgui.sketchpad.isRecording = false;
+                    } else {
+                        zynqtgui.sketchpad.isRecording = true;
+                        _private.selectedPattern.recordLive = true;
+                        if (countIn.value > 0) {
+                            Zynthbox.SyncTimer.startWithCountin(countIn.value);
+                        } else {
+                            Zynthian.CommonUtils.startMetronomeAndPlayback();
+                        }
+                    }
+                    returnValue = true;
+                }
                 break;
         }
 
@@ -176,6 +193,7 @@ Zynthian.Popup {
             Layout.fillHeight: true
 
             ColumnLayout {
+                enabled: zynqtgui.sketchpad.isRecording === false
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.leftMargin: root.spacing
@@ -780,8 +798,7 @@ Zynthian.Popup {
                             switch(recordingTypeSettingsStack.currentIndex) {
                                 case 1: // MIDI Recording
                                     if (_private.selectedPattern.hasNotes) {
-                                        // FIXME: Work out why opening this dialog causes the error: "QML DialogQuestion: cannot find any window to open popup in."
-                                        // confirmClearPatternDialog.open();
+                                        applicationWindow().confirmClearPattern(root.selectedChannel, _private.selectedPattern);
                                     }
                                     break;
                                 case 0: // Audio Recording
@@ -793,15 +810,6 @@ Zynthian.Popup {
                                     break;
                             }
                         }
-                        // Zynthian.DialogQuestion {
-                        //     id: confirmClearPatternDialog
-                        //     text: root.selectedChannel && _private.selectedPattern ? qsTr("Clear the notes in the pattern for Clip %1%2").arg(root.selectedChannel.name).arg(_private.selectedPattern.partName) : ""
-                        //     acceptText: qsTr("Clear Pattern")
-                        //     rejectText: qsTr("Don't Clear")
-                        //     onAccepted: {
-                        //         _private.selectedPattern.clear();
-                        //     }
-                        // }
                     }
                 }
             }

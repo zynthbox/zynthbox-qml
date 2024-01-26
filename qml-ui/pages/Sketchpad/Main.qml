@@ -953,13 +953,31 @@ Zynthian.ScreenPage {
                                                     : false
                             : false
 
-            width: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.width + 8 : 0
-            height: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.height + 8 : 0
-            x: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.mapToItem(content, 0, 0).x - 4 : 0
-            y: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.mapToItem(content, 0, 0).y - 4 : 0
             z: 1000
             border.width: 2
             border.color: Qt.rgba(255, 255, 255, 0.8)
+            function updateLastSelectedObjIndicatorPosition() {
+                lastSelectedObjIndicatorPositioner.restart();
+            }
+            Timer {
+                id: lastSelectedObjIndicatorPositioner
+                interval: 0; repeat: false; running: false;
+                onTriggered: {
+                    lastSelectedObjIndicator.width = zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.width + 8 : 0
+                    lastSelectedObjIndicator.height = zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.height + 8 : 0
+                    lastSelectedObjIndicator.x = zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.mapToItem(content, 0, 0).x - 4 : 0
+                    lastSelectedObjIndicator.y = zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.component ? zynqtgui.sketchpad.lastSelectedObj.component.mapToItem(content, 0, 0).y - 4 : 0
+                }
+            }
+            Connections {
+                target: zynqtgui.sketchpad ? zynqtgui.sketchpad.lastSelectedObj : null
+                onComponentChanged: lastSelectedObjIndicator.updateLastSelectedObjIndicatorPosition();
+            }
+            Connections {
+                target: content
+                onHeightChanged: lastSelectedObjIndicator.updateLastSelectedObjIndicatorPosition()
+                onWidthChanged: lastSelectedObjIndicator.updateLastSelectedObjIndicatorPosition()
+            }
 
             color: "transparent"
         }

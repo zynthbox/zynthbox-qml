@@ -102,6 +102,7 @@ Zynthian.Popup {
                 if (zynqtgui.sketchpad.recordingType === "midi") {
                     // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
                     if (_private.selectedPattern.recordLive) {
+                        _private.selectedPattern.liveRecordingSource = midiSourceCombo.model.get(midiSourceCombo.currentIndex).value;
                         _private.selectedPattern.recordLive = false;
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         zynqtgui.sketchpad.isRecording = false;
@@ -174,7 +175,7 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.leftMargin: root.spacing
             Layout.topMargin: root.spacing
-            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %1").arg(root.selectedChannel.name).arg(_private.selectedPattern.partName) : ""
+            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedPattern.partName).arg(root.selectedChannel.name) : ""
             QtObject {
                 id: _private
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
@@ -268,7 +269,11 @@ Zynthian.Popup {
 
                                     QQC2.Label {
                                         anchors.centerIn: parent
-                                        text: countIn.value == 0 ? qsTr("Off") : qsTr("%1 Bar(s)").arg(countIn.value)
+                                        text: countIn.value == 0
+                                            ? qsTr("Off")
+                                            : countIn.value == 1
+                                                ? qsTr("1 bar")
+                                                : qsTr("%1 Bars").arg(countIn.value)
                                     }
                                 }
                                 QQC2.Button {
@@ -522,7 +527,7 @@ Zynthian.Popup {
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     currentIndex: 0
                                     model: ListModel {
-                                        ListElement { text: "Current Track"; value: "current-track" }
+                                        ListElement { text: "Current Track"; value: "sketchpadTrack:-1" } // -1 is the internal shorthand used for the current track basically everywhere
                                         ListElement { text: "Track 1"; value: "sketchpadTrack:0" }
                                         ListElement { text: "Track 2"; value: "sketchpadTrack:1" }
                                         ListElement { text: "Track 3"; value: "sketchpadTrack:2" }
@@ -603,44 +608,38 @@ Zynthian.Popup {
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 0 : false
-                                    text: qsTr("1/64")
-                                    onClicked: { _private.selectedPattern.noteLength = 0; }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                     checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 1 : false
-                                    text: qsTr("1/32")
+                                    text: qsTr("1")
                                     onClicked: { _private.selectedPattern.noteLength = 1; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                     checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 2 : false
-                                    text: qsTr("1/16")
+                                    text: qsTr("1/2")
                                     onClicked: { _private.selectedPattern.noteLength = 2; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                     checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 3 : false
-                                    text: qsTr("1/8")
+                                    text: qsTr("1/4")
                                     onClicked: { _private.selectedPattern.noteLength = 3; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                     checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 4 : false
-                                    text: qsTr("1/4")
+                                    text: qsTr("1/8")
                                     onClicked: { _private.selectedPattern.noteLength = 4; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                     checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 5 : false
-                                    text: qsTr("1/2")
+                                    text: qsTr("1/16")
                                     onClicked: { _private.selectedPattern.noteLength = 5; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                     checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 6 : false
-                                    text: qsTr("1")
+                                    text: qsTr("1/32")
                                     onClicked: { _private.selectedPattern.noteLength = 6; }
                                 }
                                 QQC2.Label {

@@ -1149,6 +1149,22 @@ Kirigami.AbstractApplicationWindow {
     Sketchpad.RecordingPopup {
         id: recordingPopup
     }
+    function confirmClearPattern(channel, pattern) {
+        confirmClearPatternDialog.channel = channel;
+        confirmClearPatternDialog.pattern = pattern;
+        confirmClearPatternDialog.open();
+    }
+    Zynthian.DialogQuestion {
+        id: confirmClearPatternDialog
+        property QtObject channel
+        property QtObject pattern
+        text: confirmClearPatternDialog.channel && confirmClearPatternDialog.pattern ? qsTr("Clear the notes in the pattern for Clip %1%2").arg(confirmClearPatternDialog.channel.name).arg(confirmClearPatternDialog.pattern.partName) : ""
+        acceptText: qsTr("Clear Pattern")
+        rejectText: qsTr("Don't Clear")
+        onAccepted: {
+            confirmClearPatternDialog.pattern.clear();
+        }
+    }
 
     Zynthian.Drawer {
         id: miniPlayGridDrawer

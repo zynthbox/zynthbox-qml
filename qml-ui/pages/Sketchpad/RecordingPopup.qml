@@ -163,8 +163,15 @@ Zynthian.Popup {
         if (root.selectedChannel == null) {
             selectedChannelThrottle.restart()
         }
+
+        // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
+        _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
+        _private.updateSoloState();
     }
     onClosed: {
+        if (zynqtgui.sketchpad.song.playChannelSolo !== _private.soloChannelOnOpen) {
+            zynqtgui.sketchpad.song.playChannelSolo = _private.soloChannelOnOpen;
+        }
         zynqtgui.recordingPopupActive = false
     }
     contentItem: ColumnLayout {
@@ -183,7 +190,26 @@ Zynthian.Popup {
                 property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
                 property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
                 property bool midiSoloTrack: false
+                property int soloChannelOnOpen: -1
                 property bool armRecording: false
+                onMidiSoloTrackChanged: {
+                    _private.updateSoloState();
+                }
+                function updateSoloState() {
+                    if (root.visible) {
+                        if (zynqtgui.sketchpad.recordingType === "midi" && _private.midiSoloTrack) {
+                            zynqtgui.sketchpad.song.playChannelSolo = root.selectedChannel.id;
+                        } else {
+                            zynqtgui.sketchpad.song.playChannelSolo = -1;
+                        }
+                    }
+                }
+            }
+            Connections {
+                target: zynqtgui.sketchpad
+                onRecordingTypeChanged: {
+                    _private.updateSoloState();
+                }
             }
         }
         Kirigami.Separator {

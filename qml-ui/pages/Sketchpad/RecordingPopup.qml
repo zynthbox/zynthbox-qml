@@ -394,9 +394,8 @@ Zynthian.Popup {
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
-
                                 QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
                                     Layout.alignment: Qt.AlignCenter
                                     enabled: parent.enabled
                                     text: qsTr("Source Channel")
@@ -404,7 +403,7 @@ Zynthian.Popup {
                                 Zynthian.ComboBox {
                                     id: channelCombo
 
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+                                    Layout.fillWidth: true
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.alignment: Qt.AlignCenter
                                     model: ListModel {
@@ -425,77 +424,6 @@ Zynthian.Popup {
                                     currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
                                     onActivated: {
                                         zynqtgui.session_dashboard.selectedChannel = channelComboModel.get(index).value
-                                    }
-                                }
-
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Record Master Output")
-                                }
-                                QQC2.Switch {
-                                    Layout.alignment: Qt.AlignVCenter
-                                    implicitWidth: Kirigami.Units.gridUnit * 4
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    checked: zynqtgui.sketchpad.recordMasterOutput
-                                    onToggled: {
-                                        zynqtgui.sketchpad.recordMasterOutput = checked
-                                    }
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                                    Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Audio Source")
-                                }
-                                Zynthian.ComboBox {
-                                    id: sourceCombo
-
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignCenter
-                                    model: ListModel {
-                                        id: sourceComboModel
-
-                                        ListElement { text: "Internal (Active Layer)"; value: "internal" }
-                                        ListElement { text: "External (Audio In)"; value: "external" }
-                                    }
-                                    textRole: "text"
-                                    onActivated: {
-                                        zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
-                                    }
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-                                    Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Track")
-                                }
-                                Zynthian.ComboBox {
-                                    id: recordingChannelCombo
-
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignCenter
-                                    model: ListModel {
-                                        id: recordingChannelComboModel
-
-                                        ListElement { text: "Left Channel"; value: "1" }
-                                        ListElement { text: "Right Channel"; value: "2" }
-                                        ListElement { text: "Stereo"; value: "*" }
-                                    }
-                                    textRole: "text"
-                                    onActivated: {
-                                        zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
                                     }
                                 }
                             }
@@ -525,6 +453,7 @@ Zynthian.Popup {
                                     }
                                 }
                                 QQC2.Button {
+                                    visible: false // Keep it invisible until implemented
                                     Layout.fillWidth: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                     Layout.preferredHeight: _private.preferredRowHeight
@@ -533,6 +462,79 @@ Zynthian.Popup {
                                     text: root.selectedChannel ? qsTr("No Playback").arg(root.selectedChannel.name) : ""
                                     onClicked: {
                                         // magic stuff what?!
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Audio Source")
+                                }
+                                Zynthian.ComboBox {
+                                    id: sourceCombo
+
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: _private.preferredRowHeight
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: sourceComboModel
+
+                                        ListElement { text: "Internal (Active Layer)"; value: "internal" }
+                                        ListElement { text: "External (Audio In)"; value: "external" }
+                                    }
+                                    textRole: "text"
+                                    onActivated: {
+                                        zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Track")
+                                }
+                                Zynthian.ComboBox {
+                                    id: recordingChannelCombo
+
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: _private.preferredRowHeight
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: recordingChannelComboModel
+
+                                        ListElement { text: "Left Channel"; value: "1" }
+                                        ListElement { text: "Right Channel"; value: "2" }
+                                        ListElement { text: "Stereo"; value: "*" }
+                                    }
+                                    textRole: "text"
+                                    onActivated: {
+                                        zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
+                                    Layout.preferredHeight: _private.preferredRowHeight
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Record Master Output")
+                                }
+                                QQC2.Switch {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: _private.preferredRowHeight
+                                    Layout.alignment: Qt.AlignVCenter
+                                    indicator.implicitWidth: Kirigami.Units.gridUnit * 4
+                                    checked: zynqtgui.sketchpad.recordMasterOutput
+                                    onToggled: {
+                                        zynqtgui.sketchpad.recordMasterOutput = checked
                                     }
                                 }
                             }

@@ -329,19 +329,21 @@ ColumnLayout {
                                 let firstInStep = true;
                                 // The display order for notes wants to be higher to lower, but the subnotes
                                 // list is ordered lower to higher, so run through them backwards
-                                for (let subnoteIndex = stepNote.subnotes.length - 1; -1 < subnoteIndex; --subnoteIndex) {
-                                    let subnote = stepNote.subnotes[subnoteIndex];
-                                    if (component.midiNoteFilter.length === 0 || component.midiNoteFilter.indexOf(subnote.midiNote) > -1) {
-                                        newListData.push(
-                                            {
-                                                "barIndex": barIndex,
-                                                "stepIndex": stepIndex,
-                                                "subnoteIndex": subnoteIndex,
-                                                "firstInStep": firstInStep,
-                                                "subnote": subnote
-                                            }
-                                        );
-                                        firstInStep = false;
+                                if (stepNote) {
+                                    for (let subnoteIndex = stepNote.subnotes.length - 1; -1 < subnoteIndex; --subnoteIndex) {
+                                        let subnote = stepNote.subnotes[subnoteIndex];
+                                        if (component.midiNoteFilter.length === 0 || component.midiNoteFilter.indexOf(subnote.midiNote) > -1) {
+                                            newListData.push(
+                                                {
+                                                    "barIndex": barIndex,
+                                                    "stepIndex": stepIndex,
+                                                    "subnoteIndex": subnoteIndex,
+                                                    "firstInStep": firstInStep,
+                                                    "subnote": subnote
+                                                }
+                                            );
+                                            firstInStep = false;
+                                        }
                                     }
                                 }
                             }
@@ -420,7 +422,7 @@ ColumnLayout {
             text: component.currenParameterPageIndex === 0
                 ? "Position"
                 : component.currenParameterPageIndex === 1
-                    ? ""
+                    ? "Next Step"
                     : "Ratchet Probability"
             Zynthian.KnobIndicator {
                 anchors {
@@ -739,10 +741,33 @@ ColumnLayout {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                     visible: component.currenParameterPageIndex === 1
                 }
-                Item {
+                StepSettingsParamDelegate {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                     visible: component.currenParameterPageIndex === 1
+                    model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
+                    paramIndex: subnoteDelegate.subnoteIndex
+                    paramName: "next-step"
+                    paramDefaultString: "Next"
+                    paramValueSuffix: ""
+                    paramDefault: 0
+                    paramMin: 0
+                    paramMax: 128
+                    scrollWidth: 128
+                    paramList: [0, 1, 17, 33, 49, 65, 81, 97, 113]
+                    paramNames: {
+                        0: "Split Step, Overlap",
+                        1: "Bar 1",
+                        17: "Bar 2",
+                        33: "Bar 3",
+                        49: "Bar 4",
+                        65: "Bar 5",
+                        81: "Bar 6",
+                        97: "Bar 7",
+                        113: "Bar 8",
+                    }
+                    knobId: 3
+                    currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 2 (Probability, ???, Swing)
                 // BEGIN Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)

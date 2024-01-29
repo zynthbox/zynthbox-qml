@@ -724,7 +724,7 @@ Zynthian.BasePlayGrid {
                                     drumPadRepeater.ratchetProbabilityUp();
                                     break;
                                 case 1:
-                                    // drumPadRepeater.
+                                    drumPadRepeater.nextStepUp();
                                     break;
                                 case 0:
                                 default:
@@ -738,7 +738,7 @@ Zynthian.BasePlayGrid {
                                     drumPadRepeater.ratchetProbabilityDown();
                                     break;
                                 case 1:
-                                    // drumPadRepeater.
+                                    drumPadRepeater.nextStepDown();
                                     break;
                                 case 0:
                                 default:
@@ -1137,6 +1137,12 @@ Zynthian.BasePlayGrid {
                             }
                             function probabilityDown() {
                                 changeValue("probability", -1, 0, 100, 100);
+                            }
+                            function nextStepUp() {
+                                changeValue("next-step", 1, 0, 128, 0);
+                            }
+                            function nextStepDown() {
+                                changeValue("next-step", -1, 0, 128, 0);
                             }
                             function ratchetStyleUp() {
                                 changeValue("ratchet-style", 1, 0, 3, 0);

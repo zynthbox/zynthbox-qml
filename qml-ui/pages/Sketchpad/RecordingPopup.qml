@@ -718,6 +718,7 @@ Zynthian.Popup {
                             anchors.fill: parent
                             color: Kirigami.Theme.textColor
                             visible: recordingTypeSettingsStack.currentIndex === 0
+                            source: "audioLevelsChannel:/ports"
                         }
                         Image {
                             id: patternVisualiser

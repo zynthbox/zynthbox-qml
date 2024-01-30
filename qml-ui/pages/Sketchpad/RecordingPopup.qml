@@ -394,8 +394,74 @@ Zynthian.Popup {
                                 QQC2.Label {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 9
                                     Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Audio Source:")
+                                }
+                                Zynthian.ComboBox {
+                                    id: sourceCombo
+
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: _private.preferredRowHeight
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: sourceComboModel
+
+                                        ListElement { text: "Internal (Sketchpad Track)"; value: "internal-track" }
+                                        ListElement { text: "Internal (Master Output)"; value: "internal-master" }
+                                        ListElement { text: "External (Audio In)"; value: "external" }
+                                    }
+                                    currentIndex: 0
+                                    textRole: "text"
+                                    onActivated: {
+                                        if (sourceComboModel.get(index).value === "internal-track") {
+                                            zynqtgui.sketchpad.recordingSource = "internal"
+                                            zynqtgui.sketchpad.recordMasterOutput = false
+                                        } else if (sourceComboModel.get(index).value === "internal-master") {
+                                            zynqtgui.sketchpad.recordingSource = "internal"
+                                            zynqtgui.sketchpad.recordMasterOutput = true
+                                        } else if (sourceComboModel.get(index).value === "external") {
+                                            zynqtgui.sketchpad.recordingSource = "external"
+                                            zynqtgui.sketchpad.recordMasterOutput = false
+                                        }
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                visible: zynqtgui.sketchpad.recordingSource === "external"
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: qsTr("Recording Channel:")
+                                }
+                                Zynthian.ComboBox {
+                                    id: recordingChannelCombo
+
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: _private.preferredRowHeight
+                                    Layout.alignment: Qt.AlignCenter
+                                    model: ListModel {
+                                        id: recordingChannelComboModel
+
+                                        ListElement { text: "Left Channel"; value: "1" }
+                                        ListElement { text: "Right Channel"; value: "2" }
+                                        ListElement { text: "Stereo"; value: "*" }
+                                    }
+                                    textRole: "text"
+                                    onActivated: {
+                                        zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillHeight: true; Layout.fillWidth: true
+                                Layout.preferredHeight: _private.preferredRowHeight
+                                visible: sourceComboModel.get(sourceCombo.currentIndex).value === "internal-track"
+                                QQC2.Label {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
+                                    Layout.alignment: Qt.AlignCenter
                                     enabled: parent.enabled
-                                    text: qsTr("Source Channel")
+                                    text: qsTr("Source Track:")
                                 }
                                 Zynthian.ComboBox {
                                     id: channelCombo
@@ -444,7 +510,7 @@ Zynthian.Popup {
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.minimumHeight: Layout.preferredHeight
                                     checked: zynqtgui.sketchpad.recordSolo === true
-                                    text: root.selectedChannel ? qsTr("Solo Track %1").arg(root.selectedChannel.name) : ""
+                                    text: zynqtgui.session_dashboard.selectedChannel ? qsTr("Solo Track %1").arg(zynqtgui.session_dashboard.selectedChannel.name) : ""
                                     onClicked: {
                                         zynqtgui.sketchpad.recordSolo = true;
                                     }
@@ -462,71 +528,6 @@ Zynthian.Popup {
                                     }
                                 }
                             }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
-                                    Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Audio Source")
-                                }
-                                Zynthian.ComboBox {
-                                    id: sourceCombo
-
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignCenter
-                                    model: ListModel {
-                                        id: sourceComboModel
-
-                                        ListElement { text: "Internal (Active Track)"; value: "internal-track" }
-                                        ListElement { text: "Internal (Master Output)"; value: "internal-master" }
-                                        ListElement { text: "External (Audio In)"; value: "external" }
-                                    }
-                                    currentIndex: 0
-                                    textRole: "text"
-                                    onActivated: {
-                                        if (sourceComboModel.get(index).value === "internal-track") {
-                                            zynqtgui.sketchpad.recordingSource = "internal"
-                                            zynqtgui.sketchpad.recordMasterOutput = false
-                                        } else if (sourceComboModel.get(index).value === "internal-master") {
-                                            zynqtgui.sketchpad.recordingSource = "internal"
-                                            zynqtgui.sketchpad.recordMasterOutput = true
-                                        } else if (sourceComboModel.get(index).value === "external") {
-                                            zynqtgui.sketchpad.recordingSource = "external"
-                                            zynqtgui.sketchpad.recordMasterOutput = false
-                                        }
-                                    }
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                visible: zynqtgui.sketchpad.recordingSource === "external"
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
-                                    Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Recording Source")
-                                }
-                                Zynthian.ComboBox {
-                                    id: recordingChannelCombo
-
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignCenter
-                                    model: ListModel {
-                                        id: recordingChannelComboModel
-
-                                        ListElement { text: "Left Channel"; value: "1" }
-                                        ListElement { text: "Right Channel"; value: "2" }
-                                        ListElement { text: "Stereo"; value: "*" }
-                                    }
-                                    textRole: "text"
-                                    onActivated: {
-                                        zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
-                                    }
-                                }
-                            }
                         }
                         ColumnLayout {
                             // TODO : Implement midi recording and add midi settings here
@@ -535,7 +536,7 @@ Zynthian.Popup {
                                 Layout.preferredHeight: _private.preferredRowHeight
                                 QQC2.Label {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                                    text: qsTr("Source:")
+                                    text: qsTr("Midi Source:")
                                 }
                                 Zynthian.ComboBox {
                                     id: midiSourceCombo

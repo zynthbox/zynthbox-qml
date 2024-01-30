@@ -510,7 +510,7 @@ Zynthian.Popup {
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.minimumHeight: Layout.preferredHeight
                                     checked: zynqtgui.sketchpad.recordSolo === true
-                                    text: zynqtgui.session_dashboard.selectedChannel ? qsTr("Solo Track %1").arg(zynqtgui.session_dashboard.selectedChannel.name) : ""
+                                    text: qsTr("Solo %1").arg(channelComboModel.get(channelCombo.currentIndex).text)
                                     onClicked: {
                                         zynqtgui.sketchpad.recordSolo = true;
                                     }

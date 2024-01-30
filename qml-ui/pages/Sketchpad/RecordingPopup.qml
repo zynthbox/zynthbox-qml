@@ -482,22 +482,34 @@ Zynthian.Popup {
                                     model: ListModel {
                                         id: sourceComboModel
 
-                                        ListElement { text: "Internal (Active Layer)"; value: "internal" }
+                                        ListElement { text: "Internal (Active Track)"; value: "internal-track" }
+                                        ListElement { text: "Internal (Master Output)"; value: "internal-master" }
                                         ListElement { text: "External (Audio In)"; value: "external" }
                                     }
+                                    currentIndex: 0
                                     textRole: "text"
                                     onActivated: {
-                                        zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
+                                        if (sourceComboModel.get(index).value === "internal-track") {
+                                            zynqtgui.sketchpad.recordingSource = "internal"
+                                            zynqtgui.sketchpad.recordMasterOutput = false
+                                        } else if (sourceComboModel.get(index).value === "internal-master") {
+                                            zynqtgui.sketchpad.recordingSource = "internal"
+                                            zynqtgui.sketchpad.recordMasterOutput = true
+                                        } else if (sourceComboModel.get(index).value === "external") {
+                                            zynqtgui.sketchpad.recordingSource = "external"
+                                            zynqtgui.sketchpad.recordMasterOutput = false
+                                        }
                                     }
                                 }
                             }
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
+                                visible: zynqtgui.sketchpad.recordingSource === "external"
                                 QQC2.Label {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 9
                                     Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Track")
+                                    text: qsTr("Recording Source")
                                 }
                                 Zynthian.ComboBox {
                                     id: recordingChannelCombo
@@ -515,26 +527,6 @@ Zynthian.Popup {
                                     textRole: "text"
                                     onActivated: {
                                         zynqtgui.sketchpad.recordingChannel = recordingChannelComboModel.get(index).value
-                                    }
-                                }
-                            }
-                            RowLayout {
-                                Layout.fillHeight: true; Layout.fillWidth: true
-                                Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignCenter
-                                    text: qsTr("Record Master Output")
-                                }
-                                QQC2.Switch {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: _private.preferredRowHeight
-                                    Layout.alignment: Qt.AlignVCenter
-                                    indicator.implicitWidth: Kirigami.Units.gridUnit * 4
-                                    checked: zynqtgui.sketchpad.recordMasterOutput
-                                    onToggled: {
-                                        zynqtgui.sketchpad.recordMasterOutput = checked
                                     }
                                 }
                             }

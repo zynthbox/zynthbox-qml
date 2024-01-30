@@ -155,7 +155,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # or load default snapshot when set to False
         self.init_should_load_last_state = False
         self.__last_selected_obj = last_selected_obj_dto(self)
-        self.__sketchpad_loading_in_progress = False
+        # When starting up, init process will load a sketchpad and hence set it to True by default
+        # This will later be set to False once init process loads the sketchpad
+        self.__sketchpad_loading_in_progress = True
         self.__stopRecordingRetrier__ = QTimer(self)
         self.__stopRecordingRetrier__.setInterval(50)
         self.__stopRecordingRetrier__.setSingleShot(True)

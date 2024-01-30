@@ -780,18 +780,24 @@ class sketchpad_clip(QObject):
             #         if clip.isPlaying:
             #             clip.stop()
 
-        if self.channel is not None:
+        if self.channel is None:
+            # if channel is none, it means this clip is a sample rather than a clip and needs to be just... played
+            self.play_audio(True)
+        else:
             # logging.info(f"Setting Clip To Play at the top of the next bar {self}")
             Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.PlayingState)
 
     @Slot(None)
     def stop(self):
         # logging.info(f"Setting Clip to Stop at the top of the next bar {self}")
-        if self.channel is not None:
+        if self.channel is None:
+            # if channel is none, it means this clip is a sample rather than a clip and needs to be just... stopped
+            self.stop_audio()
+        else:
             Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState)
+
         if self.isPlaying:
             self.reset_beat_count()
-
             if self.audioSource is not None:
                 self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 

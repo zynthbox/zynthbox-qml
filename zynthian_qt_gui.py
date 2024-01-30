@@ -464,6 +464,9 @@ class zynthian_gui(QObject):
         # 2nd element of the set is the zynthian controller to control fx
         self.global_fx_engines = []
 
+        self.__channelToRecord = None
+        self.__channelRecordingRow = None
+        self.__clipToRecord = None
         self.__forceSongMode__ = False
         self.__switch_channels_button_pressed__ = False
         self.__mode_button_pressed__ = False
@@ -2002,28 +2005,42 @@ class zynthian_gui(QObject):
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "START_RECORD":
+            zl = self.screens["sketchpad"]
             if self.recording_popup_active or self.metronomeButtonPressed:
-                zl = self.screens["sketchpad"]
                 if zl.isRecording:
                     # Some Clip is currently being recorded
                     logging.info("Some Clip is currently being recorded. Stopping record")
                     self.run_stop_metronome_and_playback.emit()
+                    self.__channelToRecord = None
+                    self.__channelRecordingRow = None
+                    self.__clipToRecord = None
                 else:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
-                    channel = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
-                    clip = channel.getClipToRecord()
+                    # Ensure that if we have been asked to start recording without opening the dialog (that is, by
+                    # holding down the metronome button and then pressing record, for instant recording), we still
+                    # end up actually recording into what's expected
+                    if self.__channelToRecord is None:
+                        self.__channelToRecord = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+                    if self.__channelRecordingRow is None:
+                        self.__channelRecordingRow = self.__channelToRecord.selectedSlotRow
+                    if self.__clipToRecord is None:
+                        self.__clipToRecord = self.__channelToRecord.getClipToRecord()
 
                     # If sample[0] is empty, set sample[0] to recorded file along with selectedChannel's clip
-                    if channel.samples[channel.selectedSlotRow].path is not None and len(channel.samples[channel.selectedSlotRow].path) > 0:
-                        zl.clipsToRecord = [clip]
+                    if self.__channelToRecord.samples[self.__channelRecordingRow].path is not None and len(self.__channelToRecord.samples[self.__channelRecordingRow].path) > 0:
+                        zl.clipsToRecord = [self.__clipToRecord]
                     else:
-                        zl.clipsToRecord = [clip, channel.samples[channel.selectedSlotRow]]
+                        zl.clipsToRecord = [self.__clipToRecord, self.__channelToRecord.samples[self.__channelRecordingRow]]
 
-                    logging.info(f"Recording Clip : {clip}")
-                    clip.queueRecording()
+                    logging.info(f"Recording Clip : {self.__clipToRecord}")
+                    self.__clipToRecord.queueRecording()
                     self.run_start_metronome_and_playback.emit()
             else:
+                if zl.isRecording == False:
+                    self.__channelToRecord = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+                    self.__channelRecordingRow = self.__channelToRecord.selectedSlotRow
+                    self.__clipToRecord = self.__channelToRecord.getClipToRecord()
                 self.displayRecordingPopup.emit()
 
         elif cuia == "STOP_RECORD":

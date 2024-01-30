@@ -946,7 +946,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.__last_recording_type__ = "Internal"
 
                 if self.recordMasterOutput:
-                    recording_ports = [("system:playback_1", "system:playback_2")]
+                    recording_ports = [("GlobalPlayback:dryOutLeft", "GlobalPlayback:dryOutRight")]
                 else:
                     recording_ports = channel.channelSynthPorts
             else:
@@ -1032,7 +1032,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             try:
                 layer = self.zynqtgui.layer.generate_snapshot(currentChannel)
-                logging.debug(f"### Channel({self.zynqtgui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
+                # logging.debug(f"### Channel({self.zynqtgui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
             except:
                 layer = None
 

@@ -471,17 +471,14 @@ Zynthian.Popup {
                                     Layout.alignment: Qt.AlignCenter
                                     model: ListModel {
                                         id: channelComboModel
-
-                                        ListElement { text: "Track 1"; value: 0 }
-                                        ListElement { text: "Track 2"; value: 1 }
-                                        ListElement { text: "Track 3"; value: 2 }
-                                        ListElement { text: "Track 4"; value: 3 }
-                                        ListElement { text: "Track 5"; value: 4 }
-                                        ListElement { text: "Track 6"; value: 5 }
-                                        ListElement { text: "Track 7"; value: 6 }
-                                        ListElement { text: "Track 8"; value: 7 }
-                                        ListElement { text: "Track 9"; value: 8 }
-                                        ListElement { text: "Track 10"; value: 9 }
+                                        Component.onCompleted: {
+                                            for (var channelId = 0; channelId <= 9; channelId++) {
+                                                channelComboModel.append({
+                                                    text: qsTr("Track %1").arg(zynqtgui.sketchpad.song.channelsModel.getChannel(channelId).name),
+                                                    value: channelId
+                                                })
+                                            }
+                                        }
                                     }
                                     textRole: "text"
                                     currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1

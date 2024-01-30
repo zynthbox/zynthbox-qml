@@ -36,19 +36,10 @@ import Zynthian 1.0 as Zynthian
 Zynthian.Popup {
     id: root
     property QtObject selectedChannel: null
+    property int selectedSlotRow: 0
+
     spacing: Kirigami.Units.gridUnit * 0.5
 
-    Timer {
-        id: selectedChannelThrottle
-        interval: 1; running: false; repeat: false;
-        onTriggered: {
-            root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
-        }
-    }
-    Connections {
-        target: zynqtgui.session_dashboard
-        onSelected_channel_changed: selectedChannelThrottle.restart()
-    }
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
@@ -159,18 +150,24 @@ Zynthian.Popup {
     onOpened: {
         zynqtgui.recordingPopupActive = true
 
-        // Set selectedChannel if not already set
-        if (root.selectedChannel == null) {
-            selectedChannelThrottle.restart()
+        if (zynqtgui.sketchpad.isRecording === false) {
+            // If we're not already recording, take a snapshot of our current state, so we can keep that stable when changing settings
+            root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+            root.selectedSlotRow = root.selectedChannel.selectedSlotRow;
+            // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
+            _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
+            _private.updateSoloState();
         }
-
-        // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
-        _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
-        _private.updateSoloState();
     }
     onClosed: {
-        if (zynqtgui.sketchpad.song.playChannelSolo !== _private.soloChannelOnOpen) {
-            zynqtgui.sketchpad.song.playChannelSolo = _private.soloChannelOnOpen;
+        if (zynqtgui.sketchpad.isRecording === false) {
+            // Restore the previous solo state from before recording activities began
+            if (zynqtgui.sketchpad.song.playChannelSolo !== _private.soloChannelOnOpen) {
+                zynqtgui.sketchpad.song.playChannelSolo = _private.soloChannelOnOpen;
+            }
+            // Restore the current track state to also match the previous state
+            zynqtgui.session_dashboard.selectedChannel = root.selectedChannel.id;
+            root.selectedChannel.selectedSlotRow = root.selectedSlotRow;
         }
         zynqtgui.recordingPopupActive = false
     }
@@ -186,7 +183,7 @@ Zynthian.Popup {
             QtObject {
                 id: _private
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
-                property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(root.selectedChannel.id) : null
+                property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelByPart(root.selectedSlotRow).getClip(root.selectedChannel.id) : null
                 property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
                 property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
                 property bool midiSoloTrack: false
@@ -459,7 +456,7 @@ Zynthian.Popup {
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.minimumHeight: Layout.preferredHeight
                                     checked: false // which thing
-                                    text: root.selectedChannel ? qsTr("No Playback").arg(root.selectedChannel.name) : ""
+                                    text: qsTr("No Playback")
                                     onClicked: {
                                         // magic stuff what?!
                                     }

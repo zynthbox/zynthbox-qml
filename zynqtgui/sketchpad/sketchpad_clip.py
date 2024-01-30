@@ -787,7 +787,8 @@ class sketchpad_clip(QObject):
     @Slot(None)
     def stop(self):
         # logging.info(f"Setting Clip to Stop at the top of the next bar {self}")
-        Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState)
+        if self.channel is not None:
+            Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState)
         if self.isPlaying:
             self.reset_beat_count()
 

@@ -34,8 +34,10 @@ QQC2.Button {
 
     property var model
     property string textRole: ""
+    property string textPrefix: ""
     property int currentIndex: -1
     property QtObject currentItem: null
+    property string currentText: ""
     property var comboBoxPopup: popupComponent.createObject(applicationWindow(), {"model": root.model})
 
     signal activated(int index)
@@ -43,13 +45,12 @@ QQC2.Button {
     contentItem: QQC2.Label {
         horizontalAlignment: QQC2.Label.AlignLeft
         verticalAlignment: QQC2.Label.AlignVCenter
-        text: root.model.get(root.currentIndex) && root.model.get(root.currentIndex)[root.textRole]
-                ? root.model.get(root.currentIndex)[root.textRole]
-                : ""
+        text: root.currentText
         color: Kirigami.Theme.textColor
     }
     onCurrentIndexChanged: {
         root.currentItem = comboBoxPopup.popupRepeater.itemAt(root.currentIndex)
+        root.currentText = root.currentItem.label
     }
     onClicked: {
         comboBoxPopup.open()
@@ -92,7 +93,7 @@ QQC2.Button {
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                             reserveSpaceForIcon: false
                             highlighted: root.currentIndex === index
-                            label: model[root.textRole]
+                            label: "%1%2".arg(root.textPrefix).arg(model[root.textRole])
                             onClicked: {
                                 root.currentIndex = index
                                 root.activated(index)

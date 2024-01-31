@@ -469,21 +469,12 @@ Zynthian.Popup {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.alignment: Qt.AlignCenter
-                                    model: ListModel {
-                                        id: channelComboModel
-                                        Component.onCompleted: {
-                                            for (var channelId = 0; channelId <= 9; channelId++) {
-                                                channelComboModel.append({
-                                                    text: qsTr("Track %1").arg(zynqtgui.sketchpad.song.channelsModel.getChannel(channelId).name),
-                                                    value: channelId
-                                                })
-                                            }
-                                        }
-                                    }
-                                    textRole: "text"
+                                    model: zynqtgui.sketchpad.song.channelsModel
+                                    textRole: "name"
+                                    textPrefix: "Track "
                                     currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
                                     onActivated: {
-                                        zynqtgui.session_dashboard.selectedChannel = channelComboModel.get(index).value
+                                        zynqtgui.session_dashboard.selectedChannel = index
                                     }
                                 }
                             }
@@ -507,7 +498,7 @@ Zynthian.Popup {
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     Layout.minimumHeight: Layout.preferredHeight
                                     checked: zynqtgui.sketchpad.recordSolo === true
-                                    text: qsTr("Solo %1").arg(channelComboModel.get(channelCombo.currentIndex).text)
+                                    text: qsTr("Solo %1").arg(channelCombo.currentText)
                                     onClicked: {
                                         zynqtgui.sketchpad.recordSolo = true;
                                     }

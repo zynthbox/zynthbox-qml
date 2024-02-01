@@ -129,7 +129,7 @@ Zynthian.Popup {
             zynqtgui.sketchpad.recordingSource = "external"
             zynqtgui.sketchpad.recordingChannel = "*"
         } else {
-            zynqtgui.sketchpad.recordingSource = "internal"
+            zynqtgui.sketchpad.recordingSource = "internal-track"
         }
 
         // Reset source combo model to selected value when channel changes
@@ -409,19 +409,9 @@ Zynthian.Popup {
                                         ListElement { text: "Internal (Master Output)"; value: "internal-master" }
                                         ListElement { text: "External (Audio In)"; value: "external" }
                                     }
-                                    currentIndex: 0
                                     textRole: "text"
                                     onActivated: {
-                                        if (sourceComboModel.get(index).value === "internal-track") {
-                                            zynqtgui.sketchpad.recordingSource = "internal"
-                                            zynqtgui.sketchpad.recordMasterOutput = false
-                                        } else if (sourceComboModel.get(index).value === "internal-master") {
-                                            zynqtgui.sketchpad.recordingSource = "internal"
-                                            zynqtgui.sketchpad.recordMasterOutput = true
-                                        } else if (sourceComboModel.get(index).value === "external") {
-                                            zynqtgui.sketchpad.recordingSource = "external"
-                                            zynqtgui.sketchpad.recordMasterOutput = false
-                                        }
+                                        zynqtgui.sketchpad.recordingSource = sourceComboModel.get(index).value
                                     }
                                 }
                             }

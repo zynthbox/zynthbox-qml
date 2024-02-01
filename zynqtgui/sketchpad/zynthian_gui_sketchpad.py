@@ -142,7 +142,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__global_fx_knob_value__ = 50
         self.clips_to_record = []
         self.__display_scene_buttons = False
-        self.__recording_source = "internal"
+        self.__recording_source = "internal-track"
         self.__recording_channel = "*"
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
@@ -258,19 +258,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     countInBars = Property(int, get_countInBars, set_countInBars, notify=countInBarsChanged)
     ### END Property countInBars
-
-    ### Property recordMasterOutput
-    def get_recordMasterOutput(self):
-        return self.__record_master_output__
-
-    def set_recordMasterOutput(self, value):
-        self.__record_master_output__ = value
-        self.recordMasterOutputChanged.emit()
-
-    recordMasterOutputChanged = Signal()
-
-    recordMasterOutput = Property(bool, get_recordMasterOutput, set_recordMasterOutput, notify=recordMasterOutputChanged)
-    ### END Property recordMasterOutput
 
     ### Property recordSolo
     def get_recordSolo(self):
@@ -911,7 +898,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         else:
             (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
-        if self.recordingSource == 'internal':
+        if self.recordingSource.startswith('internal'):
             # If source is internal and there are no layers, show error and return.
             if layers_snapshot is None:
                 self.zynqtgui.passiveNotification = "Cannot record channel with no synth"
@@ -944,13 +931,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.ongoingCountIn = self.countInBars + 1
 
         if self.recordingType == "audio":
-            if self.recordingSource == 'internal':
+            if self.recordingSource.startswith('internal'):
                 self.__last_recording_type__ = "Internal"
 
-                if self.recordMasterOutput:
+                if self.recordingSource == "internal-master":
                     recording_ports = [("GlobalPlayback:dryOutLeft", "GlobalPlayback:dryOutRight")]
-                else:
+                elif  self.recordingSource == "internal-track":
                     recording_ports = channel.channelSynthPorts
+                else:
+                    self.zynqtgui.passiveNotification = "Invalid recording source"
+                    return
             else:
                 # TODO : Port external recording to AudioLevels recorder
 

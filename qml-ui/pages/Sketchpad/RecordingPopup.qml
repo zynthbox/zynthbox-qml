@@ -86,7 +86,9 @@ Zynthian.Popup {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                root.close();
+                if (!zynqtgui.sketchpad.isRecording) {
+                    root.close();
+                }
                 returnValue = true;
                 break;
             case "START_RECORD":
@@ -890,6 +892,7 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             text: qsTr("Close")
+            enabled: !zynqtgui.sketchpad.isRecording
             onClicked: {
                 root.close()
             }

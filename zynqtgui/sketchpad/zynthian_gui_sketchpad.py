@@ -1039,12 +1039,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if (currentChannel.channelAudioType == "sample-trig" or currentChannel.channelAudioType == "sample-slice"):
                 self.clip_to_record.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 
+            self.clip_to_record.enabled = True
 
             # Set same recorded clip to other additional clips
             for clip in self.clips_to_record:
                 # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
                 # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
                 if clip != self.clip_to_record:
+                    clip.enabled = True
                     clip.set_path(self.clip_to_record_path, True)
                     if layer is not None:
                         clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])

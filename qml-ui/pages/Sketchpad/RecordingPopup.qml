@@ -146,6 +146,9 @@ Zynthian.Popup {
                 break
             }
         }
+
+        // Update selected track dropdown
+        channelCombo.currentIndex = root.selectedChannel.id
     }
     onOpened: {
         zynqtgui.recordingPopupActive = true
@@ -462,7 +465,7 @@ Zynthian.Popup {
                                     model: zynqtgui.sketchpad.song.channelsModel
                                     textRole: "name"
                                     textPrefix: "Track "
-                                    currentIndex: visible ? zynqtgui.session_dashboard.selectedChannel : -1
+                                    currentIndex: -1 // Current index will be set by selectedChannelChanged handler
                                     onActivated: {
                                         zynqtgui.session_dashboard.selectedChannel = index
                                     }

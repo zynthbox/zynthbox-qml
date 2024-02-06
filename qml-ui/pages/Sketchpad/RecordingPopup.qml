@@ -179,6 +179,7 @@ Zynthian.Popup {
     contentItem: ColumnLayout {
         anchors.fill: parent
         spacing: root.spacing
+        enabled: zynqtgui.sketchpad.isRecording === false
 
         Kirigami.Heading {
             Layout.fillWidth: true
@@ -222,7 +223,6 @@ Zynthian.Popup {
             Layout.fillHeight: true
 
             ColumnLayout {
-                enabled: zynqtgui.sketchpad.isRecording === false
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.leftMargin: root.spacing
@@ -892,7 +892,6 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             text: qsTr("Close")
-            enabled: !zynqtgui.sketchpad.isRecording
             onClicked: {
                 root.close()
             }

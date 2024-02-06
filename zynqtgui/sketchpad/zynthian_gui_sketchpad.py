@@ -971,17 +971,25 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def stopRecording(self):
         if self.clip_to_record is not None and self.isRecording:
             if Zynthbox.AudioLevels.instance().isRecording() == False and Zynthbox.MidiRecorder.instance().isRecording() == False:
-                self.isRecording = False
-                Zynthbox.AudioLevels.instance().clearRecordPorts()
-                self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentMidiChannel()))
-                self.load_recorded_file_to_clip()
+                def task():
+                    Zynthbox.AudioLevels.instance().clearRecordPorts()
+                    self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentMidiChannel()))
+                    self.load_recorded_file_to_clip()
 
-                self.set_clip_to_record(None)
-                self.clip_to_record_path = None
-                self.__last_recording_type__ = ""
+                    self.set_clip_to_record(None)
+                    self.clip_to_record_path = None
+                    self.__last_recording_type__ = ""
 
-                self.clips_to_record.clear()
-                self.clipsToRecordChanged.emit()
+                    self.clips_to_record.clear()
+                    self.clipsToRecordChanged.emit()
+                    self.isRecording = False
+                    self.longOperationDecrement()
+                    self.zynqtgui.currentTaskMessage = ""
+                    QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+
+                self.zynqtgui.currentTaskMessage = "Processing recording"
+                self.longOperationIncrement()
+                self.zynqtgui.do_long_task(task)
             else:
                 logging.debug("Recording not yet stopped. Retrying in a bit.")
                 self.__stopRecordingRetrier__.start()
@@ -1028,7 +1036,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except:
                 layer = None
 
+            self.zynqtgui.currentTaskMessage = "Loading recording to clip"
             self.clip_to_record.set_path(self.clip_to_record_path, False)
+
+            self.zynqtgui.currentTaskMessage = "Storing metadata into clip"
             if layer is not None:
                 self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
             self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])

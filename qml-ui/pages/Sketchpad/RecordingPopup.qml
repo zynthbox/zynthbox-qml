@@ -60,29 +60,46 @@ Zynthian.Popup {
             case "MODE_SWITCH_LONG":
             case "KNOB0_TOUCHED":
             case "KNOB0_RELEASED":
-            case "KNOB1_UP":
-            case "KNOB1_DOWN":
             case "KNOB1_TOUCHED":
             case "KNOB1_RELEASED":
-            case "KNOB2_UP":
-            case "KNOB2_DOWN":
             case "KNOB2_TOUCHED":
             case "KNOB2_RELEASED":
-            case "KNOB3_UP":
-            case "KNOB3_DOWN":
             case "KNOB3_TOUCHED":
             case "KNOB3_RELEASED":
                 returnValue = true;
                 break
             case "KNOB0_UP":
-                Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm + 1;
+                zynqtgui.sketchpad.metronomeEnabled = true
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
+                zynqtgui.sketchpad.metronomeEnabled = false
+                returnValue = true;
+                break;                
+            case "KNOB1_UP":
+                countIn.value = Zynthian.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                countIn.value = Zynthian.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
+                returnValue = true;
+                break;
+            case "KNOB3_UP":
+                Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm + 1;
+                returnValue = true;
+                break;
+            case "KNOB3_DOWN":
                 Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm - 1;
                 returnValue = true;
                 break;
-
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
@@ -237,23 +254,35 @@ Zynthian.Popup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: ColumnLayout {
-                            QQC2.Switch {
-                                Layout.fillHeight: true
-                                Layout.alignment: Qt.AlignCenter
-                                // Explicitly set indicator implicitWidth otherwise the switch size is too small
-                                indicator.implicitWidth: Kirigami.Units.gridUnit * 3
-                                checked: zynqtgui.sketchpad.metronomeEnabled
-                                onToggled: {
-                                    zynqtgui.sketchpad.metronomeEnabled = checked
+                        contentItem: Item {
+                            Zynthian.KnobIndicator {
+                                anchors {
+                                    right: parent.right
+                                    bottom: parent.bottom
                                 }
+                                height: Kirigami.Units.gridUnit * 1.3
+                                width: height
+                                knobId: 0
                             }
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignBottom
-                                wrapMode: QQC2.Label.WordWrap
-                                horizontalAlignment: QQC2.Label.AlignHCenter
-                                text: "Metronome"
+                            ColumnLayout {
+                                anchors.fill: parent
+                                QQC2.Switch {
+                                    Layout.fillHeight: true
+                                    Layout.alignment: Qt.AlignCenter
+                                    // Explicitly set indicator implicitWidth otherwise the switch size is too small
+                                    indicator.implicitWidth: Kirigami.Units.gridUnit * 3
+                                    checked: zynqtgui.sketchpad.metronomeEnabled
+                                    onToggled: {
+                                        zynqtgui.sketchpad.metronomeEnabled = checked
+                                    }
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignBottom
+                                    wrapMode: QQC2.Label.WordWrap
+                                    horizontalAlignment: QQC2.Label.AlignHCenter
+                                    text: "Metronome"
+                                }
                             }
                         }
                     }
@@ -261,65 +290,117 @@ Zynthian.Popup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: ColumnLayout {
+                        contentItem: Item {
+                            Zynthian.KnobIndicator {
+                                anchors {
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
+                                height: Kirigami.Units.gridUnit * 1.3
+                                width: height
+                                knobId: 1
+                            }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                RowLayout {
+                                    id: countIn
+                                    property int from: 0
+                                    property int to: 4
+                                    property int value: zynqtgui.sketchpad.countInBars
+
+                                    Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignCenter
+                                    onValueChanged: {
+                                        if (zynqtgui.sketchpad.countInBars != countIn.value) {
+                                            zynqtgui.sketchpad.countInBars = countIn.value;
+                                        }
+                                    }
+
+                                    QQC2.Button {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                        Layout.preferredHeight: width
+                                        icon.name: "list-remove-symbolic"
+                                        enabled: countIn.value > countIn.from
+                                        onClicked: {
+                                            countIn.value = Zynthian.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
+                                        }
+                                    }
+                                    Rectangle {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                        Kirigami.Theme.inherit: false
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                        color: Kirigami.Theme.backgroundColor
+                                        border.color: "#ff999999"
+                                        border.width: 1
+                                        radius: 4
+
+                                        QQC2.Label {
+                                            anchors.centerIn: parent
+                                            text: countIn.value == 0
+                                                ? qsTr("Off")
+                                                : countIn.value == 1
+                                                    ? qsTr("1 bar")
+                                                    : qsTr("%1 Bars").arg(countIn.value)
+                                        }
+                                    }
+                                    QQC2.Button {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                        Layout.preferredHeight: width
+                                        icon.name: "list-add-symbolic"
+                                        enabled: countIn.value < countIn.to
+                                        onClicked: {
+                                            countIn.value = Zynthian.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
+                                        }
+                                    }
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignBottom
+                                    wrapMode: QQC2.Label.WordWrap
+                                    horizontalAlignment: QQC2.Label.AlignHCenter
+                                    text: "Count In (Bars)"
+                                }
+                            }
+                        }
+                    }
+                    Zynthian.Card {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                        contentItem: Item {
+                            Zynthian.KnobIndicator {
+                                anchors {
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
+                                height: Kirigami.Units.gridUnit * 1.3
+                                width: height
+                                knobId: 2
+                            }
                             RowLayout {
-                                id: countIn
-                                property int from: 0
-                                property int to: 4
-                                property int value: zynqtgui.sketchpad.countInBars
-
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignCenter
-                                onValueChanged: {
-                                    if (zynqtgui.sketchpad.countInBars != countIn.value) {
-                                        zynqtgui.sketchpad.countInBars = countIn.value;
+                                anchors.fill: parent
+                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                                QQC2.Label {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: true
+                                    horizontalAlignment: Text.AlignRight
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: qsTr("Master\nVolume")
+                                }
+                                Zynthian.SketchpadDial {
+                                    Layout.fillHeight: true
+                                    controlObj: zynqtgui
+                                    controlProperty: "masterVolume"
+                                    valueString: qsTr("%1%").arg(dial.value)
+                                    fineTuneButtonsVisible: false
+                                    dial {
+                                        stepSize: 1
+                                        from: 0
+                                        to: 100
                                     }
                                 }
-
-                                QQC2.Button {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Layout.preferredHeight: width
-                                    icon.name: "list-remove-symbolic"
-                                    enabled: countIn.value > countIn.from
-                                    onClicked: {
-                                        countIn.value = Zynthian.CommonUtils.clamp(countIn.value-1, countIn.from, countIn.to)
-                                    }
-                                }
-                                Rectangle {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    Kirigami.Theme.inherit: false
-                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                    color: Kirigami.Theme.backgroundColor
-                                    border.color: "#ff999999"
-                                    border.width: 1
-                                    radius: 4
-
-                                    QQC2.Label {
-                                        anchors.centerIn: parent
-                                        text: countIn.value == 0
-                                            ? qsTr("Off")
-                                            : countIn.value == 1
-                                                ? qsTr("1 bar")
-                                                : qsTr("%1 Bars").arg(countIn.value)
-                                    }
-                                }
-                                QQC2.Button {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                                    Layout.preferredHeight: width
-                                    icon.name: "list-add-symbolic"
-                                    enabled: countIn.value < countIn.to
-                                    onClicked: {
-                                        countIn.value = Zynthian.CommonUtils.clamp(countIn.value+1, countIn.from, countIn.to)
-                                    }
-                                }
-                            }
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignBottom
-                                wrapMode: QQC2.Label.WordWrap
-                                horizontalAlignment: QQC2.Label.AlignHCenter
-                                text: "Count In (Bars)"
+                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
                             }
                         }
                     }
@@ -327,26 +408,38 @@ Zynthian.Popup {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        contentItem: RowLayout {
-                            Item { Layout.fillHeight: true; Layout.fillWidth: true; }
-                            QQC2.Label {
-                                Layout.fillHeight: true
-                                Layout.fillWidth: true
-                                horizontalAlignment: Text.AlignRight
-                                text: qsTr("BPM:")
-                            }
-                            Zynthian.SketchpadDial {
-                                Layout.fillHeight: true
-                                controlObj: Zynthbox.SyncTimer
-                                controlProperty: "bpm"
-                                fineTuneButtonsVisible: false
-                                dial {
-                                    stepSize: 1
-                                    from: 50
-                                    to: 200
+                        contentItem: Item {
+                            Zynthian.KnobIndicator {
+                                anchors {
+                                    right: parent.right
+                                    bottom: parent.bottom
                                 }
+                                height: Kirigami.Units.gridUnit * 1.3
+                                width: height
+                                knobId: 3
                             }
-                            Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                            RowLayout {
+                                anchors.fill: parent
+                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                                QQC2.Label {
+                                    Layout.fillHeight: true
+                                    Layout.fillWidth: true
+                                    horizontalAlignment: Text.AlignRight
+                                    text: qsTr("BPM")
+                                }
+                                Zynthian.SketchpadDial {
+                                    Layout.fillHeight: true
+                                    controlObj: Zynthbox.SyncTimer
+                                    controlProperty: "bpm"
+                                    fineTuneButtonsVisible: false
+                                    dial {
+                                        stepSize: 1
+                                        from: 50
+                                        to: 200
+                                    }
+                                }
+                                Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                            }
                         }
                     }
                 }

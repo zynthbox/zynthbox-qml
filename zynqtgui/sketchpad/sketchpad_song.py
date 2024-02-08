@@ -201,7 +201,7 @@ class sketchpad_song(QObject):
                     f.flush()
                     os.fsync(f.fileno())
             except Exception as e:
-                logging.error(e)
+                logging.exception(e)
 
             # Save snapshot with sketchpad if not temp
             if not self.isTemp:
@@ -261,7 +261,7 @@ class sketchpad_song(QObject):
                         f.flush()
                         os.fsync(f.fileno())
             except Exception as e:
-                logging.error(e)
+                logging.exception(e)
 
     @Slot(None)
     def schedule_save(self):

@@ -173,6 +173,13 @@ Zynthian.Popup {
         zynqtgui.recordingPopupActive = true
 
         if (zynqtgui.sketchpad.isRecording === false) {
+            if (zynqtgui.current_screen_id === "playgrid" && applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.isSequencer) {
+                // If we're on the playgrid, and the current module is a sequencer, show the midi recorder
+                zynqtgui.sketchpad.recordingType = "midi";
+            } else {
+                // Otherwise assume the audio recorder's what's wanted
+                zynqtgui.sketchpad.recordingType = "audio";
+            }
             // If we're not already recording, take a snapshot of our current state, so we can keep that stable when changing settings
             root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
             root.selectedSlotRow = root.selectedChannel.selectedSlotRow;

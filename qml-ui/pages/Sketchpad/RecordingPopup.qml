@@ -846,8 +846,16 @@ Zynthian.Popup {
                         Zynthbox.WaveFormItem {
                             anchors.fill: parent
                             color: Kirigami.Theme.textColor
-                            visible: recordingTypeSettingsStack.currentIndex === 0
-                            source: "audioLevelsChannel:/ports"
+                            visible: recordingTypeSettingsStack.currentIndex === 0 && source !== ""
+                            source: {
+                                if (zynqtgui.sketchpad.isRecording) {
+                                    return "audioLevelsChannel:/ports"
+                                } else if (_private.selectedClip.path != null && _private.selectedClip.path.length > 0) {
+                                    return _private.selectedClip.path
+                                } else {
+                                    return ""
+                                }
+                            }
                         }
                         Image {
                             id: patternVisualiser
@@ -953,12 +961,14 @@ Zynthian.Popup {
                         icon.color: "#ffffffff"
                         onClicked: {
                             switch(recordingTypeSettingsStack.currentIndex) {
+                                case 0: // Audio Recording
+                                    confirmClearClipDialog.open()
+                                    break;
                                 case 1: // MIDI Recording
                                     if (_private.selectedPattern.hasNotes) {
                                         applicationWindow().confirmClearPattern(root.selectedChannel, _private.selectedPattern);
                                     }
                                     break;
-                                case 0: // Audio Recording
                                 default:
                                     // Audio Recording has three options:
                                     // - Clear slot and delete recording
@@ -988,6 +998,16 @@ Zynthian.Popup {
             onClicked: {
                 root.close()
             }
+        }
+    }
+    Zynthian.DialogQuestion {
+        id: confirmClearClipDialog
+        parent: applicationWindow()
+        text: qsTr("Are you sure you want to clear %1 from clip %2").arg(_private.selectedClip.path.split("/").pop()).arg(_private.selectedClip.name)
+        acceptText: qsTr("Clear Clip")
+        rejectText: qsTr("Don't Clear")
+        onAccepted: {
+            _private.selectedClip.clear()
         }
     }
 }

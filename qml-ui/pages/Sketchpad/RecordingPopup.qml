@@ -106,16 +106,24 @@ Zynthian.Popup {
                 root.close();
                 returnValue = true;
                 break;
+            case "ZL_STOP":
+                if (zynqtgui.sketchpad.recordingType === "midi" && _private.selectedPattern.recordLive) {
+                    _private.selectedPattern.recordLive = false;
+                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                    zynqtgui.sketchpad.isRecording = false;
+                    returnValue = true;
+                }
+                break;
             case "START_RECORD":
                 if (zynqtgui.sketchpad.recordingType === "midi") {
                     // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
                     if (_private.selectedPattern.recordLive) {
-                        _private.selectedPattern.liveRecordingSource = midiSourceCombo.model.get(midiSourceCombo.currentIndex).value;
                         _private.selectedPattern.recordLive = false;
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         zynqtgui.sketchpad.isRecording = false;
                     } else {
                         zynqtgui.sketchpad.isRecording = true;
+                        _private.selectedPattern.liveRecordingSource = midiSourceCombo.model.get(midiSourceCombo.currentIndex).value;
                         _private.selectedPattern.recordLive = true;
                         if (countIn.value > 0) {
                             Zynthbox.SyncTimer.startWithCountin(countIn.value);
@@ -865,7 +873,7 @@ Zynthian.Popup {
                         Image {
                             id: patternVisualiser
 
-                            visible: recordingTypeSettingsStack.currentIndex === 1
+                            visible: _private.selectedPattern !== null && recordingTypeSettingsStack.currentIndex === 1
 
                             anchors {
                                 fill: parent
@@ -886,7 +894,7 @@ Zynthian.Popup {
                                 color: Kirigami.Theme.highlightColor
                                 width: widthFactor // this way the progress rect is the same width as a step
                                 property double widthFactor: visible && _private.selectedPattern ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
-                                x: visible && _private.selectedPattern ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
+                                x: visible ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
                             }
                             QQC2.Label {
                                 anchors {

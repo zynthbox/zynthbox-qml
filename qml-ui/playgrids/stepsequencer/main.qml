@@ -102,20 +102,6 @@ Zynthian.BasePlayGrid {
             var channelDelta = zynqtgui.channelsModActive ? 5 : 0
 
             switch (cuia) {
-                case "START_RECORD":
-                    if (_private.activePatternModel.recordLive) {
-                        _private.activePatternModel.recordLive = false;
-                        if (Zynthbox.SyncTimer.timerRunning) {
-                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                        }
-                    } else {
-                        _private.activePatternModel.recordLive = true;
-                        if (Zynthbox.SyncTimer.timerRunning === false) {
-                            Zynthian.CommonUtils.startMetronomeAndPlayback();
-                        }
-                    }
-                    returnValue = true;
-                    break;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
                 case "SWITCH_BACK_LONG":

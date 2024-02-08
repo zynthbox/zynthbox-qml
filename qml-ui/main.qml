@@ -939,20 +939,16 @@ Kirigami.AbstractApplicationWindow {
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
             property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
             onClicked: {
-                if (zynqtgui.current_screen_id === "playgrid") {
-                    zynqtgui.callable_ui_action("START_RECORD");
-                } else {
-                    // handle live-recording-is-going state here, otherwise you might turn it
-                    // on in the sequencer, then head out, and try and turn it off and it just
-                    // opens the recording popup, which isn't what you'd be after
-                    if (globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive) {
-                        globalRecordButton.currentSequence.activePatternObject.recordLive = false;
-                        if (Zynthbox.PlayGridManager.metronomeActive) {
-                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                        }
-                    } else {
-                        applicationWindow().openRecordingPopup();
+                // handle live-recording-is-going state here, otherwise you might turn it
+                // on in the sequencer, then head out, and try and turn it off and it just
+                // opens the recording popup, which isn't what you'd be after
+                if (globalRecordButton.currentSequence.activePatternObject && globalRecordButton.currentSequence.activePatternObject.recordLive) {
+                    globalRecordButton.currentSequence.activePatternObject.recordLive = false;
+                    if (Zynthbox.PlayGridManager.metronomeActive) {
+                        Zynthian.CommonUtils.stopMetronomeAndPlayback();
                     }
+                } else {
+                    applicationWindow().openRecordingPopup();
                 }
             }
 

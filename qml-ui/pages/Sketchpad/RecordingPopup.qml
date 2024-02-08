@@ -103,9 +103,7 @@ Zynthian.Popup {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                if (!zynqtgui.sketchpad.isRecording) {
-                    root.close();
-                }
+                root.close();
                 returnValue = true;
                 break;
             case "START_RECORD":
@@ -203,7 +201,6 @@ Zynthian.Popup {
     contentItem: ColumnLayout {
         anchors.fill: parent
         spacing: root.spacing
-        enabled: zynqtgui.sketchpad.isRecording === false
 
         Kirigami.Heading {
             Layout.fillWidth: true
@@ -250,6 +247,7 @@ Zynthian.Popup {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.leftMargin: root.spacing
+                enabled: zynqtgui.sketchpad.isRecording === false
 
                 RowLayout { // Common Settings Section
                     Layout.fillWidth: true

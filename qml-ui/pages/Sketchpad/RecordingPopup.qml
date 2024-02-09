@@ -859,7 +859,7 @@ Zynthian.Popup {
                         Zynthbox.WaveFormItem {
                             anchors.fill: parent
                             color: Kirigami.Theme.textColor
-                            visible: recordingTypeSettingsStack.currentIndex === 0 && source !== ""
+                            visible: recordingTypeSettingsStack.currentIndex === 0
                             source: {
                                 if (zynqtgui.sketchpad.isRecording) {
                                     return "audioLevelsChannel:/ports"

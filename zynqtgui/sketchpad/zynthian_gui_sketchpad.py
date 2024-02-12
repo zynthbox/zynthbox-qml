@@ -885,6 +885,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         return generated_path
 
     def queue_clip_record(self, clip, do_countin = True):
+        """
+        This method will return True if the clip was successfully queued and False when there was any error while queueing
+        """
+
         # When sketchpad is open, curLayer is not updated when changing channels as it is a considerably heavy task
         # but not necessary to change to selected channel's synth.
         # Hence make sure to update curLayer before doing operations depending upon curLayer
@@ -900,9 +904,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         if self.recordingSource.startswith('internal'):
             # If source is internal and there are no layers, show error and return.
-            if layers_snapshot is None:
-                self.zynqtgui.passiveNotification = "Cannot record channel with no synth"
-                return
+            if layers_snapshot is None or "layers" not in layers_snapshot or len(layers_snapshot["layers"]) <= 0:
+                self.zynqtgui.showMessageDialog.emit("Cannot record audio with no synths", 3000)
+                return False
 
             try:
                 preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
@@ -939,8 +943,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 elif  self.recordingSource == "internal-track":
                     recording_ports = channel.channelSynthPorts
                 else:
-                    self.zynqtgui.passiveNotification = "Invalid recording source"
-                    return
+                    self.zynqtgui.showMessageDialog.emit("Invalid recording source", 3000)
+                    return False
             else:
                 # TODO : Port external recording to AudioLevels recorder
 
@@ -966,6 +970,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     Zynthbox.AudioLevels.instance().addRecordPort(port[0], port[1])
 
         self.isRecording = True
+        return True
 
     @Slot(None)
     def stopRecording(self):

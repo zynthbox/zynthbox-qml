@@ -2034,8 +2034,10 @@ class zynthian_gui(QObject):
                         zl.clipsToRecord = [self.__clipToRecord, self.__channelToRecord.samples[self.__channelRecordingRow]]
 
                     logging.info(f"Recording Clip : {self.__clipToRecord}")
-                    self.__clipToRecord.queueRecording()
-                    self.run_start_metronome_and_playback.emit()
+                    if self.__clipToRecord.queueRecording():
+                        self.run_start_metronome_and_playback.emit()
+                    else:
+                        logging.error("Error while trying to queue clip to record")
             else:
                 if zl.isRecording == False:
                     self.__channelToRecord = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)

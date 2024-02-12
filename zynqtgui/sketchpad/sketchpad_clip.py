@@ -814,7 +814,7 @@ class sketchpad_clip(QObject):
 
     @Slot(bool)
     def queueRecording(self, do_countin=True):
-        self.__song__.get_metronome_manager().queue_clip_record(self, do_countin)
+        return self.__song__.get_metronome_manager().queue_clip_record(self, do_countin)
 
     @Slot(None)
     def stopRecording(self):

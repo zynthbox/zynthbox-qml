@@ -557,7 +557,7 @@ Zynthian.Popup {
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
-                                visible: sourceComboModel.get(sourceCombo.currentIndex).value === "internal-track"
+                                visible: sourceCombo.currentIndex >= 0 && sourceComboModel.get(sourceCombo.currentIndex).value === "internal-track"
                                 QQC2.Label {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 9
                                     Layout.alignment: Qt.AlignCenter
@@ -863,7 +863,7 @@ Zynthian.Popup {
                             source: {
                                 if (zynqtgui.sketchpad.isRecording) {
                                     return "audioLevelsChannel:/ports"
-                                } else if (_private.selectedClip.path != null && _private.selectedClip.path.length > 0) {
+                                } else if (_private.selectedClip != null && _private.selectedClip.path != null && _private.selectedClip.path.length > 0) {
                                     return _private.selectedClip.path
                                 } else {
                                     return ""
@@ -1016,7 +1016,7 @@ Zynthian.Popup {
     Zynthian.DialogQuestion {
         id: confirmClearClipDialog
         parent: applicationWindow()
-        text: qsTr("Are you sure you want to clear %1 from clip %2").arg(_private.selectedClip.path.split("/").pop()).arg(_private.selectedClip.name)
+        text: _private.selectedClip != null ? qsTr("Are you sure you want to clear %1 from clip %2").arg(_private.selectedClip.path.split("/").pop()).arg(_private.selectedClip.name) : ""
         acceptText: qsTr("Clear Clip")
         rejectText: qsTr("Don't Clear")
         onAccepted: {

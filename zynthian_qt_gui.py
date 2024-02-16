@@ -665,6 +665,21 @@ class zynthian_gui(QObject):
 
         # Initialise Zynthbox plugin (which requires things found in zyncoder, specifically the zynthian midi router)
         Zynthbox.Plugin.instance().initialize()
+        # Hook up message passing
+        Zynthbox.MidiRouter.instance().midiMessage.connect(self.handleMidiMessage)
+
+    @Slot(int, int, int, int, int, int, bool)
+    def handleMidiMessage(self, port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal):
+        # logging.error(f"Port {port} event size {size} on track {sketchpadTrack} from internal: {fromInternal} - {byte1} {byte2} {byte3}")
+        if port == Zynthbox.MidiRouter.ListenerPort.HardwareInPassthroughPort:
+            if 0xAF < byte1 and byte1 < 0xC0:
+                chan = (byte1 & 0xf)
+                # If MIDI learn pending ...
+                if self.midi_learn_zctrl:
+                    self.midi_learn_zctrl.cb_midi_learn(chan, byte2)
+                # Try layer's zctrls
+                else:
+                    self.screens["layer"].midi_control_change(chan, byte2, byte3)
 
     @Slot()
     def channelsModTimerHandler(self):
@@ -1523,7 +1538,7 @@ class zynthian_gui(QObject):
 
     def enter_midi_learn_mode(self):
         self.midi_learn_mode = True
-        self.midi_learn_zctrl = None
+        self.setMidiLearnZctrl(None)
         lib_zyncoder.set_midi_learning_mode(1)
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
@@ -1531,7 +1546,7 @@ class zynthian_gui(QObject):
 
     def exit_midi_learn_mode(self):
         self.midi_learn_mode = False
-        self.midi_learn_zctrl = None
+        self.setMidiLearnZctrl(None)
         lib_zyncoder.set_midi_learning_mode(0)
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
@@ -3235,30 +3250,36 @@ class zynthian_gui(QObject):
 
     def all_sounds_off(self):
         logging.info("All Sounds Off!")
-        for chan in range(10): # One for each track (not midi channel)
-            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0)
+        for track in range(10): # One for each track and midi channel
+            for chan in range(16):
+                Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0, track)
 
     def all_notes_off(self):
         logging.info("All Notes Off!")
-        for chan in range(10): # One for each track (not midi channel)
-            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
+        for track in range(10): # One for each track and midi channel
+            for chan in range(16):
+                Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
 
     def raw_all_notes_off(self):
         logging.info("Raw All Notes Off!")
-        for chan in range(10): # One for each track (not midi channel)
-            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
+        for track in range(10): # One for each track and midi channel
+            for chan in range(16):
+                Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
 
-    def all_sounds_off_chan(self, chan):
-        logging.info("All Sounds Off for channel {}!".format(chan))
-        Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0)
+    def all_sounds_off_chan(self, track):
+        logging.info("All Sounds Off for track {}!".format(track))
+        for chan in range(16):
+            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0, track)
 
-    def all_notes_off_chan(self, chan):
-        logging.info("All Notes Off for channel {}!".format(chan))
-        Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
+    def all_notes_off_chan(self, track):
+        logging.info("All Notes Off for track {}!".format(track))
+        for chan in range(16):
+            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
 
-    def raw_all_notes_off_chan(self, chan):
-        logging.info("Raw All Notes Off for channel {}!".format(chan))
-        Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0)
+    def raw_all_notes_off_chan(self, track):
+        logging.info("Raw All Notes Off for track {}!".format(track))
+        for chan in range(16):
+            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
 
     # ------------------------------------------------------------------
     # MPE initialization
@@ -3304,14 +3325,16 @@ class zynthian_gui(QObject):
     # MIDI learning
     # ------------------------------------------------------------------
 
+    @Slot(QObject)
     def init_midi_learn(self, zctrl):
-        self.midi_learn_zctrl = zctrl
+        self.setMidiLearnZctrl(zctrl)
         lib_zyncoder.set_midi_learning_mode(1)
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
 
+    @Slot(None)
     def end_midi_learn(self):
-        self.midi_learn_zctrl = None
+        self.setMidiLearnZctrl(None)
         lib_zyncoder.set_midi_learning_mode(0)
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
@@ -3319,6 +3342,15 @@ class zynthian_gui(QObject):
     def refresh_midi_learn(self):
         self.screens["control"].refresh_midi_bind()
         self.screens["control"].set_select_path()
+
+    def getMidiLearnZctrl(self):
+        return self.midi_learn_zctrl
+    def setMidiLearnZctrl(self, zctrl):
+        if self.midi_learn_zctrl != zctrl:
+            self.midi_learn_zctrl = zctrl
+            self.midiLearnZctrlChanged.emit()
+    midiLearnZctrlChanged = Signal()
+    midiLearnZctrl = Property(QObject,getMidiLearnZctrl, notify=midiLearnZctrlChanged)
 
     # ------------------------------------------------------------------
     # Autoconnect

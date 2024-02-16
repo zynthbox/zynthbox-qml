@@ -222,4 +222,56 @@ Zynthian.ScreenPage {
             objectName: "defaultPage"
         }
     }
+
+    function showControlActions(control) {
+        controlActions.control = control;
+        controlActions.open();
+    }
+    Zynthian.ActionPickerPopup {
+        id: controlActions
+        property QtObject control: null
+        property int oldLearnChannel: -1
+        property int oldLearnCC: -1
+
+        actions: [
+            Kirigami.Action {
+                text: controlActions.control !== null ? qsTr("Clear Midi Learn\nChannel %1 - CC %2").arg(controlActions.control.midiLearnChannel + 1).arg(controlActions.control.midiLearnCC) : ""
+                enabled: controlActions.control !== null && controlActions.control.midiLearnChannel > -1
+                onTriggered: {
+                    controlActions.control.midi_unlearn();
+                }
+            },
+            Kirigami.Action {
+                text: qsTr("Midi Learn...")
+                onTriggered: {
+                    controlActions.oldLearnChannel = controlActions.control.midiLearnChannel;
+                    controlActions.oldLearnCC = controlActions.control.midiLearnCC;
+                    controlActions.control.init_midi_learn(controlActions.control);
+                }
+            }
+        ]
+    }
+    Connections {
+        target: zynqtgui
+        onMidiLearnZctrlChanged: {
+            if (zynqtgui.midiLearnZctrl) {
+                midiLearner.open();
+            } else {
+                if (midiLearner.opened) {
+                    midiLearner.close();
+                }
+            }
+        }
+    }
+    Zynthian.DialogQuestion {
+        id: midiLearner
+        text: zynqtgui.midiLearnZctrl !== null ? qsTr("Learning %1\nWaiting for midi control change input...").arg(zynqtgui.midiLearnZctrl.shortName) : ""
+        acceptText: ""
+        rejectText: qsTr("Abort Midi Learn")
+        onRejected: {
+            let theControl = zynqtgui.midiLearnZctrl;
+            zynqtgui.end_midi_learn();
+            theControl.set_midi_learn(controlActions.oldLearnChannel, controlActions.oldLearnCC);
+        }
+    }
 }

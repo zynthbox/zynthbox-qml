@@ -98,4 +98,17 @@ Item {
             root.pressedChanged(pressed)
         }
     }
+    QQC2.ToolButton {
+        visible: root.controller !== null
+        anchors {
+            bottom: parent.bottom
+            left: parent.left
+        }
+        height: Kirigami.Units.iconSizes.medium
+        width: Kirigami.Units.iconSizes.medium
+        icon.name: "overflow-menu"
+        onClicked: {
+            applicationWindow().pageStack.getPage("control").showControlActions(root.controller.ctrl.zctrl);
+        }
+    }
 }

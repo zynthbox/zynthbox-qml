@@ -27,7 +27,7 @@ import liblo
 import ctypes
 import logging
 
-from PySide2.QtCore import QObject, Signal
+from PySide2.QtCore import QObject, Signal, Slot, Property
 # Zynthian specific modules
 from zyncoder import *
 import Zynthbox
@@ -39,10 +39,11 @@ class zynthian_controller(QObject):
 
         self.engine=engine
         self.symbol=symbol
+        self.__name=symbol
+        self.__short_name=symbol
         if name:
-            self.name=self.short_name=name
-        else:
-            self.name=self.short_name=symbol
+            self.__name=name
+            self.__short_name=name
 
         self.group_symbol = None
         self.group_name = None
@@ -196,6 +197,25 @@ class zynthian_controller(QObject):
         self._configure()
 
 
+    def getName(self):
+        return self.__name
+    def setName(self,name):
+        if self.__name != name:
+            self.__name = name
+            self.nameChanged.emit()
+    nameChanged = Signal()
+    name = Property(str, getName, setName, notify=nameChanged)
+
+    def getShortName(self):
+        return self.__short_name
+    def setShortName(self,short_name):
+        if self.__short_name != short_name:
+            self.__short_name = short_name
+            self.shortNameChanged.emit()
+    shortNameChanged = Signal()
+    # Property name doesn't match the functions, mostly because the property's used in a bunch of places
+    short_name = Property(str, getShortName, setShortName, notify=shortNameChanged)
+
     def get_path(self):
         if self.osc_path:
             return str(self.osc_path)
@@ -212,7 +232,7 @@ class zynthian_controller(QObject):
 
 
     def get_ctrl_array(self):
-        tit = self.short_name
+        tit = self.__short_name
         if self.midi_chan:
             chan = self.midi_chan
         else:
@@ -244,36 +264,49 @@ class zynthian_controller(QObject):
 
 
     def _set_value(self, val):
+        valueChanged = False
         if isinstance(val, str):
-            self.value = self.get_label2value(val)
-            return
+            newValue = self.get_label2value(val)
+            if self.value != newValue:
+                self.value = newValue
+                valueChanged = True
 
         elif self.is_toggle:
+            newValue = self.value
             if val==self.value_min or val==self.value_max:
-                self.value = val
+                newValue = val
             else:
                 if val<self.value_mid:
-                    self.value = self.value_min
+                    newValue = self.value_min
                 else:
-                    self.value = self.value_max
-            return
+                    newValue = self.value_max
+
+            if self.value != newValue:
+                self.value = newValue
+                valueChanged = True
 
         elif self.ticks:
             #TODO Do something here?
             pass
 
-        elif self.is_integer:
-            val = int(val)
-
-        if val>self.value_max:
-            self.value=self.value_max
-        elif val<self.value_min:
-            self.value=self.value_min
         else:
-            self.value=val
-        self.value_changed.emit(self)
+            newValue = val;
+            if self.is_integer:
+                newValue = int(val)
 
-    def set_value(self, val, force_sending=False):
+            if newValue>self.value_max:
+                newValue=self.value_max
+            elif newValue<self.value_min:
+                newValue=self.value_min
+
+            if self.value != newValue:
+                self.value=newValue
+                valueChanged = True
+
+        if valueChanged:
+            self.value_changed.emit(self)
+
+    def set_value(self, val, force_sending=False, update_controllers=True):
         self._set_value(val)
 
         if self.engine:
@@ -292,25 +325,26 @@ class zynthian_controller(QObject):
                             # logging.debug("Sending OSC controller '{}' value => {}".format(self.symbol, val))
 
                         elif self.midi_cc:
-                            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + self.midi_chan, self.midi_cc, mval)
+                            Zynthbox.SyncTimer.instance().sendCCMessageImmediately(self.midi_chan, self.midi_cc, mval, Zynthbox.SyncTimer.instance().masterSketchpadTrack())
                             # logging.debug("Sending MIDI controller '{}' value => {} ({})".format(self.symbol, val, mval))
 
                     except Exception as e:
-                        logging.warning("Can't send controller '{}' value: {} => {}".format(self.symbol, val, e))
+                        logging.error("Can't send controller '{}' value: {} => {}".format(self.symbol, val, e))
 
-            # Send feedback to MIDI controllers
-            try:
-                if self.midi_learn_cc:
-                    Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + self.midi_learn_chan, self.midi_learn_cc, mval)
-                    # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_learn_chan,self.midi_learn_cc,mval)
-                    #logging.debug("Controller feedback '{}' (learn) => CH{}, CC{}, Val={}".format(self.symbol,self.midi_learn_chan,self.midi_learn_cc,mval))
-                elif self.midi_cc:
-                    Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + self.midi_chan, self.midi_cc, mval)
-                    # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_chan,self.midi_cc,mval)
-                    #logging.debug("Controller feedback '{}' => CH{}, CC{}, Val={}".format(self.symbol,self.midi_chan,self.midi_cc,mval))
+            if update_controllers:
+                # Send feedback to MIDI controllers
+                try:
+                    if self.midi_learn_cc:
+                        Zynthbox.SyncTimer.instance().sendCCMessageImmediately(self.midi_learn_chan, self.midi_learn_cc, mval, Zynthbox.SyncTimer.instance().masterSketchpadTrack())
+                        # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_learn_chan,self.midi_learn_cc,mval)
+                        logging.error("Controller feedback '{}' (learn) => CH{}, CC{}, Val={}".format(self.symbol,self.midi_learn_chan,self.midi_learn_cc,mval))
+                    elif self.midi_cc:
+                        Zynthbox.SyncTimer.instance().sendCCMessageImmediately(self.midi_chan, self.midi_cc, mval, Zynthbox.SyncTimer.instance().masterSketchpadTrack())
+                        # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_chan,self.midi_cc,mval)
+                        #logging.debug("Controller feedback '{}' => CH{}, CC{}, Val={}".format(self.symbol,self.midi_chan,self.midi_cc,mval))
 
-            except Exception as e:
-                logging.warning("Can't send controller feedback '{}' => Val={}".format(self.symbol,e))
+                except Exception as e:
+                    logging.error("Can't send controller feedback '{}' => Val={}".format(self.symbol,e))
 
 
     def get_value2index(self, val=None):
@@ -431,7 +465,29 @@ class zynthian_controller(QObject):
     # MIDI Learning (Generic Methods)
     #--------------------------------------------------------------------------
 
+    def getMidiLearnChannel(self):
+        if self.midi_learn_chan:
+            return self.midi_learn_chan
+        return -1;
+    def setMidiLearnChannel(self,chan):
+        if self.midi_learn_chan != chan:
+            self.midi_learn_chan = chan
+            self.midiLearnChannelChanged.emit()
+    midiLearnChannelChanged = Signal()
+    midiLearnChannel = Property(int,getMidiLearnChannel,setMidiLearnChannel,notify=midiLearnChannelChanged)
 
+    def getMidiLearnCC(self):
+        if self.midi_learn_cc:
+            return self.midi_learn_cc
+        return -1
+    def setMidiLearnCC(self,cc):
+        if self.midi_learn_cc != cc:
+            self.midi_learn_cc = cc
+            self.midiLearnCCChanged.emit()
+    midiLearnCCChanged = Signal()
+    midiLearnCC = Property(int,getMidiLearnCC,setMidiLearnCC,notify=midiLearnCCChanged)
+
+    @Slot(None)
     def init_midi_learn(self):
         # Learn only if there is a working engine ...
         if self.engine:
@@ -452,6 +508,7 @@ class zynthian_controller(QObject):
             self.engine.zynqtgui.init_midi_learn(self)
 
 
+    @Slot(None)
     def midi_unlearn(self):
         # Unlearn only if there is a working engine and something to unlearn ...
         if self.engine and self.midi_learn_chan is not None and self.midi_learn_cc is not None:
@@ -481,6 +538,7 @@ class zynthian_controller(QObject):
         return True
 
 
+    @Slot(int, int)
     def set_midi_learn(self, chan, cc):
         # Learn only if there is a working engine ...
         if self.engine:
@@ -499,8 +557,8 @@ class zynthian_controller(QObject):
     def _set_midi_learn(self, chan, cc):
         logging.info("MIDI-CC SET '{}' => {}, {}".format(self.symbol, chan, cc))
         
-        self.midi_learn_chan = chan
-        self.midi_learn_cc = cc
+        self.setMidiLearnChannel(chan)
+        self.setMidiLearnCC(cc)
 
         return True
 
@@ -508,8 +566,8 @@ class zynthian_controller(QObject):
     def _unset_midi_learn(self):
         logging.info("MIDI-CC UNSET '{}' => {}, {}".format(self.symbol, self.midi_learn_chan, self.midi_learn_cc))
         
-        self.midi_learn_chan = None
-        self.midi_learn_cc = None
+        self.setMidiLearnChannel(None)
+        self.setMidiLearnCC(None)
 
         return True
 
@@ -583,7 +641,7 @@ class zynthian_controller(QObject):
             value = self.value_min*pow(self.powbase, val/127)
         else:
             value = self.value_min+val*self.value_range/127
-        self.set_value(value)
+        self.set_value(value, update_controllers=False)
         self.refresh_gui()
 
 

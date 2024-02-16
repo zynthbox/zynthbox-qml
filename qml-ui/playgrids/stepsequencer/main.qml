@@ -1830,6 +1830,7 @@ Zynthian.BasePlayGrid {
                                                             value: patternsMenuItem.associatedChannel
                                                             when: patternPopupLoopVisualiser.visible
                                                             delayed: true
+                                                            restoreMode: Binding.RestoreBinding
                                                         }
                                                         property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex) : null
                                                         Zynthian.SampleVisualiser {

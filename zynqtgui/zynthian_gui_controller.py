@@ -52,7 +52,7 @@ class zynthian_gui_controller(QObject):
     def __init__(self, indx, zctrl, parent=None, is_engine_controller=False):
         super(zynthian_gui_controller, self).__init__(parent)
         self.zynqtgui = zynthian_gui_config.zynqtgui
-        self.zctrl=None
+        self.__zctrl=None
         self.n_values=127
         self.ctrl_max_value=127
         self.inverted=False
@@ -114,23 +114,27 @@ class zynthian_gui_controller(QObject):
         self.setup_zyncoder()
         self.index_changed.emit()
 
-    def calculate_plot_values(self):
+    def calculate_plot_values(self, update_zctrl=True):
         # FIXME: probably what's needed would be an actual threading semaphore?
         self.zynqtgui.zynread_wait_flag = True
 
-        if self.ctrl_value>self.ctrl_max_value:
-            self.ctrl_value=self.ctrl_max_value
+        newCtrlValue = self.ctrl_value
+        newValuePlot = self.ctrl_value_plot
+        newValuePrint = self.ctrl_value_print
 
-        elif self.ctrl_value<0:
-            self.ctrl_value=0
+        if newCtrlValue>self.ctrl_max_value:
+            newCtrlValue=self.ctrl_max_value
+
+        elif newCtrlValue<0:
+            newCtrlValue=0
 
         if self.zctrl.labels:
             valplot=None
-            val=self.ctrl_value
+            val=newCtrlValue
 
             #DIRTY HACK => It should be improved!!
             #if self.zctrl.value_min<0:
-            #    val=self.zctrl.value_min+self.ctrl_value
+            #    val=self.zctrl.value_min+newCtrlValue
 
             try:
                 if self.zctrl.ticks:
@@ -158,37 +162,50 @@ class zynthian_gui_controller(QObject):
                     #logging.debug("i => %s=int(%s*%s/(%s+%s))" % (i,self.n_values,val,self.ctrl_max_value,self.step))
                     valplot=self.scale_plot*i
 
-                self.ctrl_value_plot=valplot
-                self.ctrl_value_print=self.zctrl.labels[i]
-                #self.zctrl.set_value(self.ctrl_value)
-                self.zctrl.set_value(val)
+                newValuePlot=valplot
+                newValuePrint=self.zctrl.labels[i]
+                #self.zctrl.set_value(newCtrlValue)
+                # self.zctrl.set_value(val)
 
             except Exception as err:
                 logging.error("Calc Error => %s" % (err))
-                self.ctrl_value_plot=self.ctrl_value
-                self.ctrl_value_print="ERR"
+                newValuePlot=newCtrlValue
+                newValuePrint="ERR"
 
         else:
-            self.ctrl_value_plot=self.ctrl_value
+            newValuePlot=newCtrlValue
             if self.zctrl.midi_cc==0:
-                val = self.val0+self.ctrl_value
-                self.zctrl.set_value(val)
-                self.ctrl_value_print = str(round(val, 2))
+                val = self.val0+newCtrlValue
+                # self.zctrl.set_value(val)
+                newValuePrint = str(round(val, 2))
             else:
                 if self.logarithmic:
-                    val = self.zctrl.value_min*pow(self.scale_value, self.ctrl_value/self.n_values)
+                    val = self.zctrl.value_min*pow(self.scale_value, newCtrlValue/self.n_values)
                 else:
-                    val = self.zctrl.value_min+self.ctrl_value*self.scale_value
+                    val = self.zctrl.value_min+newCtrlValue*self.scale_value
 
-                self.zctrl.set_value(val)
+                # self.zctrl.set_value(val)
                 # if self.format_print and val<1000 and val>-1000:
-                #     self.ctrl_value_print = self.format_print.format(val)
+                #     newValuePrint = self.format_print.format(val)
                 if val<1000 and val>-1000:
-                    self.ctrl_value_print = str(round(val, 2))
+                    newValuePrint = str(round(val, 2))
                 else:
-                    self.ctrl_value_print = str(int(val))
+                    newValuePrint = str(int(val))
 
-        self.value_print_changed.emit()
+        emitValuePrintChanged = False
+        if self.ctrl_value != newCtrlValue:
+            self.ctrl_value = newCtrlValue
+            emitValuePrintChanged = True
+        if self.ctrl_value_plot != newValuePlot:
+            self.ctrl_value_plot = newValuePlot
+            emitValuePrintChanged = True
+        if self.ctrl_value_print != newValuePrint:
+            self.ctrl_value_print = newValuePrint
+            emitValuePrintChanged = True
+        if emitValuePrintChanged:
+            if update_zctrl:
+                self.zctrl.set_value(val)
+            self.value_print_changed.emit()
 
         self.zynqtgui.zynread_wait_flag = False
         #print("VALUE: %s" % self.ctrl_value)
@@ -413,7 +430,7 @@ class zynthian_gui_controller(QObject):
             else:
                 val = (self.zctrl.value-self.zctrl.value_min)/self.scale_value
         #Set value & Update zyncoder
-        self.set_value(val, set_zyncoder, False)
+        self.set_value(val, set_zynpot=set_zyncoder, send_zynpot=False, update_zctrl=False)
         #logging.debug("ZCTRL SYNC {} => {}".format(self.ctrl_title, val))
 
 
@@ -483,7 +500,7 @@ class zynthian_gui_controller(QObject):
         except Exception as err:
             logging.error("%s" % err)
 
-    def set_value(self, v, set_zynpot=False, send_zynpot=True):
+    def set_value(self, v, set_zynpot=False, send_zynpot=True, update_zctrl=True):
         if v>self.ctrl_max_value:
             v=self.ctrl_max_value
         elif v<0:
@@ -496,7 +513,7 @@ class zynthian_gui_controller(QObject):
                     if self.mult>1: v = self.mult*v
                     zyncoder.lib_zyncoder.set_value_zynpot(self.index,int(v),int(send_zynpot))
                     #logging.error("set_value_zyncoder {} {} ({}, {}) => {}".format(self, self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
-            self.calculate_plot_values()
+            self.calculate_plot_values(update_zctrl)
             self.value_changed.emit()
             if self.is_engine_controller:
                 # logging.debug(f"Controller value changed: {v}. Saving last state snapshot")
@@ -535,6 +552,22 @@ class zynthian_gui_controller(QObject):
         if event.num == 4 or event.delta == 120:
             self.set_value(self.ctrl_value + 1, True)
 
+    @Slot(None)
+    def updateValueFromZctrl(self):
+        self.zctrl_sync(False)
+    def getZctrl(self):
+        return self.__zctrl
+    def setZctrl(self,zctrl):
+        if self.__zctrl != zctrl:
+            if self.__zctrl:
+                try:
+                    self.__zctrl.value_changed.disconnect(self.updateValueFromZctrl)
+                except: pass
+            self.__zctrl = zctrl
+            self.__zctrl.value_changed.connect(self.updateValueFromZctrl)
+            self.zctrlChanged.emit()
+    zctrlChanged = Signal()
+    zctrl = Property(QObject,getZctrl,setZctrl,notify=zctrlChanged)
 
     index_changed = Signal()
     title_changed = Signal()

@@ -905,7 +905,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         if self.recordingSource.startswith('internal'):
             # If source is internal and there are no layers, show error and return.
             if layers_snapshot is None or "layers" not in layers_snapshot or len(layers_snapshot["layers"]) <= 0:
-                self.zynqtgui.showMessageDialog.emit("Cannot record audio with no synths", 3000)
+                self.zynqtgui.showMessageDialog.emit("Track has no synths. Cannot start recording", 3000)
                 return False
 
             try:

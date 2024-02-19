@@ -466,7 +466,7 @@ class zynthian_controller(QObject):
     #--------------------------------------------------------------------------
 
     def getMidiLearnChannel(self):
-        if self.midi_learn_chan:
+        if self.midi_learn_chan is not None:
             return self.midi_learn_chan
         return -1;
     def setMidiLearnChannel(self,chan):
@@ -477,7 +477,7 @@ class zynthian_controller(QObject):
     midiLearnChannel = Property(int,getMidiLearnChannel,setMidiLearnChannel,notify=midiLearnChannelChanged)
 
     def getMidiLearnCC(self):
-        if self.midi_learn_cc:
+        if self.midi_learn_cc is not None:
             return self.midi_learn_cc
         return -1
     def setMidiLearnCC(self,cc):

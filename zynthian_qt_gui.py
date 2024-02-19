@@ -2025,6 +2025,15 @@ class zynthian_gui(QObject):
                 if zl.isRecording:
                     # Some Clip is currently being recorded
                     logging.info("Some Clip is currently being recorded. Stopping record")
+
+                    # Explicitly show loading screen even before starting long task so that the loading page is shown as soon as stop recording is emitted
+                    # Loading screen will be eventually shown after starting a long task by zynthian_gui_sketchpad.stopRecording(). If not explicitly shown,
+                    # it takes a few seconds before showing up the loading screen because of queued events and some heavy tasks.
+                    # Hence first display loading screen and then continue with the process
+                    # FIXME : Find a way to do the stopping task immediately and hence not requiring to display loading screen manually before the long task
+                    self.currentTaskMessage = "Processing recording"
+                    recent_task_messages.put("command:show")
+
                     self.run_stop_metronome_and_playback.emit()
                     self.__channelToRecord = None
                     self.__channelRecordingRow = None

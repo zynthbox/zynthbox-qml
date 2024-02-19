@@ -221,12 +221,19 @@ ColumnLayout {
         var subnote = oldNote.subnotes[subnoteIndex];
         var metadata = component.patternModel.subnoteMetadata(row, column, subnoteIndex, "");
         component.patternModel.removeSubnote(row, column, subnoteIndex);
+        // Adjust by a full octave if the mode button is held down
+        let octaveAdjustment = 1;
+        if (zynqtgui.modeButtonPressed) {
+            octaveAdjustment = 12;
+            zynqtgui.ignoreNextModeButtonPress = true;
+        }
         // Now insert the replacement note and set the metadata again
-        subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + pitchChange, 0), 127), subnote.midiChannel)
+        subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + (octaveAdjustment * pitchChange), 0), 127), subnote.midiChannel);
         var subnotePosition = component.patternModel.insertSubnoteSorted(row, column, subnote);
         for (var key in metadata) {
             component.patternModel.setSubnoteMetadata(row, column, subnotePosition, key, metadata[key]);
         }
+        component.selectBarStepAndSubnote(row, column, subnotePosition);
         component.refreshSubnote(row, column, subnotePosition);
     }
     /**

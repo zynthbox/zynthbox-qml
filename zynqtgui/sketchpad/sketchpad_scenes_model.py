@@ -71,15 +71,12 @@ class sketchpad_scenes_model(QAbstractListModel):
         for key, val in self.__scenes__.items():
             scene_data[key] = {
                 "name": val["name"],
-                "clips": val["clips"].copy()
-            }
-            for index, clip in enumerate(scene_data[key]["clips"]):
-                scene_data[key]["clips"][index] = {
+                "clips": [{
                     "row": clip.row,
                     "col": clip.col,
                     "part": clip.part
-                }
-        # logging.error(f"{self.__scenes__}")
+                } for clip in val["clips"].copy() if clip is not None]
+            }
         return {
             "scenesData": scene_data,
             "selectedTrackIndex": self.__selected_track_index__,
@@ -93,8 +90,7 @@ class sketchpad_scenes_model(QAbstractListModel):
             for key, val in obj["scenesData"].items():
                 self.__scenes__[key] = val.copy()
                 for index, clip in enumerate(self.__scenes__[key]["clips"]):
-                    self.__scenes__[key]["clips"][index] = self.__song__.getClipByPart(clip["row"], clip["col"],
-                                                                                       clip["part"])
+                    self.__scenes__[key]["clips"][index] = self.__song__.getClipByPart(clip["row"], clip["col"], clip["part"])
             self.endResetModel()
 
         if "selectedTrackIndex" in obj:

@@ -117,6 +117,11 @@ class sketchpad_clips_model(QAbstractListModel):
             return None
         return self.__clips__[row]
 
+    @Slot(QObject, result=int)
+    def getClipIndex(self, clip):
+        if clip in self.__clips__:
+            return self.__clips__.index(clip)
+        return -1
 
     @Signal
     def countChanged(self):

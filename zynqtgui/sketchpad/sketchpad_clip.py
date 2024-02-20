@@ -785,7 +785,8 @@ class sketchpad_clip(QObject):
             self.play_audio(True)
         else:
             # logging.info(f"Setting Clip To Play from the beginning at the top of the next bar {self}")
-            Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.PlayingState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
+            songIndex = self.channel.clipsModel.getClipIndex(self)
+            Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.PlayingState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
 
     @Slot(None)
     def stop(self):
@@ -794,10 +795,12 @@ class sketchpad_clip(QObject):
             # if channel is none, it means this clip is a sample rather than a clip and needs to be just... stopped
             self.stop_audio()
         else:
+            # While we currently really only use position 0, we do have the ability to have more, so might as well just... do this properly
+            songIndex = self.channel.clipsModel.getClipIndex(self)
             if Zynthbox.SyncTimer.instance().timerRunning:
-                Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
+                Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
             else:
-                Zynthbox.PlayfieldManager.instance().setClipPlaystate(0, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.CurrentPosition, 0)
+                Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.CurrentPosition, 0)
 
         if self.isPlaying:
             self.reset_beat_count()

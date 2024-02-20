@@ -1,6 +1,8 @@
-import QtQuick 2.10
+
+import QtQuick 2.15
+import QtQml 2.15
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
@@ -25,6 +27,32 @@ ColumnLayout {
     }
 
     spacing: 1
+
+    Connections {
+        target: Zynthbox.PlayfieldManager
+        function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
+            // signalCounterThing.boop();
+            if (root.channel && sketchpadSong === 0 && sketchpadTrack === root.channel.id && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                let partDelegate = partRepeater.itemAt(clip);
+                if (partDelegate.nextBarState != newPlaystate) {
+                    partDelegate.nextBarState = newPlaystate;
+                }
+            }
+        }
+    }
+    // Timer {
+    //     id: signalCounterThing
+    //     interval: 10; running: false; repeat: false;
+    //     property int signalReceivedCount: 0
+    //     function boop() {
+    //         signalReceivedCount += 1;
+    //         restart();
+    //     }
+    //     onTriggered: {
+    //         console.log("Signal received by", root.channel.id, "this number of times:", signalReceivedCount);
+    //         signalReceivedCount = 0;
+    //     }
+    // }
 
     Repeater {
         id: partRepeater
@@ -58,15 +86,7 @@ ColumnLayout {
             property bool clipPlaying: root.channel.channelAudioType === "sample-loop"
                 ? partDelegate.cppClipObject ? partDelegate.cppClipObject.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
                 : partDelegate.pattern ? partDelegate.pattern.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
-            property int nextBarState: -1
-            Connections {
-                target: Zynthbox.PlayfieldManager
-                onPlayfieldStateChanged: function(sketchpadSong, sketchpadTrack, clip, position) {
-                    if (sketchpadSong === 0 && sketchpadTrack === root.channel.id && clip === partDelegate.partIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
-                        partDelegate;nextBarState = Zynthbox.PlayfieldManager.clipPlaystate(sketchpadSong, sketchpadTrack, clip, Zynthbox.PlayfieldManager.NextBarPosition);
-                    }
-                }
-            }
+            property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
             Layout.fillWidth: true
             Layout.fillHeight: true

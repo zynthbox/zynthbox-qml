@@ -1458,6 +1458,33 @@ Kirigami.AbstractApplicationWindow {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             channel: slotSelectionDelegate.visible ? root.selectedChannel : null
+                            Connections {
+                                target: partBar.repeater
+                                function onModelChanged() {
+                                    if (partBar.repeater.count > 0) {
+                                        for (let partIndex = 0; partIndex < 5; ++partIndex) {
+                                            let partDelegate = partBar.repeater.itemAt(partIndex);
+                                            let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(0, partBar.channel.id, partIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                                            if (partDelegate.nextBarState != newPlaystate) {
+                                                partDelegate.nextBarState = newPlaystate;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Connections {
+                                target: Zynthbox.PlayfieldManager
+                                function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
+                                    if (partBar.channel) {
+                                        if (sketchpadTrack === partBar.channel.id && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                            let partDelegate = partBar.repeater.itemAt(clip);
+                                            if (partDelegate.nextBarState != newPlaystate) {
+                                                partDelegate.nextBarState = newPlaystate;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

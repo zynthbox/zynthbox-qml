@@ -115,6 +115,32 @@ Rectangle {
 
                     spacing: 1
 
+                    Connections {
+                        target: Zynthbox.PlayfieldManager
+                        function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
+                            // signalCounterThing.boop();
+                            let trackDelegate = partDelegateRepeater.itemAt(sketchpadTrack);
+                            if (trackDelegate && trackDelegate.channel && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                let partDelegate = trackDelegate.repeater.itemAt(clip);
+                                if (partDelegate.nextBarState != newPlaystate) {
+                                    partDelegate.nextBarState = newPlaystate;
+                                }
+                            }
+                        }
+                    }
+                    // Timer {
+                    //     id: signalCounterThing
+                    //     interval: 10; running: false; repeat: false;
+                    //     property int signalReceivedCount: 0
+                    //     function boop() {
+                    //         signalReceivedCount += 1;
+                    //         restart();
+                    //     }
+                    //     onTriggered: {
+                    //         console.log("Signal received by", root.channel.id, "this number of times:", signalReceivedCount);
+                    //         signalReceivedCount = 0;
+                    //     }
+                    // }
                     Repeater {
                         id: partDelegateRepeater
                         model: 10

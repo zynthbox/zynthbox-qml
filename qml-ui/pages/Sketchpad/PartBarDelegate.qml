@@ -28,32 +28,7 @@ ColumnLayout {
 
     spacing: 1
 
-    Connections {
-        target: Zynthbox.PlayfieldManager
-        function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
-            // signalCounterThing.boop();
-            if (root.channel && sketchpadSong === 0 && sketchpadTrack === root.channel.id && position == Zynthbox.PlayfieldManager.NextBarPosition) {
-                let partDelegate = partRepeater.itemAt(clip);
-                if (partDelegate.nextBarState != newPlaystate) {
-                    partDelegate.nextBarState = newPlaystate;
-                }
-            }
-        }
-    }
-    // Timer {
-    //     id: signalCounterThing
-    //     interval: 10; running: false; repeat: false;
-    //     property int signalReceivedCount: 0
-    //     function boop() {
-    //         signalReceivedCount += 1;
-    //         restart();
-    //     }
-    //     onTriggered: {
-    //         console.log("Signal received by", root.channel.id, "this number of times:", signalReceivedCount);
-    //         signalReceivedCount = 0;
-    //     }
-    // }
-
+    readonly property QtObject repeater: partRepeater
     Repeater {
         id: partRepeater
         model: root.channel && root.sequence ? 5 : 0

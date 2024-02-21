@@ -1244,10 +1244,11 @@ class sketchpad_clip(QObject):
         if self.__enabled__ != enabled or force_set:
             self.__enabled__ = enabled
 
-            if self.__enabled__:
-                self.__song__.scenesModel.addClipToCurrentScene(self)
-            else:
-                self.__song__.scenesModel.removeClipFromCurrentScene(self)
+            if not self.isChannelSample:
+                if self.__enabled__:
+                    self.__song__.scenesModel.addClipToCurrentScene(self)
+                else:
+                    self.__song__.scenesModel.removeClipFromCurrentScene(self)
 
             self.enabled_changed.emit(self.col, self.part)
 

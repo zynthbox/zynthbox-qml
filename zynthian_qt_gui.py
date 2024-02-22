@@ -3506,43 +3506,29 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
-        # logging.debug("---p Starting stop_splash procedure")
+        logging.debug("---p Starting stop_splash procedure")
+        self.zynautoconnect()
+        self.audio_settings.setAllControllersToMaxValue()
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
-
-        #os.sched_setaffinity(os.getpid(), [3])
-
-        recent_task_messages.put("command:play-extro")
-
-        self.audio_settings.setAllControllersToMaxValue()
-
-        # Display sketchpad page and run set_selector at last before hiding splash
-        # to ensure knobs work fine
+        recent_task_messages.put("command:play-extro")        
+        # Display sketchpad page and run set_selector at last before hiding splash to ensure knobs work fine
         self.show_modal("sketchpad")
         self.session_dashboard.set_selected_channel(0, True)
-        self.set_selector()
-
-        # Explicitly run update_jack_port after booting is complete
-        # as any requests made while booting is ignored
+        self.set_selector()        
+        # Explicitly run update_jack_port after booting is complete as any requests made while booting is ignored
         for i in range(0, self.sketchpad.song.channelsModel.count):
             channel = self.sketchpad.song.channelsModel.getChannel(i)
-            # Allow jack ports connection to complete before showing UI
-            # so do not update jack ports in a thread
+            # Allow jack ports connection to complete before showing UI so do not update jack ports in a thread
             channel.update_jack_port(run_in_thread=False)
             # Cache back/preset of all selected synths of all channel
             channel.cache_bank_preset_lists()
-
-        self.zynautoconnect(True)
-
-        # Stop rainbow and initialize LED config and connect to required signals
-        # to be able to update LEDs on value change instead
+        # Stop rainbow and initialize LED config and connect to required signals to be able to update LEDs on value change instead
         rainbow_led_process.terminate()
         self.led_config.init()
-
         boot_end = timer()
-
-        # logging.debug("---p Completing stop_splash procedure")
+        logging.debug("---p Completing stop_splash procedure")
         logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
     def get_encoder_list_speed_multiplier(self):
@@ -4644,7 +4630,11 @@ if __name__ == "__main__":
 
     logging.info("STARTING ZYNTHIAN-UI ...")
     zynthian_gui_config.zynqtgui = zynqtgui = zynthian_gui()
+
+
+    logging.debug("---p Starting zynqtgui")
     zynqtgui.start()
+    logging.debug("---p zynqtgui complete")
 
     QIcon.setThemeName("breeze")
 
@@ -4685,9 +4675,10 @@ if __name__ == "__main__":
             # logging.debug("Sketchpad Loading is still in progress. Delay loading qml")
             QTimer.singleShot(1000, load_qml)
         else:
+            logging.debug("---p Starting loading qml")
             zynqtgui.currentTaskMessage = "Loading pages"
             engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
-
+            logging.debug("---p After loading qml engine")
             if not engine.rootObjects() or not app.topLevelWindows():
                 sys.exit(-1)
 

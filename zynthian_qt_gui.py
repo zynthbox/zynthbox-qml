@@ -2025,15 +2025,6 @@ class zynthian_gui(QObject):
                 if zl.isRecording:
                     # Some Clip is currently being recorded
                     logging.info("Some Clip is currently being recorded. Stopping record")
-
-                    # Explicitly show loading screen even before starting long task so that the loading page is shown as soon as stop recording is emitted
-                    # Loading screen will be eventually shown after starting a long task by zynthian_gui_sketchpad.stopRecording(). If not explicitly shown,
-                    # it takes a few seconds before showing up the loading screen because of queued events and some heavy tasks.
-                    # Hence first display loading screen and then continue with the process
-                    # FIXME : Find a way to do the stopping task immediately and hence not requiring to display loading screen manually before the long task
-                    self.currentTaskMessage = "Processing recording"
-                    recent_task_messages.put("command:show")
-
                     self.run_stop_metronome_and_playback.emit()
                     self.__channelToRecord = None
                     self.__channelRecordingRow = None
@@ -3515,6 +3506,7 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
+        # logging.debug("---p Starting stop_splash procedure")
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
@@ -3550,6 +3542,7 @@ class zynthian_gui(QObject):
 
         boot_end = timer()
 
+        # logging.debug("---p Completing stop_splash procedure")
         logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
     def get_encoder_list_speed_multiplier(self):

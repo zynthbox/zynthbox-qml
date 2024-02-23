@@ -489,7 +489,7 @@ Zynthian.ScreenPage {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
-                text: segmentDetails.selectedSegment.name
+                text: segmentDetails.selectedSegment != null ? segmentDetails.selectedSegment.name : ""
                 level: 2
             }
 
@@ -543,7 +543,7 @@ Zynthian.ScreenPage {
                     verticalAlignment: "AlignVCenter"
                     inputMethodHints: Qt.ImhDigitsOnly
                     activeFocusOnTab: false
-                    text: segmentDetails.selectedSegment.barLength
+                    text: segmentDetails.selectedSegment != null ? segmentDetails.selectedSegment.barLength : ""
                     onTextChanged: {
                         var value = parseInt(text);
                         if (text !== "" && value != segmentDetails.selectedSegment.barLength) {
@@ -568,7 +568,7 @@ Zynthian.ScreenPage {
                     verticalAlignment: "AlignVCenter"
                     inputMethodHints: Qt.ImhDigitsOnly
                     activeFocusOnTab: false
-                    text: segmentDetails.selectedSegment.beatLength
+                    text: segmentDetails.selectedSegment != null ? segmentDetails.selectedSegment.beatLength : ""
                     onTextChanged: {
                         var value = parseInt(text);
                         if (text !== "" && value != segmentDetails.selectedSegment.barLength) {

@@ -68,7 +68,7 @@ ColumnLayout {
             color: "#000000"
             border{
                 color: root.songMode
-                        ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
+                        ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
                             ? Kirigami.Theme.highlightColor
                             : "#000000"
                         : partDelegate.clip && partDelegate.clip.inCurrentScene
@@ -153,7 +153,7 @@ ColumnLayout {
                 }
                 height: Kirigami.Units.largeSpacing
                 width: Kirigami.Units.largeSpacing
-                visible: root.songMode && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClips && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(partDelegate.clip)
+                visible: root.songMode && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClips && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(partDelegate.clip)
                 source: "media-skip-backward-symbolic"
             }
             Kirigami.Icon {

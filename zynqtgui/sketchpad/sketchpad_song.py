@@ -106,15 +106,17 @@ class sketchpad_song(QObject):
                 # Create 5 parts per channel
                 for i in range(0, 5):
                     clipsModel = channel.getClipsModelByPart(i)
-                    for j in range(0, 10):
+                    # There is only 1 track now
+                    for j in range(1):
                         clip = sketchpad_clip(channel.id, j, i, self, clipsModel)
                         clipsModel.add_clip(clip)
 
             for channel_index in range(10):
                 channel = self.__channels_model__.getChannel(channel_index)
 
-                # Add first part of channel of all tracks to current scene
-                for track_index in range(10):
+                # Add first part of channel to current scene
+                # There is only 1 track now
+                for track_index in range(1):
                     channel.getClipsModelByPart(0).getClip(track_index).enabled = True
 
             # Add default Sketches and Segments

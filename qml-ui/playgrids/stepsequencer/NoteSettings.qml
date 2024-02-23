@@ -202,7 +202,8 @@ ColumnLayout {
                     var newSubnotes = [];
                     for (var subnoteIndex = 0; subnoteIndex < oldNote.subnotes.length; ++subnoteIndex) {
                         var oldSubnote = oldNote.subnotes[subnoteIndex];
-                        newSubnotes.push(Zynthbox.PlayGridManager.getNote(Math.min(Math.max(oldSubnote.midiNote + pitchChange, 0), 127), oldSubnote.midiChannel));
+                        let newMidiNote = Zynthbox.KeyScales.transposeNote(oldSubnote.midiNote, pitchChange, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey);
+                        newSubnotes.push(Zynthbox.PlayGridManager.getNote(newMidiNote, oldSubnote.midiChannel));
                     }
                     component.patternModel.setNote(row, column, Zynthbox.PlayGridManager.getCompoundNote(newSubnotes));
                     for (var subnoteIndex = 0; subnoteIndex < newSubnotes.length; ++subnoteIndex) {
@@ -222,13 +223,15 @@ ColumnLayout {
         var metadata = component.patternModel.subnoteMetadata(row, column, subnoteIndex, "");
         component.patternModel.removeSubnote(row, column, subnoteIndex);
         // Adjust by a full octave if the mode button is held down
-        let octaveAdjustment = 1;
         if (zynqtgui.modeButtonPressed) {
-            octaveAdjustment = 12;
             zynqtgui.ignoreNextModeButtonPress = true;
+            octaveAdjustment = 12;
+            subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + (octaveAdjustment * pitchChange), 0), 127), subnote.midiChannel);
+        } else {
+            let newMidiNote = Zynthbox.KeyScales.transposeNote(subnote.midiNote, pitchChange, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey);
+            subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(newMidiNote + (octaveAdjustment * pitchChange), 0), 127), subnote.midiChannel);
         }
         // Now insert the replacement note and set the metadata again
-        subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + (octaveAdjustment * pitchChange), 0), 127), subnote.midiChannel);
         var subnotePosition = component.patternModel.insertSubnoteSorted(row, column, subnote);
         for (var key in metadata) {
             component.patternModel.setSubnoteMetadata(row, column, subnotePosition, key, metadata[key]);
@@ -844,54 +847,6 @@ ColumnLayout {
         color: Kirigami.Theme.textColor
         opacity: 0.5
     }
-    // TODO This is super in the wrong place, as it sets a setting for the entire pattern, which isn't even used in this dialog... but where would it go?
-    RowLayout {
-        Layout.fillWidth: true
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-        QQC2.Label {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-            horizontalAlignment: Text.AlignHCenter
-            text: "DEFAULT"
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/32"
-            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 4 : false
-            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 4; }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/16"
-            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 8 : false
-            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 8; }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/8"
-            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 16 : false
-            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 16; }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/4"
-            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 32 : false
-            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 32; }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/2"
-            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 64 : false
-            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 64; }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1"
-            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 128 : false
-            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 128; }
-        }
-    }
     RowLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -901,7 +856,7 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
-            text: "All Notes"
+            text: "All Notes:"
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
@@ -916,6 +871,185 @@ ColumnLayout {
             onClicked: {
                 component.changeAllSubnotesPitch(1);
             }
+        }
+    }
+    Rectangle {
+        Layout.fillWidth: true
+        Layout.minimumHeight: 1
+        Layout.maximumHeight: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.5
+    }
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            horizontalAlignment: Text.AlignHCenter
+            text: "Key and Scale:"
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            horizontalAlignment: Text.AlignHCenter
+            text: component.patternModel
+                ? qsTr("Key: %1%2")
+                    .arg(Zynthbox.KeyScales.pitchName(Zynthbox.KeyScales.pitchIndexToEnumKey(component.patternModel.pitch)))
+                    .arg(Zynthbox.KeyScales.octaveName(Zynthbox.KeyScales.octaveIndexToEnumKey(component.patternModel.octave)))
+                : ""
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                }
+                width: height
+                text: "-"
+                enabled: component.patternModel ? component.patternModel.octave > 0 || component.patternModel.pitch > 0 : false
+                onClicked: {
+                    if (component.patternModel.pitch == 0) {
+                        component.patternModel.pitch = Zynthbox.KeyScales.pitchNames().length - 1;
+                        component.patternModel.octave = component.patternModel.octave - 1;
+                    } else {
+                        component.patternModel.pitch = component.patternModel.pitch - 1;
+                    }
+                }
+                Zynthian.PlayGridButton {
+                    anchors {
+                        top: parent.top
+                        left: parent.right
+                        bottom: parent.bottom
+                        leftMargin: Kirigami.Units.smallSpacing
+                    }
+                    width: height
+                    text: "-12"
+                    enabled: component.patternModel ? component.patternModel.octave > 0 : false
+                    onClicked: {
+                        component.patternModel.octave = component.patternModel.octave - 1;
+                    }
+                }
+            }
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                width: height
+                text: "+"
+                enabled: component.patternModel ? Zynthbox.KeyScales.midiPitchValue(Zynthbox.KeyScales.pitchIndexToEnumKey(component.patternModel.pitch), Zynthbox.KeyScales.octaveIndexToEnumKey(component.patternModel.octave)) < 126 : false
+                onClicked: {
+                    if (component.patternModel.pitch == Zynthbox.KeyScales.pitchNames().length - 1) {
+                        component.patternModel.pitch = 0;
+                        component.patternModel.octave = component.patternModel.octave + 1;
+                    } else {
+                        component.patternModel.pitch = component.patternModel.pitch + 1;
+                    }
+                }
+                Zynthian.PlayGridButton {
+                    anchors {
+                        top: parent.top
+                        right: parent.left
+                        bottom: parent.bottom
+                        rightMargin: Kirigami.Units.smallSpacing
+                    }
+                    width: height
+                    text: "+12"
+                    enabled: component.patternModel ? component.patternModel.octave < Zynthbox.KeyScales.octaveNames().length - 2 : false
+                    onClicked: {
+                        component.patternModel.octave = component.patternModel.octave + 1;
+                    }
+                }
+            }
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            horizontalAlignment: Text.AlignHCenter
+            text: component.patternModel ? qsTr("Scale: %1").arg(Zynthbox.KeyScales.scaleName(Zynthbox.KeyScales.scaleIndexToEnumKey(component.patternModel.scale))) : ""
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                }
+                width: height
+                text: "-"
+                enabled: component.patternModel ? component.patternModel.scale > 0 : false
+                onClicked: {
+                    component.patternModel.scale = component.patternModel.scale - 1;
+                }
+            }
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                width: height
+                text: "+"
+                enabled: component.patternModel ? component.patternModel.scale < Zynthbox.KeyScales.scaleNames().length - 2 : false
+                onClicked: {
+                    component.patternModel.scale = component.patternModel.scale + 1;
+                }
+            }
+        }
+    }
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            horizontalAlignment: Text.AlignHCenter
+            text: "Default Length:"
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+            text: qsTr("Step Size")
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 0 : false
+            onClicked: { component.patternModel.defaultNoteDuration = 0; }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+            text: "1/32"
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 4 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 4; }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+            text: "1/16"
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 8 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 8; }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+            text: "1/8"
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 16 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 16; }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+            text: "1/4"
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 32 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 32; }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+            text: "1/2"
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 64 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 64; }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+            text: "1"
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 128 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 128; }
         }
     }
 }

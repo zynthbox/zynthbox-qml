@@ -69,7 +69,9 @@ Item {
     readonly property color foregroundColor: component.visible ? (Kirigami.Theme.backgroundColor) : ""
     readonly property color borderColor: component.visible ? (foregroundColor) : ""
 
+    readonly property QtObject currentSequence: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
     RowLayout {
+        id: subnoteLayout
         visible: typeof(component.note) !== "undefined" && component.note != null && component.note.subnotes.length > 0
         anchors.fill: parent
         spacing: 0
@@ -79,6 +81,11 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 color: component.visible && modelData.isPlaying ? component.playingBackgroundColor : (modelData.midiNote % 12 === 0 ? component.firstNoteBackground : component.backgroundColor)
+                opacity: subnoteLayout.visible && component.currentSequence && component.currentSequence.activePatternObject
+                    ? Zynthbox.KeyScales.midiNoteOnScale(modelData.midiNote, component.currentSequence.activePatternObject.scaleKey, component.currentSequence.activePatternObject.pitchKey, component.currentSequence.activePatternObject.octaveKey)
+                        ? 1
+                        : 0.3
+                    : 1
                 QQC2.Label {
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
@@ -92,6 +99,11 @@ Item {
     Rectangle {
         visible: typeof(component.note) !== "undefined" && component.note != null && component.note.subnotes.length === 0
         anchors.fill: parent
+        opacity: visible && component.currentSequence && component.currentSequence.activePatternObject
+            ? Zynthbox.KeyScales.midiNoteOnScale(component.note.midiNote, component.currentSequence.activePatternObject.scaleKey, component.currentSequence.activePatternObject.pitchKey, component.currentSequence.activePatternObject.octaveKey)
+                ? 1
+                : 0.3
+            : 1
         color: {
             var color = component.backgroundColor;
             if (component.visible && component.note) {

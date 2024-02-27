@@ -31,11 +31,96 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
-Item {
+Zynthian.DialogQuestion {
     id: component
+    width: Kirigami.Units.gridUnit * 50
+    height: Kirigami.Units.gridUnit * 20
     property QtObject selectedChannel: null
+
+    title: selectedChannel ? qsTr("Set up key zones for Sample mode on Track %1").arg(selectedChannel.name) : ""
+    acceptText: qsTr("Back")
+    rejectText: ""
+
+    property var cuiaCallback: function(cuia) {
+        let returnValue = true;
+        let clipObj = null;
+        switch (cuia) {
+            case "KNOB0_UP":
+                if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
+                    component.selectedChannel.keyZoneMode = "manual";
+                    clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                    clipObj.keyZoneStart = Math.min(clipObj.keyZoneStart + 1, 127);
+                }
+                break;
+            case "KNOB0_DOWN":
+                if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
+                    component.selectedChannel.keyZoneMode = "manual";
+                    clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                    clipObj.keyZoneStart = Math.max(clipObj.keyZoneStart - 1, -1);
+                }
+                break;
+            case "KNOB1_UP":
+                if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
+                    component.selectedChannel.keyZoneMode = "manual";
+                    clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                    clipObj.keyZoneEnd = Math.min(clipObj.keyZoneEnd + 1, 127);
+                }
+                break;
+            case "KNOB1_DOWN":
+                if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
+                    component.selectedChannel.keyZoneMode = "manual";
+                    clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                    clipObj.keyZoneEnd = Math.max(clipObj.keyZoneEnd - 1, -1);
+                }
+                break;
+            case "KNOB2_UP":
+                if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
+                    component.selectedChannel.keyZoneMode = "manual";
+                    clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                    clipObj.rootNote = Math.min(clipObj.rootNote + 1, 127);
+                }
+                break;
+            case "KNOB2_DOWN":
+                if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
+                    component.selectedChannel.keyZoneMode = "manual";
+                    clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                    clipObj.rootNote = Math.max(clipObj.rootNote - 1, 0);
+                }
+                break;
+            case "KNOB3_UP":
+            case "NAVIGATE_RIGHT":
+                component.selectedChannel.selectedSlotRow = Math.min(component.selectedChannel.selectedSlotRow + 1, 4);
+                break;
+            case "KNOB3_DOWN":
+            case "NAVIGATE_LEFT":
+                component.selectedChannel.selectedSlotRow = Math.max(component.selectedChannel.selectedSlotRow - 1, 0);
+                break;
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+            case "SWITCH_SELECT_SHORT":
+                component.accept();
+                break;
+        }
+        return returnValue;
+    }
+
     ColumnLayout {
-        anchors.fill: parent
+        Timer {
+            id: keyZoneSetupSelectedChannelThrottle
+            interval: 1; running: false; repeat: false;
+            onTriggered: {
+                component.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null;
+            }
+        }
+        Connections {
+            target: zynqtgui.session_dashboard
+            onSelected_channel_changed: keyZoneSetupSelectedChannelThrottle.restart()
+        }
+        anchors {
+            fill: parent
+            margins: Kirigami.Units.largeSpacing
+        }
         spacing: 0
         RowLayout {
             Layout.fillWidth: true
@@ -230,15 +315,21 @@ Item {
                             topMargin: 3
                             left: sampleHandle.right
                         }
-                        spacing: 1
+                        spacing: 0
                         Repeater {
                             model: clipObj ? clipObj.playbackPositions : 0
-                            delegate: Rectangle {
-                                height: 4
-                                width: 4
-                                radius: 2
-                                color: sampleKeyzoneDelegate.lineColor
-                                opacity: 0.5 + (model.positionGain / 2)
+                            delegate: Item {
+                                visible: model.positionID > -1
+                                height: 5
+                                width: 5
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    rotation: 45
+                                    height: 4
+                                    width: 4
+                                    color: sampleKeyzoneDelegate.lineColor
+                                    scale: 0.5 + model.positionGain
+                                }
                             }
                         }
                     }
@@ -308,6 +399,17 @@ Item {
                             color: "black"
                             width: pianoKeysContainer.width / 100
                             height: parent.height * 3 / 5
+                        }
+                        QQC2.Label {
+                            visible: index % 12 === 0
+                            anchors {
+                                fill: parent
+                                margins: 2
+                            }
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignBottom
+                            text: (index % 12) + 1
+                            font.pixelSize: width
                         }
                     }
                 }

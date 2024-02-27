@@ -378,29 +378,8 @@ Rectangle {
         return returnValue;
     }
 
-    Zynthian.Popup {
+    ChannelKeyZoneSetup {
         id: channelKeyZoneSetup
-        parent: QQC2.Overlay.overlay
-        y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-        x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-        ChannelKeyZoneSetup {
-            id: channelKeyZoneSetupItem
-            anchors.fill: parent
-            implicitWidth: root.width
-            implicitHeight: root.height
-            selectedChannel: null
-            Timer {
-                id: keyZoneSetupSelectedChannelThrottle
-                interval: 1; running: false; repeat: false;
-                onTriggered: {
-                    channelKeyZoneSetupItem.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null;
-                }
-            }
-            Connections {
-                target: zynqtgui.session_dashboard
-                onSelected_channel_changed: keyZoneSetupSelectedChannelThrottle.restart()
-            }
-        }
     }
 
     BouncePopup {
@@ -413,6 +392,10 @@ Rectangle {
 
     RoutingStylePicker {
         id: routingStylePicker
+    }
+
+    SamplePickingStyleSelector {
+        id: samplePickingStyleSelector
     }
 
     GridLayout {
@@ -619,7 +602,32 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.channelAudioType === "sample-trig"
+                                        visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
+
+                                        QQC2.Label {
+                                            Layout.fillHeight: true
+                                            text: qsTr("Selection:")
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            onClicked: {
+                                                samplePickingStyleSelector.pickSamplePickingStyle(root.selectedChannel);
+                                            }
+                                            text: {
+                                                if (root.selectedChannel) {
+                                                    if (root.selectedChannel.samplePickingStyle === "same-or-first") {
+                                                        return qsTr("Same or First");
+                                                    } else if (root.selectedChannel.samplePickingStyle === "same") {
+                                                        return qsTr("Same Only");
+                                                    } else if (root.selectedChannel.samplePickingStyle === "first") {
+                                                        return qsTr("First Match");
+                                                    } else if (root.selectedChannel.samplePickingStyle === "all") {
+                                                        return qsTr("All Matches");
+                                                    }
+                                                }
+                                                return "";
+                                            }
+                                        }
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
@@ -653,13 +661,14 @@ Rectangle {
                                                 }
                                             }
                                         }
-//                                        QQC2.Button {
-//                                            Layout.fillHeight: true
-//                                            icon.name: "timeline-use-zone-on"
-//                                            onClicked: {
-//                                                channelKeyZoneSetup.open();
-//                                            }
-//                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            icon.name: "timeline-use-zone-on"
+                                            visible: root.selectedChannel && root.selectedChannel.samplePickingStyle !== "same-or-first"
+                                            onClicked: {
+                                                channelKeyZoneSetup.open();
+                                            }
+                                        }
                                         Item {
                                             Layout.fillWidth: false
                                             Layout.fillHeight: false

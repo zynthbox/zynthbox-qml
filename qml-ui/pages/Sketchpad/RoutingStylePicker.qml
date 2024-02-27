@@ -48,18 +48,17 @@ Zynthian.DialogQuestion {
     width: Kirigami.Units.gridUnit * 35
     acceptText: qsTr("Select")
     rejectText: qsTr("Back")
+    title: qsTr("Pick Audio Routing Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
     ColumnLayout {
-        anchors.fill: parent
-        Kirigami.Heading {
-            Layout.fillWidth: true
-            text: qsTr("Pick Audio Routing Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
- 
-            QtObject {
-                id: _private
-                property QtObject selectedChannel
-                property string newRoutingStyle
-            }
+        anchors {
+            fill: parent
+            margins: Kirigami.Units.largeSpacing
+        }
+        QtObject {
+            id: _private
+            property QtObject selectedChannel
+            property string newRoutingStyle
         }
         RowLayout {
             Layout.fillHeight: true

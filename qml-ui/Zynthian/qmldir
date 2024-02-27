@@ -55,3 +55,4 @@ ClipGraineratorSettings 1.0 ClipGraineratorSettings.qml
 InfinitySlider 1.0 InfinitySlider.qml
 ClipInfoView 1.0 ClipInfoView.qml
 ActionPickerPopup 1.0 ActionPickerPopup.qml
+DialogQuestionButtonFocusHighlight 1.0 DialogQuestionButtonFocusHighlight.qml

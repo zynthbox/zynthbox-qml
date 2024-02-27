@@ -70,6 +70,7 @@ class sketchpad_channel(QObject):
         self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
         self.__samples__ = []
+        self.__sample_picking_style__ = "same-or-first"
         self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
         self.__color__ = "#000000"
@@ -429,6 +430,7 @@ class sketchpad_channel(QObject):
                 "externalAudioSource": self.__externalAudioSource__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
                 "layers_snapshot": self.__layers_snapshot,
+                "sample_picking_style": self.__sample_picking_style__,
                 "keyzone_mode": self.__keyzone_mode__,
                 "routeThroughGlobalFX": self.route_through_global_fx}
 
@@ -469,6 +471,8 @@ class sketchpad_channel(QObject):
             if "layers_snapshot" in obj:
                 self.__layers_snapshot = obj["layers_snapshot"]
                 self.sound_data_changed.emit()
+            if "sample_picking_style" in obj:
+                self.set_samplePickingStyle(obj["sample_picking_style"])
             if "keyzone_mode" in obj:
                 self.__keyzone_mode__ = obj["keyzone_mode"]
                 self.keyZoneModeChanged.emit();
@@ -1250,6 +1254,27 @@ class sketchpad_channel(QObject):
 
     samples = Property('QVariantList', get_samples, notify=samples_changed)
     ### END Property samples
+
+    ### BEGIN Property samplePickingStyle
+    # Possible values: "same-or-first", "same", "first", "all"
+    # same-or-first will pick the sample which matches the current pattern's slot number, or whatever is the first sample with a matching keyZone setup
+    # first will always pick the sample which current pattern's slot number (unless explicitly rejected by the keyZone setup)
+    # first will always pick whatever is the first sample with a matching keyZone
+    # all will pick all samples which match the keyZone
+    def get_samplePickingStyle(self):
+        return self.__sample_picking_style__
+
+    @Slot(str)
+    def set_samplePickingStyle(self, sample_picking):
+        if self.__sample_picking_style__ != sample_picking:
+            self.__sample_picking_style__ = sample_picking
+            self.samplePickingStyleChanged.emit()
+            self.__song__.schedule_save()
+
+    samplePickingStyleChanged = Signal()
+
+    samplePickingStyle = Property(str, get_samplePickingStyle, set_samplePickingStyle, notify=samplePickingStyleChanged)
+    ### END Property samplePickingStyle
 
     ### Property keyzoneMode
     # Possible values : "manual", "all-full", "split-full", "split-narrow"

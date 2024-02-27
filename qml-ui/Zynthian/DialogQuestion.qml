@@ -61,18 +61,31 @@ Zynthian.Dialog {
     height: Kirigami.Units.gridUnit * 10
     parent: QQC2.Overlay.overlay
 
-    property var selectedButton: rejectButton
+    property var additionalButtons: []
+    readonly property alias selectedButton: _private.selectedButton
+    onAdditionalButtonsChanged: _private.updateAllButtons();
+    Component.onCompleted: _private.updateAllButtons();
+    function selectNextButton() {
+        let index = _private.allButtons.indexOf(_private.selectedButton);
+        index = Math.min(index + 1, _private.allButtons.length - 1);
+        _private.selectedButton = _private.allButtons[index];
+    }
+    function selectPreviousButton() {
+        let index = _private.allButtons.indexOf(_private.selectedButton);
+        index = Math.max(index - 1, 0);
+        _private.selectedButton = _private.allButtons[index];
+    }
     property var cuiaCallback: function(cuia) {
         var result = component.opened;
         switch (cuia) {
             case "KNOB3_DOWN":
             case "NAVIGATE_LEFT":
-                component.selectedButton = rejectButton
+                component.selectPreviousButton();
                 result = true;
                 break;
             case "KNOB3_UP":
             case "NAVIGATE_RIGHT":
-                component.selectedButton = acceptButton
+                component.selectNextButton();
                 result = true;
                 break;
             case "SWITCH_BACK_SHORT":
@@ -90,9 +103,19 @@ Zynthian.Dialog {
         }
         return result;
     }
+
     header: Kirigami.Heading {
         level: 2
         text: component.title
+        QtObject {
+            id: _private
+            property var selectedButton: rejectButton
+            property var allButtons: []
+            readonly property var standardButtons: [rejectButton, acceptButton]
+            function updateAllButtons() {
+                allButtons = standardButtons.concat(component.additionalButtons);
+            }
+        }
     }
     contentItem: QQC2.Label {
         wrapMode: Text.Wrap
@@ -113,14 +136,7 @@ Zynthian.Dialog {
             onClicked: {
                 component.reject()
             }
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -5
-                color: "transparent"
-                border.width: 2
-                border.color: Kirigami.Theme.textColor
-                opacity: component.selectedButton === rejectButton ? 0.7 : 0
-            }
+            DialogQuestionButtonFocusHighlight { selectedButton: _private.selectedButton }
         }
         PlayGridButton {
             id: acceptButton
@@ -134,14 +150,7 @@ Zynthian.Dialog {
             onClicked: {
                 component.accept()
             }
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: -5
-                color: "transparent"
-                border.width: 2
-                border.color: Kirigami.Theme.textColor
-                opacity: component.selectedButton === acceptButton ? 0.7 : 0
-            }
+            DialogQuestionButtonFocusHighlight { selectedButton: _private.selectedButton }
         }
     }
 }

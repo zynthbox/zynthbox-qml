@@ -842,6 +842,7 @@ Zynthian.Popup {
                     }
                 }
                 RowLayout { // Post Recording Preview section
+                    id: recordingSectionLayout
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     Layout.maximumHeight: Layout.preferredHeight
@@ -993,14 +994,31 @@ Zynthian.Popup {
                     }
                 }
             }
-            QQC2.Button {
+            ColumnLayout {
                 Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                 Layout.minimumWidth: Layout.preferredWidth
                 Layout.rightMargin: root.spacing
-                icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                onClicked: {
-                    zynqtgui.callable_ui_action("START_RECORD")
+                spacing: root.spacing
+                QQC2.Button {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 18
+                    icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                    onClicked: {
+                        zynqtgui.callable_ui_action("START_RECORD");
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: recordingSectionLayout.height
+                    Layout.maximumHeight: recordingSectionLayout.height
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    icon.name: "view-grid-symbolic"
+                    onClicked: {
+                        zynqtgui.callable_ui_action("KEYBOARD");
+                    }
                 }
             }
         }

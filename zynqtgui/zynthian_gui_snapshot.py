@@ -270,7 +270,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
     @Slot()
     def schedule_save_last_state_snapshot(self):
         # HACK to use a timer from another thread
-        if self.isLoading == 0 and self.zynqtgui.sketchpad is not None and self.zynqtgui.sketchpad.song is not None and not self.zynqtgui.sketchpad.song.isLoading:
+        if self.isLoading == 0 and self.zynqtgui.sketchpad is not None and self.zynqtgui.sketchpad.song is not None and not self.zynqtgui.sketchpad.song.isLoading and self.zynqtgui.isBootingComplete:
             self.save_last_state_timer_requested.emit()
         else:
             # logging.info("Not saving snapshot while we're loading")

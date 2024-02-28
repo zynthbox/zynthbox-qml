@@ -1939,7 +1939,7 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.layer.emit_layer_preset_changed(layer)
                 self.zynqtgui.screens['control'].show()
                 self.zynqtgui.layer.fill_list()
-                self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
                 self.chainedSoundsInfoChanged.emit()
                 self.chainedSoundsNamesChanged.emit()
 
@@ -1966,7 +1966,7 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.layer.emit_layer_preset_changed(layer)
                 self.zynqtgui.screens['control'].show()
                 self.zynqtgui.layer.fill_list()
-                self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
                 self.chainedSoundsInfoChanged.emit()
                 self.chainedSoundsNamesChanged.emit()
 
@@ -1979,7 +1979,7 @@ class sketchpad_channel(QObject):
             self.zynqtgui.layer.emit_layer_preset_changed(layer)
             self.zynqtgui.screens['control'].show()
             self.zynqtgui.layer.fill_list()
-            self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
+            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
             self.chainedFxNamesChanged.emit()
 
     @Slot(int)
@@ -1991,7 +1991,7 @@ class sketchpad_channel(QObject):
             self.zynqtgui.layer.emit_layer_preset_changed(layer)
             self.zynqtgui.screens['control'].show()
             self.zynqtgui.layer.fill_list()
-            self.zynqtgui.screens['snapshot'].save_last_state_snapshot()
+            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
             self.chainedFxNamesChanged.emit()
 
     @Slot(None, result=QObject)

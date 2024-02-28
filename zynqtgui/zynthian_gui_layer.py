@@ -1268,10 +1268,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
             snapshot={
                 'index':self.index,
                 'layers':[],
-                'global_fx': [
-                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[0][2].get_snapshot()),
-                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[1][2].get_snapshot())
-                ],
+                'global_fx': [], # global_fx should only be filled when generating full snapshot
                 'clone':[],
                 'note_range':[],
                 'audio_capture': self.get_audio_capture(),
@@ -1280,6 +1277,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 'extended_config': self.get_extended_config(),
                 'midi_profile_state': self.get_midi_profile_state(),
             }
+
+            # Fill global_fx only if generating full snapshot
+            if track is None:
+                snapshot["global_fx"] = [
+                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[0][2].get_snapshot()),
+                    self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(self.zynqtgui.global_fx_engines[1][2].get_snapshot())
+                ]
 
             #Layers info
             for layer in self.layers:

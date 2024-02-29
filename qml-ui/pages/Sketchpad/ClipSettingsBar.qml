@@ -42,20 +42,20 @@ ColumnLayout {
 
     property QtObject bottomBar: null
     property string controlType: zynqtgui.bottomBarControlType
-    property QtObject controlObj: null;/*(root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
-                                    ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
-                                    : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
-                                        ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
-                                        : null*/
+    property QtObject controlObj: null;
+    property QtObject clipAudioSource: root.controlObj ? Zynthbox.PlayGridManager.getClipById(root.controlObj.cppObjId) : null
+    property bool controlObjIsManual: false
     Timer {
         id: controlObjUpdater
         interval: 1; repeat: false; running: false;
         onTriggered: {
-            root.controlObj = (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
-                ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
-                : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
-                    ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
-                    : null
+            if (controlObjIsManual == false) {
+                root.controlObj = (root.controlType === "bottombar-controltype-clip" || root.controlType === "bottombar-controltype-pattern")
+                    ? zynqtgui.bottomBarControlObj // selected bottomBar object is clip/pattern
+                    : zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.hasOwnProperty("samples") && zynqtgui.bottomBarControlObj.hasOwnProperty("selectedSlotRow") // selected bottomBar object is not clip/pattern and hence it is a channel
+                        ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow]
+                        : null
+            }
         }
     }
     Connections {
@@ -131,7 +131,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
-            controlObj: root.controlObj ? Zynthbox.PlayGridManager.getClipById(root.controlObj.cppObjId) : null
+            controlObj: root.clipAudioSource
             controlProperty: "gainAbsolute"
             valueString: root.controlObj && root.controlObj.gain ? root.controlObj.gain.toFixed(1) : 0
             Layout.fillWidth: true
@@ -344,21 +344,66 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
-            QQC2.Switch {
+            QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                checked: root.controlObj && root.controlObj.hasOwnProperty("loopingPlayback") ? root.controlObj.loopingPlayback : true
-                visible: root.selectedChannel.channelAudioType !== "sample-loop"
-                onToggled: {
-                    root.controlObj.loopingPlayback = checked
+                visible: root.selectedChannel ? root.selectedChannel.channelAudioType !== "sample-loop" : false
+                text: root.clipAudioSource ? root.clipAudioSource.playbackStyleLabel : ""
+                onClicked: {
+                    playbackStylePicker.open();
+                }
+                Zynthian.ActionPickerPopup {
+                    id: playbackStylePicker
+                    actions: [
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle
+                                ? qsTr("<b>Non-looping</b>")
+                                : qsTr("Non-looping")
+                            onTriggered: {
+                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.LoopingPlaybackStyle
+                                ? qsTr("<b>Looping</b>")
+                                : qsTr("Looping")
+                            onTriggered: {
+                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.LoopingPlaybackStyle;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.OneshotPlaybackStyle
+                                ? qsTr("<b>One-shot</b>")
+                                : qsTr("One-shot")
+                            onTriggered: {
+                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.OneshotPlaybackStyle;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
+                                ? qsTr("<b>Granular Non-looping</b>")
+                                : qsTr("Granular Non-looping")
+                            onTriggered: {
+                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle
+                                ? qsTr("<b>Granular Looping</b>")
+                                : qsTr("Granular Looping")
+                            onTriggered: {
+                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
+                            }
+                        }
+                    ]
                 }
             }
             QQC2.Label {
                 Layout.fillWidth: true
-                visible: root.selectedChannel.channelAudioType !== "sample-loop"
+                visible: root.selectedChannel ? root.selectedChannel.channelAudioType !== "sample-loop" : false
                 horizontalAlignment: TextInput.AlignHCenter
                 wrapMode: Text.Wrap
-                text: qsTr("Loop")
+                text: qsTr("Playback Style")
             }
             Item {
                 Layout.fillWidth: true
@@ -375,7 +420,7 @@ ColumnLayout {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: root.selectedChannel.channelAudioType === "sample-loop"
+                visible: root.selectedChannel ? root.selectedChannel.channelAudioType === "sample-loop" : false
             }
             QQC2.Label {
                 Layout.fillWidth: true

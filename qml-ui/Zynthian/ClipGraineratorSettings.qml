@@ -29,6 +29,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
 
 Item {
@@ -53,7 +54,7 @@ Item {
         if (_private.settingsCategory === 0) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.granular = true;
+                    component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
                     break;
                 case 1:
                     component.clip.grainPosition = Math.min(1, component.clip.grainPosition + 0.001);
@@ -116,7 +117,7 @@ Item {
         if (_private.settingsCategory === 0) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.granular = false;
+                    component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
                     break;
                 case 1:
                     component.clip.grainPosition = Math.max(0, component.clip.grainPosition - 0.001);
@@ -257,27 +258,34 @@ Item {
             visible: _private.settingsCategory === 0
             Kirigami.Heading {
                 level: 2
-                text: qsTr("Enable\nGrainerator")
+                text: qsTr("Grainerator\nLooping")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
             Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                function toggleGraineratorLooping() {
+                    if (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) {
+                        component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
+                    } else {
+                        component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
+                    }
+                }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: component.clip.granular = !component.clip.granular
+                    onClicked: toggleGraineratorLooping()
                 }
                 QQC2.Switch {
                     id: granularEnabledSwitch
                     anchors.centerIn: parent
                     width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
                     height: Kirigami.Units.gridUnit * 3
-                    checked: component.clip ? component.clip.granular : false
-                    onToggled: component.clip.granular = !component.clip.granular
+                    checked: component.clip ? (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) : false
+                    onToggled: toggleGraineratorLooping()
                     Connections {
                         target: component.clip
-                        onGranularChanged: granularEnabledSwitch.checked = component.clip.granular
+                        onGranularChanged: granularEnabledSwitch.checked = (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle)
                     }
                 }
             }

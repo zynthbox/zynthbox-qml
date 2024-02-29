@@ -680,6 +680,8 @@ class zynthian_gui(QObject):
                 # Try layer's zctrls
                 else:
                     self.screens["layer"].midi_control_change(chan, byte2, byte3)
+                    # TODO Our hook for external track midi routing would be here (set up on sketchpad.channel, send through sketchpad, which routes to current song, and then to all channels, who can handle the logic of what to do)
+                    # Also where we can hook in the k0 through k3 knobs and clickiness and such for learning...
 
     @Slot()
     def channelsModTimerHandler(self):

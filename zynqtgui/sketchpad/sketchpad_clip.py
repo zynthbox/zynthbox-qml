@@ -631,18 +631,17 @@ class sketchpad_clip(QObject):
         self.__filename__ = self.__path__.split("/")[-1]
         self.stop()
 
-        try:
-            self.audioSource.audioLevelChanged.disconnect()
-            self.audioSource.progressChanged.disconnect()
-            self.audioSource.gainAbsoluteChanged.disconnect()
-        except Exception as e:
-            logging.debug(f"Not connected : {str(e)}")
         if self.audioSource is not None:
-            try:
-                self.audioSource.isPlayingChanged.disconnect(self.is_playing_changed.emit)
-            except:
-                # Not being able to disconnect in this case will invariably mean the signal was already disconnected (somehow)
-                pass
+            try: self.audioSource.isPlayingChanged.disconnect(self.is_playing_changed.emit)
+            except: pass
+            try: self.audioSource.audioLevelChanged.disconnect()
+            except: pass
+            try: self.audioSource.progressChanged.disconnect()
+            except: pass
+            try: self.audioSource.gainAbsoluteChanged.disconnect()
+            except: pass
+            try: self.audioSource.playbackStyleChanged.disconnect()
+            except: pass
             self.audioSource.deleteLater()
 
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
@@ -654,9 +653,26 @@ class sketchpad_clip(QObject):
 
         self.__read_metadata__()
 
+        playbackStyle = int(self.__get_metadata_prop__("ZYNTHBOX_PLAYBACK_STYLE", -1))
+        if playbackStyle == -1:
+            # TODO Probably get rid of this at some point - it's a temporary fallback while there's reasonably still things around without playback style set on them
+            looping = bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True))
+            granular = (self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_ENABLED", 'False').lower() == "true")
+            if looping:
+                if granular:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularLoopingPlaybackStyle)
+                else:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
+            elif looping:
+                if granular:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularNonLoopingPlaybackStyle)
+                else:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.NonLoopingPlaybackStyle)
+        else:
+            self.audioSource.setPlaybackStyle(playbackStyle)
+
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
-        self.audioSource.setLooping(bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True)))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
         self.audioSource.setLoopDelta(self.__loop_delta__)
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
@@ -670,7 +686,6 @@ class sketchpad_clip(QObject):
         self.audioSource.setADSRSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
         self.audioSource.setADSRRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
 
-        self.audioSource.setGranular(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_ENABLED", 'False').lower() == "true")
         self.audioSource.setGrainPosition(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
         self.audioSource.setGrainSpray(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
         self.audioSource.setGrainScan(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
@@ -692,6 +707,7 @@ class sketchpad_clip(QObject):
 
         self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
         self.audioSource.gainAbsoluteChanged.connect(self.updateGain, Qt.QueuedConnection)
+        self.audioSource.playbackStyleChanged.connect(self.saveMetadata, Qt.QueuedConnection)
 
         # self.startPosition = self.__start_position__
         # self.length = self.__length__
@@ -1083,14 +1099,13 @@ class sketchpad_clip(QObject):
             self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
             self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
             self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
-            self.write_metadata("ZYNTHBOX_LOOPING_PLAYBACK", [str(self.audioSource.looping())])
+            self.write_metadata("ZYNTHBOX_PLAYBACK_STYLE", [str(self.audioSource.playbackStyle())])
             self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
             self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
             self.write_metadata("ZYNTHBOX_ADSR_ATTACK", [str(self.audioSource.adsrAttack())])
             self.write_metadata("ZYNTHBOX_ADSR_DECAY", [str(self.audioSource.adsrDecay())])
             self.write_metadata("ZYNTHBOX_ADSR_SUSTAIN", [str(self.audioSource.adsrSustain())])
             self.write_metadata("ZYNTHBOX_ADSR_RELEASE", [str(self.audioSource.adsrRelease())])
-            self.write_metadata("ZYNTHBOX_GRAINERATOR_ENABLED", [str(self.audioSource.granular())])
             self.write_metadata("ZYNTHBOX_GRAINERATOR_POSITION", [str(self.audioSource.grainPosition())])
             self.write_metadata("ZYNTHBOX_GRAINERATOR_SPRAY", [str(self.audioSource.grainSpray())])
             self.write_metadata("ZYNTHBOX_GRAINERATOR_SCAN", [str(self.audioSource.grainScan())])
@@ -1176,24 +1191,6 @@ class sketchpad_clip(QObject):
 
     snapLengthToBeat = Property(bool, get_snap_length_to_beat, set_snap_length_to_beat, notify=snap_length_to_beat_changed)
     ### END Property snapLengthToBeat
-
-    ### BEGIN Property loopingPlayback
-    @Signal
-    def looping_playback_changed(self):
-        pass
-    def get_looping_playback(self):
-        if self.audioSource is not None:
-            return self.audioSource.looping()
-        return False
-
-    def set_looping_playback(self, loop):
-        if self.audioSource is not None and self.audioSource.looping() != loop:
-            self.audioSource.setLooping(loop)
-            self.saveMetadata()
-            self.looping_playback_changed.emit()
-
-    loopingPlayback = Property(bool, get_looping_playback, set_looping_playback, notify=looping_playback_changed)
-    ### END Property loopingPlayback
 
     ### Property loopDelta
     def get_loop_delta(self):

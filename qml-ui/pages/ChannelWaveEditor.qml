@@ -44,6 +44,7 @@ Zynthian.ScreenPage {
         id: selectedChannelThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
+            component.selectedChannel = null;
             component.selectedChannel = applicationWindow().selectedChannel;
         }
     }
@@ -51,22 +52,38 @@ Zynthian.ScreenPage {
         target: applicationWindow()
         onSelectedChannelChanged: selectedChannelThrottle.restart()
     }
+    Connections {
+        target: zynqtgui.sketchpad
+        onSongChanged: selectedChannelThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song
+        onIsLoadingChanged: selectedChannelThrottle.restart()
+    }
     Component.onCompleted: {
         selectedChannelThrottle.restart()
     }
-    property QtObject selectedClip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
-                                        ? component.selectedChannel.getClipsModelByPart(selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
-                                        : component.selectedChannel.samples[selectedChannel.selectedSlotRow]
+    property QtObject selectedClip: component.selectedChannel
+                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                                        ? component.selectedChannel.getClipsModelByPart(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                                        : component.selectedChannel.samples[component.selectedChannel.selectedSlotRow]
+                                    : null
     property bool selectedClipHasWav: false
     Timer {
         id: selectedClipHasWavThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
-            component.selectedClipHasWav = selectedClip && selectedClip.path && selectedClip.path.length > 0;
+            let newHasWav = selectedClip && selectedClip.path && selectedClip.path.length > 0;
+            if (component.selectedClipHasWav != newHasWav) {
+                component.selectedClipHasWav = newHasWav;
+            }
         }
     }
     onSelectedClipChanged: selectedClipHasWavThrottle.restart()
-
+    onIsVisibleChanged: {
+        selectedChannelThrottle.restart();
+        selectedClipHasWavThrottle.restart();
+    }
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
@@ -288,7 +305,7 @@ Zynthian.ScreenPage {
 
         QQC2.Label {
             Layout.fillHeight: false
-            text: qsTr("Track %1 Clips").arg(component.selectedChannel.id + 1)
+            text: component.selectedChannel ? qsTr("Track %1 Clips").arg(component.selectedChannel.id + 1) : ""
             font.pointSize: Kirigami.Units.gridUnit
         }
 
@@ -317,9 +334,11 @@ Zynthian.ScreenPage {
                         anchors.fill: parent
                         clip: true
                         controlObj: component.selectedClip
-                        controlType: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                        controlType: component.selectedChannel
+                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                         ? "bottombar-controltype-clip"
                                         : "bottombar-controltype-channel"
+                                    : ""
                         visible: component.selectedClipHasWav
                     }
                 }
@@ -360,7 +379,7 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             text: qsTr("Granular")
-                            visible: zynqtgui.graineratorEnabled
+                            visible: clipSettingsGrainerator.clip && (clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
                             enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
                             MouseArea {
@@ -409,6 +428,7 @@ Zynthian.ScreenPage {
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
                             anchors.fill: parent
                             anchors.margins: Kirigami.Units.gridUnit
+                            controlObjIsManual: true
                             controlObj: component.selectedClip
                             Timer {
                                 id: clipSettingsBarControlObjThrottle
@@ -417,9 +437,11 @@ Zynthian.ScreenPage {
                                     clipSettingsBar.controlObj = component.selectedClip;
                                 }
                             }
-                            controlType: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                            controlType: component.selectedChannel
+                                        ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                             ? "bottombar-controltype-clip"
                                             : "bottombar-controltype-channel"
+                                        : ""
                             showCopyPasteButtons: false
                         }
                         Zynthian.ADSRClipView {

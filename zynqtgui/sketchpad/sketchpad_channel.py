@@ -2061,4 +2061,33 @@ class sketchpad_channel(QObject):
 
         # logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 
+    @Slot("QVariantList")
+    def reorderChainedFx(self, newOrder):
+        """
+        This method will reorder the chained FX engines as per the new index order provided in newOrder
+        """
+        # Form a new chainedFx as per newOrder
+        newChainedFx = [self.__chained_fx[index] for index in newOrder]
+
+        # Update slot_index of all the zynthian_layer objects
+        for index, fx in enumerate(newChainedFx):
+            if fx is not None:
+                fx.slot_index = index
+
+        # Update chainedFx
+        self.set_chainedFx(newChainedFx)
+
+        # Since slot index updated, schedule a snapshot save
+        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+
+    @Slot(int, int)
+    def swapChainedFx(self, slot1, slot2):
+        """
+        Swap positions of two FX engines in chainedFx located at index slot1 and slot2
+        """
+        newOrder = [0, 1, 2, 3, 4]
+        newOrder[slot1] = slot2
+        newOrder[slot2] = slot1
+        self.reorderChainedFx(newOrder)
+
     className = Property(str, className, constant=True)

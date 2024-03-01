@@ -42,7 +42,14 @@ Zynthian.DialogQuestion {
         var newSlotTitles = [];
         switch(_private.slotType) {
             case "synth":
-                newSlotTitles = root.selectedChannel.chainedSoundsNames;
+                for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                    let slotData = root.selectedChannel.chainedSoundsNames[slotIndex]
+                    if (slotData !== "") {
+                        newSlotTitles.push(slotData);
+                    } else {
+                        newSlotTitles.push("(empty)");
+                    }
+                }
                 break;
             case "sample":
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
@@ -65,7 +72,14 @@ Zynthian.DialogQuestion {
                 }
                 break;
             case "fx":
-                newSlotTitles = root.selectedChannel.chainedFxNames;
+                for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                    let slotData = root.selectedChannel.chainedFxNames[slotIndex]
+                    if (slotData !== "") {
+                        newSlotTitles.push(slotData);
+                    } else {
+                        newSlotTitles.push("(empty)");
+                    }
+                }
                 break;
             default:
                 console.debug("Unknown slot type! Expected one of synth, sample, sketch, or fx, and got:", slotType);

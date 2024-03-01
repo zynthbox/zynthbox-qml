@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Sketch Unbouncer, for unbouncing sketches (write the sketch source into sound setup and pattern)
+Routing Style Picker, for picking the basic decision profile for routing the audio of sound sources and fx
 
 Copyright (C) 2023 Dan Leinir Turthra Jensen <admin@leinir.dk>
 

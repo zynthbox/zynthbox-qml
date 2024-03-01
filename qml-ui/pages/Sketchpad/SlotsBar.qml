@@ -24,7 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
@@ -738,6 +738,10 @@ Rectangle {
         }
     }
 
+    SlotSwapperPopup {
+        id: slotSwapperPopup
+    }
+
     Zynthian.FilePickerDialog {
         id: bankPickerDialog
         parent: zlScreen.parent
@@ -794,9 +798,9 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: ""
-                enabled: false
+                text: "Swap with..."
                 onTriggered: {
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlotRow);
                 }
             },
             QQC2.Action {
@@ -883,9 +887,9 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: ""
-                enabled: false
+                text: "Swap with..."
                 onTriggered: {
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sample", root.selectedChannel.selectedSlotRow);
                 }
             },
             QQC2.Action {
@@ -926,6 +930,9 @@ Rectangle {
 
     Zynthian.LayerSetupDialog {
         id: layerSetupDialog
+        onRequestSlotPicker: {
+            slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);
+        }
     }
 
     ExternalAudioSourcePicker {
@@ -957,6 +964,12 @@ Rectangle {
                     zynqtgui.forced_screen_back = "sketchpad"
                     zynqtgui.current_screen_id = "effect_preset"
                     zynqtgui.layer.page_after_layer_creation = "sketchpad"
+                }
+            },
+            Kirigami.Action {
+                text: qsTr("Swap with...")
+                onTriggered: {
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
                 }
             },
             Kirigami.Action {

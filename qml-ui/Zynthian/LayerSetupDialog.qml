@@ -23,7 +23,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
@@ -37,6 +37,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 Zynthian.ActionPickerPopup {
     id: root
     property QtObject selectedChannel: null
+    signal requestSlotPicker(QtObject channel, string slotType, int slotIndex)
 
     Timer {
         id: selectedChannelThrottle
@@ -117,6 +118,12 @@ Zynthian.ActionPickerPopup {
             onTriggered: {
                 zynqtgui.show_modal("sound_categories")
                 root.close();
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Swap with...")
+            onTriggered: {
+                root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
             }
         },
         Kirigami.Action {

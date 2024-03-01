@@ -516,8 +516,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
                 # Try to connect Audio Effects ...
                 if len(self.layers)>0 and layer.engine.type=="Audio Effect":
-                    # setFxToChain will handle adding layer to self.layers if a new fx is created or replace new layer with an old one
-                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
+                    channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index)
+                    if channel.chainedFx[channel.selectedFxSlotRow] is not None:
+                        old_layer = channel.chainedFx[channel.selectedFxSlotRow]
+                        old_layer_index = self.layers.index(old_layer)
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
+                        if old_layer_index >= 0:
+                            # There is already a layer in slot which will get replaced. So replace that layer from self.layers with the current one
+                            self.layers[old_layer_index] = layer
+                        else:
+                            # If by any chance replaced layer was not in self.layers, append to self.layers
+                            self.layers.append(layer)
+                    else:
+                        # New fx layer. Add to self.layers
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
+                        self.layers.append(layer)
                 # Try to connect MIDI tools ...
                 elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
                     if self.replace_layer_index is not None:

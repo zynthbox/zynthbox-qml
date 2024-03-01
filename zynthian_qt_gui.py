@@ -2019,7 +2019,10 @@ class zynthian_gui(QObject):
                 else:
                     self.run_start_metronome_and_playback.emit()
         elif cuia == "ZL_STOP":
-            self.run_stop_metronome_and_playback.emit()
+            if Zynthbox.SyncTimer.instance().timerRunning():
+                self.run_stop_metronome_and_playback.emit()
+            else:
+                self.callable_ui_action("ALL_NOTES_OFF")
 
         elif cuia == "START_RECORD":
             zl = self.screens["sketchpad"]

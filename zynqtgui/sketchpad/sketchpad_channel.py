@@ -2074,6 +2074,13 @@ class sketchpad_channel(QObject):
             if fx is not None:
                 fx.slot_index = index
 
+        # Update fxPassthrough values in audioTypeSettings to retain correct values after re-ordering
+        newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
+        for audioType in newAudioTypeSettings:
+            updatedAudioTypeSettings = [newAudioTypeSettings[audioType]["fxPassthrough"][index] for index in newOrder]
+            newAudioTypeSettings[audioType]["fxPassthrough"] = updatedAudioTypeSettings
+        self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
+
         # Update chainedFx
         self.set_chainedFx(newChainedFx)
 

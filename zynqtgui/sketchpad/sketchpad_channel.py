@@ -174,6 +174,56 @@ class sketchpad_channel(QObject):
         # Update filter controllers when booting is complete
         self.zynqtgui.isBootingCompleteChanged.connect(self.update_filter_controllers)
 
+        def handlePassthroughClientDryAmountChanged(theSender):
+            self.handlePassthroughClientSomethingChanged(theSender, "dryAmount", theSender.dryAmount())
+        def handlePassthroughClientWetFx1AmountChanged(theSender):
+            self.handlePassthroughClientSomethingChanged(theSender, "wetFx1Amount", theSender.wetFx1Amount())
+        def handlePassthroughClientWetFx2AmountChanged(theSender):
+            self.handlePassthroughClientSomethingChanged(theSender, "wetFx2Amount", theSender.wetFx2Amount())
+        def handlePassthroughClientDryWetMixAmountChanged(theSender):
+            self.handlePassthroughClientSomethingChanged(theSender, "dryWetMixAmount", theSender.dryWetMixAmount())
+        def handlePassthroughClientPanAmountChanged(theSender):
+            self.handlePassthroughClientSomethingChanged(theSender, "panAmount", theSender.panAmount())
+        def handlePassthroughClientMutedChanged(theSender):
+            self.handlePassthroughClientSomethingChanged(theSender, "muted", theSender.muted())
+        self.__synthPassthroughClients = []
+        for channelIndex in range(0, 16):
+            synthPassthrough = Zynthbox.Plugin.instance().synthPassthroughClients()[channelIndex]
+            self.__synthPassthroughClients.insert(channelIndex, synthPassthrough)
+            synthPassthrough.panAmountChanged.connect(lambda:handlePassthroughClientPanAmountChanged(synthPassthrough))
+            synthPassthrough.dryAmountChanged.connect(lambda:handlePassthroughClientDryAmountChanged(synthPassthrough))
+        self.__channelPassthroughClients = []
+        self.__fxPassthroughClients = []
+        for laneId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            channelClient = Zynthbox.Plugin.instance().channelPassthroughClients()[self.__id__ * 5 + laneId]
+            self.__channelPassthroughClients.insert(laneId, channelClient)
+            channelClient.mutedChanged.connect(lambda:handlePassthroughClientMutedChanged(channelClient))
+            channelClient.wetFx1AmountChanged.connect(lambda:handlePassthroughClientWetFx1AmountChanged(channelClient))
+            channelClient.wetFx2AmountChanged.connect(lambda:handlePassthroughClientWetFx2AmountChanged(channelClient))
+            fxClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
+            self.__fxPassthroughClients.insert(laneId, fxClient)
+            fxClient.dryWetMixAmountChanged.connect(lambda:handlePassthroughClientDryWetMixAmountChanged(fxClient))
+            fxClient.panAmountChanged.connect(lambda:handlePassthroughClientPanAmountChanged(fxClient))
+
+    def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
+        if theSender in self.__channelPassthroughClients:
+            if theSomething == "muted":
+                self.set_muted(theValue)
+            elif theSomething == "wetFx1Amount":
+                self.set_wetFx1Amount(theValue)
+            elif theSomething == "wetFx2Amount":
+                self.set_wetFx2Amount(theValue)
+        elif theSender in self.__synthPassthroughClients:
+            clientIndex = self.__synthPassthroughClients.index(theSender)
+            if clientIndex in self.__chained_sounds__:
+                laneId = self.__chained_sounds__.index(clientIndex)
+                self.set_passthroughValue("synthPassthrough", laneId, theSomething, theValue)
+        elif theSender in self.__fxPassthroughClients:
+            clientIndex = self.__fxPassthroughClients.index(theSender)
+            if clientIndex in self.__chained_fx:
+                laneId = self.__chained_fx.index(clientIndex)
+                self.set_passthroughValue("fxPassthrough", laneId, theSomething, theValue)
+
     def defaultAudioTypeSettings(self):
         # A set of mixing values for each of the main audio types. The logic being that
         # if you e.g. bounce a thing, you've also recorded the effects, and then playing back

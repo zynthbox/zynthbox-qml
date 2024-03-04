@@ -959,6 +959,26 @@ class sketchpad_clip(QObject):
     sketchContainsSamples = Property(bool, get_sketchContainsSamples, notify=samples_data_changed)
     ### END Property sketchContainsSamples
 
+    ### BEGIN Property metadataSamples
+    def get_metadataSamples(self):
+        if self.audio_metadata is not None:
+            return self.audio_metadata["ZYNTHBOX_SAMPLES"]
+        return ""
+    metadataSamples = Property(str, get_metadataSamples, notify=samples_data_changed)
+    ### END Property metadataSamples
+
+    ### BEGIN Property metadataSamplePickingStyle
+    def get_metadataSamplePickingStyle(self):
+        if self.audio_metadata is not None:
+            try:
+                return int(self.audio_metadata["ZYNTHBOX_SAMPLE_PICKING_STYLE"][0])
+            except Exception as e:
+                pass
+        return 0
+
+    metadataSamplePickingStyle = Property(int, get_metadataSamplePickingStyle, notify=sound_data_changed)
+    ### END Property metadataSamplePickingStyle
+
     ### BEGIN Property metadataAudioTypeSettings
     def get_metadataAudioTypeSettings(self):
         if self.audio_metadata is not None:

@@ -190,6 +190,10 @@ Rectangle {
         }
     }
 
+    function pickSlotToSwapWith(channel, slotType, slotIndex) {
+        slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);
+    }
+
     Connections {
         target: applicationWindow()
         onRequestSamplePicker: {
@@ -694,6 +698,22 @@ Rectangle {
                         to: 1
                         onMoved: {
                             root.selectedChannel.set_passthroughValue("synthPassthrough", root.selectedSlotRow, "dryAmount", value);
+                        }
+                    }
+
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        text: qsTr("Swap with...")
+                        onClicked: {
+                            let swapType = "unknown";
+                            if (synthsButton.checked) {
+                                swapType = "synth";
+                            } else if (fxButton.checked) {
+                                swapType = "fx";
+                            } else if (samplesButton.checked) {
+                                swapType = "sample";
+                            }
+                            bottomStack.slotsBar.pickSlotToSwapWith(root.selectedSlotRowItem.channel, swapType, root.selectedSlotRowItem.channel.selectedSlotRow);
                         }
                     }
                 }

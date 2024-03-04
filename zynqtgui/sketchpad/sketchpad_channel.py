@@ -2062,11 +2062,14 @@ class sketchpad_channel(QObject):
         # logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 
     @Slot("QVariantList")
-    def reorderSlots(self, newOrder):
+    def reorderSlots(self, newOrder, channelAudioType = None):
         """
         This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon channelAudioType
         """
-        if self.channelAudioType == "synth":
+        _channelAudioType = channelAudioType
+        if _channelAudioType is None:
+            _channelAudioType = self.channelAudioType
+        if _channelAudioType == "synth":
             # Reorder synths
             # Form a new chainedSounds as per newOrder
             newChainedSounds = [self.__chained_sounds__[index] for index in newOrder]
@@ -2078,10 +2081,10 @@ class sketchpad_channel(QObject):
                     layer.slot_index = index
 
             self.set_chained_sounds(newChainedSounds)
-        elif self.channelAudioType == "sample-loop":
+        elif _channelAudioType == "sample-loop":
             # Reorder sketches
             pass
-        elif self.channelAudioType in ["sample-trig", "sample-slice"]:
+        elif _channelAudioType in ["sample-trig", "sample-slice"]:
             # Reorder samples
             pass
 
@@ -2094,14 +2097,17 @@ class sketchpad_channel(QObject):
         self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
     @Slot(int, int)
-    def swapSlots(self, slot1, slot2):
+    def swapSlots(self, slot1, slot2, channelAudioType = None):
         """
         Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon channelAudioType
         """
+        _channelAudioType = channelAudioType
+        if _channelAudioType is None:
+            _channelAudioType = self.channelAudioType
         newOrder = [0, 1, 2, 3, 4]
         newOrder[slot1] = slot2
         newOrder[slot2] = slot1
-        self.reorderSlots(newOrder)
+        self.reorderSlots(newOrder, _channelAudioType)
 
     @Slot("QVariantList")
     def reorderChainedFx(self, newOrder):

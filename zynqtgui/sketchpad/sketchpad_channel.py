@@ -2062,6 +2062,48 @@ class sketchpad_channel(QObject):
         # logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 
     @Slot("QVariantList")
+    def reorderSlots(self, newOrder):
+        """
+        This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon channelAudioType
+        """
+        if self.channelAudioType == "synth":
+            # Reorder synths
+            # Form a new chainedSounds as per newOrder
+            newChainedSounds = [self.__chained_sounds__[index] for index in newOrder]
+
+            # Update slot_index of all the zynthian_layer objects
+            for index, midiChannel in enumerate(newChainedSounds):
+                if midiChannel >=0 and self.checkIfLayerExists(midiChannel):
+                    layer = self.zynqtgui.layer.layer_midi_map[midiChannel]
+                    layer.slot_index = index
+
+            self.set_chained_sounds(newChainedSounds)
+        elif self.channelAudioType == "sample-loop":
+            # Reorder sketches
+            pass
+        elif self.channelAudioType in ["sample-trig", "sample-slice"]:
+            # Reorder samples
+            pass
+
+        # Update channelPassthrough values in audioTypeSettings to retain correct values after re-ordering
+        newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
+        newAudioTypeSettings[self.audioTypeKey()]["channelPassthrough"] = [newAudioTypeSettings[self.audioTypeKey()]["channelPassthrough"][index] for index in newOrder]
+        self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
+
+        # Schedule a snapshot save
+        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
+
+    @Slot(int, int)
+    def swapSlots(self, slot1, slot2):
+        """
+        Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon channelAudioType
+        """
+        newOrder = [0, 1, 2, 3, 4]
+        newOrder[slot1] = slot2
+        newOrder[slot2] = slot1
+        self.reorderSlots(newOrder)
+
+    @Slot("QVariantList")
     def reorderChainedFx(self, newOrder):
         """
         This method will reorder the chained FX engines as per the new index order provided in newOrder

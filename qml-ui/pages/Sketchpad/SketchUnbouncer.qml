@@ -91,6 +91,9 @@ Zynthian.DialogQuestion {
                     if (clip.metadataAudioType === "sample-trig") {
                         console.log("Sketch was recorded via sample-trig, so switch to that");
                         _private.channel.channelAudioType = "sample-trig";
+                    } else if (clip.metadataAudioType === "sample-slice") {
+                        console.log("Sketch was recorded via sample-slice, so switch to that");
+                        _private.channel.channelAudioType = "sample-slice";
                     } else if (clip.metadataAudioType === "synth") {
                         console.log("Sketch was recorded via synth sounds, so switch to that");
                         _private.channel.channelAudioType = "synth";
@@ -112,6 +115,7 @@ Zynthian.DialogQuestion {
                     if (replaceSamples.sketchHasData && replaceSamples.checked) {
                         console.log("Replace the channel's sample selection");
                         _private.channel.setChannelSamplesFromSnapshot(clip.metadataSamples);
+                        _private.channel.samplePickingStyle = clip.metadataSamplePickingStyle;
                     }
                     if (replaceSounds.sketchHasData && replaceSounds.checked) {
                         console.log("Replace the channel's current sound setup with what's stored in the sketch");

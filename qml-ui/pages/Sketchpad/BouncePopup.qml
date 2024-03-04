@@ -407,6 +407,7 @@ Zynthian.Popup {
                             if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
                                 // Store the sample data, if we've been playing in a patterny sample mode
                                 metadata["ZYNTHBOX_SAMPLES"] = sketchpadTrack.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
+                                metadata["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = sketchpadTrack.samplePickingStyle; // The method by which samples are picked for playback mode
                             }
                             // Set up the loop points in the new recording
                             let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }

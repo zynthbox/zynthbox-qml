@@ -184,13 +184,31 @@ Rectangle {
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
                             visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType !== "sample-loop"
-                            text: root.selectedPartPattern ? root.selectedPartPattern.objectName : ""
+                            text: root.selectedPartPattern ? qsTr("Pattern %1%2").arg(root.selectedPartChannel.id + 1).arg(root.selectedPartPattern.partName) : ""
                         }
 
                         Kirigami.Separator {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             Layout.preferredHeight: 2
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            visible: root.selectedPartChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedPartChannel.channelAudioType) > -1
+                            text: qsTr("Swap with...")
+                            onClicked: {
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedPartChannel, "pattern", partBarDelegate.selectedPartPattern.partIndex);
+                            }
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType === "sample-loop"
+                            text: qsTr("Swap with...")
+                            onClicked: {
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedPartChannel, "sketch", partBarDelegate.selectedPartPattern.partIndex);
+                            }
                         }
 
                         Item {

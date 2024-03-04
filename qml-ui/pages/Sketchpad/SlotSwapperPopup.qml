@@ -41,19 +41,31 @@ Zynthian.DialogQuestion {
         _private.slotType = slotType;
         var newSlotTitles = [];
         switch(_private.slotType) {
+            case "pattern":
+                let sequenceModel = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+                for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                    let patternModel = sequenceModel.sequence.getByPart(_private.selectedChannel.id, slotIndex);
+                    if (patternModel.hasNotes) {
+                        newSlotTitles.push(qsTr("Pattern %1%2").arg(_private.selectedChannel.id + 1).arg(patternModel.partName));
+                    } else {
+                        newSlotTitles.push(qsTr("Pattern %1%2 (empty)").arg(_private.selectedChannel.id + 1).arg(patternModel.partName));
+                    }
+                }
+                newSlotTitles = [qsTr("Pattern 1"), qsTr("Pattern 2"), qsTr("Pattern 3"), qsTr("Pattern 4"), qsTr("Pattern 5")];
+                break;
             case "synth":
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                    let slotData = root.selectedChannel.chainedSoundsNames[slotIndex]
-                    if (slotData !== "") {
-                        newSlotTitles.push(slotData);
-                    } else {
+                    let slotData = root.selectedChannel.chainedSoundsNames[slotIndex];
+                    if (slotData === "") {
                         newSlotTitles.push("(empty)");
+                    } else {
+                        newSlotTitles.push(slotData);
                     }
                 }
                 break;
             case "sample":
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                    let slotData = root.selectedChannel.samples[slotIndex]
+                    let slotData = root.selectedChannel.samples[slotIndex];
                     if (slotData.path) {
                         newSlotTitles.push(slotData.path.split("/").pop());
                     } else {
@@ -63,7 +75,7 @@ Zynthian.DialogQuestion {
                 break;
             case "sketch":
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                    let slotData = root.selectedChannel.getClipsModelByPart(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                    let slotData = root.selectedChannel.getClipsModelByPart(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                     if (slotData.path) {
                         newSlotTitles.push(slotData.path.split("/").pop());
                     } else {
@@ -73,11 +85,11 @@ Zynthian.DialogQuestion {
                 break;
             case "fx":
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                    let slotData = root.selectedChannel.chainedFxNames[slotIndex]
-                    if (slotData !== "") {
-                        newSlotTitles.push(slotData);
-                    } else {
+                    let slotData = root.selectedChannel.chainedFxNames[slotIndex];
+                    if (slotData === "") {
                         newSlotTitles.push("(empty)");
+                    } else {
+                        newSlotTitles.push(slotData);
                     }
                 }
                 break;
@@ -91,6 +103,15 @@ Zynthian.DialogQuestion {
 
     onAccepted: {
         switch(_private.slotType) {
+            case "pattern":
+                let sequenceModel = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+                let swapThisPattern = sequenceModel.getByPart(_private.selectedChannel.id, _private.slotIndex);
+                let swapThisData = swapThisPattern.toJson();
+                let withThisPattern = sequenceModel.getByPart(_private.selectedChannel.id, slotIndex);
+                let withThisData = withThisPattern.toJson();
+                swapThisPattern.setFromJson(withThisData);
+                withThisPattern.setFromJson(swapThisData);
+                break;
             case "synth":
                 break;
             case "sample":
@@ -98,6 +119,7 @@ Zynthian.DialogQuestion {
             case "sketch":
                 break;
             case "fx":
+                _private.selectedChannel.swapChainedFx(_private.slotIndex, _private.swapWithSlotIndex);
                 break;
             default:
                 console.debug("Unknown slot type!");

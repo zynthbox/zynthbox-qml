@@ -2169,8 +2169,7 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                    readonly property var partNames: ["a", "b", "c", "d", "e"]
-                                    text: qsTr("Pick Part %1%2").arg(partPicker.associatedChannelIndex + 1).arg(partNames[model.index])
+                                    text: qsTr("Pick Part %1%2").arg(partPicker.associatedChannelIndex + 1).arg(partDelegate.pattern.partName)
                                     onClicked: {
                                         var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                                         if (associatedClip.enabled) {

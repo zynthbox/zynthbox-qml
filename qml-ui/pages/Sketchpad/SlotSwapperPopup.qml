@@ -113,13 +113,13 @@ Zynthian.DialogQuestion {
                 withThisPattern.setFromJson(swapThisData);
                 break;
             case "synth":
-                _private.selectedChannel.swapChainedFx(_private.slotIndex, _private.swapWithSlotIndex, "synth");
+                _private.selectedChannel.swapSlots(_private.slotIndex, _private.swapWithSlotIndex, "synth");
                 break;
             case "sample":
-                _private.selectedChannel.swapChainedFx(_private.slotIndex, _private.swapWithSlotIndex, "sample-trig");
+                _private.selectedChannel.swapSlots(_private.slotIndex, _private.swapWithSlotIndex, "sample-trig");
                 break;
             case "sketch":
-                _private.selectedChannel.swapChainedFx(_private.slotIndex, _private.swapWithSlotIndex, "sample-loop");
+                _private.selectedChannel.swapSlots(_private.slotIndex, _private.swapWithSlotIndex, "sample-loop");
                 break;
             case "fx":
                 _private.selectedChannel.swapChainedFx(_private.slotIndex, _private.swapWithSlotIndex);

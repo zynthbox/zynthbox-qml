@@ -1227,11 +1227,11 @@ class sketchpad_channel(QObject):
         if channelAudioType is None:
             channelAudioType = self.channelAudioType
 
-        if self.__channel_audio_type__ == "sample-loop":
+        if channelAudioType == "sample-loop":
             return "sketch"
-        elif self.__channel_audio_type__ == "sample-trig" or self.__channel_audio_type__ == "sample-slice":
+        elif channelAudioType in ["sample-trig", "sample-slice"]:
             return "sample"
-        return self.__channel_audio_type__
+        return channelAudioType
 
     @Slot(None)
     def handleAudioTypeSettingsChanged(self):

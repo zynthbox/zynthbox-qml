@@ -1223,7 +1223,10 @@ class sketchpad_channel(QObject):
 
     channel_audio_type_changed = Signal()
 
-    def audioTypeKey(self):
+    def audioTypeKey(self, channelAudioType = None):
+        if channelAudioType is None:
+            channelAudioType = self.channelAudioType
+
         if self.__channel_audio_type__ == "sample-loop":
             return "sketch"
         elif self.__channel_audio_type__ == "sample-trig" or self.__channel_audio_type__ == "sample-slice":
@@ -2140,7 +2143,7 @@ class sketchpad_channel(QObject):
 
         # Update channelPassthrough values in audioTypeSettings to retain correct values after re-ordering
         newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
-        newAudioTypeSettings[self.audioTypeKey()]["channelPassthrough"] = [newAudioTypeSettings[self.audioTypeKey()]["channelPassthrough"][index] for index in newOrder]
+        newAudioTypeSettings[self.audioTypeKey(_channelAudioType)]["channelPassthrough"] = [newAudioTypeSettings[self.audioTypeKey(_channelAudioType)]["channelPassthrough"][index] for index in newOrder]
         self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
 
         # Schedule a snapshot save

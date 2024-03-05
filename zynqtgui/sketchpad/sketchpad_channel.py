@@ -2114,7 +2114,7 @@ class sketchpad_channel(QObject):
 
         # logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 
-    @Slot("QVariantList")
+    @Slot("QVariantList", str)
     def reorderSlots(self, newOrder, channelAudioType = None):
         """
         This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon channelAudioType
@@ -2149,7 +2149,7 @@ class sketchpad_channel(QObject):
         # Schedule a snapshot save
         self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
-    @Slot(int, int)
+    @Slot(int, int, str)
     def swapSlots(self, slot1, slot2, channelAudioType = None):
         """
         Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon channelAudioType

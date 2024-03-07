@@ -2119,6 +2119,7 @@ class sketchpad_channel(QObject):
         """
         This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon channelAudioType
         """
+        # TODO : Use selectedTrackIndex instead of hardcoding it to 0 after renaming it to something that does not interfere with the name track
         _channelAudioType = channelAudioType
         if _channelAudioType is None:
             _channelAudioType = self.channelAudioType
@@ -2136,7 +2137,12 @@ class sketchpad_channel(QObject):
             self.set_chained_sounds(newChainedSounds)
         elif _channelAudioType == "sample-loop":
             # Reorder sketches
-            pass
+            old_order_clips = [self.getClipsModelByPart(index).getClip(0) for index in range(5)]
+            for index, clip in enumerate(old_order_clips):
+                if index != newOrder[index]:
+                    self.getClipsModelByPart(newOrder[index]).__clips__[0] = clip
+                    clip.part = newOrder[index]
+            self.zynqtgui.sketchpad.song.schedule_save()
         elif _channelAudioType in ["sample-trig", "sample-slice"]:
             # Reorder samples
             pass
@@ -2145,6 +2151,8 @@ class sketchpad_channel(QObject):
         newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
         newAudioTypeSettings[self.audioTypeKey(_channelAudioType)]["channelPassthrough"] = [newAudioTypeSettings[self.audioTypeKey(_channelAudioType)]["channelPassthrough"][index] for index in newOrder]
         self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
+
+        self.slotsReordered.emit()
 
         # Schedule a snapshot save
         self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
@@ -2197,4 +2205,5 @@ class sketchpad_channel(QObject):
         newOrder[slot2] = slot1
         self.reorderChainedFx(newOrder)
 
+    slotsReordered = Signal()
     className = Property(str, className, constant=True)

@@ -464,8 +464,12 @@ class sketchpad_clip(QObject):
 
     def part(self):
         return self.__part_index__
-
-    part = Property(int, part, constant=True)
+    def set_part(self, index):
+        if self.__part_index__ != index:
+            self.__part_index__ = index
+            self.part_index_changed.emit()
+    part_index_changed = Signal()
+    part = Property(int, part, set_part, notify=part_index_changed)
 
     def lane(self):
         return self.__lane__

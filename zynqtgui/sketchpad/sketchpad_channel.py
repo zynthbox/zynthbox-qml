@@ -2202,7 +2202,11 @@ class sketchpad_channel(QObject):
             self.zynqtgui.sketchpad.song.schedule_save()
         elif _channelAudioType in ["sample-trig", "sample-slice"]:
             # Reorder samples
-            pass
+            new_order_samples = [self.samples[index] for index in newOrder]
+            for index, sample in enumerate(new_order_samples):
+                sample.set_lane(index)
+            self.__samples__ = new_order_samples
+            self.samples_changed.emit()
 
         # Update channelPassthrough values in audioTypeSettings to retain correct values after re-ordering
         newAudioTypeSettings = json.loads(self.getAudioTypeSettings())

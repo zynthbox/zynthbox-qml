@@ -722,45 +722,11 @@ Rectangle {
                                 Layout.fillHeight: false
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
-                                Binding { //Optimization
-                                    target: synthRepeater
-                                    property: "synthData"
-                                    delayed: true
-                                    function humanReadableClientName(clientName) {
-                                        if (clientName === "") {
-                                            return qsTr("None");
-                                        } else if (clientName === "system") {
-                                            return qsTr("Mic In");
-                                        }
-                                        return clientName;
-                                    }
-                                    value: root.selectedChannel.channelAudioType === "synth"
-                                                ? root.selectedChannel.chainedSoundsNames
-                                                : root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                root.selectedChannel.channelAudioType === "sample-slice"
-                                                    ? root.selectedChannel.samples
-                                                    : root.selectedChannel.channelAudioType === "sample-loop"
-                                                        ? [root.selectedChannel.getClipsModelByPart(0).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex),
-                                                           root.selectedChannel.getClipsModelByPart(1).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex),
-                                                           root.selectedChannel.getClipsModelByPart(2).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex),
-                                                           root.selectedChannel.getClipsModelByPart(3).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex),
-                                                           root.selectedChannel.getClipsModelByPart(4).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)]
-                                                        : root.selectedChannel.channelAudioType === "external"
-                                                            ? [
-                                                                qsTr("Capture: %1").arg(root.selectedChannel ? humanReadableClientName(root.selectedChannel.externalAudioSource) : ""),
-                                                                qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""),
-                                                                null,
-                                                                null,
-                                                                null]
-                                                            : [null, null, null, null, null]
-
-                                }
-
                                 Repeater {
                                     id: synthRepeater
 
                                     model: 5
-                                    property var synthData: [null, null, null, null, null]
+                                    property var synthData: root.selectedChannel.slotsData
                                     delegate: Rectangle {
                                         id: slotDelegate
                                         property bool highlighted: root.selectedChannel.channelAudioType === "sample-slice"

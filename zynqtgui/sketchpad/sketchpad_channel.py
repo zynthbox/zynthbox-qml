@@ -205,6 +205,14 @@ class sketchpad_channel(QObject):
             fxClient.dryWetMixAmountChanged.connect(lambda:handlePassthroughClientDryWetMixAmountChanged(fxClient))
             fxClient.panAmountChanged.connect(lambda:handlePassthroughClientPanAmountChanged(fxClient))
 
+        # Connect to respective signals when any of the slot data changes for property slotsData
+        self.channel_audio_type_changed.connect(lambda: self.emitSlotsDataChanged("channelAudioType"))
+        self.chainedSoundsNamesChanged.connect(lambda: self.emitSlotsDataChanged("chainedSoundsNames"))
+        self.samples_changed.connect(lambda: self.emitSlotsDataChanged("samples"))
+        self.slotsReordered.connect(lambda: self.emitSlotsDataChanged("slotsReordered"))
+        self.externalAudioSourceChanged.connect(lambda: self.emitSlotsDataChanged("externalAudioSource"))
+        self.externalMidiChannelChanged.connect(lambda: self.emitSlotsDataChanged("externalMidiChannel"))
+
     def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
         if theSender in self.__channelPassthroughClients:
             if theSomething == "muted":
@@ -1954,6 +1962,55 @@ class sketchpad_channel(QObject):
 
     chainedSoundsAcceptedChannels = Property("QVariantList", get_chainedSoundsAcceptedChannels, notify=chainedSoundsAcceptedChannelsChanged)
     ### End property chainedSoundsAcceptedChannels
+
+    ### BEGIN Property slotsData
+    def emitSlotsDataChanged(self, whatChanged):
+        emitSlotsChanged = False
+
+        if whatChanged == "channelAudioType":
+            emitSlotsChanged = True
+        elif whatChanged == "chainedSoundsNames":
+            if self.channelAudioType == "synth":
+                emitSlotsChanged = True
+        elif whatChanged == "samples":
+            if self.channelAudioType in ["sample-trig", "sample-slice"]:
+                emitSlotsChanged = True
+        elif whatChanged == "slotsReordered":
+            if self.channelAudioType == "sample-loop":
+                emitSlotsChanged = True
+        elif whatChanged in ["externalAudioSource", "externalMidiChannel"]:
+            if self.channelAudioType == "external":
+                emitSlotsChanged = True
+
+        if emitSlotsChanged:
+            self.slotsDataChanged.emit()
+
+    def get_slotsData(self):
+        def humanReadableExternalClientName(clientName):
+            if clientName == "":
+                return "None"
+            elif clientName == "system":
+                return "Mic In"
+            else:
+                return clientName
+
+        if self.channelAudioType == "synth":
+            return self.chainedSoundsNames
+        elif self.channelAudioType in ["sample-trig", "sample-slice"]:
+            return self.samples
+        elif self.channelAudioType == "sample-loop":
+            return self.getAllPartClips()
+        elif self.channelAudioType == "external":
+            return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
+                    f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
+                    None,
+                    None,
+                    None]
+        else:
+            return [None, None, None, None, None]
+    slotsDataChanged = Signal()
+    slotsData = Property("QVariantList", get_slotsData, notify=slotsDataChanged)
+    ### END Property slotsData
 
     @Slot(int)
     def selectPreviousSynthPreset(self, slot_index):

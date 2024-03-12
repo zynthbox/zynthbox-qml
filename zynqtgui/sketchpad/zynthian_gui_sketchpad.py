@@ -786,11 +786,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     # Load snapshot
                     if Path(snapshot_path).exists():
                         logging.info(f"Loading snapshot : {snapshot_path}")
-                        self.zynqtgui.currentTaskMessage = "Loading snapshot"
+                        self.zynqtgui.currentTaskMessage = "Loading Sketchpad: Restoring Snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot(snapshot_path)
                     elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                         logging.info(f"Loading default snapshot")
-                        self.zynqtgui.currentTaskMessage = "Loading snapshot"
+                        self.zynqtgui.currentTaskMessage = "Loading Sketchpad: Default Snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
                 if load_last_state_snapshot:
                     if not self.zynqtgui.screens["snapshot"].load_last_state_snapshot():

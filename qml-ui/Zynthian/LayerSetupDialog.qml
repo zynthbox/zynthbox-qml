@@ -38,6 +38,7 @@ Zynthian.ActionPickerPopup {
     id: root
     property QtObject selectedChannel: null
     signal requestSlotPicker(QtObject channel, string slotType, int slotIndex)
+    signal requestSlotInputPicker(QtObject channel, string slotType, int slotIndex)
 
     Timer {
         id: selectedChannelThrottle
@@ -70,23 +71,16 @@ Zynthian.ActionPickerPopup {
             font.italic: true
         }
     }
-    Timer { //HACK why is this necessary?
-        id: newSynthWorkaroundTimer
-        interval: 200
-        onTriggered: {
-            if (root.selectedChannel.connectedPattern >= 0) {
-                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
-                pattern.midiChannel = root.selectedChannel.connectedSound;
-            }
-        }
-    }
 
+    columns: 2
+    rows: 4
+    property bool layerExists: root.selectedChannel ? root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]) : false
     actions: [
         Kirigami.Action {
             text: qsTr("Pick a Synth")
             onTriggered: {
                 Qt.callLater(function() {
-                    if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
+                    if (root.layerExists) {
                         zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
                         root.close()
                         zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
@@ -106,7 +100,7 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            enabled: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+            enabled: root.layerExists
             text: qsTr("Change preset")
             onTriggered: {
                 zynqtgui.current_screen_id = "preset"
@@ -121,12 +115,6 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            text: qsTr("Swap with...")
-            onTriggered: {
-                root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
-            }
-        },
-        Kirigami.Action {
             text: qsTr("Edit Sound")
             onTriggered: {
                 root.close();
@@ -134,11 +122,27 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            enabled: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+            text: qsTr("Swap with...")
+            onTriggered: {
+                root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
+            }
+        },
+        QQC2.Action {
+            enabled: root.layerExists
+            text: "Set Input Overrides..."
+            onTriggered: {
+                root.requestSlotInputPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
+            }
+        },
+        QQC2.Action {
+            enabled: false
+        },
+        Kirigami.Action {
+            enabled: root.layerExists
             text: qsTr("Remove Synth")
             onTriggered: {
                 root.close();
-                if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
+                if (root.layerExists) {
                     root.selectedChannel.remove_and_unchain_sound(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                 }
             }

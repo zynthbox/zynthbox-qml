@@ -194,6 +194,10 @@ Rectangle {
         slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);
     }
 
+    function openSlotInputPicker(channel, slotType, slotIndex) {
+        slotInputPicker.pickSlotInputs(channel, slotType, slotIndex);
+    }
+
     Connections {
         target: applicationWindow()
         onRequestSamplePicker: {
@@ -762,6 +766,10 @@ Rectangle {
         id: slotSwapperPopup
     }
 
+    SlotInputPicker {
+        id: slotInputPicker
+    }
+
     Zynthian.FilePickerDialog {
         id: bankPickerDialog
         parent: zlScreen.parent
@@ -953,6 +961,9 @@ Rectangle {
         onRequestSlotPicker: {
             slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);
         }
+        onRequestSlotInputPicker: {
+            slotInputPicker.pickSlotInputs(channel, slotType, slotIndex);
+        }
     }
 
     ExternalAudioSourcePicker {
@@ -987,16 +998,22 @@ Rectangle {
                 }
             },
             Kirigami.Action {
+                text: qsTr("Edit FX")
+                visible: fxSetupDialog.selectedFx != null
+                onTriggered: {
+                    zynqtgui.show_screen("control")
+                }
+            },
+            Kirigami.Action {
                 text: qsTr("Swap with...")
                 onTriggered: {
                     slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
                 }
             },
-            Kirigami.Action {
-                text: qsTr("Edit FX")
-                visible: fxSetupDialog.selectedFx != null
+            QQC2.Action {
+                text: "Set Input Overrides..."
                 onTriggered: {
-                    zynqtgui.show_screen("control")
+                    slotInputPicker.pickSlotInputs(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
                 }
             },
             Kirigami.Action {

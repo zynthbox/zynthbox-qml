@@ -27,6 +27,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 import Zynthian 1.0 as Zynthian
 
 QQC2.Button {
@@ -41,6 +42,12 @@ QQC2.Button {
     property var comboBoxPopup: popupComponent.createObject(applicationWindow(), {"model": root.model})
 
     signal activated(int index)
+    function selectIndex(index) {
+        root.currentIndex = index;
+        if (-1 < index && index < comboBoxPopup.popupListView.count) {
+            comboBoxPopup.popupListView.positionViewAtIndex(index, ListView.Center);
+        }
+    }
 
     contentItem: QQC2.Label {
         horizontalAlignment: QQC2.Label.AlignLeft
@@ -49,8 +56,12 @@ QQC2.Button {
         color: Kirigami.Theme.textColor
     }
     onCurrentIndexChanged: {
-        root.currentItem = comboBoxPopup.popupRepeater.itemAt(root.currentIndex)
-        root.currentText = root.currentItem.label
+        root.currentItem = comboBoxPopup.popupListView.itemAtIndex(root.currentIndex);
+        if (root.currentItem) {
+            root.currentText = root.currentItem.text;
+        } else {
+            root.currentText = "";
+        }
     }
     onClicked: {
         comboBoxPopup.open()
@@ -66,40 +77,79 @@ QQC2.Button {
         Zynthian.Popup {
             id: popupRoot
 
-            property alias popupRepeater: popupRepeater
-            property alias model: popupRepeater.model
+            property alias popupListView: popupListView
+            property alias model: popupListView.model
+
+            property var cuiaCallback: function(cuia) {
+                var returnValue = true;
+                switch (cuia) {
+                    case "KNOB3_UP":
+                    case "SELECT_DOWN":
+                    case "NAVIGATE_RIGHT":
+                        root.selectIndex(root.currentIndex + 1);
+                        break;
+                    case "KNOB3_DOWN":
+                    case "SELECT_UP":
+                    case "NAVIGATE_LEFT":
+                        root.selectIndex(root.currentIndex - 1);
+                        break;
+                    case "SWITCH_SELECT_SHORT":
+                    case "SWITCH_SELECT_BOLD":
+                    case "SWITCH_SELECT_LONG":
+                        root.activated(root.currentIndex);
+                        popupRoot.close();
+                        break;
+                    case "SWITCH_BACK_SHORT":
+                    case "SWITCH_BACK_BOLD":
+                    case "SWITCH_BACK_LONG":
+                        popupRoot.close();
+                        break;
+                }
+
+                return returnValue;
+            }
 
             parent: QQC2.Overlay.overlay
             x: parent.width / 2 - width / 2
             y: parent.height / 2 - height / 2
             width: Kirigami.Units.gridUnit * 20
-            height: Math.min(contentHeight, parent.height * 0.8)
+            height: Math.min(popupListView.count * Kirigami.Units.gridUnit * 2, parent.height * 0.8)
             clip: true
 
-            QQC2.ScrollView {
+            ListView {
+                id: popupListView
                 anchors.fill: parent
-                contentWidth: parent.width
-
-                ColumnLayout {
-                    id: content
-                    anchors.fill: parent
-                    spacing: 0
-
-                    Repeater {
-                        id: popupRepeater
-                        delegate: Kirigami.BasicListItem {
-                            id: delegate
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                            reserveSpaceForIcon: false
-                            highlighted: root.currentIndex === index
-                            label: "%1%2".arg(root.textPrefix).arg(model[root.textRole])
-                            onClicked: {
-                                root.currentIndex = index
-                                root.activated(index)
-                                popupRoot.close()
-                            }
+                cacheBuffer: height * 2
+                currentIndex: root.currentIndex
+                delegate: QQC2.ItemDelegate {
+                    id: delegate
+                    width: ListView.view.width
+                    height: Kirigami.Units.gridUnit * 2
+                    text: "%1%2".arg(root.textPrefix).arg(model[root.textRole])
+                    highlighted: popupListView.currentIndex === index || delegate.pressed
+                    contentItem: Item {
+                        anchors.fill: parent
+                        PlasmaCore.FrameSvgItem {
+                            anchors.fill: parent
+                            visible: delegate.highlighted
+                            imagePath: "widgets/viewitem"
+                            // Always add hover prefix as it should not show filled background for selected items
+                            // Always show white outline for hover/selected item.
+                            prefix: "hover"
                         }
+                        QQC2.Label {
+                            text: delegate.text
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.smallSpacing
+                            }
+                            horizontalAlignment: Text.AlignLeft
+                        }
+                    }
+                    onClicked: {
+                        root.currentIndex = index
+                        root.activated(index)
+                        popupRoot.close()
                     }
                 }
             }

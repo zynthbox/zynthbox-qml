@@ -39,6 +39,7 @@ from pathlib import Path
 from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QThread, QTimer, Qt, Signal, Slot
 from .sketchpad_clips_model import sketchpad_clips_model
 from .sketchpad_clip import sketchpad_clip
+from .sketchpad_engineRoutingData import sketchpad_engineRoutingData
 from zynqtgui import zynthian_gui_config
 from ..zynthian_gui_multi_controller import MultiController
 
@@ -138,6 +139,15 @@ class sketchpad_channel(QObject):
 
         self.__channel_audio_type__ = "synth"
         self.__channel_routing_style__ = "standard"
+        self.__routingData__ = {
+            "fx": [],
+            "synth": []
+            }
+        for routingDataCategory in ["fx", "synth"]:
+            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                newRoutingData = sketchpad_engineRoutingData(self)
+                newRoutingData.routingDataChanged.connect(self.__song__.schedule_save)
+                self.__routingData__[routingDataCategory].append(newRoutingData)
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
 
@@ -482,6 +492,8 @@ class sketchpad_channel(QObject):
                 "chainedSounds": self.__chained_sounds__,
                 "channelAudioType": self.__channel_audio_type__,
                 "channelRoutingStyle": self.__channel_routing_style__,
+                "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
+                "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
                 "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
@@ -505,8 +517,8 @@ class sketchpad_channel(QObject):
                 self.__connected_pattern__ = obj["connectedPattern"]
                 self.set_connected_pattern(self.__connected_pattern__)
             if "chainedSounds" in obj:
-                self.__chained_sounds__ = obj["chainedSounds"]
-                self.set_chained_sounds(self.__chained_sounds__)
+                self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
+                self.set_chained_sounds(obj["chainedSounds"])
             if "channelAudioType" in obj:
                 self.__channel_audio_type__ = obj["channelAudioType"]
                 self.set_channel_audio_type(self.__channel_audio_type__, True)
@@ -519,6 +531,20 @@ class sketchpad_channel(QObject):
                 self.set_channel_routing_style(obj["channelRoutingStyle"], True)
             else:
                 self.set_channel_routing_style("standard", True)
+            if "fxRoutingData" in obj:
+                for slotIndex, routingData in enumerate(obj["fxRoutingData"]):
+                    if slotIndex > 4:
+                        logging.error("Error during deserialization: fxRoutingData has too many entries")
+                        break
+                    self.__routingData__["fx"][slotIndex].deserialize(routingData)
+            self.fxRoutingDataChanged.emit()
+            if "synthRoutingData" in obj:
+                for slotIndex, routingData in enumerate(obj["synthRoutingData"]):
+                    if slotIndex > 4:
+                        logging.error("Error during deserialization: synthRoutingData has too many entries")
+                        break
+                    self.__routingData__["synth"][slotIndex].deserialize(routingData)
+            self.synthRoutingDataChanged.emit()
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "externalCaptureVolume" in obj:
@@ -999,7 +1025,7 @@ class sketchpad_channel(QObject):
         self.zynqtgui.currentTaskMessage = f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}"
         self.zynqtgui.do_long_task(task)
 
-    def set_chained_sounds(self, sounds):
+    def set_chained_sounds(self, sounds, updateRoutingData:bool = True):
         logging.debug(f"set_chained_sounds : {sounds}")
         update_jack_ports = True
 
@@ -1016,6 +1042,7 @@ class sketchpad_channel(QObject):
         if chained_sounds == self.__chained_sounds__:
             update_jack_ports = False
 
+        oldChainedSounds = self.__chained_sounds__
         self.__chained_sounds__ = chained_sounds
 
         try: #can be called before creation
@@ -1030,6 +1057,30 @@ class sketchpad_channel(QObject):
 
         if update_jack_ports:
             self.update_jack_port()
+
+        if updateRoutingData:
+            self.zynqtgui.layer.fill_list()
+            logging.error(f"Updating routing data for {self.name} with chained sounds {chained_sounds}")
+            for position in range(0, 5):
+                oldEntry = oldChainedSounds[position]
+                newEntry = chained_sounds[position]
+                if oldEntry == -1 and newEntry > -1 and self.checkIfLayerExists(newEntry):
+                    # if any engines have been added, ensure the synth engine data slot has that information
+                    newLayer = self.zynqtgui.layer.layer_midi_map[newEntry]
+                    logging.error(f"Updating data container for {newLayer.engine.name}")
+                    dataContainer = self.__routingData__["synth"][position]
+                    dataContainer.name = self.getLayerNameByMidiChannel(newEntry)
+                    audioInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_audio=True, is_input=True)
+                    for port in audioInPorts:
+                        logging.error(f"Adding audio in port for {port}")
+                        dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                    midiInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_midi=True, is_input=True)
+                    for port in midiInPorts:
+                        logging.error(f"Adding midi in port for {port}")
+                        dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                elif newEntry == -1 and oldEntry > -1:
+                    # if any engines have been removed, clear out the equivalent synth engine data slot
+                    self.__routingData__["synth"][position].clear()
 
         self.update_sound_snapshot_json()
         if self.zynqtgui.isBootingComplete:
@@ -1047,6 +1098,8 @@ class sketchpad_channel(QObject):
     def set_chainedFx(self, fx):
         if fx != self.__chained_fx:
             self.__chained_fx = fx
+            for slot_index, layer in enumerate(fx):
+                self.updateChainedFxEngineData(slot_index, layer)
             self.update_jack_port()
             self.update_sound_snapshot_json()
             self.__song__.schedule_save()
@@ -1064,8 +1117,10 @@ class sketchpad_channel(QObject):
             self.__chained_fx[slot_row].reset()
             self.zynqtgui.zynautoconnect_release_lock()
             self.zynqtgui.screens['engine'].stop_unused_engines()
+            self.__routingData__["fx"][slot_row].clear()
 
         self.__chained_fx[slot_row] = layer
+        self.updateChainedFxEngineData(slot_row, layer)
         self.chainedFxChanged.emit()
         self.chainedFxNamesChanged.emit()
 
@@ -1077,6 +1132,7 @@ class sketchpad_channel(QObject):
                     layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[self.__selected_fx_slot_row])
                     self.zynqtgui.layer.remove_layer(layer_index)
                     self.__chained_fx[self.__selected_fx_slot_row] = None
+                    self.__routingData__["fx"][self.__selected_fx_slot_row].clear()
 
                     self.chainedFxChanged.emit()
                     self.chainedFxNamesChanged.emit()
@@ -1092,6 +1148,17 @@ class sketchpad_channel(QObject):
 
         self.zynqtgui.currentTaskMessage = f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}"
         self.zynqtgui.do_long_task(task)
+
+    def updateChainedFxEngineData(self, position, layer):
+        if layer is not None:
+            dataContainer = self.__routingData__["fx"][position]
+            dataContainer.name = self.chainedFxNames[position]
+            audioInPorts = self.jclient.get_ports(layer.jackname, is_audio=True, is_input=True)
+            for port in audioInPorts:
+                dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+            midiInPorts = self.jclient.get_ports(layer.jackname, is_midi=True, is_input=True)
+            for port in midiInPorts:
+                dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
 
     chainedFxChanged = Signal()
     chainedFx = Property('QVariantList', get_chainedFx, set_chainedFx, notify=chainedFxChanged)
@@ -1271,7 +1338,35 @@ class sketchpad_channel(QObject):
     channel_routing_style_changed = Signal()
 
     channelRoutingStyle = Property(str, get_channel_routing_style, set_channel_routing_style, notify=channel_routing_style_changed)
+
+    def get_channel_routing_style_name(self):
+        if self.__channel_routing_style__ == "standard":
+            return "Standard"
+        elif self.__channel_routing_style__ == "one-to-one":
+            return "One-to-One"
+        return "Unknown"
+    channelRoutingStyleName = Property(str, get_channel_routing_style_name, notify=channel_routing_style_changed)
     ### END Property channelRoutingStyle
+
+    ### BEGIN Property fxRoutingData
+    def get_fxRoutingData(self):
+        return self.__routingData__["fx"]
+
+    fxRoutingDataChanged = Signal()
+
+    fxRoutingData = Property('QVariantList', get_fxRoutingData, notify=fxRoutingDataChanged)
+    ### END Property fxRoutingData
+
+    ### BEGIN Property synthRoutingData
+    def get_synthRoutingData(self):
+        routingData = self.__routingData__["synth"]
+        # logging.error(f"Getting routing data: {routingData}")
+        return routingData
+
+    synthRoutingDataChanged = Signal()
+
+    synthRoutingData = Property('QVariantList', get_synthRoutingData, notify=synthRoutingDataChanged)
+    ### END Property synthRoutingData
 
     ### BEGIN Property channelTypeDisplayName
     def get_channelTypeDisplayName(self):
@@ -2191,7 +2286,10 @@ class sketchpad_channel(QObject):
                     layer = self.zynqtgui.layer.layer_midi_map[midiChannel]
                     layer.slot_index = index
 
-            self.set_chained_sounds(newChainedSounds)
+            self.set_chained_sounds(newChainedSounds, updateRoutingData=False)
+
+            newRoutingData = [self.__routingData__["synth"] for index in newOrder]
+            self.__routingData__["synth"] = newRoutingData
         elif _channelAudioType == "sample-loop":
             # Reorder sketches
             old_order_clips = [self.getClipsModelByPart(index).getClip(0) for index in range(5)]
@@ -2243,6 +2341,10 @@ class sketchpad_channel(QObject):
         for index, fx in enumerate(newChainedFx):
             if fx is not None:
                 fx.slot_index = index
+
+        # Swap the routing data
+        newRoutingData = [self.__routingData__["fx"] for index in newOrder]
+        self.__routingData__["fx"] = newRoutingData
 
         # Update fxPassthrough values in audioTypeSettings to retain correct values after re-ordering
         newAudioTypeSettings = json.loads(self.getAudioTypeSettings())

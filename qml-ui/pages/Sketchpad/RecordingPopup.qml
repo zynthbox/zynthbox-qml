@@ -633,86 +633,8 @@ Zynthian.Popup {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                     Layout.preferredHeight: _private.preferredRowHeight
                                     currentIndex: 0
-                                    model: ListModel {
-                                        id: midiSourcesModel
-                                        ListElement { text: "Current Track"; value: "sketchpadTrack:-1" } // -1 is the internal shorthand used for the current track basically everywhere
-                                        ListElement { text: "Track 1"; value: "sketchpadTrack:0"; hardwareRow: -1 }
-                                        ListElement { text: "Track 2"; value: "sketchpadTrack:1"; hardwareRow: -1 }
-                                        ListElement { text: "Track 3"; value: "sketchpadTrack:2"; hardwareRow: -1 }
-                                        ListElement { text: "Track 4"; value: "sketchpadTrack:3"; hardwareRow: -1 }
-                                        ListElement { text: "Track 5"; value: "sketchpadTrack:4"; hardwareRow: -1 }
-                                        ListElement { text: "Track 6"; value: "sketchpadTrack:5"; hardwareRow: -1 }
-                                        ListElement { text: "Track 7"; value: "sketchpadTrack:6"; hardwareRow: -1 }
-                                        ListElement { text: "Track 8"; value: "sketchpadTrack:7"; hardwareRow: -1 }
-                                        ListElement { text: "Track 9"; value: "sketchpadTrack:8"; hardwareRow: -1 }
-                                        ListElement { text: "Track 10"; value: "sketchpadTrack:9"; hardwareRow: -1 }
-                                    }
+                                    model: Zynthbox.MidiRouter.model.midiInSources
                                     textRole: "text"
-                                    Zynthbox.FilterProxy {
-                                        id: hardwareInputDevices
-                                        sourceModel: Zynthbox.MidiRouter.model
-                                        filterRole: Zynthbox.MidiRouterDeviceModel.IsHardwareDeviceRole
-                                        filterBoolean: true
-                                    }
-                                    Component.onCompleted: {
-                                        for (let newRow = 0; newRow < hardwareInputDevices.count; ++newRow) {
-                                            midiSourcesModel.append({
-                                                "text": hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole),
-                                                "value": "external:" + hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HardwareIdRole),
-                                                "hardwareRow": newRow
-                                            });
-                                            // console.log("Adding device", hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole), "for row", newRow);
-                                        }
-                                    }
-                                    Connections {
-                                        target: hardwareInputDevices
-                                        onRowsInserted: {
-                                            for (let newRow = first; newRow < last + 1; ++newRow) {
-                                                let addEntry = true;
-                                                for (let ourIndex = 0; ourIndex < midiSourcesModel.count; ++ourIndex) {
-                                                    let ourEntry = midiSourcesModel.get(ourIndex);
-                                                    if (ourEntry.hardwareRow === newRow) {
-                                                        addEntry = false;
-                                                        break;
-                                                    }
-                                                }
-                                                if (addEntry) {
-                                                    midiSourcesModel.append({
-                                                        "text": hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole),
-                                                        "value": "external:" + hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HardwareIdRole),
-                                                        "hardwareRow": newRow
-                                                    });
-                                                    // console.log("Adding device", hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole), "for row", newRow);
-                                                }
-                                            }
-                                        }
-                                        onRowsRemoved: {
-                                            for (let removedRow = first; removedRow < last + 1; ++removedRow) {
-                                                for (let ourIndex = 0; ourIndex < midiSourcesModel.count; ++ourIndex) {
-                                                    let ourEntry = midiSourcesModel.get(ourIndex);
-                                                    if (ourEntry.hardwareRow === removedRow) {
-                                                        midiSourcesModel.remove(ourIndex);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        onDataChanged: {
-                                            for (let changedRow = topLeft.row; changedRow < bottomRight.row + 1; ++changedRow) {
-                                                for (let ourIndex = 0; ourIndex < midiSourcesModel.count; ++ourIndex) {
-                                                    let ourEntry = midiSourcesModel.get(ourIndex);
-                                                    if (ourEntry.hardwareRow === changedRow) {
-                                                        midiSourcesModel.set(ourIndex, {
-                                                            "text": hardwareInputDevices.data(hardwareInputDevices.index(changedRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole),
-                                                            "value": "external:" + hardwareInputDevices.data(hardwareInputDevices.index(changedRow, 0), Zynthbox.MidiRouterDeviceModel.HardwareIdRole),
-                                                            "hardwareRow": changedRow
-                                                        });
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                             }
                             RowLayout {

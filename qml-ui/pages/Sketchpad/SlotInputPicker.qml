@@ -110,11 +110,12 @@ Zynthian.DialogQuestion {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: false
+                model: Zynthbox.MidiRouter.model.audioInSources
                 function pickSource(port, source) {
                     sourceComboBox.port = port;
                     sourceComboBox.source = source;
                     if (sourceComboBox.source) {
-                        sourceComboBox.selectIndex(audioInSourceComboModel.indexOfValue(source.port));
+                        sourceComboBox.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(source.port));
                     } else {
                         sourceComboBox.selectIndex(-1);
                     }
@@ -124,7 +125,7 @@ Zynthian.DialogQuestion {
                 property QtObject port: null
                 property QtObject source: null
                 onActivated: {
-                    let listElement = sourceComboBox.model.get(index);
+                    let listElement = sourceComboBox.model[index];
                     if (sourceComboBox.source === null) {
                         sourceComboBox.port.addSource(listElement.value, listElement.text);
                     } else {
@@ -133,62 +134,6 @@ Zynthian.DialogQuestion {
                     }
                     sourceComboBox.source = null;
                 }
-            }
-            ListModel {
-                id: audioInSourceComboModel
-                function indexOfValue(value) {
-                    for (let index = 0; index < count; ++index) {
-                        let element = get(index);
-                        if (element.value == value) {
-                            return index;
-                        }
-                    }
-                    return -1;
-                }
-                // standard routing input (the normal input)
-                // system
-                //  - microphone in
-                // track
-                //  - sound slot 1-5
-                //  - fx slot 1-5
-                // no input (literally just a "don't route sound to here" option
-                ListElement { text: "Standard Routing - Left Channel"; value: "standard-routing:left" }
-                ListElement { text: "Standard Routing - Right Channel"; value: "standard-routing:right" }
-                ListElement { text: "Standard Routing - Both Channels"; value: "standard-routing:both" }
-                ListElement { text: "No Audio Input"; value: "no-input" }
-                ListElement { text: "Audio In - Left Channel"; value: "external:left" }
-                ListElement { text: "Audio In - Right Channel"; value: "external:right" }
-                ListElement { text: "Audio In - Both Channels"; value: "external:both" }
-                ListElement { text: "Master Output - Left Channel"; value: "internal-master:left" }
-                ListElement { text: "Master Output - Right Channel"; value: "internal-master:right" }
-                ListElement { text: "Master Output - Both Channels"; value: "internal-master:both" }
-            }
-            Component.onCompleted: {
-                let clients = ["sketchpadTrack", "fxSlot"]
-                let clientNames = ["Track Sound", "Track FX"]
-                let entries = [
-                    ["dry0", "dry1", "dry2", "dry3", "dry4"],
-                    ["dry0", "wet0", "dry1", "wet1", "dry2", "wet2", "dry3", "wet3", "dry4", "wet4"]
-                    ];
-                let entryNames = [
-                    ["Output 1", "Output 2", "Output 3", "Output 4", "Output 5"],
-                    ["Slot 1 (Dry)", "Slot 1 (Wet)", "Slot 2 (Dry)", "Slot 2 (Wet)", "Slot 3 (Dry)", "Slot 3 (Wet)", "Slot 4 (Dry)", "Slot 4 (Wet)", "Slot 5 (Dry)", "Slot 5 (Wet)"]
-                    ];
-                let channels = ["left", "right", "both"];
-                let channelNames = ["Left", "Right", "Both"]
-                for (let clientIndex = 0; clientIndex < 2; ++clientIndex) {
-                    for (let trackIndex = 0; trackIndex < Zynthbox.Plugin.sketchpadTrackCount; ++trackIndex) {
-                        for (let entryIndex = 0; entryIndex < entries[clientIndex].length; ++entryIndex) {
-                            for (let channelIndex = 0; channelIndex < 3; ++channelIndex) {
-                                audioInSourceComboModel.append({
-                                    "text": qsTr("Track %1 %2 - %3 - %4 Channel").arg(clientNames[clientIndex]).arg(trackIndex + 1).arg(entryNames[clientIndex][entryIndex]).arg(channelNames[channelIndex]),
-                                    "value": "%1:%2:%3:%4".arg(clients[clientIndex]).arg(trackIndex).arg(entries[clientIndex][entryIndex]).arg(channels[channelIndex])
-                                });
-                            }
-                        }
-                    }
-                }
-                sourceComboBox.model = audioInSourceComboModel;
             }
             Repeater {
                 id: portRepeater
@@ -253,11 +198,12 @@ Zynthian.DialogQuestion {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 visible: false
+                model: Zynthbox.MidiRouter.model.midiInSources
                 function pickSource(port, source) {
                     midiSourceComboBox.port = port;
                     midiSourceComboBox.source = source;
                     if (midiSourceComboBox.source) {
-                        midiSourceComboBox.selectIndex(midiSourcesModel.indexOfValue(source.port));
+                        midiSourceComboBox.selectIndex(Zynthbox.MidiRouter.model.midiInSourceValue(source.port));
                     } else {
                         midiSourceComboBox.selectIndex(-1);
                     }
@@ -267,7 +213,7 @@ Zynthian.DialogQuestion {
                 property QtObject port: null
                 property QtObject source: null
                 onActivated: {
-                    let listElement = midiSourceComboBox.model.get(index);
+                    let listElement = midiSourceComboBox.model[index];
                     if (midiSourceComboBox.source === null) {
                         midiSourceComboBox.port.addSource(listElement.value, listElement.text);
                     } else {
@@ -275,96 +221,6 @@ Zynthian.DialogQuestion {
                         midiSourceComboBox.source.name = listElement.text;
                     }
                     midiSourceComboBox.source = null;
-                }
-            }
-            ListModel {
-                id: midiSourcesModel
-                function indexOfValue(value) {
-                    for (let index = 0; index < count; ++index) {
-                        let element = get(index);
-                        if (element.value == value) {
-                            return index;
-                        }
-                    }
-                    return -1;
-                }
-                ListElement { text: "Current Track"; value: "sketchpadTrack:-1" } // -1 is the internal shorthand used for the current track basically everywhere
-                ListElement { text: "Track 1"; value: "sketchpadTrack:0"; hardwareRow: -1 }
-                ListElement { text: "Track 2"; value: "sketchpadTrack:1"; hardwareRow: -1 }
-                ListElement { text: "Track 3"; value: "sketchpadTrack:2"; hardwareRow: -1 }
-                ListElement { text: "Track 4"; value: "sketchpadTrack:3"; hardwareRow: -1 }
-                ListElement { text: "Track 5"; value: "sketchpadTrack:4"; hardwareRow: -1 }
-                ListElement { text: "Track 6"; value: "sketchpadTrack:5"; hardwareRow: -1 }
-                ListElement { text: "Track 7"; value: "sketchpadTrack:6"; hardwareRow: -1 }
-                ListElement { text: "Track 8"; value: "sketchpadTrack:7"; hardwareRow: -1 }
-                ListElement { text: "Track 9"; value: "sketchpadTrack:8"; hardwareRow: -1 }
-                ListElement { text: "Track 10"; value: "sketchpadTrack:9"; hardwareRow: -1 }
-                ListElement { text: "No Midi Input"; value: "no-input" }
-            }
-            Zynthbox.FilterProxy {
-                id: hardwareInputDevices
-                sourceModel: Zynthbox.MidiRouter.model
-                filterRole: Zynthbox.MidiRouterDeviceModel.IsHardwareDeviceRole
-                filterBoolean: true
-            }
-            Component.onCompleted: {
-                for (let newRow = 0; newRow < hardwareInputDevices.count; ++newRow) {
-                    midiSourcesModel.append({
-                        "text": hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole),
-                        "value": "external:" + hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HardwareIdRole),
-                        "hardwareRow": newRow
-                    });
-                    // console.log("Adding device", hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole), "for row", newRow);
-                }
-                midiSourceComboBox.model = midiSourcesModel;
-            }
-            Connections {
-                target: hardwareInputDevices
-                onRowsInserted: {
-                    for (let newRow = first; newRow < last + 1; ++newRow) {
-                        let addEntry = true;
-                        for (let ourIndex = 0; ourIndex < midiSourcesModel.count; ++ourIndex) {
-                            let ourEntry = midiSourcesModel.get(ourIndex);
-                            if (ourEntry.hardwareRow === newRow) {
-                                addEntry = false;
-                                break;
-                            }
-                        }
-                        if (addEntry) {
-                            midiSourcesModel.append({
-                                "text": hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole),
-                                "value": "external:" + hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HardwareIdRole),
-                                "hardwareRow": newRow
-                            });
-                            // console.log("Adding device", hardwareInputDevices.data(hardwareInputDevices.index(newRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole), "for row", newRow);
-                        }
-                    }
-                }
-                onRowsRemoved: {
-                    for (let removedRow = first; removedRow < last + 1; ++removedRow) {
-                        for (let ourIndex = 0; ourIndex < midiSourcesModel.count; ++ourIndex) {
-                            let ourEntry = midiSourcesModel.get(ourIndex);
-                            if (ourEntry.hardwareRow === removedRow) {
-                                midiSourcesModel.remove(ourIndex);
-                                break;
-                            }
-                        }
-                    }
-                }
-                onDataChanged: {
-                    for (let changedRow = topLeft.row; changedRow < bottomRight.row + 1; ++changedRow) {
-                        for (let ourIndex = 0; ourIndex < midiSourcesModel.count; ++ourIndex) {
-                            let ourEntry = midiSourcesModel.get(ourIndex);
-                            if (ourEntry.hardwareRow === changedRow) {
-                                midiSourcesModel.set(ourIndex, {
-                                    "text": hardwareInputDevices.data(hardwareInputDevices.index(changedRow, 0), Zynthbox.MidiRouterDeviceModel.HumanNameRole),
-                                    "value": "external:" + hardwareInputDevices.data(hardwareInputDevices.index(changedRow, 0), Zynthbox.MidiRouterDeviceModel.HardwareIdRole),
-                                    "hardwareRow": changedRow
-                                });
-                                break;
-                            }
-                        }
-                    }
                 }
             }
             Repeater {

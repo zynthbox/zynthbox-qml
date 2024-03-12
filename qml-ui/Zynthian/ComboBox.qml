@@ -27,7 +27,6 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import org.kde.plasma.core 2.0 as PlasmaCore
 import Zynthian 1.0 as Zynthian
 
 QQC2.Button {
@@ -125,17 +124,19 @@ QQC2.Button {
                     id: delegate
                     width: ListView.view.width
                     height: Kirigami.Units.gridUnit * 2
-                    text: "%1%2".arg(root.textPrefix).arg(model[root.textRole])
+                    text: "%1%2".arg(root.textPrefix).arg(modelData ? modelData[root.textRole] : model[root.textRole])
                     highlighted: popupListView.currentIndex === index || delegate.pressed
                     contentItem: Item {
                         anchors.fill: parent
-                        PlasmaCore.FrameSvgItem {
+                        Rectangle {
                             anchors.fill: parent
                             visible: delegate.highlighted
-                            imagePath: "widgets/viewitem"
-                            // Always add hover prefix as it should not show filled background for selected items
-                            // Always show white outline for hover/selected item.
-                            prefix: "hover"
+                            radius: 3
+                            border {
+                                width: 1
+                                color: Kirigami.Theme.focusColor
+                            }
+                            color: "transparent"
                         }
                         QQC2.Label {
                             text: delegate.text

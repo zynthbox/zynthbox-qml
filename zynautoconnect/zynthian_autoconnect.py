@@ -32,9 +32,10 @@ from threading  import Thread, Lock
 from collections import OrderedDict
 from itertools import cycle
 
-# Zynthian specific modules
 from PySide2.QtCore import QTimer
+import Zynthbox
 
+# Zynthian specific modules
 from zyncoder import *
 from zynqtgui import zynthian_gui_config
 
@@ -321,6 +322,56 @@ def midi_autoconnect(force=False):
                             'port': ports[0],
                             'chans': [mcprl.midi_chan]
                         }
+
+    # If there are any overrides set on that slot (information is on sketchpad_channel), use those instead:
+    #   - sketchpadTrack:(-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9) where -1 is whatever the current is
+    #   - no-input (explicitly refuse midi data)
+    #   - specifically named hardware devices
+    song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
+    if song:
+        for channelId in range(0, 10):
+            channel = song.channelsModel.getChannel(channelId)
+            if channel is not None:
+                for routingData in [channel.synthRoutingData, channel.fxRoutingData]:
+                    for slotId in range(0, 5):
+                        # BEGIN Midi Routing Overrides
+                        for midiInPort in routingData[slotId].midiInPorts:
+                            if len(midiInPort.sources) > 0:
+                                # Only actually perform overriding if there are any sources defined, otherwise leave well enough alone
+                                eventPorts = []
+                                # Gather up what inputs we should be connected to
+                                for inputSource in midiInPort.sources:
+                                    if inputSource.port == "no-input":
+                                        # Just do nothing in this case
+                                        pass
+                                    elif inputSource.port.startswith("sketchpadTrack:"):
+                                        splitData = inputSource.port.split(":")
+                                        if splitData[1] == "-1":
+                                            # TODO This can't be done without a touch of work on MidiRouter - there's a passthrough, but not a "current track"
+                                            pass
+                                        else:
+                                            if channel.channelAudioType == "synth":
+                                                eventPorts.append(f"ZLRouter:Channel{splitData[1]}")
+                                            else:
+                                                eventPorts.append(f"ZLRouter:Zynthian-Channel{splitData[1]}")
+                                            pass
+                                    elif inputSource.port.startswith("external:"):
+                                        # Listen to input from a specific hardware device
+                                        splitData = inputSource.port.split(":")
+                                        hardwareDevice = Zynthbox.MidiRouter.instance().model().getDevice(splitData[1])
+                                        if hardwareDevice is not None:
+                                            eventPorts.append(hardwareDevice.inputPortName())
+                                # First disconnect anything already hooked up
+                                try:
+                                    for connectedTo in jclient.get_all_connections(midiInPort.jackname):
+                                        jclient.disconnect(midiInPort.jackname, connectedTo)
+                                except: pass
+                                # Then hook up what we've been asked to
+                                for eventPort in eventPorts:
+                                    try:
+                                        jclient.connect(eventPort, midiInPort.jackname)
+                                    except: pass
+                    # END Midi Routing Overrides
 
     for jn, info in root_engine_info.items():
         #logger.debug("MIDI ROOT ENGINE INFO: {} => {}".format(jn, info))
@@ -616,6 +667,8 @@ def audio_autoconnect(force=False):
                 channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channelId + 1}", is_audio=True, is_input=True)
                 laneHasInput = [False] * 5; # needs to be lane-bound, to ensure we don't disconnect just because we end up without a thing later
                 if channel is not None:
+                    channelSynthRoutingData = channel.synthRoutingData
+                    channelFxRoutingData = channel.fxRoutingData
                     channelInputLanes = [1] * 5 # The default is a serial layout, meaning all channel output goes through a single lane
                     if channel.channelRoutingStyle == "one-to-one":
                         channelInputLanes = [1, 2, 3, 4, 5]
@@ -656,6 +709,13 @@ def audio_autoconnect(force=False):
                                 except: pass
                         # END Handle sample slots
                         # BEGIN Handle synth slots
+                        # If there are any overrides set on that slot, use those instead:
+                        #   - standard-routing:(left, right, both) - synth have none, but the option exists and would function the same as no-input
+                        #   - no-input (explicitly refuse audio input) - this is the default, but again, option exists
+                        #   - external:(left, right, both)
+                        #   - internal-master:(left, right, both)
+                        #   - sketchpadTrack:(trackindex):(dry0, dry1, dry2, dry3, dry4):(left,right,both)
+                        #   - fxSlot:(trackindex):(dry0, wet0, dry1, wet1, dry2, wet2, dry3, wet3, dry4, wet4):(left,right,both)
                         chainedSound = channel.chainedSounds[laneId]
                         if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
                             # We have a synth to hook up, let's do that thing
@@ -664,6 +724,61 @@ def audio_autoconnect(force=False):
                             synthPassthroughOutputPorts = [f"SynthPassthrough:Synth{chainedSound + 1}-dryOutLeft", f"SynthPassthrough:Synth{chainedSound + 1}-dryOutRight"]
                             layer = zynthian_gui_config.zynqtgui.screens['layer'].layer_midi_map[chainedSound]
                             if layer is not None:
+                                # BEGIN Synth Inputs
+                                slotRoutingData = channelSynthRoutingData[laneId]
+                                for audioInPort in slotRoutingData.audioInPorts:
+                                    if len(audioInPort.sources) > 0:
+                                        # Only actually perform overriding if there are any sources defined, otherwise leave well enough alone
+                                        capture_ports = []
+                                        for inputSource in audioInPort.sources:
+                                            if inputSource.port.starswith("standard-routing:") or inputSource.port == "no-input":
+                                                # just do nothing in this case:
+                                                # - standard routing is to have no sound connected to synth engines
+                                                # - no-input means don't make any connections
+                                                pass
+                                            elif inputSource.port.startswith("external:"):
+                                                # hook up to the system/mic input
+                                                if inputSource.endswith(":left"):
+                                                    capture_ports.append(get_audio_capture_ports()[0]);
+                                                elif inputSource.endswith(":right"):
+                                                    capture_ports.append(get_audio_capture_ports()[1]);
+                                                else:
+                                                    capture_ports = get_audio_capture_ports()
+                                            elif inputSource.port.startswith("internal-master:"):
+                                                # hook up to listen to the master output
+                                                if inputSource.endswith(":left") or inputSource.endswith(":both"):
+                                                    capture_ports.append("GlobalPlayback:dryOutLeft");
+                                                if inputSource.endswith(":right") or inputSource.endswith(":both"):
+                                                    capture_ports.append("GlobalPlayback:dryOutRight");
+                                            elif inputSource.port.startswith("sketchpadTrack:") or inputSource.port.startswith("fxSlot:"):
+                                                # hook up to listen to the output of that specific graph port
+                                                splitData = inputSource.split(":")
+                                                portRootName = ""
+                                                theLane = splitData[2][-1]
+                                                if inputSource.port.startswith("sketchpadTrack:"):
+                                                    portRootName = f"FXPassthrough-lane{theLane}-Channel{splitData[1]}"
+                                                else:
+                                                    portRootName = f"ChannelPassthrough:Channel{splitData[1]}-lane{theLane}"
+                                                if splitData[2].startswith("dry"):
+                                                    dryOrWet = "dryOut"
+                                                elif splitData[2].starswith("wet"):
+                                                    dryOrWet = "wetOutFx1"
+                                                if splitData[3] == "left" or splitData[3] == "both":
+                                                    capture_ports.append(f"{portRootName}-{dryOrWet}Left")
+                                                if splitData[3] == "right" or splitData[3] == "both":
+                                                    capture_ports.append(f"{portRootName}-{dryOrWet}Right")
+                                        # First disconnect anything already hooked up
+                                        try:
+                                            for connectedTo in jclient.get_all_connections(audioInPort.jackname):
+                                                jclient.disconnect(audioInPort.jackname, connectedTo)
+                                        except: pass
+                                        # Then hook up what we've been asked to
+                                        for capture_port in capture_ports:
+                                            try:
+                                                jclient.connect(capture_port, audioInPort.jackname)
+                                            except: pass
+                                # END Synth Inputs
+                                # BEGIN Synth Outputs
                                 engineOutPorts = jclient.get_ports(layer.jackname, is_output=True, is_input=False, is_audio=True)
                                 # If this engine is mono, make sure we hook the output to both of the synth passthrough's inputs
                                 if len(engineOutPorts) < 2:
@@ -693,6 +808,7 @@ def audio_autoconnect(force=False):
                                         # logging.info(f"Connecting {port[0]} to channel passthrough client {port[1]}")
                                         jclient.connect(port[0], port[1])
                                     except: pass
+                                # END Synth Outputs
                         # END Handle synth slots
                         # BEGIN Connect lane to its relevant FX input port (or disconnect if there's no audio input)
                         laneOutputs = jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-dryOut", is_audio=True, is_output=True, is_input=False)
@@ -750,11 +866,19 @@ def audio_autoconnect(force=False):
                     logging.debug(f"# Channel{channelId+1} effects port connections :")
 
                     # Create a list of lists of ports to be connected in order, dependent on routing style
-                    # For serial ("standard"): Single entry containint (Fx1, Fx2, Fx3, Fx4, Fx5, GlobalPlayback)
+                    # For serial ("standard"): Single entry containing (Fx1, Fx2, Fx3, Fx4, Fx5, GlobalPlayback)
                     # one-to-one: An entry per part, entries contain the FXPassthrough lane for the equivalent part, and GlobalPlayback. For example: (Fx1, GlobalPlayback), (Fx2, GlobalPlayback), (Fx3, GlobalPlayback)...
                     # Only add an fx entry to the list if the slot is occupied (an fx entry consists of two clients: the fx passthrough, and the fx jack client itself)
                     # Only add GlobalPlayback to the list if the list is not empty
                     # Only add the individual list to the processing list if it is not empty
+                    # Further, if there are any overrides set on that slot, use those instead:
+                    #   - standard-routing:(left, right, both)
+                    #   - no-input (explicitly refuse audio input)
+                    #   - external:(left, right, both)
+                    #   - internal-master:(left, right, both)
+                    #   - sketchpadTrack:(trackindex):(dry0, dry1, dry2, dry3, dry4, ):(left,right,both)
+                    #   - fxSlot:(trackindex):(dry0, wet0, dry1, wet1, dry2, wet2, dry3, wet3, dry4, wet4):(left,right,both)
+                    # TODO Implement overrides
                     process_list = []
 
                     if channel.channelRoutingStyle == "standard":
@@ -899,6 +1023,80 @@ def audio_autoconnect(force=False):
                                                 jclient.connect(ports[0], ports[1])
                                             except: pass
                     ### END Connect ChannelPassthrough to GlobalPlayback and AudioLevels via FX
+                    ### BEGIN FX Engine Audio Routing Overrides
+                    for laneId in range(0, 5):
+                        slotRoutingData = channelFxRoutingData[laneId]
+                        fxSlotInputs = {
+                            "left": [],
+                            "right": []
+                            }
+                        for audioInPort in slotRoutingData.audioInPorts:
+                            if len(audioInPort.sources) > 0:
+                                # Only actually perform overriding if there are any sources defined, otherwise leave well enough alone
+                                capture_ports = []
+                                for inputSource in audioInPort.sources:
+                                    if inputSource.port == "no-input":
+                                        # just do nothing in this case:
+                                        pass
+                                    if inputSource.port.starswith("standard-routing:"):
+                                        # hook up with the default route input
+                                        if len(fxSlotInputs["left"]) == 0:
+                                            # Lazily fill the slots input list here, in case it hasn't happened yet
+                                            # Bit of a tricky trick - usually there will be two ports, sometimes there will be only one, so we'll have to deal with both those eventualities
+                                            for port, leftOrRight in zip(slotRoutingData.audioInPorts, cycle("left", "right")):
+                                                for connectedTo in jclient.get_all_connections(port):
+                                                    fxSlotInputs[leftOrRight].append(connectedTo)
+                                            if len(slotRoutingData.audioInPorts) == 1:
+                                                fxSlotInputs["right"] = fxSlotInputs["left"]
+                                        if inputSource.endswith(":left"):
+                                            capture_ports.append(fxSlotInputs["left"]);
+                                        elif inputSource.endswith(":right"):
+                                            capture_ports.append(fxSlotInputs["right"]);
+                                        else:
+                                            capture_ports.append(fxSlotInputs["left"]);
+                                            capture_ports.append(fxSlotInputs["right"]);
+                                    elif inputSource.port.startswith("external:"):
+                                        # hook up to the system/mic input
+                                        if inputSource.endswith(":left"):
+                                            capture_ports.append(get_audio_capture_ports()[0]);
+                                        elif inputSource.endswith(":right"):
+                                            capture_ports.append(get_audio_capture_ports()[1]);
+                                        else:
+                                            capture_ports = get_audio_capture_ports()
+                                    elif inputSource.port.startswith("internal-master:"):
+                                        # hook up to listen to the master output
+                                        if inputSource.endswith(":left") or inputSource.endswith(":both"):
+                                            capture_ports.append("GlobalPlayback:dryOutLeft");
+                                        if inputSource.endswith(":right") or inputSource.endswith(":both"):
+                                            capture_ports.append("GlobalPlayback:dryOutRight");
+                                    elif inputSource.port.startswith("sketchpadTrack:") or inputSource.port.startswith("fxSlot:"):
+                                        # hook up to listen to the output of that specific graph port
+                                        splitData = inputSource.split(":")
+                                        portRootName = ""
+                                        theLane = splitData[2][-1]
+                                        if inputSource.port.startswith("sketchpadTrack:"):
+                                            portRootName = f"FXPassthrough-lane{theLane}-Channel{splitData[1]}"
+                                        else:
+                                            portRootName = f"ChannelPassthrough:Channel{splitData[1]}-lane{theLane}"
+                                        if splitData[2].startswith("dry"):
+                                            dryOrWet = "dryOut"
+                                        elif splitData[2].starswith("wet"):
+                                            dryOrWet = "wetOutFx1"
+                                        if splitData[3] == "left" or splitData[3] == "both":
+                                            capture_ports.append(f"{portRootName}-{dryOrWet}Left")
+                                        if splitData[3] == "right" or splitData[3] == "both":
+                                            capture_ports.append(f"{portRootName}-{dryOrWet}Right")
+                                # First disconnect anything already hooked up
+                                try:
+                                    for connectedTo in jclient.get_all_connections(audioInPort.jackname):
+                                        jclient.disconnect(audioInPort.jackname, connectedTo)
+                                except: pass
+                                # Then hook up what we've been asked to
+                                for capture_port in capture_ports:
+                                    try:
+                                        jclient.connect(capture_port, audioInPort.jackname)
+                                    except: pass
+                    ### END FX Engine Audio Routing Overrides
         else:
             logging.info("No song yet, clearly ungood - also how?")
     except Exception as e:

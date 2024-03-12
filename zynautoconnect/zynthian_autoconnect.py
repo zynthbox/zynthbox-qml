@@ -347,7 +347,7 @@ def midi_autoconnect(force=False):
                                     elif inputSource.port.startswith("sketchpadTrack:"):
                                         splitData = inputSource.port.split(":")
                                         if splitData[1] == "-1":
-                                            # TODO This can't be done without a touch of work on MidiRouter - there's a passthrough, but not a "current track"
+                                            eventPorts.append("ZLRouter:CurrentTrackMirror")
                                             pass
                                         else:
                                             if channel.channelAudioType == "synth":

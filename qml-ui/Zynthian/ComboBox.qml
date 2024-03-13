@@ -42,7 +42,7 @@ QQC2.Button {
 
     signal activated(int index)
     function selectIndex(index) {
-        root.currentIndex = index;
+        root.currentIndex = Math.max(-1, Math.min(index, comboBoxPopup.popupListView.count - 1));
         if (-1 < index && index < comboBoxPopup.popupListView.count) {
             comboBoxPopup.popupListView.positionViewAtIndex(index, ListView.Center);
         }
@@ -124,7 +124,7 @@ QQC2.Button {
                     id: delegate
                     width: ListView.view.width
                     height: Kirigami.Units.gridUnit * 2
-                    text: "%1%2".arg(root.textPrefix).arg(modelData ? modelData[root.textRole] : model[root.textRole])
+                    text: "%1%2".arg(root.textPrefix).arg(modelData ? (root.textRole === "" ? modelData : modelData[root.textRole]) : model[root.textRole])
                     highlighted: popupListView.currentIndex === index || delegate.pressed
                     contentItem: Item {
                         anchors.fill: parent

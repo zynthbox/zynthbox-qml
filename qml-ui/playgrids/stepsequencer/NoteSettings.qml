@@ -965,36 +965,27 @@ ColumnLayout {
                 }
             }
         }
-        QQC2.Label {
+        Zynthian.PlayGridButton {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            horizontalAlignment: Text.AlignHCenter
             text: component.patternModel ? qsTr("Scale: %1").arg(Zynthbox.KeyScales.scaleName(Zynthbox.KeyScales.scaleIndexToEnumKey(component.patternModel.scale))) : ""
-            Zynthian.PlayGridButton {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    bottom: parent.bottom
+            onClicked: scaleComboBox.onClicked()
+            Zynthian.ComboBox {
+                id: scaleComboBox
+                visible: false;
+                model: Zynthbox.KeyScales.scaleNames()
+                onActivated: {
+                    // Clamp this to be inside the thing, we can't really take one that doesn't exist
+                    component.patternModel.scale = Math.max(0, scaleComboBox.currentIndex);
                 }
-                width: height
-                text: "-"
-                enabled: component.patternModel ? component.patternModel.scale > 0 : false
-                onClicked: {
-                    component.patternModel.scale = component.patternModel.scale - 1;
-                }
-            }
-            Zynthian.PlayGridButton {
-                anchors {
-                    top: parent.top
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-                width: height
-                text: "+"
-                enabled: component.patternModel ? component.patternModel.scale < Zynthbox.KeyScales.scaleNames().length - 2 : false
-                onClicked: {
-                    component.patternModel.scale = component.patternModel.scale + 1;
+                Connections {
+                    target: component
+                    onPatternModelChanged: {
+                        if (component.patternModel) {
+                            scaleComboBox.currentIndex = component.patternModel.scale;
+                        }
+                    }
                 }
             }
         }

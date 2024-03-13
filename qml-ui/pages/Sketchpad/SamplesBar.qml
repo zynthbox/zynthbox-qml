@@ -108,7 +108,7 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: controlObj.samples && controlObj.samples[index].path && controlObj.samples[index].path.length > 0
+                            text: controlObj.samples && !controlObj.samples[index].isEmpty
                                     ? controlObj.samples[index].path.split("/").pop()
                                     : ""
 

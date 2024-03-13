@@ -73,7 +73,7 @@ Zynthian.ScreenPage {
         id: selectedClipHasWavThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
-            let newHasWav = selectedClip && selectedClip.path && selectedClip.path.length > 0;
+            let newHasWav = selectedClip && !selectedClip.isEmpty;
             if (component.selectedClipHasWav != newHasWav) {
                 component.selectedClipHasWav = newHasWav;
             }
@@ -508,7 +508,7 @@ Zynthian.ScreenPage {
                         property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
                                                             ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
                                                             : component.selectedChannel.samples[index]
-                        property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
+                        property bool clipHasWav: partDelegate.clip && !partDelegate.isEmpty
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true

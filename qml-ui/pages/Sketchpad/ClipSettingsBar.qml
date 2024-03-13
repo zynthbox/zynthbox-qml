@@ -441,12 +441,12 @@ ColumnLayout {
     //         text: "<No Metadata>"
     //     }
     //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
+    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty && root.controlObj.metadataAudioType
     //         text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
     //         font.pointSize: 10
     //     }
     //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && root.controlObj.path.length > 0
+    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty
     //         text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
     //         font.pointSize: 10
     //     }

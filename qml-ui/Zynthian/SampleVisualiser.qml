@@ -65,7 +65,7 @@ Item {
             restoreMode: Binding.RestoreBinding
         }
 
-        visible: component.visible && _private.sample && _private.sample.path && _private.sample.path.length > 0
+        visible: component.visible && _private.sample && !_private.sample.isEmpty
 
         // Mask for wave part before start
         Rectangle {

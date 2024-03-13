@@ -104,7 +104,7 @@ ColumnLayout {
                         property QtObject channel: model.channel
                         property int channelIndex: index
                         property QtObject selectedClip: channel.clipsModel.getClip(0)
-                        property bool hasWavLoaded: channelDelegate.selectedClip.path.length > 0
+                        property bool hasWavLoaded: !channelDelegate.selectedClip.isEmpty
                         property bool channelHasConnectedPattern: channel.connectedPattern >= 0
 
                         id: channelDelegate

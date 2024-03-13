@@ -113,7 +113,7 @@ ColumnLayout {
                             model: delegate.channel.clipsModel
                             QQC2.Label {
                                 text: model.display
-                                visible: model.clip.path.length > 0
+                                visible: !model.clip.isEmpty
                                 Rectangle {
                                     anchors {
                                         fill: parent

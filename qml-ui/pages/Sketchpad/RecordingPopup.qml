@@ -786,7 +786,7 @@ Zynthian.Popup {
                             source: {
                                 if (zynqtgui.sketchpad.isRecording) {
                                     return "audioLevelsChannel:/ports"
-                                } else if (_private.selectedClip != null && _private.selectedClip.path != null && _private.selectedClip.path.length > 0) {
+                                } else if (_private.selectedClip != null && !_private.selectedClip.isEmpty) {
                                     return _private.selectedClip.path
                                 } else {
                                     return ""

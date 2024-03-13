@@ -61,7 +61,7 @@ GridLayout {
                 leftPadding: 0
                 width: ListView.view.width
                 text: model.clip.name + "(" + model.clip.duration.toFixed(2) +"s)"
-                visible: model.clip.path.length > 0
+                visible: !model.clip.isEmpty
                 highlighted: root.sideBar.controlObj.selectedClip === model.clip
                 onClicked: {
                     root.sideBar.controlObj.selectedClip = model.clip

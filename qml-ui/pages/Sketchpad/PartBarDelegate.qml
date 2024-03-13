@@ -37,7 +37,7 @@ ColumnLayout {
             property int partIndex: index
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
             property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
-            property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
+            property bool clipHasWav: partDelegate.clip && !partDelegate.clip.isEmpty
             property QtObject cppClipObject: root.visible && root.channel.channelAudioType === "sample-loop" && partDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
             function handleItemClick() {
                 if (root.songMode) {

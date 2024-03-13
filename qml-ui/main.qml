@@ -764,7 +764,7 @@ Kirigami.AbstractApplicationWindow {
             icon.color: Kirigami.Theme.textColor
             text: qsTr("Sample %1 ˬ %2")
                     .arg(root.selectedChannel.selectedSlotRow + 1)
-                    .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
+                    .arg(selectedSample && !selectedSample.isEmpty ? "" : ": none")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 11
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
@@ -799,8 +799,7 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.channelAudioType === "sample-loop" &&
-                    clip && clip.path && clip.path.length >= 0
+            visible: root.selectedChannel.channelAudioType === "sample-loop"
         }
         Zynthian.BreadcrumbButton {
             id: synthButton

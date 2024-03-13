@@ -1278,5 +1278,16 @@ class sketchpad_clip(QObject):
     enabled = Property(bool, get_enabled, set_enabled, notify=enabled_changed)
     ### END Property enabled
 
+    ### BEGIN property isEmpty
+    """
+    isEmpty property is for detecting if a clip has some file loaded or not
+    It depends on the path property and will get updated with changes to path
+    """
+    def get_isEmpty(self):
+        return self.path is None or len(self.path) == 0
+
+    isEmpty = Property(bool, get_isEmpty, notify=path_changed)
+    ### END property isEmpty
+
     className = Property(str, className, constant=True)
     recordingDir = Property(str, recordingDir, constant=True)

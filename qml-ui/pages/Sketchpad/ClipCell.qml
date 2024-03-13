@@ -111,9 +111,7 @@ QQC2.AbstractButton {
 //                bottom: parent.bottom
 //            }
 //            visible: root.isInScene &&
-//                     channel.channelAudioType === "sample-loop" &&
-//                     channel.sceneClip.path &&
-//                     channel.sceneClip.path.length > 0
+//                     channel.channelAudioType === "sample-loop" && !channel.sceneClip.isEmpty
 //            text: visible
 //                ? qsTr("%1%2")
 //                    .arg(channel.sceneClip.isPlaying &&
@@ -266,8 +264,7 @@ QQC2.AbstractButton {
             visible: root.isInScene &&
                      channel.sceneClip.isPlaying &&
                      channel.channelAudioType === "sample-loop" &&
-                     channel.sceneClip.path &&
-                     channel.sceneClip.path.length > 0
+                     !channel.sceneClip.isEmpty
 
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing

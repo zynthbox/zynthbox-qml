@@ -174,7 +174,7 @@ Zynthian.ScreenPage {
         }
         var sample = root.selectedChannel.samples[slot]
         function valueSetter(value) {
-            if (sample != null && sample.path != null && sample.path.length > 0) {
+            if (sample != null && !sample.isEmpty) {
                 sample.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
                 applicationWindow().showOsd({
                     parameterName: "sample_gain",
@@ -208,7 +208,7 @@ Zynthian.ScreenPage {
         }
         var clip = root.selectedChannel.getClipsModelByPart(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
         function valueSetter(value) {
-            if (clip != null && clip.path != null && clip.path.length > 0) {
+            if (clip != null && !clip.isEmpty) {
                 clip.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
                 applicationWindow().showOsd({
                     parameterName: "clip_gain",
@@ -587,7 +587,7 @@ Zynthian.ScreenPage {
                     var sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
                     // when sample and slot is active, goto wave editor or show popup when empty
-                    if (sample && sample.path && sample.path.length > 0) {
+                    if (sample && !sample.isEmpty) {
                         zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                         zynqtgui.bottomBarControlObj = root.selectedChannel;
                         bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -599,7 +599,7 @@ Zynthian.ScreenPage {
                     var clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
 
                     // when loop and slot is active, goto wave editor or show popup when empty
-                    if (clip && clip.path && clip.path.length > 0) {
+                    if (clip && !clip.isEmpty) {
                         zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                         zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                         bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -1456,14 +1456,14 @@ Zynthian.ScreenPage {
                                         interval: 10
                                         onTriggered: {
                                             // update color
-//                                                if (channel.channelAudioType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && channel.sceneClip.path && channel.sceneClip.path.length > 0) {
+//                                                if (channel.channelAudioType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && !channel.sceneClip.isEmpty) {
 //                                                    // In scene
 //                                                    clipCell.backgroundColor = "#3381d4fa";
 //                                                } /*else if (channel.sceneClip && (!channel.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col))) {
 //                                                    // Not in scene
 //                                                    clipCell.backgroundColor = "#33f44336";
 //                                                }*/ else if ((channel.connectedPattern >= 0 && clipCell.pattern.hasNotes)
-//                                                    || (channel.channelAudioType === "sample-loop" && channel.sceneClip.path && channel.sceneClip.path.length > 0)) {
+//                                                    || (channel.channelAudioType === "sample-loop" && !channel.sceneClip.isEmpty)) {
 //                                                    clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
 //                                                } else {
 //                                                    clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
@@ -1499,7 +1499,7 @@ Zynthian.ScreenPage {
 //                                        bottomStack.slotsBar.bottomBarButton.checked = true;
 
 //                                        if (channel.channelAudioType === "sample-loop") {
-//                                            if (channel.sceneClip && channel.sceneClip.path && channel.sceneClip.path.length > 0) {
+//                                            if (channel.sceneClip && !channel.sceneClip.isEmpty) {
 //                                                bottomStack.bottomBar.waveEditorAction.trigger();
 //                                            } else {
 //                                                bottomStack.bottomBar.recordingAction.trigger();

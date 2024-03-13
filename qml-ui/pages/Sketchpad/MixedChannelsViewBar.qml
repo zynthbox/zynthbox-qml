@@ -790,7 +790,7 @@ Rectangle {
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
                                             property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
                                             property QtObject sample: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0 ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
-                                            property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop" && synthRepeater.synthData[index] != null && synthRepeater.synthData[index].path != null && synthRepeater.synthData[index].path.length >= 0 ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
+                                            property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop" ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
 
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -897,7 +897,7 @@ Rectangle {
                                                     if (!delegateMouseArea.dragHappened) {
                                                         if (root.selectedChannel.channelAudioType === "sample-loop") {
                                                             // If channel type is sample-loop open clip wave editor
-                                                            if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
                                                                 zynqtgui.bottomBarControlObj = waveformContainer.clip;
                                                                 bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -907,7 +907,7 @@ Rectangle {
                                                             }
                                                         } else if (root.selectedChannel.channelAudioType.startsWith("sample")) {
                                                             // If channel type is sample then open channel wave editor
-                                                            if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                            if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                                                 zynqtgui.bottomBarControlObj = root.selectedChannel;
                                                                 bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -1137,7 +1137,7 @@ Rectangle {
                                             color: Kirigami.Theme.textColor
                                             source: waveformContainer.clip ? waveformContainer.clip.path : ""
 
-                                            visible: waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0
+                                            visible: waveformContainer.clip && !waveformContainer.clip.isEmpty
 
                                             // Mask for wave part before start
                                             Rectangle {
@@ -1234,7 +1234,7 @@ Rectangle {
                                                 }*/
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop") {
-                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                             zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                                                             zynqtgui.bottomBarControlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -1243,7 +1243,7 @@ Rectangle {
                                                             })
                                                         }
                                                     } else {
-                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                                             zynqtgui.bottomBarControlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -1257,7 +1257,7 @@ Rectangle {
                                             onPressAndHold: {
                                                 if (waveformContainer.showWaveform) {
                                                     if (root.selectedChannel.channelAudioType === "sample-loop") {
-                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                             zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                                                             zynqtgui.bottomBarControlObj = waveformContainer.clip;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;
@@ -1266,7 +1266,7 @@ Rectangle {
                                                             })
                                                         }
                                                     } else {
-                                                        if (waveformContainer.clip && waveformContainer.clip.path && waveformContainer.clip.path.length > 0) {
+                                                        if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                                             zynqtgui.bottomBarControlObj = root.selectedChannel;
                                                             bottomStack.slotsBar.bottomBarButton.checked = true;

@@ -446,7 +446,7 @@ class zynthian_gui(QObject):
         self.__ignoreNextMetronomeButtonPress = False
         self.__current_task_message = ""
         self.__show_current_task_message = True
-        self.currentTaskMessage = f"Starting Zynthbox QML"
+        self.currentTaskMessage = f"Starting Zynthbox"
         self.__master_volume = self.get_initialMasterVolume()
 
         self.zynmidi = None
@@ -1155,7 +1155,7 @@ class zynthian_gui(QObject):
         # self.zyntransport = zynthian_engine_transport()
 
         # Create Core UI Screens
-        self.currentTaskMessage = "Creating Screen Objects"
+        self.currentTaskMessage = "Creating Core Control Objects"
 
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
@@ -4678,10 +4678,10 @@ if __name__ == "__main__":
     def load_qml():
         if zynqtgui.sketchpad.sketchpadLoadingInProgress:
             # logging.debug("Sketchpad Loading is still in progress. Delay loading qml")
-            QTimer.singleShot(1000, load_qml)
+            QTimer.singleShot(100, load_qml)
         else:
             logging.debug("---p Starting loading qml")
-            zynqtgui.currentTaskMessage = "Loading pages"
+            zynqtgui.currentTaskMessage = "Loading Core UI"
             engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
             logging.debug("---p After loading qml engine")
             if not engine.rootObjects() or not app.topLevelWindows():
@@ -4691,7 +4691,7 @@ if __name__ == "__main__":
             zynthian_gui_config.top = app.topLevelWindows()[0]
             zynthian_gui_config.app = app
 
-            # Norify isExternalActive changed when top window active value changes
+            # Notify isExternalActive changed when top window active value changes
             zynthian_gui_config.top.activeChanged.connect(lambda: zynqtgui.isExternalAppActiveChanged.emit())
 
     # Delay loading qml to let zynqtgui complete it's init sequence

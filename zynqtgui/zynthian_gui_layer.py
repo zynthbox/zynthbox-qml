@@ -1396,7 +1396,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
                     slot_index = layer_snapshot['slot_index']
                     track_index = layer_snapshot['track_index']
-                    engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
+                    engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'], taskMessagePrefix="Loading Snapshot : ")
                     layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, slot_index, track_index)
                     self.layers.append(layer)
                     if engine.type == "Audio Effect":
@@ -1404,24 +1404,24 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 i += 1
 
             # Finally, stop all unused engines
-            self.zynqtgui.currentTaskMessage = "Stopping unused engines"
+            self.zynqtgui.currentTaskMessage = "Loading Snapshot : Stopping unused engines"
             self.zynqtgui.screens['engine'].stop_unused_engines()
 
             #Restore MIDI profile state
             if 'midi_profile_state' in snapshot:
-                self.zynqtgui.currentTaskMessage = "Setting midi profile state"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Setting midi profile state"
                 self.set_midi_profile_state(snapshot['midi_profile_state'])
 
             #Set MIDI Routing
             if 'midi_routing' in snapshot:
-                self.zynqtgui.currentTaskMessage = "Setting midi routing"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Setting midi routing"
                 self.set_midi_routing(snapshot['midi_routing'])
             else:
-                self.zynqtgui.currentTaskMessage = "Resetting midi routing"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Resetting midi routing"
                 self.reset_midi_routing()
 
             #Autoconnect MIDI
-            self.zynqtgui.currentTaskMessage = "Connect midi ports"
+            self.zynqtgui.currentTaskMessage = "Loading Snapshot : Connect midi ports"
             self.zynqtgui.zynautoconnect_midi(True)
 
             #Set extended config
@@ -1431,7 +1431,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
             # Restore layer state, step 1 => Restore Bank & Preset Status
             i = 0
             for lss in snapshot['layers']:
-                self.zynqtgui.currentTaskMessage = "Restoring bank and presets"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Restoring bank and presets"
                 layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
                 self.layers[i].restore_snapshot_1(layer_snapshot)
                 i += 1
@@ -1439,34 +1439,34 @@ class zynthian_gui_layer(zynthian_gui_selector):
             # Restore layer state, step 2 => Restore Controllers Status
             i = 0
             for lss in snapshot['layers']:
-                self.zynqtgui.currentTaskMessage = "Restoring controller status"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Restoring controller status"
                 layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
                 self.layers[i].restore_snapshot_2(layer_snapshot)
                 i += 1
 
             #Set Audio Routing
             if 'audio_routing' in snapshot:
-                self.zynqtgui.currentTaskMessage = "Setting audio routing"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Setting audio routing"
                 self.set_audio_routing(snapshot['audio_routing'])
             else:
-                self.zynqtgui.currentTaskMessage = "Resetting audio routing"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Resetting audio routing"
                 self.reset_audio_routing()
 
             #Set Audio Capture
             if 'audio_capture' in snapshot:
-                self.zynqtgui.currentTaskMessage = "Setting audio capture"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Setting audio capture"
                 self.set_audio_capture(snapshot['audio_capture'])
             else:
-                self.zynqtgui.currentTaskMessage = "Resetting audio capture"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Resetting audio capture"
                 self.reset_audio_routing()
 
             #Autoconnect Audio
-            self.zynqtgui.currentTaskMessage = "Connect synth/audio ports"
+            self.zynqtgui.currentTaskMessage = "Loading Snapshot : Connect synth/audio ports"
             self.zynqtgui.zynautoconnect_audio()
 
             # Restore ALSA Mixer settings
             if self.amixer_layer and 'amixer_layer' in snapshot:
-                self.zynqtgui.currentTaskMessage = "Restore alsa mixer settings"
+                self.zynqtgui.currentTaskMessage = "Loading Snapshot : Restore alsa mixer settings"
                 self.amixer_layer.restore_snapshot_1(snapshot['amixer_layer'])
                 self.amixer_layer.restore_snapshot_2(snapshot['amixer_layer'])
 
@@ -1575,7 +1575,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     midi_chan = int(channels_mapping[str(midi_chan)])
                 layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
                 logging.debug(f"### Restoring engine : {layer_snapshot['engine_nick']}")
-                engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'])
+                engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'], "Loading Snapshot : ")
                 slot_index = layer_snapshot['slot_index']
                 track_index = layer_snapshot['track_index']
                 new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index, track_index)

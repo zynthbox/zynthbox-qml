@@ -65,8 +65,8 @@ QQC2.ApplicationWindow {
     QQC2.Label {
         visible: root.displayLoadingText
         width: parent.width
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 50
+        anchors.top: parent.bottom
+        anchors.topMargin: -80
         horizontalAlignment: Qt.AlignHCenter
         font.pointSize: 14
         color: "white"

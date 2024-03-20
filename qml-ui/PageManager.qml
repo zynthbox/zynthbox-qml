@@ -87,6 +87,8 @@ Zynthian.Stack {
 
     // List of pages that will be cached on start
     property var pagesToCache: [
+        "playgrid",
+        "sketchpad",
         "main",
         "control",
         "layers_for_channel",
@@ -114,6 +116,92 @@ Zynthian.Stack {
     // Get absolute url of page file by page name
     function pageResolvedUrl(page) {
         return Qt.resolvedUrl("./pages/" + root.pageScreenMapping[page])
+    }
+
+    property string switchToPageAfterCacheCreation: ""
+    property int remainingPagesForCreation: 0
+    onRemainingPagesForCreationChanged: {
+        if (remainingPagesForCreation === 0) {
+            // We are done! (at least with the current batch) Let's spit out some statistics
+            console.log("------------------------------------------------------------------------")
+            console.log("PAGE CACHE SUMMARY")
+            console.log("------------------------------------------------------------------------")
+            for (let page in root.pageCache) {
+                let cache = root.pageCache[page]
+                console.log(`${page.padEnd(20)} ${("("+cache.url+")").padEnd(70)} ${cache.errorString == "" ? "SUCCESS" : "ERRORED " + cache.errorString} : ${(""+cache.ttl).padStart(4)} ms`)
+            }
+            console.log("------------------------------------------------------------------------")
+
+            if (switchToPageAfterCacheCreation !== "") {
+                pageChangeHandler.handlePageChange(root.switchToPageAfterCacheCreation);
+                root.switchToPageAfterCacheCreation = "";
+            }
+            zynqtgui.currentTaskMessage = "Loaded Core UI"
+
+            // And finally, hide the splash now that the caching process has been completed
+            zynqtgui.stop_splash();
+        } else {
+            zynqtgui.currentTaskMessage = "Loading Core UI: %1\%".arg(100 - Math.floor(100 * root.remainingPagesForCreation / root.pagesToCache.length));
+        }
+    }
+    function handlePageCreation(page, incubator) {
+        root.pageCache[page].ttl = Date.now() - root.pageCache[page].creationStartedTime;
+        if (incubator && incubator.status === Component.Ready) {
+            root.pageCache[page].pageObject = incubator.object;
+        } else {
+            root.pageCache[page].errorString = "Failed to incubate object from otherwise successfully loaded component";
+        }
+        root.remainingPagesForCreation = root.remainingPagesForCreation - 1;
+    }
+    function handleComponentCreated(page, createdComponent, params) {
+        if (createdComponent.status === Component.Ready) {
+            let incubator = createdComponent.incubateObject(applicationWindow(), root.pageCache[page].params);
+            if (incubator.status === Component.Loading) {
+                // If the object is still being loaded, don't complete yet
+                incubator.onStatusChanged = function() {
+                    handlePageCreation(page, incubator);
+                };
+            } else {
+                // Otherwise, time to handle that immediately
+                handlePageCreation(page, incubator);
+            }
+        } else {
+            console.log("Error during the creation of the", page, "component! This is not great. The reported error was:", createdComponent.errorString());
+            root.pageCache[page].errorString = createdComponent.errorString();
+            handlePageCreation(page, null);
+        }
+    }
+    function buildCache() {
+        root.remainingPagesForCreation = root.remainingPagesForCreation + root.pagesToCache.length;
+        for (let pageIndex = 0; pageIndex < root.pagesToCache.length; ++pageIndex) {
+            let page = root.pagesToCache[pageIndex];
+            let url = pageResolvedUrl(page);
+            root.pageCache[page] = {
+                creationStartedTime: Date.now(),
+                ttl: 0,
+                url: url,
+                params: {"width": root.width, "height": root.height, visible: false},
+                errorString: "",
+                pageObject: null
+            }
+            let component = Qt.createComponent(url, Component.Asynchronous);
+            if (component.status === Component.Loading) {
+                // If the component is still loading, don't complete yet
+                component.statusChanged.connect(function() {
+                    handleComponentCreated(page, component);
+                });
+            } else {
+                // If it's done, let's do the thing now
+                handleComponentCreated(page, component);
+            }
+        }
+    }
+    Component.onCompleted: {
+        root.buildCache();
+    }
+
+    background: Rectangle {
+        color: Kirigami.Theme.backgroundColor
     }
 
     // Get page instance
@@ -148,58 +236,30 @@ Zynthian.Stack {
         }
     }
 
-    Component.onCompleted: {
-        // Cache all initial pages explicitly
-        zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName("playgrid")
-        root.getPage("playgrid")
-        zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName("sketchpad")
-        root.getPage("sketchpad")
-
-        // Cache all the remaining configured pages when starting up
-        for (var pageIndex in root.pagesToCache) {
-            var pageName = root.pagesToCache[pageIndex]
-            zynqtgui.currentTaskMessage = "Loading page : " + root.getPageDisplayName(pageName)            
-            // Call getPage explicitly to cache the page
-            root.getPage(pageName)
-        }
-
-        console.log("------------------------------------------------------------------------")
-        console.log("PAGE CACHE SUMMARY")
-        console.log("------------------------------------------------------------------------")
-        for (var page in root.pageCache) {
-            var cache = root.pageCache[page]
-            console.log(`${page.padEnd(20)} ${("("+cache.url+")").padEnd(70)} ${cache.errorString == "" ? "SUCCESS" : "ERRORED " + cache.errorString} : ${(""+cache.ttl).padStart(4)} ms`)
-        }
-        console.log("------------------------------------------------------------------------")
-
-        // Caching complete. Call stop_splash
-        zynqtgui.stop_splash();
-    }
-
-    background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
-    }
-
     Connections {
+        id: pageChangeHandler
         target: zynqtgui
         onCurrent_screen_idChanged: handlePageChange(zynqtgui.current_screen_id)
         onCurrent_modal_screen_idChanged: handlePageChange(zynqtgui.current_screen_id)
 
         function handlePageChange(page) {
-            if (page != "" && root.currentPage != page) {
-                root.currentPage = page
-                console.log("Changing page to", page)
-                
-                if (zynqtgui.current_modal_screen_id === "confirm") {
-                    // Confirm page is not a seperate page. Show confirm dialog if confirm page is requested
-                    applicationWindow().showConfirmationDialog()
-                } else {
-                    if (root.currentItem) {
-                        root.currentItem.visible = false
+            if (root.remainingPagesForCreation === 0) {
+                if (page != "" && root.currentPage != page) {
+                    root.currentPage = page
+                    console.log("Changing page to", page)
+                    if (zynqtgui.current_modal_screen_id === "confirm") {
+                        // Confirm page is not a seperate page. Show confirm dialog if confirm page is requested
+                        applicationWindow().showConfirmationDialog()
+                    } else {
+                        if (root.currentItem) {
+                            root.currentItem.visible = false
+                        }
+                        root.replace(root.getPage(page))
+                        root.currentItem.visible = true
                     }
-                    root.replace(root.getPage(page))
-                    root.currentItem.visible = true
                 }
+            } else {
+                root.switchToPageAfterCacheCreation = page;
             }
         }
     }

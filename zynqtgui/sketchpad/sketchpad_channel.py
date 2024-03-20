@@ -449,11 +449,8 @@ class sketchpad_channel(QObject):
     def restore_bank(self):
         bank_dir = Path(self.bankDir)
 
-        if not (bank_dir / 'sample-bank.json').exists():
-            logging.info(f"sample-bank.json does not exist for channel {self.id + 1}. Skipping restoration")
-        else:
-            logging.info(f"Restoring sample-bank.json for channel {self.id + 1}")
-
+        if (bank_dir / 'sample-bank.json').exists():
+            # logging.info(f"Restoring sample-bank.json for channel {self.id + 1}")
             try:
                 with open(bank_dir / 'sample-bank.json', "r") as f:
                     obj = json.loads(f.read())
@@ -479,6 +476,8 @@ class sketchpad_channel(QObject):
                     self.samples_changed.emit()
             except Exception as e:
                 logging.error(f"Error reading sample-bank.json from {bank_dir} : {str(e)}")
+        else:
+            logging.info(f"sample-bank.json does not exist for channel {self.id + 1}. Skipping restoration")
 
     def serialize(self):
         # Save bank when serializing so that bank is saved everytime song is saved
@@ -526,7 +525,7 @@ class sketchpad_channel(QObject):
             if "audioTypeSettings" in obj:
                 self.__audioTypeSettings__.update(obj["audioTypeSettings"])
             self.handleAudioTypeSettingsChanged()
-            logging.error("Audio type settings changing handled")
+            # logging.error("Audio type settings changing handled")
             if "channelRoutingStyle" in obj:
                 self.set_channel_routing_style(obj["channelRoutingStyle"], True)
             else:

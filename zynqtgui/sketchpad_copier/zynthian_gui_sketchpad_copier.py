@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthian Arranger: A page to copy channels between sketchpads in a session
+# Zynthian Sketchpad Copier: A page to copy channels between sketchpads in a session
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #

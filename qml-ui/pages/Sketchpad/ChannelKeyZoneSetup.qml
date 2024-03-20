@@ -235,7 +235,7 @@ Zynthian.DialogQuestion {
                     property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null
                     property Item pianoKeyEndItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneEnd) : null
                     property Item pianoRootNoteItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.rootNote) : null
-                    x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : -Math.floor(pianoKeysRepeater.itemAt(0).width / 2)
+                    x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : (pianoKeysRepeater.itemAt(0) ? -Math.floor(pianoKeysRepeater.itemAt(0).width / 2) : 0)
                     opacity: clipObj ? 1 : 0.3
                     QQC2.Label {
                         id: sampleLabel

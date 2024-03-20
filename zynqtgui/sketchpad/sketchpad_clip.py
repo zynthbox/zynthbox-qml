@@ -648,6 +648,7 @@ class sketchpad_clip(QObject):
             except: pass
             self.audioSource.deleteLater()
 
+        self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
         self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
         self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
         self.audioSource.setLaneAffinity(self.__lane__)
@@ -657,8 +658,8 @@ class sketchpad_clip(QObject):
 
         self.__read_metadata__()
 
-        playbackStyle = int(self.__get_metadata_prop__("ZYNTHBOX_PLAYBACK_STYLE", -1))
-        if playbackStyle == -1:
+        playbackStyle = str(self.__get_metadata_prop__("ZYNTHBOX_PLAYBACK_STYLE", ""))
+        if playbackStyle == "":
             # TODO Probably get rid of this at some point - it's a temporary fallback while there's reasonably still things around without playback style set on them
             looping = bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True))
             granular = (self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_ENABLED", 'False').lower() == "true")
@@ -673,7 +674,12 @@ class sketchpad_clip(QObject):
                 else:
                     self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.NonLoopingPlaybackStyle)
         else:
-            self.audioSource.setPlaybackStyle(playbackStyle)
+            if playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
+                playbackStyle = playbackStyle.split(".")[-1]
+            if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
+                self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
+            else:
+                self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
 
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))

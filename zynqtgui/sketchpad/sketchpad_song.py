@@ -275,7 +275,7 @@ class sketchpad_song(QObject):
         self.isLoadingChanged.emit()
         filename = self.__name__ + ".sketchpad.json"
 
-        self.zynqtgui.currentTaskMessage = f"Restoring sketchpad"
+        self.zynqtgui.currentTaskMessage = "Loading Sketchpad : Restoring Data"
 
         try:
             logging.info(f"Restoring {self.sketchpad_folder + filename}, loadHistory({load_history})")

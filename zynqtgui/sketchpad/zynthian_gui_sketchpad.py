@@ -748,11 +748,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             sketchpad_path = Path(sketchpad)
 
-            self.zynqtgui.currentTaskMessage = "Stopping playback"
+            # self.zynqtgui.currentTaskMessage = "Stopping playback"
             try:
-                self.stopAllPlayback()
-                self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
-                self.zynqtgui.screens["song_arranger"].stop()
+                self.zynqtgui.run_stop_metronome_and_playback.emit()
             except:
                 pass
 
@@ -776,7 +774,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.newSketchpad(sketchpad, _cb, load_snapshot=load_snapshot, force=True)
             else:
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
-                self.zynqtgui.currentTaskMessage = "Loading sketchpad"
+                self.zynqtgui.currentTaskMessage = "Loading Sketchpad"
                 self.sketchpadLoadingInProgress = True
                 self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_history)
                 self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(str(sketchpad_path))
@@ -786,11 +784,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     # Load snapshot
                     if Path(snapshot_path).exists():
                         logging.info(f"Loading snapshot : {snapshot_path}")
-                        self.zynqtgui.currentTaskMessage = "Loading Sketchpad: Restoring Snapshot"
+                        self.zynqtgui.currentTaskMessage = "Loading Sketchpad : Restoring Snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot(snapshot_path)
                     elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                         logging.info(f"Loading default snapshot")
-                        self.zynqtgui.currentTaskMessage = "Loading Sketchpad: Default Snapshot"
+                        self.zynqtgui.currentTaskMessage = "Loading Sketchpad : Loading Default Snapshot"
                         self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
                 if load_last_state_snapshot:
                     if not self.zynqtgui.screens["snapshot"].load_last_state_snapshot():

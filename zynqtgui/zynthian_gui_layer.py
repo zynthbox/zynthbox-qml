@@ -205,7 +205,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def create_amixer_layer(self):
-        mixer_eng = self.zynqtgui.screens['engine'].start_engine('MX')
+        mixer_eng = self.zynqtgui.screens['engine'].start_engine('MX', setTaskMessage=False)
         self.amixer_layer=zynthian_layer(mixer_eng, None, self.zynqtgui)
 
 

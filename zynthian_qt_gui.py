@@ -72,7 +72,6 @@ from datetime import timedelta
 
 from zynqtgui.sketchpad_copier import zynthian_gui_sketchpad_copier
 from zynqtgui.zynthian_gui_bluetooth_config import zynthian_gui_bluetooth_config
-from zynqtgui.zynthian_gui_song_player import zynthian_gui_song_player
 from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
 from zynqtgui.utils import file_properties_helper
@@ -1253,7 +1252,6 @@ class zynthian_gui(QObject):
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
-        self.screens["song_player"] = zynthian_gui_song_player(self)
         self.screens["song_manager"] = zynthian_gui_song_manager(self)
         self.screens["sketchpad_copier"] = zynthian_gui_sketchpad_copier(self)
 
@@ -1916,9 +1914,6 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCREEN_SKETCHPAD":
             self.show_modal("sketchpad")
-
-        elif cuia == "SCREEN_SONG_PLAYER":
-            self.show_modal("song_player")
 
         elif cuia == "SCREEN_SONG_MANAGER":
             self.show_modal("song_manager")
@@ -3720,9 +3715,6 @@ class zynthian_gui(QObject):
     def session_dashboard(self):
         return self.screens["session_dashboard"]
 
-    def song_player(self):
-        return self.screens["song_player"]
-
     def song_manager(self):
         return self.screens["song_manager"]
 
@@ -4364,7 +4356,6 @@ class zynthian_gui(QObject):
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
     session_dashboard = Property(QObject, session_dashboard, constant=True)
-    song_player = Property(QObject, song_player, constant=True)
     song_manager = Property(QObject, song_manager, constant=True)
     sketchpad_copier = Property(QObject, sketchpad_copier, constant=True)
     sound_categories = Property(QObject, sound_categories, constant=True)

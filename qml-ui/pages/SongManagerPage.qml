@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Song Player Page
+Song Manager Page
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 

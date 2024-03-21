@@ -53,7 +53,6 @@ Zynthian.Stack {
         "channel": "ChannelPage.qml",
         "channel_external_setup": "ChannelExternalSetup.qml",
         "channel_wave_editor": "ChannelWaveEditor.qml",
-        "song_player": "SongPlayerPage.qml",
         "song_manager": "SongManagerPage.qml",
         "sketchpad_copier": "SketchpadCopier/main.qml",
         "sample_downloader": "SampleDownloaderPage.qml",
@@ -79,7 +78,7 @@ Zynthian.Stack {
         "playgrid": "Playgrid",
         "sound_categories": "Sound Categories",
         "engine": "Synths",
-        "song_manager": "Song Player",
+        "song_manager": "Song Manager",
         "channel_wave_editor": "Audio Editor",
         "sketchpad": "Sketchpad"
     }

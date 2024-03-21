@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Song Player Page
+Dialog which allows for recording multiple tracks simultaneously
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 

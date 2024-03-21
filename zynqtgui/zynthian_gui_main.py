@@ -84,10 +84,6 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.playgrid, 0, "Playground"))
             self.list_metadata.append({"icon":"../../img/playground.svg"})
 
-            # self.list_data.append((self.song_player, 0, "Song Player"))
-            # self.list_metadata.append({"icon":"../../img/song_player.svg"})
-            # self.list_metadata.append({"icon":"../../img/song-player.svg"})
-
             self.list_data.append((self.song_manager, 0, "Song Manager"))
             self.list_metadata.append({"icon":"../../img/song-player.svg"})
 
@@ -390,10 +386,6 @@ class zynthian_gui_main(zynthian_gui_selector):
     def step_sequencer(self):
         logging.info("Step Sequencer")
         self.zynqtgui.show_modal("stepseq")
-
-    def song_player(self):
-        logging.info("Song Player")
-        self.zynqtgui.show_modal("song_player")
 
     def song_manager(self):
         logging.info("Song Manager")

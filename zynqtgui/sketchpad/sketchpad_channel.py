@@ -1181,6 +1181,16 @@ class sketchpad_channel(QObject):
     chainedFxNames = Property('QStringList', get_chainedFxNames, notify=chainedFxNamesChanged)
     ### END Property chainedFxNames
 
+    ### BEGIN Property channelHasFx
+    def get_channelHasFx(self):
+        for fx in self.chainedFx:
+            if fx is not None:
+                return True
+        return False
+
+    channelHasFx = Property(bool, get_channelHasFx, notify=chainedFxChanged)
+    ### END Property channelHasFx
+
     ### Property connectedSound
     def get_connected_sound(self):
         for sound in self.__chained_sounds__:

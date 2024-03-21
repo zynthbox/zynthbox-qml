@@ -55,6 +55,9 @@ Zynthian.Dialog {
      */
     property alias rejectEnabled: rejectButton.enabled
 
+    property alias textHorizontalAlignment: contentText.horizontalAlignment
+    property alias textVerticalAlignment: contentText.verticalAlignment
+
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
     width: Kirigami.Units.gridUnit * 20
@@ -118,6 +121,7 @@ Zynthian.Dialog {
         }
     }
     contentItem: QQC2.Label {
+        id: contentText
         wrapMode: Text.Wrap
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

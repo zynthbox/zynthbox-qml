@@ -468,6 +468,38 @@ Rectangle {
                                     root.selectedChannel.channelAudioType = "synth"
                                     synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
+                                QQC2.Button {
+                                    anchors {
+                                        top: parent.top
+                                        left: parent.left
+                                        bottom: parent.bottom
+                                        margins: Kirigami.Units.smallSpacing
+                                    }
+                                    width: height
+                                    icon.name: "dialog-warning-symbolic"
+                                    visible: (root.selectedChannel.channelAudioType !== "synth" && root.selectedChannel.channelHasSynth)
+                                        || (root.selectedChannel.channelAudioType === "sample-loop" && root.selectedChannel.channelHasFx)
+                                    onClicked: {
+                                        let theText = "<p>" + qsTr("The following things may be causing unneeded load on the system, as this track is set to a mode which does not use these things. You might want to consider getting rid of them to make space for other things.") + "</p>";
+                                        if (root.selectedChannel.channelAudioType !== "synth" && root.selectedChannel.channelHasSynth) {
+                                            theText = theText + "<br><p><b>" + qsTr("Synths:") + "</b><br> " + qsTr("You have at least one synth engine on the track. While they do not produce sound, they will still be using some amount of processing power.") + "</p>";
+                                        }
+                                        if (root.selectedChannel.channelAudioType === "sample-loop" && root.selectedChannel.channelHasFx) {
+                                            theText = theText + "<br><p><b>" + qsTr("Effects:") + "</b><br> " + qsTr("You have effects set up on the track. While they will not affect the sound of your Sketch, they will still be using some amount of processing power.") + "</p>";
+                                        }
+                                        unusedStuffWarning.text = theText;
+                                        unusedStuffWarning.open();
+                                    }
+                                    Zynthian.DialogQuestion {
+                                        id: unusedStuffWarning
+                                        width: Kirigami.Units.gridUnit * 30
+                                        height: Kirigami.Units.gridUnit * 18
+                                        title: qsTr("Unused Engines on Track %1").arg(root.selectedChannel.name)
+                                        rejectText: ""
+                                        acceptText: qsTr("Close")
+                                        textHorizontalAlignment: Text.AlignLeft
+                                    }
+                                }
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false

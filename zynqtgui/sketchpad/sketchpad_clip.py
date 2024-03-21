@@ -69,7 +69,6 @@ class sketchpad_clip(QObject):
         self.__current_beat__ = -1
         self.__should_sync__ = False
         self.__playing_started__ = False
-        self.__arranger_bar_positions__ = []
         self.audioSource = None
         self.audio_metadata = None
         self.recording_basepath = song.sketchpad_folder
@@ -240,8 +239,7 @@ class sketchpad_clip(QObject):
                 "time": self.__time__,
                 "enabled": self.__enabled__,
                 "shouldSync": self.__should_sync__,
-                "snapLengthToBeat": self.__snap_length_to_beat__,
-                "arrangerBarPositions": self.__arranger_bar_positions__}
+                "snapLengthToBeat": self.__snap_length_to_beat__}
 
     def deserialize(self, obj):
         try:
@@ -280,9 +278,6 @@ class sketchpad_clip(QObject):
             if "snapLengthToBeat" in obj:
                 self.__snap_length_to_beat__ = obj["snapLengthToBeat"]
                 self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
-            if "arrangerBarPositions" in obj:
-                self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
-                self.arranger_bar_positions_changed.emit()
         except Exception as e:
             logging.error(f"Error during clip deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
@@ -359,27 +354,6 @@ class sketchpad_clip(QObject):
 
     isPlaying = Property(bool, get_isPlaying, notify=is_playing_changed)
     # END Property isPlaying
-
-    @Signal
-    def arranger_bar_positions_changed(self):
-        pass
-
-    def get_arranger_bar_positions(self):
-        return self.__arranger_bar_positions__
-
-    def add_arranger_bar_position(self, pos):
-        if pos not in self.__arranger_bar_positions__:
-            self.__arranger_bar_positions__.append(pos)
-        self.arranger_bar_positions_changed.emit()
-        self.__song__.schedule_save()
-
-    def remove_arranger_bar_position(self, pos):
-        self.__arranger_bar_positions__.remove(pos)
-        self.arranger_bar_positions_changed.emit()
-        self.__song__.schedule_save()
-
-    arrangerBarPositions = Property('QVariantList', get_arranger_bar_positions, notify=arranger_bar_positions_changed)
-
 
     @Signal
     def progressChanged(self):

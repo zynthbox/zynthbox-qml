@@ -71,7 +71,6 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 from zynqtgui.sketchpad_copier import zynthian_gui_sketchpad_copier
-from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.zynthian_gui_bluetooth_config import zynthian_gui_bluetooth_config
 from zynqtgui.zynthian_gui_song_player import zynthian_gui_song_player
 from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
@@ -1254,7 +1253,6 @@ class zynthian_gui(QObject):
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
-        self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
         self.screens["song_player"] = zynthian_gui_song_player(self)
         self.screens["song_manager"] = zynthian_gui_song_manager(self)
         self.screens["sketchpad_copier"] = zynthian_gui_sketchpad_copier(self)
@@ -1918,9 +1916,6 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCREEN_SKETCHPAD":
             self.show_modal("sketchpad")
-
-        elif cuia == "SCREEN_ARRANGER":
-            self.show_modal("song_arranger")
 
         elif cuia == "SCREEN_SONG_PLAYER":
             self.show_modal("song_player")
@@ -3725,9 +3720,6 @@ class zynthian_gui(QObject):
     def session_dashboard(self):
         return self.screens["session_dashboard"]
 
-    def song_arranger(self):
-        return self.screens["song_arranger"]
-
     def song_player(self):
         return self.screens["song_player"]
 
@@ -4372,7 +4364,6 @@ class zynthian_gui(QObject):
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
     session_dashboard = Property(QObject, session_dashboard, constant=True)
-    song_arranger = Property(QObject, song_arranger, constant=True)
     song_player = Property(QObject, song_player, constant=True)
     song_manager = Property(QObject, song_manager, constant=True)
     sketchpad_copier = Property(QObject, sketchpad_copier, constant=True)

@@ -84,9 +84,6 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.playgrid, 0, "Playground"))
             self.list_metadata.append({"icon":"../../img/playground.svg"})
 
-            # self.list_data.append((self.song_arranger, 0, "Song Arranger"))
-            # self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
-
             # self.list_data.append((self.song_player, 0, "Song Player"))
             # self.list_metadata.append({"icon":"../../img/song_player.svg"})
             # self.list_metadata.append({"icon":"../../img/song-player.svg"})

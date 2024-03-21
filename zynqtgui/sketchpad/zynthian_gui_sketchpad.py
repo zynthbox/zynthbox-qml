@@ -561,7 +561,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             try:
                 self.stopAllPlayback()
                 self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
-                self.zynqtgui.screens["song_arranger"].stop()
             except:
                 pass
 
@@ -682,7 +681,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         def task():
             self.stopAllPlayback()
             self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
-            self.zynqtgui.screens["song_arranger"].stop()
 
             # Rename temp sketchpad folder to the user defined name
             Path(self.__sketchpad_basepath__ / 'temp').rename(self.__sketchpad_basepath__ / name)
@@ -834,7 +832,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         self.stopAllPlayback()
         self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
-        self.zynqtgui.screens["song_arranger"].stop()
 
         self.__song__ = sketchpad_song.sketchpad_song(sketchpad_folder, version, self)
         self.song_changed.emit()

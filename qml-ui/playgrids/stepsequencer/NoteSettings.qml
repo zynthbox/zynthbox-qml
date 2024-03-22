@@ -737,14 +737,63 @@ ColumnLayout {
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "probability"
-                    paramDefaultString: "100%"
+                    paramDefaultString: "Every Time"
                     paramValueSuffix: "%"
-                    paramDefault: 100
+                    paramDefault: 0
                     paramMin: 0
-                    paramMax: 100
-                    scrollWidth: 101
+                    paramMax: 45
+                    scrollWidth: 46
                     knobId: 1
                     currentlySelected: subnoteDelegate.isCurrent
+                    paramList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
+                    paramNames: {
+                        0: "Every Time",
+                        1: "90%",
+                        2: "80%",
+                        3: "70%",
+                        4: "60%",
+                        5: "50%",
+                        6: "40%",
+                        7: "30%",
+                        8: "20%",
+                        9: "10%",
+                        10: "Same As Previous",
+                        11: "Play 1, Skip 1",
+                        12: "Play 1, 50% Next",
+                        13: "Play 1, Skip 2",
+                        14: "Play 1, Skip 3",
+                        15: "Play 1, Skip 4",
+                        16: "Play 1, Skip 5",
+                        17: "Play 1, Skip 6",
+                        18: "Play 1, Skip 7",
+                        19: "Skip 1, Play 1",
+                        20: "50% One, 100% Next",
+                        21: "Skip 2, Play 1",
+                        22: "Skip 3, Play 1",
+                        23: "Skip 4, Play 1",
+                        24: "Skip 5, Play 1",
+                        25: "Skip 6, Play 1",
+                        26: "Skip 7, Play 1",
+                        27: "Play 2, Skip 1",
+                        28: "Play 2, Skip 2",
+                        29: "Play 2, Skip 3",
+                        30: "Skip 1, Play 2",
+                        31: "Skip 2, Play 2",
+                        32: "Skip 3, Play 2",
+                        33: "Play 3, Skip 1",
+                        34: "Play 3, Skip 2",
+                        35: "Play 3, Skip 3",
+                        36: "Skip 1, Play 3",
+                        37: "Skip 2, Play 3",
+                        38: "Skip 3, Play 3",
+                        39: "Play 4, Skip 1",
+                        40: "Play 4, Skip 2",
+                        41: "Play 4, Skip 3",
+                        42: "Play 4, Skip 4",
+                        43: "Play 5, Skip 1",
+                        44: "Play 6, Skip 1",
+                        45: "Play 7, Skip 1",
+                    }
                 }
                 Item {
                     Layout.fillWidth: true

@@ -1119,10 +1119,10 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function probabilityUp() {
-                                changeValue("probability", 1, 0, 100, 100);
+                                changeValue("probability", 1, 0, 45, 0);
                             }
                             function probabilityDown() {
-                                changeValue("probability", -1, 0, 100, 100);
+                                changeValue("probability", -1, 0, 45, 0);
                             }
                             function nextStepUp() {
                                 changeValue("next-step", 1, 0, 128, 0);

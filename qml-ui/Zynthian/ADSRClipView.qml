@@ -63,16 +63,16 @@ Item {
         } else {
             switch(currentADSRElement) {
                 case 0:
-                    clip.adsrAttack = Math.min(2, clip.adsrAttack + 0.01);
+                    clip.adsrAttack = clip.adsrAttack + 0.01;
                     break;
                 case 1:
-                    clip.adsrDecay = Math.min(2, clip.adsrDecay + 0.01);
+                    clip.adsrDecay = clip.adsrDecay + 0.01;
                     break;
                 case 2:
                     clip.adsrSustain = Math.min(1, clip.adsrSustain + 0.01);
                     break;
                 case 3:
-                    clip.adsrRelease = Math.min(2, clip.adsrRelease + 0.01);
+                    clip.adsrRelease = clip.adsrRelease + 0.01;
                     break;
             }
         }
@@ -139,148 +139,115 @@ Item {
                 }
             }
         }
-        ColumnLayout {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.showGranularSettings === false
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Attack")
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            QQC2.Slider {
-                implicitWidth: 1
-                implicitHeight: 1
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                orientation: Qt.Vertical
-                stepSize: 0.01
-                value: component.clip ? component.clip.adsrAttack : 0
-                from: 0
-                to: 2
-                onMoved: component.clip.adsrAttack = value
-            }
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("%1\nseconds").arg((component.clip ? component.clip.adsrAttack : 0).toFixed(2))
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.minimumHeight: 2
-                Layout.maximumHeight: 2
-                color: component.currentADSRElement === 0 ? Kirigami.Theme.highlightedTextColor : "transparent"
+        Connections {
+            target: component.clip
+            onAdsrParametersChanged: {
+                if (component.clip.adsrAttack !== attackSlider.value) {
+                    attackSlider.value = component.clip.adsrAttack;
+                }
+                if (component.clip.adsrDecay !== decaySlider.value) {
+                    decaySlider.value = component.clip.adsrDecay;
+                }
+                if (component.clip.adsrSustain !== sustainSlider.value) {
+                    sustainSlider.value = component.clip.adsrSustain;
+                }
+                if (component.clip.adsrRelease !== releaseSlider.value) {
+                    releaseSlider.value = component.clip.adsrRelease;
+                }
             }
         }
-        ColumnLayout {
+        InfinitySlider {
+            id: attackSlider
+            text: qsTr("Attack")
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Decay")
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            QQC2.Slider {
-                implicitWidth: 1
-                implicitHeight: 1
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                orientation: Qt.Vertical
-                stepSize: 0.01
-                value: component.clip ? component.clip.adsrDecay : 0
-                from: 0
-                to: 2
-                onMoved: component.clip.adsrDecay = value
-            }
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("%1\nseconds").arg((component.clip ? component.clip.adsrDecay : 0).toFixed(2))
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.minimumHeight: 2
-                Layout.maximumHeight: 2
-                color: component.currentADSRElement === 1 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            unitLabel: "\n" + qsTr("seconds")
+            value: component.clip ? component.clip.adsrAttack : 0
+            decimals: 2
+            increment: 0.1
+            slideIncrement: 0.01
+            applyLowerBound: true
+            lowerBound: 0
+            resetOnTap: true
+            resetValue: 0
+            selected: component.currentADSRElement === 0
+            onValueChanged: {
+                if (component.clip.adsrAttack != attackSlider.value) {
+                    component.clip.adsrAttack = attackSlider.value
+                }
             }
         }
-        ColumnLayout {
+        InfinitySlider {
+            id: decaySlider
+            text: qsTr("Decay")
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Sustain")
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            QQC2.Slider {
-                implicitWidth: 1
-                implicitHeight: 1
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                orientation: Qt.Vertical
-                stepSize: 0.01
-                value: component.clip ? component.clip.adsrSustain : 0
-                from: 0
-                to: 1
-                onMoved: component.clip.adsrSustain = value
-            }
-            Kirigami.Heading {
-                level: 2
-                text: "%1%\n".arg(component.clip ? component.clip.adsrSustain.toFixed(2) * 100 : 0)
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.minimumHeight: 2
-                Layout.maximumHeight: 2
-                color: component.currentADSRElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            unitLabel: "\n" + qsTr("seconds")
+            value: component.clip ? component.clip.adsrDecay : 0
+            decimals: 2
+            increment: 0.1
+            slideIncrement: 0.01
+            applyLowerBound: true
+            lowerBound: 0
+            resetOnTap: true
+            resetValue: 0
+            selected: component.currentADSRElement === 1
+            onValueChanged: {
+                if (component.clip.adsrDecay != decaySlider.value) {
+                    component.clip.adsrDecay = decaySlider.value
+                }
             }
         }
-        ColumnLayout {
+        InfinitySlider {
+            id: sustainSlider
+            text: qsTr("Sustain")
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Release")
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
+            unitLabel: "%"
+            value: component.clip ? component.clip.adsrSustain : 0
+            decimals: 2
+            increment: 0.1
+            slideIncrement: 0.01
+            applyLowerBound: true
+            lowerBound: 0
+            applyUpperBound: true
+            upperBound: 1
+            resetOnTap: true
+            resetValue: 1
+            selected: component.currentADSRElement === 2
+            onValueChanged: {
+                if (component.clip.adsrSustain != sustainSlider.value) {
+                    component.clip.adsrSustain = sustainSlider.value
+                }
             }
-            QQC2.Slider {
-                implicitWidth: 1
-                implicitHeight: 1
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                orientation: Qt.Vertical
-                stepSize: 0.01
-                value: component.clip ? component.clip.adsrRelease : 0
-                from: 0
-                to: 2
-                onMoved: component.clip.adsrRelease = value
-            }
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("%1\nseconds").arg((component.clip ? component.clip.adsrRelease : 0).toFixed(2))
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.minimumHeight: 2
-                Layout.maximumHeight: 2
-                color: component.currentADSRElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
+        }
+        InfinitySlider {
+            id: releaseSlider
+            text: qsTr("Release")
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+            visible: component.showGranularSettings === false
+            unitLabel: "\n" + qsTr("seconds")
+            value: component.clip ? component.clip.adsrRelease : 0
+            decimals: 2
+            increment: 0.1
+            slideIncrement: 0.01
+            applyLowerBound: true
+            lowerBound: 0
+            resetOnTap: true
+            resetValue: 0
+            selected: component.currentADSRElement === 3
+            onValueChanged: {
+                if (component.clip.adsrRelease != releaseSlider.value) {
+                    component.clip.adsrRelease = releaseSlider.value
+                }
             }
         }
         ColumnLayout {
@@ -362,15 +329,15 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             property double grainRemaining: component.clip ? (1 - component.clip.grainSustain) : 1;
             attackValue: component.clip ? (component.showGranularSettings ? grainRemaining * component.clip.grainTilt : component.clip.adsrAttack) : 0
-            attackMax: component.showGranularSettings ? 1 : 2
+            attackMax: component.showGranularSettings ? 1 : Math.max(1, component.clip ? component.clip.adsrAttack : 1)
             decayValue: component.clip ? (component.showGranularSettings ? 0 : component.clip.adsrDecay) : 0
-            decayMax: 2
-            decayWidth: component.showGranularSettings ? 0 : 1;
+            decayMax: component.showGranularSettings ? 2 : Math.max(1, component.clip ? component.clip.adsrDecay : 2)
+            decayWidth: component.showGranularSettings ? 0 : decayMax;
             sustainValue: component.clip ? (component.showGranularSettings ? 1 : component.clip.adsrSustain) : 0
             sustainMax: 1
             sustainWidth: component.clip ? (component.showGranularSettings ? component.clip.grainSustain : 1) : 1
             releaseValue: component.clip ? (component.showGranularSettings ? grainRemaining * (1.0 - component.clip.grainTilt) : component.clip.adsrRelease) : 0
-            releaseMax: component.showGranularSettings ? 1 : 2
+            releaseMax: component.showGranularSettings ? 1 : Math.max(1, component.clip ? component.clip.adsrRelease : 1)
             Connections {
                 target: component
                 onClipChanged: {

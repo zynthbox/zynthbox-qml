@@ -31,14 +31,16 @@ Card {
     id: component
     property double attackValue: 1
     property double attackMax: 1
+    property double attackWidth: attackMax
     property double decayValue: 1
     property double decayMax: 1
-    property double decayWidth: 1
+    property double decayWidth: decayMax
     property double sustainValue: 1
     property double sustainMax: 1
     property double sustainWidth: 1
     property double releaseValue: 1
     property double releaseMax: 1
+    property double releaseWidth: releaseMax
     function requestPaint() {
         canvas.requestPaint();
     }
@@ -49,36 +51,44 @@ Card {
             var ctx = getContext("2d");
             ctx.lineWidth = 3;
             ctx.strokeStyle = Kirigami.Theme.highlightColor
-            var grd = ctx.createLinearGradient(0, 0, 0, height)
-            grd.addColorStop(0, Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                        Kirigami.Theme.highlightColor.g,
-                                        Kirigami.Theme.highlightColor.b,
-                                        0.4))
-            grd.addColorStop(0.8, Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                        Kirigami.Theme.highlightColor.g,
-                                        Kirigami.Theme.highlightColor.b,
-                                        0))
-            ctx.fillStyle = grd;
-            let piece = width / (2 + component.decayWidth + component.sustainWidth);
+            // var grd = ctx.createLinearGradient(0, 0, 0, height)
+            // grd.addColorStop(0, Qt.rgba(Kirigami.Theme.highlightColor.r,
+            //                             Kirigami.Theme.highlightColor.g,
+            //                             Kirigami.Theme.highlightColor.b,
+            //                             0.4))
+            // grd.addColorStop(0.8, Qt.rgba(Kirigami.Theme.highlightColor.r,
+            //                             Kirigami.Theme.highlightColor.g,
+            //                             Kirigami.Theme.highlightColor.b,
+            //                             0))
+            // ctx.fillStyle = grd;
+
+            let actualWidth = component.attackValue + component.decayValue + component.sustainWidth + component.releaseValue;
+            let maximumWidth = component.attackWidth + component.decayWidth + component.sustainWidth + component.releaseWidth;
+
+            let attackWidth = width * component.attackValue / maximumWidth;
+            let decayWidth = width * component.decayValue / maximumWidth;
+            let sustainWidth = width * component.sustainWidth / maximumWidth;
+            let releaseWidth = width * component.releaseValue / maximumWidth;
+
             let top = Kirigami.Units.gridUnit
             let bottom = height - Kirigami.Units.gridUnit * 2
 
             ctx.clearRect(0, 0, width, height);
             ctx.beginPath();
 
-            let currentX = piece * (1 - component.attackValue/component.attackMax);
+            let currentX = width * ((maximumWidth - actualWidth) / maximumWidth) / 2;
             ctx.moveTo(currentX, top + bottom);
-            currentX = piece;
+            currentX += attackWidth;
             ctx.lineTo(currentX, top);
-            currentX += piece * (component.decayValue/component.decayMax) * component.decayWidth;
+            currentX += decayWidth;
             ctx.lineTo(currentX, top + bottom * (1 - component.sustainValue/component.sustainMax));
-            currentX += (piece * component.sustainWidth);
+            currentX += sustainWidth;
             ctx.lineTo(currentX, top + bottom * (1 - component.sustainValue/component.sustainMax));
-            currentX += piece * (component.releaseValue/component.releaseMax);
+            currentX += releaseWidth;
             ctx.lineTo(currentX, top + bottom);
             //ctx.closePath();
             ctx.stroke();
-            ctx.fill();
+            // ctx.fill();
         }
     }
 }

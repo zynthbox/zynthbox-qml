@@ -1018,7 +1018,7 @@ ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            text: component.patternModel ? qsTr("Scale: %1").arg(Zynthbox.KeyScales.scaleName(Zynthbox.KeyScales.scaleIndexToEnumKey(component.patternModel.scale))) : ""
+            text: component.patternModel ? Zynthbox.KeyScales.scaleName(Zynthbox.KeyScales.scaleIndexToEnumKey(component.patternModel.scale)) : ""
             onClicked: scaleComboBox.onClicked()
             Zynthian.ComboBox {
                 id: scaleComboBox

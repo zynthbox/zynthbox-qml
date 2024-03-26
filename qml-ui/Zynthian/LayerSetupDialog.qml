@@ -84,7 +84,6 @@ Zynthian.ActionPickerPopup {
                         zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
                         root.close()
                         zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
-                        newSynthWorkaroundTimer.restart()
                         zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                     } else if (!root.selectedChannel.createChainedSoundInNextFreeLayer(root.selectedChannel.selectedSlotRow)) {
                         root.close();
@@ -93,7 +92,6 @@ Zynthian.ActionPickerPopup {
                         zynqtgui.layer.page_after_layer_creation = zynqtgui.current_screen_id
                         root.close()
                         zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
-                        newSynthWorkaroundTimer.restart()
                         zynqtgui.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                     }
                 })

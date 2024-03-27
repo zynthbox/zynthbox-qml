@@ -225,11 +225,11 @@ ColumnLayout {
         // Adjust by a full octave if the mode button is held down
         if (zynqtgui.modeButtonPressed) {
             zynqtgui.ignoreNextModeButtonPress = true;
-            octaveAdjustment = 12;
+            let octaveAdjustment = 12;
             subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + (octaveAdjustment * pitchChange), 0), 127), subnote.midiChannel);
         } else {
             let newMidiNote = Zynthbox.KeyScales.transposeNote(subnote.midiNote, pitchChange, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey);
-            subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(newMidiNote + (octaveAdjustment * pitchChange), 0), 127), subnote.midiChannel);
+            subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(newMidiNote, 0), 127), subnote.midiChannel);
         }
         // Now insert the replacement note and set the metadata again
         var subnotePosition = component.patternModel.insertSubnoteSorted(row, column, subnote);
@@ -635,7 +635,7 @@ ColumnLayout {
                     paramMin: 0
                     paramMax: 127
                     scrollWidth: 128
-                    knobId: 1
+                    knobId: 0
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 StepSettingsParamDelegate {
@@ -672,7 +672,7 @@ ColumnLayout {
                         896: "7",
                         1024: "8"
                     }
-                    knobId: 2
+                    knobId: 1
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 StepSettingsParamDelegate {
@@ -725,7 +725,7 @@ ColumnLayout {
                         paramList = values;
                         paramNames = names;
                     }
-                    knobId: 3
+                    knobId: 2
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 1 (Velocity, Length, Position)
@@ -743,7 +743,7 @@ ColumnLayout {
                     paramMin: 0
                     paramMax: 45
                     scrollWidth: 46
-                    knobId: 1
+                    knobId: 0
                     currentlySelected: subnoteDelegate.isCurrent
                     paramList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
                     paramNames: {
@@ -825,7 +825,7 @@ ColumnLayout {
                         97: "Bar 7",
                         113: "Bar 8",
                     }
-                    knobId: 3
+                    knobId: 2
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 2 (Probability, ???, Swing)
@@ -850,7 +850,7 @@ ColumnLayout {
                         2: "Split Length, Overlap",
                         3: "Split Length, Choke",
                     }
-                    knobId: 1
+                    knobId: 0
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 StepSettingsParamDelegate {
@@ -866,7 +866,7 @@ ColumnLayout {
                     paramMin: 0
                     paramMax: 12
                     scrollWidth: 13
-                    knobId: 2
+                    knobId: 1
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 StepSettingsParamDelegate {
@@ -882,7 +882,7 @@ ColumnLayout {
                     paramMin: 0
                     paramMax: 100
                     scrollWidth: 101
-                    knobId: 3
+                    knobId: 2
                     currentlySelected: subnoteDelegate.isCurrent
                 }
                 // END Page 3 (Ratchet Style, Ratchet Count, Ratchet Probability)

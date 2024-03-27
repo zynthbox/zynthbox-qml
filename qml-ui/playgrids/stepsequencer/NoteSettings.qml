@@ -297,6 +297,19 @@ ColumnLayout {
     }
 
     RowLayout {
+        visible: component.listData.length === 0
+        Layout.fillWidth: true
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        QQC2.Label {
+            opacity: 0.7
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            horizontalAlignment: Text.AlignHCenter
+            text: qsTr("(no notes to display)")
+        }
+    }
+    RowLayout {
+        visible: component.listData.length > 0
         Layout.fillWidth: true
         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
         QQC2.Label {

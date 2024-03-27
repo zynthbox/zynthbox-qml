@@ -525,61 +525,65 @@ Zynthian.BasePlayGrid {
                 // Internal stuff is handled by the DrumsGrid, so limit to external only during playback
                 listenToPort = 2;
             }
-            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3 && 127 < byte1 && byte1 < 160) {
-                // let midiChannel = byte1 - 127;
-                let setOn = false;
-                if (byte1 > 143) {
-                    // midiChannel = byte1 - 143;
-                    setOn = true;
-                }
-                let midiNote = byte2;
-                let velocity = byte3;
-                if (setOn == true) {
-                    if (component.noteListeningActivations === 0) {
-                        // Clear the current state, in case there's something there (otherwise things look a little weird)
-                        component.heardNotes = [];
-                        component.heardVelocities = [];
-                        if (Zynthbox.SyncTimer.timerRunning) {
-                            component.listeningStartedDuringPlayback = true;
+            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3) {
+                if (127 < byte1 && byte1 < 160) {
+                    let setOn = false;
+                    if (byte1 > 143) {
+                        setOn = true;
+                    }
+                    let midiNote = byte2;
+                    let velocity = byte3;
+                    if (setOn == true) {
+                        if (component.noteListeningActivations === 0) {
+                            // Clear the current state, in case there's something there (otherwise things look a little weird)
+                            component.heardNotes = [];
+                            component.heardVelocities = [];
+                            if (Zynthbox.SyncTimer.timerRunning) {
+                                component.listeningStartedDuringPlayback = true;
+                            }
                         }
+                        // Count up one tick for a note on message
+                        component.noteListeningActivations = component.noteListeningActivations + 1;
+                        // Create a new note based on the new thing that just arrived, but only if it's an on note
+                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, sketchpadTrack);
+                        var existingIndex = component.noteListeningNotes.indexOf(newNote);
+                        if (existingIndex > -1) {
+                            component.noteListeningNotes.splice(existingIndex, 1);
+                            component.noteListeningVelocities.splice(existingIndex, 1);
+                        }
+                        component.noteListeningNotes.push(newNote);
+                        component.noteListeningVelocities.push(velocity);
+                        // console.log("Registering note on , new activation count is", component.noteListeningActivations, component.noteListeningNotes);
+                    } else if (setOn == false) {
+                        // Count down one for a note off message
+                        component.noteListeningActivations = component.noteListeningActivations - 1;
+                        // console.log("Registering note off, new activation count is", component.noteListeningActivations, component.noteListeningNotes);
                     }
-                    // Count up one tick for a note on message
-                    component.noteListeningActivations = component.noteListeningActivations + 1;
-                    // Create a new note based on the new thing that just arrived, but only if it's an on note
-                    var newNote = Zynthbox.PlayGridManager.getNote(midiNote, sketchpadTrack);
-                    var existingIndex = component.noteListeningNotes.indexOf(newNote);
-                    if (existingIndex > -1) {
-                        component.noteListeningNotes.splice(existingIndex, 1);
-                        component.noteListeningVelocities.splice(existingIndex, 1);
+                    if (component.noteListeningActivations < 0) {
+                        // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
+                        // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
+                        // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
+                        // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                        component.noteListeningActivations = 0;
+                        component.noteListeningNotes = [];
+                        component.noteListeningVelocities = [];
+                        component.listeningStartedDuringPlayback = false;
                     }
-                    component.noteListeningNotes.push(newNote);
-                    component.noteListeningVelocities.push(velocity);
-                } else if (setOn == false) {
-                    // Count down one for a note off message
-                    component.noteListeningActivations = component.noteListeningActivations - 1;
-                }
-                component.heardNotes = component.noteListeningNotes;
-                component.heardVelocities = component.noteListeningVelocities;
-                if (component.noteListeningActivations === 0) {
-                    // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                    component.listeningStartedDuringPlayback = false;
-                } else if (component.noteListeningActivations < 0) {
-                    // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
-                    // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
-                    // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
-                    // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                    if (component.noteListeningActivations === 0) {
+                        // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
+                        component.heardNotes = component.noteListeningNotes;
+                        component.heardVelocities = component.noteListeningVelocities;
+                        component.noteListeningNotes = [];
+                        component.noteListeningVelocities = [];
+                        component.listeningStartedDuringPlayback = false;
+                    }
+                } else if (175 < byte1 && byte1 < 192 && byte2 === 123) {
+                    // console.log("Registering all-off, resetting to empty, bytes are", byte1, byte2, byte3);
                     component.noteListeningActivations = 0;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
                     component.listeningStartedDuringPlayback = false;
                 }
-            } if (size === 3 && byte2 === 0x7B && sketchpadTrack === _private.activePatternModel.midiChannel) {
-                component.noteListeningActivations = 0;
-                component.noteListeningNotes = [];
-                component.noteListeningVelocities = [];
-                component.listeningStartedDuringPlayback = false;
             }
         }
     }

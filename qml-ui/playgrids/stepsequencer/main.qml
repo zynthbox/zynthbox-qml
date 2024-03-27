@@ -215,7 +215,7 @@ Zynthian.BasePlayGrid {
     signal hidePatternsMenu();
     signal showPatternsMenu();
     property bool showPatternSettings: false
-    signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter);
+    signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter, int firstStep, int lastStep);
 
     property var heardNotes: []
     property var heardVelocities: []
@@ -331,6 +331,7 @@ Zynthian.BasePlayGrid {
         signal deselectSelectedItem()
         signal activateSelectedItem()
         property bool hasSelection: false
+        property int selectedStep: -1
         function previousBar() {
             if (sequence.activePatternObject.activeBar > 0) {
                 sequence.activePatternObject.activeBar = sequence.activePatternObject.activeBar - 1;
@@ -911,6 +912,7 @@ Zynthian.BasePlayGrid {
                             property int selectedIndex: -1
                             onSelectedIndexChanged: {
                                 _private.hasSelection = (drumPadRepeater.selectedIndex > -1);
+                                _private.selectedStep = drumPadRepeater.selectedIndex;
                             }
                             function updateMostRecentFromSelection() {
                                 var seqPad = drumPadRepeater.itemAt(selectedIndex);
@@ -1039,7 +1041,7 @@ Zynthian.BasePlayGrid {
                                                 filter.push(component.heardNotes[i].midiNote);
                                             }
                                         }
-                                        component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter);
+                                        component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter, -1, -1);
                                     }
                                 }
                             }
@@ -2046,7 +2048,11 @@ Zynthian.BasePlayGrid {
                         }
                     }
                     onShowNoteSettingsPopup: {
-                        noteSettingsPopup.showSettings(patternModel, firstBar, lastBar, midiNoteFilter);
+                        if (firstStep > -1 && lastStep > -1) {
+                            noteSettingsPopup.showSettings(patternModel, firstBar, lastBar, midiNoteFilter, firstStep, lastStep);
+                        } else {
+                            noteSettingsPopup.showSettings(patternModel, firstBar, lastBar, midiNoteFilter);
+                        }
                     }
                 }
                 NoteSettings {
@@ -2296,6 +2302,9 @@ Zynthian.BasePlayGrid {
                             component.ignoreNextBack = true;
                             _private.activePatternModel.clear();
                         } else {
+                            if (_private.selectedStep > -1) {
+                                _private.deselectSelectedItem();
+                            }
                             component.heardNotes = [];
                             component.heardVelocities = [];
                         }
@@ -2303,9 +2312,11 @@ Zynthian.BasePlayGrid {
                 }
                 Zynthian.PlayGridButton {
                     id: defaultNoteSettingsButton
-                    text: component.heardNotes.length > 0
-                        ? "%1\n%2".arg(noteLength).arg(velocity)
-                        : (component.currentBarNotes.length > 0 ? component.currentBarNotes.length : "-") + " in\nBar"
+                    text: _private.selectedStep > -1
+                        ? "Step\n%1".arg((_private.activePatternModel.width * (_private.activePatternModel.activeBar + _private.activePatternModel.bankOffset)) + _private.selectedStep + 1)
+                        : component.heardNotes.length > 0
+                            ? "%1\n%2".arg(noteLength).arg(velocity)
+                            : (component.currentBarNotes.length > 0 ? component.currentBarNotes.length : "-") + " in\nBar"
                     property var stepNames: {
                         0: component.stepDurationName,
                         1: "1/128th",
@@ -2332,14 +2343,16 @@ Zynthian.BasePlayGrid {
                             : _private.activePatternModel.defaultNoteDuration + "/128th"
                     property string velocity: component.heardVelocities.length === 0 ? "" : "Vel " + component.heardVelocities[0]
                     onClicked: {
-                        if (component.heardNotes.length > 0) {
+                        if (_private.selectedStep > -1) {
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
+                        } else if (component.heardNotes.length > 0) {
                             var filter = []
                             for (var i = 0; i < component.heardNotes.length; ++i) {
                                 filter.push(component.heardNotes[i].midiNote);
                             }
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter);
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter, -1, -1);
                         } else {
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, []);
+                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [], -1, -1);
                         }
                     }
                     Kirigami.Icon {

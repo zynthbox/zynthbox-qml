@@ -184,9 +184,9 @@ QQC2.Button {
                                         if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
                                             if (!longPressTimer.pressingAndHolding) {
                                                 if (zynqtgui.altButtonPressed) {
-                                                    component.tapped(-1);
-                                                } else {
                                                     component.tapped(index);
+                                                } else {
+                                                    component.tapped(-1);
                                                 }
                                             }
                                         }

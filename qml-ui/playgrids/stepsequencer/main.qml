@@ -782,7 +782,11 @@ Zynthian.BasePlayGrid {
                                 // So we also visualise default-duration notes which have been moved around
                                 noteLengthVisualiser.noteDuration = noteLengthVisualiser.singleStepLength;
                             }
-                            noteLengthVisualiser.note = note;
+                            if (note) {
+                                noteLengthVisualiser.note = note;
+                            } else {
+                                noteLengthVisualiser.note = null;
+                            }
                         }
                         property var noteLengths: {
                             1: 32,
@@ -2333,6 +2337,15 @@ Zynthian.BasePlayGrid {
                         } else {
                             component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, []);
                         }
+                    }
+                    Kirigami.Icon {
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                        }
+                        height: parent.width * 0.3
+                        width: height
+                        source: "overflow-menu"
                     }
                 }
 

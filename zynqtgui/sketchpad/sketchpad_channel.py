@@ -1031,7 +1031,7 @@ class sketchpad_channel(QObject):
         # Stop all playing notes
         for old_chan in self.__chained_sounds__:
             if old_chan > -1:
-                self.zynqtgui.raw_all_notes_off_chan(old_chan)
+                self.zynqtgui.raw_all_notes_off_chan(self.id)
 
         chained_sounds = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):

@@ -30,6 +30,7 @@ import logging
 from os.path import isfile
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
+from PySide2.QtCore import Slot, QTimer
 
 from . import zynthian_lv2
 from . import zynthian_engine
@@ -171,6 +172,7 @@ class zynthian_engine_jalv(zynthian_engine):
         self.nickname = "JV/" + plugin_name
         self.plugin_name = plugin_name
         self.plugin_url = self.plugins_dict[plugin_name]['URL']
+        self.dryrun = dryrun
 
         self.ui = False
         if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
@@ -193,17 +195,7 @@ class zynthian_engine_jalv(zynthian_engine):
 
             self.command_prompt = "\n> "
 
-            output = self.start()
-
-            # Get Plugin & Jack names from Jalv starting text ...
-            self.jackname = None
-            if output:
-                for line in output.split("\n"):
-                    if line[0:10]=="JACK Name:":
-                        self.jackname = line[11:].strip()
-                        logging.debug("Jack Name => {}".format(self.jackname))
-                        break
-
+            self.start()
             # Set static MIDI Controllers from hardcoded plugin info
             try:
                 self._ctrls = self.plugin_ctrl_info[self.plugin_name]['ctrls']
@@ -217,7 +209,7 @@ class zynthian_engine_jalv(zynthian_engine):
             self.generate_ctrl_screens(self.lv2_zctrl_dict)
 
         # Get bank & presets info
-        self.preset_info = zynthian_lv2.get_plugin_presets(plugin_name)
+        self.preset_info = zynthian_lv2.get_plugin_presets(self.plugin_name)
 
         self.bank_list = []
         for bank_label, info in self.preset_info.items():
@@ -227,6 +219,27 @@ class zynthian_engine_jalv(zynthian_engine):
             self.bank_list.append(("", None, "", None))
 
         self.reset()
+        self.post_engine_startup_task()
+
+    @Slot()
+    def post_engine_startup_task(self):
+        if self.proc_start_output is None:
+            logging.debug(f"Waiting for engine {self.name} to start before continuing with engine setup")
+            QTimer.singleShot(200, self.post_engine_startup_task)
+            return
+
+        logging.debug(f"Doing post engine startup task for : {self.name}")
+        if not self.dryrun:
+            # Get Plugin & Jack names from Jalv starting text ...
+            self.jackname = None
+            if self.proc_start_output is not None:
+                for line in self.proc_start_output.split("\n"):
+                    if line[0:10]=="JACK Name:":
+                        self.jackname = line[11:].strip()
+                        logging.debug("Jack Name => {}".format(self.jackname))
+                        for layer in self.layers:
+                            layer.jackname = self.jackname
+                        break
 
 
     # Jack, when listing ports, accepts regular expressions as the jack name.

@@ -29,10 +29,12 @@ import json
 import liblo
 import logging
 import pexpect
+import threading
 from time import sleep
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
+from PySide2.QtCore import QObject
 
 from . import zynthian_controller
 
@@ -40,7 +42,7 @@ from . import zynthian_controller
 # Basic Engine Class: Spawn a proccess & manage IPC communication using pexpect
 #--------------------------------------------------------------------------------
 
-class zynthian_basic_engine:
+class zynthian_basic_engine(QObject):
 
     # ---------------------------------------------------------------------------
     # Data dirs 
@@ -64,6 +66,8 @@ class zynthian_basic_engine:
         self.command = command
         self.command_env = os.environ.copy()
         self.command_prompt = prompt
+        self.proc_started = False
+        self.proc_start_output = None
 
 
     def __del__(self):
@@ -75,47 +79,53 @@ class zynthian_basic_engine:
     # ---------------------------------------------------------------------------
 
     def start(self):
-        def task():
-            logging.debug("Command: {}".format(self.command))
-            self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
-            #os.sched_setaffinity(self.proc.pid, [0,1,2])
+        def task_engine_startup():
+            def task_spawn_process():
+                logging.debug("Command: {}".format(self.command))
+                self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
+                #os.sched_setaffinity(self.proc.pid, [0,1,2])
 
-            self.proc.delaybeforesend = 0
+                self.proc.delaybeforesend = 0
 
-            output = self.proc_get_output()
+                output = self.proc_get_output()
 
-            if self.proc_start_sleep:
-                sleep(self.proc_start_sleep)
+                if self.proc_start_sleep:
+                    sleep(self.proc_start_sleep)
 
-            return output
+                self.proc_started = True
 
-        restart_count = 0
+                return output
 
-        if not self.proc:
-            output = None
-            logging.info("Starting Engine {}".format(self.name))
-            while output is None:
-                try:
-                    output = task()
-                except Exception as err:
-                    restart_count += 1
-                    logging.error("Can't start engine {} => {}".format(self.name, err))
-                    logging.debug(f"Engine {self.name} Restart Count : {restart_count}")
+            restart_count = 0
 
-                if restart_count >= 5:
-                    # Tried restarting engine 5 times but failed. Force restart the entire application
-                    self.zynqtgui.exit(102)
-            return output
+            if not self.proc:
+                logging.info("Starting Engine {}".format(self.name))
+                while self.proc_start_output is None:
+                    try:
+                        self.proc_start_output = task_spawn_process()
+                    except Exception as err:
+                        restart_count += 1
+                        logging.error("Can't start engine {} => {}".format(self.name, err))
+                        logging.debug(f"Engine {self.name} Restart Count : {restart_count}")
+
+                    if restart_count >= 5:
+                        # Tried restarting engine 5 times but failed. Force restart the entire application
+                        self.zynqtgui.exit(102)
+
+        worker_thread = threading.Thread(target=task_engine_startup, args=())
+        worker_thread.start()
 
 
     def stop(self):
-        if self.proc:
+        if self.proc_started:
             try:
                 logging.info("Stoping Engine " + self.name)
                 self.proc.terminate()
                 sleep(0.2)
                 self.proc.terminate(True)
                 self.proc=None
+                self.proc_started = False
+                self.proc_start_output = None
             except Exception as err:
                 logging.error("Can't stop engine {} => {}".format(self.name, err))
 
@@ -130,7 +140,11 @@ class zynthian_basic_engine:
 
 
     def proc_cmd(self, cmd):
-        if self.proc:
+        while not self.proc_started:
+            logging.debug(f"Waiting for engine {self.name} process to start before issuing a process command")
+            sleep(0.1)
+
+        if self.proc_started:
             try:
                 #logging.debug("proc command: "+cmd)
                 self.proc.sendline(cmd)

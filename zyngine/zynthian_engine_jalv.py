@@ -30,7 +30,7 @@ import logging
 from os.path import isfile
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
-from PySide2.QtCore import Slot, QTimer
+from PySide2.QtCore import QObject, Slot, QTimer
 
 from . import zynthian_lv2
 from . import zynthian_engine
@@ -48,7 +48,7 @@ def get_jalv_plugins():
 # Jalv Engine Class
 #------------------------------------------------------------------------------
 
-class zynthian_engine_jalv(zynthian_engine):
+class zynthian_engine_jalv(zynthian_engine, QObject):
 
     #------------------------------------------------------------------------------
     # Plugin List (this list is used ONLY if no config file is found)
@@ -173,6 +173,7 @@ class zynthian_engine_jalv(zynthian_engine):
         self.plugin_name = plugin_name
         self.plugin_url = self.plugins_dict[plugin_name]['URL']
         self.dryrun = dryrun
+        self.jackname = self.get_jalv_jackname()
 
         self.ui = False
         if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
@@ -187,11 +188,11 @@ class zynthian_engine_jalv(zynthian_engine):
 
         if not dryrun:
             if self.config_remote_display() and self.ui:
-                self.command = ("jalv.gtk --jack-name {} {}".format(self.get_jalv_jackname(), self.plugin_url))
+                self.command = ("jalv.gtk --jack-name {} {}".format(self.jackname, self.plugin_url))
             else:
                 self.command_env['DISPLAY'] = ":0"
                 self.command_env['QT_QPA_PLATFORM'] = "offscreen"
-                self.command = ("jalv -n {} {}".format(self.get_jalv_jackname(), self.plugin_url))
+                self.command = ("jalv -n {} {}".format(self.jackname, self.plugin_url))
 
             self.command_prompt = "\n> "
 
@@ -219,28 +220,6 @@ class zynthian_engine_jalv(zynthian_engine):
             self.bank_list.append(("", None, "", None))
 
         self.reset()
-        self.post_engine_startup_task()
-
-    @Slot()
-    def post_engine_startup_task(self):
-        if self.proc_start_output is None:
-            logging.debug(f"Waiting for engine {self.name} to start before continuing with engine setup")
-            QTimer.singleShot(200, self.post_engine_startup_task)
-            return
-
-        logging.debug(f"Doing post engine startup task for : {self.name}")
-        if not self.dryrun:
-            # Get Plugin & Jack names from Jalv starting text ...
-            self.jackname = None
-            if self.proc_start_output is not None:
-                for line in self.proc_start_output.split("\n"):
-                    if line[0:10]=="JACK Name:":
-                        self.jackname = line[11:].strip()
-                        logging.debug("Jack Name => {}".format(self.jackname))
-                        for layer in self.layers:
-                            layer.jackname = self.jackname
-                        break
-
 
     # Jack, when listing ports, accepts regular expressions as the jack name.
     # So, for avoiding problems, jack names shouldn't contain regex characters.
@@ -261,6 +240,7 @@ class zynthian_engine_jalv(zynthian_engine):
         layer.listen_midi_cc = False
         super().add_layer(layer)
         self.set_midi_chan(layer)
+        layer.jackname = self.jackname
 
     # ---------------------------------------------------------------------------
     # MIDI Channel Management
@@ -788,13 +768,13 @@ class zynthian_engine_jalv(zynthian_engine):
     def sanitize_text(text):
         # Remove bad chars
         bad_chars = ['.', ',', ';', ':', '!', '*', '+', '?', '@', '&', '$', '%', '=', '"', '\'', '`', '/', '\\', '^', '<', '>', '[', ']', '(', ')', '{', '}']
-        for i in bad_chars: 
+        for i in bad_chars:
             text = text.replace(i, ' ')
-            
+
         # Strip and replace (multi)spaces by single underscore
         text = '_'.join(text.split())
         text = '_'.join(filter(None,text.split('_')))
-    
+
         return text
 
 

@@ -2251,6 +2251,7 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.sequence
                         ? _private.sequence.soloPatternObject
                             ? "Track" + (_private.sequence.soloPatternObject.channelIndex + 1) + "\n"
@@ -2270,6 +2271,7 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-up"
                     onClicked: {
                         _private.octaveUp();
@@ -2282,6 +2284,7 @@ Zynthian.BasePlayGrid {
                 }
 
                 Zynthian.PlayGridButton {
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     icon.name: "arrow-down"
                     onClicked: {
                         _private.octaveDown();
@@ -2291,11 +2294,9 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    icon.name: component.heardNotes.length > 0 ? "edit-clear-locationbar-ltr" : ""
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: "Note:\n" + (component.heardNotes.length > 0
-                        ? (component.heardNotes.length === 1
-                            ? component.heardNotes[0].name + (component.heardNotes[0].octave - 1)
-                            : component.heardNotes.length + " ♫")
+                        ? Zynthbox.Chords.symbol(component.heardNotes, _private.activePatternModel.scaleKey, _private.activePatternModel.pitchKey, _private.activePatternModel.octaveKey, "\n")
                         : "(all)")
                     onClicked: {
                         if (zynqtgui.backButtonPressed && _private.activePatternModel) {
@@ -2309,8 +2310,20 @@ Zynthian.BasePlayGrid {
                             component.heardVelocities = [];
                         }
                     }
+                    Kirigami.Icon {
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                            margins: Kirigami.Units.smallSpacing
+                        }
+                        height: parent.width * 0.3
+                        width: height
+                        visible: component.heardNotes.length > 0
+                        source: "edit-clear-locationbar"
+                    }
                 }
                 Zynthian.PlayGridButton {
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     id: defaultNoteSettingsButton
                     text: _private.selectedStep > -1
                         ? "Step\n%1".arg((_private.activePatternModel.width * (_private.activePatternModel.activeBar + _private.activePatternModel.bankOffset)) + _private.selectedStep + 1)
@@ -2369,6 +2382,7 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1
                     id:sequencerSettingsBtn
                     icon.name: "configure"
                     onClicked: {

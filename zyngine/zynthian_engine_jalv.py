@@ -24,13 +24,11 @@
 
 import os
 import re
-import json
 import shutil
 import logging
-from os.path import isfile
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
-from PySide2.QtCore import QObject, Slot, QTimer
+from PySide2.QtCore import QObject
 
 from . import zynthian_lv2
 from . import zynthian_engine
@@ -281,17 +279,19 @@ class zynthian_engine_jalv(zynthian_engine, QObject):
     def set_preset(self, layer, preset, preload=False):
         if not preset[0]:
             return
-        output=self.proc_cmd("preset {}".format(preset[0]))
+        output = self.proc_cmd("preset {}".format(preset[0]), run_async=True)
+        # FIXME : Implement sync proc_cmd so that the output can be read
+        # logging.debug("proc_cmd sync output :\n{}".format(output))
 
-        #Parse new controller values
-        for line in output.split("\n"):
-            try:
-                parts=line.split(" = ")
-                if len(parts)==2:
-                    self.lv2_zctrl_dict[parts[0]]._set_value(float(parts[1]))
-            except Exception as e:
-                # logging.debug(e)
-                pass
+        # #Parse new controller values
+        # for line in output.split("\n"):
+        #     try:
+        #         parts=line.split(" = ")
+        #         if len(parts)==2:
+        #             self.lv2_zctrl_dict[parts[0]]._set_value(float(parts[1]))
+        #     except Exception as e:
+        #         # logging.debug(e)
+        #         pass
 
         return True
 

@@ -68,18 +68,13 @@ class zynthian_basic_engine(Process):
         self.command_prompt = prompt
         self.proc_started = False
         self.proc_start_output = Value(ctypes.c_char_p, b"")
-
         self.command_start = Event()
         self.command_stop = Event()
         self.command_process_cmd = Event()
         self.proc_cmd_queue = Queue()
-        self.condition_do_work = Condition()
-        self.condition_engine_running = Condition()
-
 
     def __del__(self):
         self.stop()
-
 
     # ---------------------------------------------------------------------------
     # Subproccess Management & IPC
@@ -88,19 +83,13 @@ class zynthian_basic_engine(Process):
     def start(self):
         super().start()
         self.command_start.set()
-        with self.condition_do_work:
-            self.condition_do_work.notify()
 
     def stop(self):
         self.command_stop.set()
-        with self.condition_do_work:
-            self.condition_do_work.notify()
 
     def proc_cmd(self, cmd):
         self.proc_cmd_queue.put(cmd)
         self.command_process_cmd.set()
-        with self.condition_do_work:
-            self.condition_do_work.notify()
 
     def proc_get_output(self):
         if self.command_prompt:
@@ -168,28 +157,27 @@ class zynthian_basic_engine(Process):
     def run(self):
         logging.debug("Running engine thread")
         while True:
-            with self.condition_do_work:
-                logging.debug("Waiting for engine task")
-                # Wait till there is some work to do
-                self.condition_do_work.wait()
+            if not (self.command_start.is_set() or self.command_process_cmd.is_set() or self.command_stop.is_set()):
+                # No task to do. Sleep for a bit
+                sleep(0.2)
 
-                if self.command_start.is_set():
-                    logging.debug(f"Got engine task : start {self._name}")
-                    # Do proc start task
-                    self.proc_start()
-                    self.command_start.clear()
-                if self.command_process_cmd.is_set():
-                    logging.debug(f"Got engine task : process cmd {self._name}")
-                    # Run proc commands
-                    while not self.proc_cmd_queue.empty():
-                        self.proc_process_cmd(self.proc_cmd_queue.get())
-                    self.command_process_cmd.clear()
-                if self.command_stop.is_set():
-                    logging.debug(f"Got engine task : stop {self._name}")
-                    # Do proc stop task and exit thread
-                    self.proc_stop()
-                    self.command_stop.clear()
-                    break
+            if self.command_start.is_set():
+                logging.debug(f"Got engine task : start {self._name}")
+                # Do proc start task
+                self.proc_start()
+                self.command_start.clear()
+            if self.command_process_cmd.is_set():
+                logging.debug(f"Got engine task : process cmd {self._name}")
+                # Run proc commands
+                while not self.proc_cmd_queue.empty():
+                    self.proc_process_cmd(self.proc_cmd_queue.get())
+                self.command_process_cmd.clear()
+            if self.command_stop.is_set():
+                logging.debug(f"Got engine task : stop {self._name}")
+                # Do proc stop task and exit thread
+                self.proc_stop()
+                self.command_stop.clear()
+                break
 
 
 

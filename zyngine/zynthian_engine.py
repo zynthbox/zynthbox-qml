@@ -28,20 +28,19 @@ import json
 import liblo
 import logging
 import pexpect
-import ctypes
 from time import sleep
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
-from multiprocessing import Process, Event, Queue, Condition, Value
-
+from threading import Thread, Event
+from queue import Queue
 from . import zynthian_controller
 
 #--------------------------------------------------------------------------------
 # Basic Engine Class: Spawn a proccess & manage IPC communication using pexpect
 #--------------------------------------------------------------------------------
 
-class zynthian_basic_engine(Process):
+class zynthian_basic_engine(Thread):
 
     # ---------------------------------------------------------------------------
     # Data dirs 
@@ -67,11 +66,13 @@ class zynthian_basic_engine(Process):
         self.command_env = os.environ.copy()
         self.command_prompt = prompt
         self.proc_started = False
-        self.proc_start_output = Value(ctypes.c_char_p, b"")
+        self.proc_start_output = ""
         self.command_start = Event()
         self.command_stop = Event()
         self.command_process_cmd = Event()
         self.proc_cmd_queue = Queue()
+        self.proc_cmd_complete = Event()
+        self.proc_cmd_output = ""
 
     def __del__(self):
         self.stop()
@@ -87,9 +88,18 @@ class zynthian_basic_engine(Process):
     def stop(self):
         self.command_stop.set()
 
-    def proc_cmd(self, cmd):
-        self.proc_cmd_queue.put(cmd)
+    def proc_cmd(self, cmd, run_async=True):
+        self.proc_cmd_queue.put({
+            "cmd": cmd,
+            "run_async": run_async
+        })
         self.command_process_cmd.set()
+        if not run_async:
+            logging.debug(f"Waiting for proc_cmd to complete : {cmd}")
+            self.proc_cmd_complete.clear()
+            self.proc_cmd_complete.wait()
+            logging.debug(f"proc_cmd complete : {cmd}")
+            return self.proc_cmd_output
 
     def proc_get_output(self):
         if self.command_prompt:
@@ -114,19 +124,17 @@ class zynthian_basic_engine(Process):
 
         if not self.proc:
             logging.info("Starting Engine {}".format(self._name))
-            with self.proc_start_output.get_lock():
-                while self.proc_start_output.value == b"":
-                    try:
-                        output = task_spawn_process()
-                        self.proc_start_output.value = output.encode('utf-8')
-                    except Exception as err:
-                        restart_count += 1
-                        logging.error("Can't start engine {} => {}".format(self._name, err))
-                        logging.debug(f"Engine {self._name} Restart Count : {restart_count}")
+            while self.proc_start_output == "":
+                try:
+                    self.proc_start_output = task_spawn_process()
+                except Exception as err:
+                    restart_count += 1
+                    logging.error("Can't start engine {} => {}".format(self._name, err))
+                    logging.debug(f"Engine {self._name} Restart Count : {restart_count}")
 
-                    if restart_count >= 5:
-                        # Tried restarting engine 5 times but failed. Force restart the entire application
-                        self.zynqtgui.exit(102)
+                if restart_count >= 5:
+                    # Tried restarting engine 5 times but failed. Force restart the entire application
+                    self.zynqtgui.exit(102)
 
 
     def proc_stop(self):
@@ -138,20 +146,24 @@ class zynthian_basic_engine(Process):
                 self.proc.terminate(True)
                 self.proc=None
                 self.proc_started = False
-                self.proc_start_output.value = b""
+                self.proc_start_output = ""
             except Exception as err:
                 logging.error("Can't stop engine {} => {}".format(self._name, err))
 
-    def proc_process_cmd(self, cmd):
+    def proc_process_cmd(self, item):
         if self.proc_started:
             try:
-                logging.debug("proc command: "+cmd)
-                self.proc.sendline(cmd)
+                logging.debug("proc command: "+item["cmd"])
+                self.proc.sendline(item["cmd"])
                 out=self.proc_get_output()
+                self.proc_cmd_complete.set()
                 #logging.debug("proc output:\n{}".format(out))
+                if not item["run_async"]:
+                    self.proc_cmd_output = out
+                    # logging.debug("proc output Value object value:\n{}".format(self.proc_cmd_output.value))
             except Exception as err:
                 out=""
-                logging.error("Can't exec engine command: {} => {}".format(cmd, err))
+                logging.error("Can't exec engine command: {} => {}".format(item["cmd"], err))
             return out
 
     def run(self):

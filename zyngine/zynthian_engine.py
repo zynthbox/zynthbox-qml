@@ -24,17 +24,16 @@
 
 #import sys
 import os
-import copy
 import json
 import liblo
 import logging
 import pexpect
-import threading
+import ctypes
 from time import sleep
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
-from PySide2.QtCore import QObject
+from multiprocessing import Process, Event, Queue, Condition, Value
 
 from . import zynthian_controller
 
@@ -42,7 +41,7 @@ from . import zynthian_controller
 # Basic Engine Class: Spawn a proccess & manage IPC communication using pexpect
 #--------------------------------------------------------------------------------
 
-class zynthian_basic_engine(QObject):
+class zynthian_basic_engine(Process):
 
     # ---------------------------------------------------------------------------
     # Data dirs 
@@ -58,7 +57,8 @@ class zynthian_basic_engine(QObject):
     # ---------------------------------------------------------------------------
 
     def __init__(self, name=None, command=None, prompt=None):
-        self.name = name
+        super().__init__()
+        self._name = name
 
         self.proc = None
         self.proc_timeout = 20
@@ -67,7 +67,14 @@ class zynthian_basic_engine(QObject):
         self.command_env = os.environ.copy()
         self.command_prompt = prompt
         self.proc_started = False
-        self.proc_start_output = None
+        self.proc_start_output = Value(ctypes.c_char_p, b"")
+
+        self.command_start = Event()
+        self.command_stop = Event()
+        self.command_process_cmd = Event()
+        self.proc_cmd_queue = Queue()
+        self.condition_do_work = Condition()
+        self.condition_engine_running = Condition()
 
 
     def __del__(self):
@@ -79,56 +86,21 @@ class zynthian_basic_engine(QObject):
     # ---------------------------------------------------------------------------
 
     def start(self):
-        def task_engine_startup():
-            def task_spawn_process():
-                logging.debug("Command: {}".format(self.command))
-                self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
-                #os.sched_setaffinity(self.proc.pid, [0,1,2])
-
-                self.proc.delaybeforesend = 0
-
-                output = self.proc_get_output()
-
-                if self.proc_start_sleep:
-                    sleep(self.proc_start_sleep)
-
-                self.proc_started = True
-
-                return output
-
-            restart_count = 0
-
-            if not self.proc:
-                logging.info("Starting Engine {}".format(self.name))
-                while self.proc_start_output is None:
-                    try:
-                        self.proc_start_output = task_spawn_process()
-                    except Exception as err:
-                        restart_count += 1
-                        logging.error("Can't start engine {} => {}".format(self.name, err))
-                        logging.debug(f"Engine {self.name} Restart Count : {restart_count}")
-
-                    if restart_count >= 5:
-                        # Tried restarting engine 5 times but failed. Force restart the entire application
-                        self.zynqtgui.exit(102)
-
-        worker_thread = threading.Thread(target=task_engine_startup, args=())
-        worker_thread.start()
-
+        super().start()
+        self.command_start.set()
+        with self.condition_do_work:
+            self.condition_do_work.notify()
 
     def stop(self):
-        if self.proc_started:
-            try:
-                logging.info("Stoping Engine " + self.name)
-                self.proc.terminate()
-                sleep(0.2)
-                self.proc.terminate(True)
-                self.proc=None
-                self.proc_started = False
-                self.proc_start_output = None
-            except Exception as err:
-                logging.error("Can't stop engine {} => {}".format(self.name, err))
+        self.command_stop.set()
+        with self.condition_do_work:
+            self.condition_do_work.notify()
 
+    def proc_cmd(self, cmd):
+        self.proc_cmd_queue.put(cmd)
+        self.command_process_cmd.set()
+        with self.condition_do_work:
+            self.condition_do_work.notify()
 
     def proc_get_output(self):
         if self.command_prompt:
@@ -138,15 +110,53 @@ class zynthian_basic_engine(QObject):
             logging.warning("Command Prompt is not defined!")
             return None
 
+    def proc_start(self):
+        def task_spawn_process():
+            logging.debug("Command: {}".format(self.command))
+            self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
+            self.proc.delaybeforesend = 0
+            output = self.proc_get_output()
+            if self.proc_start_sleep:
+                sleep(self.proc_start_sleep)
+            self.proc_started = True
+            return output
 
-    def proc_cmd(self, cmd):
-        while not self.proc_started:
-            logging.debug(f"Waiting for engine {self.name} process to start before issuing a process command")
-            sleep(0.1)
+        restart_count = 0
 
+        if not self.proc:
+            logging.info("Starting Engine {}".format(self._name))
+            with self.proc_start_output.get_lock():
+                while self.proc_start_output.value == b"":
+                    try:
+                        output = task_spawn_process()
+                        self.proc_start_output.value = output.encode('utf-8')
+                    except Exception as err:
+                        restart_count += 1
+                        logging.error("Can't start engine {} => {}".format(self._name, err))
+                        logging.debug(f"Engine {self._name} Restart Count : {restart_count}")
+
+                    if restart_count >= 5:
+                        # Tried restarting engine 5 times but failed. Force restart the entire application
+                        self.zynqtgui.exit(102)
+
+
+    def proc_stop(self):
         if self.proc_started:
             try:
-                #logging.debug("proc command: "+cmd)
+                logging.info("Stoping Engine " + self._name)
+                self.proc.terminate()
+                sleep(0.2)
+                self.proc.terminate(True)
+                self.proc=None
+                self.proc_started = False
+                self.proc_start_output.value = b""
+            except Exception as err:
+                logging.error("Can't stop engine {} => {}".format(self._name, err))
+
+    def proc_process_cmd(self, cmd):
+        if self.proc_started:
+            try:
+                logging.debug("proc command: "+cmd)
                 self.proc.sendline(cmd)
                 out=self.proc_get_output()
                 #logging.debug("proc output:\n{}".format(out))
@@ -154,6 +164,33 @@ class zynthian_basic_engine(QObject):
                 out=""
                 logging.error("Can't exec engine command: {} => {}".format(cmd, err))
             return out
+
+    def run(self):
+        logging.debug("Running engine thread")
+        while True:
+            with self.condition_do_work:
+                logging.debug("Waiting for engine task")
+                # Wait till there is some work to do
+                self.condition_do_work.wait()
+
+                if self.command_start.is_set():
+                    logging.debug(f"Got engine task : start {self._name}")
+                    # Do proc start task
+                    self.proc_start()
+                    self.command_start.clear()
+                if self.command_process_cmd.is_set():
+                    logging.debug(f"Got engine task : process cmd {self._name}")
+                    # Run proc commands
+                    while not self.proc_cmd_queue.empty():
+                        self.proc_process_cmd(self.proc_cmd_queue.get())
+                    self.command_process_cmd.clear()
+                if self.command_stop.is_set():
+                    logging.debug(f"Got engine task : stop {self._name}")
+                    # Do proc stop task and exit thread
+                    self.proc_stop()
+                    self.command_stop.clear()
+                    break
+
 
 
 #------------------------------------------------------------------------------

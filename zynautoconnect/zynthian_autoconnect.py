@@ -548,7 +548,7 @@ def audio_autoconnect(force=False):
         globalFx1OutputPorts = jclient.get_ports(zynthian_gui_config.zynqtgui.global_fx_engines[0][0].jackname, is_audio=True, is_output=True)
         globalFx2OutputPorts = jclient.get_ports(zynthian_gui_config.zynqtgui.global_fx_engines[1][0].jackname, is_audio=True, is_output=True)
     except Exception as e:
-        logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
+        logging.error(f"Failed to connect effect engines. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True
         release_lock()

@@ -1401,17 +1401,17 @@ Zynthian.BasePlayGrid {
                                         Layout.alignment: Qt.AlignHCenter
                                         horizontalAlignment: Text.AlignHCenter
                                         Layout.preferredHeight: noteLengthLabel.height
-                                        text: "swing:\n" + _private.swing + "%"
+                                        text: "swing:\n" + (_private.swing === 50 ? "none" : _private.swing)
                                         MultiPointTouchArea {
                                             anchors.fill: parent
                                             touchPoints: [
                                                 TouchPoint {
                                                     id: swingSlidePoint;
                                                     property double increment: 1
-                                                    property double slideIncrement: 1
+                                                    property double slideIncrement: 0.2
                                                     property double upperBound: 99
-                                                    property double lowerBound: 0
-                                                    property int resetValue: 0
+                                                    property double lowerBound: 1
+                                                    property int resetValue: 50
                                                     property var currentValue: undefined
                                                     property var pressedTime: undefined
                                                     onPressedChanged: {

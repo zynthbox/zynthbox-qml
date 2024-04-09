@@ -2296,7 +2296,7 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: "Note:\n" + (component.heardNotes.length > 0
-                        ? Zynthbox.Chords.symbol(component.heardNotes, _private.activePatternModel.scaleKey, _private.activePatternModel.pitchKey, _private.activePatternModel.octaveKey, "\n")
+                        ? Zynthbox.Chords.symbol(component.heardNotes, _private.activePatternModel.scaleKey, _private.activePatternModel.pitchKey, _private.activePatternModel.octaveKey, "\n—\n")
                         : "(all)")
                     onClicked: {
                         if (zynqtgui.backButtonPressed && _private.activePatternModel) {

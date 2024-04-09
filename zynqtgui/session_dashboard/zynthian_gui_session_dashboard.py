@@ -39,6 +39,7 @@ from zynqtgui import zynthian_gui_selector
 
 # Qt modules
 from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property, QMetaObject
+import Zynthbox
 
 
 #------------------------------------------------------------------------------
@@ -163,7 +164,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def set_selected_channel(self, channel, force_set=False):
         if self.__selected_channel__ != channel or force_set is True:
             logging.debug(f"### Setting selected channel : channel({channel})")
-            self.__selected_channel__ = channel
+            self.__selected_channel__ = max(0, min(channel, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
             self.selected_channel_changed.emit()
 
             # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when channel changes

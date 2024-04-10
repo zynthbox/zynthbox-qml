@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Zynthbox Apps
-ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=671
 XdgTargetDir=zynthian/modules
 Uncompress=always

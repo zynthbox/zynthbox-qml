@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Sounds
-ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=676
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sounds/community-sounds/
 Uncompress=never

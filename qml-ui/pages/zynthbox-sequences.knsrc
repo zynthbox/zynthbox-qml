@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Sequences
-ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=677
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sequences/community-sequences/
 Uncompress=archive

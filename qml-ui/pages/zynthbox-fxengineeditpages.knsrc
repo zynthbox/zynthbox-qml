@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Themes
-ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=668
 XdgTargetDir=zynthian/engineeditpages
 Uncompress=always

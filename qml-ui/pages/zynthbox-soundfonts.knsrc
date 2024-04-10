@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Soundfonts (SFZ/SF2)
-ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=682
 # This almost certainly will not work as intended - we are supposed to install soundfonts into subfolders of this folder according to suffix (so /sf2, /sfz, /gig), which means we will need install and uninstall scripts...
 AbsoluteInstallPath=/zynthian/zynthian-my-data/soundfonts/

@@ -121,14 +121,15 @@ Item {
                 top: parent.top
                 bottom: parent.bottom
             }
-            visible: component.visible && _private.progressStyle === 1 && _private.sample && _private.sample.isPlaying
+            visible: component.visible && _private.progressStyle === 1 && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
             color: Kirigami.Theme.highlightColor
             width: Kirigami.Units.smallSpacing
-            x: visible ? _private.sample.progress/_private.sample.duration * parent.width : 0
+            x: visible ? progressDots.cppClipObject.progress * parent.width : 0
         }
 
         // SamplerSynth progress dots
         Repeater {
+            id: progressDots
             property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId) : null;
             model: component.visible && _private.progressStyle === 2 && cppClipObject
                 ? cppClipObject.playbackPositions

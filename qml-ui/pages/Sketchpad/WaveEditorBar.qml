@@ -389,14 +389,15 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                visible: waveBar.visible && waveBar.controlObj.isPlaying
+                visible: waveBar.visible && progressDots.cppClipObject.isPlaying
                 color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
-                x: visible ? waveBar.controlObj.progress/waveBar.controlObj.duration * parent.width : 0
+                x: visible ? progressDots.cppClipObject.position * parent.width : 0
             }
 
-            // Slice progress lines
+            // SamplerSynth progress dots
             Repeater {
+                id: progressDots
                 property QtObject cppClipObject: waveBar.controlObj
                                                     ? Zynthbox.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
                                                     : null

@@ -1229,14 +1229,15 @@ Rectangle {
                                                     top: parent.top
                                                     bottom: parent.bottom
                                                 }
-                                                visible: root.visible && waveformContainer.clip != null && waveformContainer.clip.isPlaying
+                                                visible: root.visible && root.selectedChannel.channelAudioType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
                                                 color: Kirigami.Theme.highlightColor
                                                 width: Kirigami.Units.smallSpacing
-                                                x: visible && waveformContainer.clip != null ? waveformContainer.clip.progress/waveformContainer.clip.duration * parent.width : 0
+                                                x: visible && progressDots.cppClipObject ? progressDots.cppClipObject.position * parent.width : 0
                                             }
 
                                             // SamplerSynth progress dots
                                             Repeater {
+                                                id: progressDots
                                                 property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
                                                 model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
                                                     ? cppClipObject.playbackPositions

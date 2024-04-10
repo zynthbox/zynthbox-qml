@@ -23,7 +23,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.11
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import QtQuick.Window 2.1
@@ -215,6 +215,63 @@ Kirigami.AbstractApplicationWindow {
                     root.updateSketchpadBpm(-1)
                     result = true;
                 }
+                break;
+            case "SCREEN_EDIT_CONTEXTUAL":
+                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (root.selectedChannel.channelAudioType.startsWith("sample-")) {
+                        zynqtgui.show_modal("channel_wave_editor");
+                    } else if (root.selectedChannel.channelAudioType === "synth") {
+                        var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
+                        if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                            zynqtgui.show_screen("control");
+                        } else {
+                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                        }
+                    } else if (root.selectedChannel.channelAudioType === "external") {
+                        show_modal("channel_external_setup");
+                    }
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
+                        zynqtgui.show_screen("control");
+                    } else {
+                        applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                    }
+                } else {
+                    if (root.selectedChannel.channelAudioType.startsWith("sample-")) {
+                        // If we are in any sample mode, switch whatever else is going on (as that page knows what to do about it)
+                        if (root.selectedChannel.channelAudioType === "sample-loop") {
+                            root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedPart;
+                        } else {
+                            for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                                if (root.selectedChannel.samples[slotIndex].cppObjId > -1) {
+                                    // Let's at least make sure there's some sample selected
+                                    root.selectedChannel.selectedSlotRow = slotIndex;
+                                    break;
+                                }
+                            }
+                        }
+                        zynqtgui.show_modal("channel_wave_editor");
+                    } else if (root.selectedChannel.channelAudioType === "synth") {
+                        // If we are in synth mode, select the first slot explicitly and then switch to the control page, and if there isn't one... throw up the warning
+                        let foundASound = false;
+                        for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                            let sound = root.selectedChannel.chainedSounds[slotIndex];
+                            if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                                root.selectedChannel.selectedSlotRow = sound;
+                                zynqtgui.show_screen("control");
+                                foundASound = true;
+                                break;
+                            }
+                        }
+                        if (foundASound === false) {
+                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: No sounds defined"), 2000);
+                        }
+                    } else if (root.selectedChannel.channelAudioType === "external") {
+                        // If we are in external mode, just load up the external setup page
+                        show_modal("channel_external_setup");
+                    }
+                }
+                returnValue = true;
                 break;
         }
         

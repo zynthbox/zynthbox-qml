@@ -352,32 +352,6 @@ Rectangle {
                     returnValue = true;
                 }
                 break;
-            case "SCREEN_EDIT_CONTEXTUAL":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType.startsWith("sample-")) {
-                        zynqtgui.show_modal("channel_wave_editor")
-                    } else if (root.selectedChannel.channelAudioType === "synth") {
-                        var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-                        if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
-                            zynqtgui.show_screen("control")
-                        } else {
-                            applicationWindow().showMessageDialog(qsTr("Selected slot is empty. Cannot open edit page."), 2000)
-                        }
-                    } else if (root.selectedChannel.channelAudioType === "external") {
-                        show_modal("channel_external_setup")
-                    }
-                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                    if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
-                        zynqtgui.show_screen("control")
-                    } else {
-                        applicationWindow().showMessageDialog(qsTr("Selected slot is empty. Cannot open edit page."), 2000)
-                    }
-                } else {
-                    applicationWindow().showMessageDialog(qsTr("No slots selected. Cannot open edit page."), 2000)
-                }
-
-                returnValue = true;
-                break;
         }
         return returnValue;
     }

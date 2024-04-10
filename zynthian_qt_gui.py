@@ -1880,11 +1880,11 @@ class zynthian_gui(QObject):
             else:
                 self.show_screen("main")
 
-        elif cuia == "SCREEN_EDIT_CONTEXTUAL":
-            # Do not handle this here. Instead handle it from the page itself
-            # Open respective edit page as per selected slot from MixedChannelsViewBar
+        # elif cuia == "SCREEN_EDIT_CONTEXTUAL":
+            # Do not handle this here. Instead handle it from qml main
             # Open control page if selected slot has synth from SynthSetupPage
-            pass
+            # Open respective edit page as per selected slot from any other page
+            # pass
 
         # elif cuia == "SCREEN_ADMIN":
             # Do not handle 5th under screen button globally.

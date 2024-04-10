@@ -174,7 +174,7 @@ Item {
             resetValue: 0
             selected: component.currentADSRElement === 0
             onValueChanged: {
-                if (component.clip.adsrAttack != attackSlider.value) {
+                if (component.clip && component.clip.adsrAttack != attackSlider.value) {
                     component.clip.adsrAttack = attackSlider.value
                 }
             }
@@ -197,7 +197,7 @@ Item {
             resetValue: 0
             selected: component.currentADSRElement === 1
             onValueChanged: {
-                if (component.clip.adsrDecay != decaySlider.value) {
+                if (component.clip && component.clip.adsrDecay != decaySlider.value) {
                     component.clip.adsrDecay = decaySlider.value
                 }
             }
@@ -222,7 +222,7 @@ Item {
             resetValue: 1
             selected: component.currentADSRElement === 2
             onValueChanged: {
-                if (component.clip.adsrSustain != sustainSlider.value) {
+                if (component.clip && component.clip.adsrSustain != sustainSlider.value) {
                     component.clip.adsrSustain = sustainSlider.value
                 }
             }
@@ -245,7 +245,7 @@ Item {
             resetValue: 0
             selected: component.currentADSRElement === 3
             onValueChanged: {
-                if (component.clip.adsrRelease != releaseSlider.value) {
+                if (component.clip && component.clip.adsrRelease != releaseSlider.value) {
                     component.clip.adsrRelease = releaseSlider.value
                 }
             }

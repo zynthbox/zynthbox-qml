@@ -210,17 +210,20 @@ Rectangle {
                 }
 
                 SidebarButton {
-                    icon.name: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    icon.name: cppClipObject && cppClipObject.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    enabled: cppClipObject !== null
                     active: zynqtgui.bottomBarControlType !== "bottombar-controltype-part" &&
                              (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable && zynqtgui.bottomBarControlObj.path
 
+                    property QtObject cppClipObject: zynqtgui.bottomBarControlObj.cppObjId > -1 ? Zynthbox.PlayGridManager.getClipById(zynqtgui.bottomBarControlObj.cppObjId) : null
                     onClicked: {
-                        if (zynqtgui.bottomBarControlObj.isPlaying) {
+                        console.log("Click for", zynqtgui.bottomBarControlObj.path, zynqtgui.bottomBarControlObj.cppObjId, cppClipObject);
+                        if (cppClipObject.isPlaying) {
                             console.log("Stopping Sound Loop")
-                            zynqtgui.bottomBarControlObj.stop();
+                            cppClipObject.stop();
                         } else {
                             console.log("Playing Sound Loop")
-                            zynqtgui.bottomBarControlObj.play();
+                            cppClipObject.play(false, zynqtgui.bottomBarControlObj.row);
                         }
                     }
                 }

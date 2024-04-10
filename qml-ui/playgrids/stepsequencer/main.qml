@@ -529,7 +529,7 @@ Zynthian.BasePlayGrid {
             if (port == listenToPort && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = false;
-                    if (byte1 > 143) {
+                    if (byte1 > 143 || byte3 === 0) {
                         setOn = true;
                     }
                     let midiNote = byte2;

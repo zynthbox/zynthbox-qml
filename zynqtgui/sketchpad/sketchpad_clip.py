@@ -967,7 +967,7 @@ class sketchpad_clip(QObject):
     def get_metadataAudioTypeSettings(self):
         if self.audio_metadata is not None:
             try:
-                return json.loads(self.audio_metadata["ZYNTHBOX_AUDIOTYPESETTINGS"][0])
+                return self.audio_metadata["ZYNTHBOX_AUDIOTYPESETTINGS"][0]
             except:
                 pass
         return ""

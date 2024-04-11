@@ -470,8 +470,10 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
             property QtObject selectedSegment: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment
             onSelectedSegmentChanged: {
-                barLengthInput.text = segmentDetails.selectedSegment.barLength
-                beatLengthInput.text = segmentDetails.selectedSegment.beatLength
+                if (segmentDetails.selectedSegment) {
+                    barLengthInput.text = segmentDetails.selectedSegment.barLength;
+                    beatLengthInput.text = segmentDetails.selectedSegment.beatLength;
+                }
             }
             Connections {
                 target: segmentDetails.selectedSegment

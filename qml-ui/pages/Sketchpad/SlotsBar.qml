@@ -885,13 +885,13 @@ Rectangle {
     Zynthian.ActionPickerPopup {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
-        property QtObject sketch: root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow]
+        property QtObject sketch: root.selectedSlotRowItem && root.selectedSlotRowItem.channel ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow] : null
         columns: 2
         rows: 4
         actions: [
             QQC2.Action {
                 text: qsTr("Save As...")
-                enabled: samplePickerPopup.sketch.cppObjId !== -1
+                enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
                     samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
                     samplePickerDialog.clipToSave = samplePickerPopup.sketch;
@@ -901,14 +901,14 @@ Rectangle {
             },
             QQC2.Action {
                 text: qsTr("Remove")
-                enabled: samplePickerPopup.sketch.cppObjId !== -1
+                enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
                     samplePickerPopup.sketch.clear()
                 }
             },
             QQC2.Action {
                 text: qsTr("Unbounce...")
-                enabled: samplePickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
+                enabled: (samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false) && shouldUnbounce
                 property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && samplePickerPopup.sketch && samplePickerPopup.sketch.metadataMidiRecording != null && samplePickerPopup.sketch.metadataMidiRecording.length > 10
                 onTriggered: {
                     sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
@@ -975,7 +975,7 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: fxSetupDialog
-        property var selectedFx: root.selectedSlotRowItem.channel.chainedFx[root.selectedSlotRowItem.channel.selectedFxSlotRow]
+        property var selectedFx: root.selectedSlotRowItem && root.selectedSlotRowItem.channel ? root.selectedSlotRowItem.channel.chainedFx[root.selectedSlotRowItem.channel.selectedFxSlotRow] : null
 
         actions: [
             Kirigami.Action {

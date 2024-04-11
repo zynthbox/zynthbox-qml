@@ -820,7 +820,7 @@ Rectangle {
             QQC2.Action {
                 text: qsTr("Unbounce...")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
-                property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadataMidiRecording != null && sketchPickerPopup.sketch.metadataMidiRecording.length > 10
+                property bool shouldUnbounce: sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadataAudioType && sketchPickerPopup.sketch.metadataAudioType.length > 0
                 onTriggered: {
                     sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                 }
@@ -909,7 +909,7 @@ Rectangle {
             QQC2.Action {
                 text: qsTr("Unbounce...")
                 enabled: (samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false) && shouldUnbounce
-                property bool shouldUnbounce: root.selectedChannel.channelAudioType === "sample-loop" && samplePickerPopup.sketch && samplePickerPopup.sketch.metadataMidiRecording != null && samplePickerPopup.sketch.metadataMidiRecording.length > 10
+                property bool shouldUnbounce: samplePickerPopup.sketch && samplePickerPopup.sketch.metadataAudioType && samplePickerPopup.sketch.metadataAudioType.length > 0
                 onTriggered: {
                     sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
                 }

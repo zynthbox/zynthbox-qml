@@ -517,13 +517,30 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+    Timer {
+        id: wasStoppedRecentlyTimer
+        property bool wasStoppedRecently: false
+        interval: 100; running: false; repeat: false;
+        onTriggered: {
+            wasStoppedRecently = false;
+        }
+    }
+    Connections {
+        target: Zynthbox.SyncTimer
+        onTimerRunningChanged: {
+            if (Zynthbox.SyncTimer.timerRunning === false) {
+                wasStoppedRecentlyTimer.wasStoppedRecently = true;
+                wasStoppedRecentlyTimer.restart();
+            }
+        }
+    }
     Connections {
         target: Zynthbox.MidiRouter
         enabled: component.isVisible
         onMidiMessage: {
             let listenToPort = 0;
-            if (Zynthbox.SyncTimer.timerRunning || component.listeningStartedDuringPlayback) {
-                // Internal stuff is handled by the DrumsGrid, so limit to external only during playback
+            if (Zynthbox.SyncTimer.timerRunning || component.listeningStartedDuringPlayback || wasStoppedRecentlyTimer.wasStoppedRecently) {
+                // Internal stuff is handled by the DrumsGrid, so limit to external only during playback (and immediately after it)
                 listenToPort = 2;
             }
             if (port == listenToPort && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3) {

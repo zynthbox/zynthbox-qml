@@ -250,18 +250,22 @@ Zynthian.DialogQuestion {
                         if (partSketch.metadataPatternJson !== null && partSketch.metadataPatternJson.length > 5) {
                             console.log("Replace the slot's pattern content with the stored pattern");
                             pattern.setFromJson(partSketch.metadataPatternJson)
-                        } else {
+                        } else if (partSketch.metadataMidiRecording !== null && partSketch.metadataMidiRecording.length > 10) {
                             console.log("Replace the slot's pattern content by reconstructing from recorded midi");
                             // Load the recording into the global recorder track
                             Zynthbox.MidiRecorder.loadTrackFromBase64Midi(partSketch.metadataMidiRecording, -1);
                             // Apply that newly loaded recording to the pattern
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
+                        } else {
+                            console.log("Not adding in data for pattern, as no data exists for this part");
                         }
                     }
                     // - Clean up after ourselves
                     _private.sketchpadTrackId = -1;
                     // - End long-running task
                     zynqtgui.stop_loading();
+                    // - Finally, during the unbouncing process we'll not be saving the snapshot, so do that explicitly now
+                    zynqtgui.snapshot.schedule_save_last_state_snapshot();
                 }
             }
         }

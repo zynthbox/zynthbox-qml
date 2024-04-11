@@ -278,75 +278,82 @@ class sketchpad_song(QObject):
         self.zynqtgui.currentTaskMessage = "Loading Sketchpad : Restoring Data"
 
         try:
-            logging.info(f"Restoring {self.sketchpad_folder + filename}, loadHistory({load_history})")
-            with open(self.sketchpad_folder + filename, "r") as f:
-                sketchpad = json.loads(f.read())
+            sketchpadFile = self.sketchpad_folder + filename
+            if os.path.exists(sketchpadFile):
+                logging.info(f"Restoring {sketchpadFile}, loadHistory({load_history})")
+                with open(self.sketchpad_folder + filename, "r") as f:
+                    sketchpad = json.loads(f.read())
 
-                try:
-                    cache_dir = Path(self.sketchpad_folder) / ".cache"
+                    try:
+                        cache_dir = Path(self.sketchpad_folder) / ".cache"
 
-                    if load_history and "history" in sketchpad and len(sketchpad["history"]) > 0:
-                        logging.info("Loading History")
-                        with open(cache_dir / (sketchpad["history"][-1] + ".sketchpad.json"), "r") as f_cache:
-                            sketchpad = json.load(f_cache)
-                            self.hasUnsavedChanges = True
-                    else:
-                        logging.info("Not loading History")
-                        # If sketchpad is temp then set hasUnsavedChanges to True otherwise set ot to False as it has no history
-                        if self.isTemp:
-                            self.hasUnsavedChanges = True
+                        if load_history and "history" in sketchpad and len(sketchpad["history"]) > 0:
+                            logging.info("Loading History")
+                            with open(cache_dir / (sketchpad["history"][-1] + ".sketchpad.json"), "r") as f_cache:
+                                sketchpad = json.load(f_cache)
+                                self.hasUnsavedChanges = True
                         else:
-                            self.hasUnsavedChanges = False
-                        for history in sketchpad["history"]:
+                            logging.info("Not loading History")
+                            # If sketchpad is temp then set hasUnsavedChanges to True otherwise set ot to False as it has no history
+                            if self.isTemp:
+                                self.hasUnsavedChanges = True
+                            else:
+                                self.hasUnsavedChanges = False
+                            for history in sketchpad["history"]:
+                                try:
+                                    Path(cache_dir / (history + ".sketchpad.json")).unlink()
+                                except Exception as e:
+                                    logging.error(
+                                        f"Error while trying to remove cache file .cache/{history}.sketchpad.json : {str(e)}")
+
+                            sketchpad["history"] = []
+                    except:
+                        logging.error(f"Error loading cache file. Continuing with sketchpad loading")
+
+                    if "name" in sketchpad and sketchpad["name"] != "":
+                        if self.__name__ != sketchpad["name"]:
+                            logging.info(f"Sketchpad filename changed from '{sketchpad['name']}' to '{self.__name__}'. "
+                                        f"Trying to rename soundset file.")
+                            logging.info(f'Renaming {self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss to {self.sketchpad_folder}/soundsets/{self.__name__}.zss')
+
                             try:
-                                Path(cache_dir / (history + ".sketchpad.json")).unlink()
+                                shutil.move(f'{self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss', f'{self.sketchpad_folder}/soundsets/{self.__name__}.zss')
                             except Exception as e:
-                                logging.error(
-                                    f"Error while trying to remove cache file .cache/{history}.sketchpad.json : {str(e)}")
+                                logging.error(f"Error renaming old soundset to new name : {str(e)}")
+                    if "volume" in sketchpad:
+                        self.__volume__ = sketchpad["volume"]
+                        self.set_volume(self.__volume__, True)
+                    if "selectedScaleIndex" in sketchpad:
+                        self.set_selected_scale_index(sketchpad["selectedScaleIndex"], True)
+                    if "octave" in sketchpad:
+                        self.set_octave(sketchpad["octave"], True)
+                    if "parts" in sketchpad:
+                        self.__parts_model__.deserialize(sketchpad["parts"])
+                    if "channels" in sketchpad:
+                        self.__channels_model__.deserialize(sketchpad["channels"])
+                    if "scenes" in sketchpad:
+                        self.__scenes_model__.deserialize(sketchpad["scenes"])
+                    if "sketches" in sketchpad:
+                        self.__sketches_model__.deserialize(sketchpad["sketches"])
+                    if "bpm" in sketchpad:
+                        # In older sketchpad files, bpm would still be an int instead of a list
+                        # So if bpm is not a list, then generate a list and store it
+                        if isinstance(sketchpad["bpm"], list):
+                            self.__bpm__ = sketchpad["bpm"]
+                        else:
+                            self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
+                            self.__bpm__[self.__scenes_model__.selectedTrackIndex] = sketchpad["bpm"]
 
-                        sketchpad["history"] = []
-                except:
-                    logging.error(f"Error loading cache file. Continuing with sketchpad loading")
+                        Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
 
-                if "name" in sketchpad and sketchpad["name"] != "":
-                    if self.__name__ != sketchpad["name"]:
-                        logging.info(f"Sketchpad filename changed from '{sketchpad['name']}' to '{self.__name__}'. "
-                                      f"Trying to rename soundset file.")
-                        logging.info(f'Renaming {self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss to {self.sketchpad_folder}/soundsets/{self.__name__}.zss')
-
-                        try:
-                            shutil.move(f'{self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss', f'{self.sketchpad_folder}/soundsets/{self.__name__}.zss')
-                        except Exception as e:
-                            logging.error(f"Error renaming old soundset to new name : {str(e)}")
-                if "volume" in sketchpad:
-                    self.__volume__ = sketchpad["volume"]
-                    self.set_volume(self.__volume__, True)
-                if "selectedScaleIndex" in sketchpad:
-                    self.set_selected_scale_index(sketchpad["selectedScaleIndex"], True)
-                if "octave" in sketchpad:
-                    self.set_octave(sketchpad["octave"], True)
-                if "parts" in sketchpad:
-                    self.__parts_model__.deserialize(sketchpad["parts"])
-                if "channels" in sketchpad:
-                    self.__channels_model__.deserialize(sketchpad["channels"])
-                if "scenes" in sketchpad:
-                    self.__scenes_model__.deserialize(sketchpad["scenes"])
-                if "sketches" in sketchpad:
-                    self.__sketches_model__.deserialize(sketchpad["sketches"])
-                if "bpm" in sketchpad:
-                    # In older sketchpad files, bpm would still be an int instead of a list
-                    # So if bpm is not a list, then generate a list and store it
-                    if isinstance(sketchpad["bpm"], list):
-                        self.__bpm__ = sketchpad["bpm"]
-                    else:
-                        self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
-                        self.__bpm__[self.__scenes_model__.selectedTrackIndex] = sketchpad["bpm"]
-
-                    Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
-
+                    self.__is_loading__ = False
+                    self.isLoadingChanged.emit()
+                    return True
+            else:
+                logging.info(f"Sketchpad not restored - no such file (expected when creating a new sketchpad): {sketchpadFile}")
                 self.__is_loading__ = False
                 self.isLoadingChanged.emit()
-                return True
+                return False
         except Exception as e:
             logging.error(f"Error during sketchpad restoration: {e}")
             traceback.print_exception(None, e, e.__traceback__)

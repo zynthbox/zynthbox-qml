@@ -1664,7 +1664,7 @@ class zynthian_gui(QObject):
             if cuia_callback is not None and cuia_callback.isCallable():
                 _result = cuia_callback.call([cuia])
                 if _result is not None and _result.toBool():
-                        return
+                    return
         except Exception as e:
             logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
             pass

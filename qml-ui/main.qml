@@ -216,6 +216,20 @@ Kirigami.AbstractApplicationWindow {
                     result = true;
                 }
                 break;
+            case "NAVIGATE_LEFT":
+                if (zynqtgui.modeButtonPressed) {
+                    root.selectedChannel.selectedPart = Math.max(0, root.selectedChannel.selectedPart - 1);
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    result = true;
+                }
+                break;
+            case "NAVIGATE_RIGHT":
+                if (zynqtgui.modeButtonPressed) {
+                    root.selectedChannel.selectedPart = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, root.selectedChannel.selectedPart + 1);
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    result = true;
+                }
+                break;
             case "SCREEN_EDIT_CONTEXTUAL":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.channelAudioType.startsWith("sample-")) {

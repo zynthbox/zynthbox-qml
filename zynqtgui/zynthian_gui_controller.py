@@ -517,6 +517,7 @@ class zynthian_gui_controller(QObject):
             self.value_changed.emit()
             if self.is_engine_controller:
                 # logging.debug(f"Controller value changed: {v}. Saving last state snapshot")
+                # Save snapshot when a controller value changes
                 self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
             return True
 

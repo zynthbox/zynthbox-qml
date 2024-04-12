@@ -140,8 +140,6 @@ Zynthian.DialogQuestion {
                     _private.track = "";
                     // End long-running task
                     zynqtgui.stop_loading();
-                    // And, once completed, make sure we save our snapshot
-                    zynqtgui.snapshot.schedule_save_last_state_snapshot();
                 }
             }
         }

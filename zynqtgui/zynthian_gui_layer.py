@@ -579,7 +579,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
             QTimer.singleShot(500, emit_sounds_changed)
             self.zynqtgui.zynautoconnect(True)
-            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
         except Exception as e:
             logging.exception(f"Error adding engine : {e}")
 
@@ -601,7 +600,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 self.zynqtgui.screens['engine'].stop_unused_engines()
 
             self.zynqtgui.zynautoconnect()
-            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
 
     @Slot(int)
@@ -689,7 +687,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
             self.zynqtgui.zynautoconnect()
             self.set_selector()
-            self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
 
     def remove_all_layers(self, stop_engines=True):

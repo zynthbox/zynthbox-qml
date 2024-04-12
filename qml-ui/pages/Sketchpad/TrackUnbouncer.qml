@@ -264,8 +264,6 @@ Zynthian.DialogQuestion {
                     _private.sketchpadTrackId = -1;
                     // - End long-running task
                     zynqtgui.stop_loading();
-                    // - Finally, during the unbouncing process we'll not be saving the snapshot, so do that explicitly now
-                    zynqtgui.snapshot.schedule_save_last_state_snapshot();
                 }
             }
         }

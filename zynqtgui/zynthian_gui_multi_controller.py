@@ -31,6 +31,7 @@
 
 import numpy as np
 from PySide2.QtCore import Property, QObject, Signal, Qt
+from . import zynthian_gui_config
 
 
 class MultiController(QObject):
@@ -108,6 +109,9 @@ class MultiController(QObject):
                 control.set_value(np.interp(value, (self.value_min, self.value_max), (control.value_min, control.value_max)), True)
 
             self.value_changed.emit()
+            # Multi controller always controls engine controllers so always
+            # schedule save snapshot when multi controller value changes
+            zynthian_gui_config.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
     value_changed = Signal()
 

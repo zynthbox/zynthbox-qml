@@ -1036,14 +1036,12 @@ class zynthian_gui(QObject):
     """
     def init_global_fx(self):
         def handle_delay_change():
-            self.snapshot.schedule_save_last_state_snapshot()
             if self.curlayer == self.global_fx_engines[0][2]:
                 zctrl = self.global_fx_engines[0][2].controllers_dict["LEVEL"]
                 if zctrl in self.control.zgui_custom_controllers_map:
                     self.control.zgui_custom_controllers_map[zctrl].zctrl_sync()
 
         def handle_reverb_change():
-            self.snapshot.schedule_save_last_state_snapshot()
             if self.curlayer == self.global_fx_engines[1][2]:
                 zctrl = self.global_fx_engines[1][2].controllers_dict["dry_wet"]
                 if zctrl in self.control.zgui_custom_controllers_map:
@@ -1596,7 +1594,6 @@ class zynthian_gui(QObject):
                 self.screens['main_layers_view'].set_start_midi_chan(math.floor(midi_chan / 5) * 5)
         self.active_midi_channel_changed.emit()
         self.screens["main_layers_view"].sync_index_from_curlayer()
-        self.screens["snapshot"].schedule_save_last_state_snapshot()
         self.curlayerEngineNameChanged.emit()
         self.curlayerPresetNameChanged.emit()
         self.curlayerIsFXChanged.emit()

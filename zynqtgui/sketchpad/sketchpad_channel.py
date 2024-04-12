@@ -94,7 +94,7 @@ class sketchpad_channel(QObject):
         self.fxPassthroughMixingChanged.connect(self.handleFxPassthroughMixingChanged)
         self.channel_audio_type_changed.connect(self.handleAudioTypeSettingsChanged)
         self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
-        self.chainedFxChanged.connect(self.clearFxPassthroughForEmtpySlots, Qt.QueuedConnection)
+        self.chainedFxChanged.connect(self.chainedFxChangedHandler, Qt.QueuedConnection)
         self.zynaddsubfx_midi_output = None
         self.zynaddsubfx_midi_input = None
         self.zynaddubfx_heuristic_connect_timer = QTimer(self)
@@ -324,6 +324,11 @@ class sketchpad_channel(QObject):
         self.chainedSoundsNamesChanged.emit()
         self.chainedFxNamesChanged.emit()
         self.chainedSoundsAcceptedChannelsChanged.emit()
+        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+
+    def chainedFxChangedHandler(self):
+        self.clearFxPassthroughForEmtpySlots()
+        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
     def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()
@@ -2322,9 +2327,6 @@ class sketchpad_channel(QObject):
 
         self.slotsReordered.emit()
 
-        # Schedule a snapshot save
-        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
-
     @Slot(int, int, str)
     def swapSlots(self, slot1, slot2, channelAudioType = None):
         """
@@ -2363,9 +2365,6 @@ class sketchpad_channel(QObject):
 
         # Update chainedFx
         self.set_chainedFx(newChainedFx)
-
-        # Since slot index updated, schedule a snapshot save
-        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
     @Slot(int, int)
     def swapChainedFx(self, slot1, slot2):

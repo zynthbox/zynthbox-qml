@@ -95,7 +95,6 @@ Zynthian.ScreenPage {
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
                 controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
-                zynqtgui.snapshot.schedule_save_last_state_snapshot()
                 applicationWindow().showOsd({
                     parameterName: "layer_filter_cutoff",
                     description: qsTr("%1 Filter Cutoff").arg(synthName),
@@ -133,7 +132,6 @@ Zynthian.ScreenPage {
         function valueSetter(value) {
             if (controller != null && controller.controlsCount > 0) {
                 controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
-                zynqtgui.snapshot.schedule_save_last_state_snapshot()
                 applicationWindow().showOsd({
                     parameterName: "layer_filter_resonance",
                     description: qsTr("%1 Filter Resonance").arg(synthName),

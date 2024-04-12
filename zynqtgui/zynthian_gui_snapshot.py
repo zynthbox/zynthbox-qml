@@ -269,6 +269,14 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
     @Slot()
     def schedule_save_last_state_snapshot(self):
+        """
+        A snapshot save needs to be schedule after any changes made to synths and its controllers
+        schedule_save_last_state_snapshot is called when :
+            - chainedSounds or chainedFX changes
+            - A zynthian_gui_controller value changes
+            - A multi controller value changes
+            - When preset is changed by gui_sketchpad
+        """
         # HACK to use a timer from another thread
         if self.isLoading == 0 and self.zynqtgui.sketchpad is not None and self.zynqtgui.sketchpad.song is not None and not self.zynqtgui.sketchpad.song.isLoading and self.zynqtgui.isBootingComplete:
             self.save_last_state_timer_requested.emit()

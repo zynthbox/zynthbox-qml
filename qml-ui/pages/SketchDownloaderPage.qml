@@ -35,7 +35,6 @@ Zynthian.NewStuffPage {
     configFile: Qt.resolvedUrl("zynthbox-sketches.knsrc").toString().slice(7)
 
     showUseThis: true
-    useThisLabel: currentChannel.channelAudioType === "sample-loop" ? qsTr("Use As Sketch") : qsTr("Use As Sample")
     onUseThis: {
         let currentChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
         if (installedFiles.length > 0) {

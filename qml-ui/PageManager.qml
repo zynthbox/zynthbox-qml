@@ -55,7 +55,7 @@ Zynthian.Stack {
         "channel_wave_editor": "ChannelWaveEditor.qml",
         "song_manager": "SongManagerPage.qml",
         "sketchpad_copier": "SketchpadCopier/main.qml",
-        "sample_downloader": "SampleDownloaderPage.qml",
+        "sketch_downloader": "SketchDownloaderPage.qml",
         "sound_downloader": "SoundDownloaderPage.qml",
         "soundfont_downloader": "SoundfontDownloaderPage.qml",
         "soundset_downloader": "SoundsetsDownloaderPage.qml",

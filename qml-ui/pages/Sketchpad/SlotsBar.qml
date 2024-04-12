@@ -770,28 +770,28 @@ Rectangle {
         id: slotInputPicker
     }
 
-    Zynthian.FilePickerDialog {
-        id: bankPickerDialog
-        parent: zlScreen.parent
-
-        width: parent.width
-        height: parent.height
-        x: parent.x
-        y: parent.y
-
-        headerText: root.selectedSlotRowItem
-                    ? qsTr("%1-S%2 : Pick a bank")
-                        .arg(root.selectedSlotRowItem.channel.name)
-                        .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
-                    : ""
-        rootFolder: "/zynthian/zynthian-my-data"
-        folderModel {
-            nameFilters: ["sample-bank.json"]
-        }
-        onFileSelected: {
-            root.selectedSlotRowItem.channel.setBank(file.filePath)
-        }
-    }
+    // Zynthian.FilePickerDialog {
+    //     id: bankPickerDialog
+    //     parent: zlScreen.parent
+    //
+    //     width: parent.width
+    //     height: parent.height
+    //     x: parent.x
+    //     y: parent.y
+    //
+    //     headerText: root.selectedSlotRowItem
+    //                 ? qsTr("%1-S%2 : Pick a bank")
+    //                     .arg(root.selectedSlotRowItem.channel.name)
+    //                     .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
+    //                 : ""
+    //     rootFolder: "/zynthian/zynthian-my-data"
+    //     folderModel {
+    //         nameFilters: ["sample-bank.json"]
+    //     }
+    //     onFileSelected: {
+    //         root.selectedSlotRowItem.channel.setBank(file.filePath)
+    //     }
+    // }
 
     Zynthian.ActionPickerPopup {
         id: sketchPickerPopup
@@ -804,7 +804,7 @@ Rectangle {
                 text: qsTr("Save As...")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
+                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sketches/my-sketches';
                     samplePickerDialog.clipToSave = sketchPickerPopup.sketch;
                     samplePickerDialog.saveMode = true;
                     samplePickerDialog.open();
@@ -834,29 +834,31 @@ Rectangle {
             QQC2.Action {
                 text: qsTr("Pick recording")
                 onTriggered: {
-                    loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir
-                    loopPickerDialog.open()
+                    loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir;
+                    loopPickerDialog.saveMode = false;
+                    loopPickerDialog.open();
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick sample")
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
-                    samplePickerDialog.saveMode = false;
-                    samplePickerDialog.open()
+                    loopPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
+                    loopPickerDialog.saveMode = false;
+                    loopPickerDialog.open();
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick sample-bank")
+                text: qsTr("Pick sketch")
                 onTriggered: {
-                    bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
-                    bankPickerDialog.open()
+                    loopPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sketches';
+                    loopPickerDialog.saveMode = false;
+                    loopPickerDialog.open();
                 }
             },
             QQC2.Action {
-                text: qsTr("Download Samples")
+                text: qsTr("Download Sketches")
                 onTriggered: {
-                    zynqtgui.current_modal_screen_id = "sample_downloader"
+                    zynqtgui.current_modal_screen_id = "sketch_downloader"
                 }
             }
         ]
@@ -871,11 +873,11 @@ Rectangle {
         x: parent.x
         y: parent.y
 
-        headerText: qsTr("%1 : Pick an audio file")
+        headerText: qsTr("%1 : Pick A Sketch")
                         .arg(root.selectedChannel.name)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
-            nameFilters: ["*.wav"]
+            nameFilters: ["*.sketch.wav"]
         }
         onFileSelected: {
             root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
@@ -893,7 +895,7 @@ Rectangle {
                 text: qsTr("Save As...")
                 enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
+                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples/my-samples';
                     samplePickerDialog.clipToSave = samplePickerPopup.sketch;
                     samplePickerDialog.saveMode = true;
                     samplePickerDialog.open();
@@ -937,16 +939,17 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick sample-bank")
+                text: qsTr("Pick sketch")
                 onTriggered: {
-                    bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks';
-                    bankPickerDialog.open();
+                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sketches';
+                    samplePickerDialog.saveMode = false;
+                    samplePickerDialog.open();
                 }
             },
             QQC2.Action {
-                text: qsTr("Download Samples")
+                text: qsTr("Download Sketches")
                 onTriggered: {
-                    zynqtgui.current_modal_screen_id = "sample_downloader";
+                    zynqtgui.current_modal_screen_id = "sketch_downloader";
                 }
             }
         ]

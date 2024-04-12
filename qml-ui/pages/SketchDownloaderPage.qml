@@ -29,12 +29,13 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.NewStuffPage {
     id: component
-    screenId: "sample_downloader"
-    title: qsTr("Clip Downloader")
+    screenId: "sketch_downloader"
+    title: qsTr("Sketch Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthbox-samples.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynthbox-sketches.knsrc").toString().slice(7)
 
     showUseThis: true
+    useThisLabel: currentChannel.channelAudioType === "sample-loop" ? qsTr("Use As Sketch") : qsTr("Use As Sample")
     onUseThis: {
         let currentChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
         if (installedFiles.length > 0) {

@@ -2,6 +2,6 @@
 Name=Sketches
 ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=677
-AbsoluteInstallPath=/zynthian/zynthian-my-data/samples/community-samples/
+AbsoluteInstallPath=/zynthian/zynthian-my-data/sketches/community-sketches/
 Uncompress=archive
 RemoveDeadEntries=true

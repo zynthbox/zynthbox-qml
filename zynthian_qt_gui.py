@@ -1239,7 +1239,7 @@ class zynthian_gui(QObject):
         # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
-        self.screens["sample_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["sketch_downloader"] = zynthian_gui_newstuff(self)
         self.screens["sound_downloader"] = zynthian_gui_newstuff(self)
         self.screens["soundfont_downloader"] = zynthian_gui_newstuff(self)
         self.screens["soundset_downloader"] = zynthian_gui_newstuff(self)
@@ -3649,8 +3649,8 @@ class zynthian_gui(QObject):
     def get_theme_downloader(self):
         return self.screens["theme_downloader"]
 
-    def get_sample_downloader(self):
-        return self.screens["sample_downloader"]
+    def get_sketch_downloader(self):
+        return self.screens["sketch_downloader"]
 
     def get_sound_downloader(self):
         return self.screens["sound_downloader"]
@@ -4446,7 +4446,7 @@ class zynthian_gui(QObject):
     playgrid_downloader = Property(QObject, get_playgrid_downloader, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)
     theme_downloader = Property(QObject, get_theme_downloader, constant=True)
-    sample_downloader = Property(QObject, get_sample_downloader, constant=True)
+    sketch_downloader = Property(QObject, get_sketch_downloader, constant=True)
     sound_downloader = Property(QObject, get_sound_downloader, constant=True)
     soundfont_downloader = Property(QObject, get_soundfont_downloader, constant=True)
     soundset_downloader = Property(QObject, get_soundset_downloader, constant=True)

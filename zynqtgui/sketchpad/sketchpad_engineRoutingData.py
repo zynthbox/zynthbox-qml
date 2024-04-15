@@ -204,9 +204,9 @@ class sketchpad_engineRoutingData(QObject):
         # Heuristics for more pleasant port display names
         if portName == "events" or portName == "lv2_events_in" or portName == "input":
             return "Midi Events In"
-        if portName.startswith("lv2_audio_in_") or portName.startsWith("input_"):
+        if portName.startswith("lv2_audio_in_") or portName.startswith("input_"):
             return "Audio In " + portName.split("_")[-1]
-        if portName.startswith("lv2-audio-in-") or portName.startsWith("input-"):
+        if portName.startswith("lv2-audio-in-") or portName.startswith("input-"):
             return "Audio In " + portName.split("-")[-1]
         if portName == "in_L":
             return "Audio In Left"

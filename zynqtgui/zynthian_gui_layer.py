@@ -519,7 +519,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index)
                     if channel.chainedFx[channel.selectedFxSlotRow] is not None:
                         old_layer = channel.chainedFx[channel.selectedFxSlotRow]
-                        old_layer_index = self.layers.index(old_layer)
+                        old_layer_index = -1
+                        if old_layer in self.layers:
+                            old_layer_index = self.layers.index(old_layer)
                         self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
                         if old_layer_index >= 0:
                             # There is already a layer in slot which will get replaced. So replace that layer from self.layers with the current one

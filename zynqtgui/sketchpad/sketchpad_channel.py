@@ -82,6 +82,7 @@ class sketchpad_channel(QObject):
         self.__externalCaptureVolume__ = 0
         self.__externalAudioSource__ = ""
         self.__sound_json_snapshot__ = ""
+        self.__sound_snapshot_changed = True
         self.route_through_global_fx = True
         self.__channel_synth_ports = []
         self.__audioTypeSettings__ = self.defaultAudioTypeSettings()
@@ -180,7 +181,7 @@ class sketchpad_channel(QObject):
         self.zynqtgui.recordingPopupActiveChanged.connect(self.recordingPopupActiveChanged.emit)
 
         # Re-read sound snapshot json when a new snapshot is loaded
-        self.zynqtgui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
+        self.zynqtgui.layer.snapshotLoaded.connect(self.snapshotLoadedHandler)
         # Update filter controllers when booting is complete
         self.zynqtgui.isBootingCompleteChanged.connect(self.update_filter_controllers)
 
@@ -290,6 +291,9 @@ class sketchpad_channel(QObject):
     def layerCreatedHandler(self, midichannel):
         if midichannel in self.chainedSounds:
             self.chainedSoundsAcceptedChannelsChanged.emit()
+
+    def snapshotLoadedHandler(self):
+        self.__sound_snapshot_changed = True
 
     @Slot(int, int)
     def onClipEnabledChanged(self, trackIndex, partNum):
@@ -1086,7 +1090,7 @@ class sketchpad_channel(QObject):
                     # if any engines have been removed, clear out the equivalent synth engine data slot
                     self.__routingData__["synth"][position].clear()
 
-        self.update_sound_snapshot_json()
+        self.__sound_snapshot_changed = True
         if self.zynqtgui.isBootingComplete:
             self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
@@ -1105,7 +1109,7 @@ class sketchpad_channel(QObject):
             for slot_index, layer in enumerate(fx):
                 self.updateChainedFxEngineData(slot_index, layer)
             self.update_jack_port()
-            self.update_sound_snapshot_json()
+            self.__sound_snapshot_changed = True
             self.__song__.schedule_save()
             self.chainedFxChanged.emit()
             self.chainedFxNamesChanged.emit()
@@ -1125,6 +1129,7 @@ class sketchpad_channel(QObject):
 
         self.__chained_fx[slot_row] = layer
         self.updateChainedFxEngineData(slot_row, layer)
+        self.__sound_snapshot_changed = True
         self.chainedFxChanged.emit()
         self.chainedFxNamesChanged.emit()
 
@@ -2246,7 +2251,12 @@ class sketchpad_channel(QObject):
 
     @Slot(None, result=str)
     def getChannelSoundSnapshotJson(self):
-        #logging.error(f"getChannelSoundSnapshotJson : T({self.__id__ + 1})")
+        if self.__sound_snapshot_changed:
+            logging.debug(f"Updating sound snapshot json of Track {self.name}")
+            self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.generate_snapshot(self))
+            self.__sound_snapshot_changed = False
+        logging.debug(f"getChannelSoundSnapshotJson : {self.name}")
+        logging.debug(self.__sound_json_snapshot__)
         return self.__sound_json_snapshot__
 
     @Slot(str, result=None)
@@ -2271,14 +2281,6 @@ class sketchpad_channel(QObject):
             self.zynqtgui.set_curlayer(None)
         else:
             self.zynqtgui.set_curlayer(None)
-
-    def update_sound_snapshot_json(self):
-        if self.connectedSound == -1:
-            self.__sound_json_snapshot__ = ""
-        else:
-            self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.generate_snapshot(self))
-
-        # logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
 
     @Slot("QVariantList", str)
     def reorderSlots(self, newOrder, channelAudioType = None):

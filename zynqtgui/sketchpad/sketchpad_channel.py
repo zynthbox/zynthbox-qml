@@ -2302,7 +2302,7 @@ class sketchpad_channel(QObject):
 
             self.set_chained_sounds(newChainedSounds, updateRoutingData=False)
 
-            newRoutingData = [self.__routingData__["synth"] for index in newOrder]
+            newRoutingData = [self.__routingData__["synth"][index] for index in newOrder]
             self.__routingData__["synth"] = newRoutingData
         elif _channelAudioType == "sample-loop":
             # Reorder sketches
@@ -2354,7 +2354,7 @@ class sketchpad_channel(QObject):
                 fx.slot_index = index
 
         # Swap the routing data
-        newRoutingData = [self.__routingData__["fx"] for index in newOrder]
+        newRoutingData = [self.__routingData__["fx"][index] for index in newOrder]
         self.__routingData__["fx"] = newRoutingData
 
         # Update fxPassthrough values in audioTypeSettings to retain correct values after re-ordering

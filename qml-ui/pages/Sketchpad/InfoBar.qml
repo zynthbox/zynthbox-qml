@@ -223,6 +223,22 @@ RowLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
     }
+
+    QQC2.Button {
+        property var clip: applicationWindow().selectedChannel.getClipsModelByPart(applicationWindow().selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+
+        Layout.fillWidth: false
+        Layout.fillHeight: false
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+        Layout.alignment: Qt.AlignVCenter
+        checkable: true
+        visible: clip.clipChannel.channelAudioType == "sample-loop"
+        checked: clip.enabled
+        text: clip.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
+        onToggled: {
+            clip.enabled = !clip.enabled
+        }
+    }
     
     QQC2.Button {
         Layout.fillWidth: false
@@ -238,18 +254,18 @@ RowLayout {
             zynqtgui.preset.current_is_favorite = checked
         }
     }
-    QQC2.Label {
-        Layout.fillWidth: false
-        Layout.fillHeight: false
-        Layout.alignment: Qt.AlignVCenter
-        font.pointSize: 10
-        visible: false
-        Binding {
-            property: "text"
-            delayed: true
-            value: qsTr("%1 %2")
-                    .arg("T" + (zynqtgui.session_dashboard.selectedChannel+1))
-                    .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
-        }
-    }
+    // QQC2.Label {
+    //     Layout.fillWidth: false
+    //     Layout.fillHeight: false
+    //     Layout.alignment: Qt.AlignVCenter
+    //     font.pointSize: 10
+    //     visible: false
+    //     Binding {
+    //         property: "text"
+    //         delayed: true
+    //         value: qsTr("%1 %2")
+    //                 .arg("T" + (zynqtgui.session_dashboard.selectedChannel+1))
+    //                 .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
+    //     }
+    // }
 } 

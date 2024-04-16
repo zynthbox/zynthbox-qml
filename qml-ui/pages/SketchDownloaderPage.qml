@@ -41,14 +41,18 @@ Zynthian.NewStuffPage {
             if (installedFiles.length > 4) {
                 for (let fileIndex = 0; fileIndex < 5; ++fileIndex) {
                     if (currentChannel.channelAudioType === "sample-loop") {
-                        currentChannel.getClipsModelByPart(fileIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).path = installedFiles[fileIndex];
+                        var clip = currentChannel.getClipsModelByPart(fileIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                        clip.path = installedFiles[fileIndex];
+                        clip.enabled = true
                     } else {
                         currentChannel.set_sample(installedFiles[fileIndex], fileIndex);
                     }
                  }
             } else {
                 if (currentChannel.channelAudioType === "sample-loop") {
-                    currentChannel.getClipsModelByPart(currentChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).path = installedFiles[0];
+                    var clip = currentChannel.getClipsModelByPart(currentChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                    clip.path = installedFiles[0];
+                    clip.enabled = true
                 } else {
                     currentChannel.set_sample(installedFiles[0], currentChannel.selectedSlotRow);
                 }

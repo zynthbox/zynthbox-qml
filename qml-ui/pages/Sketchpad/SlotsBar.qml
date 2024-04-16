@@ -880,7 +880,9 @@ Rectangle {
             nameFilters: ["*.sketch.wav"]
         }
         onFileSelected: {
-            root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
+            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip.path = file.filePath
+            clip.enabled = true
         }
     }
 

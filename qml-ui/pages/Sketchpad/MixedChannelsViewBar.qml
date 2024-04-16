@@ -810,8 +810,8 @@ Rectangle {
                                             Kirigami.Theme.inherit: false
                                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                             color: Kirigami.Theme.backgroundColor
-                                            border.color: "#ff999999"
-                                            border.width: 1
+                                            border.color: root.selectedChannel.channelAudioType === "sample-loop" && synthRepeater.synthData[index].enabled ? Kirigami.Theme.highlightColor :"#ff999999"
+                                            border.width: 2
                                             radius: 4
                                             // For slice mode only first slot is visible.
                                             // For external mode the first two slots are visible
@@ -822,37 +822,47 @@ Rectangle {
                                             opacity: enabled ? 1 : 0
                                             visible: enabled
 
-                                            Rectangle {
-                                                width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryAmount : 0
+                                            Item {
                                                 anchors {
-                                                    left: parent.left
-                                                    top: parent.top
-                                                    bottom: parent.bottom
+                                                    fill: parent
+                                                    margins: Kirigami.Units.smallSpacing
                                                 }
-                                                visible: root.selectedChannel.channelAudioType === "synth" &&
-                                                         synthNameLabel.text.trim().length > 0
-
-                                                color: Kirigami.Theme.highlightColor
-                                            }
-                                            Rectangle {
-                                                width: delegate.sample ? parent.width * delegate.sample.gainAbsolute : 0
-                                                anchors {
-                                                    left: parent.left
-                                                    top: parent.top
-                                                    bottom: parent.bottom
+                                                Rectangle {
+                                                    width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryAmount : 0
+                                                    anchors {
+                                                        left: parent.left
+                                                        top: parent.top
+                                                        bottom: parent.bottom
+                                                    }
+                                                    radius: 4
+                                                    opacity: 0.8
+                                                    visible: root.selectedChannel.channelAudioType === "synth" && synthNameLabel.text.trim().length > 0
+                                                    color: Kirigami.Theme.highlightColor
                                                 }
-                                                visible: delegate.sample != null
-                                                color: Kirigami.Theme.highlightColor
-                                            }
-                                            Rectangle {
-                                                width: delegate.clip ? parent.width * delegate.clip.gainAbsolute : 0
-                                                anchors {
-                                                    left: parent.left
-                                                    top: parent.top
-                                                    bottom: parent.bottom
+                                                Rectangle {
+                                                    width: delegate.sample ? parent.width * delegate.sample.gainAbsolute : 0
+                                                    anchors {
+                                                        left: parent.left
+                                                        top: parent.top
+                                                        bottom: parent.bottom
+                                                    }
+                                                    radius: 4
+                                                    opacity: 0.8
+                                                    visible: delegate.sample != null
+                                                    color: Kirigami.Theme.highlightColor
                                                 }
-                                                visible: delegate.clip != null
-                                                color: Kirigami.Theme.highlightColor
+                                                Rectangle {
+                                                    width: delegate.clip ? parent.width * delegate.clip.gainAbsolute : 0
+                                                    anchors {
+                                                        left: parent.left
+                                                        top: parent.top
+                                                        bottom: parent.bottom
+                                                    }
+                                                    radius: 4
+                                                    opacity: 0.8
+                                                    visible: delegate.clip != null
+                                                    color: Kirigami.Theme.highlightColor
+                                                }
                                             }
 
                                             QQC2.Label {

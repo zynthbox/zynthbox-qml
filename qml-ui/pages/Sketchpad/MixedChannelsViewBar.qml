@@ -756,8 +756,11 @@ Rectangle {
                                             if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
                                                 zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
                                                 zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
+                                                zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate                                                
+                                                root.selectedChannel.selectedPart = index
                                                 root.selectedChannel.selectedSlotRow = index
+                                                zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+                                                zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(currentChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                                             } else {
                                                 if (root.selectedChannel.channelAudioType === "external") {
                                                     // If channel type is external, then it has 2 slots visible

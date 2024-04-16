@@ -1648,13 +1648,15 @@ class sketchpad_channel(QObject):
     ### END Property occupiedSampleSlotsCount
 
     ### Property selectedPart
+    # TODO : selectedPart is a thing from way back and is analogous to selectedSlotRow or selectedFxSlotRow.
+    #        Update all references of selectedPart to selectedSlotRow and selectedFxSlotRow as required
     def get_selected_part(self):
         return self.__selected_part__
 
     def set_selected_part(self, selected_part):
         if selected_part != self.__selected_part__:
-            old_selected_part = self.__selected_part__
             self.__selected_part__ = selected_part
+            self.selectedSlotRow = selected_part
 
             # old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, old_selected_part)
             # if old_clip is not None:
@@ -2252,11 +2254,9 @@ class sketchpad_channel(QObject):
     @Slot(None, result=str)
     def getChannelSoundSnapshotJson(self):
         if self.__sound_snapshot_changed:
-            logging.debug(f"Updating sound snapshot json of Track {self.name}")
+            # logging.debug(f"Updating sound snapshot json of Track {self.name}")
             self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.generate_snapshot(self))
             self.__sound_snapshot_changed = False
-        logging.debug(f"getChannelSoundSnapshotJson : {self.name}")
-        logging.debug(self.__sound_json_snapshot__)
         return self.__sound_json_snapshot__
 
     @Slot(str, result=None)

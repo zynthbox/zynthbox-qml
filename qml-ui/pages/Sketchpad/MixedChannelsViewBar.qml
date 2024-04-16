@@ -760,7 +760,7 @@ Rectangle {
                                                 root.selectedChannel.selectedPart = index
                                                 root.selectedChannel.selectedSlotRow = index
                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                                zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(currentChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                                zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                                             } else {
                                                 if (root.selectedChannel.channelAudioType === "external") {
                                                     // If channel type is external, then it has 2 slots visible

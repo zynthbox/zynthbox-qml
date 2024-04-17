@@ -760,6 +760,7 @@ class sketchpad_clip(QObject):
             self.cppObjIdChanged.emit()
 
         self.__path__ = None
+        self.__filename__ = ""
         self.path_changed.emit()
         if self.is_channel_sample:
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()

@@ -756,7 +756,7 @@ Rectangle {
                                             if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
                                                 zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
                                                 zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate                                                
+                                                zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
                                                 root.selectedChannel.selectedPart = index
                                                 root.selectedChannel.selectedSlotRow = index
                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";

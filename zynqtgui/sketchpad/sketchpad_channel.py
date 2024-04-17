@@ -314,7 +314,7 @@ class sketchpad_channel(QObject):
         if clip is not None and clip.enabled is True:
             self.set_selected_part(partNum)
             # We will now allow playing multiple parts of a sample-loop channel
-            allowMultipart = (self.channelAudioType == "sample-loop" or self.channelAudioType == "sample-trig") and self.keyZoneMode == "all-full"
+            allowMultipart = self.channelAudioType == "sample-loop" or (self.channelAudioType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
             # logging.error(f"Allowing multipart playback: {allowMultipart}")
             if not allowMultipart:
                 for part in range(0, 5):

@@ -31,7 +31,7 @@ def testIsSketch(filename):
         try:
             tagFile = taglib.File(filename)
             resultData = {"isValid": True}
-        except Exception as e:
+        except:
             resultData = {"isValid": False, "erorrString": "Could not open file to read the tags"}
         if resultData["isValid"]:
             # Basic testing out of the way at this point, time to actually perform Zynthbox Sketch linting
@@ -82,6 +82,9 @@ def testIsSketch(filename):
                     resultData = {"isValid": False, "errorString": "This wave file does not contain the Pattern JSON tag required to be recognized as a Zynthbox Sketch"}
             else:
                 resultData = {"isValid": False, "errorString": "This wave file does not contain the BPM tag required to be recognized as a Zynthbox Sketch"}
+            # Close file after reading tags
+            tagFile.close()
+
     return resultData
 
 if __name__ == "__main__":

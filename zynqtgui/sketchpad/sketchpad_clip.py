@@ -784,8 +784,9 @@ class sketchpad_clip(QObject):
             # if channel is none, it means this clip is a sample rather than a clip and needs to be just... played
             self.play_audio(True)
         else:
-            # logging.info(f"Setting Clip To Play from the beginning at the top of the next bar {self}")
-            songIndex = self.channel.clipsModel.getClipIndex(self)
+            # logging.info(f"Setting Clip To Play from the beginning at the top of the next bar {self} track {self.channel.id} part {self.part}")
+            # Until we work out what to actually do with the whole "more than one songs" thing, this will do
+            songIndex = 0
             Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.PlayingState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
 
     @Slot(None)
@@ -795,11 +796,13 @@ class sketchpad_clip(QObject):
             # if channel is none, it means this clip is a sample rather than a clip and needs to be just... stopped
             self.stop_audio()
         else:
-            # While we currently really only use position 0, we do have the ability to have more, so might as well just... do this properly
-            songIndex = self.channel.clipsModel.getClipIndex(self)
+            # Until we work out what to actually do with the whole "more than one songs" thing, this will do
+            songIndex = 0
             if Zynthbox.SyncTimer.instance().timerRunning:
+                # logging.info(f"Setting Clip To Stop from the beginning at the top of the next bar {self} track {self.channel.id} part {self.part}")
                 Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
             else:
+                # logging.info(f"Setting Clip To Stop immediately {self} track {self.channel.id} part {self.part}")
                 Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.CurrentPosition, 0)
 
         if self.isPlaying:

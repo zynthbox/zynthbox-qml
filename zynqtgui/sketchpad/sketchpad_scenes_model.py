@@ -265,11 +265,6 @@ class sketchpad_scenes_model(QAbstractListModel):
         clip.in_current_scene_changed.emit()
         self.__song__.schedule_save()
 
-    def addClipToScene(self, clip, scene):
-        if clip in self.getScene(scene)["clips"]:
-            return
-        self.getScene(scene)["clips"].append(clip)
-
     @Slot(QObject, int, result=bool)
     def isClipInScene(self, clip, sceneIndex):
         return clip in self.getScene(sceneIndex)["clips"]

@@ -1983,21 +1983,23 @@ class sketchpad_channel(QObject):
         # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
         if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
             shouldEmitChanged = False
+            defaultDryWetMixAmount = -1
+            if self.audioTypeKey() in ["synth", "sample", "external"]:
+                # For synth/sample/external, default is to have 100% dry and 100% wet mixed
+                defaultDryWetMixAmount = 1
+            elif self.audioTypeKey() == "sketch":
+                 # For sketch, default is to have 100% dry and 0% wet
+                defaultDryWetMixAmount = 0
             for laneId in range(0, 5):
                 if self.__chained_fx[laneId] is None:
                     if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
-                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__                        
-                        if self.audioTypeKey() in ["synth", "sample", "external"]:
-                            # For synth/sample/external, default is to have 100% dry and 100% wet mixed
-                            self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = 1
-                        elif self.audioTypeKey() == "sketch":
-                            # For sketch, default is to have 100% dry and 0% wet
-                            self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = 0
-                        else:
-                            self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = -1
+                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
                         shouldEmitChanged = True
-                        self.__song__.schedule_save()
+                    if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
+                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
+                        shouldEmitChanged = True
             if shouldEmitChanged:
+                self.__song__.schedule_save()
                 self.fxPassthroughMixingChanged.emit()
 
     def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][0]["panAmount"]

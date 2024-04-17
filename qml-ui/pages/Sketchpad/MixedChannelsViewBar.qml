@@ -1025,16 +1025,24 @@ Rectangle {
                                             border.width: 1
                                             radius: 4
 
-                                            Rectangle {
-                                                // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                                width: fxRowDelegate.fxPassthroughClient && fxRowDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(fxRowDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                            Item {
                                                 anchors {
-                                                    left: parent.left
-                                                    top: parent.top
-                                                    bottom: parent.bottom
+                                                    fill: parent
+                                                    margins: Kirigami.Units.smallSpacing
                                                 }
-                                                visible: fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0
-                                                color: Kirigami.Theme.highlightColor
+                                                Rectangle {
+                                                    // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                                                    width: fxRowDelegate.fxPassthroughClient && fxRowDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(fxRowDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                                                    anchors {
+                                                        left: parent.left
+                                                        top: parent.top
+                                                        bottom: parent.bottom
+                                                    }
+                                                    radius: 4
+                                                    opacity: 0.8
+                                                    visible: fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0
+                                                    color: Kirigami.Theme.highlightColor
+                                                }
                                             }
 
                                             QQC2.Label {

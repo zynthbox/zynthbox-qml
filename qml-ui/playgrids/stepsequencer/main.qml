@@ -537,21 +537,23 @@ Zynthian.BasePlayGrid {
     Connections {
         target: Zynthbox.MidiRouter
         enabled: component.isVisible
-        onMidiMessage: {
-            let listenToPort = 0;
+        onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
+            let listenToPort = Zynthbox.MidiRouter.PassthroughPort;
             if (Zynthbox.SyncTimer.timerRunning || component.listeningStartedDuringPlayback || wasStoppedRecentlyTimer.wasStoppedRecently) {
                 // Internal stuff is handled by the DrumsGrid, so limit to external only during playback (and immediately after it)
-                listenToPort = 2;
+                listenToPort = Zynthbox.MidiRouter.HardwareInPassthroughPort;
             }
-            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.midiChannel && size === 3) {
+            // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.channelIndex, "listening on port", listenToPort);
+            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.channelIndex && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
-                    let setOn = false;
-                    if (byte1 > 143 || byte3 === 0) {
-                        setOn = true;
+                    let setOn = true;
+                    // By convention, an "off" note can be either a midi off message, or an off message with a velocity of 0
+                    if (byte1 < 144 || byte3 === 0) {
+                        setOn = false;
                     }
                     let midiNote = byte2;
                     let velocity = byte3;
-                    if (setOn == true) {
+                    if (setOn === true) {
                         if (component.noteListeningActivations === 0) {
                             // Clear the current state, in case there's something there (otherwise things look a little weird)
                             component.heardNotes = [];

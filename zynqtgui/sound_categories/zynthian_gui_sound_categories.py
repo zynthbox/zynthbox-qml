@@ -318,6 +318,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                         logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
                         logging.debug(f"# Sound json             : {sound_json}")
 
+                        # Run autoconnect after completing loading sounds
+                        if run_autoconnect:
+                            self.zynqtgui.zynautoconnect()
+
                 if len(used_layers) > 0:
                     # Remove all current sounds from channel
                     for i in used_layers:
@@ -326,9 +330,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                 else:
                     # If there are no sounds in curent channel, immediately do post removal task
                     post_removal_task()
-
-            if run_autoconnect:
-                self.zynqtgui.zynautoconnect()
             self.zynqtgui.end_long_task()
 
         self.zynqtgui.currentTaskMessage = "Loading sound"

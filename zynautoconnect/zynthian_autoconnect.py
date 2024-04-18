@@ -664,7 +664,7 @@ def audio_autoconnect(force=False):
         if song:
             for channelId in range(0, 10):
                 channel = song.channelsModel.getChannel(channelId)
-                channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channelId + 1}", is_audio=True, is_input=True)
+                channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channelId + 1}-", is_audio=True, is_input=True)
                 laneHasInput = [False] * 5; # needs to be lane-bound, to ensure we don't disconnect just because we end up without a thing later
                 if channel is not None:
                     channelSynthRoutingData = channel.synthRoutingData

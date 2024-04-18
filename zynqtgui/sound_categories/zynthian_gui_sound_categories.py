@@ -265,7 +265,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
             logging.debug(f"# Source Channels Count  : {len(source_channels)}")
             logging.debug(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
-            logging.debug(f"# Sound json             : {sound_json}")
+            # logging.debug(f"# Sound json             : {sound_json}")
 
             # Check if count of channels required to load sound is available or not
             # Available count of channels : used layers by current channel (will get replaced) + free layers
@@ -316,7 +316,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                         logging.debug("### After Loading")
                         logging.debug(f"# Free Layers            : {free_layers}")
                         logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
-                        logging.debug(f"# Sound json             : {sound_json}")
+                        # logging.debug(f"# Sound json             : {sound_json}")
 
                         # Run autoconnect after completing loading sounds
                         if run_autoconnect:

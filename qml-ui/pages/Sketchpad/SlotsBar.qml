@@ -734,9 +734,31 @@ Rectangle {
         x: parent.x
         y: parent.y
 
-        headerText: qsTr("%1-S%2 : Pick a sample")
-                        .arg(root.selectedChannel.name)
-                        .arg(root.selectedChannel.selectedSlotRow + 1)
+        function pickSampleForSlot(slot, pickWhat) {
+            samplePickerDialog.sampleSlot = slot;
+            samplePickerDialog.clipToSave = root.selectedSlotRowItem.channel.samples[slot];
+            samplePickerDialog.saveMode = (pickWhat === "save-location");
+            if (pickWhat === "sample" || pickWhat === "save-location") {
+                samplePickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/samples/my-samples";
+                samplePickerDialog.folderModel.nameFilters = ["*.wav"];
+            } else if (pickWhat === "sketch") {
+                samplePickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/sketches";
+                samplePickerDialog.folderModel.nameFilters = ["*.sketch.wav"];
+            } else if (pickWhat === "recording") {
+                samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir;
+                samplePickerDialog.folderModel.nameFilters = ["*.wav"];
+            }
+            samplePickerDialog.open();
+        }
+        property int sampleSlot: -1
+
+        headerText: saveMode
+            ? qsTr("Pick Save Location For %1-S%2")
+                .arg(root.selectedChannel.name)
+                .arg(sampleSlot + 1)
+            : qsTr("%1-S%2 : Pick a sample")
+                .arg(root.selectedChannel.name)
+                .arg(sampleSlot + 1)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
@@ -757,7 +779,71 @@ Rectangle {
                     console.log("Failed to copy the clip with path name", clipToSave.path, "to", copyTo)
                 }
             } else {
-                root.selectedChannel.set_sample(samplePickerDialog.selectedFile.filePath, root.selectedChannel.selectedSlotRow)
+                // TODO Handle mp3/ogg/whatnot - juce supports reading it, but we don't really handle that great...
+                root.selectedChannel.set_sample(samplePickerDialog.selectedFile.filePath, samplePickerDialog.sampleSlot)
+            }
+        }
+    }
+
+    Zynthian.FilePickerDialog {
+        id: loopPickerDialog
+        parent: zlScreen.parent
+
+        function pickLoopForClip(clip, pickWhat) {
+            loopPickerDialog.theClip = clip;
+            loopPickerDialog.saveMode = (pickWhat === "save-location");
+            if (pickWhat === "sketch" || pickWhat === "save-location") {
+                loopPickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/sketches";
+                loopPickerDialog.folderModel.nameFilters = ["*.sketch.wav"];
+                loopPickerDialog.thingToPick = qsTr("Sketch");
+            } else if (pickWhat === "sample") {
+                loopPickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/samples";
+                loopPickerDialog.folderModel.nameFilters = ["*.wav"];
+                loopPickerDialog.thingToPick = qsTr("Sample");
+            } else if (pickWhat === "recording") {
+                loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir;
+                loopPickerDialog.folderModel.nameFilters = ["*.wav"];
+                loopPickerDialog.thingToPick = qsTr("Recording");
+            }
+            loopPickerDialog.open();
+        }
+        property QtObject theClip: null
+
+        width: parent.width
+        height: parent.height
+        x: parent.x
+        y: parent.y
+
+        headerText: saveMode
+            ? qsTr("Pick Save Location For %1%2")
+                .arg(root.selectedChannel.name)
+                .arg(root.selectedChannel.selectedSlotRow + 1)
+            : qsTr("%1%2 : Pick a %3")
+                .arg(root.selectedChannel.name)
+                .arg(root.selectedChannel.selectedSlotRow + 1)
+                .arg(thingToPick)
+        property string thingToPick: ""
+        rootFolder: "/zynthian/zynthian-my-data"
+        folderModel {
+            nameFilters: ["*.sketch.wav"]
+        }
+        onFileSelected: {
+            if (loopPickerDialog.saveMode === true) {
+                let copyTo = loopPickerDialog.selectedFile.filePath;
+                let originalSuffix = loopPickerDialog.theClip.path.split(".").slice(-2).toString().toLowerCase();
+                console.log("Testing", copyTo, "has the suffix", originalSuffix);
+                if (copyTo.split(".").slice(-2).toString().toLowerCase() != originalSuffix) {
+                    console.log("It does not, append it");
+                    copyTo = copyTo + "." + originalSuffix;
+                }
+                if (loopPickerDialog.theClip.copyTo(copyTo)) {
+                    console.log("Successfully copied the clip with path name", loopPickerDialog.theClip.path, "to ", copyTo)
+                } else {
+                    console.log("Failed to copy the clip with path name", loopPickerDialog.theClip.path, "to", copyTo)
+                }
+            } else {
+                loopPickerDialog.theClip.path = file.filePath;
+                loopPickerDialog.theClip.enabled = true;
             }
         }
     }
@@ -804,17 +890,14 @@ Rectangle {
                 text: qsTr("Save As...")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sketches/my-sketches';
-                    samplePickerDialog.clipToSave = sketchPickerPopup.sketch;
-                    samplePickerDialog.saveMode = true;
-                    samplePickerDialog.open();
+                    loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "save-location");
                 }
             },
             QQC2.Action {
                 text: qsTr("Remove")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
-                    sketchPickerPopup.sketch && sketchPickerPopup.sketch.clear()
+                    sketchPickerPopup.sketch && sketchPickerPopup.sketch.clear();
                 }
             },
             QQC2.Action {
@@ -826,64 +909,36 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: "Swap with..."
+                text: "Swap With..."
                 onTriggered: {
                     slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlotRow);
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick recording")
+                text: qsTr("Pick Recording...")
                 onTriggered: {
-                    loopPickerDialog.folderModel.folder = sketchPickerPopup.sketch.recordingDir;
-                    loopPickerDialog.saveMode = false;
-                    loopPickerDialog.open();
+                    loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "recording");
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick sample")
+                text: qsTr("Pick Sample...")
                 onTriggered: {
-                    loopPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
-                    loopPickerDialog.saveMode = false;
-                    loopPickerDialog.open();
+                    loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "sample");
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick sketch")
+                text: qsTr("Pick Sketch...")
                 onTriggered: {
-                    loopPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sketches';
-                    loopPickerDialog.saveMode = false;
-                    loopPickerDialog.open();
+                    loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "sketch");
                 }
             },
             QQC2.Action {
-                text: qsTr("Download Sketches")
+                text: qsTr("Download Sketches...")
                 onTriggered: {
                     zynqtgui.current_modal_screen_id = "sketch_downloader"
                 }
             }
         ]
-    }
-
-    Zynthian.FilePickerDialog {
-        id: loopPickerDialog
-        parent: zlScreen.parent
-
-        width: parent.width
-        height: parent.height
-        x: parent.x
-        y: parent.y
-
-        headerText: qsTr("%1 : Pick A Sketch")
-                        .arg(root.selectedChannel.name)
-        rootFolder: "/zynthian/zynthian-my-data"
-        folderModel {
-            nameFilters: ["*.sketch.wav"]
-        }
-        onFileSelected: {
-            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
-            clip.path = file.filePath
-            clip.enabled = true
-        }
     }
 
     Zynthian.ActionPickerPopup {
@@ -897,10 +952,7 @@ Rectangle {
                 text: qsTr("Save As...")
                 enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples/my-samples';
-                    samplePickerDialog.clipToSave = samplePickerPopup.sketch;
-                    samplePickerDialog.saveMode = true;
-                    samplePickerDialog.open();
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "save-location");
                 }
             },
             QQC2.Action {
@@ -927,25 +979,19 @@ Rectangle {
             QQC2.Action {
                 text: qsTr("Pick recording")
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir;
-                    samplePickerDialog.saveMode = false;
-                    samplePickerDialog.open();
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "recording");
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick sample")
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples';
-                    samplePickerDialog.saveMode = false;
-                    samplePickerDialog.open();
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sample");
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick sketch")
                 onTriggered: {
-                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sketches';
-                    samplePickerDialog.saveMode = false;
-                    samplePickerDialog.open();
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sketch");
                 }
             },
             QQC2.Action {

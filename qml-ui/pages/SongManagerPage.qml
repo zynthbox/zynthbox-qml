@@ -239,6 +239,14 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
+                Connections {
+                    target: Zynthbox.SegmentHandler
+                    onPlayheadSegmentChanged: {
+                        if (Zynthbox.SyncTimer.timerRunning && -1 < Zynthbox.SegmentHandler.playheadSegment && Zynthbox.SegmentHandler.playheadSegment < zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count) {
+                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = Zynthbox.SegmentHandler.playheadSegment;
+                        }
+                    }
+                }
                 Repeater {
                     model: segmentsLayout.lastVisibleSegmentCellIndex + 1
                     Sketchpad.TableHeader {

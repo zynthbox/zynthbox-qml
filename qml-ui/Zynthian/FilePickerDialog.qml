@@ -329,7 +329,9 @@ Zynthian.Dialog {
                             if (folderName == "file:///zynthian/zynthian-my-data/sketches/community-sketches") {
                                 return qsTr("When you download Sketches from the popup in Sample and Sketch slots, you will be able to find them here");
                             } else if (folderName == "file:///zynthian/zynthian-my-data/sketches/my-sketches") {
-                                return qsTr("This is where you should store your own Sketches. Use Save As... in the Sketch slot popup after bouncing");
+                                return qsTr("This is where you should store your own Sketches.\nUse Save A Copy... in the Sketch slot popup after bouncing");
+                            } else if (folderName == "file:///zynthian/zynthian-my-data/samples/my-samples") {
+                                return qsTr("This is where you should store your own samples.\nUse Save A Copy... in the Sample slot popup after recording.\nYou can also use WebConf to easily access the file system");
                             } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
                                 return qsTr("When you use Get New Sounds, you will be able to find them here");
                             } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {

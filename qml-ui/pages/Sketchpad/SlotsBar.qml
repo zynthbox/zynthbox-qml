@@ -887,7 +887,7 @@ Rectangle {
         property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
         actions: [
             QQC2.Action {
-                text: qsTr("Save As...")
+                text: qsTr("Save A Copy...")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
                     loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "save-location");
@@ -949,7 +949,7 @@ Rectangle {
         rows: 4
         actions: [
             QQC2.Action {
-                text: qsTr("Save As...")
+                text: qsTr("Save A Copy...")
                 enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "save-location");

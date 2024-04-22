@@ -639,7 +639,6 @@ ColumnLayout {
                                 playgridPickerPopup.channelObj.connectedPattern = index;
 
                                 var seq = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(playgridPickerPopup.channelIndex, playgridPickerPopup.channelObj.selectedPart);
-                                seq.midiChannel = playgridPickerPopup.channelObj.connectedSound;
                                 seq.bank = "A"
                                 seq.enabled = true;
 

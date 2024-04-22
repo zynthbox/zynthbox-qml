@@ -143,13 +143,13 @@ Zynthian.BasePlayGrid {
                     //break;
                 case "NAVIGATE_LEFT":
                     if (zynqtgui.session_dashboard.selectedChannel > 0) {
-                        zynqtgui.session_dashboard.selectedChannel = _private.activePatternModel.channelIndex - 1;
+                        zynqtgui.session_dashboard.selectedChannel = _private.activePatternModel.sketchpadTrack - 1;
                     }
                     returnValue = true;
                     break;
                 case "NAVIGATE_RIGHT":
                     if (zynqtgui.session_dashboard.selectedChannel < _private.channelCount) {
-                        zynqtgui.session_dashboard.selectedChannel = _private.activePatternModel.channelIndex + 1;
+                        zynqtgui.session_dashboard.selectedChannel = _private.activePatternModel.sketchpadTrack + 1;
                     }
                     returnValue = true;
                     break;
@@ -230,9 +230,9 @@ Zynthian.BasePlayGrid {
 
     function pickPattern(patternIndex) {
         var patternObject = _private.sequence.get(patternIndex);
-        if (patternObject.channelIndex > -1 && patternObject.partIndex > -1) {
-            zynqtgui.session_dashboard.selectedChannel = patternObject.channelIndex;
-            var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(patternObject.channelIndex);
+        if (patternObject.sketchpadTrack > -1 && patternObject.partIndex > -1) {
+            zynqtgui.session_dashboard.selectedChannel = patternObject.sketchpadTrack;
+            var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(patternObject.sketchpadTrack);
             channel.selectedPart = patternObject.partIndex;
         }
     }
@@ -280,8 +280,8 @@ Zynthian.BasePlayGrid {
             interval: 1;
             onTriggered: {
                 if (_private.activePatternModel) {
-                    _private.associatedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.channelIndex);
-                    _private.associatedChannelIndex =  _private.activePatternModel.channelIndex;
+                    _private.associatedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.sketchpadTrack);
+                    _private.associatedChannelIndex =  _private.activePatternModel.sketchpadTrack;
                     Qt.callLater(_private.updateUniqueCurrentRowNotes)
                 } else {
                     _private.updateChannel();
@@ -408,7 +408,7 @@ Zynthian.BasePlayGrid {
                         var oldSubnotes = oldCompound.subnotes;
                         if (oldSubnotes) {
                             for (var j = 0; j < oldSubnotes.length; ++j) {
-                                newSubnotes.push(component.getNote(oldSubnotes[j].midiNote, model.midiChannel));
+                                newSubnotes.push(component.getNote(oldSubnotes[j].midiNote, model.sketchpadTrack));
                             }
                         }
                     }
@@ -543,8 +543,8 @@ Zynthian.BasePlayGrid {
                 // Internal stuff is handled by the DrumsGrid, so limit to external only during playback (and immediately after it)
                 listenToPort = Zynthbox.MidiRouter.HardwareInPassthroughPort;
             }
-            // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.channelIndex, "listening on port", listenToPort);
-            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.channelIndex && size === 3) {
+            // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.sketchpadTrack, "listening on port", listenToPort);
+            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.sketchpadTrack && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = true;
                     // By convention, an "off" note can be either a midi off message, or an off message with a velocity of 0
@@ -1630,7 +1630,7 @@ Zynthian.BasePlayGrid {
                                     interval: 1; running: false; repeat: false;
                                     onTriggered: {
                                         if (_private.activePatternModel) {
-                                            patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.channelIndex / 5), ListView.Beginning);
+                                            patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.sketchpadTrack / 5), ListView.Beginning);
                                         }
                                     }
                                 }
@@ -1647,7 +1647,7 @@ Zynthian.BasePlayGrid {
                                     width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
                                     Kirigami.Theme.inherit: false
                                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                    color: _private.activePatternModel && _private.activePatternModel.channelIndex === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
+                                    color: _private.activePatternModel && _private.activePatternModel.sketchpadTrack === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
                                     border.color: Kirigami.Theme.textColor
                                     function pickThisPattern() {
                                         component.pickPattern(patternsMenuItem.thisPatternIndex)
@@ -1829,7 +1829,7 @@ Zynthian.BasePlayGrid {
                                                             : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination
                                                                 ? "Sample Slice Mode"
                                                                 : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.ExternalDestination
-                                                                    ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
+                                                                    ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.sketchpadTrack + 1)
                                                                     : patternsMenuItem.associatedChannel
                                                                         ? patternsMenuItem.associatedChannel.connectedSound > -1 && soundName.length > 2
                                                                             ? "Sound: " + soundName
@@ -2273,13 +2273,13 @@ Zynthian.BasePlayGrid {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.sequence
                         ? _private.sequence.soloPatternObject
-                            ? "Track" + (_private.sequence.soloPatternObject.channelIndex + 1) + "\n"
+                            ? "Track" + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + "\n"
                                 + "SOLO\n"
-                                + (_private.sequence.soloPatternObject.channelIndex + 1) + _private.sequence.soloPatternObject.partName
+                                + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + _private.sequence.soloPatternObject.partName
                             : _private.activePatternModel
-                                ? "Track" + (_private.activePatternModel.channelIndex + 1) + "\n"
+                                ? "Track" + (_private.activePatternModel.sketchpadTrack + 1) + "\n"
                                     + "Clip"
-                                    + (_private.activePatternModel.channelIndex + 1) + _private.activePatternModel.partName
+                                    + (_private.activePatternModel.sketchpadTrack + 1) + _private.activePatternModel.partName
                                 : "(no\npat\ntern)"
                         : "(no\nsequ\nence)"
                     onClicked: {

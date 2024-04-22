@@ -58,7 +58,7 @@ Zynthian.BasePlayGrid {
             : null
         property QtObject model
         property QtObject miniGridModel
-        property int channel: Zynthbox.PlayGridManager.currentMidiChannel
+        property int sketchpadTrack: Zynthbox.PlayGridManager.currentMidiChannel
         property int startingNote: component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]
         property int transposeAmount: 0
         property string scale: "chromatic"
@@ -86,7 +86,7 @@ Zynthian.BasePlayGrid {
 
     gridRowStartNotes: typeof _private.startNotes[_private.scale] === "undefined" ? [0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120] : _private.startNotes[_private.scale]
     function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
-        console.log("Filling notes model " + model + " with notes on channel " + _private.channel)
+        console.log("Filling notes model " + model + " with notes for sketchpad track " + _private.sketchpadTrack)
         var col = startingNote;
         var scaleArray = _private.scale_mode_map[scale];
         // Octave is not the correct term here, rather it's the position in the start note
@@ -107,7 +107,7 @@ Zynthian.BasePlayGrid {
                 }
             } else {
                 for (var i = 0; i < columns; ++i) {
-                    var note = component.getNote(col, _private.channel);
+                    var note = component.getNote(col, _private.sketchpadTrack);
                     notes.push(note);
                     col += scaleArray[scale_index];
                     scale_index = (scale_index + 1) % scaleArray.length;

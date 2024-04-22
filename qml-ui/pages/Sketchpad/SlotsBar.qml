@@ -182,11 +182,6 @@ Rectangle {
     function selectConnectedSound() {
         if (root.selectedSlotRowItem.channel.connectedSound >= 0) {
             zynqtgui.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
-
-            if (root.selectedSlotRowItem.channel.connectedPattern >= 0) {
-                var pattern = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
-                pattern.midiChannel = root.selectedSlotRowItem.channel.connectedSound;
-            }
         }
     }
 

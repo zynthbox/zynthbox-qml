@@ -53,6 +53,11 @@ GridLayout {
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
+            case "KNOB0_TOUCHED":
+            case "KNOB1_TOUCHED":
+            case "KNOB2_TOUCHED":
+            case "KNOB3_TOUCHED":
+                return true;
             case "KNOB0_UP":
                 pageManager.getPage("sketchpad").updateClipStartPosition(waveBar.controlObj, 1)
                 return true;

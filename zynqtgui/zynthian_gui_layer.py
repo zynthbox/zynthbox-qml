@@ -421,8 +421,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def add_layer_engine(self, eng, midi_chan=None, select=True):
-        logging.debug(f"add_layer_engine : eng({eng}), midi_chan({midi_chan})")
-
         if eng=='MD':
             self.add_layer_midich(None)
 
@@ -475,9 +473,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
             if engine is not None:
                 zyngine = self.zynqtgui.screens['engine'].start_engine(engine)
                 slot_index = -1
-
-                logging.debug(f"add_layer_midich : engine({engine}), midich({midich})")
-
                 if self.layer_index_replace_engine != None and len(self.layers) > self.index:
                     layer = self.root_layers[self.layer_index_replace_engine]
                     # The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted

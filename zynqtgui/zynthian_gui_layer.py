@@ -167,8 +167,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
             if t=='S':
                 self.layer_control()
 
-            elif t=='B':
-                self.layer_options()
+            # Disabling the layer_options page here - it's essentially not usable for our needs any longer (an old style selector page for menu purposes where we use action pickers everywhere else for that)
+            # elif t=='B':
+                # self.layer_options()
 
 
     def next_action(self):

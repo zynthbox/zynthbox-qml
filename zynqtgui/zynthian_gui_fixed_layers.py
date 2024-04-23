@@ -188,8 +188,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.zynqtgui.screens['layer'].activate_midichan_layer(chan)
 
-        if t=='B' and chan in self.zynqtgui.screens['layer'].layer_midi_map:
-            self.zynqtgui.screens['layer'].layer_options()
+        # Disabling the layer_options page here - it's essentially not usable for our needs any longer (an old style selector page for menu purposes where we use action pickers everywhere else for that)
+        # if t=='B' and chan in self.zynqtgui.screens['layer'].layer_midi_map:
+            # self.zynqtgui.screens['layer'].layer_options()
 
         self.fill_list()
 

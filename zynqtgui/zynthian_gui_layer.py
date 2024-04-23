@@ -57,7 +57,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
         self.root_layers = []
         self.layer_midi_map = {}
         self.amixer_layer = None
-        self.add_layer_eng = None
         self.replace_layer_index = None
         self.layer_chain_parallel = False
         self.last_snapshot_fpath = None
@@ -92,7 +91,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
     def reset(self):
         self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel
         self.show_all_layers = False
-        self.add_layer_eng = None
         self.last_snapshot_fpath = None
         self.reset_clone()
         self.reset_note_range()
@@ -341,7 +339,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def add_layer(self, etype):
-        self.add_layer_eng = None
         self.replace_layer_index = None
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_engine_type(etype)
@@ -351,7 +348,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
     @Slot(int)
     def select_engine(self, midi_chan = -1):
-        self.add_layer_eng = None
         self.replace_layer_index = None
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_engine_type("MIDI Synth")
@@ -370,7 +366,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
     @Slot(int)
     def new_effect_layer(self, midi_chan = -1):
-        self.add_layer_eng = None
         self.replace_layer_index = None
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_engine_type("Audio Effect")
@@ -388,7 +383,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def add_fxchain_layer(self, midi_chan):
-        self.add_layer_eng = None
         self.replace_layer_index = None
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_fxchain_mode(midi_chan)
@@ -400,7 +394,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def replace_fxchain_layer(self, i):
-        self.add_layer_eng = None
         self.replace_layer_index = i
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_fxchain_mode(self.layers[i].midi_chan)
@@ -409,7 +402,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def add_midichain_layer(self, midi_chan):
-        self.add_layer_eng = None
         self.replace_layer_index = None
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_midichain_mode(midi_chan)
@@ -421,7 +413,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def replace_midichain_layer(self, i):
-        self.add_layer_eng = None
         self.replace_layer_index = i
         self.layer_chain_parallel = False
         self.zynqtgui.screens['engine'].set_midichain_mode(self.layers[i].midi_chan)
@@ -430,7 +421,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
     def add_layer_engine(self, eng, midi_chan=None, select=True):
-        self.add_layer_eng=eng
+        logging.debug(f"add_layer_engine : eng({eng}), midi_chan({midi_chan})")
 
         if eng=='MD':
             self.add_layer_midich(None)
@@ -450,7 +441,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 #            self.zynqtgui.show_modal('midi_chan')
 
         else:
-            self.add_layer_midich(midi_chan, select)
+            self.add_layer_midich(midi_chan, select, eng)
 
     def add_midichannel_to_channel(self, midich, position_in_channel = -1):
         try:
@@ -479,12 +470,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
         except Exception as e:
             logging.exception(e)
 
-    def add_layer_midich(self, midich, select=True):
+    def add_layer_midich(self, midich, select=True, engine=None):
         try:
-            if self.add_layer_eng:
-                zyngine = self.zynqtgui.screens['engine'].start_engine(self.add_layer_eng)
-                self.add_layer_eng = None
+            if engine is not None:
+                zyngine = self.zynqtgui.screens['engine'].start_engine(engine)
                 slot_index = -1
+
+                logging.debug(f"add_layer_midich : engine({engine}), midich({midich})")
 
                 if self.layer_index_replace_engine != None and len(self.layers) > self.index:
                     layer = self.root_layers[self.layer_index_replace_engine]

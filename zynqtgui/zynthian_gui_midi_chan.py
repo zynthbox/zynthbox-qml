@@ -112,7 +112,10 @@ class zynthian_gui_midi_chan(zynthian_gui_selector):
         self.midi_chan_sel = selchan
 
         if self.mode=='ADD':
-            self.zynqtgui.screens['layer'].add_layer_midich(selchan)
+            # self.zynqtgui.screens['layer'].add_layer_midich(selchan)
+            # TODO : Check if this page is being used or not and adjust the above logic accordingly
+            #        Disable it for now
+            pass
 
         elif self.mode=='SET':
             root_layer=self.zynqtgui.screens['layer_options'].layer

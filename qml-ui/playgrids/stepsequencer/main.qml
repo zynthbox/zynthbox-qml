@@ -577,7 +577,7 @@ Zynthian.BasePlayGrid {
                     } else if (setOn == false) {
                         // Count down one for a note off message
                         component.noteListeningActivations = component.noteListeningActivations - 1;
-                        // console.log("Registering note off, new activation count is", component.noteListeningActivations, component.noteListeningNotes);
+                        // console.log("Registering note off, new activation count is", component.noteListeningActivations, component.noteListeningNotes, component.noteListeningVelocities);
                     }
                     if (component.noteListeningActivations < 0) {
                         // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
@@ -2323,7 +2323,9 @@ Zynthian.BasePlayGrid {
                             _private.activePatternModel.clear();
                         } else {
                             if (_private.selectedStep > -1) {
-                                _private.deselectSelectedItem();
+                                while (_private.hasSelection) {
+                                    _private.deselectSelectedItem();
+                                }
                             }
                             component.heardNotes = [];
                             component.heardVelocities = [];

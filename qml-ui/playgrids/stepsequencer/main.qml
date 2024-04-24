@@ -262,7 +262,6 @@ Zynthian.BasePlayGrid {
         // Properties inherent to the active pattern (set these through _private.sequence.setPatternProperty(_private.activePattern, ...))
         property int noteLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.noteLength : 0
         property int swing: sequence && sequence.activePatternObject ? sequence.activePatternObject.swing : 0
-        property int layer: sequence && sequence.activePatternObject ? sequence.activePatternObject.layer : 0
         property var availableBars: sequence && sequence.activePatternObject ? sequence.activePatternObject.availableBars : 0
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
@@ -314,10 +313,6 @@ Zynthian.BasePlayGrid {
             while (hasSelection) {
                 deselectSelectedItem();
             }
-        }
-
-        onLayerChanged: {
-            updateChannel();
         }
 
         signal knob0Up();

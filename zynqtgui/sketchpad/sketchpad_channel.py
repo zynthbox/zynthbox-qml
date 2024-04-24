@@ -40,6 +40,7 @@ from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QTh
 from .sketchpad_clips_model import sketchpad_clips_model
 from .sketchpad_clip import sketchpad_clip
 from .sketchpad_engineRoutingData import sketchpad_engineRoutingData
+from .sketchpad_keyzoneData import sketchpad_keyzoneData
 from zynqtgui import zynthian_gui_config
 from ..zynthian_gui_multi_controller import MultiController
 
@@ -67,6 +68,12 @@ class sketchpad_channel(QObject):
         self.__connected_pattern__ = -1
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
+        self.__chained_sounds_keyzones__ = [ sketchpad_keyzoneData(self), sketchpad_keyzoneData(self), sketchpad_keyzoneData(self), sketchpad_keyzoneData(self), sketchpad_keyzoneData(self) ]
+        for slotIndex, keyzoneData in enumerate(self.__chained_sounds_keyzones__):
+            keyzoneData.keyZoneStartChanged.connect(lambda idx=slotIndex, data=keyzoneData:self.handleChainedSoundsKeyzoneChanged(data, idx))
+            keyzoneData.keyZoneEndChanged.connect(lambda idx=slotIndex, data=keyzoneData:self.handleChainedSoundsKeyzoneChanged(data, idx))
+            keyzoneData.rootNoteChanged.connect(lambda idx=slotIndex, data=keyzoneData:self.handleChainedSoundsKeyzoneChanged(data, idx))
+        self.chainedSoundsKeyzonesChanged.connect(self.__song__.schedule_save)
         self.__chained_fx = [None, None, None, None, None]
         self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
@@ -242,6 +249,10 @@ class sketchpad_channel(QObject):
             if clientIndex in self.__chained_fx:
                 laneId = self.__chained_fx.index(clientIndex)
                 self.set_passthroughValue("fxPassthrough", laneId, theSomething, theValue)
+
+    def handleChainedSoundsKeyzoneChanged(self, keyzoneData, slotIndex):
+        Zynthbox.MidiRouter.instance().setZynthianSynthKeyzones(self.__chained_sounds__[slotIndex], keyzoneData.keyZoneStart, keyzoneData.keyZoneEnd, keyzoneData.rootNote)
+        self.chainedSoundsKeyzonesChanged.emit()
 
     def defaultAudioTypeSettings(self):
         # A set of mixing values for each of the main audio types. The logic being that
@@ -514,6 +525,7 @@ class sketchpad_channel(QObject):
                 "channelRoutingStyle": self.__channel_routing_style__,
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
+                "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
                 "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
@@ -565,6 +577,16 @@ class sketchpad_channel(QObject):
                         break
                     self.__routingData__["synth"][slotIndex].deserialize(routingData)
             self.synthRoutingDataChanged.emit()
+            if "synthKeyzoneData" in obj:
+                for slotIndex, keyzoneData in enumerate(obj["synthKeyzoneData"]):
+                    if slotIndex > 4:
+                        logging.error("Error during deserialization: synthKeyzoneData has too many entries")
+                        break
+                    self.__chained_sounds_keyzones__[slotIndex].deserialize(keyzoneData)
+            else:
+                for entry in self.__chained_sounds_keyzones__:
+                    entry.clear()
+            self.chainedSoundsKeyzonesChanged.emit()
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "externalCaptureVolume" in obj:
@@ -1042,6 +1064,7 @@ class sketchpad_channel(QObject):
             if cb is not None:
                 cb()
             self.zynqtgui.end_long_task()
+        self.__chained_sounds_keyzones__[self.selectedSlotRow].clear()
         self.zynqtgui.currentTaskMessage = f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}"
         self.zynqtgui.do_long_task(task)
 
@@ -1398,6 +1421,15 @@ class sketchpad_channel(QObject):
 
     synthRoutingData = Property('QVariantList', get_synthRoutingData, notify=synthRoutingDataChanged)
     ### END Property synthRoutingData
+
+    ### BEGIN Property chainedSoundsKeyzones
+    def get_chainedSoundsKeyzones(self):
+        return self.__chained_sounds_keyzones__
+
+    chainedSoundsKeyzonesChanged = Signal()
+
+    chainedSoundsKeyzones = Property('QVariantList', get_chainedSoundsKeyzones, notify=chainedSoundsKeyzonesChanged)
+    ### END Property chainedSoundsKeyzones
 
     ### BEGIN Property channelTypeDisplayName
     def get_channelTypeDisplayName(self):

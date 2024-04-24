@@ -574,6 +574,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.currentTaskMessage = "Removing existing temp sketchpad"
                 shutil.rmtree(self.__sketchpad_basepath__ / 'temp')
 
+            # Reset the keyzoning state when creating a new sketch (essentially to be on the safe side, it should otherwise be reset whenever we load/create synths)
+            for synthSlot in range(0, 16):
+                Zynthbox.MidiRouter.instance().setZynthianSynthKeyzones(synthSlot, 0, 127, 60)
             if base_sketchpad is not None:
                 logging.info(f"Creating New Sketchpad from community sketchpad : {base_sketchpad}")
                 self.zynqtgui.currentTaskMessage = "Copying community sketchpad to my sketchpads"

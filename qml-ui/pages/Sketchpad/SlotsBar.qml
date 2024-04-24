@@ -193,6 +193,10 @@ Rectangle {
         slotInputPicker.pickSlotInputs(channel, slotType, slotIndex);
     }
 
+    function requestChannelKeyZoneSetup() {
+        channelKeyZoneSetup.open();
+    }
+
     Connections {
         target: applicationWindow()
         onRequestSamplePicker: {
@@ -851,6 +855,10 @@ Rectangle {
         id: slotInputPicker
     }
 
+    ChannelKeyZoneSetup {
+        id: channelKeyZoneSetup
+    }
+
     // Zynthian.FilePickerDialog {
     //     id: bankPickerDialog
     //     parent: zlScreen.parent
@@ -1004,11 +1012,14 @@ Rectangle {
 
     Zynthian.LayerSetupDialog {
         id: layerSetupDialog
-        onRequestSlotPicker: {
+        onRequestSlotPicker: function(channel, slotType, slotIndex) {
             slotSwapperPopup.pickSlotToSwapWith(channel, slotType, slotIndex);
         }
-        onRequestSlotInputPicker: {
+        onRequestSlotInputPicker: function(channel, slotType, slotIndex) {
             slotInputPicker.pickSlotInputs(channel, slotType, slotIndex);
+        }
+        onRequestChannelKeyZoneSetup: function() {
+            channelKeyZoneSetup.open();
         }
     }
 

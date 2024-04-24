@@ -39,6 +39,7 @@ Zynthian.ActionPickerPopup {
     property QtObject selectedChannel: null
     signal requestSlotPicker(QtObject channel, string slotType, int slotIndex)
     signal requestSlotInputPicker(QtObject channel, string slotType, int slotIndex)
+    signal requestChannelKeyZoneSetup()
 
     Timer {
         id: selectedChannelThrottle
@@ -99,28 +100,28 @@ Zynthian.ActionPickerPopup {
         },
         Kirigami.Action {
             enabled: root.layerExists
-            text: qsTr("Change preset")
+            text: qsTr("Change Preset...")
             onTriggered: {
                 zynqtgui.current_screen_id = "preset"
                 root.close();
             }
         },
         Kirigami.Action {
-            text: qsTr("Load A Sound")
+            text: qsTr("Load A Sound...")
             onTriggered: {
                 zynqtgui.show_modal("sound_categories")
                 root.close();
             }
         },
         Kirigami.Action {
-            text: qsTr("Edit Sound")
+            text: qsTr("Edit Sound...")
             onTriggered: {
                 root.close();
                 zynqtgui.show_modal("control")
             }
         },
         Kirigami.Action {
-            text: qsTr("Swap with...")
+            text: qsTr("Swap With...")
             onTriggered: {
                 root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
             }
@@ -133,7 +134,11 @@ Zynthian.ActionPickerPopup {
             }
         },
         QQC2.Action {
-            enabled: false
+            enabled: root.layerExists
+            text: "Edit Keyzones..."
+            onTriggered: {
+                root.requestChannelKeyZoneSetup();
+            }
         },
         Kirigami.Action {
             enabled: root.layerExists

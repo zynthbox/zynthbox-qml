@@ -356,10 +356,6 @@ Rectangle {
         return returnValue;
     }
 
-    ChannelKeyZoneSetup {
-        id: channelKeyZoneSetup
-    }
-
     BouncePopup {
         id: bouncePopup
     }
@@ -676,7 +672,7 @@ Rectangle {
                                             icon.name: "timeline-use-zone-on"
                                             visible: root.selectedChannel && root.selectedChannel.samplePickingStyle !== "same-or-first"
                                             onClicked: {
-                                                channelKeyZoneSetup.open();
+                                                bottomStack.slotsBar.requestChannelKeyZoneSetup();
                                             }
                                         }
                                         Item {

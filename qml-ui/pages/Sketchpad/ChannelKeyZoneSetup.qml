@@ -37,7 +37,7 @@ Zynthian.DialogQuestion {
     height: Kirigami.Units.gridUnit * 20
     property QtObject selectedChannel: null
 
-    title: selectedChannel ? qsTr("Set up key zones for on Track %1").arg(selectedChannel.name) : ""
+    title: selectedChannel ? qsTr("Set up keyzones on Track %1").arg(selectedChannel.name) : ""
     acceptText: qsTr("Back")
     rejectText: ""
 

@@ -135,7 +135,7 @@ Zynthian.DialogQuestion {
                     // Since we unbounced the thing, we should disable that in favour of the newly unbounced thing
                     _private.clip.enabled = false;
                     // Always enable the newly created thing, to avoid that "eh?" experience
-                    let destinationClip = _private.channel.getClipsModelByPart(_private.slot);
+                    let destinationClip = _private.channel.getClipsModelByPart(_private.slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                     destinationClip.enabled = true;
 
                     // Clear out ourselves

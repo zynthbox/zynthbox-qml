@@ -257,7 +257,7 @@ Zynthian.DialogQuestion {
                             pattern.setFromJson(partSketch.metadataPatternJson)
                             if (enabledAPart === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
-                                let destinationClip = _private.channel.getClipsModelByPart(_private.slot);
+                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                                 destinationClip.enabled = true;
                                 enabledAPart = true;
                             }
@@ -269,7 +269,7 @@ Zynthian.DialogQuestion {
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
                             if (enabledAPart === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
-                                let destinationClip = _private.channel.getClipsModelByPart(_private.slot);
+                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
                                 destinationClip.enabled = true;
                                 enabledAPart = true;
                             }

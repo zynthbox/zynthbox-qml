@@ -165,12 +165,13 @@ Zynthian.DialogQuestion {
                     color: Kirigami.Theme.highlightColor
                 }
             }
-            QQC2.Button {
-                visible: component.selectedChannel.channelAudioType === "synth"
-                text: "Split Evenly"
-                onClicked: {
-                }
-            }
+            // QQC2.Button {
+            //     visible: component.selectedChannel.channelAudioType === "synth"
+            //     text: "Split Evenly"
+            //     onClicked: {
+            //          This should split the space evenly between the slots, but also... this will likely work a bit weirdly for more than two slots, which would usually be more a case of layering + splitting, and we can't reasonably guess at that... but maybe we don't care?
+            //     }
+            // }
             Repeater {
                 model: 5
                 QQC2.Button {

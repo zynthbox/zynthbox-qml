@@ -234,7 +234,11 @@ class sketchpad_channel(QObject):
     def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
         if theSender in self.__channelPassthroughClients:
             if theSomething == "muted":
-                self.set_muted(theValue)
+                # Do not update channel muted state when being played on solo mode
+                # If muted state is changed at all times, when setting solo mode, all channel's muted state is set to True
+                # and hence disabling solo mode does
+                if self.zynqtgui.song.playChannelSolo == -1:
+                    self.set_muted(theValue)
             elif theSomething == "wetFx1Amount":
                 self.set_wetFx1Amount(theValue)
             elif theSomething == "wetFx2Amount":
@@ -1273,6 +1277,9 @@ class sketchpad_channel(QObject):
         return self.__muted__
 
     def set_muted(self, muted):
+        import traceback
+        traceback.print_stack()
+
         if self.__muted__ != muted:
             self.__muted__ = muted
             for laneId in range(0, 5):

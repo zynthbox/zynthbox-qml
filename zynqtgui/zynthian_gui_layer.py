@@ -1512,7 +1512,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
                                 if not found:
                                     needs_change = True
                                     for jackname in sublayer.audio_out:
-                                        base1 = othersublayer.jackname.split("-")[0]
+                                        base1 = ""
+                                        if othersublayer.jackname is not None:
+                                            base1 = othersublayer.jackname.split("-")[0]
                                         base2 = jackname.split("-")[0]
                                         if othersublayer.jackname != jackname and base1 == base2:
                                             new_audio_out.append(othersublayer.jackname)

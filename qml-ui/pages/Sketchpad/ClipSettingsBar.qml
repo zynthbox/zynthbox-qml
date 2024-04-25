@@ -381,16 +381,16 @@ ColumnLayout {
                         },
                         Kirigami.Action {
                             text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
-                                ? qsTr("<b>Granular Non-looping</b>")
-                                : qsTr("Granular Non-looping")
+                                ? qsTr("<b>Granular Non-looping</b>\n(experimental)")
+                                : qsTr("Granular Non-looping\n(experimental)")
                             onTriggered: {
                                 root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
                             }
                         },
                         Kirigami.Action {
                             text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle
-                                ? qsTr("<b>Granular Looping</b>")
-                                : qsTr("Granular Looping")
+                                ? qsTr("<b>Granular Looping</b>\n(experimental)")
+                                : qsTr("Granular Looping\n(experimental)")
                             onTriggered: {
                                 root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
                             }

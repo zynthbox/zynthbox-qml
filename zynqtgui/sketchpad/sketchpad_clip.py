@@ -809,7 +809,9 @@ class sketchpad_clip(QObject):
         if self.isPlaying:
             self.reset_beat_count()
             if self.audioSource is not None:
-                self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
+                partObject = self.__song__.partsModel.getPart(self.__col_index__)
+                if partObject is not None:
+                    partObject.isPlaying = False
 
     def reset_beat_count(self):
         self.__current_beat__ = -1

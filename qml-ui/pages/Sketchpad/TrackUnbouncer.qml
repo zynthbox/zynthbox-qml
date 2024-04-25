@@ -241,21 +241,38 @@ Zynthian.DialogQuestion {
                     }
                     // - Run through the track's patterns
                     let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
+                    let enabledAPart = false;
                     for (let partIndex = 0; partIndex < 5; ++partIndex) {
                         let pattern = sequence.getByPart(_private.sketchpadTrack.id, partIndex);
                     //   - Clear the existing pattern and reset it to defaults
                         pattern.resetPattern(true);
                         let partSketch = _private.sketches[partIndex];
+                        // Disable the sketch we're unbouncing in favour of one of the destination slots
+                        if (partSketch) {
+                            partSketch.enabled = false;
+                        }
                     //   - If there is a sketch at that position, and it has pattern data, fill up the part's pattern data from that sketch (ZYNTHBOX_PATTERN_JSON - setFromJson(clip.metadataPatternJson))
                         if (partSketch.metadataPatternJson !== null && partSketch.metadataPatternJson.length > 5) {
                             console.log("Replace the slot's pattern content with the stored pattern");
                             pattern.setFromJson(partSketch.metadataPatternJson)
+                            if (enabledAPart === false) {
+                                // If we've not already enabled something, enable the first thing we encounter
+                                let destinationClip = _private.channel.getClipsModelByPart(_private.slot);
+                                destinationClip.enabled = true;
+                                enabledAPart = true;
+                            }
                         } else if (partSketch.metadataMidiRecording !== null && partSketch.metadataMidiRecording.length > 10) {
                             console.log("Replace the slot's pattern content by reconstructing from recorded midi");
                             // Load the recording into the global recorder track
                             Zynthbox.MidiRecorder.loadTrackFromBase64Midi(partSketch.metadataMidiRecording, -1);
                             // Apply that newly loaded recording to the pattern
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
+                            if (enabledAPart === false) {
+                                // If we've not already enabled something, enable the first thing we encounter
+                                let destinationClip = _private.channel.getClipsModelByPart(_private.slot);
+                                destinationClip.enabled = true;
+                                enabledAPart = true;
+                            }
                         } else {
                             console.log("Not adding in data for pattern, as no data exists for this part");
                         }

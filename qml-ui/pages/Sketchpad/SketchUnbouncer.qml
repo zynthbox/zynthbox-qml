@@ -132,6 +132,11 @@ Zynthian.DialogQuestion {
                     zynqtgui.session_dashboard.selectedChannel = _private.channel.id;
                     // Similarly, if we unbounced to another slot, update the current one there as well
                     _private.channel.selectedPart = _private.slot;
+                    // Since we unbounced the thing, we should disable that in favour of the newly unbounced thing
+                    _private.clip.enabled = false;
+                    // Always enable the newly created thing, to avoid that "eh?" experience
+                    let destinationClip = _private.channel.getClipsModelByPart(_private.slot);
+                    destinationClip.enabled = true;
 
                     // Clear out ourselves
                     _private.clip = null;

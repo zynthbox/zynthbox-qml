@@ -86,7 +86,7 @@ class zynthbox_plugins_helper(QObject):
                 snapshot["engine_name"] = "{0}/${{{1}_name}}".format(snapshot['engine_name'].split('/')[0], plugin_id)
                 snapshot["engine_nick"] = "{0}/${{{1}_name}}".format(snapshot['engine_nick'].split('/')[0], plugin_id)
             else:
-                logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+                logging.info(f"Plugin name JV/{plugin_name} not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
         elif snapshot["engine_nick"] == "SF":
             # SFizz stores the plugin name in a few places
             # 1. bank_name: `SFZ/<plugin name>` or `MySFZ/<plugin name>`
@@ -105,7 +105,7 @@ class zynthbox_plugins_helper(QObject):
                 snapshot["bank_info"][4] = "${{{0}_name}}".format(plugin.id)
                 snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, "${{{0}_path}}".format(plugin.id))
             else:
-                logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+                logging.info(f"Plugin name SF/{plugin_name} not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
         elif snapshot["engine_nick"] == "FS":
             # Fluidsynth stores the plugin name in a few places
             # 1. bank_name: `<plugin name>`
@@ -126,7 +126,7 @@ class zynthbox_plugins_helper(QObject):
                 snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, "${{{0}_path}}".format(plugin.id))
                 snapshot["preset_info"][3] = "${{{0}_path}}".format(plugin.id)
             else:
-                logging.info("Plugin name not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+                logging.info(f"Plugin name FS/{plugin_name} not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
 
         return snapshot
 

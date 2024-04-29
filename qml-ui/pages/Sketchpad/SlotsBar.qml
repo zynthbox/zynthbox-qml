@@ -264,7 +264,7 @@ Rectangle {
         } else if (type === "sample-loop") {
             console.log("handleItemClick : Audio")
 
-            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
             if (zynqtgui.backButtonPressed) {
                 clip.clear()
@@ -887,7 +887,7 @@ Rectangle {
         objectName: "sketchPickerPopup"
         columns: 2
         rows: 4
-        property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+        property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         actions: [
             QQC2.Action {
                 text: qsTr("Save A Copy...")

@@ -756,7 +756,7 @@ Rectangle {
                                                 root.selectedChannel.selectedPart = index
                                                 root.selectedChannel.selectedSlotRow = index
                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                                zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                                zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                             } else {
                                                 if (root.selectedChannel.channelAudioType === "external") {
                                                     // If channel type is external, then it has 2 slots visible
@@ -1106,7 +1106,7 @@ Rectangle {
                                     interval: 1; repeat: false; running: false;
                                     onTriggered: {
                                         waveformContainer.clip = root.selectedChannel.channelAudioType === "sample-loop"
-                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                             : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
                                         waveformContainer.showWaveform = root.selectedChannel.channelAudioType === "sample-trig" ||
                                                                          root.selectedChannel.channelAudioType === "sample-slice" ||
@@ -1128,7 +1128,7 @@ Rectangle {
                                 }
                                 Connections {
                                     target: zynqtgui.sketchpad.song.scenesModel
-                                    onSelected_track_index_changed: waveformThrottle.restart()
+                                    onSelected_sketchpad_song_index_changed: waveformThrottle.restart()
                                 }
 
                                 Layout.fillWidth: true

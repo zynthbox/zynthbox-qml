@@ -68,7 +68,7 @@ Zynthian.DialogQuestion {
                     if (_private.sketchpadTrack) {
                         let newSketches = [];
                         for (let partIndex = 0; partIndex < 5; ++partIndex) {
-                            let clip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                            let clip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             newSketches.push(clip);
                         }
                         _private.sketches = newSketches;
@@ -257,7 +257,7 @@ Zynthian.DialogQuestion {
                             pattern.setFromJson(partSketch.metadataPatternJson)
                             if (enabledAPart === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
-                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 destinationClip.enabled = true;
                                 enabledAPart = true;
                             }
@@ -269,7 +269,7 @@ Zynthian.DialogQuestion {
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
                             if (enabledAPart === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
-                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 destinationClip.enabled = true;
                                 enabledAPart = true;
                             }

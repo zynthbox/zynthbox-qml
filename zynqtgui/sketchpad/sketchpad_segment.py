@@ -52,7 +52,7 @@ class sketchpad_segment(QObject):
         # Update sketch isEmpty when segment isEmpty is updated
         self.isEmptyChanged.connect(self.__sketch.segment_is_empty_changed_handler, Qt.QueuedConnection)
 
-        self.__song.scenesModel.selected_track_index_changed.connect(self.clipsChanged.emit)
+        self.__song.scenesModel.selected_sketchpad_song_index_changed.connect(self.clipsChanged.emit)
         for channel_index in range(10):
             channel = self.__song.channelsModel.getChannel(channel_index)
             channel.channel_audio_type_changed.connect(self.sync_clips_for_channel_audio_type_change, Qt.QueuedConnection)
@@ -309,11 +309,11 @@ class sketchpad_segment(QObject):
         """
 
         # Remove all previously selected clips of current sketchpad from this segment
-        self.__clips = [clip for clip in self.__clips if clip.col != self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex]
+        self.__clips = [clip for clip in self.__clips if clip.col != self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex]
 
         # Add all clips of current sketchpad from selected scene to this segment
         for scene_clip in self.zynqtgui.sketchpad.song.scenesModel.getScene(sceneIndex)["clips"]:
-            if scene_clip.col == self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex:
+            if scene_clip.col == self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex:
                 self.addClip(scene_clip)
 
     @Slot(QObject)

@@ -70,11 +70,11 @@ ColumnLayout {
                         separatorVisible: false
                         width: scenesView.width
                         height: root.itemHeight
-                        highlighted: index === zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex
+                        highlighted: index === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex
                         contentItem: QQC2.Label {
                             text: model.scene.name
                         }
-                        onClicked: zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex = index
+                        onClicked: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = index
                     }
                 }
             }

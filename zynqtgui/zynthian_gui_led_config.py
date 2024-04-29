@@ -349,11 +349,11 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
         # Light up 1-5 buttons when respective part clip is enabled when leftSidebar is active
         partClipEnabled = [
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, 0).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, 1).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, 2).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, 3).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, 4).enabled,
+            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 0).enabled,
+            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 1).enabled,
+            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 2).enabled,
+            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 3).enabled,
+            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 4).enabled,
         ]
         # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
         channelDelta = 5 if self.zynqtgui.channelsModActive else 0

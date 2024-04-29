@@ -342,9 +342,9 @@ class sketchpad_song(QObject):
                             self.__bpm__ = sketchpad["bpm"]
                         else:
                             self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
-                            self.__bpm__[self.__scenes_model__.selectedTrackIndex] = sketchpad["bpm"]
+                            self.__bpm__[self.__scenes_model__.selectedSketchpadSongIndex] = sketchpad["bpm"]
 
-                        Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
+                        Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedSketchpadSongIndex])
 
                     self.__is_loading__ = False
                     self.isLoadingChanged.emit()
@@ -532,13 +532,13 @@ class sketchpad_song(QObject):
     #     self.schedule_save()
 
     def setBpmFromTrack(self):
-        Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
+        Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedSketchpadSongIndex])
 
     @Slot()
     def setTrackBpmFromCurrent(self):
         bpm = math.floor(Zynthbox.SyncTimer.instance().getBpm())
-        if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != bpm:
-            self.__bpm__[self.__scenes_model__.selectedTrackIndex] = bpm
+        if self.__bpm__[self.__scenes_model__.selectedSketchpadSongIndex] != bpm:
+            self.__bpm__[self.__scenes_model__.selectedSketchpadSongIndex] = bpm
             self.schedule_save()
 
     def index(self):

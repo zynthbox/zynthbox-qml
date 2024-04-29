@@ -65,7 +65,7 @@ Zynthian.ScreenPage {
     }
     property QtObject selectedClip: component.selectedChannel
                                     ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
-                                        ? component.selectedChannel.getClipsModelByPart(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                                        ? component.selectedChannel.getClipsModelByPart(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                         : component.selectedChannel.samples[component.selectedChannel.selectedSlotRow]
                                     : null
     property bool selectedClipHasWav: false
@@ -506,7 +506,7 @@ Zynthian.ScreenPage {
                         id: partDelegate
 
                         property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
-                                                            ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+                                                            ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                                             : component.selectedChannel.samples[index]
                         property bool clipHasWav: partDelegate.clip && !partDelegate.isEmpty
 

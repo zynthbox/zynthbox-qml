@@ -168,13 +168,13 @@ class sketchpad_channel(QObject):
         if 0 <= self.__id__ <= 9:
             self.__connected_pattern__ = self.__id__
 
-        self.__song__.scenesModel.selected_track_index_changed.connect(self.track_index_changed_handler)
+        self.__song__.scenesModel.selected_sketchpad_song_index_changed.connect(self.track_index_changed_handler)
         self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.selectedPartNamesChanged.emit())
 
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
         try:
-            self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+            self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         except:
             pass
         self.channel_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
@@ -800,7 +800,7 @@ class sketchpad_channel(QObject):
 
         for index in range(5):
             clips_model = self.getClipsModelByPart(index)
-            clips.append(clips_model.getClip(self.__song__.scenesModel.selectedTrackIndex))
+            clips.append(clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex))
 
         return clips
 
@@ -1544,7 +1544,7 @@ class sketchpad_channel(QObject):
 
     ### Property sceneClip
     def get_scene_clip(self):
-        return self.__song__.getClip(self.id, self.__song__.scenesModel.selectedTrackIndex)
+        return self.__song__.getClip(self.id, self.__song__.scenesModel.selectedSketchpadSongIndex)
 
     scene_clip_changed = Signal()
 
@@ -1709,11 +1709,11 @@ class sketchpad_channel(QObject):
             self.__selected_part__ = selected_part
             self.selectedSlotRow = selected_part
 
-            # old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, old_selected_part)
+            # old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSketchpadSongIndex, old_selected_part)
             # if old_clip is not None:
             #     old_clip.stop()
             #
-            # clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, selected_part)
+            # clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSketchpadSongIndex, selected_part)
             # if clip is not None and clip.inCurrentScene:
             #     clip.play()
 
@@ -1775,7 +1775,7 @@ class sketchpad_channel(QObject):
     def get_selectedPartNames(self):
         partNames = []
         for i in range(5):
-            clip = self.getClipsModelByPart(i).getClip(self.zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip = self.getClipsModelByPart(i).getClip(self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
             if clip.enabled:
                 partNames.append(chr(i+65).lower())
@@ -2271,7 +2271,7 @@ class sketchpad_channel(QObject):
         if self.channelAudioType in ["sample-trig", "sample-slice"]:
             return self.samples[self.selectedSlotRow]
         else:
-            return self.getClipsModelByPart(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedTrackIndex)
+            return self.getClipsModelByPart(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
 
     @Slot(str)
     def setChannelSamplesFromSnapshot(self, snapshot: str):
@@ -2347,7 +2347,7 @@ class sketchpad_channel(QObject):
         """
         This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon channelAudioType
         """
-        # TODO : Use selectedTrackIndex instead of hardcoding it to 0 after renaming it to something that does not interfere with the name track
+        # TODO : Use selectedSketchpadSongIndex instead of hardcoding it to 0 after renaming it to something that does not interfere with the name track
         _channelAudioType = channelAudioType
         if _channelAudioType is None:
             _channelAudioType = self.channelAudioType

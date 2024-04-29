@@ -47,7 +47,7 @@ Item {
      */
     function loadSequenceFromFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = zynqtgui.sketchpad.song.scenesModel.selectedTrackName;
+            sequenceFilePicker.sequenceName = zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
@@ -62,7 +62,7 @@ Item {
      */
     function saveSequenceToFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = zynqtgui.sketchpad.song.scenesModel.selectedTrackName;
+            sequenceFilePicker.sequenceName = zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }

@@ -77,7 +77,7 @@ Rectangle {
                 break
         }
 
-        console.log("### Part Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex, cuia, clip)
+        console.log("### Part Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, cuia, clip)
 
         return returnVal;
     }

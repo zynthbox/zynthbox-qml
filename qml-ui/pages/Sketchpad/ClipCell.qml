@@ -61,7 +61,7 @@ QQC2.AbstractButton {
         onTriggered: {
             if (zynqtgui.sketchpad.song && zynqtgui.sketchpad.song.isLoading === false) {
                 root.highlighted = channel.sceneClip.row === zynqtgui.session_dashboard.selectedChannel &&
-                                channel.sceneClip.col === zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex // zynqtgui.bottomBarControlObj === channel.sceneClip
+                                channel.sceneClip.col === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex // zynqtgui.bottomBarControlObj === channel.sceneClip
             }
         }
     }
@@ -80,7 +80,7 @@ QQC2.AbstractButton {
     }
     Connections {
         target: zynqtgui.sketchpad.song.scenesModel
-        onSelected_track_index_changed: highlightThrottle.restart()
+        onSelected_sketchpad_song_index_changed: highlightThrottle.restart()
     }
 
     contentItem: Item {

@@ -1012,7 +1012,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         if not self.is_recording or \
                 (self.is_recording and not self.recordSolo):
             self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex,
-                                                self.__song__.scenesModel.selectedTrackIndex)
+                                                self.__song__.scenesModel.selectedSketchpadSongIndex)
 
     def start_metronome_request(self):
         logging.debug(f"Start Metronome Request : while timer is running:{self.isMetronomeRunning}")

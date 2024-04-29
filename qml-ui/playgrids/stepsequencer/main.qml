@@ -266,7 +266,7 @@ Zynthian.BasePlayGrid {
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
-        property string sceneName: zynqtgui.sketchpad.song.scenesModel.selectedTrackName
+        property string sceneName: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongName
         property QtObject associatedChannel;
         property int associatedChannelIndex;
 
@@ -908,7 +908,7 @@ Zynthian.BasePlayGrid {
                             delayed: true
                             restoreMode: Binding.RestoreBinding
                         }
-                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex) : null
+                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
                         Zynthian.SampleVisualiser {
                             anchors.fill: parent
                             sample: parent.visible ? drumpadLoopVisualiser.sample : null
@@ -1688,7 +1688,7 @@ Zynthian.BasePlayGrid {
                                                         icon.name: "player-volume"
                                                         onClicked: {
                                                             if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                                var associatedClip = patternsMenuItem.associatedChannel.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                                                var associatedClip = patternsMenuItem.associatedChannel.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                                 associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                             }
@@ -1856,7 +1856,7 @@ Zynthian.BasePlayGrid {
                                                             delayed: true
                                                             restoreMode: Binding.RestoreBinding
                                                         }
-                                                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex) : null
+                                                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
                                                         Zynthian.SampleVisualiser {
                                                             anchors.fill: parent
                                                             sample: parent.visible ?  patternPopupLoopVisualiser.sample : null
@@ -2178,7 +2178,7 @@ Zynthian.BasePlayGrid {
                                         icon.name: "player-volume"
                                         onClicked: {
                                             if (partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1) {
-                                                var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                                var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                 associatedClip.enabled = !partDelegate.pattern.enabled
                                             }
@@ -2199,7 +2199,7 @@ Zynthian.BasePlayGrid {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                     text: qsTr("Pick Part %1%2").arg(partPicker.associatedChannelIndex + 1).arg(partDelegate.pattern.partName)
                                     onClicked: {
-                                        var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                                        var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (associatedClip.enabled) {
                                             partPicker.associatedChannel.selectedPart = model.index;
                                         } else {

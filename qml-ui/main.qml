@@ -667,7 +667,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*1.5
             font.pointSize: 11
             onClicked: {
-                // print(zynqtgui.sketchpad.song.scenesModel.getScene(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).name)
+                // print(zynqtgui.sketchpad.song.scenesModel.getScene(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).name)
                 zynqtgui.current_modal_screen_id = 'sketchpad'
                 // tracksMenu.open()
             }
@@ -708,9 +708,9 @@ Kirigami.AbstractApplicationWindow {
                         font.pointSize: 11
                         onClicked: {
                             tracksMenu.close();
-                            zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex = index;
+                            zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = index;
                         }
-                        highlighted: zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex === index
+                        highlighted: zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex === index
                     }
                 }
             }
@@ -863,7 +863,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sampleLoopButton
 
-            property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+            property QtObject clip: zynqtgui.sketchpad.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
             icon.color: Kirigami.Theme.textColor
             text: qsTr("%1").arg(clip && clip.filename ? clip.filename : "")

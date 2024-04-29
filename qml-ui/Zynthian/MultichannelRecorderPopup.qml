@@ -56,7 +56,7 @@ Zynthian.Dialog {
                 }
             } else if (channel.channelAudioType === "sample-loop") {
                 for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                    if (channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex).cppObjId > -1) {
+                    if (channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
@@ -169,7 +169,7 @@ Zynthian.Dialog {
                         }
                     } else if (channel.channelAudioType === "sample-loop") {
                         for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                            var clip = channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex);
+                            var clip = channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             if (clip.cppObjId > -1) {
                                 // We pick the name of whatever the first loop is here, just so we've got one
                                 soundIndication = clip.path.split("/").pop();

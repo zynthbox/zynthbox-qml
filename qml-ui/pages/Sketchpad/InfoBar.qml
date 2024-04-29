@@ -36,7 +36,7 @@ RowLayout {
         id: clipThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
-            infoBar.clip = root.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+            infoBar.clip = root.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         }
     }
     Connections {
@@ -45,7 +45,7 @@ RowLayout {
     }
     Connections {
         target: zynqtgui.sketchpad.song.scenesModel
-        onSelected_track_index_changed: clipThrottle.restart()
+        onSelected_sketchpad_song_index_changed: clipThrottle.restart()
     }
     Component.onCompleted: {
         clipThrottle.restart();
@@ -225,7 +225,7 @@ RowLayout {
     }
 
     QQC2.Button {
-        property var clip: applicationWindow().selectedChannel.getClipsModelByPart(applicationWindow().selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedTrackIndex)
+        property var clip: applicationWindow().selectedChannel.getClipsModelByPart(applicationWindow().selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
         Layout.fillWidth: false
         Layout.fillHeight: false

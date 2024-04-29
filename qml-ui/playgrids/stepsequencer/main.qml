@@ -472,7 +472,7 @@ Zynthian.BasePlayGrid {
     }
     Connections {
         target: zynqtgui.isBootingComplete && zynqtgui.sketchpad && zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.scenesModel : null
-        onSelectedTrackNameChanged: Qt.callLater(_private.adoptSequence) // Makes scene change look smoother
+        onSelectedSequenceNameChanged: Qt.callLater(_private.adoptSequence) // Makes scene change look smoother
     }
     Connections {
         target: zynqtgui

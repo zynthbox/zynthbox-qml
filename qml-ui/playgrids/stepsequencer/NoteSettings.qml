@@ -50,6 +50,11 @@ ColumnLayout {
     function cuiaCallback(cuia) {
         let result = true;
         switch(cuia) {
+            case "ZL_PLAY":
+            case "ZL_STOP":
+                // Pass basic playback control through
+                result = false
+                break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":

@@ -72,6 +72,10 @@ Rectangle {
                 }
 
                 return true;
+            case "KNOB0_TOUCHED":
+            case "KNOB1_TOUCHED":
+                // Eat these two events to stop the OSD from showing up
+                return true;
             case "KNOB0_UP":
                 pageManager.getPage("sketchpad").updateSelectedChannelVolume(1)
                 return true;

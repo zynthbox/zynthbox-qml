@@ -194,10 +194,10 @@ class sketchpad_channel(QObject):
 
         def handlePassthroughClientDryAmountChanged(theSender):
             self.handlePassthroughClientSomethingChanged(theSender, "dryAmount", theSender.dryAmount())
-        def handlePassthroughClientWetFx1AmountChanged(theSender):
-            self.handlePassthroughClientSomethingChanged(theSender, "wetFx1Amount", theSender.wetFx1Amount())
-        def handlePassthroughClientWetFx2AmountChanged(theSender):
-            self.handlePassthroughClientSomethingChanged(theSender, "wetFx2Amount", theSender.wetFx2Amount())
+        # def handlePassthroughClientWetFx1AmountChanged(theSender):
+            # self.handlePassthroughClientSomethingChanged(theSender, "wetFx1Amount", theSender.wetFx1Amount())
+        # def handlePassthroughClientWetFx2AmountChanged(theSender):
+            # self.handlePassthroughClientSomethingChanged(theSender, "wetFx2Amount", theSender.wetFx2Amount())
         def handlePassthroughClientDryWetMixAmountChanged(theSender):
             self.handlePassthroughClientSomethingChanged(theSender, "dryWetMixAmount", theSender.dryWetMixAmount())
         def handlePassthroughClientPanAmountChanged(theSender):
@@ -208,20 +208,20 @@ class sketchpad_channel(QObject):
         for channelIndex in range(0, 16):
             synthPassthrough = Zynthbox.Plugin.instance().synthPassthroughClients()[channelIndex]
             self.__synthPassthroughClients.insert(channelIndex, synthPassthrough)
-            synthPassthrough.panAmountChanged.connect(lambda:handlePassthroughClientPanAmountChanged(synthPassthrough))
-            synthPassthrough.dryAmountChanged.connect(lambda:handlePassthroughClientDryAmountChanged(synthPassthrough))
+            synthPassthrough.panAmountChanged.connect(lambda theClient=synthPassthrough:handlePassthroughClientPanAmountChanged(theClient))
+            synthPassthrough.dryAmountChanged.connect(lambda theClient=synthPassthrough:handlePassthroughClientDryAmountChanged(theClient))
         self.__channelPassthroughClients = []
         self.__fxPassthroughClients = []
         for laneId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
             channelClient = Zynthbox.Plugin.instance().channelPassthroughClients()[self.__id__ * 5 + laneId]
             self.__channelPassthroughClients.insert(laneId, channelClient)
-            channelClient.mutedChanged.connect(lambda:handlePassthroughClientMutedChanged(channelClient))
-            channelClient.wetFx1AmountChanged.connect(lambda:handlePassthroughClientWetFx1AmountChanged(channelClient))
-            channelClient.wetFx2AmountChanged.connect(lambda:handlePassthroughClientWetFx2AmountChanged(channelClient))
+            channelClient.mutedChanged.connect(lambda theClient=channelClient:handlePassthroughClientMutedChanged(theClient))
+            # channelClient.wetFx1AmountChanged.connect(lambda theClient=channelClient:handlePassthroughClientWetFx1AmountChanged(theClient))
+            # channelClient.wetFx2AmountChanged.connect(lambda theClient=channelClient:handlePassthroughClientWetFx2AmountChanged(theClient))
             fxClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
             self.__fxPassthroughClients.insert(laneId, fxClient)
-            fxClient.dryWetMixAmountChanged.connect(lambda:handlePassthroughClientDryWetMixAmountChanged(fxClient))
-            fxClient.panAmountChanged.connect(lambda:handlePassthroughClientPanAmountChanged(fxClient))
+            fxClient.dryWetMixAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientDryWetMixAmountChanged(theClient))
+            fxClient.panAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientPanAmountChanged(theClient))
 
         # Connect to respective signals when any of the slot data changes for property slotsData
         self.channel_audio_type_changed.connect(lambda: self.emitSlotsDataChanged("channelAudioType"))
@@ -239,10 +239,10 @@ class sketchpad_channel(QObject):
                 # and hence disabling solo mode does
                 if self.zynqtgui.song.playChannelSolo == -1:
                     self.set_muted(theValue)
-            elif theSomething == "wetFx1Amount":
-                self.set_wetFx1Amount(theValue)
-            elif theSomething == "wetFx2Amount":
-                self.set_wetFx2Amount(theValue)
+            # elif theSomething == "wetFx1Amount":
+                # self.set_wetFx1Amount(theValue)
+            # elif theSomething == "wetFx2Amount":
+                # self.set_wetFx2Amount(theValue)
         elif theSender in self.__synthPassthroughClients:
             clientIndex = self.__synthPassthroughClients.index(theSender)
             if clientIndex in self.__chained_sounds__:

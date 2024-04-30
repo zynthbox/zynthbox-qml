@@ -286,8 +286,9 @@ class zynthian_controller(QObject):
                 valueChanged = True
 
         elif self.ticks:
-            #TODO Do something here?
-            pass
+            if val in self.ticks and self.value != val:
+                self.value = val
+                valueChanged = True
 
         else:
             newValue = val;

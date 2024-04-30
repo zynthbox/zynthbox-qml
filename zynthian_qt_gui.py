@@ -1037,8 +1037,8 @@ class zynthian_gui(QObject):
     def init_global_fx(self):
         delay_engine_name = "JV/Gxdigital_delay_st"
         delay_level_controller_name = "LEVEL"
-        reverb_engine_name = "JV/Roomy"
-        reverb_level_controller_name = "dry_wet"
+        reverb_engine_name = "JV/TAP Reverberator"
+        reverb_level_controller_name = "wetlevel"
 
         def handle_delay_change():
             if self.curlayer == self.global_fx_engines[0][2]:

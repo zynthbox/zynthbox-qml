@@ -203,9 +203,9 @@ class zynthian_gui_controller(QObject):
             self.ctrl_value_print = newValuePrint
             emitValuePrintChanged = True
         if emitValuePrintChanged:
-            if update_zctrl:
-                self.zctrl.set_value(val)
             self.value_print_changed.emit()
+        if update_zctrl:
+            self.zctrl.set_value(val)
 
         self.zynqtgui.zynread_wait_flag = False
         #print("VALUE: %s" % self.ctrl_value)
@@ -507,12 +507,12 @@ class zynthian_gui_controller(QObject):
             v=0
         if self.ctrl_value is None or self.ctrl_value!=v:
             self.ctrl_value=v
-            #logging.error("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
+            #logging.debug("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
             if self.__visible:
                 if set_zynpot:
                     if self.mult>1: v = self.mult*v
                     zyncoder.lib_zyncoder.set_value_zynpot(self.index,int(v),int(send_zynpot))
-                    #logging.error("set_value_zyncoder {} {} ({}, {}) => {}".format(self, self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
+                    #logging.debug("set_value_zyncoder {} {} ({}, {}) => {}".format(self, self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
             self.calculate_plot_values(update_zctrl)
             self.value_changed.emit()
             if self.is_engine_controller:

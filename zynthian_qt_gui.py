@@ -1035,32 +1035,37 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
+        delay_engine_name = "JV/Gxdigital_delay_st"
+        delay_level_controller_name = "LEVEL"
+        reverb_engine_name = "JV/Roomy"
+        reverb_level_controller_name = "dry_wet"
+
         def handle_delay_change():
             if self.curlayer == self.global_fx_engines[0][2]:
-                zctrl = self.global_fx_engines[0][2].controllers_dict["LEVEL"]
+                zctrl = self.global_fx_engines[0][2].controllers_dict[delay_level_controller_name]
                 if zctrl in self.control.zgui_custom_controllers_map:
                     self.control.zgui_custom_controllers_map[zctrl].zctrl_sync()
 
         def handle_reverb_change():
             if self.curlayer == self.global_fx_engines[1][2]:
-                zctrl = self.global_fx_engines[1][2].controllers_dict["dry_wet"]
+                zctrl = self.global_fx_engines[1][2].controllers_dict[reverb_level_controller_name]
                 if zctrl in self.control.zgui_custom_controllers_map:
                     self.control.zgui_custom_controllers_map[zctrl].zctrl_sync()
 
         logging.debug("Initializing global FX engines")
 
         self.currentTaskMessage = "Initializing Global FX Engines : Delay"
-        delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st", False)
+        delay_engine = self.engine.start_engine(delay_engine_name, False)
         delay_layer = zynthian_layer(delay_engine, -1, self)
         delay_controller = MultiController(self)
-        delay_controller.add_control(delay_layer.controllers_dict["LEVEL"])
+        delay_controller.add_control(delay_layer.controllers_dict[delay_level_controller_name])
         delay_controller.value_changed.connect(handle_delay_change)
 
         self.currentTaskMessage = "Initializing Global FX Engines : Reverb"
-        reverb_engine = self.engine.start_engine("JV/Roomy", False)
+        reverb_engine = self.engine.start_engine(reverb_engine_name, False)
         reverb_layer = zynthian_layer(reverb_engine, -1, self)
         reverb_controller = MultiController(self)
-        reverb_controller.add_control(reverb_layer.controllers_dict["dry_wet"])
+        reverb_controller.add_control(reverb_layer.controllers_dict[reverb_level_controller_name])
         reverb_controller.value_changed.connect(handle_reverb_change)
 
         # global_fx_engines is a list of lists of 3 elements.

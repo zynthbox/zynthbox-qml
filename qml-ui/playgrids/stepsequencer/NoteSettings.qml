@@ -47,6 +47,8 @@ ColumnLayout {
     // If filled, the component only shows the subnotes whose note is contained in this list
     property var midiNoteFilter: []
 
+    property bool showCloseButton: false
+
     function cuiaCallback(cuia) {
         let result = true;
         switch(cuia) {
@@ -174,59 +176,41 @@ ColumnLayout {
             lastStep = -1;
         }
     }
-/*
-    function setDuration(duration, isDefault) {
-        if (component.currentStep > -1) {
-            if (component.currentSubNote > -1) {
-                // We have a specific one selected
-            } else {
-                // Work on all the subnotes on the current step
-            }
-        } else {
-            // Work on all subnotes in all the steps in the displayed bars
-        }
-
-        if (component.currentSubNote === -1) {
-            if (note) {
-                for (var subnoteIndex = 0; subnoteIndex < note.subnotes.length; ++subnoteIndex) {
-                    component.patternModel.setSubnoteMetadata(component.row, component.column, subnoteIndex, "duration", isDefault ? 0 : duration);
-                }
-            }
-        } else {
-            component.patternModel.setSubnoteMetadata(component.row, component.column, component.currentSubNote, "duration", isDefault ? 0 : duration);
-        }
-    }*/
 
     signal refreshStep(int row, int column);
     signal refreshSubnote(int row, int column, int subnoteIndex);
     function changeAllSubnotesPitch(pitchChange) {
-        for (var row = component.firstBar; row < component.lastBar + 1; ++row) {
-            for (var column = 0; column < component.patternModel.width; ++column) {
-                var oldNote = component.patternModel.getNote(row, column);
-                if (oldNote) {
-                    var newSubnotes = [];
-                    for (var subnoteIndex = 0; subnoteIndex < oldNote.subnotes.length; ++subnoteIndex) {
-                        var oldSubnote = oldNote.subnotes[subnoteIndex];
-                        let newMidiNote = Zynthbox.KeyScales.transposeNote(oldSubnote.midiNote, pitchChange, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey);
-                        newSubnotes.push(Zynthbox.PlayGridManager.getNote(newMidiNote, oldSubnote.midiChannel));
-                    }
-                    component.patternModel.setNote(row, column, Zynthbox.PlayGridManager.getCompoundNote(newSubnotes));
-                    for (var subnoteIndex = 0; subnoteIndex < newSubnotes.length; ++subnoteIndex) {
-                        component.refreshSubnote(row, column, subnoteIndex);
+        if (component.midiNoteFilter.length === 0) {
+            let firstStep = (component.firstStep == -1 ? 0 : component.firstStep);
+            let lastStepAndOne = (component.lastStep == -1 ? component.patternModel.width : component.lastStep + 1);
+            for (var barIndex = component.firstBar; barIndex < component.lastBar + 1; ++barIndex) {
+                for (var stepIndex = firstStep; stepIndex < lastStepAndOne; ++stepIndex) {
+                    var oldNote = component.patternModel.getNote(barIndex, stepIndex);
+                    if (oldNote) {
+                        var newSubnotes = [];
+                        for (var subnoteIndex = 0; subnoteIndex < oldNote.subnotes.length; ++subnoteIndex) {
+                            var oldSubnote = oldNote.subnotes[subnoteIndex];
+                            let newMidiNote = Zynthbox.KeyScales.transposeNote(oldSubnote.midiNote, pitchChange, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey);
+                            newSubnotes.push(Zynthbox.PlayGridManager.getNote(newMidiNote, oldSubnote.midiChannel));
+                        }
+                        component.patternModel.setNote(barIndex, stepIndex, Zynthbox.PlayGridManager.getCompoundNote(newSubnotes));
+                        for (var subnoteIndex = 0; subnoteIndex < newSubnotes.length; ++subnoteIndex) {
+                            component.refreshSubnote(barIndex, stepIndex, subnoteIndex);
+                        }
                     }
                 }
             }
+        } else {
+            // First move all the notes by the given pitch change
+            // Then adjust the midi note filter by the same amount
         }
-        // var patternModel = component.patternModel;
-        // component.patternModel = null;
-        // component.patternModel = patternModel;
     }
-    function changeSubnotePitch(row, column, subnoteIndex, pitchChange) {
+    function changeSubnotePitch(barIndex, stepIndex, subnoteIndex, pitchChange) {
         // First get the old data out
-        var oldNote = component.patternModel.getNote(row, column);
+        var oldNote = component.patternModel.getNote(barIndex, stepIndex);
         var subnote = oldNote.subnotes[subnoteIndex];
-        var metadata = component.patternModel.subnoteMetadata(row, column, subnoteIndex, "");
-        component.patternModel.removeSubnote(row, column, subnoteIndex);
+        var metadata = component.patternModel.subnoteMetadata(barIndex, stepIndex, subnoteIndex, "");
+        component.patternModel.removeSubnote(barIndex, stepIndex, subnoteIndex);
         // Adjust by a full octave if the mode button is held down
         if (zynqtgui.modeButtonPressed) {
             zynqtgui.ignoreNextModeButtonPress = true;
@@ -237,12 +221,12 @@ ColumnLayout {
             subnote = Zynthbox.PlayGridManager.getNote(Math.min(Math.max(newMidiNote, 0), 127), subnote.midiChannel);
         }
         // Now insert the replacement note and set the metadata again
-        var subnotePosition = component.patternModel.insertSubnoteSorted(row, column, subnote);
+        var subnotePosition = component.patternModel.insertSubnoteSorted(barIndex, stepIndex, subnote);
         for (var key in metadata) {
-            component.patternModel.setSubnoteMetadata(row, column, subnotePosition, key, metadata[key]);
+            component.patternModel.setSubnoteMetadata(barIndex, stepIndex, subnotePosition, key, metadata[key]);
         }
-        component.selectBarStepAndSubnote(row, column, subnotePosition);
-        component.refreshSubnote(row, column, subnotePosition);
+        component.selectBarStepAndSubnote(barIndex, stepIndex, subnotePosition);
+        component.refreshSubnote(barIndex, stepIndex, subnotePosition);
     }
     /**
      * The data the dialog list operates on, in the form of a bunch of objects with the structure
@@ -301,6 +285,18 @@ ColumnLayout {
         listDataUpdater.barStepAndSubnoteToSelect = { "barIndex": barIndex, "stepIndex": stepIndex, "subnoteIndex": subnoteIndex }
     }
 
+    Kirigami.Heading {
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        level: 2
+        text: component.midiNoteFilter.length > 0
+            ? "Note Settings: Notes %1".arg(Zynthbox.Chords.symbol(component.midiNoteFilter, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey, " | "))
+            : component.firstBar === component.lastBar
+                ? component.firstStep > -1 && component.patternModel && component.firstStep === component.lastStep
+                    ? "Note Settings: Step %1".arg((component.firstBar * component.patternModel.width) + component.firstStep + 1)
+                    : "Note Settings: Bar %1".arg(component.firstBar + 1)
+                : "Note Settings"
+        Layout.fillWidth: true
+    }
     RowLayout {
         visible: component.listData.length === 0
         Layout.fillWidth: true
@@ -921,22 +917,49 @@ ColumnLayout {
         QQC2.Label {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            Layout.minimumWidth: applicationWindow().width * 0.25
+            Layout.maximumWidth: Layout.minimumWidth
             horizontalAlignment: Text.AlignHCenter
             text: "All Notes:"
         }
         Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            text: "Pitch -"
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            text: "Pitch -12"
+            onClicked: {
+                component.changeAllSubnotesPitch(-12);
+            }
+        }
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 0
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            text: "Pitch -1"
             onClicked: {
                 component.changeAllSubnotesPitch(-1);
             }
         }
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 0
+        }
         Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            text: "Pitch +"
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            text: "Pitch +1"
             onClicked: {
                 component.changeAllSubnotesPitch(1);
+            }
+        }
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 0
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            text: "Pitch +12"
+            onClicked: {
+                component.changeAllSubnotesPitch(12);
             }
         }
     }
@@ -953,84 +976,75 @@ ColumnLayout {
         QQC2.Label {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            Layout.minimumWidth: applicationWindow().width * 0.25
+            Layout.maximumWidth: Layout.minimumWidth
             horizontalAlignment: Text.AlignHCenter
             text: "Key and Scale:"
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+            text: "-12"
+            enabled: component.patternModel ? component.patternModel.octave > 0 : false
+            onClicked: {
+                component.patternModel.octave = component.patternModel.octave - 1;
+            }
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+            text: "-"
+            enabled: component.patternModel ? component.patternModel.octave > 0 || component.patternModel.pitch > 0 : false
+            onClicked: {
+                if (component.patternModel.pitch == 0) {
+                    component.patternModel.pitch = Zynthbox.KeyScales.pitchNames().length - 1;
+                    component.patternModel.octave = component.patternModel.octave - 1;
+                } else {
+                    component.patternModel.pitch = component.patternModel.pitch - 1;
+                }
+            }
         }
         QQC2.Label {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 14
             horizontalAlignment: Text.AlignHCenter
             text: component.patternModel
                 ? qsTr("Key: %1%2")
                     .arg(Zynthbox.KeyScales.pitchName(Zynthbox.KeyScales.pitchIndexToEnumKey(component.patternModel.pitch)))
                     .arg(Zynthbox.KeyScales.octaveName(Zynthbox.KeyScales.octaveIndexToEnumKey(component.patternModel.octave)))
                 : ""
-            Zynthian.PlayGridButton {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    bottom: parent.bottom
-                }
-                width: height
-                text: "-"
-                enabled: component.patternModel ? component.patternModel.octave > 0 || component.patternModel.pitch > 0 : false
-                onClicked: {
-                    if (component.patternModel.pitch == 0) {
-                        component.patternModel.pitch = Zynthbox.KeyScales.pitchNames().length - 1;
-                        component.patternModel.octave = component.patternModel.octave - 1;
-                    } else {
-                        component.patternModel.pitch = component.patternModel.pitch - 1;
-                    }
-                }
-                Zynthian.PlayGridButton {
-                    anchors {
-                        top: parent.top
-                        left: parent.right
-                        bottom: parent.bottom
-                        leftMargin: Kirigami.Units.smallSpacing
-                    }
-                    width: height
-                    text: "-12"
-                    enabled: component.patternModel ? component.patternModel.octave > 0 : false
-                    onClicked: {
-                        component.patternModel.octave = component.patternModel.octave - 1;
-                    }
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+            text: "+"
+            enabled: component.patternModel ? Zynthbox.KeyScales.midiPitchValue(Zynthbox.KeyScales.pitchIndexToEnumKey(component.patternModel.pitch), Zynthbox.KeyScales.octaveIndexToEnumKey(component.patternModel.octave)) < 126 : false
+            onClicked: {
+                if (component.patternModel.pitch == Zynthbox.KeyScales.pitchNames().length - 1) {
+                    component.patternModel.pitch = 0;
+                    component.patternModel.octave = component.patternModel.octave + 1;
+                } else {
+                    component.patternModel.pitch = component.patternModel.pitch + 1;
                 }
             }
-            Zynthian.PlayGridButton {
-                anchors {
-                    top: parent.top
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-                width: height
-                text: "+"
-                enabled: component.patternModel ? Zynthbox.KeyScales.midiPitchValue(Zynthbox.KeyScales.pitchIndexToEnumKey(component.patternModel.pitch), Zynthbox.KeyScales.octaveIndexToEnumKey(component.patternModel.octave)) < 126 : false
-                onClicked: {
-                    if (component.patternModel.pitch == Zynthbox.KeyScales.pitchNames().length - 1) {
-                        component.patternModel.pitch = 0;
-                        component.patternModel.octave = component.patternModel.octave + 1;
-                    } else {
-                        component.patternModel.pitch = component.patternModel.pitch + 1;
-                    }
-                }
-                Zynthian.PlayGridButton {
-                    anchors {
-                        top: parent.top
-                        right: parent.left
-                        bottom: parent.bottom
-                        rightMargin: Kirigami.Units.smallSpacing
-                    }
-                    width: height
-                    text: "+12"
-                    enabled: component.patternModel ? component.patternModel.octave < Zynthbox.KeyScales.octaveNames().length - 2 : false
-                    onClicked: {
-                        component.patternModel.octave = component.patternModel.octave + 1;
-                    }
-                }
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+            text: "+12"
+            enabled: component.patternModel ? component.patternModel.octave < Zynthbox.KeyScales.octaveNames().length - 2 : false
+            onClicked: {
+                component.patternModel.octave = component.patternModel.octave + 1;
             }
+        }
+        Item {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 0
         }
         Zynthian.PlayGridButton {
             Layout.fillWidth: true
@@ -1063,7 +1077,8 @@ ColumnLayout {
         QQC2.Label {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            Layout.minimumWidth: applicationWindow().width * 0.25
+            Layout.maximumWidth: Layout.minimumWidth
             horizontalAlignment: Text.AlignHCenter
             text: "Default Length:"
         }
@@ -1110,5 +1125,13 @@ ColumnLayout {
             onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 128; }
         }
     }
+    Zynthian.PlayGridButton {
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        Layout.fillWidth: true
+        text: "Back"
+        visible: component.showCloseButton
+        onClicked: {
+            component.close();
+        }
+    }
 }
-

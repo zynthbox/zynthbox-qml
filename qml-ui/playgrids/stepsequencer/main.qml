@@ -2072,8 +2072,9 @@ Zynthian.BasePlayGrid {
                 NoteSettings {
                     id: noteSettings
                     anchors.fill: parent
-                    implicitWidth: drumPad.width - Kirigami.Units.largeSpacing * 2
+                    implicitWidth: applicationWindow().width - Kirigami.Units.largeSpacing * 2
                     onClose: noteSettingsPopup.close();
+                    showCloseButton: true
                 }
             }
             QQC2.Drawer {

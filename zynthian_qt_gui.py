@@ -151,9 +151,6 @@ from zynqtgui.sketchpad.zynthian_gui_sketchpad import (
 
 from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
 from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
-
-from zynqtgui.zynthian_gui_guioptions import zynthian_gui_guioptions
-
 from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
 from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
@@ -540,19 +537,6 @@ class zynthian_gui(QObject):
         self.channelsModTimer.setInterval(3000)
         self.channelsModTimer.setSingleShot(True)
         self.channelsModTimer.timeout.connect(self.channelsModTimerHandler)
-
-        speed_settings = QSettings("/home/pi/config/gui_optionsrc", QSettings.IniFormat)
-        if speed_settings.status() != QSettings.NoError:
-            self.__encoder_list_speed_multiplier = 4
-        else:
-            speed_settings.beginGroup("Encoder0")
-            self.__encoder_list_speed_multiplier = None
-            try:
-                self.__encoder_list_speed_multiplier = int(speed_settings.value("speed"));
-            except:
-                pass
-            if self.__encoder_list_speed_multiplier is None:
-                self.__encoder_list_speed_multiplier = 4
 
         self.info_timer = QTimer(self)
         self.info_timer.setInterval(3000)
@@ -1203,7 +1187,6 @@ class zynthian_gui(QObject):
         self.screens["main"] = zynthian_gui_main(self)
         self.screens["module_downloader"] = zynthian_gui_newstuff(self)
         self.screens["admin"] = zynthian_gui_admin(self)
-        self.screens["guioptions"] = zynthian_gui_guioptions(self)
         self.screens["audio_settings"] = zynthian_gui_audio_settings(self)
         self.screens["wifi_settings"] = zynthian_gui_wifi_settings(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
@@ -3524,20 +3507,6 @@ class zynthian_gui(QObject):
         logging.debug("---p Completing stop_splash procedure")
         logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
-    def get_encoder_list_speed_multiplier(self):
-        return self.__encoder_list_speed_multiplier
-
-    def set_encoder_list_speed_multiplier(self, val):
-        if self.__encoder_list_speed_multiplier == val:
-            return
-        self.__encoder_list_speed_multiplier = val
-        speed_settings = QSettings("/home/pi/config/gui_optionsrc", QSettings.IniFormat)
-        speed_settings.beginGroup("Encoder0")
-        speed_settings.setValue("speed", self.__encoder_list_speed_multiplier);
-        speed_settings.endGroup()
-
-        self.encoder_list_speed_multiplier_changed.emit()
-
     # ---------------------------------------------------------------------------
     # Screens getters
     def get_info(self):
@@ -3671,9 +3640,6 @@ class zynthian_gui(QObject):
 
     def get_sketchpad_downloader(self):
         return self.screens["sketchpad_downloader"]
-
-    def get_guioptions(self):
-        return self.screens["guioptions"]
 
     def test_touchpoints(self):
         return self.screens["test_touchpoints"]
@@ -4330,7 +4296,6 @@ class zynthian_gui(QObject):
     forced_screen_back_changed = Signal()
     run_start_metronome_and_playback = Signal()
     run_stop_metronome_and_playback = Signal()
-    encoder_list_speed_multiplier_changed = Signal()
     displayMainWindow = Signal()
     displayRecordingPopup = Signal()
     openLeftSidebar = Signal()
@@ -4382,14 +4347,9 @@ class zynthian_gui(QObject):
     )
 
     graineratorEnabled = Property(bool, get_grainerator_enabled, constant=True)
-
     is_loading = Property(bool, get_is_loading, notify=is_loading_changed)
-
     home_screen = Property(str, get_home_screen, set_home_screen, notify=home_screen_changed)
-
     active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
-
-    encoder_list_speed_multiplier = Property(int, get_encoder_list_speed_multiplier, set_encoder_list_speed_multiplier, notify = encoder_list_speed_multiplier_changed)
 
     def get_forced_screen_back(self):
         return self.__forced_screen_back
@@ -4457,7 +4417,6 @@ class zynthian_gui(QObject):
     soundset_downloader = Property(QObject, get_soundset_downloader, constant=True)
     sequence_downloader = Property(QObject, get_sequence_downloader, constant=True)
     sketchpad_downloader = Property(QObject, get_sketchpad_downloader, constant=True)
-    guioptions = Property(QObject, get_guioptions, constant=True)
 
 # ------------------------------------------------------------------------------
 # Reparent Top Window using GTK XEmbed protocol features

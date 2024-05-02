@@ -27,7 +27,6 @@ __all__ = [
     "zynthian_gui_audio_recorder",
     "zynthian_gui_autoeq",
     "zynthian_gui_session_dashboard",
-    "zynthian_gui_guioptions",
     "zynthian_gui_test_knobs",
 #    "zynthian_gui_osc_browser"
     "zynthian_osd"
@@ -60,7 +59,6 @@ from zynqtgui.zynthian_gui_confirm import zynthian_gui_confirm
 from zynqtgui.zynthian_gui_main import zynthian_gui_main
 from zynqtgui.zynthian_gui_audio_recorder import zynthian_gui_audio_recorder
 from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq
-from zynqtgui.zynthian_gui_guioptions import zynthian_gui_guioptions
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
 #from zynqtgui.zynthian_gui_osc_browser import zynthian_gui_osc_browser

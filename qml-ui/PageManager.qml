@@ -64,7 +64,6 @@ Zynthian.Stack {
         "sequence_downloader": "SequenceDownloaderPage.qml",
         "sketchpad_downloader": "SketchpadDownloaderPage.qml",
         "network_info": "NetworkInfoPage.qml",
-        "guioptions" : "GuiOptionsPage.qml",
         "sound_categories": "SoundCategories/Main.qml",
         "wifi_settings":"WifiSettingsPage.qml",
         "test_knobs":"TestKnobsPage.qml"

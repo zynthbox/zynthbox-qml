@@ -592,6 +592,19 @@ class zynthian_gui(QObject):
         self.__knob_values_default = [10000, 10000, 10000, 10000]
         self.__knob_values = [10000, 10000, 10000, 10000]
 
+        # Create Global FX Settings
+        self.global_fx_settings = QSettings()
+        self.global_fx_settings.beginGroup("GlobalFX")
+        if self.global_fx_settings.value("delay_engine_name", None) is None:
+            self.global_fx_settings.setValue("delay_engine_name", "JV/Gxdigital_delay_st")
+        if self.global_fx_settings.value("delay_level_controller_name", None) is None:
+            self.global_fx_settings.setValue("delay_level_controller_name", "LEVEL")
+        if self.global_fx_settings.value("reverb_engine_name", None) is None:
+            self.global_fx_settings.setValue("reverb_engine_name", "JV/TAP Reverberator")
+        if self.global_fx_settings.value("reverb_level_controller_name", None) is None:
+            self.global_fx_settings.setValue("reverb_level_controller_name", "wetlevel")
+        self.global_fx_settings.endGroup()
+
         self.knobDeltaChanged.connect(self.knobDeltaCuiaEmitter, Qt.QueuedConnection)
 
         # This variable will decide if zyncoder_read should be called or not depending on whether
@@ -1019,10 +1032,12 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
-        delay_engine_name = "JV/Gxdigital_delay_st"
-        delay_level_controller_name = "LEVEL"
-        reverb_engine_name = "JV/TAP Reverberator"
-        reverb_level_controller_name = "wetlevel"
+        self.global_fx_settings.beginGroup("GlobalFX")
+        delay_engine_name = self.global_fx_settings.value("delay_engine_name")
+        delay_level_controller_name = self.global_fx_settings.value("delay_level_controller_name")
+        reverb_engine_name = self.global_fx_settings.value("reverb_engine_name")
+        reverb_level_controller_name = self.global_fx_settings.value("reverb_level_controller_name")
+        self.global_fx_settings.endGroup()
 
         def handle_delay_change():
             if self.curlayer == self.global_fx_engines[0][2]:
@@ -4559,6 +4574,9 @@ if __name__ == "__main__":
         logging.error(f"Error updating libzynthbox Settings.xml : {str(e)}")
 
     ###
+
+    QGuiApplication.setOrganizationName("zynthbox")
+    QGuiApplication.setApplicationName("zynthbox-qml")
 
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()

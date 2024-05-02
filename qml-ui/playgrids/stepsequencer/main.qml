@@ -370,12 +370,18 @@ Zynthian.BasePlayGrid {
         }
 
         readonly property var noteLengthNames: {
-            1: "1/4th",
-            2: "1/8th",
-            3: "1/16th",
-            4: "1/32th",
-            5: "1/64th",
-            6: "1/128th"
+            "-1": "1",
+            "0": "1/2",
+            "1": "1/4th",
+            "8": "1/6th",
+            "2": "1/8th",
+            "7": "1/12th",
+            "3": "1/16th",
+            "9": "1/24th",
+            "4": "1/32th",
+            "10": "148th",
+            "5": "1/64th",
+            "6": "1/128th"
         }
         /**
          * \brief Copy the range from startRow to endRow (inclusive) from model into the clipboard
@@ -1369,31 +1375,51 @@ Zynthian.BasePlayGrid {
                                 ColumnLayout {
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: _private.noteLength < 6
+                                        enabled: noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString()) < noteLengthLabel.availableNoteLengths.length - 1
                                         onClicked: {
-                                            if (_private.noteLength < 6){
-                                                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", _private.noteLength + 1);
+                                            let currentIndex = noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString());
+                                            if (currentIndex < noteLengthLabel.availableNoteLengths.length - 1) {
+                                                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", noteLengthLabel.availableNoteLengths[currentIndex + 1]);
                                             }
                                         }
                                     }
                                     QQC2.Label {
                                         id:noteLengthLabel
+                                        property var availableNoteLengths: ["-1", "0", "1", "8", "2", "7", "3", "9", "4", "10", "5", "6"]
                                         Layout.alignment: Qt.AlignHCenter
                                         horizontalAlignment: Text.AlignHCenter
                                         text: {
                                             var text = "speed:\n"
                                             switch(_private.noteLength) {
+                                                case -1:
+                                                    text += "1/16";
+                                                    break;
+                                                case 0:
+                                                    text += "1/8";
+                                                    break;
                                                 case 1:
-                                                    text += "quarter";
+                                                    text += "1/4";
+                                                    break;
+                                                case 8:
+                                                    text += "1/3";
                                                     break;
                                                 case 2:
-                                                    text += "half";
+                                                    text += "1/2";
+                                                    break;
+                                                case 7:
+                                                    text += "3/4";
                                                     break;
                                                 case 3:
                                                     text += "normal";
                                                     break;
+                                                case 9:
+                                                    text += "5/4";
+                                                    break;
                                                 case 4:
                                                     text += "double";
+                                                    break;
+                                                case 10:
+                                                    text += "triple"
                                                     break;
                                                 case 5:
                                                     text += "quadruple";
@@ -1408,10 +1434,11 @@ Zynthian.BasePlayGrid {
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: _private.noteLength > 1
+                                        enabled: noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString()) > 0
                                         onClicked: {
-                                            if (_private.noteLength > 1){
-                                                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", _private.noteLength - 1)
+                                            let currentIndex = noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString());
+                                            if (currentIndex > 0) {
+                                                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", noteLengthLabel.availableNoteLengths[currentIndex - 1]);
                                             }
                                         }
                                     }

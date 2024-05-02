@@ -315,9 +315,9 @@ ColumnLayout {
         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
         QQC2.Label {
             id: noteHeaderLabel
-            Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            Layout.minimumWidth: applicationWindow().width * 0.25
+            Layout.maximumWidth: Layout.minimumWidth
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
             text: "Note"
@@ -526,9 +526,9 @@ ColumnLayout {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Item {
                     id: noteDelegate
-                    Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                    Layout.minimumWidth: applicationWindow().width * 0.25
+                    Layout.maximumWidth: Layout.minimumWidth
                     MultiPointTouchArea {
                         anchors.fill: parent
                         touchPoints: [

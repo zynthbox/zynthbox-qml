@@ -122,14 +122,14 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "SELECT_UP":
-                    if (zynqtgui.altButtonPressed) {
+                    if (zynqtgui.altButtonPressed || zynqtgui.modeButtonPressed) {
                         _private.octaveUp();
                     } else {
                         _private.nextBar();
                     }
                     break;
                 case "SELECT_DOWN":
-                    if (zynqtgui.altButtonPressed) {
+                    if (zynqtgui.altButtonPressed || zynqtgui.modeButtonPressed) {
                         _private.octaveDown();
                     } else {
                         _private.previousBar();
@@ -339,19 +339,33 @@ Zynthian.BasePlayGrid {
         }
 
         function octaveUp() {
-            // Don't scroll past the end
-            if (_private.activePatternModel.gridModelStartNote < 112) {
-                // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
-                _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote + 4;
-                _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+            let numberOfMoves = 1;
+            if (zynqtgui.modeButtonPressed) {
+                numberOfMoves = 3;
+                zynqtgui.ignoreNextModeButtonPress = true;
+            }
+            for (let moveNumber = 0; moveNumber < numberOfMoves; ++moveNumber) {
+                // Don't scroll past the end
+                if (_private.activePatternModel.gridModelStartNote < 112) {
+                    // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
+                    _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote + 4;
+                    _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+                }
             }
         }
         function octaveDown() {
-            // Don't scroll past the end
-            if (_private.activePatternModel.gridModelStartNote > 0) {
-                // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
-                _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote - 4;
-                _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+            let numberOfMoves = 1;
+            if (zynqtgui.modeButtonPressed) {
+                numberOfMoves = 3;
+                zynqtgui.ignoreNextModeButtonPress = true;
+            }
+            for (let moveNumber = 0; moveNumber < numberOfMoves; ++moveNumber) {
+                // Don't scroll past the end
+                if (_private.activePatternModel.gridModelStartNote > 0) {
+                    // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
+                    _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote - 4;
+                    _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+                }
             }
         }
 
@@ -2294,7 +2308,7 @@ Zynthian.BasePlayGrid {
                 }
 
                 QQC2.Label {
-                    text: "Octave"
+                    text: "Note Grid"
                     Layout.alignment: Qt.AlignHCenter
                 }
 

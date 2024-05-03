@@ -1207,6 +1207,8 @@ Zynthian.BasePlayGrid {
                                 activeBar:_private.activeBar
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
+                                opacity: padNoteNumber < _private.activePatternModel.patternLength ? 1 : 0.3
+                                enabled: opacity === 1
                                 note: visible && _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
                                 isCurrent: visible && model.index == drumPadRepeater.selectedIndex
                                 function setSelected(subNoteIndex) {
@@ -1321,58 +1323,9 @@ Zynthian.BasePlayGrid {
                             RowLayout {
                                 anchors.fill: parent
 
-//                                 ColumnLayout {
-//                                     Layout.fillHeight: true
-//                                     Zynthian.PlayGridButton {
-//                                         text: "TRIG"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination
-//                                         onClicked: {
-//                                             if (checked) {
-//                                                 _private.associatedChannel.channelAudioType = "external";
-//                                             } else {
-//                                                 _private.associatedChannel.channelAudioType = "sample-trig";
-//                                             }
-//                                         }
-//                                     }
-//                                     Zynthian.PlayGridButton {
-//                                         text: "SYNTH"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SynthDestination
-//                                         onClicked: {
-//                                             if (checked) {
-//                                                 _private.associatedChannel.channelAudioType = "external";
-//                                             } else {
-//                                                 _private.associatedChannel.channelAudioType = "synth";
-//                                             }
-//                                         }
-//                                     }
-//                                 }
-//                                 ColumnLayout {
-//                                     Layout.fillHeight: true
-//                                     Zynthian.PlayGridButton {
-//                                         text: "SLICE"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination
-//                                         onClicked: {
-//                                             if (checked) {
-//                                                 _private.associatedChannel.channelAudioType = "external";
-//                                             } else {
-//                                                 _private.associatedChannel.channelAudioType = "sample-slice";
-//                                             }
-//                                         }
-//                                     }
-//                                     Zynthian.PlayGridButton {
-//                                         text: "LOOP"
-//                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
-//                                         onClicked: {
-//                                             if (checked) {
-//                                                 _private.associatedChannel.channelAudioType = "external";
-//                                             } else {
-//                                                 _private.associatedChannel.channelAudioType = "sample-loop";
-//                                             }
-//                                         }
-//                                     }
-//                                 }
-
                                 ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width / 6
                                     Zynthian.PlayGridButton {
                                         text: "+"
                                         enabled: noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString()) < noteLengthLabel.availableNoteLengths.length - 1
@@ -1445,6 +1398,8 @@ Zynthian.BasePlayGrid {
                                 }
 
                                 ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width / 6
                                     Zynthian.PlayGridButton {
                                         text: "+"
                                         enabled: _private.swing < 99
@@ -1503,29 +1458,77 @@ Zynthian.BasePlayGrid {
                                 }
 
                                 ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width / 6
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: _private.availableBars < 8
+                                        enabled: _private.activePatternModel && _private.activePatternModel.patternLength < (_private.activePatternModel.bankLength * _private.activePatternModel.width)
                                         onClicked: {
-                                            _private.sequence.setPatternProperty(_private.activePattern, "availableBars", _private.availableBars + 1)
+                                            if (zynqtgui.modeButtonPressed) {
+                                                zynqtgui.ignoreNextModeButtonPress = true;
+                                                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + 1);
+                                            } else {
+                                                if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
+                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + _private.activePatternModel.width);
+                                                } else {
+                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.availableBars * _private.activePatternModel.width);
+                                                }
+                                            }
                                         }
                                     }
                                     QQC2.Label {
                                         Layout.alignment: Qt.AlignHCenter
                                         Layout.preferredHeight: noteLengthLabel.height
-                                        text: _private.availableBars + " Bars"
+                                        text: _private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength
+                                            ? _private.activePatternModel.availableBars + " Bars"
+                                            : "%1.%2 Bars".arg(_private.activePatternModel.availableBars - 1).arg(_private.activePatternModel.patternLength - ((_private.activePatternModel.availableBars - 1) * _private.activePatternModel.width))
+                                        MultiPointTouchArea {
+                                            anchors.fill: parent
+                                            touchPoints: [
+                                                TouchPoint {
+                                                    id: patternLengthSlidePoint;
+                                                    property double increment: 1
+                                                    property double slideIncrement: 0.2
+                                                    property double upperBound: _private.activePatternModel.bankLength * _private.activePatternModel.width
+                                                    property double lowerBound: 1
+                                                    property var currentValue: undefined
+                                                    onPressedChanged: {
+                                                        if (pressed) {
+                                                            currentValue = _private.activePatternModel.patternLength;
+                                                        }
+                                                    }
+                                                    onYChanged: {
+                                                        if (pressed && currentValue !== undefined) {
+                                                            var delta = -(patternLengthSlidePoint.y - patternLengthSlidePoint.startY) * patternLengthSlidePoint.slideIncrement;
+                                                            _private.sequence.setPatternProperty(_private.activePattern, "patternLength", Math.min(Math.max(currentValue + delta, patternLengthSlidePoint.lowerBound), patternLengthSlidePoint.upperBound))
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
                                     }
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: _private.availableBars > 1
+                                        enabled: _private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width
                                         onClicked: {
-                                            _private.sequence.setPatternProperty(_private.activePattern, "availableBars", _private.availableBars - 1);
+                                            if (zynqtgui.modeButtonPressed) {
+                                                zynqtgui.ignoreNextModeButtonPress = true;
+                                                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - 1);
+                                            } else {
+                                                if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
+                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - _private.activePatternModel.width);
+                                                } else {
+                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", (_private.activePatternModel.availableBars - 1) * _private.activePatternModel.width);
+                                                }
+                                            }
                                         }
                                     }
                                 }
 
                                 Zynthian.PlayGridButton {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width / 6
                                     text: "copy\n"
                                     onClicked: {
                                         _private.copyRange(
@@ -1538,6 +1541,8 @@ Zynthian.BasePlayGrid {
                                 }
 
                                 Zynthian.PlayGridButton {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width / 6
                                     text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
                                     enabled: _private.clipBoard !== undefined
                                     onClicked: {
@@ -1546,6 +1551,8 @@ Zynthian.BasePlayGrid {
                                 }
 
                                 Zynthian.PlayGridButton {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width / 6
                                     text: "clear\n"
                                     onClicked: {
                                         _private.activeBarModel.parentModel.clearRow(_private.activeBar + _private.bankOffset);

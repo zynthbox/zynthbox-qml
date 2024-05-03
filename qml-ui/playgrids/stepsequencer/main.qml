@@ -369,6 +369,58 @@ Zynthian.BasePlayGrid {
             }
         }
 
+        property var availableNoteLengths: ["-1", "0", "1", "8", "2", "7", "3", "9", "4", "10", "5", "6"]
+        function noteLengthUp() {
+            let currentIndex = _private.availableNoteLengths.indexOf(_private.noteLength.toString());
+            if (currentIndex < _private.availableNoteLengths.length - 1) {
+                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", _private.availableNoteLengths[currentIndex + 1]);
+            }
+        }
+        function noteLengthDown() {
+            let currentIndex = _private.availableNoteLengths.indexOf(_private.noteLength.toString());
+            if (currentIndex > 0) {
+                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", _private.availableNoteLengths[currentIndex - 1]);
+            }
+        }
+        function swingUp() {
+            if (_private.swing < 99) {
+                _private.sequence.setPatternProperty(_private.activePattern, "swing", _private.swing + 1)
+            }
+        }
+        function swingDown() {
+            if (_private.swing > 1) {
+                _private.sequence.setPatternProperty(_private.activePattern, "swing", _private.swing - 1);
+            }
+        }
+        function patternLengthUp() {
+            if (_private.activePatternModel && _private.activePatternModel.patternLength < (_private.activePatternModel.bankLength * _private.activePatternModel.width)) {
+                if (zynqtgui.modeButtonPressed) {
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + 1);
+                } else {
+                    if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + _private.activePatternModel.width);
+                    } else {
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.availableBars * _private.activePatternModel.width);
+                    }
+                }
+            }
+        }
+        function patternLengthDown() {
+            if (_private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width) {
+                if (zynqtgui.modeButtonPressed) {
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - 1);
+                } else {
+                    if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - _private.activePatternModel.width);
+                    } else {
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", (_private.activePatternModel.availableBars - 1) * _private.activePatternModel.width);
+                    }
+                }
+            }
+        }
+
         readonly property var noteLengthNames: {
             "-1": "1",
             "0": "1/2",
@@ -688,87 +740,111 @@ Zynthian.BasePlayGrid {
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
                         onKnob0Up: {
-                            switch (drumPad.parameterPageIndex) {
-                                case 2:
-                                    drumPadRepeater.ratchetStyleUp();
-                                    break;
-                                case 1:
-                                    drumPadRepeater.probabilityUp();
-                                    break;
-                                case 0:
-                                default:
-                                    drumPadRepeater.velocityUp();
-                                    break;
+                            if (component.showPatternSettings) {
+                                _private.noteLengthUp();
+                            } else {
+                                switch (drumPad.parameterPageIndex) {
+                                    case 2:
+                                        drumPadRepeater.ratchetStyleUp();
+                                        break;
+                                    case 1:
+                                        drumPadRepeater.probabilityUp();
+                                        break;
+                                    case 0:
+                                    default:
+                                        drumPadRepeater.velocityUp();
+                                        break;
+                                }
                             }
                         }
                         onKnob0Down: {
-                            switch (drumPad.parameterPageIndex) {
-                                case 2:
-                                    drumPadRepeater.ratchetStyleDown();
-                                    break;
-                                case 1:
-                                    drumPadRepeater.probabilityDown();
-                                    break;
-                                case 0:
-                                default:
-                                    drumPadRepeater.velocityDown();
-                                    break;
+                            if (component.showPatternSettings) {
+                                _private.noteLengthDown();
+                            } else {
+                                switch (drumPad.parameterPageIndex) {
+                                    case 2:
+                                        drumPadRepeater.ratchetStyleDown();
+                                        break;
+                                    case 1:
+                                        drumPadRepeater.probabilityDown();
+                                        break;
+                                    case 0:
+                                    default:
+                                        drumPadRepeater.velocityDown();
+                                        break;
+                                }
                             }
                         }
                         onKnob1Up: {
-                            switch (drumPad.parameterPageIndex) {
-                                case 2:
-                                    drumPadRepeater.ratchetCountUp();
-                                    break;
-                                case 1:
-                                    // drumPadRepeater.
-                                    break;
-                                case 0:
-                                default:
-                                    drumPadRepeater.durationUp();
-                                    break;
+                            if (component.showPatternSettings) {
+                                _private.swingUp();
+                            } else {
+                                switch (drumPad.parameterPageIndex) {
+                                    case 2:
+                                        drumPadRepeater.ratchetCountUp();
+                                        break;
+                                    case 1:
+                                        // drumPadRepeater.
+                                        break;
+                                    case 0:
+                                    default:
+                                        drumPadRepeater.durationUp();
+                                        break;
+                                }
                             }
                         }
                         onKnob1Down: {
-                            switch (drumPad.parameterPageIndex) {
-                                case 2:
-                                    drumPadRepeater.ratchetCountDown();
-                                    break;
-                                case 1:
-                                    // drumPadRepeater.
-                                    break;
-                                case 0:
-                                default:
-                                    drumPadRepeater.durationDown();
-                                    break;
+                            if (component.showPatternSettings) {
+                                _private.swingDown();
+                            } else {
+                                switch (drumPad.parameterPageIndex) {
+                                    case 2:
+                                        drumPadRepeater.ratchetCountDown();
+                                        break;
+                                    case 1:
+                                        // drumPadRepeater.
+                                        break;
+                                    case 0:
+                                    default:
+                                        drumPadRepeater.durationDown();
+                                        break;
+                                }
                             }
                         }
                         onKnob2Up: {
-                            switch (drumPad.parameterPageIndex) {
-                                case 2:
-                                    drumPadRepeater.ratchetProbabilityUp();
-                                    break;
-                                case 1:
-                                    drumPadRepeater.nextStepUp();
-                                    break;
-                                case 0:
-                                default:
-                                    drumPadRepeater.delayUp();
-                                    break;
+                            if (component.showPatternSettings) {
+                                _private.patternLengthUp();
+                            } else {
+                                switch (drumPad.parameterPageIndex) {
+                                    case 2:
+                                        drumPadRepeater.ratchetProbabilityUp();
+                                        break;
+                                    case 1:
+                                        drumPadRepeater.nextStepUp();
+                                        break;
+                                    case 0:
+                                    default:
+                                        drumPadRepeater.delayUp();
+                                        break;
+                                }
                             }
                         }
                         onKnob2Down: {
-                            switch (drumPad.parameterPageIndex) {
-                                case 2:
-                                    drumPadRepeater.ratchetProbabilityDown();
-                                    break;
-                                case 1:
-                                    drumPadRepeater.nextStepDown();
-                                    break;
-                                case 0:
-                                default:
-                                    drumPadRepeater.delayDown();
-                                    break;
+                            if (component.showPatternSettings) {
+                                _private.patternLengthDown();
+                            } else {
+                                switch (drumPad.parameterPageIndex) {
+                                    case 2:
+                                        drumPadRepeater.ratchetProbabilityDown();
+                                        break;
+                                    case 1:
+                                        drumPadRepeater.nextStepDown();
+                                        break;
+                                    case 0:
+                                    default:
+                                        drumPadRepeater.delayDown();
+                                        break;
+                                }
                             }
                         }
                     }
@@ -1325,20 +1401,27 @@ Zynthian.BasePlayGrid {
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width / 6
+                                    Layout.minimumWidth: parent.width / 5
+                                    Layout.maximumWidth: Layout.minimumWidth
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString()) < noteLengthLabel.availableNoteLengths.length - 1
+                                        enabled: _private.availableNoteLengths.indexOf(_private.noteLength.toString()) < _private.availableNoteLengths.length - 1
                                         onClicked: {
-                                            let currentIndex = noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString());
-                                            if (currentIndex < noteLengthLabel.availableNoteLengths.length - 1) {
-                                                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", noteLengthLabel.availableNoteLengths[currentIndex + 1]);
+                                            _private.noteLengthUp();
+                                        }
+                                        Zynthian.KnobIndicator {
+                                            anchors {
+                                                left: parent.left
+                                                top: parent.bottom
+                                                margins: 2
                                             }
+                                            height: parent.height * 0.7
+                                            width: height
+                                            knobId: 0
                                         }
                                     }
                                     QQC2.Label {
                                         id:noteLengthLabel
-                                        property var availableNoteLengths: ["-1", "0", "1", "8", "2", "7", "3", "9", "4", "10", "5", "6"]
                                         Layout.alignment: Qt.AlignHCenter
                                         horizontalAlignment: Text.AlignHCenter
                                         text: {
@@ -1387,24 +1470,32 @@ Zynthian.BasePlayGrid {
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString()) > 0
+                                        enabled: _private.availableNoteLengths.indexOf(_private.noteLength.toString()) > 0
                                         onClicked: {
-                                            let currentIndex = noteLengthLabel.availableNoteLengths.indexOf(_private.noteLength.toString());
-                                            if (currentIndex > 0) {
-                                                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", noteLengthLabel.availableNoteLengths[currentIndex - 1]);
-                                            }
+                                            _private.noteLengthDown();
                                         }
                                     }
                                 }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width / 6
+                                    Layout.minimumWidth: parent.width / 5
+                                    Layout.maximumWidth: Layout.minimumWidth
                                     Zynthian.PlayGridButton {
                                         text: "+"
                                         enabled: _private.swing < 99
                                         onClicked: {
-                                            _private.sequence.setPatternProperty(_private.activePattern, "swing", _private.swing + 1)
+                                            _private.swingUp();
+                                        }
+                                        Zynthian.KnobIndicator {
+                                            anchors {
+                                                left: parent.left
+                                                top: parent.bottom
+                                                margins: 2
+                                            }
+                                            height: parent.height * 0.7
+                                            width: height
+                                            knobId: 1
                                         }
                                     }
                                     QQC2.Label {
@@ -1452,28 +1543,30 @@ Zynthian.BasePlayGrid {
                                         text:"-"
                                         enabled: _private.swing > 0
                                         onClicked: {
-                                            _private.sequence.setPatternProperty(_private.activePattern, "swing", _private.swing - 1);
+                                            _private.swingDown();
                                         }
                                     }
                                 }
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width / 6
+                                    Layout.minimumWidth: parent.width / 5
+                                    Layout.maximumWidth: Layout.minimumWidth
                                     Zynthian.PlayGridButton {
                                         text: "+"
                                         enabled: _private.activePatternModel && _private.activePatternModel.patternLength < (_private.activePatternModel.bankLength * _private.activePatternModel.width)
                                         onClicked: {
-                                            if (zynqtgui.modeButtonPressed) {
-                                                zynqtgui.ignoreNextModeButtonPress = true;
-                                                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + 1);
-                                            } else {
-                                                if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
-                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + _private.activePatternModel.width);
-                                                } else {
-                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.availableBars * _private.activePatternModel.width);
-                                                }
+                                            _private.patternLengthUp();
+                                        }
+                                        Zynthian.KnobIndicator {
+                                            anchors {
+                                                left: parent.left
+                                                top: parent.bottom
+                                                margins: 2
                                             }
+                                            height: parent.height * 0.7
+                                            width: height
+                                            knobId: 2
                                         }
                                     }
                                     QQC2.Label {
@@ -1512,23 +1605,13 @@ Zynthian.BasePlayGrid {
                                         text:"-"
                                         enabled: _private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width
                                         onClicked: {
-                                            if (zynqtgui.modeButtonPressed) {
-                                                zynqtgui.ignoreNextModeButtonPress = true;
-                                                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - 1);
-                                            } else {
-                                                if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
-                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - _private.activePatternModel.width);
-                                                } else {
-                                                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", (_private.activePatternModel.availableBars - 1) * _private.activePatternModel.width);
-                                                }
-                                            }
+                                            _private.patternLengthDown();
                                         }
                                     }
                                 }
 
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width / 6
                                     text: "copy\n"
                                     onClicked: {
                                         _private.copyRange(
@@ -1542,7 +1625,6 @@ Zynthian.BasePlayGrid {
 
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width / 6
                                     text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
                                     enabled: _private.clipBoard !== undefined
                                     onClicked: {
@@ -1552,7 +1634,6 @@ Zynthian.BasePlayGrid {
 
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
-                                    Layout.preferredWidth: parent.width / 6
                                     text: "clear\n"
                                     onClicked: {
                                         _private.activeBarModel.parentModel.clearRow(_private.activeBar + _private.bankOffset);

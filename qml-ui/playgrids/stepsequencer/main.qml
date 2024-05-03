@@ -407,11 +407,11 @@ Zynthian.BasePlayGrid {
             }
         }
         function patternLengthDown() {
-            if (_private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width) {
-                if (zynqtgui.modeButtonPressed) {
-                    zynqtgui.ignoreNextModeButtonPress = true;
-                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - 1);
-                } else {
+            if (zynqtgui.modeButtonPressed) {
+                zynqtgui.ignoreNextModeButtonPress = true;
+                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - 1);
+            } else {
+                if (_private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width) {
                     if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
                         _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - _private.activePatternModel.width);
                     } else {

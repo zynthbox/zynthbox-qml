@@ -560,12 +560,14 @@ class zynthian_gui_controller(QObject):
         return self.__zctrl
     def setZctrl(self,zctrl):
         if self.__zctrl != zctrl:
+            # FIXME : Temporarily disable syncing zctrl value until a fix is found as it is causing rapid random value changes
             if self.__zctrl:
-                try:
-                    self.__zctrl.value_changed.disconnect(self.updateValueFromZctrl)
-                except: pass
+                pass
+                # try:
+                #     self.__zctrl.value_changed.disconnect(self.updateValueFromZctrl)
+                # except: pass
             self.__zctrl = zctrl
-            self.__zctrl.value_changed.connect(self.updateValueFromZctrl)
+            # self.__zctrl.value_changed.connect(self.updateValueFromZctrl)
             self.zctrlChanged.emit()
     zctrlChanged = Signal()
     zctrl = Property(QObject,getZctrl,setZctrl,notify=zctrlChanged)

@@ -555,19 +555,21 @@ class zynthian_gui_controller(QObject):
 
     @Slot(None)
     def updateValueFromZctrl(self):
-        self.zctrl_sync(False)
+        # Sync zctrl only if it is a engine controller
+        # If a zctrl which is being used to control knob is synced, it is causing random rapid value changes
+        # which in turn causes abrupt value changes when knobs are turned
+        if self.is_engine_controller:
+            self.zctrl_sync(True)
     def getZctrl(self):
         return self.__zctrl
     def setZctrl(self,zctrl):
         if self.__zctrl != zctrl:
-            # FIXME : Temporarily disable syncing zctrl value until a fix is found as it is causing rapid random value changes
             if self.__zctrl:
-                pass
-                # try:
-                #     self.__zctrl.value_changed.disconnect(self.updateValueFromZctrl)
-                # except: pass
+                try:
+                    self.__zctrl.value_changed.disconnect(self.updateValueFromZctrl)
+                except: pass
             self.__zctrl = zctrl
-            # self.__zctrl.value_changed.connect(self.updateValueFromZctrl)
+            self.__zctrl.value_changed.connect(self.updateValueFromZctrl)
             self.zctrlChanged.emit()
     zctrlChanged = Signal()
     zctrl = Property(QObject,getZctrl,setZctrl,notify=zctrlChanged)

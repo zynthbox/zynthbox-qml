@@ -108,18 +108,20 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB0_TOUCHED":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
-                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
-                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
-                        pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
-                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
-                        pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                if (!applicationWindow().osd.opened) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (root.selectedChannel.channelAudioType == "synth") {
+                            pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
+                        } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                        } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                        }
+                        returnValue = true;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                        returnValue = true;
                     }
-                    returnValue = true;
-                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, zynqtgui.sketchpad.lastSelectedObj.value)
-                    returnValue = true;
                 }
                 break;
             case "KNOB0_RELEASED":
@@ -162,14 +164,16 @@ Rectangle {
                 }
                 break;
             case "KNOB1_TOUCHED":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
-                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                if (!applicationWindow().osd.opened) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (root.selectedChannel.channelAudioType == "synth") {
+                            pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                        }
+                        returnValue = true;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        // Do nothing
+                        returnValue = true;
                     }
-                    returnValue = true;
-                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                    // Do nothing
-                    returnValue = true;
                 }
                 break;
             case "KNOB1_RELEASED":
@@ -204,14 +208,16 @@ Rectangle {
                 }
                 break;
             case "KNOB2_TOUCHED":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
-                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                if (!applicationWindow().osd.opened) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (root.selectedChannel.channelAudioType == "synth") {
+                            pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                        }
+                        returnValue = true;
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        // Do nothing
+                        returnValue = true;
                     }
-                    returnValue = true;
-                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                    // Do nothing
-                    returnValue = true;
                 }
                 break;
             case "KNOB2_RELEASED":

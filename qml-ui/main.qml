@@ -41,6 +41,7 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item currentPage: pageStack.currentItem
     readonly property Item playGrids: playGridsRepeater
     readonly property QtObject virtualKeyboard: virtualKeyboardLoader.item
+    readonly property QtObject osd: osd
 
     property bool headerVisible: true
     property var channels: [
@@ -1673,7 +1674,9 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    Zynthian.OnScreenDisplay { }
+    Zynthian.OnScreenDisplay {
+        id: osd
+    }
 
     Zynthian.Popup {
         id: messageDialog

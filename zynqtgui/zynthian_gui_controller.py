@@ -558,6 +558,7 @@ class zynthian_gui_controller(QObject):
         # Sync zctrl only if it is a engine controller
         # If a zctrl which is being used to control knob is synced, it is causing random rapid value changes
         # which in turn causes abrupt value changes when knobs are turned
+        # FIXME : Find a proper solution for the issue : Why is set_value being called multiple times when zctrl_sync is called for knob related zctrls?
         if self.is_engine_controller:
             self.zctrl_sync(True)
     def getZctrl(self):

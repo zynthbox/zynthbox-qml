@@ -1841,19 +1841,22 @@ Zynthian.BasePlayGrid {
                                                     }
                                                     Connections {
                                                         target: patternsMenuItem.associatedChannel
-                                                        onChainedSoundsChanged: updateSoundNameTimer.restart();
+                                                        onChainedSoundsNamesChanged: updateSoundNameTimer.restart();
                                                         onConnectedSoundChanged: updateSoundNameTimer.restart();
                                                     }
                                                     function updateSoundName() {
                                                         var text = "";
 
                                                         if (patternsMenuItem.associatedChannel) {
-                                                            for (var id in patternsMenuItem.associatedChannel.chainedSounds) {
-                                                                if (patternsMenuItem.associatedChannel.chainedSounds[id] >= 0 &&
-                                                                    patternsMenuItem.associatedChannel.checkIfLayerExists(patternsMenuItem.associatedChannel.chainedSounds[id])) {
-                                                                    text = zynqtgui.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.associatedChannel.chainedSounds[id]);
-                                                                    break;
+                                                            let soundNames = patternsMenuItem.associatedChannel.chainedSoundsNames;
+                                                            let theNames = [];
+                                                            for (let index = 0; index < soundNames.length; ++index) {
+                                                                if (soundNames[index] !== "") {
+                                                                    theNames.push(soundNames[index]);
                                                                 }
+                                                            }
+                                                            if (theNames.length > 0) {
+                                                                text = theNames.join(",");
                                                             }
                                                         }
 

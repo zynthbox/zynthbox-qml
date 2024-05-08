@@ -138,17 +138,8 @@ ColumnLayout {
 
     readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
     property int stepDuration: component.patternModel ? (component.patternModel.stepLength / patternSubbeatToTickMultiplier) : 0
-    // This is going to come back to haunt us - if we don't somehow tell the user the difference between a quantised note and one set to what happens to be the current note length... that will be an issue
-    property var noteLengthNames: {
-        96: "1/4 (auto)",
-        48: "1/8 (auto)",
-        24: "1/16 (auto)",
-        12: "1/32 (auto)",
-        6: "1/64 (auto)",
-        3: "1/128 (auto)"
-    }
     property string stepDurationName: component.patternModel
-        ? noteLengthNames.indexOf(component.patternModel.stepLength) > -1 ? noteLengthNames[component.patternModel.stepLength] : component.patternModel.stepLengthName(component.patternModel.stepLength)
+        ? "%1 (auto)".arg(component.patternModel.stepLengthName(component.patternModel.stepLength))
         : ""
 
     readonly property int parameterPageCount: 3

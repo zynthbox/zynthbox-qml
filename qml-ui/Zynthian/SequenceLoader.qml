@@ -428,7 +428,7 @@ Item {
             property int targetPartIndex: -1
             property var soundInfo: patternObject.layerData.length > 0 ? zynqtgui.layer.sound_metadata_from_json(patternObject.layerData) : [];
             Component.onCompleted: {
-                targetTrackIndex = zynqtgui.session_dashboard.selectedChannel;
+                targetTrackIndex = zynqtgui.sketchpad.selectedTrackId;
                 targetPartIndex = parent.singlePatternImport ? targetTrack.selectedPart : model.index;
             }
             RowLayout {

@@ -38,7 +38,7 @@ Zynthian.Popup {
     function bounce(trackName, channel, partIndex) {
         _private.trackName = trackName;
         if (channel === null) {
-            _private.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+            _private.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
         } else {
             _private.selectedChannel = channel;
         }

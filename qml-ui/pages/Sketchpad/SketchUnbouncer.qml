@@ -129,7 +129,7 @@ Zynthian.DialogQuestion {
                         _private.channel.audioRoutingStyle = _private.clip.metadataRoutingStyle;
                     }
                     // In case we unbounced to a different sketchpad track, switch to that one
-                    zynqtgui.session_dashboard.selectedChannel = _private.channel.id;
+                    zynqtgui.sketchpad.selectedTrackId = _private.channel.id;
                     // Similarly, if we unbounced to another slot, update the current one there as well
                     _private.channel.selectedPart = _private.slot;
                     // Since we unbounced the thing, we should disable that in favour of the newly unbounced thing

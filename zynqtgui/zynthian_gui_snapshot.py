@@ -238,23 +238,18 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
             if fpath=='NEW_SNAPSHOT':
                 fpath=self.get_snapshot_fpath(self.get_new_snapshot())
                 self.zynqtgui.screens['layer'].save_snapshot(fpath)
-                self.zynqtgui.show_screen("session_dashboard")
             elif fpath:
                 if isfile(fpath):
                     self.zynqtgui.show_confirm("Do you really want to overwrite the snapshot %s?" % fname, self.cb_confirm_save_snapshot,[fpath])
                 else:
                     self.zynqtgui.screens['layer'].save_snapshot(fpath)
-                    self.zynqtgui.show_screen("session_dashboard")
 
 
     def cb_confirm_save_snapshot(self, params):
         self.zynqtgui.screens['layer'].save_snapshot(params[0])
-        self.zynqtgui.show_screen("session_dashboard")
-
 
     def save_default_snapshot(self):
         self.zynqtgui.screens['layer'].save_snapshot(self.default_snapshot_fpath)
-
 
     def load_default_snapshot(self, quiet=False):
         if isfile(self.default_snapshot_fpath):

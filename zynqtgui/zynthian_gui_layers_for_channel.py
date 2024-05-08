@@ -42,7 +42,6 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
         super(zynthian_gui_layers_for_channel, self).__init__('ChannelLayers', parent)
         self.__total_chains = 5
         self.__volume_controllers = []
-        # self.zynqtgui.screens['session_dashboard'].selected_channel_changed.connect(self.update_channel_sounds)
         self.zynqtgui.screens['layer'].layer_deleted.connect(self.update_channel_sounds)
 
     def fill_list(self):
@@ -53,7 +52,7 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
             song = self.zynqtgui.screens['sketchpad'].song
 
             if song is not None:
-                selected_channel = song.channelsModel.getChannel(self.zynqtgui.screens['session_dashboard'].selectedChannel)
+                selected_channel = song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
                 chain = selected_channel.get_chained_sounds()
                 empty_channels_needed = 0
                 used_empty_channels = []
@@ -139,7 +138,7 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
     def do_activate_midich_layer(self):
         song = self.zynqtgui.screens["sketchpad"].song
         if song is not None and song.channelsModel is not None:
-            channel = song.channelsModel.getChannel(self.zynqtgui.screens['session_dashboard'].get_selected_channel())
+            channel = song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             if channel is not None:
                 logging.debug(f"Update Channel Sounds : {channel.connectedSound}")
                 if channel.connectedSound >= 0:

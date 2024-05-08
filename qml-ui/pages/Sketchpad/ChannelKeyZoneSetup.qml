@@ -134,12 +134,12 @@ Zynthian.DialogQuestion {
             id: keyZoneSetupSelectedChannelThrottle
             interval: 1; running: false; repeat: false;
             onTriggered: {
-                component.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel) : null;
+                component.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null;
             }
         }
         Connections {
-            target: zynqtgui.session_dashboard
-            onSelected_channel_changed: keyZoneSetupSelectedChannelThrottle.restart()
+            target: zynqtgui.sketchpad
+            onSelected_track_id_changed: keyZoneSetupSelectedChannelThrottle.restart()
         }
         anchors {
             fill: parent

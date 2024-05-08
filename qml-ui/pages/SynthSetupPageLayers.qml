@@ -36,7 +36,7 @@ Zynthian.ScreenPage {
     id: root
     backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: zynqtgui.current_screen_id = "session_dashboard"
+        onTriggered: {}
     }
     contextualActions: [
         Kirigami.Action {

@@ -187,7 +187,7 @@ Zynthian.Popup {
                 zynqtgui.sketchpad.recordingType = "audio";
             }
             // If we're not already recording, take a snapshot of our current state, so we can keep that stable when changing settings
-            root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+            root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
             root.selectedSlotRow = root.selectedChannel.selectedSlotRow;
             // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
             _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
@@ -201,7 +201,7 @@ Zynthian.Popup {
                 zynqtgui.sketchpad.song.playChannelSolo = _private.soloChannelOnOpen;
             }
             // Restore the current track state to also match the previous state
-            zynqtgui.session_dashboard.selectedChannel = root.selectedChannel.id;
+            zynqtgui.sketchpad.selectedTrackId = root.selectedChannel.id;
             root.selectedChannel.selectedSlotRow = root.selectedSlotRow;
         }
         zynqtgui.recordingPopupActive = false
@@ -575,7 +575,7 @@ Zynthian.Popup {
                                     textPrefix: "Track "
                                     currentIndex: -1 // Current index will be set by selectedChannelChanged handler
                                     onActivated: {
-                                        zynqtgui.session_dashboard.selectedChannel = index
+                                        zynqtgui.sketchpad.selectedTrackId = index
                                     }
                                 }
                             }

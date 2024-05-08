@@ -146,7 +146,7 @@ ColumnLayout {
                         }
                         property bool performCurrentCheck: false;
                         function checkCurrent() {
-                            if (zynqtgui.session_dashboard.selectedChannel === delegate.channelIndex && delegate.channel != null && delegate.channel.selectedSlotRow === index) {
+                            if (zynqtgui.sketchpad.selectedTrackId === delegate.channelIndex && delegate.channel != null && delegate.channel.selectedSlotRow === index) {
                                 setCurrent();
                             }
                         }
@@ -162,8 +162,8 @@ ColumnLayout {
                             }
                         }
                         Connections {
-                            target: zynqtgui.session_dashboard
-                            onSelectedChannelChanged: checkCurrentTimer.restart()
+                            target: zynqtgui.sketchpad
+                            onSelected_track_id_changed: checkCurrentTimer.restart()
                         }
                         Connections {
                             target: delegate.channel
@@ -178,7 +178,7 @@ ColumnLayout {
                             }
                         }
                         onClicked: {
-                            zynqtgui.session_dashboard.selectedChannel = delegate.channelIndex;
+                            zynqtgui.sketchpad.selectedTrackId = delegate.channelIndex;
                             delegate.channel.selectedSlotRow = index;
                         }
                     }

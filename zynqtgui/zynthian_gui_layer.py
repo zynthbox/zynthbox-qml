@@ -444,7 +444,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
     def add_midichannel_to_channel(self, midich, position_in_channel = -1):
         try:
-            selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.zynqtgui.screens['session_dashboard'].selectedChannel)
+            selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             chain = selected_channel.get_chained_sounds()
             if midich not in chain:
                 if position_in_channel >= 0:
@@ -460,7 +460,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
     def remove_midichannel_from_channel(self, midich):
         try:
-            selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.zynqtgui.screens['session_dashboard'].selectedChannel)
+            selected_channel = self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             chain = selected_channel.get_chained_sounds()
             for i, el in enumerate(chain):
                 if el == midich:
@@ -491,7 +491,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     if not self.zynqtgui.screens['bank'].get_show_top_sounds():
                         self.zynqtgui.screens['bank'].select_action(0)
                 else:
-                    track_index = self.zynqtgui.session_dashboard.selectedChannel
+                    track_index = self.zynqtgui.sketchpad.selectedTrackId
                     if zyngine.type=="Audio Effect":
                         midich = 15
                         slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedFxSlotRow
@@ -565,7 +565,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 logging.exception(f"Error while trying to set preset to 0 when creating engine : {e}")
 
             def emit_sounds_changed():
-                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel).chained_sounds_changed.emit()
+                self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId).chained_sounds_changed.emit()
 
             QTimer.singleShot(500, emit_sounds_changed)
             self.zynqtgui.zynautoconnect(True)

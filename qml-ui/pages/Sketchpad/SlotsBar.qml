@@ -67,15 +67,15 @@ Rectangle {
                 return true;
 
             case "NAVIGATE_LEFT":
-                if (zynqtgui.session_dashboard.selectedChannel > 0) {
-                    zynqtgui.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.sketchpad.selectedTrackId > 0) {
+                    zynqtgui.sketchpad.selectedTrackId -= 1;
                 }
 
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynqtgui.session_dashboard.selectedChannel < 9) {
-                    zynqtgui.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.sketchpad.selectedTrackId < 9) {
+                    zynqtgui.sketchpad.selectedTrackId += 1;
                 }
 
                 return true;
@@ -463,12 +463,12 @@ Rectangle {
                                 id: channelHighlightedThrottle
                                 interval: 1; running: false; repeat: false;
                                 onTriggered: {
-                                    channelDelegate.highlighted = (index === zynqtgui.session_dashboard.selectedChannel);
+                                    channelDelegate.highlighted = (index === zynqtgui.sketchpad.selectedTrackId);
                                 }
                             }
                             Connections {
-                                target: zynqtgui.session_dashboard
-                                onSelected_channel_changed: channelHighlightedThrottle.restart()
+                                target: zynqtgui.sketchpad
+                                onSelected_track_id_changed: channelHighlightedThrottle.restart()
                             }
                             // Make sure to highlight first column correctly after booting is complete
                             Connections {
@@ -521,7 +521,7 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    if (zynqtgui.session_dashboard.selectedChannel !== channelDelegate.channelIndex ||
+                                                    if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
                                                         ((!fxButton.checked && channelDelegate.channel.selectedSlotRow !== index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow !== index))) {
                                                         channelsSlotsRow.currentIndex = index
                                                         if (fxButton.checked) {
@@ -530,7 +530,7 @@ Rectangle {
                                                             channelDelegate.channel.selectedSlotRow = index
                                                         }
 
-                                                        zynqtgui.session_dashboard.selectedChannel = channelDelegate.channelIndex;
+                                                        zynqtgui.sketchpad.selectedTrackId = channelDelegate.channelIndex;
                                                     } else {
                                                         handleItemClick()
                                                     }
@@ -601,7 +601,7 @@ Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         font.pointSize: 14
                         text: qsTr("Ch%1-Slot%2")
-                                .arg(zynqtgui.session_dashboard.selectedChannel + 1)
+                                .arg(zynqtgui.sketchpad.selectedTrackId + 1)
                                 .arg(root.selectedSlotRowItem ? root.selectedSlotRowItem.channel.selectedSlotRow + 1 : 0)
                     }
                     QQC2.Label {

@@ -191,7 +191,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     @Slot(str, str)
     def saveSound(self, filename, category):
         file_name = str(self.__my_sounds_path__ / filename)
-        track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         # Only store layers from snapshot as sounds
         snapshot = {
             'layers': self.zynqtgui.layer.generate_snapshot(track)['layers']
@@ -245,7 +245,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                 sound_json = json.load(f)
 
             if channelIndex == -1:
-                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             else:
                 channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channelIndex)
 
@@ -258,7 +258,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                     used_layers.append(i)
 
             logging.debug("### Before Removing")
-            logging.debug(f"# Selected Channel         : {self.zynqtgui.session_dashboard.selectedChannel}")
+            logging.debug(f"# Selected Channel         : {self.zynqtgui.sketchpad.selectedTrackId}")
             logging.debug(f"# Source Channels        : {source_channels}")
             logging.debug(f"# Free Layers            : {free_layers}")
             logging.debug(f"# Used Layers            : {used_layers}")
@@ -337,7 +337,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):
-        channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         suggested = ""
         try:
             # Get preset name of connectedSound

@@ -93,6 +93,5 @@ class zynthian_gui_sketchpad_copier(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(int)
     def setSketchpadSlot(self, slot):
-        self.zynqtgui.session_dashboard.setSketchpadSlot(slot, self.__add_sketchpad_path__)
         self.__add_sketchpad_path__ = ""
         self.add_sketchpad_path_changed.emit()

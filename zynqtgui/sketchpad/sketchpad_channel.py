@@ -425,7 +425,6 @@ class sketchpad_channel(QObject):
         zynqtgui = self.__song__.get_metronome_manager().zynqtgui
         if self.checkIfLayerExists(zynqtgui.active_midi_channel):
             logging.info("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
-            # zynqtgui.screens['session_dashboard'].set_selected_channel(zynqtgui.screens['session_dashboard'].selectedChannel, True)
             try:
                 zynqtgui.screens["layers_for_channel"].update_channel_sounds()
             except:
@@ -987,7 +986,6 @@ class sketchpad_channel(QObject):
         try: #can be called before creation
             zynqtgui = self.__song__.get_metronome_manager().zynqtgui
             zynqtgui.screens['fixed_layers'].fill_list() #This will update *also* layers for channel
-            # zynqtgui.screens['session_dashboard'].set_selected_channel(zynqtgui.screens['session_dashboard'].selectedChannel, True)
             zynqtgui.screens['layers_for_channel'].activate_index(0)
             zynqtgui.set_curlayer(None)
         except Exception as e:

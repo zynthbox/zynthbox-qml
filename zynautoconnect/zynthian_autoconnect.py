@@ -102,6 +102,7 @@ def get_fixed_midi_port_name(port_name):
 
 def midi_autoconnect(force=False):
     global last_hw_str
+    global force_next_autoconnect
 
     #Get Mutex Lock
     acquire_lock()
@@ -327,51 +328,57 @@ def midi_autoconnect(force=False):
     #   - sketchpadTrack:(-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9) where -1 is whatever the current is
     #   - no-input (explicitly refuse midi data)
     #   - specifically named hardware devices
-    song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
-    if song:
-        for channelId in range(0, 10):
-            channel = song.channelsModel.getChannel(channelId)
-            if channel is not None:
-                for routingData in [channel.synthRoutingData, channel.fxRoutingData]:
-                    for slotId in range(0, 5):
-                        # BEGIN Midi Routing Overrides
-                        for midiInPort in routingData[slotId].midiInPorts:
-                            if len(midiInPort.sources) > 0:
-                                # Only actually perform overriding if there are any sources defined, otherwise leave well enough alone
-                                eventPorts = []
-                                # Gather up what inputs we should be connected to
-                                for inputSource in midiInPort.sources:
-                                    if inputSource.port == "no-input":
-                                        # Just do nothing in this case
-                                        pass
-                                    elif inputSource.port.startswith("sketchpadTrack:"):
-                                        splitData = inputSource.port.split(":")
-                                        if splitData[1] == "-1":
-                                            eventPorts.append("ZLRouter:CurrentTrackMirror")
+    try:
+        song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
+        if song:
+            for channelId in range(0, 10):
+                channel = song.channelsModel.getChannel(channelId)
+                if channel is not None:
+                    for routingData in [channel.synthRoutingData, channel.fxRoutingData]:
+                        for slotId in range(0, 5):
+                            # BEGIN Midi Routing Overrides
+                            for midiInPort in routingData[slotId].midiInPorts:
+                                if len(midiInPort.sources) > 0:
+                                    # Only actually perform overriding if there are any sources defined, otherwise leave well enough alone
+                                    eventPorts = []
+                                    # Gather up what inputs we should be connected to
+                                    for inputSource in midiInPort.sources:
+                                        if inputSource.port == "no-input":
+                                            # Just do nothing in this case
                                             pass
-                                        else:
-                                            if channel.channelAudioType == "synth":
-                                                eventPorts.append(f"ZLRouter:Channel{splitData[1]}")
+                                        elif inputSource.port.startswith("sketchpadTrack:"):
+                                            splitData = inputSource.port.split(":")
+                                            if splitData[1] == "-1":
+                                                eventPorts.append("ZLRouter:CurrentTrackMirror")
+                                                pass
                                             else:
-                                                eventPorts.append(f"ZLRouter:Zynthian-Channel{splitData[1]}")
-                                            pass
-                                    elif inputSource.port.startswith("external:"):
-                                        # Listen to input from a specific hardware device
-                                        splitData = inputSource.port.split(":")
-                                        hardwareDevice = Zynthbox.MidiRouter.instance().model().getDevice(splitData[1])
-                                        if hardwareDevice is not None:
-                                            eventPorts.append(hardwareDevice.inputPortName())
-                                # First disconnect anything already hooked up
-                                try:
-                                    for connectedTo in jclient.get_all_connections(midiInPort.jackname):
-                                        jclient.disconnect(midiInPort.jackname, connectedTo)
-                                except: pass
-                                # Then hook up what we've been asked to
-                                for eventPort in eventPorts:
+                                                if channel.channelAudioType == "synth":
+                                                    eventPorts.append(f"ZLRouter:Channel{splitData[1]}")
+                                                else:
+                                                    eventPorts.append(f"ZLRouter:Zynthian-Channel{splitData[1]}")
+                                                pass
+                                        elif inputSource.port.startswith("external:"):
+                                            # Listen to input from a specific hardware device
+                                            splitData = inputSource.port.split(":")
+                                            hardwareDevice = Zynthbox.MidiRouter.instance().model().getDevice(splitData[1])
+                                            if hardwareDevice is not None:
+                                                eventPorts.append(hardwareDevice.inputPortName())
+                                    # First disconnect anything already hooked up
                                     try:
-                                        jclient.connect(eventPort, midiInPort.jackname)
+                                        for connectedTo in jclient.get_all_connections(midiInPort.jackname):
+                                            jclient.disconnect(midiInPort.jackname, connectedTo)
                                     except: pass
-                    # END Midi Routing Overrides
+                                    # Then hook up what we've been asked to
+                                    for eventPort in eventPorts:
+                                        try:
+                                            jclient.connect(eventPort, midiInPort.jackname)
+                                        except: pass
+                        # END Midi Routing Overrides
+    except Exception as e:
+        logging.debug(f"Error while trying to run midi_autoconnect due to : {e}. Postponing midi_autoconnect request")
+        force_next_autoconnect = True
+        release_lock()
+        return
 
     for jn, info in root_engine_info.items():
         #logger.debug("MIDI ROOT ENGINE INFO: {} => {}".format(jn, info))
@@ -511,11 +518,16 @@ def midi_autoconnect(force=False):
 def audio_autoconnect(force=False):
     global force_next_autoconnect
 
-    if not zynthian_gui_config.zynqtgui.isBootingComplete or zynthian_gui_config.zynqtgui.sketchpad.sketchpadLoadingInProgress:
-        # If Booting is not complete, do not run autoconnect
-        # If a sketchpad is being loaded do not run autoconnect
-        # Autoconnect will be explicitly called once after booting is complete
-        # logging.debug("Skipping audio_autoconnect")
+    try:
+        if not zynthian_gui_config.zynqtgui.isBootingComplete or zynthian_gui_config.zynqtgui.sketchpad.sketchpadLoadingInProgress:
+            # If Booting is not complete, do not run autoconnect
+            # If a sketchpad is being loaded do not run autoconnect
+            # Autoconnect will be explicitly called once after booting is complete
+            # logging.debug("Skipping audio_autoconnect")
+            return
+    except Exception as e:
+        logging.debug(f"Error while trying to run audio_autoconnect due to : {e}. Postponing midi_autoconnect request")
+        force_next_autoconnect = True
         return
 
     if not force:

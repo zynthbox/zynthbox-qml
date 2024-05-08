@@ -77,15 +77,15 @@ Rectangle {
         console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
-                if (zynqtgui.session_dashboard.selectedChannel > 0) {
-                    zynqtgui.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.sketchpad.selectedTrackId > 0) {
+                    zynqtgui.sketchpad.selectedTrackId -= 1;
                 }
                 returnValue = true;
                 break;
 
             case "NAVIGATE_RIGHT":
-                if (zynqtgui.session_dashboard.selectedChannel < 9) {
-                    zynqtgui.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.sketchpad.selectedTrackId < 9) {
+                    zynqtgui.sketchpad.selectedTrackId += 1;
                 }
                 returnValue = true;
                 break;

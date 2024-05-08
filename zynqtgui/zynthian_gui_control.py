@@ -146,14 +146,14 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.selected_column_controller = None
         self.selected_column_gui_controller = None
 
-        # This page needs a signal from session_dashboard. Hence use this timer 
-        # to wait for session_dashboard to get initialized before trying to connect
+        # This page needs a signal from sketchpad. Hence use this timer 
+        # to wait for sketchpad to get initialized before trying to connect
         # to the signal
-        self.__selected_channel_changed_handler_timer = QTimer(self)
-        self.__selected_channel_changed_handler_timer.setInterval(1000)
-        self.__selected_channel_changed_handler_timer.setSingleShot(True)
-        self.__selected_channel_changed_handler_timer.timeout.connect(self.__selected_channel_changed_handler_timer_timeout)
-        self.__selected_channel_changed_handler_timer.start()
+        self.__selected_track_id_changed_handler_timer = QTimer(self)
+        self.__selected_track_id_changed_handler_timer.setInterval(1000)
+        self.__selected_track_id_changed_handler_timer.setSingleShot(True)
+        self.__selected_track_id_changed_handler_timer.timeout.connect(self.__selected_track_id_changed_handler_timer_timeout)
+        self.__selected_track_id_changed_handler_timer.start()
 
         # xyselect mode vars
         self.xyselect_mode=False
@@ -165,13 +165,13 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.show()
         self.sync_selectors_visibility()
 
-    def __selected_channel_changed_handler_timer_timeout(self):
-        if "session_dashboard" in self.zynqtgui.screens:
-            self.zynqtgui.session_dashboard.selected_channel_changed.connect(self.__selected_channel_changed_handler)
+    def __selected_track_id_changed_handler_timer_timeout(self):
+        if "sketchpad" in self.zynqtgui.screens:
+            self.zynqtgui.sketchpad.selected_track_id_changed.connect(self.__selected_track_id_changed_handler)
         else:
-            self.__selected_channel_changed_handler_timer.start()
+            self.__selected_track_id_changed_handler_timer.start()
 
-    def __selected_channel_changed_handler(self):
+    def __selected_track_id_changed_handler(self):
         # When selected channel changes, reset selectedColumn to 0
         self.selectedColumn = 0
 

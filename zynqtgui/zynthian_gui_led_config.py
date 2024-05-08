@@ -295,12 +295,12 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
         # Reset channel as it would change when song changes
         if self.zynqtgui.sketchpad.song is not None:
-            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
         # Connect to required signals for updating led
         self.zynqtgui.isExternalAppActiveChanged.connect(self.update_button_colors)
         self.zynqtgui.sketchpad.song_changed.connect(self.connect_dependent_property_signals)
-        self.zynqtgui.session_dashboard.selected_channel_changed.connect(self.selected_channel_changed_handler)
+        self.zynqtgui.sketchpad.selected_track_id_changed.connect(self.selected_track_id_changed_handler)
         self.zynqtgui.current_screen_id_changed.connect(self.update_button_colors)
         self.zynqtgui.current_modal_screen_id_changed.connect(self.update_button_colors)
         self.zynqtgui.leftSidebarActiveChanged.connect(self.update_button_colors)
@@ -318,8 +318,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.update_button_colors()
 
     @Slot()
-    def selected_channel_changed_handler(self):
-        self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+    def selected_track_id_changed_handler(self):
+        self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         # Connect to part clips changed when channel changes
         self.channel.selectedPartNamesChanged.connect(self.update_button_colors)
 
@@ -333,8 +333,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     def update_button_colors_actual(self):
         logging.debug("Updating LEDs")
 
-        if self.zynqtgui.sketchpad.song is not None and (self.channel is None or (self.channel is not None and self.channel.id != self.zynqtgui.session_dashboard.selectedChannel)):
-            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        if self.zynqtgui.sketchpad.song is not None and (self.channel is None or (self.channel is not None and self.channel.id != self.zynqtgui.sketchpad.selectedTrackId)):
+            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
         if self.channel is None:
             # Do not continue if channel is not yet instantiated
@@ -357,7 +357,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         ]
         # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
         channelDelta = 5 if self.zynqtgui.channelsModActive else 0
-        selectedChannelIndex = self.zynqtgui.session_dashboard.selectedChannel - channelDelta
+        selectedChannelIndex = self.zynqtgui.sketchpad.selectedTrackId - channelDelta
 
         if self.zynqtgui.isExternalAppActive:
             for button_id in range(0, 25):

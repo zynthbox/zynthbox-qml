@@ -37,7 +37,7 @@ Zynthian.ScreenPage {
     id: root
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
     /**
      * Update volume of synth
      * @param midiChannel The layer midi channel whose volume needs to be updated
@@ -426,7 +426,7 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Track %1 Sounds").arg(zynqtgui.session_dashboard.selectedChannel+1)
+                    text: qsTr("Track %1 Sounds").arg(zynqtgui.sketchpad.selectedTrackId+1)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                     Layout.preferredHeight: favToggleButton.height

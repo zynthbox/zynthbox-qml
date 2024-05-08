@@ -10,7 +10,7 @@ import io.zynthbox.components 1.0 as Zynthbox
 Zynthian.Card {
     id: root
 
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
     property QtObject controlObj: zynqtgui.bottomBarControlObj
 
     function cuiaCallback(cuia) {

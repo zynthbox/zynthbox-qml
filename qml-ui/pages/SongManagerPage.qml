@@ -448,7 +448,7 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                         text: "Ch" + (index + 1)
                         onClicked: {
-                            zynqtgui.session_dashboard.selectedChannel = index;
+                            zynqtgui.sketchpad.selectedTrackId = index;
                         }
                     }
                 }

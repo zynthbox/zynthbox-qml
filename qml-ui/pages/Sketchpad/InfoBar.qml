@@ -36,12 +36,15 @@ RowLayout {
         id: clipThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
-            infoBar.clip = root.song.getClip(zynqtgui.session_dashboard.selectedChannel, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            infoBar.clip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         }
     }
     Connections {
-        target: zynqtgui.session_dashboard
-        onSelected_channel_changed: clipThrottle.restart()
+        target: zynqtgui.sketchpad
+        onSelected_track_id_changed: {
+            updateSoundNameTimer.restart()
+            clipThrottle.restart()
+        }
     }
     Connections {
         target: zynqtgui.sketchpad.song.scenesModel
@@ -99,13 +102,6 @@ RowLayout {
     Connections {
         target: zynqtgui.fixed_layers
         onList_updated: {
-            updateSoundNameTimer.restart()
-        }
-    }
-    
-    Connections {
-        target: zynqtgui.session_dashboard
-        onSelectedChannelChanged: {
             updateSoundNameTimer.restart()
         }
     }
@@ -264,7 +260,7 @@ RowLayout {
     //         property: "text"
     //         delayed: true
     //         value: qsTr("%1 %2")
-    //                 .arg("T" + (zynqtgui.session_dashboard.selectedChannel+1))
+    //                 .arg("T" + (zynqtgui.sketchpad.selectedTrackId+1))
     //                 .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
     //     }
     // }

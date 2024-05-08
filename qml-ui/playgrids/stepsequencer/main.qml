@@ -142,14 +142,14 @@ Zynthian.BasePlayGrid {
                     //returnValue = true;
                     //break;
                 case "NAVIGATE_LEFT":
-                    if (zynqtgui.session_dashboard.selectedChannel > 0) {
-                        zynqtgui.session_dashboard.selectedChannel = _private.activePatternModel.sketchpadTrack - 1;
+                    if (zynqtgui.sketchpad.selectedTrackId > 0) {
+                        zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack - 1;
                     }
                     returnValue = true;
                     break;
                 case "NAVIGATE_RIGHT":
-                    if (zynqtgui.session_dashboard.selectedChannel < _private.channelCount) {
-                        zynqtgui.session_dashboard.selectedChannel = _private.activePatternModel.sketchpadTrack + 1;
+                    if (zynqtgui.sketchpad.selectedTrackId < _private.channelCount) {
+                        zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack + 1;
                     }
                     returnValue = true;
                     break;
@@ -231,7 +231,7 @@ Zynthian.BasePlayGrid {
     function pickPattern(patternIndex) {
         var patternObject = _private.sequence.get(patternIndex);
         if (patternObject.sketchpadTrack > -1 && patternObject.partIndex > -1) {
-            zynqtgui.session_dashboard.selectedChannel = patternObject.sketchpadTrack;
+            zynqtgui.sketchpad.selectedTrackId = patternObject.sketchpadTrack;
             var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(patternObject.sketchpadTrack);
             channel.selectedPart = patternObject.partIndex;
         }
@@ -288,7 +288,7 @@ Zynthian.BasePlayGrid {
             }
         }
 
-        property QtObject currentChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+        property QtObject currentChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
         property string currentSoundName: {
             var text = "(no sound)";
             if (_private.currentChannel) {
@@ -568,8 +568,8 @@ Zynthian.BasePlayGrid {
                         break;
                     }
                 }
-                if (foundIndex > -1 && zynqtgui.session_dashboard.selectedChannel !== foundIndex) {
-                    zynqtgui.session_dashboard.selectedChannel = foundIndex;
+                if (foundIndex > -1 && zynqtgui.sketchpad.selectedTrackId !== foundIndex) {
+                    zynqtgui.sketchpad.selectedTrackId = foundIndex;
                 }
             }
         }
@@ -989,7 +989,7 @@ Zynthian.BasePlayGrid {
                         Binding {
                             target: drumpadLoopVisualiser
                             property: "channel"
-                            value: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+                            value: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
                             when: drumpadLoopVisualiser.visible
                             delayed: true
                             restoreMode: Binding.RestoreBinding
@@ -1910,8 +1910,8 @@ Zynthian.BasePlayGrid {
                                                                 : "Unassigned - playing to: " + _private.currentSoundName
                                                         : ""
                                                     onClicked: {
-                                                        if (zynqtgui.session_dashboard.selectedChannel !== patternsMenuItem.associatedChannelIndex) {
-                                                            zynqtgui.session_dashboard.selectedChannel = patternsMenuItem.associatedChannelIndex;
+                                                        if (zynqtgui.sketchpad.selectedTrackId !== patternsMenuItem.associatedChannelIndex) {
+                                                            zynqtgui.sketchpad.selectedTrackId = patternsMenuItem.associatedChannelIndex;
                                                         }
                                                         channelsViewDrawer.open();
                                                     }

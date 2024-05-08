@@ -38,7 +38,7 @@ Rectangle {
     id: root
 
     readonly property QtObject song: zynqtgui.sketchpad.song
-    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -53,22 +53,22 @@ Rectangle {
 
             case "SWITCH_SELECT_SHORT":
                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+                zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
 
                 bottomStack.slotsBar.bottomBarButton.checked = true
 
                 return true;
 
             case "NAVIGATE_LEFT":
-                if (zynqtgui.session_dashboard.selectedChannel > 0) {
-                    zynqtgui.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.sketchpad.selectedTrackId > 0) {
+                    zynqtgui.sketchpad.selectedTrackId -= 1;
                 }
 
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynqtgui.session_dashboard.selectedChannel < 9) {
-                    zynqtgui.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.sketchpad.selectedTrackId < 9) {
+                    zynqtgui.sketchpad.selectedTrackId += 1;
                 }
 
                 return true;
@@ -140,9 +140,9 @@ Rectangle {
                         id: channelsVolumeRow
 
                         function handleClick(channel) {
-                            zynqtgui.session_dashboard.selectedChannel = channel.id;
+                            zynqtgui.sketchpad.selectedTrackId = channel.id;
                             zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                            zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+                            zynqtgui.bottomBarControlObj = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
                         }
 
                         Layout.fillWidth: true
@@ -153,7 +153,7 @@ Rectangle {
                             model: root.song.channelsModel
 
                             delegate: Rectangle {
-                                property bool highlighted: index === zynqtgui.session_dashboard.selectedChannel
+                                property bool highlighted: index === zynqtgui.sketchpad.selectedTrackId
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 color: highlighted ? "#22ffffff" : "transparent"

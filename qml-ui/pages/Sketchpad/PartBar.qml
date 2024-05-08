@@ -42,7 +42,7 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     property QtObject bottomBar: null
-    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
     property QtObject selectedPartChannel
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
@@ -63,15 +63,15 @@ Rectangle {
                 break
 
             case "NAVIGATE_LEFT":
-                if (zynqtgui.session_dashboard.selectedChannel > 0) {
-                    zynqtgui.session_dashboard.selectedChannel -= 1;
+                if (zynqtgui.sketchpad.selectedTrackId > 0) {
+                    zynqtgui.sketchpad.selectedTrackId -= 1;
                 }
                 returnVal = true
                 break
 
             case "NAVIGATE_RIGHT":
-                if (zynqtgui.session_dashboard.selectedChannel < 9) {
-                    zynqtgui.session_dashboard.selectedChannel += 1;
+                if (zynqtgui.sketchpad.selectedTrackId < 9) {
+                    zynqtgui.sketchpad.selectedTrackId += 1;
                 }
                 returnVal = true
                 break
@@ -151,7 +151,7 @@ Rectangle {
                             Layout.fillHeight: true
                             channel: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
                             onClicked: {
-                                zynqtgui.session_dashboard.selectedChannel = model.index
+                                zynqtgui.sketchpad.selectedTrackId = model.index
                                 root.selectedPartChannel = partBarDelegate.channel
                                 root.selectedPartClip = partBarDelegate.selectedPartClip
                                 root.selectedPartPattern = partBarDelegate.selectedPartPattern

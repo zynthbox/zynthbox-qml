@@ -310,7 +310,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
     special_layer_name = Property(str, get_special_layer_name, notify = special_layer_name_changed)
 
     def back_action(self):
-        return 'session_dashboard'
+        return 'sketchpad'
 
     def next_action(self):
         return 'bank'

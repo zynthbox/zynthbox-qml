@@ -100,26 +100,6 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.sketchpad_copier, 0, "Sketchpad Copier"))
             self.list_metadata.append({"icon":"../../img/sketchpad_copier.svg"})
 
-            #self.list_data.append((self.session_dashboard, 0, "Channels"))
-            #self.list_metadata.append({"icon":"../../img/channels.svg"})
-
-            # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
-
-            #self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
-            #self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
-
-            # if "autoeq" in zynthian_gui_config.experimental_features:
-            #    self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
-
-            # Snapshot Management
-            # self.list_data.append((None, 0, ""))
-
-            # if len(self.zynqtgui.screens["layer"].layers) > 0:
-                # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
-                # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
-
-            # self.list_data.append((None, 0, ""))
-
         if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             if Path(apps_folder).exists():
@@ -366,10 +346,6 @@ class zynthian_gui_main(zynthian_gui_selector):
     def channel(self):
         logging.info("Channel")
         self.zynqtgui.show_modal("channel")
-
-    def session_dashboard(self):
-        logging.info("Session")
-        self.zynqtgui.show_modal("session_dashboard")
 
     def sketchpad(self):
         logging.info("Sketchpad")

@@ -670,11 +670,6 @@ don't want to have to dig too far...
     }
     Binding {
         target: Zynthbox.PlayGridManager
-        property: "zlDashboard"
-        value: zynqtgui.session_dashboard
-    }
-    Binding {
-        target: Zynthbox.PlayGridManager
         property: "zlSketchpad"
         value: zynqtgui.sketchpad
     }
@@ -735,7 +730,6 @@ don't want to have to dig too far...
                     }
                     onPatternChanged: {
                         if (channelPartSceneDelegate.pattern) {
-                            channelPartSceneDelegate.pattern.zlDashboard = zynqtgui.session_dashboard;
                             channelPartSceneDelegate.pattern.zlChannel = baseChannelDelegate.theChannel;
                             channelPartSceneDelegate.pattern.zlPart = channelPartDelegate.part;
                             channelPartSceneDelegate.pattern.zlScene = channelPartSceneDelegate.sceneClip;

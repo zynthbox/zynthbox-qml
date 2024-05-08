@@ -60,15 +60,15 @@ QQC2.AbstractButton {
         interval: 0; running: false; repeat: false;
         onTriggered: {
             if (zynqtgui.sketchpad.song && zynqtgui.sketchpad.song.isLoading === false) {
-                root.highlighted = channel.sceneClip.row === zynqtgui.session_dashboard.selectedChannel &&
+                root.highlighted = channel.sceneClip.row === zynqtgui.sketchpad.selectedTrackId &&
                                 channel.sceneClip.col === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex // zynqtgui.bottomBarControlObj === channel.sceneClip
             }
         }
     }
     onChannelChanged: highlightThrottle.restart()
     Connections {
-        target: zynqtgui.session_dashboard
-        onSelected_channel_changed: highlightThrottle.restart()
+        target: zynqtgui.sketchpad
+        onSelected_track_id_changed: highlightThrottle.restart()
     }
     Connections {
         target: zynqtgui.sketchpad

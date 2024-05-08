@@ -36,7 +36,7 @@ Zynthian.NewStuffPage {
 
     showUseThis: true
     onUseThis: {
-        let currentChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel);
+        let currentChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
         if (installedFiles.length > 0) {
             if (installedFiles.length > 4) {
                 for (let fileIndex = 0; fileIndex < 5; ++fileIndex) {

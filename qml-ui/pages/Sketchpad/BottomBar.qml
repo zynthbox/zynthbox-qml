@@ -290,21 +290,6 @@ Rectangle {
                         }
                     }
                 }
-//                finalHeaderItem: RowLayout {
-//                    Layout.fillWidth: true
-//                    visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
-//                    QQC2.Button {
-//                        visible: zynqtgui.bottomBarControlObj && zynqtgui.bottomBarControlObj.connectedPattern < 0
-//                        Layout.fillHeight: true
-
-//                        text: qsTr("Midi")
-//                        //enabled: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
-
-//                        onClicked: {
-//                            zynqtgui.session_dashboard.midiSelectionRequested();
-//                        }
-//                    }
-//                }
 
                 initialAction: {
                     switch (zynqtgui.bottomBarControlType) {

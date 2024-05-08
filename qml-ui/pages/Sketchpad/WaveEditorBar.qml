@@ -46,7 +46,7 @@ GridLayout {
                                     : zynqtgui.bottomBarControlObj != null && zynqtgui.bottomBarControlObj.samples != null
                                         ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
                                         : null
-    property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.session_dashboard.selectedChannel)
+    property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
     function cuiaCallback(cuia) {
         switch (cuia) {

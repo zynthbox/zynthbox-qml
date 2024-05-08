@@ -25,7 +25,6 @@ Zynthian.Stack {
         "effect_preset": "FXSetupPage.qml",
         "layer_midi_effects": "MidiFXSetupPage.qml",
         "midi_effect_types": "MidiFXSetupPage.qml",
-        "session_dashboard": "SessionDashboard/Main.qml",
         "midi_key_range": "MidiKeyRangePage.qml",
         "engine": "EnginePage.qml",
         "midi_chan": "MidiChanPage.qml",

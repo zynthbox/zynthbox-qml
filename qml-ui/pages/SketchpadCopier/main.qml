@@ -33,7 +33,7 @@ import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     readonly property QtObject copier: zynqtgui.sketchpad_copier
-    readonly property QtObject session: zynqtgui.session_dashboard
+    readonly property QtObject session: null
     readonly property QtObject curSketchpad: zynqtgui.sketchpad.song
 
     id: root

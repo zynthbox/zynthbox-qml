@@ -207,8 +207,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
             return
 
         if t=='S':
-            selected_channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(
-                self.zynqtgui.session_dashboard.get_selected_channel())
+            selected_channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             prev_volume = None
             try:
                 prev_volume = self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow].value

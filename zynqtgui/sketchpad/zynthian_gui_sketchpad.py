@@ -124,10 +124,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.is_recording = False
         self.recording_count_in_value = 0
         self.jack_client = None
-        self.__jack_client_init_timer__ = QTimer()
-        self.__jack_client_init_timer__.setInterval(1000)
-        self.__jack_client_init_timer__.setSingleShot(True)
-        self.__jack_client_init_timer__.timeout.connect(self.init_jack_client)
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
@@ -158,10 +154,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # When starting up, init process will load a sketchpad and hence set it to True by default
         # This will later be set to False once init process loads the sketchpad
         self.__sketchpad_loading_in_progress = True
+        self.__selected_track_id = 0
         self.__stopRecordingRetrier__ = QTimer(self)
         self.__stopRecordingRetrier__.setInterval(50)
         self.__stopRecordingRetrier__.setSingleShot(True)
         self.__stopRecordingRetrier__.timeout.connect(self.stopRecording)
+        self.__fixed_layers_fill_list_timer = None
+        self.__update_channel_sounds_timer = None
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
         self.metronome_clip_tick.setVolumeAbsolute(self.__metronomeVolume)
@@ -185,43 +184,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 #        Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
 #        Path('/zynthian/zynthian-my-data/sample-banks/community-samplebanks').mkdir(exist_ok=True, parents=True)
 
-    def init_jack_client(self):
-        try:
-            jack.Client('').get_port_by_name("AudioLevels:SystemPlayback-left_in")
-            self.jack_client = jack.Client('AudioLevels')
-            logging.info(f"*** AudioLevels Jack client found. Continuing")
-
-            # Connect all jack ports of respective channel after jack client initialization is done.
-            for i in range(0, self.__song__.channelsModel.count):
-                channel = self.__song__.channelsModel.getChannel(i)
-                channel.update_jack_port()
-        except:
-            logging.info(f"*** AudioLevels Jack client not found. Checking again in 1000ms")
-            self.__jack_client_init_timer__.start()
-
-#    def connect_control_objects(self):
-#        selected_channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.get_selected_channel())
-
-#        if self.__volume_control_obj == self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]:
-#            return
-#        if self.__volume_control_obj:
-#            self.__volume_control_obj.value_changed.disconnect(self.set_selector)
-
-#        self.__volume_control_obj = self.zynqtgui.layers_for_channel.volumeControllers[selected_channel.selectedSlotRow]
-
-#        if self.__volume_control_obj:
-#            self.__volume_control_obj.value_changed.connect(self.set_selector)
-#            self.set_selector()
-
-    def init_sketchpad(self, sketchpad, cb=None):
+    def init(self):
         def _cb():
             Zynthbox.PlayGridManager.instance().metronomeBeat4thChanged.connect(self.metronome_update)
-
-            if cb is not None:
-                cb()
-
-            self.zynqtgui.layers_for_channel.fill_list()
-            self.zynqtgui.session_dashboard.set_selected_channel(0, True)
+            self.selectedTrackId = 0
             self.__is_init_in_progress__ = False
             logging.info("Sketchpad Initialization Complete")
 
@@ -231,14 +197,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 channel = self.__song__.channelsModel.getChannel(i)
                 channel.update_jack_port()
 
-        if sketchpad is not None:
-            logging.debug(f"### Checking Sketchpad : {sketchpad} : exists({Path(sketchpad).exists()}) ")
-        else:
-            logging.debug("### Checking Sketchpad : sketchpad is none ")
-
-        if sketchpad is not None and Path(sketchpad).exists():
-            # Existing sketch found. last_state snapshot after loading sketchpad
-            self.loadSketchpad(sketchpad, load_history=True, load_snapshot=False, cb=_cb, load_last_state_snapshot=True)
+        lastSelectedSketchpad = self.zynqtgui.global_settings.value("Sketchpad/lastSelectedSketchpad", None)
+        self.zynqtgui.layer.layer_created.connect(self.emit_chained_sounds_changed, Qt.QueuedConnection)
+        self.zynqtgui.layer_effects.fx_layers_changed.connect(self.emit_chained_sounds_changed, Qt.QueuedConnection)
+        if lastSelectedSketchpad is not None and Path(lastSelectedSketchpad).exists():
+            # Existing sketch found. Load last_state snapshot after loading sketchpad
+            self.loadSketchpad(lastSelectedSketchpad, load_history=True, load_snapshot=False, cb=_cb, load_last_state_snapshot=True)
         else:
             # Existing sketch not found. Load default snapshot after loading sketchpad
             self.newSketchpad(base_sketchpad=None, cb=_cb, load_snapshot=False, load_last_state_snapshot=True)
@@ -472,6 +436,38 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     sketchpadLoadingInProgress = Property(QObject, get_sketchpadLoadingInProgress, set_sketchpadLoadingInProgress, notify=sketchpadLoadingInProgressChanged)
     ### END Property sketchpadLoadingInProgress
 
+    ### BEGIN Property selectedTrackId
+    def get_selected_track_id(self):
+        return self.__selected_track_id
+    def set_selected_track_id(self, track_id, force_set=False):
+        if self.__selected_track_id != track_id or force_set is True:
+            logging.debug(f"### Setting selected track : channel({track_id})")
+            self.__selected_track_id = max(0, min(track_id, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            self.selected_track_id_changed.emit()
+            if self.__fixed_layers_fill_list_timer is None:
+                self.__fixed_layers_fill_list_timer = QTimer(self)
+                self.__fixed_layers_fill_list_timer.setInterval(100)
+                self.__fixed_layers_fill_list_timer.setSingleShot(True)
+                self.__fixed_layers_fill_list_timer.timeout.connect(self.zynqtgui.fixed_layers.fill_list, Qt.QueuedConnection)
+            if self.__update_channel_sounds_timer is None:
+                self.__update_channel_sounds_timer = QTimer(self)
+                self.__update_channel_sounds_timer.setInterval(500)
+                self.__update_channel_sounds_timer.setSingleShot(True)
+                self.__update_channel_sounds_timer.timeout.connect(self.zynqtgui.layers_for_channel.update_channel_sounds, Qt.QueuedConnection)
+            self.__fixed_layers_fill_list_timer.start()
+            self.__update_channel_sounds_timer.start()
+    selected_track_id_changed = Signal()
+    selectedTrackId = Property(int, get_selected_track_id, set_selected_track_id, notify=selected_track_id_changed)
+    ### END Property selectedTrackId
+
+    @Slot(None)
+    def emit_chained_sounds_changed(self):
+        selected_channel = self.song.channelsModel.getChannel(self.selectedChannel)
+        if selected_channel is not None:
+            selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
+            selected_channel.update_jack_port()
+        self.song.channelsModel.connected_sounds_count_changed.emit()
+
     @Signal
     def metronomeEnabledChanged(self):
         pass
@@ -580,21 +576,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if base_sketchpad is not None:
                 logging.info(f"Creating New Sketchpad from community sketchpad : {base_sketchpad}")
                 self.zynqtgui.currentTaskMessage = "Copying community sketchpad to my sketchpads"
-
                 base_sketchpad_path = Path(base_sketchpad)
-
                 # Copy community sketchpad to my sketchpads
-
                 new_sketchpad_name = self.generate_unique_mysketchpad_name(base_sketchpad_path.parent.name)
                 shutil.copytree(base_sketchpad_path.parent, self.__sketchpad_basepath__ / new_sketchpad_name)
-
                 logging.info(f"Loading new sketchpad from community sketchpad : {str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)}")
-
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/",
-                                                                  base_sketchpad_path.stem.replace(".sketchpad", ""), self)
-                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
-                    str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
-
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/", base_sketchpad_path.stem.replace(".sketchpad", ""), self)
+                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
                 # Load sketchpad snapshot if available or else load default snapshot
                 snapshot_path = f"{str(self.__sketchpad_basepath__ / new_sketchpad_name / 'soundsets')}/{base_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
                 if Path(snapshot_path).exists():
@@ -605,20 +593,15 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     logging.info(f"Loading default snapshot")
                     self.zynqtgui.currentTaskMessage = "Loading snapshot"
                     self.zynqtgui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
-
                 self.song_changed.emit()
-                self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
+                self.selectedTrackId = 0
             else:
                 logging.info("Creating New Sketchpad")
-
                 # Reset global fx to 100%
                 self.zynqtgui.global_fx_engines[0][1].value = self.zynqtgui.global_fx_engines[0][1].value_max
                 self.zynqtgui.global_fx_engines[1][1].value = self.zynqtgui.global_fx_engines[1][1].value_max
-
                 self.zynqtgui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
-
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
-
                 # When zynqtgui is starting, it will load last_state or default snapshot
                 # based on the value of self.init_should_load_last_state
                 # Do not load snapshot again otherwise it will create multiple processes for same synths
@@ -631,17 +614,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     if not self.zynqtgui.screens["snapshot"].load_default_snapshot():
                         # Show error if loading default snapshot fails
                         logging.error("Error loading default snapshot")
-
-                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
-                    str(self.__sketchpad_basepath__ / 'temp' / 'Sketchpad-1.sketchpad.json'))
-
+                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(self.__sketchpad_basepath__ / 'temp' / 'Sketchpad-1.sketchpad.json'))
                 # Connect all jack ports of respective channel after jack client initialization is done.
                 for i in range(0, self.__song__.channelsModel.count):
                     channel = self.__song__.channelsModel.getChannel(i)
                     channel.update_jack_port()
-
                 self.song_changed.emit()
-                self.zynqtgui.screens["session_dashboard"].set_selected_channel(0, True)
+                self.selectedTrackId = 0
                 self.newSketchpadLoaded.emit()
 
             # Update volume controls
@@ -652,13 +631,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             self.sketchpadLoadingInProgress = False
             self.zynqtgui.zynautoconnect()
-
             if self.zynqtgui.isBootingComplete:
                 self.zynqtgui.currentTaskMessage = "Finalizing"
-
             # Schedule a save sketchpad file is available after creating a new sketchpad
             self.song.schedule_save()
-
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
@@ -722,10 +698,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if layer.engine.type == "Audio Effect":
                     self.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer, layer.slot_index)
 
-            self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(
-                str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
+            self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
             self.__song__.save(False)
-            self.zynqtgui.session_dashboard.set_selected_channel(0, force_set=True)
+            self.selectedTrackId = 0
             self.song_changed.emit()
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
@@ -781,7 +756,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.currentTaskMessage = "Loading Sketchpad"
                 self.sketchpadLoadingInProgress = True
                 self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_history)
-                self.zynqtgui.screens["session_dashboard"].set_last_selected_sketchpad(str(sketchpad_path))
+                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_path))
 
                 if load_snapshot:
                     snapshot_path = str(sketchpad_path.parent.absolute()) + '/soundsets/' + str(sketchpad_path.stem.replace('.sketchpad', '')) + '.zss'
@@ -803,7 +778,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
                 # Update volume controls
                 self.zynqtgui.fixed_layers.fill_list()
-                self.zynqtgui.session_dashboard.set_selected_channel(0, force_set=True)
+                self.selectedTrackId = 0
                 self.song_changed.emit()
 
                 # Connect all jack ports of respective channel after jack client initialization is done.
@@ -899,7 +874,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         # but not necessary to change to selected channel's synth.
         # Hence make sure to update curLayer before doing operations depending upon curLayer
         self.zynqtgui.screens["layers_for_channel"].do_activate_midich_layer()
-        channel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+        channel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         layers_snapshot = self.zynqtgui.layer.generate_snapshot(channel)
         self.set_clip_to_record(clip)
 
@@ -1039,7 +1014,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 
-            currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.session_dashboard.selectedChannel)
+            currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
             try:
                 layer = self.zynqtgui.layer.generate_snapshot(currentChannel)

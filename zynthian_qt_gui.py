@@ -156,9 +156,6 @@ from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
-
-from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
-
 from zynqtgui.zynthian_osd import zynthian_osd
 
 import Zynthbox
@@ -330,7 +327,6 @@ recent_task_messages = queue.SimpleQueue()
 class zynthian_gui(QObject):
 
     screens_sequence = (
-        #"session_dashboard",  #FIXME or main? make this more configurable?
         "sketchpad",
         "layers_for_channel",
         "bank",
@@ -340,7 +336,6 @@ class zynthian_gui(QObject):
         "layer_midi_effects",
     )
     non_modal_screens = (
-        #"session_dashboard",  #FIXME or main? make this more configurable?
         "sketchpad",
         "main",
         "layer",
@@ -593,17 +588,17 @@ class zynthian_gui(QObject):
         self.__knob_values = [10000, 10000, 10000, 10000]
 
         # Create Global FX Settings
-        self.global_fx_settings = QSettings()
-        self.global_fx_settings.beginGroup("GlobalFX")
-        if self.global_fx_settings.value("delay_engine_name", None) is None:
-            self.global_fx_settings.setValue("delay_engine_name", "JV/Gxdigital_delay_st")
-        if self.global_fx_settings.value("delay_level_controller_name", None) is None:
-            self.global_fx_settings.setValue("delay_level_controller_name", "LEVEL")
-        if self.global_fx_settings.value("reverb_engine_name", None) is None:
-            self.global_fx_settings.setValue("reverb_engine_name", "JV/TAP Reverberator")
-        if self.global_fx_settings.value("reverb_level_controller_name", None) is None:
-            self.global_fx_settings.setValue("reverb_level_controller_name", "wetlevel")
-        self.global_fx_settings.endGroup()
+        self.global_settings = QSettings()
+        self.global_settings.beginGroup("GlobalFX")
+        if self.global_settings.value("delay_engine_name", None) is None:
+            self.global_settings.setValue("delay_engine_name", "JV/Gxdigital_delay_st")
+        if self.global_settings.value("delay_level_controller_name", None) is None:
+            self.global_settings.setValue("delay_level_controller_name", "LEVEL")
+        if self.global_settings.value("reverb_engine_name", None) is None:
+            self.global_settings.setValue("reverb_engine_name", "JV/TAP Reverberator")
+        if self.global_settings.value("reverb_level_controller_name", None) is None:
+            self.global_settings.setValue("reverb_level_controller_name", "wetlevel")
+        self.global_settings.endGroup()
 
         self.knobDeltaChanged.connect(self.knobDeltaCuiaEmitter, Qt.QueuedConnection)
 
@@ -684,7 +679,7 @@ class zynthian_gui(QObject):
         # to state where it shows current channel.
 
         # Set channelsModActive to true when channel 5-10 is active
-        self.channelsModActive = self.session_dashboard.selectedChannel >= 5
+        self.channelsModActive = self.sketchpad.selectedTrackId >= 5
 
     ### SHOW SCREEN QUEUE
     '''
@@ -1032,12 +1027,12 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
-        self.global_fx_settings.beginGroup("GlobalFX")
-        delay_engine_name = self.global_fx_settings.value("delay_engine_name")
-        delay_level_controller_name = self.global_fx_settings.value("delay_level_controller_name")
-        reverb_engine_name = self.global_fx_settings.value("reverb_engine_name")
-        reverb_level_controller_name = self.global_fx_settings.value("reverb_level_controller_name")
-        self.global_fx_settings.endGroup()
+        self.global_settings.beginGroup("GlobalFX")
+        delay_engine_name = self.global_settings.value("delay_engine_name")
+        delay_level_controller_name = self.global_settings.value("delay_level_controller_name")
+        reverb_engine_name = self.global_settings.value("reverb_engine_name")
+        reverb_level_controller_name = self.global_settings.value("reverb_level_controller_name")
+        self.global_settings.endGroup()
 
         logging.debug("Initializing global FX engines")
         self.currentTaskMessage = "Initializing Global FX Engines : Delay"
@@ -1211,11 +1206,7 @@ class zynthian_gui(QObject):
         self.screens["sketchpad"] = zynthian_gui_sketchpad(self)
 
         ###
-        # Session Dashboard depends on ZL to load sketchpads and hence needs to be initialized after ZL page
-        ###
-        self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
-        ###
-        # Fixed layers depends on sketchpad and session_dashboard screens and hence needs to be initialized
+        # Fixed layers depends on sketchpad screen and hence needs to be initialized
         # after those 2 pages
         ###
         self.screens["layers_for_channel"] = zynthian_gui_layers_for_channel(self)
@@ -1271,7 +1262,7 @@ class zynthian_gui(QObject):
         # self.init_mpe_zones(0, 2)
 
         # Reset channels LED state on selectedChannel change
-        self.session_dashboard.selected_channel_changed.connect(self.channelsModTimerHandler)
+        self.sketchpad.selected_track_id_changed.connect(self.channelsModTimerHandler)
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
@@ -1928,51 +1919,36 @@ class zynthian_gui(QObject):
             pass
 
         elif cuia == "CHANNEL_1":
-            if self.screens["session_dashboard"].selectedChannel == 0 + channelDelta and not self.leftSidebarActive:
+            if self.sketchpad.selectedTrackId == 0 + channelDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.screens["session_dashboard"].selectedChannel = 0 + channelDelta
+                self.sketchpad.selectedTrackId = 0 + channelDelta
         elif cuia == "CHANNEL_2":
-            if self.screens["session_dashboard"].selectedChannel == 1 + channelDelta and not self.leftSidebarActive:
+            if self.sketchpad.selectedTrackId == 1 + channelDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.screens["session_dashboard"].selectedChannel = 1 + channelDelta
+                self.sketchpad.selectedTrackId = 1 + channelDelta
         elif cuia == "CHANNEL_3":
-            if self.screens["session_dashboard"].selectedChannel == 2 + channelDelta and not self.leftSidebarActive:
+            if self.sketchpad.selectedTrackId == 2 + channelDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.screens["session_dashboard"].selectedChannel = 2 + channelDelta
+                self.sketchpad.selectedTrackId = 2 + channelDelta
         elif cuia == "CHANNEL_4":
-            if self.screens["session_dashboard"].selectedChannel == 3 + channelDelta and not self.leftSidebarActive:
+            if self.sketchpad.selectedTrackId == 3 + channelDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.screens["session_dashboard"].selectedChannel = 3 + channelDelta
+                self.sketchpad.selectedTrackId = 3 + channelDelta
         elif cuia == "CHANNEL_5":
-            if self.screens["session_dashboard"].selectedChannel == 4 + channelDelta and not self.leftSidebarActive:
+            if self.sketchpad.selectedTrackId == 4 + channelDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.screens["session_dashboard"].selectedChannel = 4 + channelDelta
-        # elif cuia == "CHANNEL_6":
-        #     self.screens["session_dashboard"].selectedChannel = 5
-        # elif cuia == "CHANNEL_7":
-        #     self.screens["session_dashboard"].selectedChannel = 6
-        # elif cuia == "CHANNEL_8":
-        #     self.screens["session_dashboard"].selectedChannel = 7
-        # elif cuia == "CHANNEL_9":
-        #     self.screens["session_dashboard"].selectedChannel = 8
-        # elif cuia == "CHANNEL_10":
-        #     self.screens["session_dashboard"].selectedChannel = 9
-        # elif cuia == "CHANNEL_11":
-        #     self.screens["session_dashboard"].selectedChannel = 10
-        # elif cuia == "CHANNEL_12":
-        #     self.screens["session_dashboard"].selectedChannel = 11
-
+                self.sketchpad.selectedTrackId = 4 + channelDelta
         elif cuia == "CHANNEL_PREVIOUS":
-            if self.screens["session_dashboard"].selectedChannel > 0:
-                self.screens["session_dashboard"].selectedChannel -= 1
+            if self.sketchpad.selectedTrackId > 0:
+                self.sketchpad.selectedTrackId -= 1
         elif cuia == "CHANNEL_NEXT":
-            if self.screens["session_dashboard"].selectedChannel < 11:
-                self.screens["session_dashboard"].selectedChannel += 1
+            if self.sketchpad.selectedTrackId < 11:
+                self.sketchpad.selectedTrackId += 1
 
         elif cuia == "KEYBOARD":
             logging.info("KEYBOARD")
@@ -2012,7 +1988,7 @@ class zynthian_gui(QObject):
                     # holding down the metronome button and then pressing record, for instant recording), we still
                     # end up actually recording into what's expected
                     if self.__channelToRecord is None:
-                        self.__channelToRecord = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+                        self.__channelToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
                     if self.__channelRecordingRow is None:
                         self.__channelRecordingRow = self.__channelToRecord.selectedSlotRow
                     if self.__clipToRecord is None:
@@ -2031,7 +2007,7 @@ class zynthian_gui(QObject):
                         logging.error("Error while trying to queue clip to record")
             else:
                 if zl.isRecording == False:
-                    self.__channelToRecord = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+                    self.__channelToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
                     self.__channelRecordingRow = self.__channelToRecord.selectedSlotRow
                     self.__clipToRecord = self.__channelToRecord.getClipToRecord()
                 self.displayRecordingPopup.emit()
@@ -2527,7 +2503,7 @@ class zynthian_gui(QObject):
                     else:
                         screen_back = self.active_screen #self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
 
-            elif self.active_screen != "session_dashboard": # Session dashboard is always at the end of the back chain
+            else:
                 try:
                     screen_back = self.screens[
                         self.active_screen
@@ -3039,7 +3015,6 @@ class zynthian_gui(QObject):
                         self.screens[self.active_screen].refresh_loading()
                 except Exception as err:
                     logging.error("zynthian_gui.loading_refresh() => %s" % err)
-                    self.show_screen("session_dashboard")
             time.sleep(0.1)
 
     def wait_threads_end(self, n=20):
@@ -3491,7 +3466,6 @@ class zynthian_gui(QObject):
         recent_task_messages.put("command:play-extro")        
         # Display sketchpad page and run set_selector at last before hiding splash to ensure knobs work fine
         self.show_modal("sketchpad")
-        self.session_dashboard.set_selected_channel(0, True)
         self.set_selector()        
         # Explicitly run update_jack_port after booting is complete as any requests made while booting is ignored
         for i in range(0, self.sketchpad.song.channelsModel.count):
@@ -3675,9 +3649,6 @@ class zynthian_gui(QObject):
 
     def hardware(self):
         return self.screens["hardware"]
-
-    def session_dashboard(self):
-        return self.screens["session_dashboard"]
 
     def song_manager(self):
         return self.screens["song_manager"]
@@ -4318,7 +4289,6 @@ class zynthian_gui(QObject):
     snapshots_menu = Property(QObject, snapshots_menu, constant=True)
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
-    session_dashboard = Property(QObject, session_dashboard, constant=True)
     song_manager = Property(QObject, song_manager, constant=True)
     sketchpad_copier = Property(QObject, sketchpad_copier, constant=True)
     sound_categories = Property(QObject, sound_categories, constant=True)
@@ -4577,14 +4547,11 @@ if __name__ == "__main__":
 
     logging.info("STARTING ZYNTHIAN-UI ...")
     zynthian_gui_config.zynqtgui = zynqtgui = zynthian_gui()
-
-
     logging.debug("---p Starting zynqtgui")
     zynqtgui.start()
     logging.debug("---p zynqtgui complete")
-
-    QIcon.setThemeName("breeze")
-
+    zynqtgui.sketchpad.init() # Call init after zynqtgui initialization is complete
+    QIcon.setThemeName("breeze")    
     palette = app.palette()
     bgColor = QColor(zynthian_gui_config.color_bg)
     txColor = QColor(zynthian_gui_config.color_tx)
@@ -4604,16 +4571,9 @@ if __name__ == "__main__":
     palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
     palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
     app.setPalette(palette)
-
     zynqtgui.screens["theme_chooser"].apply_font()
-    # font = app.font()
-    # font.setPointSize(12)
-    # font.setFamily("Roboto")
-    # app.setFont(font)
-
     zynqtgui.show_screen(zynqtgui.home_screen)
     zynqtgui.screens["preset"].disable_show_fav_presets()
-
     engine.addImportPath(os.fspath(Path(__file__).resolve().parent / "qml-ui"))
     engine.rootContext().setContextProperty("zynqtgui", zynqtgui)
 

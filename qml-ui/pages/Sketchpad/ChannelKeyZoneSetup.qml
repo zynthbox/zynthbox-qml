@@ -152,7 +152,7 @@ Zynthian.DialogQuestion {
                 Layout.fillWidth: true
             }
             QQC2.Label {
-                visible: component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop"
+                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
                 text: "Manual"
                 Rectangle {
                     visible: component.selectedChannel && component.selectedChannel.keyZoneMode == "manual";
@@ -215,7 +215,7 @@ Zynthian.DialogQuestion {
                 }
             }
             Rectangle {
-                visible: component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop"
+                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
                 Layout.margins: Kirigami.Units.smallSpacing
@@ -223,11 +223,11 @@ Zynthian.DialogQuestion {
             }
             QQC2.Label {
                 text: "Auto"
-                visible: component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop"
+                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
             }
             QQC2.Button {
                 text: "All Full"
-                visible: component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop"
+                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "all-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -237,7 +237,7 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 text: "Split Full"
-                visible: component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop"
+                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -247,7 +247,7 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 text: "Split Narrow"
-                visible: component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop"
+                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-narrow";
                 onClicked: {
                     if (component.selectedChannel) {

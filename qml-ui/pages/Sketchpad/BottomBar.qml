@@ -45,7 +45,7 @@ Rectangle {
     property alias recordingAction: recordingAction
     property alias waveEditorAction: waveEditorAction
     property alias channelWaveEditorAction: channelWaveEditorAction
-    property alias channelsViewSoundsBarAction: channelSoundsAction
+    // property alias channelsViewSoundsBarAction: channelSoundsAction
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -387,14 +387,14 @@ Rectangle {
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
-                        id: channelSoundsAction
-                        text: qsTr("Sounds")
-                        page: Qt.resolvedUrl("../SessionDashboard/ChannelsViewSoundsBar.qml")
-                        preload: true
-                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
-                        initialProperties: {"bottomBar": root}
-                    },
+                    // Zynthian.TabbedControlViewAction {
+                    //     id: channelSoundsAction
+                    //     text: qsTr("Sounds")
+                    //     page: Qt.resolvedUrl("../SessionDashboard/ChannelsViewSoundsBar.qml")
+                    //     preload: true
+                    //     visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
+                    //     initialProperties: {"bottomBar": root}
+                    // },
                     Zynthian.TabbedControlViewAction {
                         id: sampleSoundsAction
                         text: qsTr("Samples")

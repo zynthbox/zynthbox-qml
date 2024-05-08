@@ -34,7 +34,6 @@ import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
 
 import Zynthian 1.0 as Zynthian
-import '../SessionDashboard'
 
 Zynthian.ScreenPage {
     id: root
@@ -692,13 +691,13 @@ Zynthian.ScreenPage {
             }
 
             // Check if sound combinator is active
-            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
-                bottomBar.tabbedView.activeAction.page.search("ChannelsViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
-            ) {
-                zynqtgui.soundCombinatorActive = true;
-            } else {
-                zynqtgui.soundCombinatorActive = false;
-            }
+            // if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+            //     bottomBar.tabbedView.activeAction.page.search("ChannelsViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
+            // ) {
+            //     zynqtgui.soundCombinatorActive = true;
+            // } else {
+            //     zynqtgui.soundCombinatorActive = false;
+            // }
 
             // Check if sound combinator is active
             if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
@@ -1819,11 +1818,12 @@ Zynthian.ScreenPage {
                     }
                 }
 
-                ChannelsViewSoundsBar {
-                    id: soundCombinatorBar
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+                // If this needs reviving - it used to be a part of SessionDashboard
+                // ChannelsViewSoundsBar {
+                //     id: soundCombinatorBar
+                //     Layout.fillWidth: true
+                //     Layout.fillHeight: true
+                // }
             }
 
             InfoBar {

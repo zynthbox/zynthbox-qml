@@ -34,7 +34,6 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
-import "../../pages/SessionDashboard/" as SessionDashboard
 
 Zynthian.BasePlayGrid {
     id: component
@@ -43,7 +42,6 @@ Zynthian.BasePlayGrid {
     popup: drumsPopup
     sidebar: drumsGridSidebar
     name:'Stepsequencer'
-    dashboardModel: _private.sequence
     isSequencer: true
     defaults: {
         "positionalVelocity": true
@@ -552,26 +550,6 @@ Zynthian.BasePlayGrid {
     onPropertyChanged: {
         if (property === "positionalVelocity") {
             _private.positionalVelocity = value;
-        }
-    }
-    Connections {
-        target: Zynthbox.PlayGridManager
-        onDashboardItemPicked: {
-            adoptSequence(); // just to be safe...
-            if (component.dashboardModel === model) {
-                _private.sequence.activePattern = index;
-                var foundIndex = -1;
-                for(var i = 0; i < zynqtgui.sketchpad.song.channelsModel.count; ++i) {
-                    var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(i);
-                    if (channel && channel.connectedPattern === index) {
-                        foundIndex = i;
-                        break;
-                    }
-                }
-                if (foundIndex > -1 && zynqtgui.sketchpad.selectedTrackId !== foundIndex) {
-                    zynqtgui.sketchpad.selectedTrackId = foundIndex;
-                }
-            }
         }
     }
     Timer {
@@ -2184,10 +2162,10 @@ Zynthian.BasePlayGrid {
                         }
                     }
                 }
-                SessionDashboard.ChannelsViewSoundsBar {
-                    anchors.fill: parent
-                    property QtObject bottomDrawer: channelsViewDrawer
-                }
+                // SessionDashboard.ChannelsViewSoundsBar {
+                //     anchors.fill: parent
+                //     property QtObject bottomDrawer: channelsViewDrawer
+                // }
             }
             Zynthian.Popup {
                 id: partPicker

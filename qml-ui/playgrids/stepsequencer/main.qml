@@ -1888,10 +1888,7 @@ Zynthian.BasePlayGrid {
                                                                 : "Unassigned - playing to: " + _private.currentSoundName
                                                         : ""
                                                     onClicked: {
-                                                        if (zynqtgui.sketchpad.selectedTrackId !== patternsMenuItem.associatedChannelIndex) {
-                                                            zynqtgui.sketchpad.selectedTrackId = patternsMenuItem.associatedChannelIndex;
-                                                        }
-                                                        channelsViewDrawer.open();
+                                                        zynqtgui.current_screen_id = "sketchpad";
                                                     }
                                                 }
 
@@ -2132,40 +2129,6 @@ Zynthian.BasePlayGrid {
                     onClose: noteSettingsPopup.close();
                     showCloseButton: true
                 }
-            }
-            QQC2.Drawer {
-                id: channelsViewDrawer
-
-                edge: Qt.BottomEdge
-                modal: true
-
-                width: parent.width
-                height: Kirigami.Units.gridUnit * 15
-
-                property var cuiaCallback: function(cuia) {
-                    if (cuia === "SWITCH_BACK_SHORT" || cuia === "SWITCH_BACK_BOLD" || cuia === "SWITCH_BACK_LONG") {
-                        channelsViewDrawer.close();
-                    }
-                    return true;
-                }
-                onOpened: {
-                    zynqtgui.pushDialog(channelsViewDrawer);
-                }
-                onClosed: {
-                    zynqtgui.popDialog(channelsViewDrawer);
-                }
-                Connections {
-                    target: component
-                    onIsVisibleChanged: {
-                        if (channelsViewDrawer.opened && component.isVisible === false) {
-                            channelsViewDrawer.close();
-                        }
-                    }
-                }
-                // SessionDashboard.ChannelsViewSoundsBar {
-                //     anchors.fill: parent
-                //     property QtObject bottomDrawer: channelsViewDrawer
-                // }
             }
             Zynthian.Popup {
                 id: partPicker

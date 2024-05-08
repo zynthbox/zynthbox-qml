@@ -136,33 +136,20 @@ ColumnLayout {
     }
     signal close();
 
-    property var noteLengths: {
-        1: 32,
-        2: 16,
-        3: 8,
-        4: 4,
-        5: 2,
-        6: 1
-    }
-    property int stepDuration: component.patternModel ? noteLengths[component.patternModel.noteLength] : 0
+    readonly property int patternSubbeatToTickMultiplier: (Zynthbox.SyncTimer.getMultiplier() / 32);
+    property int stepDuration: component.patternModel ? (component.patternModel.stepLength / patternSubbeatToTickMultiplier) : 0
     // This is going to come back to haunt us - if we don't somehow tell the user the difference between a quantised note and one set to what happens to be the current note length... that will be an issue
     property var noteLengthNames: {
-        1: "1/4 (auto)",
-        2: "1/8 (auto)",
-        3: "1/16 (auto)",
-        4: "1/32 (auto)",
-        5: "1/64 (auto)",
-        6: "1/128 (auto)"
+        96: "1/4 (auto)",
+        48: "1/8 (auto)",
+        24: "1/16 (auto)",
+        12: "1/32 (auto)",
+        6: "1/64 (auto)",
+        3: "1/128 (auto)"
     }
-    //property var noteLengthNames: {
-        //1: "1/4",
-        //2: "1/8",
-        //3: "1/16",
-        //4: "1/32",
-        //5: "1/64",
-        //6: "1/128"
-    //}
-    property string stepDurationName: component.patternModel ? noteLengthNames[component.patternModel.noteLength] : ""
+    property string stepDurationName: component.patternModel
+        ? noteLengthNames.indexOf(component.patternModel.stepLength) > -1 ? noteLengthNames[component.patternModel.stepLength] : component.patternModel.stepLengthName(component.patternModel.stepLength)
+        : ""
 
     readonly property int parameterPageCount: 3
     property int currenParameterPageIndex: 0
@@ -1084,7 +1071,7 @@ ColumnLayout {
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 12
-            text: qsTr("Step Size")
+            text: qsTr("Step Length")
             checked: component.patternModel ? component.patternModel.defaultNoteDuration === 0 : false
             onClicked: { component.patternModel.defaultNoteDuration = 0; }
         }

@@ -86,11 +86,11 @@ Zynthian.Dialog {
             var sequence = Zynthbox.PlayGridManager.getSequenceModel(song.scenesModel.selectedSequenceName)
             var longestPatternDuration = 0;
             // Assemble the duration of time we want to be recording for
-            var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
+            var syncTimerToPatternDurationMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
             for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                 for (var partIndex = 0; partIndex < 5; ++partIndex) {
                     var pattern = sequence.getByPart(channelIndex, partIndex);
-                    var patternDuration = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
+                    var patternDuration = pattern.width * pattern.availableBars * pattern.stepLength / syncTimerToPatternDurationMultiplier;
                     if (patternDuration > longestPatternDuration) {
                         longestPatternDuration = patternDuration;
                     }

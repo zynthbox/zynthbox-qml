@@ -260,7 +260,7 @@ Zynthian.BasePlayGrid {
         property int gridStartNote: 48
 
         // Properties inherent to the active pattern (set these through _private.sequence.setPatternProperty(_private.activePattern, ...))
-        property int noteLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.noteLength : 0
+        property int stepLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.stepLength : 0
         property int swing: sequence && sequence.activePatternObject ? sequence.activePatternObject.swing : 0
         property var availableBars: sequence && sequence.activePatternObject ? sequence.activePatternObject.availableBars : 0
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
@@ -369,17 +369,21 @@ Zynthian.BasePlayGrid {
             }
         }
 
-        property var availableNoteLengths: ["-1", "0", "1", "8", "2", "7", "3", "9", "4", "10", "5", "6"]
-        function noteLengthUp() {
-            let currentIndex = _private.availableNoteLengths.indexOf(_private.noteLength.toString());
-            if (currentIndex < _private.availableNoteLengths.length - 1) {
-                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", _private.availableNoteLengths[currentIndex + 1]);
+        property var availableNoteLengths: [384, 192, 96, 48, 24, 12, 6, 3]
+        function stepLengthUp() {
+            if (zynqtgui.modeButtonPressed) {
+                zynqtgui.ignoreNextModeButtonPress = true;
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.stepLength + 1);
+            } else {
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, 1));
             }
         }
-        function noteLengthDown() {
-            let currentIndex = _private.availableNoteLengths.indexOf(_private.noteLength.toString());
-            if (currentIndex > 0) {
-                _private.sequence.setPatternProperty(_private.activePattern, "noteLength", _private.availableNoteLengths[currentIndex - 1]);
+        function stepLengthDown() {
+            if (zynqtgui.modeButtonPressed) {
+                zynqtgui.ignoreNextModeButtonPress = true;
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.stepLength - 1);
+            } else {
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, -1));
             }
         }
         function swingUp() {
@@ -421,20 +425,6 @@ Zynthian.BasePlayGrid {
             }
         }
 
-        readonly property var noteLengthNames: {
-            "-1": "1",
-            "0": "1/2",
-            "1": "1/4th",
-            "8": "1/6th",
-            "2": "1/8th",
-            "7": "1/12th",
-            "3": "1/16th",
-            "9": "1/24th",
-            "4": "1/32th",
-            "10": "148th",
-            "5": "1/64th",
-            "6": "1/128th"
-        }
         /**
          * \brief Copy the range from startRow to endRow (inclusive) from model into the clipboard
          * @param model The model you wish to copy notes and metadata out of
@@ -741,7 +731,7 @@ Zynthian.BasePlayGrid {
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
                         onKnob0Up: {
                             if (component.showPatternSettings) {
-                                _private.noteLengthUp();
+                                _private.stepLengthUp();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
@@ -759,7 +749,7 @@ Zynthian.BasePlayGrid {
                         }
                         onKnob0Down: {
                             if (component.showPatternSettings) {
-                                _private.noteLengthDown();
+                                _private.stepLengthDown();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
                                     case 2:
@@ -887,7 +877,7 @@ Zynthian.BasePlayGrid {
                             noteLengthVisualiser.lastLoopIndex = -1;
                         }
                         function visualiseNote(note, noteDuration, noteDelay, noteOffset) {
-                            noteLengthVisualiser.singleStepLength = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                            noteLengthVisualiser.singleStepLength = noteLengthVisualiser.noteLengths[_private.activePatternModel.stepLength]
                             noteLengthVisualiser.totalStepLength = noteDuration / noteLengthVisualiser.singleStepLength;
                             noteLengthVisualiser.lastLoopIndex = (noteLengthVisualiser.totalStepLength + noteOffset) / 16;
                             noteLengthVisualiser.noteDuration = noteDuration;
@@ -904,12 +894,12 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         property var noteLengths: {
-                            1: 32,
-                            2: 16,
-                            3: 8,
-                            4: 4,
-                            5: 2,
-                            6: 1
+                            96: 32,
+                            48: 16,
+                            24: 8,
+                            12: 4,
+                            6: 2,
+                            3: 1
                         }
                         property QtObject note: null
                         property int noteOffset: 0
@@ -1222,7 +1212,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.activePatternModel.stepLength]
                                         changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
@@ -1233,7 +1223,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.activePatternModel.stepLength]
                                         changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
@@ -1405,74 +1395,33 @@ Zynthian.BasePlayGrid {
                                     Layout.maximumWidth: Layout.minimumWidth
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: _private.availableNoteLengths.indexOf(_private.noteLength.toString()) < _private.availableNoteLengths.length - 1
+                                        enabled: _private.activePatternModel && _private.activePatternModel.stepLength < _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, 1)
                                         onClicked: {
-                                            _private.noteLengthUp();
-                                        }
-                                        Zynthian.KnobIndicator {
-                                            anchors {
-                                                left: parent.left
-                                                top: parent.bottom
-                                                margins: 2
-                                            }
-                                            height: parent.height * 0.7
-                                            width: height
-                                            knobId: 0
+                                            _private.stepLengthUp();
                                         }
                                     }
                                     QQC2.Label {
                                         id:noteLengthLabel
                                         Layout.alignment: Qt.AlignHCenter
                                         horizontalAlignment: Text.AlignHCenter
-                                        text: {
-                                            var text = "speed:\n"
-                                            switch(_private.noteLength) {
-                                                case -1:
-                                                    text += "1/16";
-                                                    break;
-                                                case 0:
-                                                    text += "1/8";
-                                                    break;
-                                                case 1:
-                                                    text += "1/4";
-                                                    break;
-                                                case 8:
-                                                    text += "1/3";
-                                                    break;
-                                                case 2:
-                                                    text += "1/2";
-                                                    break;
-                                                case 7:
-                                                    text += "3/4";
-                                                    break;
-                                                case 3:
-                                                    text += "normal";
-                                                    break;
-                                                case 9:
-                                                    text += "5/4";
-                                                    break;
-                                                case 4:
-                                                    text += "double";
-                                                    break;
-                                                case 10:
-                                                    text += "triple"
-                                                    break;
-                                                case 5:
-                                                    text += "quadruple";
-                                                    break;
-                                                case 6:
-                                                    text += "octuple";
-                                                    break;
-                                            }
-                                            return text
-                                        }
+                                        text: "step length:\n%1".arg(_private.activePatternModel.stepLengthName(_private.stepLength))
                                     }
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: _private.availableNoteLengths.indexOf(_private.noteLength.toString()) > 0
+                                        enabled: _private.activePatternModel && _private.activePatternModel.stepLength > _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, -1)
                                         onClicked: {
-                                            _private.noteLengthDown();
+                                            _private.stepLengthDown();
+                                        }
+                                        Zynthian.KnobIndicator {
+                                            anchors {
+                                                left: parent.left
+                                                bottom: parent.top
+                                                margins: 2
+                                            }
+                                            height: parent.height * 0.7
+                                            width: height
+                                            knobId: 0
                                         }
                                     }
                                 }
@@ -1486,16 +1435,6 @@ Zynthian.BasePlayGrid {
                                         enabled: _private.swing < 99
                                         onClicked: {
                                             _private.swingUp();
-                                        }
-                                        Zynthian.KnobIndicator {
-                                            anchors {
-                                                left: parent.left
-                                                top: parent.bottom
-                                                margins: 2
-                                            }
-                                            height: parent.height * 0.7
-                                            width: height
-                                            knobId: 1
                                         }
                                     }
                                     QQC2.Label {
@@ -1545,6 +1484,16 @@ Zynthian.BasePlayGrid {
                                         onClicked: {
                                             _private.swingDown();
                                         }
+                                        Zynthian.KnobIndicator {
+                                            anchors {
+                                                left: parent.left
+                                                bottom: parent.top
+                                                margins: 2
+                                            }
+                                            height: parent.height * 0.7
+                                            width: height
+                                            knobId: 1
+                                        }
                                     }
                                 }
 
@@ -1557,16 +1506,6 @@ Zynthian.BasePlayGrid {
                                         enabled: _private.activePatternModel && _private.activePatternModel.patternLength < (_private.activePatternModel.bankLength * _private.activePatternModel.width)
                                         onClicked: {
                                             _private.patternLengthUp();
-                                        }
-                                        Zynthian.KnobIndicator {
-                                            anchors {
-                                                left: parent.left
-                                                top: parent.bottom
-                                                margins: 2
-                                            }
-                                            height: parent.height * 0.7
-                                            width: height
-                                            knobId: 2
                                         }
                                     }
                                     QQC2.Label {
@@ -1606,6 +1545,16 @@ Zynthian.BasePlayGrid {
                                         enabled: _private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width
                                         onClicked: {
                                             _private.patternLengthDown();
+                                        }
+                                        Zynthian.KnobIndicator {
+                                            anchors {
+                                                left: parent.left
+                                                bottom: parent.top
+                                                margins: 2
+                                            }
+                                            height: parent.height * 0.7
+                                            width: height
+                                            knobId: 2
                                         }
                                     }
                                 }
@@ -2495,11 +2444,13 @@ Zynthian.BasePlayGrid {
                         896: "7",
                         1024: "8"
                     }
-                    property string noteLength:  _private.activePatternModel.defaultNoteDuration === 0
-                        ? _private.noteLengthNames[_private.noteLength]
-                        : defaultNoteSettingsButton.stepNames.hasOwnProperty(_private.activePatternModel.defaultNoteDuration)
-                            ? defaultNoteSettingsButton.stepNames[_private.activePatternModel.defaultNoteDuration]
-                            : _private.activePatternModel.defaultNoteDuration + "/128th"
+                    property string noteLength: _private.activePatternModel
+                        ? _private.activePatternModel.defaultNoteDuration === 0
+                            ? _private.activePatternModel.stepLengthName(_private.activePatternModel.stepLength)
+                            : defaultNoteSettingsButton.stepNames.hasOwnProperty(_private.activePatternModel.defaultNoteDuration)
+                                ? defaultNoteSettingsButton.stepNames[_private.activePatternModel.defaultNoteDuration]
+                                : _private.activePatternModel.defaultNoteDuration + "/128th"
+                        : ""
                     property string velocity: component.heardVelocities.length === 0 ? "" : "Vel " + component.heardVelocities[0]
                     onClicked: {
                         if (_private.selectedStep > -1) {

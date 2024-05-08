@@ -220,7 +220,6 @@ Zynthian.Popup {
                         //   - also add an "all sound off" midi message at the same position as any recording-stop, to avoid any long tails bleeding into the next recording
                         // - Bounce progress done vya playback progress of the temporary "song"
                         // - Only do metadata writing once all recording is completed, to avoid unnecessary overhead (add in a "finishing up" message to tell the user about this, too)
-                        let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 };
                         let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                         let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
 
@@ -283,7 +282,7 @@ Zynthian.Popup {
                                 for (let partIndex = 0; partIndex < partsToBounce.length; ++partIndex) {
                                     let pattern = _private.sequence.getByPart(sketchpadTrackId, partsToBounce[partIndex]);
                                     if (pattern.hasNotes) {
-                                        let patternDurationInPatternSubbeats = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
+                                        let patternDurationInPatternSubbeats = pattern.width * pattern.availableBars * pattern.stepLength / patternSubbeatToTickMultiplier;
                                         let patternRepeatCount = _private.patternRepeatCount; // How long are the tails expected (we just start with 1 here, until we work out how to properly expose this)
                                         let includeLeadin = _private.includeLeadin ? 1 : 0;
                                         let includeMainLoop = 1; // The main part can't be disabled anyway, so this is just a 1
@@ -410,10 +409,9 @@ Zynthian.Popup {
                                 metadata["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = sketchpadTrack.samplePickingStyle; // The method by which samples are picked for playback mode
                             }
                             // Set up the loop points in the new recording
-                            let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                             var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                             // Reset this to beats (rather than pattern subbeats)
-                            let patternDurationInBeats = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
+                            let patternDurationInBeats = pattern.width * pattern.availableBars * pattern.stepLength / patternSubbeatToTickMultiplier;
                             let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
                             patternDurationInBeats = patternDurationInBeats / 32;
                             let startPosition = 0.0; // This is in seconds

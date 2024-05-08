@@ -700,39 +700,39 @@ Zynthian.Popup {
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 1 : false
+                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 96 : false
                                     text: qsTr("1")
-                                    onClicked: { _private.selectedPattern.noteLength = 1; }
+                                    onClicked: { _private.selectedPattern.stepLength = 96; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 2 : false
+                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 48 : false
                                     text: qsTr("1/2")
-                                    onClicked: { _private.selectedPattern.noteLength = 2; }
+                                    onClicked: { _private.selectedPattern.stepLength = 48; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 3 : false
+                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 24 : false
                                     text: qsTr("1/4")
-                                    onClicked: { _private.selectedPattern.noteLength = 3; }
+                                    onClicked: { _private.selectedPattern.stepLength = 24; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 4 : false
+                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 12 : false
                                     text: qsTr("1/8")
-                                    onClicked: { _private.selectedPattern.noteLength = 4; }
+                                    onClicked: { _private.selectedPattern.stepLength = 12; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 5 : false
+                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 6 : false
                                     text: qsTr("1/16")
-                                    onClicked: { _private.selectedPattern.noteLength = 5; }
+                                    onClicked: { _private.selectedPattern.stepLength = 6; }
                                 }
                                 QQC2.Button {
                                     Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.noteLength === 6 : false
+                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 3 : false
                                     text: qsTr("1/32")
-                                    onClicked: { _private.selectedPattern.noteLength = 6; }
+                                    onClicked: { _private.selectedPattern.stepLength = 3; }
                                 }
                                 QQC2.Label {
                                     Layout.preferredWidth: _private.preferredRowHeight
@@ -826,13 +826,12 @@ Zynthian.Popup {
                                     margins: Kirigami.Units.smallSpacing
                                     rightMargin: patternVisualiser.visible ? parent.width * (8 - _private.selectedPattern.availableBars) / 8 : 0
                                 }
-                                text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.availableBars, _private.selectedPattern.noteLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
+                                text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.availableBars, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
                                 function patternBarsToSeconds(patternBars, noteLength, bpm) {
                                     // Set up the loop points in the new recording
-                                    let noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                                     let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                                     // Reset this to beats (rather than pattern subbeats)
-                                    let patternDurationInBeats = patternBars * _private.selectedPattern.width * noteLengths[noteLength];
+                                    let patternDurationInBeats = patternBars * _private.selectedPattern.width * noteLength / patternSubbeatToTickMultiplier;
                                     let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
                                     return patternDurationInSeconds;
                                 }

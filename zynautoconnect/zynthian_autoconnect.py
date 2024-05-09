@@ -324,6 +324,24 @@ def midi_autoconnect(force=False):
                             'chans': [mcprl.midi_chan]
                         }
 
+    for jn, info in root_engine_info.items():
+        #logger.debug("MIDI ROOT ENGINE INFO: {} => {}".format(jn, info))
+        if None in info['chans']:
+            try:
+                jclient.connect(zmr_out['main_out'], info['port'])
+            except:
+                pass
+
+        else:
+            for ch in range(0,16):
+                try:
+                    if ch in info['chans']:
+                        jclient.connect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
+                    else:
+                        jclient.disconnect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
+                except:
+                    pass
+
     # If there are any overrides set on that slot (information is on sketchpad_channel), use those instead:
     #   - sketchpadTrack:(-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9) where -1 is whatever the current is
     #   - no-input (explicitly refuse midi data)
@@ -366,8 +384,10 @@ def midi_autoconnect(force=False):
                                     # First disconnect anything already hooked up
                                     try:
                                         for connectedTo in jclient.get_all_connections(midiInPort.jackname):
-                                            jclient.disconnect(midiInPort.jackname, connectedTo)
-                                    except: pass
+                                            jclient.disconnect(connectedTo, midiInPort.jackname)
+                                    except Exception as e:
+                                        logging.error(f"Error while trying to disconnect other midi in port connections due to : {e} - we attempted to disconnect {connectedTo} from {midiInPort.jackname}")
+                                        pass
                                     # Then hook up what we've been asked to
                                     for eventPort in eventPorts:
                                         try:
@@ -379,24 +399,6 @@ def midi_autoconnect(force=False):
         force_next_autoconnect = True
         release_lock()
         return
-
-    for jn, info in root_engine_info.items():
-        #logger.debug("MIDI ROOT ENGINE INFO: {} => {}".format(jn, info))
-        if None in info['chans']:
-            try:
-                jclient.connect(zmr_out['main_out'], info['port'])
-            except:
-                pass
-
-        else:
-            for ch in range(0,16):
-                try:
-                    if ch in info['chans']:
-                        jclient.connect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
-                    else:
-                        jclient.disconnect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
-                except:
-                    pass
 
     # Connect Engine's MIDI output to assigned ports
     for layer in zynthian_gui_config.zynqtgui.screens["layer"].root_layers:

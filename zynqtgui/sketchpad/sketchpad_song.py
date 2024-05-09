@@ -32,6 +32,7 @@ import Zynthbox
 import logging
 import json
 import os
+import warnings
 
 from pathlib import Path
 from PySide2.QtCore import Qt, QTimer, QMetaObject, Property, QObject, Signal, Slot
@@ -148,7 +149,7 @@ class sketchpad_song(QObject):
             "volume": self.__volume__,
             "selectedScaleIndex": self.__selected_scale_index__,
             "octave": self.__octave__,
-            "channels": self.__channels_model__.serialize(),
+            "tracks": self.__channels_model__.serialize(),
             "parts": self.__parts_model__.serialize(),
             "scenes": self.__scenes_model__.serialize(),
             "sketches": self.__sketches_model__.serialize()
@@ -329,8 +330,14 @@ class sketchpad_song(QObject):
                         self.set_octave(sketchpad["octave"], True)
                     if "parts" in sketchpad:
                         self.__parts_model__.deserialize(sketchpad["parts"])
+
+                    # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback in the future
                     if "channels" in sketchpad:
+                        warnings.warn("`channels` key is deprecated (will be removed soon) and has been renamed to `track`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
                         self.__channels_model__.deserialize(sketchpad["channels"])
+                    if "tracks" in sketchpad:
+                        self.__channels_model__.deserialize(sketchpad["tracks"])
+
                     if "scenes" in sketchpad:
                         self.__scenes_model__.deserialize(sketchpad["scenes"])
                     if "sketches" in sketchpad:

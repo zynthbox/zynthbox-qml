@@ -462,7 +462,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(None)
     def emit_chained_sounds_changed(self):
-        selected_channel = self.song.channelsModel.getChannel(self.selectedChannel)
+        selected_channel = self.song.channelsModel.getChannel(self.selectedTrackId)
         if selected_channel is not None:
             selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
             selected_channel.update_jack_port()

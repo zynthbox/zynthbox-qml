@@ -1261,7 +1261,7 @@ class zynthian_gui(QObject):
         # Initialize MPE Zones
         # self.init_mpe_zones(0, 2)
 
-        # Reset channels LED state on selectedChannel change
+        # Reset channels LED state on selectedTrackId change
         self.sketchpad.selected_track_id_changed.connect(self.channelsModTimerHandler)
 
     def stop(self):
@@ -1994,7 +1994,7 @@ class zynthian_gui(QObject):
                     if self.__clipToRecord is None:
                         self.__clipToRecord = self.__channelToRecord.getClipToRecord()
 
-                    # If sample[0] is empty, set sample[0] to recorded file along with selectedChannel's clip
+                    # If sample[0] is empty, set sample[0] to recorded file along with selectedTrackId's clip
                     if self.__channelToRecord.samples[self.__channelRecordingRow].path is not None and len(self.__channelToRecord.samples[self.__channelRecordingRow].path) > 0:
                         zl.clipsToRecord = [self.__clipToRecord]
                     else:

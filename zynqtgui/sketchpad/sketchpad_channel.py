@@ -129,6 +129,11 @@ class sketchpad_channel(QObject):
         self.__chained_sounds_info_updater.setSingleShot(True)
         self.__chained_sounds_info_updater.timeout.connect(self.chainedSoundsInfoChanged.emit)
 
+        self.__synthRoutingDataUpdaterThrottle__ = QTimer()
+        self.__synthRoutingDataUpdaterThrottle__.setInterval(1)
+        self.__synthRoutingDataUpdaterThrottle__.setSingleShot(True)
+        self.__synthRoutingDataUpdaterThrottle__.timeout.connect(self.updateSynthRoutingDataActual)
+
         self.zynqtgui.layer.layerPresetChanged.connect(self.layerPresetChangedHandler)
         self.zynqtgui.layer.layer_created.connect(self.layerCreatedHandler)
 
@@ -368,6 +373,7 @@ class sketchpad_channel(QObject):
         self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
         self.chainedFxNamesChanged.emit()
+        self.updateSynthRoutingData()
 
     def cache_bank_preset_lists(self):
         # Back up curlayer
@@ -1079,6 +1085,31 @@ class sketchpad_channel(QObject):
         self.zynqtgui.currentTaskMessage = f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}"
         self.zynqtgui.do_long_task(task)
 
+    def updateSynthRoutingData(self):
+        self.__synthRoutingDataUpdaterThrottle__.start()
+
+    def updateSynthRoutingDataActual(self):
+        # logging.error(f"Updating routing data for {self.name} with chained sounds {self.__chained_sounds__}")
+        for position in range(0, 5):
+            newEntry = self.__chained_sounds__[position]
+            if newEntry > -1 and self.checkIfLayerExists(newEntry):
+                # if any engines have been added, ensure the synth engine data slot has that information
+                newLayer = self.zynqtgui.layer.layer_midi_map[newEntry]
+                # logging.error(f"Updating data container for {newLayer.engine.name}")
+                dataContainer = self.__routingData__["synth"][position]
+                dataContainer.name = self.getLayerNameByMidiChannel(newEntry)
+                audioInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_audio=True, is_input=True)
+                for port in audioInPorts:
+                    # logging.error(f"Adding audio in port for {port}")
+                    dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+                midiInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_midi=True, is_input=True)
+                for port in midiInPorts:
+                    # logging.error(f"Adding midi in port for {port}")
+                    dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+            elif newEntry == -1: # Don't clear data unless the position is actually cleared
+                # if any engines have been removed, clear out the equivalent synth engine data slot
+                self.__routingData__["synth"][position].clear()
+
     def set_chained_sounds(self, sounds, updateRoutingData:bool = True):
         logging.debug(f"set_chained_sounds : {sounds}")
         update_jack_ports = True
@@ -1113,28 +1144,7 @@ class sketchpad_channel(QObject):
             self.update_jack_port()
 
         if updateRoutingData:
-            self.zynqtgui.layer.fill_list()
-            logging.error(f"Updating routing data for {self.name} with chained sounds {chained_sounds}")
-            for position in range(0, 5):
-                oldEntry = oldChainedSounds[position]
-                newEntry = chained_sounds[position]
-                if oldEntry == -1 and newEntry > -1 and self.checkIfLayerExists(newEntry):
-                    # if any engines have been added, ensure the synth engine data slot has that information
-                    newLayer = self.zynqtgui.layer.layer_midi_map[newEntry]
-                    logging.error(f"Updating data container for {newLayer.engine.name}")
-                    dataContainer = self.__routingData__["synth"][position]
-                    dataContainer.name = self.getLayerNameByMidiChannel(newEntry)
-                    audioInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_audio=True, is_input=True)
-                    for port in audioInPorts:
-                        logging.error(f"Adding audio in port for {port}")
-                        dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
-                    midiInPorts = self.jclient.get_ports(newLayer.get_jackname(), is_midi=True, is_input=True)
-                    for port in midiInPorts:
-                        logging.error(f"Adding midi in port for {port}")
-                        dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
-                elif newEntry == -1 and oldEntry > -1:
-                    # if any engines have been removed, clear out the equivalent synth engine data slot
-                    self.__routingData__["synth"][position].clear()
+            self.updateSynthRoutingData()
 
         self.__sound_snapshot_changed = True
         if self.zynqtgui.isBootingComplete:

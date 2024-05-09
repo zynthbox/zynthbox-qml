@@ -70,7 +70,6 @@ from pynput.keyboard import Key, Controller
 from timeit import default_timer as timer
 from datetime import timedelta
 
-from zynqtgui.sketchpad_copier import zynthian_gui_sketchpad_copier
 from zynqtgui.zynthian_gui_bluetooth_config import zynthian_gui_bluetooth_config
 from zynqtgui.zynthian_gui_song_manager import zynthian_gui_song_manager
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
@@ -1228,10 +1227,7 @@ class zynthian_gui(QObject):
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
-
         self.screens["song_manager"] = zynthian_gui_song_manager(self)
-        self.screens["sketchpad_copier"] = zynthian_gui_sketchpad_copier(self)
-
         self.screens["led_config"] = zynthian_gui_led_config(self)
         self.screens["bluetooth_config"] = zynthian_gui_bluetooth_config(self)
 
@@ -3651,9 +3647,6 @@ class zynthian_gui(QObject):
     def song_manager(self):
         return self.screens["song_manager"]
 
-    def sketchpad_copier(self):
-        return self.screens["sketchpad_copier"]
-
     def sound_categories(self):
         return self.screens["sound_categories"]
 
@@ -4288,7 +4281,6 @@ class zynthian_gui(QObject):
     network = Property(QObject, network, constant=True)
     hardware = Property(QObject, hardware, constant=True)
     song_manager = Property(QObject, song_manager, constant=True)
-    sketchpad_copier = Property(QObject, sketchpad_copier, constant=True)
     sound_categories = Property(QObject, sound_categories, constant=True)
     led_config = Property(QObject, led_config, constant=True)
     bluetooth_config = Property(QObject, bluetooth_config, constant=True)

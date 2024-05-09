@@ -97,9 +97,6 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
             self.list_metadata.append({"icon":"../../img/snapshots.svg"})
 
-            self.list_data.append((self.sketchpad_copier, 0, "Sketchpad Copier"))
-            self.list_metadata.append({"icon":"../../img/sketchpad_copier.svg"})
-
         if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             if Path(apps_folder).exists():
@@ -366,10 +363,6 @@ class zynthian_gui_main(zynthian_gui_selector):
     def song_manager(self):
         logging.info("Song Manager")
         self.zynqtgui.show_modal("song_manager")
-
-    def sketchpad_copier(self):
-        logging.info("Sketchpad Copier")
-        self.zynqtgui.show_modal("sketchpad_copier")
 
     def admin(self):
         logging.info("Admin")

@@ -219,13 +219,13 @@ class sketchpad_segments_model(QAbstractListModel):
     # Returns the segment which was removed from the list
     @Slot(int, result=QObject)
     def remove_segment(self, segment_index):
-        segment = self.__segments[segment_index]
-        self.__segments.pop(segment_index)
+        segment = self.__segments.pop(segment_index)
         self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()
-        if self.__selected_segment_index >= len(self.__segments):
-            self.__selected_segment_index = len(self.__segments) - 1
-            self.selectedSegmentIndexChanged.emit()
+        if self.__selected_segment_index == len(self.__segments):
+            self.__selected_segment_index = self.__selected_segment_index - 1
+        # Always emit the index changed signal here - even if we're staying in the same place, the selected /segment/ has changed
+        self.selectedSegmentIndexChanged.emit()
         if not self.__song.isLoading:
             self.__song.schedule_save()
         return segment

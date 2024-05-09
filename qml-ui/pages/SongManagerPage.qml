@@ -432,6 +432,29 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
+                    QQC2.Label {
+                        anchors {
+                            topMargin: -7 // Similar logic to our height above
+                            top: parent.top
+                            right: parent.right
+                            left: parent.left
+                        }
+                        font.pixelSize: Kirigami.Units.gridUnit / 2
+                        horizontalAlignment: Text.AlignRight
+                        text: segmentsRepeater.totalDuration > 0 ? formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
+                        function formatTime(seconds) {
+                            const hours = Math.floor(seconds / 3600);
+                            const minutes = Math.floor((seconds % 3600) / 60);
+                            const remainingSeconds = seconds % 60;
+
+                            if (hours > 0) {
+                                return `${hours}h${minutes}m${remainingSeconds}s`;
+                            } else if (minutes > 0) {
+                                return `${minutes}m${remainingSeconds}s`;
+                            }
+                            return `${seconds}s`;
+                        }
+                    }
                 }
             }
             // END Playback progress bar

@@ -556,7 +556,7 @@ class sketchpad_channel(QObject):
                 self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
                 self.set_chained_sounds(obj["chainedSounds"])
 
-            # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback later
+            # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
             if "channelAudioType" in obj:
                 warnings.warn("`channelAudioType` key is deprecated (will be removed soon) and has been renamed to `trackType`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
                 self.__track_type__ = obj["channelAudioType"]

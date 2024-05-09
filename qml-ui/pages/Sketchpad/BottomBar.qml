@@ -299,7 +299,7 @@ Rectangle {
                         return !zynqtgui.bottomBarControlObj.isEmpty ? clipSettingsAction : recordingAction;
                     case "bottombar-controltype-channel":
                         if (zynqtgui.bottomBarControlObj.trackType === "synth")
-                            return channelSoundsAction;
+                            return partAction; // as there's no channelSoundsAction any longer
                         else {
                             return sampleSoundsAction;
                         }

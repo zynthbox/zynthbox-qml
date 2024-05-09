@@ -667,12 +667,12 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*1.5
             font.pointSize: 11
             onClicked: {
-                // print(zynqtgui.sketchpad.song.scenesModel.getScene(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).name)
-                zynqtgui.current_modal_screen_id = 'sketchpad'
-                // tracksMenu.open()
+                if (zynqtgui.current_modal_screen_id == "sketchpad") {
+                    root.showMessageDialog(zynqtgui.sketchpad.song.sketchpadFolder+zynqtgui.sketchpad.song.name+".sketchpad.json", 0)
+                } else {
+                    zynqtgui.current_modal_screen_id = 'sketchpad'
+                }
             }
-            //onPressAndHold: zynqtgui.current_screen_id = 'main'
-            // highlighted: zynqtgui.current_screen_id === 'sketchpad'
 
             ColumnLayout {
                 anchors.left: parent.left

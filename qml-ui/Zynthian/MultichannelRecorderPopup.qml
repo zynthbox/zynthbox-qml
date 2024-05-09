@@ -47,21 +47,21 @@ Zynthian.Dialog {
             // Work out which channels we want to default-enable (that is, all channels which have things that are likely to be making a noise)
             var shouldRecord = false;
             var channel = song.channelsModel.getChannel(channelIndex);
-            if (channel.channelAudioType === "synth") {
+            if (channel.trackType === "synth") {
                 for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
                     if (channel.chainedSounds[soundIndex] > -1) {
                         shouldRecord = true;
                         break;
                     }
                 }
-            } else if (channel.channelAudioType === "sample-loop") {
+            } else if (channel.trackType === "sample-loop") {
                 for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
                     if (channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
                 }
-            } else if (channel.channelAudioType === "sample-trig" || channel.channelAudioType === "sample-slice") {
+            } else if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
                 for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                     if (channel.samples[sampleIndex].cppObjId > -1) {
                         shouldRecord = true;
@@ -160,14 +160,14 @@ Zynthian.Dialog {
                 for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                     var channel = _private.song.channelsModel.getChannel(channelIndex);
                     var soundIndication = "(unknown)";
-                    if (channel.channelAudioType === "synth") {
+                    if (channel.trackType === "synth") {
                         for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
                             if (channel.chainedSounds[soundIndex] > -1) {
                                 soundIndication = channel.connectedSoundName.replace(/([^a-z0-9]+)/gi, '-');
                                 break;
                             }
                         }
-                    } else if (channel.channelAudioType === "sample-loop") {
+                    } else if (channel.trackType === "sample-loop") {
                         for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
                             var clip = channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             if (clip.cppObjId > -1) {
@@ -182,7 +182,7 @@ Zynthian.Dialog {
                                 break;
                             }
                         }
-                    } else if (channel.channelAudioType === "sample-trig" || channel.channelAudioType === "sample-slice") {
+                    } else if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
                         for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                             var clip = channel.samples[sampleIndex];
                             if (clip.cppObjId > -1) {
@@ -251,8 +251,8 @@ Zynthian.Dialog {
                             let channel = zynqtgui.sketchpad.song.channelsModel.getChannel(filenameIndex - 2);
                             if (channel) { // by all rights this should not be possible, but... best safe
                                 metadata["ZYNTHBOX_ACTIVELAYER"] = channel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
-                                metadata["ZYNTHBOX_AUDIO_TYPE"] = channel.channelAudioType; // The audio type of this channel
-                                if (channel.channelAudioType === "sample-trig" || channel.channelAudioType === "sample-slice") {
+                                metadata["ZYNTHBOX_AUDIO_TYPE"] = channel.trackType; // The audio type of this channel
+                                if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
                                     // Store the sample data, if we've been playing in a patterny sample mode
                                     metadata["ZYNTHBOX_SAMPLES"] = channel.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
                                 }

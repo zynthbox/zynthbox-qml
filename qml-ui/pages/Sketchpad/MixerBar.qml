@@ -262,16 +262,16 @@ Rectangle {
 
                                                     Connections {
                                                         target: model.channel
-                                                        onChainedSoundsChanged: model.channel.channelAudioType === "synth" ? soundnameUpdater.restart() : false
-                                                        onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.channel.channelAudioType) >= 0 ? soundnameUpdater.restart() : false
-                                                        onChannelAudioTypeChanged: soundnameUpdater.restart()
-                                                        onSceneClipChanged: model.channel.channelAudioType === "sample-loop" ? soundnameUpdater.restart() : false
-                                                        onSelectedSlotRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.channel.channelAudioType) >= 0 ? soundnameUpdater.restart() : false
+                                                        onChainedSoundsChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
+                                                        onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
+                                                        onTrackTypeChanged: soundnameUpdater.restart()
+                                                        onSceneClipChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                        onSelectedSlotRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
                                                     }
 
                                                     Connections {
                                                         target: model.channel.sceneClip
-                                                        onPathChanged: model.channel.channelAudioType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                        onPathChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
                                                     }
                                                     Connections {
                                                         target: root
@@ -282,7 +282,7 @@ Rectangle {
                                                         if (root.visible) {
                                                             var text = "";
 
-                                                            if (model.channel.channelAudioType === "synth") {
+                                                            if (model.channel.trackType === "synth") {
                                                                 for (var id in model.channel.chainedSounds) {
                                                                     if (model.channel.chainedSounds[id] >= 0 &&
                                                                         model.channel.checkIfLayerExists(model.channel.chainedSounds[id])) {
@@ -291,12 +291,12 @@ Rectangle {
                                                                         break;
                                                                     }
                                                                 }
-                                                            } else if (model.channel.channelAudioType === "sample-trig" ||
-                                                                    model.channel.channelAudioType === "sample-slice") {
+                                                            } else if (model.channel.trackType === "sample-trig" ||
+                                                                    model.channel.trackType === "sample-slice") {
                                                                 try {
                                                                     text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
                                                                 } catch (e) {}
-                                                            } else if (model.channel.channelAudioType === "sample-loop") {
+                                                            } else if (model.channel.trackType === "sample-loop") {
                                                                 try {
                                                                     text = model.channel.sceneClip.path.split("/").pop()
                                                                 } catch (e) {}

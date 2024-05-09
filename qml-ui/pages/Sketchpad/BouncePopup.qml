@@ -156,7 +156,7 @@ Zynthian.Popup {
                         }
                     }
                     function checkSketchpadTrackSounds(sketchpadTrack) {
-                        if (sketchpadTrack.channelAudioType === "synth") {
+                        if (sketchpadTrack.trackType === "synth") {
                             let hasSound = false;
                             for (let soundIndex = 0; soundIndex < sketchpadTrack.chainedSounds.length; ++soundIndex) {
                                 if (sketchpadTrack.chainedSounds[soundIndex] > -1) {
@@ -170,7 +170,7 @@ Zynthian.Popup {
                                 _private.canBounce = false;
                                 _private.cannotBounceReason = qsTr("There are no synth engines on this track");
                             }
-                        } else if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
+                        } else if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
                             let hasSound = false;
                             for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                                 if (sketchpadTrack.samples[sampleIndex].cppObjId > -1) {
@@ -184,10 +184,10 @@ Zynthian.Popup {
                                 _private.canBounce = false;
                                 _private.cannotBounceReason = qsTr("There are no samples on this track, which is set to Sample mode.");
                             }
-                        } else if (sketchpadTrack.channelAudioType === "sample-loop") {
+                        } else if (sketchpadTrack.trackType === "sample-loop") {
                             _private.canBounce = false;
                             _private.cannotBounceReason = qsTr("This track is already a sketch, so it cannot be bounced further.");
-                        } else if (sketchpadTrack.channelAudioType === "external") {
+                        } else if (sketchpadTrack.trackType === "external") {
                             if (sketchpadTrack.externalAudioSource.length > 0) {
                                 _private.canBounce = true;
                             } else {
@@ -236,16 +236,16 @@ Zynthian.Popup {
                         for (let sketchpadTrackIndex = 0; sketchpadTrackIndex < sketchpadTracksToBounce.length; ++sketchpadTrackIndex) {
                             let sketchpadTrackId = sketchpadTracksToBounce[sketchpadTrackIndex];
                             let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(sketchpadTrackId);
-                            if (sketchpadTrack.channelAudioType === "synth" || sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice" || (sketchpadTrack.channelAudioType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
+                            if (sketchpadTrack.trackType === "synth" || sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice" || (sketchpadTrack.trackType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
                                 let soundIndication = "(unknown)";
-                                if (sketchpadTrack.channelAudioType === "synth") {
+                                if (sketchpadTrack.trackType === "synth") {
                                     for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
                                         if (sketchpadTrack.chainedSounds[soundIndex] > -1) {
                                             soundIndication = sketchpadTrack.connectedSoundName.replace(/([^a-z0-9]+)/gi, '-');
                                             break;
                                         }
                                     }
-                                } else if (sketchpadTrack.channelAudioType === "sample-loop") {
+                                } else if (sketchpadTrack.trackType === "sample-loop") {
                                     for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
                                         var clip = sketchpadTrack.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (clip.cppObjId > -1) {
@@ -260,7 +260,7 @@ Zynthian.Popup {
                                             break;
                                         }
                                     }
-                                } else if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
+                                } else if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
                                     for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                                         var clip = sketchpadTrack.samples[sampleIndex];
                                         if (clip.cppObjId > -1) {
@@ -401,9 +401,9 @@ Zynthian.Popup {
                                 "ZYNTHBOX_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
                                 "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.channelRoutingStyle,
                                 "ZYNTHBOX_ACTIVELAYER": sketchpadTrack.getChannelSoundSnapshotJson(), // The layer setup which produced the sounds in this recording
-                                "ZYNTHBOX_AUDIO_TYPE": sketchpadTrack.channelAudioType, // The audio type of this channel
+                                "ZYNTHBOX_AUDIO_TYPE": sketchpadTrack.trackType, // The audio type of this channel
                             };
-                            if (sketchpadTrack.channelAudioType === "sample-trig" || sketchpadTrack.channelAudioType === "sample-slice") {
+                            if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
                                 // Store the sample data, if we've been playing in a patterny sample mode
                                 metadata["ZYNTHBOX_SAMPLES"] = sketchpadTrack.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
                                 metadata["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = sketchpadTrack.samplePickingStyle; // The method by which samples are picked for playback mode
@@ -456,7 +456,7 @@ Zynthian.Popup {
                             clip.set_path(filename, false);
                             console.log("...and the clip says it is", clip.duration, "seconds long");
                             // Set channel mode to loop
-                            sketchpadTrack.channelAudioType = "sample-loop";
+                            sketchpadTrack.trackType = "sample-loop";
                         }
 
                         // Clean up the temporary segments model

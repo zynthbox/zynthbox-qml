@@ -976,7 +976,7 @@ Zynthian.BasePlayGrid {
                         Zynthian.SampleVisualiser {
                             anchors.fill: parent
                             sample: parent.visible ? drumpadLoopVisualiser.sample : null
-                            channelAudioType: drumpadLoopVisualiser.channel === null ? "" : drumpadLoopVisualiser.channel.channelAudioType
+                            trackType: drumpadLoopVisualiser.channel === null ? "" : drumpadLoopVisualiser.channel.trackType
                         }
                     }
                     RowLayout {
@@ -1819,7 +1819,7 @@ Zynthian.BasePlayGrid {
                                                             anchors.fill: parent
                                                             opacity: 0.2
                                                             sample: parent.visible ? patternPopupSampleVisualiser.sample : null
-                                                            channelAudioType: patternPopupSampleVisualiser.channel === null ? "" : patternPopupSampleVisualiser.channel.channelAudioType
+                                                            trackType: patternPopupSampleVisualiser.channel === null ? "" : patternPopupSampleVisualiser.channel.trackType
                                                         }
                                                     }
                                                     Component.onCompleted: {
@@ -1916,7 +1916,7 @@ Zynthian.BasePlayGrid {
                                                         Zynthian.SampleVisualiser {
                                                             anchors.fill: parent
                                                             sample: parent.visible ?  patternPopupLoopVisualiser.sample : null
-                                                            channelAudioType: patternPopupLoopVisualiser.channel === null ? "" : patternPopupLoopVisualiser.channel.channelAudioType
+                                                            trackType: patternPopupLoopVisualiser.channel === null ? "" : patternPopupLoopVisualiser.channel.trackType
                                                         }
                                                     }
                                                     Image {
@@ -1976,9 +1976,9 @@ Zynthian.BasePlayGrid {
                                                     //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                            //patternsMenuItem.associatedChannel.trackType = "external";
                                                         //} else {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "sample-trig";
+                                                            //patternsMenuItem.associatedChannel.trackType = "sample-trig";
                                                         //}
                                                     //}
                                                 //}
@@ -1988,9 +1988,9 @@ Zynthian.BasePlayGrid {
                                                     //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SynthDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                            //patternsMenuItem.associatedChannel.trackType = "external";
                                                         //} else {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "synth";
+                                                            //patternsMenuItem.associatedChannel.trackType = "synth";
                                                         //}
                                                     //}
                                                 //}
@@ -2003,9 +2003,9 @@ Zynthian.BasePlayGrid {
                                                     //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                            //patternsMenuItem.associatedChannel.trackType = "external";
                                                         //} else {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "sample-slice";
+                                                            //patternsMenuItem.associatedChannel.trackType = "sample-slice";
                                                         //}
                                                     //}
                                                 //}
@@ -2015,9 +2015,9 @@ Zynthian.BasePlayGrid {
                                                     //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination : false
                                                     //onClicked: {
                                                         //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "external";
+                                                            //patternsMenuItem.associatedChannel.trackType = "external";
                                                         //} else {
-                                                            //patternsMenuItem.associatedChannel.channelAudioType = "sample-loop";
+                                                            //patternsMenuItem.associatedChannel.trackType = "sample-loop";
                                                         //}
                                                     //}
                                                 //}

@@ -227,16 +227,16 @@ Zynthian.DialogQuestion {
                     }
                     // - Pick out the specific clip selected for sound source
                     let originSketch = _private.sketches[_private.soundSourceSketch];
-                    //   - Set track channelAudioType to match ZYNTHBOX_AUDIO_TYPE (clip.metadataAudioType)
-                    _private.sketchpadTrack.channelAudioType = originSketch.metadataAudioType;
+                    //   - Set track trackType to match ZYNTHBOX_AUDIO_TYPE (clip.metadataAudioType)
+                    _private.sketchpadTrack.trackType = originSketch.metadataAudioType;
                     //   - Set track channelRoutingStyle to match ZYNTHBOX_ROUTING_STYLE (clip.metadataRoutingStyle)
                     _private.sketchpadTrack.channelRoutingStyle = originSketch.metadataRoutingStyle;
                     //   - Set track setAudioTypeSettings to ZYNTHBOX_AUDIOTYPESETTINGS (clip.metadataAudioTypeSettings)
                     _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadataAudioTypeSettings);
                     //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_ACTIVE_LAYER (clip.metadataActiveLayer)
                     _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadataActiveLayer);
-                    //   - If channelAudioType is sample-trig or sample-slice: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadataSamples))
-                    if (_private.sketchpadTrack.channelAudioType === "sample-trig" || _private.sketchpadTrack.channelAudioType === "sample-slice") {
+                    //   - If trackType is sample-trig or sample-slice: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadataSamples))
+                    if (_private.sketchpadTrack.trackType === "sample-trig" || _private.sketchpadTrack.trackType === "sample-slice") {
                         _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadataSamples);
                     }
                     // - Run through the track's patterns

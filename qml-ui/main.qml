@@ -232,16 +232,16 @@ Kirigami.AbstractApplicationWindow {
                 break;
             case "SCREEN_EDIT_CONTEXTUAL":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType.startsWith("sample-")) {
+                    if (root.selectedChannel.trackType.startsWith("sample-")) {
                         zynqtgui.show_modal("channel_wave_editor");
-                    } else if (root.selectedChannel.channelAudioType === "synth") {
+                    } else if (root.selectedChannel.trackType === "synth") {
                         var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
                         if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
                             zynqtgui.show_screen("control");
                         } else {
                             applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
                         }
-                    } else if (root.selectedChannel.channelAudioType === "external") {
+                    } else if (root.selectedChannel.trackType === "external") {
                         show_modal("channel_external_setup");
                     }
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
@@ -251,9 +251,9 @@ Kirigami.AbstractApplicationWindow {
                         applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
                     }
                 } else {
-                    if (root.selectedChannel.channelAudioType.startsWith("sample-")) {
+                    if (root.selectedChannel.trackType.startsWith("sample-")) {
                         // If we are in any sample mode, switch whatever else is going on (as that page knows what to do about it)
-                        if (root.selectedChannel.channelAudioType === "sample-loop") {
+                        if (root.selectedChannel.trackType === "sample-loop") {
                             root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedPart;
                         } else {
                             for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
@@ -265,7 +265,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                         zynqtgui.show_modal("channel_wave_editor");
-                    } else if (root.selectedChannel.channelAudioType === "synth") {
+                    } else if (root.selectedChannel.trackType === "synth") {
                         // If we are in synth mode, select the first slot explicitly and then switch to the control page, and if there isn't one... throw up the warning
                         let foundASound = false;
                         for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
@@ -280,7 +280,7 @@ Kirigami.AbstractApplicationWindow {
                         if (foundASound === false) {
                             applicationWindow().showMessageDialog(qsTr("Cannot open edit page: No sounds defined"), 2000);
                         }
-                    } else if (root.selectedChannel.channelAudioType === "external") {
+                    } else if (root.selectedChannel.trackType === "external") {
                         // If we are in external mode, just load up the external setup page
                         show_modal("channel_external_setup");
                     }
@@ -815,7 +815,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
             onClicked: samplesMenu.visible = true
-            visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
+            visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0
 
             Zynthian.Menu {
                 id: samplesMenu
@@ -845,7 +845,7 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.channelAudioType === "sample-loop"
+            visible: root.selectedChannel.trackType === "sample-loop"
         }
         Zynthian.BreadcrumbButton {
             id: synthButton
@@ -853,7 +853,7 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.channelAudioType === "synth" && zynqtgui.curlayerEngineName.length > 0
+            visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
             text: synthButton.updateSoundName();
             // Open preset screen on clicking this synth button
             onClicked: {
@@ -887,7 +887,7 @@ Kirigami.AbstractApplicationWindow {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
-            visible: root.selectedChannel.channelAudioType === "synth" && synthButton.visible
+            visible: root.selectedChannel.trackType === "synth" && synthButton.visible
             onClicked: {
                 // Open synth edit page whjen preset button is clicked
                 zynqtgui.current_screen_id = "control";
@@ -1361,15 +1361,15 @@ Kirigami.AbstractApplicationWindow {
                                         delayed: true
 
                                         value: {
-                                            if (channelHeaderDelegate.channel.channelAudioType === "synth")
+                                            if (channelHeaderDelegate.channel.trackType === "synth")
                                                 return zynqtgui.sketchpad.channelTypeSynthColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop")
+                                            else if (channelHeaderDelegate.channel.trackType === "sample-loop")
                                                 return zynqtgui.sketchpad.channelTypeSketchesColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig")
+                                            else if (channelHeaderDelegate.channel.trackType === "sample-trig")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice")
+                                            else if (channelHeaderDelegate.channel.trackType === "sample-slice")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "external")
+                                            else if (channelHeaderDelegate.channel.trackType === "external")
                                                 return zynqtgui.sketchpad.channelTypeExternalColor
                                             else
                                                 return "#66888888"
@@ -1440,15 +1440,15 @@ Kirigami.AbstractApplicationWindow {
                                         delayed: true
 
                                         value: {
-                                            if (channelHeaderDelegate2.channel.channelAudioType === "synth")
+                                            if (channelHeaderDelegate2.channel.trackType === "synth")
                                                 return zynqtgui.sketchpad.channelTypeSynthColor
-                                            else if (channelHeaderDelegate2.channel.channelAudioType === "sample-loop")
+                                            else if (channelHeaderDelegate2.channel.trackType === "sample-loop")
                                                 return zynqtgui.sketchpad.channelTypeSketchesColor
-                                            else if (channelHeaderDelegate2.channel.channelAudioType === "sample-trig")
+                                            else if (channelHeaderDelegate2.channel.trackType === "sample-trig")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate2.channel.channelAudioType === "sample-slice")
+                                            else if (channelHeaderDelegate2.channel.trackType === "sample-slice")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate2.channel.channelAudioType === "external")
+                                            else if (channelHeaderDelegate2.channel.trackType === "external")
                                                 return zynqtgui.sketchpad.channelTypeExternalColor
                                             else
                                                 return "#66888888"

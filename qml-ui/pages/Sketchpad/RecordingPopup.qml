@@ -150,7 +150,7 @@ Zynthian.Popup {
     topPadding: 0
     bottomPadding: 0
     onSelectedChannelChanged: {
-        if (root.selectedChannel.channelAudioType === "external") {
+        if (root.selectedChannel.trackType === "external") {
             zynqtgui.sketchpad.recordingSource = "external"
             zynqtgui.sketchpad.recordingChannel = "*"
         } else {

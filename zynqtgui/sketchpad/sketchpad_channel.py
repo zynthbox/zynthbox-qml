@@ -34,6 +34,7 @@ import jack
 import numpy as np
 import base64
 import Zynthbox
+import warnings
 
 from pathlib import Path
 from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QThread, QTimer, Qt, Signal, Slot
@@ -100,7 +101,7 @@ class sketchpad_channel(QObject):
         self.wetFx2AmountChanged.connect(self.handleWetFx2AmountChanged)
         self.synthPassthroughMixingChanged.connect(self.handleSynthPassthroughMixingChanged)
         self.fxPassthroughMixingChanged.connect(self.handleFxPassthroughMixingChanged)
-        self.channel_audio_type_changed.connect(self.handleAudioTypeSettingsChanged)
+        self.track_type_changed.connect(self.handleAudioTypeSettingsChanged)
         self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
         self.chainedFxChanged.connect(self.chainedFxChangedHandler, Qt.QueuedConnection)
         self.zynaddsubfx_midi_output = None
@@ -145,7 +146,7 @@ class sketchpad_channel(QObject):
             newSample.set_lane(i)
             self.__samples__.append(newSample)
 
-        self.__channel_audio_type__ = "synth"
+        self.__track_type__ = "synth"
         self.__channel_routing_style__ = "standard"
         self.__routingData__ = {
             "fx": [],
@@ -177,7 +178,7 @@ class sketchpad_channel(QObject):
             self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         except:
             pass
-        self.channel_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+        self.track_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
 
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
@@ -224,7 +225,7 @@ class sketchpad_channel(QObject):
             fxClient.panAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientPanAmountChanged(theClient))
 
         # Connect to respective signals when any of the slot data changes for property slotsData
-        self.channel_audio_type_changed.connect(lambda: self.emitSlotsDataChanged("channelAudioType"))
+        self.track_type_changed.connect(lambda: self.emitSlotsDataChanged("trackType"))
         self.chainedSoundsNamesChanged.connect(lambda: self.emitSlotsDataChanged("chainedSoundsNames"))
         self.samples_changed.connect(lambda: self.emitSlotsDataChanged("samples"))
         self.slotsReordered.connect(lambda: self.emitSlotsDataChanged("slotsReordered"))
@@ -329,7 +330,7 @@ class sketchpad_channel(QObject):
         if clip is not None and clip.enabled is True:
             self.set_selected_part(partNum)
             # We will now allow playing multiple parts of a sample-loop channel
-            allowMultipart = self.channelAudioType == "sample-loop" or (self.channelAudioType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
+            allowMultipart = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
             # logging.error(f"Allowing multipart playback: {allowMultipart}")
             if not allowMultipart:
                 for part in range(0, 5):
@@ -524,7 +525,7 @@ class sketchpad_channel(QObject):
                 "audioTypeSettings": self.__audioTypeSettings__,
                 "connectedPattern": self.__connected_pattern__,
                 "chainedSounds": self.__chained_sounds__,
-                "channelAudioType": self.__channel_audio_type__,
+                "trackType": self.__track_type__,
                 "channelRoutingStyle": self.__channel_routing_style__,
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
@@ -554,9 +555,16 @@ class sketchpad_channel(QObject):
             if "chainedSounds" in obj:
                 self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
                 self.set_chained_sounds(obj["chainedSounds"])
+
+            # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback later
             if "channelAudioType" in obj:
-                self.__channel_audio_type__ = obj["channelAudioType"]
-                self.set_channel_audio_type(self.__channel_audio_type__, True)
+                warnings.warn("`channelAudioType` key is deprecated (will be removed soon) and has been renamed to `trackType`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
+                self.__track_type__ = obj["channelAudioType"]
+                self.set_track_type(self.__track_type__, True)
+            if "trackType" in obj:
+                self.__track_type__ = obj["trackType"]
+                self.set_track_type(self.__track_type__, True)
+
             self.__audioTypeSettings__ = self.defaultAudioTypeSettings()
             if "audioTypeSettings" in obj:
                 self.__audioTypeSettings__.update(obj["audioTypeSettings"])
@@ -1289,24 +1297,24 @@ class sketchpad_channel(QObject):
     muted = Property(bool, get_muted, set_muted, notify=mutedChanged)
     ### End Property muted
 
-    ### BEGIN Property channelAudioType
+    ### BEGIN Property trackType
     # Possible values : "synth", "sample-loop", "sample-trig", "sample-slice", "external"
-    # For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth" or "external"
+    # For simplicity, trackType is string in the format "sample-xxxx" or "synth" or "external"
     # TODO : Later implement it properly with model and enums
-    def get_channel_audio_type(self):
-        return self.__channel_audio_type__
+    def get_track_type(self):
+        return self.__track_type__
 
-    def set_channel_audio_type(self, type:str, force_set=False):
-        logging.debug(f"Setting Audio Type : {type}, {self.__channel_audio_type__}")
+    def set_track_type(self, type:str, force_set=False):
+        logging.debug(f"Setting Audio Type : {type}, {self.__track_type__}")
 
-        if force_set or type != self.__channel_audio_type__:
+        if force_set or type != self.__track_type__:
             # Heuristic to fix a problem with ZynAddSubFX :
-            # While switching channel_audio_type for a couple of times, ZynAddSubFX goes completely berserk
+            # While switching track_type for a couple of times, ZynAddSubFX goes completely berserk
             # and causes jack to become unresponsive and hence causing everything to go out-of-order
             # Testing suggests ZynAddSubFX does not like handling midi events it does not quite know about.
-            # During testing it was noticed that if ZynAddSubFX was disconnected before changing channel_audio_type
+            # During testing it was noticed that if ZynAddSubFX was disconnected before changing track_type
             # and reconnected on complete it does not cause the aforementioned issue. Hence make sure to
-            # do the disconnect-connect dance when changing channel_audio_type only to the ZynAddSubFX synth if the
+            # do the disconnect-connect dance when changing track_type only to the ZynAddSubFX synth if the
             # track has one
             self.zynaddsubfx_midi_input = None
             self.zynaddsubfx_midi_output = None
@@ -1327,8 +1335,8 @@ class sketchpad_channel(QObject):
                     sketchpad_channel.jclient.disconnect(self.zynaddsubfx_midi_output, self.zynaddsubfx_midi_input)
                 except: pass
 
-            self.__channel_audio_type__ = type
-            self.channel_audio_type_changed.emit()
+            self.__track_type__ = type
+            self.track_type_changed.emit()
 
             # Set selectedSlotRow to 0 when type is changed to slice as slice mode always operates on slot 0
             if type == "sample-slice":
@@ -1355,17 +1363,17 @@ class sketchpad_channel(QObject):
                 sketchpad_channel.jclient.connect(self.zynaddsubfx_midi_output, self.zynaddsubfx_midi_input)
             except: pass
 
-    channel_audio_type_changed = Signal()
+    track_type_changed = Signal()
 
-    def audioTypeKey(self, channelAudioType = None):
-        if channelAudioType is None:
-            channelAudioType = self.channelAudioType
+    def audioTypeKey(self, trackType = None):
+        if trackType is None:
+            trackType = self.trackType
 
-        if channelAudioType == "sample-loop":
+        if trackType == "sample-loop":
             return "sketch"
-        elif channelAudioType in ["sample-trig", "sample-slice"]:
+        elif trackType in ["sample-trig", "sample-slice"]:
             return "sample"
-        return channelAudioType
+        return trackType
 
     @Slot(None)
     def handleAudioTypeSettingsChanged(self):
@@ -1376,8 +1384,8 @@ class sketchpad_channel(QObject):
         self.synthPassthroughMixingChanged.emit()
         self.fxPassthroughMixingChanged.emit()
 
-    channelAudioType = Property(str, get_channel_audio_type, set_channel_audio_type, notify=channel_audio_type_changed)
-    ### END Property channelAudioType
+    trackType = Property(str, get_track_type, set_track_type, notify=track_type_changed)
+    ### END Property trackType
 
     ### BEGIN Property channelRoutingStyle
     # Possible values : "standard", "one-to-one"
@@ -1438,16 +1446,16 @@ class sketchpad_channel(QObject):
 
     ### BEGIN Property channelTypeDisplayName
     def get_channelTypeDisplayName(self):
-        if self.__channel_audio_type__ == "synth":
+        if self.__track_type__ == "synth":
             return "Synth"
-        elif self.__channel_audio_type__ == "sample-loop":
+        elif self.__track_type__ == "sample-loop":
             return "Sketch"
-        elif self.__channel_audio_type__.startswith("sample"):
+        elif self.__track_type__.startswith("sample"):
             return "Sample"
-        elif self.__channel_audio_type__ == "external":
+        elif self.__track_type__ == "external":
             return "External"
 
-    channelTypeDisplayName = Property(str, get_channelTypeDisplayName, notify=channel_audio_type_changed)
+    channelTypeDisplayName = Property(str, get_channelTypeDisplayName, notify=track_type_changed)
     ### END Property channelTypeDisplayName
 
     ### Property samples
@@ -1629,7 +1637,7 @@ class sketchpad_channel(QObject):
     def get_occupiedSlots(self):
         occupied_slots = []
 
-        if self.__channel_audio_type__ == "sample-trig":
+        if self.__track_type__ == "sample-trig":
             # logging.debug(f"### get_occupiedSlots : Sample trig")
             # If type is sample-trig check how many samples has wavs selected
             for sample in self.__samples__:
@@ -1639,7 +1647,7 @@ class sketchpad_channel(QObject):
                     occupied_slots.append(True)
                 else:
                     occupied_slots.append(False)
-        elif self.__channel_audio_type__ == "synth":
+        elif self.__track_type__ == "synth":
             # logging.debug(f"### get_occupiedSlots : synth")
             # If type is synth check how many synth engines are selected and chained
             for sound in self.__chained_sounds__:
@@ -1647,7 +1655,7 @@ class sketchpad_channel(QObject):
                     occupied_slots.append(True)
                 else:
                     occupied_slots.append(False)
-        elif self.__channel_audio_type__ == "sample-slice":
+        elif self.__track_type__ == "sample-slice":
             # logging.debug(f"### get_occupiedSlots : Sample slice")
 
             # If type is sample-slice check if samples[0] has wav selected
@@ -2141,19 +2149,19 @@ class sketchpad_channel(QObject):
     def emitSlotsDataChanged(self, whatChanged):
         emitSlotsChanged = False
 
-        if whatChanged == "channelAudioType":
+        if whatChanged == "trackType":
             emitSlotsChanged = True
         elif whatChanged == "chainedSoundsNames":
-            if self.channelAudioType == "synth":
+            if self.trackType == "synth":
                 emitSlotsChanged = True
         elif whatChanged == "samples":
-            if self.channelAudioType in ["sample-trig", "sample-slice"]:
+            if self.trackType in ["sample-trig", "sample-slice"]:
                 emitSlotsChanged = True
         elif whatChanged == "slotsReordered":
-            if self.channelAudioType == "sample-loop":
+            if self.trackType == "sample-loop":
                 emitSlotsChanged = True
         elif whatChanged in ["externalAudioSource", "externalMidiChannel"]:
-            if self.channelAudioType == "external":
+            if self.trackType == "external":
                 emitSlotsChanged = True
 
         if emitSlotsChanged:
@@ -2168,13 +2176,13 @@ class sketchpad_channel(QObject):
             else:
                 return clientName
 
-        if self.channelAudioType == "synth":
+        if self.trackType == "synth":
             return self.chainedSoundsNames
-        elif self.channelAudioType in ["sample-trig", "sample-slice"]:
+        elif self.trackType in ["sample-trig", "sample-slice"]:
             return self.samples
-        elif self.channelAudioType == "sample-loop":
+        elif self.trackType == "sample-loop":
             return self.getAllPartClips()
-        elif self.channelAudioType == "external":
+        elif self.trackType == "external":
             return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
                     f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
                     None,
@@ -2266,7 +2274,7 @@ class sketchpad_channel(QObject):
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):
-        if self.channelAudioType in ["sample-trig", "sample-slice"]:
+        if self.trackType in ["sample-trig", "sample-slice"]:
             return self.samples[self.selectedSlotRow]
         else:
             return self.getClipsModelByPart(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
@@ -2341,15 +2349,15 @@ class sketchpad_channel(QObject):
             self.zynqtgui.set_curlayer(None)
 
     @Slot("QVariantList", str)
-    def reorderSlots(self, newOrder, channelAudioType = None):
+    def reorderSlots(self, newOrder, trackType = None):
         """
-        This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon channelAudioType
+        This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon trackType
         """
         # TODO : Use selectedSketchpadSongIndex instead of hardcoding it to 0 after renaming it to something that does not interfere with the name track
-        _channelAudioType = channelAudioType
-        if _channelAudioType is None:
-            _channelAudioType = self.channelAudioType
-        if _channelAudioType == "synth":
+        _trackType = trackType
+        if _trackType is None:
+            _trackType = self.trackType
+        if _trackType == "synth":
             # Reorder synths
             # Form a new chainedSounds as per newOrder
             newChainedSounds = [self.__chained_sounds__[index] for index in newOrder]
@@ -2364,7 +2372,7 @@ class sketchpad_channel(QObject):
 
             newRoutingData = [self.__routingData__["synth"][index] for index in newOrder]
             self.__routingData__["synth"] = newRoutingData
-        elif _channelAudioType == "sample-loop":
+        elif _trackType == "sample-loop":
             # Reorder sketches
             old_order_clips = [self.getClipsModelByPart(index).getClip(0) for index in range(5)]
             for index, clip in enumerate(old_order_clips):
@@ -2372,7 +2380,7 @@ class sketchpad_channel(QObject):
                     self.getClipsModelByPart(newOrder[index]).__clips__[0] = clip
                     clip.part = newOrder[index]
             self.zynqtgui.sketchpad.song.schedule_save()
-        elif _channelAudioType in ["sample-trig", "sample-slice"]:
+        elif _trackType in ["sample-trig", "sample-slice"]:
             # Reorder samples
             new_order_samples = [self.samples[index] for index in newOrder]
             for index, sample in enumerate(new_order_samples):
@@ -2382,23 +2390,23 @@ class sketchpad_channel(QObject):
 
         # Update channelPassthrough values in audioTypeSettings to retain correct values after re-ordering
         newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
-        newAudioTypeSettings[self.audioTypeKey(_channelAudioType)]["channelPassthrough"] = [newAudioTypeSettings[self.audioTypeKey(_channelAudioType)]["channelPassthrough"][index] for index in newOrder]
+        newAudioTypeSettings[self.audioTypeKey(_trackType)]["channelPassthrough"] = [newAudioTypeSettings[self.audioTypeKey(_trackType)]["channelPassthrough"][index] for index in newOrder]
         self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
 
         self.slotsReordered.emit()
 
     @Slot(int, int, str)
-    def swapSlots(self, slot1, slot2, channelAudioType = None):
+    def swapSlots(self, slot1, slot2, trackType = None):
         """
-        Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon channelAudioType
+        Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon trackType
         """
-        _channelAudioType = channelAudioType
-        if _channelAudioType is None:
-            _channelAudioType = self.channelAudioType
+        _trackType = trackType
+        if _trackType is None:
+            _trackType = self.trackType
         newOrder = [0, 1, 2, 3, 4]
         newOrder[slot1] = slot2
         newOrder[slot2] = slot1
-        self.reorderSlots(newOrder, _channelAudioType)
+        self.reorderSlots(newOrder, _trackType)
 
     @Slot("QVariantList")
     def reorderChainedFx(self, newOrder):

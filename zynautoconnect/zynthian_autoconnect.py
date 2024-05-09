@@ -352,7 +352,7 @@ def midi_autoconnect(force=False):
                                                 eventPorts.append("ZLRouter:CurrentTrackMirror")
                                                 pass
                                             else:
-                                                if channel.channelAudioType == "synth":
+                                                if channel.trackType == "synth":
                                                     eventPorts.append(f"ZLRouter:Channel{splitData[1]}")
                                                 else:
                                                     eventPorts.append(f"ZLRouter:Zynthian-Channel{splitData[1]}")
@@ -688,7 +688,7 @@ def audio_autoconnect(force=False):
                         laneInputs = jclient.get_ports(name_pattern=f"ChannelPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-input", is_audio=True, is_output=False, is_input=True)
                         # BEGIN Handle external inputs for external mode channels
                         # only hook up the first lane, doesn't make super lots of sense otherwise
-                        if laneId == 0 and channel.channelAudioType == "external":
+                        if laneId == 0 and channel.trackType == "external":
                             # logging.info(f"Channel {channelId} is external with the audio source {channel.externalAudioSource}")
                             if len(channel.externalAudioSource) > 0:
                                 if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True

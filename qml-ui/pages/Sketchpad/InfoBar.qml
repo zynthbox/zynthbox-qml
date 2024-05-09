@@ -159,7 +159,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
@@ -174,7 +174,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
@@ -186,7 +186,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
@@ -198,7 +198,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "sample-loop"
+        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "sample-loop"
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynqtgui.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.filename && infoBar.clip.filename.length > 0 ? infoBar.clip.filename : "--") : ""
@@ -208,8 +208,8 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && (infoBar.clip.clipChannel.channelAudioType === "sample-trig" ||
-                 infoBar.clip.clipChannel.channelAudioType === "sample-slice")
+        visible: infoBar.clip && (infoBar.clip.clipChannel.trackType === "sample-trig" ||
+                 infoBar.clip.clipChannel.trackType === "sample-slice")
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynqtgui.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.filename.length > 0 ? sample.filename : "--") : ""
@@ -228,7 +228,7 @@ RowLayout {
         Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
         Layout.alignment: Qt.AlignVCenter
         checkable: true
-        visible: clip.clipChannel.channelAudioType == "sample-loop"
+        visible: clip.clipChannel.trackType == "sample-loop"
         checked: clip.enabled
         text: clip.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
         onToggled: {
@@ -243,7 +243,7 @@ RowLayout {
         Layout.alignment: Qt.AlignVCenter
         icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
         checkable: true
-        visible: infoBar.clip && infoBar.clip.clipChannel.channelAudioType === "synth"
+        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
         // Bind to current index to properly update when preset changed from other screen
         checked: zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
         onToggled: {

@@ -64,7 +64,7 @@ Zynthian.ScreenPage {
         selectedChannelThrottle.restart()
     }
     property QtObject selectedClip: component.selectedChannel
-                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                         ? component.selectedChannel.getClipsModelByPart(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                         : component.selectedChannel.samples[component.selectedChannel.selectedSlotRow]
                                     : null
@@ -274,9 +274,9 @@ Zynthian.ScreenPage {
         enabled: component.isVisible
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
-                if (applicationWindow().selectedChannel.channelAudioType === "synth") {
+                if (applicationWindow().selectedChannel.trackType === "synth") {
                     zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
-                } else if (applicationWindow().selectedChannel.channelAudioType === "external") {
+                } else if (applicationWindow().selectedChannel.trackType === "external") {
                     zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 }
             }
@@ -335,7 +335,7 @@ Zynthian.ScreenPage {
                         clip: true
                         controlObj: component.selectedClip
                         controlType: component.selectedChannel
-                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                         ? "bottombar-controltype-clip"
                                         : "bottombar-controltype-channel"
                                     : ""
@@ -438,7 +438,7 @@ Zynthian.ScreenPage {
                                 }
                             }
                             controlType: component.selectedChannel
-                                        ? ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                                        ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                             ? "bottombar-controltype-clip"
                                             : "bottombar-controltype-channel"
                                         : ""
@@ -505,7 +505,7 @@ Zynthian.ScreenPage {
                     delegate: Rectangle {
                         id: partDelegate
 
-                        property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.channelAudioType) >= 0
+                        property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                                             ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                                             : component.selectedChannel.samples[index]
                         property bool clipHasWav: partDelegate.clip && !partDelegate.isEmpty

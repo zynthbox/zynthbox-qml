@@ -645,7 +645,7 @@ don't want to have to dig too far...
                 if (delta > 0) {
                     let selectedChannel = applicationWindow().selectedChannel;
                     while (delta > 0) {
-                        if (selectedChannel.channelAudioType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                             selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                         } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                             selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
@@ -656,7 +656,7 @@ don't want to have to dig too far...
                 } else if (delta < 0) {
                     let selectedChannel = applicationWindow().selectedChannel;
                     while (delta < 0) {
-                        if (selectedChannel.channelAudioType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                             selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                         } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                             selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);

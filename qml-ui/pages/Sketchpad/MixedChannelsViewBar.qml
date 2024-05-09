@@ -87,7 +87,7 @@ Rectangle {
                 break;
 
             case "SELECT_UP":
-                if (root.selectedChannel.channelAudioType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                     root.selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
@@ -96,7 +96,7 @@ Rectangle {
                 break;
 
             case "SELECT_DOWN":
-                if (root.selectedChannel.channelAudioType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                     root.selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
@@ -106,11 +106,11 @@ Rectangle {
             case "KNOB0_TOUCHED":
                 if (!applicationWindow().osd.opened) {
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                        if (root.selectedChannel.channelAudioType == "synth") {
+                        if (root.selectedChannel.trackType == "synth") {
                             pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
-                        } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                        } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
                             pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
-                        } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                        } else if (root.selectedChannel.trackType == "sample-loop") {
                             pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
                         }
                         returnValue = true;
@@ -131,11 +131,11 @@ Rectangle {
                 break;
             case "KNOB0_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
+                    if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 1)
-                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
                         pageManager.getPage("sketchpad").updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
-                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                    } else if (root.selectedChannel.trackType == "sample-loop") {
                         pageManager.getPage("sketchpad").updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
                     returnValue = true;
@@ -146,11 +146,11 @@ Rectangle {
                 break;
             case "KNOB0_DOWN":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
+                    if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], -1)
-                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
                         pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
-                    } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                    } else if (root.selectedChannel.trackType == "sample-loop") {
                         pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
                     returnValue = true;
@@ -162,7 +162,7 @@ Rectangle {
             case "KNOB1_TOUCHED":
                 if (!applicationWindow().osd.opened) {
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                        if (root.selectedChannel.channelAudioType == "synth") {
+                        if (root.selectedChannel.trackType == "synth") {
                             pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
                         }
                         returnValue = true;
@@ -183,7 +183,7 @@ Rectangle {
                 break;
             case "KNOB1_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
+                    if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
                     returnValue = true;
@@ -194,7 +194,7 @@ Rectangle {
                 break;
             case "KNOB1_DOWN":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
+                    if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
                     returnValue = true;
@@ -206,7 +206,7 @@ Rectangle {
             case "KNOB2_TOUCHED":
                 if (!applicationWindow().osd.opened) {
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                        if (root.selectedChannel.channelAudioType == "synth") {
+                        if (root.selectedChannel.trackType == "synth") {
                             pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
                         }
                         returnValue = true;
@@ -227,7 +227,7 @@ Rectangle {
                 break;
             case "KNOB2_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
+                    if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
                     returnValue = true;
@@ -238,7 +238,7 @@ Rectangle {
                 break;
             case "KNOB2_DOWN":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.channelAudioType == "synth") {
+                    if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
                     }
                     returnValue = true;
@@ -264,11 +264,11 @@ Rectangle {
                     zynqtgui.ignoreNextModeButtonPress = true;
                     let slotMax = 4;
                     let fxSlotMax = 4;
-                    if (root.selectedChannel.channelAudioType === "external") {
+                    if (root.selectedChannel.trackType === "external") {
                         slotMax = 1;
-                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                    } else if (root.selectedChannel.trackType === "sample-slice") {
                         slotMax = 0;
-                    } else if (root.selectedChannel.channelAudioType === "sample-loop") {
+                    } else if (root.selectedChannel.trackType === "sample-loop") {
                         fxSlotMax = -1;
                     }
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
@@ -304,11 +304,11 @@ Rectangle {
                     zynqtgui.ignoreNextModeButtonPress = true;
                     let slotMax = 4;
                     let fxSlotMax = 4;
-                    if (root.selectedChannel.channelAudioType === "external") {
+                    if (root.selectedChannel.trackType === "external") {
                         slotMax = 1;
-                    } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                    } else if (root.selectedChannel.trackType === "sample-slice") {
                         slotMax = 0;
-                    } else if (root.selectedChannel.channelAudioType === "sample-loop") {
+                    } else if (root.selectedChannel.trackType === "sample-loop") {
                         fxSlotMax = -1;
                     }
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
@@ -347,7 +347,7 @@ Rectangle {
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                     returnValue = true;
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                     bottomStack.slotsBar.handleItemClick("fx")
@@ -434,10 +434,10 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
-                                checked: root.selectedChannel.channelAudioType === "synth"
+                                checked: root.selectedChannel.trackType === "synth"
                                 text: qsTr("Synth")
                                 onClicked: {
-                                    root.selectedChannel.channelAudioType = "synth"
+                                    root.selectedChannel.trackType = "synth"
                                     synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                                 QQC2.Button {
@@ -449,14 +449,14 @@ Rectangle {
                                     }
                                     width: height
                                     icon.name: "dialog-warning-symbolic"
-                                    visible: (root.selectedChannel.channelAudioType !== "synth" && root.selectedChannel.channelHasSynth)
-                                        || (root.selectedChannel.channelAudioType === "sample-loop" && root.selectedChannel.channelHasFx)
+                                    visible: (root.selectedChannel.trackType !== "synth" && root.selectedChannel.channelHasSynth)
+                                        || (root.selectedChannel.trackType === "sample-loop" && root.selectedChannel.channelHasFx)
                                     onClicked: {
                                         let theText = "<p>" + qsTr("The following things may be causing unneeded load on the system, as this track is set to a mode which does not use these things. You might want to consider getting rid of them to make space for other things.") + "</p>";
-                                        if (root.selectedChannel.channelAudioType !== "synth" && root.selectedChannel.channelHasSynth) {
+                                        if (root.selectedChannel.trackType !== "synth" && root.selectedChannel.channelHasSynth) {
                                             theText = theText + "<br><p><b>" + qsTr("Synths:") + "</b><br> " + qsTr("You have at least one synth engine on the track. While they do not produce sound, they will still be using some amount of processing power.") + "</p>";
                                         }
-                                        if (root.selectedChannel.channelAudioType === "sample-loop" && root.selectedChannel.channelHasFx) {
+                                        if (root.selectedChannel.trackType === "sample-loop" && root.selectedChannel.channelHasFx) {
                                             theText = theText + "<br><p><b>" + qsTr("Effects:") + "</b><br> " + qsTr("You have effects set up on the track. While they will not affect the sound of your Sketch, they will still be using some amount of processing power.") + "</p>";
                                         }
                                         unusedStuffWarning.text = theText;
@@ -478,10 +478,10 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
-                                checked: root.selectedChannel.channelAudioType === "sample-trig"
+                                checked: root.selectedChannel.trackType === "sample-trig"
                                 text: qsTr("Sample")
                                 onClicked: {
-                                    root.selectedChannel.channelAudioType = "sample-trig"
+                                    root.selectedChannel.trackType = "sample-trig"
                                     synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
@@ -490,10 +490,10 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
-                                checked: root.selectedChannel.channelAudioType.startsWith("sample-loop")
+                                checked: root.selectedChannel.trackType.startsWith("sample-loop")
                                 text: qsTr("Sketch")
                                 onClicked: {
-                                    root.selectedChannel.channelAudioType = "sample-loop"
+                                    root.selectedChannel.trackType = "sample-loop"
                                     synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
@@ -502,10 +502,10 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
-                                checked: root.selectedChannel.channelAudioType === "external"
+                                checked: root.selectedChannel.trackType === "external"
                                 text: qsTr("External")
                                 onClicked: {
-                                    root.selectedChannel.channelAudioType = "external"
+                                    root.selectedChannel.trackType = "external"
                                     synthRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
@@ -524,32 +524,32 @@ Rectangle {
                                     anchors.fill: parent
                                 
                                 //     RowLayout {
-                                //         visible: root.selectedChannel.channelAudioType.startsWith("sample-")
+                                //         visible: root.selectedChannel.trackType.startsWith("sample-")
                                 //         Layout.fillHeight: true
                                 //         spacing: 0
                                 // 
                                 //         QQC2.Button {
                                 //             Layout.fillHeight: true
                                 //             text: "Audio"
-                                //             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
+                                //             checked: root.selectedChannel && root.selectedChannel.trackType === "sample-loop"
                                 //             onClicked: {
-                                //                 root.selectedChannel.channelAudioType = "sample-loop"
+                                //                 root.selectedChannel.trackType = "sample-loop"
                                 //             }
                                 //         }
                                 //         QQC2.Button {
                                 //             Layout.fillHeight: true
                                 //             text: "Trig"
-                                //             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
+                                //             checked: root.selectedChannel && root.selectedChannel.trackType === "sample-trig"
                                 //             onClicked: {
-                                //                 root.selectedChannel.channelAudioType = "sample-trig"
+                                //                 root.selectedChannel.trackType = "sample-trig"
                                 //             }
                                 //         }
                                 //         QQC2.Button {
                                 //             Layout.fillHeight: true
                                 //             text: "Slice"
-                                //             checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-slice"
+                                //             checked: root.selectedChannel && root.selectedChannel.trackType === "sample-slice"
                                 //             onClicked: {
-                                //                 root.selectedChannel.channelAudioType = "sample-slice"
+                                //                 root.selectedChannel.trackType = "sample-slice"
                                 //             }
                                 //         }
                                 //     }
@@ -560,7 +560,7 @@ Rectangle {
 
 //                                    RowLayout {
 //                                        Layout.fillHeight: true
-//                                        visible: root.selectedChannel.channelAudioType === "external"
+//                                        visible: root.selectedChannel.trackType === "external"
 
 //                                        QQC2.Button {
 //                                            Layout.fillHeight: true
@@ -578,7 +578,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
+                                        visible: ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0
                                         QQC2.Label {
                                             Layout.fillHeight: true
                                             text: qsTr("Routing")
@@ -610,7 +610,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
+                                        visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
@@ -686,7 +686,7 @@ Rectangle {
                                     RowLayout {
                                         id: bounceButtonLayout
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.channelAudioType !== "sample-loop" && root.selectedChannel.channelAudioType !== "external"
+                                        visible: root.selectedChannel.trackType !== "sample-loop" && root.selectedChannel.trackType !== "external"
                                         QQC2.Button {
                                             text: qsTr("Bounce To Sketch")
                                             icon.name: "go-next"
@@ -703,7 +703,7 @@ Rectangle {
                                     RowLayout {
                                         id: unbounceButtonLayout
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.channelAudioType === "sample-loop"
+                                        visible: root.selectedChannel.trackType === "sample-loop"
                                         QQC2.Button {
                                             text: qsTr("Unbounce Track")
                                             icon.name: "go-previous"
@@ -737,7 +737,7 @@ Rectangle {
                                     property var synthData: root.selectedChannel.slotsData
                                     delegate: Rectangle {
                                         id: slotDelegate
-                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-slice"
+                                        property bool highlighted: root.selectedChannel.trackType === "sample-slice"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
                                         property int slotIndex: index
@@ -760,36 +760,36 @@ Rectangle {
                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                                                 zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                             } else {
-                                                if (root.selectedChannel.channelAudioType === "external") {
+                                                if (root.selectedChannel.trackType === "external") {
                                                     // If channel type is external, then it has 2 slots visible
                                                     // and the respective selectedSlotRow is already selected. Hence directly handle item click
                                                     if (!onlyFocus) {
-                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                                                     }
-                                                } else if (root.selectedChannel.channelAudioType === "sample-slice") {
+                                                } else if (root.selectedChannel.trackType === "sample-slice") {
                                                     // If channel type is sample-slice, then it has only 1 slot visible and it is always slot 0
                                                     // Hence set selectedSlotRow to 0 and call handle item click
                                                     root.selectedChannel.selectedSlotRow  = 0
                                                     if (!onlyFocus) {
-                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                                                     }
                                                 } else {
                                                     // For synth, handle item click only if not dragged. For other cases handle click immediately
-                                                    if ((root.selectedChannel.channelAudioType == "synth" && !delegateMouseArea.dragHappened) || root.selectedChannel.channelAudioType != "synth") {
+                                                    if ((root.selectedChannel.trackType == "synth" && !delegateMouseArea.dragHappened) || root.selectedChannel.trackType != "synth") {
                                                         if (!onlyFocus) {
-                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                                                         }
                                                     }
                                                 }
                                             }
 
-                                            if (root.selectedChannel.channelAudioType == "synth") {
+                                            if (root.selectedChannel.trackType == "synth") {
                                                 root.selectedChannel.setCurlayerByType("synth")
-                                            } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) == 0) {
+                                            } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) == 0) {
                                                 root.selectedChannel.setCurlayerByType("sample")
-                                            } else if (root.selectedChannel.channelAudioType == "sample-loop") {
+                                            } else if (root.selectedChannel.trackType == "sample-loop") {
                                                 root.selectedChannel.setCurlayerByType("loop")
-                                            } else if (root.selectedChannel.channelAudioType == "external") {
+                                            } else if (root.selectedChannel.trackType == "external") {
                                                 root.selectedChannel.setCurlayerByType("external")
                                             } else {
                                                 root.selectedChannel.setCurlayerByType("")
@@ -800,23 +800,23 @@ Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
                                             property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-                                            property QtObject sample: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0 ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
-                                            property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop" ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
+                                            property QtObject sample: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0 ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
+                                            property QtObject clip: root.selectedChannel.trackType === "sample-loop" ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
 
                                             anchors.fill: parent
                                             anchors.margins: 4
                                             Kirigami.Theme.inherit: false
                                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                             color: Kirigami.Theme.backgroundColor
-                                            border.color: root.selectedChannel.channelAudioType === "sample-loop" && synthRepeater.synthData[index].enabled ? Kirigami.Theme.highlightColor :"#ff999999"
+                                            border.color: root.selectedChannel.trackType === "sample-loop" && synthRepeater.synthData[index].enabled ? Kirigami.Theme.highlightColor :"#ff999999"
                                             border.width: 2
                                             radius: 4
                                             // For slice mode only first slot is visible.
                                             // For external mode the first two slots are visible
                                             // For other modes all slots are visible
-                                            enabled: (root.selectedChannel.channelAudioType !== "sample-slice" && root.selectedChannel.channelAudioType !== "external") ||
-                                                     (root.selectedChannel.channelAudioType === "sample-slice" && index === 0) ||
-                                                     (root.selectedChannel.channelAudioType === "external" && (index === 0 || index === 1))
+                                            enabled: (root.selectedChannel.trackType !== "sample-slice" && root.selectedChannel.trackType !== "external") ||
+                                                     (root.selectedChannel.trackType === "sample-slice" && index === 0) ||
+                                                     (root.selectedChannel.trackType === "external" && (index === 0 || index === 1))
                                             opacity: enabled ? 1 : 0
                                             visible: enabled
 
@@ -834,7 +834,7 @@ Rectangle {
                                                     }
                                                     radius: 4
                                                     opacity: 0.8
-                                                    visible: root.selectedChannel.channelAudioType === "synth" && synthNameLabel.text.trim().length > 0
+                                                    visible: root.selectedChannel.trackType === "synth" && synthNameLabel.text.trim().length > 0
                                                     color: Kirigami.Theme.highlightColor
                                                 }
                                                 Rectangle {
@@ -873,16 +873,16 @@ Rectangle {
                                                     rightMargin: Kirigami.Units.gridUnit*0.5
                                                 }
                                                 horizontalAlignment: Text.AlignLeft
-                                                text: root.selectedChannel.channelAudioType === "synth" && synthRepeater.synthData[index] && synthRepeater.synthData[index].className == null // Check if synthRepeater.synthData[index] is not a channel/clip object by checking if it has the className property
+                                                text: root.selectedChannel.trackType === "synth" && synthRepeater.synthData[index] && synthRepeater.synthData[index].className == null // Check if synthRepeater.synthData[index] is not a channel/clip object by checking if it has the className property
                                                         ? synthRepeater.synthData[index]
-                                                        : (root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                          root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                          root.selectedChannel.channelAudioType === "sample-loop") &&
+                                                        : (root.selectedChannel.trackType === "sample-trig" ||
+                                                          root.selectedChannel.trackType === "sample-slice" ||
+                                                          root.selectedChannel.trackType === "sample-loop") &&
                                                           synthRepeater.synthData[index]
                                                             ? synthRepeater.synthData[index].path
                                                               ? synthRepeater.synthData[index].path.split("/").pop()
                                                               : ""
-                                                            : root.selectedChannel.channelAudioType === "external"
+                                                            : root.selectedChannel.trackType === "external"
                                                                 ? synthRepeater.synthData[index]
                                                                 : ""
 
@@ -904,11 +904,11 @@ Rectangle {
                                                 onClicked: slotDelegate.switchToThisSlot()
                                                 onMouseXChanged: {
                                                     var newVal
-                                                    if (root.selectedChannel.channelAudioType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                    if (root.selectedChannel.trackType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
                                                         root.selectedChannel.set_passthroughValue("synthPassthrough", slotDelegate.slotIndex, "dryAmount", newVal)
-                                                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0 && delegate.sample && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                                                    } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0 && delegate.sample && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
                                                         delegate.sample.gainAbsolute = newVal;
@@ -916,7 +916,7 @@ Rectangle {
                                                 }
                                                 onPressAndHold: {
                                                     if (!delegateMouseArea.dragHappened) {
-                                                        if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                        if (root.selectedChannel.trackType === "sample-loop") {
                                                             // If channel type is sample-loop open clip wave editor
                                                             if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
@@ -926,7 +926,7 @@ Rectangle {
                                                                     bottomStack.bottomBar.waveEditorAction.trigger();
                                                                 })
                                                             }
-                                                        } else if (root.selectedChannel.channelAudioType.startsWith("sample")) {
+                                                        } else if (root.selectedChannel.trackType.startsWith("sample")) {
                                                             // If channel type is sample then open channel wave editor
                                                             if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                                 zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
@@ -936,7 +936,7 @@ Rectangle {
                                                                     bottomStack.bottomBar.channelWaveEditorAction.trigger();
                                                                 })
                                                             }
-                                                        } else if (root.selectedChannel.channelAudioType === "synth") {
+                                                        } else if (root.selectedChannel.trackType === "synth") {
                                                             // If channel type is synth open synth edit page
                                                             if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[index])) {
                                                                 zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
@@ -1009,7 +1009,7 @@ Rectangle {
                                             root.selectedChannel.setCurlayerByType("fx")
                                         }
                                         // Show fx slots for all modes except sketch
-                                        enabled: root.selectedChannel.channelAudioType !== "sample-loop"
+                                        enabled: root.selectedChannel.trackType !== "sample-loop"
                                         opacity: enabled ? 1 : 0
                                         visible: enabled
 
@@ -1107,12 +1107,12 @@ Rectangle {
                                     id: waveformThrottle
                                     interval: 1; repeat: false; running: false;
                                     onTriggered: {
-                                        waveformContainer.clip = root.selectedChannel.channelAudioType === "sample-loop"
+                                        waveformContainer.clip = root.selectedChannel.trackType === "sample-loop"
                                             ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                             : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
-                                        waveformContainer.showWaveform = root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                                         root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                                         root.selectedChannel.channelAudioType === "sample-loop"
+                                        waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-trig" ||
+                                                                         root.selectedChannel.trackType === "sample-slice" ||
+                                                                         root.selectedChannel.trackType === "sample-loop"
                                     }
                                 }
                                 Connections {
@@ -1121,7 +1121,7 @@ Rectangle {
                                 }
                                 Connections {
                                     target: root.selectedChannel
-                                    onChannel_audio_type_changed: waveformThrottle.restart()
+                                    onTrack_type_changed: waveformThrottle.restart()
                                     onSelectedSlotRowChanged: waveformThrottle.restart()
                                 }
                                 Connections {
@@ -1222,7 +1222,7 @@ Rectangle {
                                                     top: parent.top
                                                     bottom: parent.bottom
                                                 }
-                                                visible: root.visible && root.selectedChannel.channelAudioType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
+                                                visible: root.visible && root.selectedChannel.trackType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
                                                 color: Kirigami.Theme.highlightColor
                                                 width: Kirigami.Units.smallSpacing
                                                 x: visible && progressDots.cppClipObject ? progressDots.cppClipObject.position * parent.width : 0
@@ -1232,7 +1232,7 @@ Rectangle {
                                             Repeater {
                                                 id: progressDots
                                                 property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
-                                                model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
+                                                model: (root.visible && root.selectedChannel.trackType === "sample-slice" || root.selectedChannel.trackType === "sample-trig") && cppClipObject
                                                     ? cppClipObject.playbackPositions
                                                     : 0
                                                 delegate: Item {
@@ -1260,10 +1260,10 @@ Rectangle {
 
                                                 // Show waveform on click as well as longclick instead of opening picker dialog
                                                 /*if (waveformContainer.showWaveform) {
-                                                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                                    bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                                                 }*/
                                                 if (waveformContainer.showWaveform) {
-                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                    if (root.selectedChannel.trackType === "sample-loop") {
                                                         if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                             zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                                                             zynqtgui.bottomBarControlObj = waveformContainer.clip;
@@ -1286,7 +1286,7 @@ Rectangle {
                                             }
                                             onPressAndHold: {
                                                 if (waveformContainer.showWaveform) {
-                                                    if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                    if (root.selectedChannel.trackType === "sample-loop") {
                                                         if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
                                                             zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                                                             zynqtgui.bottomBarControlObj = waveformContainer.clip;
@@ -1315,10 +1315,10 @@ Rectangle {
                                 ColumnLayout {
                                     id: patternContainer
 
-                                    property bool showPattern: root.selectedChannel.channelAudioType === "synth" ||
-                                                               root.selectedChannel.channelAudioType === "external" ||
-                                                               root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                               root.selectedChannel.channelAudioType === "sample-slice"
+                                    property bool showPattern: root.selectedChannel.trackType === "synth" ||
+                                                               root.selectedChannel.trackType === "external" ||
+                                                               root.selectedChannel.trackType === "sample-trig" ||
+                                                               root.selectedChannel.trackType === "sample-slice"
 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true

@@ -21,7 +21,7 @@ Item {
      * If you are visualising an orphaned sample (for example when previewing one for loading), set this to "sample-loop" to have a single progress line, or "sample-trig" for multiple progress dots
      * Accepted values are any one of the track audio type strings, so: "sample-trig", "sample-slice", "sample-loop", "external", or "synth"
      */
-    property string channelAudioType: ""
+    property string trackType: ""
     clip: true
     Rectangle {
         anchors.fill: parent
@@ -46,9 +46,9 @@ Item {
     Binding {
         target: _private
         property: "progressStyle"
-        value: component.channelAudioType === "sample-loop"
+        value: component.trackType === "sample-loop"
             ? 1
-            : component.channelAudioType === "sample-trig" || component.channelAudioType === "sample-slice"
+            : component.trackType === "sample-trig" || component.trackType === "sample-slice"
                 ? 2
                 : 0
     }

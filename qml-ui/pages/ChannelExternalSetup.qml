@@ -117,9 +117,9 @@ Zynthian.ScreenPage {
         enabled: component.isVisible
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
-                if (applicationWindow().selectedChannel.channelAudioType === "synth") {
+                if (applicationWindow().selectedChannel.trackType === "synth") {
                     zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
-                } else if (applicationWindow().selectedChannel.channelAudioType.startsWith("sample-")) {
+                } else if (applicationWindow().selectedChannel.trackType.startsWith("sample-")) {
                     zynqtgui.callable_ui_action("SCREEN_EDIT_CONTEXTUAL");
                 }
             }

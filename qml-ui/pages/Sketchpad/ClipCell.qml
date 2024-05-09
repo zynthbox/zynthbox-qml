@@ -98,7 +98,7 @@ QQC2.AbstractButton {
 //            smooth: false
 
 //            visible: root.isInScene &&
-//                     channel.channelAudioType !== "sample-loop" &&
+//                     channel.trackType !== "sample-loop" &&
 //                     root.pattern &&
 //                     root.pattern.hasNotes
 //            source: root.pattern ? root.pattern.thumbnailUrl : ""
@@ -111,7 +111,7 @@ QQC2.AbstractButton {
 //                bottom: parent.bottom
 //            }
 //            visible: root.isInScene &&
-//                     channel.channelAudioType === "sample-loop" && !channel.sceneClip.isEmpty
+//                     channel.trackType === "sample-loop" && !channel.sceneClip.isEmpty
 //            text: visible
 //                ? qsTr("%1%2")
 //                    .arg(channel.sceneClip.isPlaying &&
@@ -131,7 +131,7 @@ QQC2.AbstractButton {
 //                bottom: parent.bottom
 //            }
 //            visible: root.isInScene &&
-//                     channel.channelAudioType !== "sample-loop" &&
+//                     channel.trackType !== "sample-loop" &&
 //                     root.pattern &&
 //                     root.pattern.hasNotes
 //            text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
@@ -235,13 +235,13 @@ QQC2.AbstractButton {
 //                horizontalAlignment: "AlignHCenter"
 //                verticalAlignment: "AlignVCenter"
 //                font.pointSize: 8
-//                text: model.channel.channelAudioType === "synth"
+//                text: model.channel.trackType === "synth"
 //                      ? presetText
 //                          ? presetText
 //                          : ""
-//                      : ["sample-trig", "sample-slice"].indexOf(model.channel.channelAudioType) >= 0
+//                      : ["sample-trig", "sample-slice"].indexOf(model.channel.trackType) >= 0
 //                          ? model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-//                          : model.channel.channelAudioType === "sample-loop"
+//                          : model.channel.trackType === "sample-loop"
 //                              ? model.channel.sceneClip.path.split("/").pop()
 //                              : qsTr("Midi %1").arg(model.channel.externalMidiChannel > -1 ? model.channel.externalMidiChannel + 1 : model.channel.id + 1)
 //            }
@@ -263,7 +263,7 @@ QQC2.AbstractButton {
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
                      channel.sceneClip.isPlaying &&
-                     channel.channelAudioType === "sample-loop" &&
+                     channel.trackType === "sample-loop" &&
                      !channel.sceneClip.isEmpty
 
             color: Kirigami.Theme.textColor
@@ -276,7 +276,7 @@ QQC2.AbstractButton {
 
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
-                     channel.channelAudioType !== "sample-loop" &&
+                     channel.trackType !== "sample-loop" &&
                      sequence.isPlaying &&
                      root.pattern.hasNotes
             color: Kirigami.Theme.textColor

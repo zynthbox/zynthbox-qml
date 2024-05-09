@@ -93,13 +93,13 @@ Zynthian.DialogQuestion {
                     zynqtgui.currentTaskMessage = qsTr("Unbouncing Sketch to Track %2").arg(_private.channel.name);
                     if (_private.clip.metadataAudioType === "sample-trig") {
                         console.log("Sketch was recorded via sample-trig, so switch to that");
-                        _private.channel.channelAudioType = "sample-trig";
+                        _private.channel.trackType = "sample-trig";
                     } else if (_private.clip.metadataAudioType === "sample-slice") {
                         console.log("Sketch was recorded via sample-slice, so switch to that");
-                        _private.channel.channelAudioType = "sample-slice";
+                        _private.channel.trackType = "sample-slice";
                     } else if (_private.clip.metadataAudioType === "synth") {
                         console.log("Sketch was recorded via synth sounds, so switch to that");
-                        _private.channel.channelAudioType = "synth";
+                        _private.channel.trackType = "synth";
                     } else {
                         console.log("Weird audio type:", _private.clip.metadataAudioType);
                     }

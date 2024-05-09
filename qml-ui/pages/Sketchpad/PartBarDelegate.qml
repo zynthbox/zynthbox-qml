@@ -38,7 +38,7 @@ ColumnLayout {
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
             property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             property bool clipHasWav: partDelegate.clip && !partDelegate.clip.isEmpty
-            property QtObject cppClipObject: root.visible && root.channel.channelAudioType === "sample-loop" && partDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
+            property QtObject cppClipObject: root.visible && root.channel.trackType === "sample-loop" && partDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId) : null;
             function handleItemClick() {
                 if (root.songMode) {
                     if (zynqtgui.altButtonPressed) {
@@ -58,7 +58,7 @@ ColumnLayout {
 
                 root.clicked()
             }
-            property bool clipPlaying: root.channel.channelAudioType === "sample-loop"
+            property bool clipPlaying: root.channel.trackType === "sample-loop"
                 ? partDelegate.cppClipObject ? partDelegate.cppClipObject.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
                 : partDelegate.pattern ? partDelegate.pattern.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
             property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
@@ -81,7 +81,7 @@ ColumnLayout {
                 color: Kirigami.Theme.textColor
                 source: partDelegate.clip ? partDelegate.clip.path : ""
 
-                visible: root.visible && root.channel.channelAudioType === "sample-loop" && partDelegate.clipHasWav
+                visible: root.visible && root.channel.trackType === "sample-loop" && partDelegate.clipHasWav
                 // Progress line
                 Rectangle {
                     anchors {
@@ -98,7 +98,7 @@ ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 2
                 smooth: false
-                visible: root.visible && root.channel.channelAudioType !== "sample-loop" &&
+                visible: root.visible && root.channel.trackType !== "sample-loop" &&
                          partDelegate.pattern &&
                          partDelegate.pattern.hasNotes
                 source: partDelegate.pattern ? partDelegate.pattern.thumbnailUrl : ""
@@ -118,7 +118,7 @@ ColumnLayout {
             QQC2.Label {
                 anchors.centerIn: parent
                 font.pointSize: 12
-                visible: ["sample-loop", "sample-trig", "sample-slice", "synth", "external"].indexOf(root.channel.channelAudioType) >= 0
+                visible: ["sample-loop", "sample-trig", "sample-slice", "synth", "external"].indexOf(root.channel.trackType) >= 0
                 text: qsTr("%1%2")
                         .arg(root.channel.id + 1)
                         .arg(String.fromCharCode(partDelegate.partIndex+65).toLowerCase())
@@ -131,7 +131,7 @@ ColumnLayout {
                     right: parent.right
                 }
                 color: "#99888888"
-                visible: root.channel.channelAudioType === "sample-loop" &&
+                visible: root.channel.trackType === "sample-loop" &&
                          detailsLabel.text && detailsLabel.text.trim().length > 0
 
                 QQC2.Label {
@@ -195,7 +195,7 @@ ColumnLayout {
                         zynqtgui.bottomBarControlObj = root.channel.sceneClip;
                         bottomStack.slotsBar.bottomBarButton.checked = true;
 
-                        if (root.channel.channelAudioType === "sample-loop") {
+                        if (root.channel.trackType === "sample-loop") {
                             if (partDelegate.clipHasWav) {
                                 bottomStack.bottomBar.waveEditorAction.trigger();
                             } else {

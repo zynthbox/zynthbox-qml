@@ -258,13 +258,13 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         buttonColor = None
 
         if setChannelColor:
-            if self.channel.channelAudioType == "synth":
+            if self.channel.trackType == "synth":
                 buttonColor = self.led_color_channel_synth
-            elif self.channel.channelAudioType in ["sample-trig", "sample-slice"]:
+            elif self.channel.trackType in ["sample-trig", "sample-slice"]:
                 buttonColor = self.led_color_channel_sample
-            elif self.channel.channelAudioType == "sample-loop":
+            elif self.channel.trackType == "sample-loop":
                 buttonColor = self.led_color_channel_loop
-            elif self.channel.channelAudioType == "external":
+            elif self.channel.trackType == "external":
                 buttonColor = self.led_color_channel_external
         else:
             assert color is not None, "color cannot be None when setChannelColor is False"
@@ -312,7 +312,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.globalPopupOpenedChanged.connect(self.update_button_colors)
 
         for channel_id in range(self.zynqtgui.sketchpad.song.channelsModel.count):
-            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).channel_audio_type_changed.connect(
+            self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).track_type_changed.connect(
                 self.update_button_colors)
 
         self.update_button_colors()

@@ -568,7 +568,7 @@ Zynthian.ScreenPage {
                 return false;
 
             case "SCREEN_ADMIN":
-                if (root.selectedChannel && root.selectedChannel.channelAudioType === "synth") {
+                if (root.selectedChannel && root.selectedChannel.trackType === "synth") {
                     var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
 
                     // when synth and slot is active, edit that sound or show popup when empty
@@ -578,9 +578,9 @@ Zynthian.ScreenPage {
                         zynqtgui.current_screen_id = "control";
                         zynqtgui.forced_screen_back = "sketchpad"
                     } else {
-                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                     }
-                } else if (root.selectedChannel && ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0) {
+                } else if (root.selectedChannel && ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
                     var sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
                     // when sample and slot is active, goto wave editor or show popup when empty
@@ -590,9 +590,9 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.bottomBarButton.checked = true;
                         bottomStack.bottomBar.channelWaveEditorAction.trigger();
                     } else {
-                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                     }
-                } else if (root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop") {
+                } else if (root.selectedChannel && root.selectedChannel.trackType === "sample-loop") {
                     var clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
                     // when loop and slot is active, goto wave editor or show popup when empty
@@ -602,7 +602,7 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.bottomBarButton.checked = true;
                         bottomStack.bottomBar.waveEditorAction.trigger();
                     } else {
-                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                     }
                 } else {
                     // do nothing for other cases
@@ -1246,15 +1246,15 @@ Zynthian.ScreenPage {
                                         value: {
                                             if (root.copySourceObj && root.copySourceObj.value === model.channel)
                                                 return "#ff2196f3"
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "synth")
+                                            else if (channelHeaderDelegate.channel.trackType === "synth")
                                                 return zynqtgui.sketchpad.channelTypeSynthColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop")
+                                            else if (channelHeaderDelegate.channel.trackType === "sample-loop")
                                                 return zynqtgui.sketchpad.channelTypeSketchesColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig")
+                                            else if (channelHeaderDelegate.channel.trackType === "sample-trig")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice")
+                                            else if (channelHeaderDelegate.channel.trackType === "sample-slice")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.channelAudioType === "external")
+                                            else if (channelHeaderDelegate.channel.trackType === "external")
                                                 return zynqtgui.sketchpad.channelTypeExternalColor
                                             else
                                                 return "#66888888"
@@ -1423,7 +1423,7 @@ Zynthian.ScreenPage {
                                     Connections {
                                         target: channel
                                         onConnectedPatternChanged: colorTimer.restart()
-                                        onChannelAudioTypeChanged: colorTimer.restart()
+                                        onTrackTypeChanged: colorTimer.restart()
                                         onClipsModelChanged: colorTimer.restart()
                                     }
                                     Connections {
@@ -1449,14 +1449,14 @@ Zynthian.ScreenPage {
                                         interval: 10
                                         onTriggered: {
                                             // update color
-//                                                if (channel.channelAudioType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && !channel.sceneClip.isEmpty) {
+//                                                if (channel.trackType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && !channel.sceneClip.isEmpty) {
 //                                                    // In scene
 //                                                    clipCell.backgroundColor = "#3381d4fa";
 //                                                } /*else if (channel.sceneClip && (!channel.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col))) {
 //                                                    // Not in scene
 //                                                    clipCell.backgroundColor = "#33f44336";
 //                                                }*/ else if ((channel.connectedPattern >= 0 && clipCell.pattern.hasNotes)
-//                                                    || (channel.channelAudioType === "sample-loop" && !channel.sceneClip.isEmpty)) {
+//                                                    || (channel.trackType === "sample-loop" && !channel.sceneClip.isEmpty)) {
 //                                                    clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
 //                                                } else {
 //                                                    clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
@@ -1491,7 +1491,7 @@ Zynthian.ScreenPage {
 //                                        zynqtgui.bottomBarControlObj = channel.sceneClip;
 //                                        bottomStack.slotsBar.bottomBarButton.checked = true;
 
-//                                        if (channel.channelAudioType === "sample-loop") {
+//                                        if (channel.trackType === "sample-loop") {
 //                                            if (channel.sceneClip && !channel.sceneClip.isEmpty) {
 //                                                bottomStack.bottomBar.waveEditorAction.trigger();
 //                                            } else {

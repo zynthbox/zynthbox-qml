@@ -231,7 +231,7 @@ GridLayout {
             QQC2.Button {
                 id: loopHandle
 
-                visible: waveBar.channel.channelAudioType !== "sample-slice"
+                visible: waveBar.channel.trackType !== "sample-slice"
                 anchors.verticalCenter: startLoopLine.verticalCenter
                 padding: Kirigami.Units.largeSpacing * 1.5
                 background: Item {
@@ -350,7 +350,7 @@ GridLayout {
             // Loop line
             Rectangle {
                 id: loopLine
-                visible: waveBar.channel.channelAudioType !== "sample-slice"
+                visible: waveBar.channel.trackType !== "sample-slice"
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -406,7 +406,7 @@ GridLayout {
                 property QtObject cppClipObject: waveBar.controlObj
                                                     ? Zynthbox.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
                                                     : null
-                model: (waveBar.visible && waveBar.channel.channelAudioType === "sample-slice" || waveBar.channel.channelAudioType === "sample-trig") && cppClipObject
+                model: (waveBar.visible && waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && cppClipObject
                         ? cppClipObject.playbackPositions
                         : 0
                 delegate: Item {
@@ -427,10 +427,10 @@ GridLayout {
                 }
             }
 
-            // Create and place beat lines when channelAudioType !== "sample-slice"
+            // Create and place beat lines when trackType !== "sample-slice"
             Repeater {
                 // Count number of beat lines to be shown as per beat and visible width
-                model: waveBar.channel.channelAudioType !== "sample-slice"
+                model: waveBar.channel.trackType !== "sample-slice"
                         ? Math.ceil(wav.width / wav.pixelsPerBeat)
                         : 0
                 delegate: Rectangle {
@@ -446,10 +446,10 @@ GridLayout {
                 }
             }
 
-            // Create and place slice lines when channelAudioType === "sample-slice"
+            // Create and place slice lines when trackType === "sample-slice"
             Repeater {
                 // Count number of slice lines to be shown
-                model: waveBar.channel.channelAudioType === "sample-slice"
+                model: waveBar.channel.trackType === "sample-slice"
                        ? waveBar.controlObj.slices
                        : 0
                 delegate: Rectangle {

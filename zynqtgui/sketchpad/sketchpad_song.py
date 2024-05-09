@@ -331,7 +331,7 @@ class sketchpad_song(QObject):
                     if "parts" in sketchpad:
                         self.__parts_model__.deserialize(sketchpad["parts"])
 
-                    # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback in the future
+                    # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback later
                     if "channels" in sketchpad:
                         warnings.warn("`channels` key is deprecated (will be removed soon) and has been renamed to `track`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
                         self.__channels_model__.deserialize(sketchpad["channels"])

@@ -347,7 +347,7 @@ ColumnLayout {
             QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                visible: root.selectedChannel ? root.selectedChannel.channelAudioType !== "sample-loop" : false
+                visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
                 text: root.clipAudioSource ? root.clipAudioSource.playbackStyleLabel : ""
                 onClicked: {
                     playbackStylePicker.open();
@@ -400,7 +400,7 @@ ColumnLayout {
             }
             QQC2.Label {
                 Layout.fillWidth: true
-                visible: root.selectedChannel ? root.selectedChannel.channelAudioType !== "sample-loop" : false
+                visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
                 horizontalAlignment: TextInput.AlignHCenter
                 wrapMode: Text.Wrap
                 text: qsTr("Playback Style")
@@ -420,7 +420,7 @@ ColumnLayout {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: root.selectedChannel ? root.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: root.selectedChannel ? root.selectedChannel.trackType === "sample-loop" : false
             }
             QQC2.Label {
                 Layout.fillWidth: true

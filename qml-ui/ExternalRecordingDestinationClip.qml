@@ -216,7 +216,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 sample: component.selectedSample
-                channelAudioType: root.selectedChannel.channelAudioType
+                trackType: root.selectedChannel.trackType
             }
         }
     }

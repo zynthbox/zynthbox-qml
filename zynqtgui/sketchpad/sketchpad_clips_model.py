@@ -45,7 +45,7 @@ class sketchpad_clips_model(QAbstractListModel):
         self.__partName__ = "(?)" if (partIndex == -1) else partNames[partIndex]
         if self.__channel__ is not None:
             self.__channel__.keyZoneModeChanged.connect(self.updateSamplesFromChannel)
-            self.__channel__.channel_audio_type_changed.connect(self.updateSamplesFromChannel)
+            self.__channel__.track_type_changed.connect(self.updateSamplesFromChannel)
 
     def serialize(self):
         data = []
@@ -172,7 +172,7 @@ class sketchpad_clips_model(QAbstractListModel):
     @Slot(None)
     def updateSamplesFromChannel(self):
         if self.__channel__ is not None:
-            if self.__channel__.channelAudioType == "sample-trig" and self.__channel__.keyZoneMode == "all-full":
+            if self.__channel__.trackType == "sample-trig" and self.__channel__.keyZoneMode == "all-full":
                 self.__samples__ = [self.__partIndex__] # A little odd seeming perhaps, but the indices line up (five parts, five samples, we want the sample for trig/full to match the part)
             else:
                 self.__samples__ = [0, 1, 2, 3, 4]

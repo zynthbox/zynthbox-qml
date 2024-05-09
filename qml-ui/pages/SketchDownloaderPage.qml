@@ -40,7 +40,7 @@ Zynthian.NewStuffPage {
         if (installedFiles.length > 0) {
             if (installedFiles.length > 4) {
                 for (let fileIndex = 0; fileIndex < 5; ++fileIndex) {
-                    if (currentChannel.channelAudioType === "sample-loop") {
+                    if (currentChannel.trackType === "sample-loop") {
                         var clip = currentChannel.getClipsModelByPart(fileIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                         clip.path = installedFiles[fileIndex];
                         clip.enabled = true
@@ -49,7 +49,7 @@ Zynthian.NewStuffPage {
                     }
                  }
             } else {
-                if (currentChannel.channelAudioType === "sample-loop") {
+                if (currentChannel.trackType === "sample-loop") {
                     var clip = currentChannel.getClipsModelByPart(currentChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                     clip.path = installedFiles[0];
                     clip.enabled = true

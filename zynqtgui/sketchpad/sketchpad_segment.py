@@ -55,7 +55,7 @@ class sketchpad_segment(QObject):
         self.__song.scenesModel.selected_sketchpad_song_index_changed.connect(self.clipsChanged.emit)
         for channel_index in range(10):
             channel = self.__song.channelsModel.getChannel(channel_index)
-            channel.channel_audio_type_changed.connect(self.sync_clips_for_channel_audio_type_change, Qt.QueuedConnection)
+            channel.track_type_changed.connect(self.sync_clips_for_track_type_change, Qt.QueuedConnection)
 
     def serialize(self):
         logging.debug("### Serializing Segment")
@@ -98,8 +98,8 @@ class sketchpad_segment(QObject):
             for clip in obj["restartClips"]:
                 self.__restartClips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
 
-    def sync_clips_for_channel_audio_type_change(self):
-        # When any of the channel changes channelAudioType, this method will be called to adjust.
+    def sync_clips_for_track_type_change(self):
+        # When any of the channel changes trackType, this method will be called to adjust.
         # Iterate over all clips in segment to remove and add them. Removing and adding back will make sure any
         # other clips in same part are not selected when channel mode is not sample-trig
         # This will make sure there are no discrepencies when a channel mode changes from sample-trig to something else
@@ -262,7 +262,7 @@ class sketchpad_segment(QObject):
             # If channel mode is not sample-trig, remove all other part clips from segment
             # This is required because only sample-trig can have multiple selectable parts while
             # all other channel mode can have only 1 part active at a time
-            if not (channel.channelAudioType == "sample-trig" and channel.keyZoneMode == "all-full"):
+            if not (channel.trackType == "sample-trig" and channel.keyZoneMode == "all-full"):
                 for part_index in range(5):
                     _clip = channel.getClipsModelByPart(part_index).getClip(clip.col)
                     self.removeClip(_clip)

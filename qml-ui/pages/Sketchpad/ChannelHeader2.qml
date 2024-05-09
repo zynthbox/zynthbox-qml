@@ -114,7 +114,7 @@ QQC2.AbstractButton {
 
                     Image {
                         id: synthImage
-                        visible: root.channel.channelAudioType === "synth" &&
+                        visible: root.channel.trackType === "synth" &&
                                  root.channel.occupiedSlotsCount > 0  &&
                                  synthImage.status !== Image.Error
                         anchors.fill: parent
@@ -126,8 +126,8 @@ QQC2.AbstractButton {
                     }
 
                     Image {
-                        visible: (root.channel.channelAudioType === "synth" && synthImage.status === Image.Error && root.channel.occupiedSlotsCount > 0) ||
-                                 ["sample-loop", "sample-trig", "sample-slice"].indexOf(root.channel.channelAudioType) >= 0
+                        visible: (root.channel.trackType === "synth" && synthImage.status === Image.Error && root.channel.occupiedSlotsCount > 0) ||
+                                 ["sample-loop", "sample-trig", "sample-slice"].indexOf(root.channel.trackType) >= 0
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectCrop
                         horizontalAlignment: Image.AlignHCenter
@@ -156,7 +156,7 @@ QQC2.AbstractButton {
                         verticalAlignment: "AlignVCenter"
                         font.pointSize: 8
                         // text: channel.connectedSoundName.split(" > ")[0]
-                        text: root.channel.channelAudioType === "synth"
+                        text: root.channel.trackType === "synth"
                                   ? root.channel.connectedSoundName.split(" > ")[0]
                                   : ""
                     }
@@ -170,7 +170,7 @@ QQC2.AbstractButton {
                     verticalAlignment: "AlignVCenter"
                     font.pointSize: Kirigami.Units.gridUnit
                     color: Kirigami.Theme.textColor
-                    visible: root.channel.channelAudioType === "external"
+                    visible: root.channel.trackType === "external"
                     text: root.channel.externalMidiChannel > -1 ? root.channel.externalMidiChannel + 1 : root.channel.id + 1
                 }
             }

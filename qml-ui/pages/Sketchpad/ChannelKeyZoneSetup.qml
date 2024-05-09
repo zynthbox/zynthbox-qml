@@ -47,7 +47,7 @@ Zynthian.DialogQuestion {
         switch (cuia) {
             case "KNOB0_UP":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.channelAudioType === "synth") {
+                    if (component.selectedChannel.trackType === "synth") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -58,7 +58,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB0_DOWN":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.channelAudioType === "synth") {
+                    if (component.selectedChannel.trackType === "synth") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -69,7 +69,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB1_UP":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.channelAudioType === "synth") {
+                    if (component.selectedChannel.trackType === "synth") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -80,7 +80,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB1_DOWN":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.channelAudioType === "synth") {
+                    if (component.selectedChannel.trackType === "synth") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -91,7 +91,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB2_UP":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.channelAudioType === "synth") {
+                    if (component.selectedChannel.trackType === "synth") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -102,7 +102,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB2_DOWN":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.channelAudioType === "synth") {
+                    if (component.selectedChannel.trackType === "synth") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -152,7 +152,7 @@ Zynthian.DialogQuestion {
                 Layout.fillWidth: true
             }
             QQC2.Label {
-                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 text: "Manual"
                 Rectangle {
                     visible: component.selectedChannel && component.selectedChannel.keyZoneMode == "manual";
@@ -166,7 +166,7 @@ Zynthian.DialogQuestion {
                 }
             }
             // QQC2.Button {
-            //     visible: component.selectedChannel.channelAudioType === "synth"
+            //     visible: component.selectedChannel.trackType === "synth"
             //     text: "Split Evenly"
             //     onClicked: {
             //          This should split the space evenly between the slots, but also... this will likely work a bit weirdly for more than two slots, which would usually be more a case of layering + splitting, and we can't reasonably guess at that... but maybe we don't care?
@@ -177,13 +177,13 @@ Zynthian.DialogQuestion {
                 QQC2.Button {
                     property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
                     property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.channelAudioType === "synth"
+                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
                     enabled: clipObj !== null
                     text: (index === 0 ? "Disable slot " : "") + (index + 1)
                     onClicked: {
-                        if (component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop") {
+                        if (component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
                             component.selectedChannel.keyZoneMode = "manual";
                         }
                         clipObj.keyZoneStart = -1;
@@ -198,13 +198,13 @@ Zynthian.DialogQuestion {
                 QQC2.Button {
                     property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
                     property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.channelAudioType === "synth"
+                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
                     enabled: clipObj !== null
                     text: (index === 0 ? "Assign full width to slot " : "") + (index + 1)
                     onClicked: {
-                        if (component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop") {
+                        if (component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
                             component.selectedChannel.keyZoneMode = "manual";
                         }
                         clipObj.keyZoneStart = 0;
@@ -215,7 +215,7 @@ Zynthian.DialogQuestion {
                 }
             }
             Rectangle {
-                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
                 Layout.margins: Kirigami.Units.smallSpacing
@@ -223,11 +223,11 @@ Zynthian.DialogQuestion {
             }
             QQC2.Label {
                 text: "Auto"
-                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
             }
             QQC2.Button {
                 text: "All Full"
-                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "all-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -237,7 +237,7 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 text: "Split Full"
-                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -247,7 +247,7 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 text: "Split Narrow"
-                visible: component.selectedChannel ? component.selectedChannel.channelAudioType === "sample-trig" || component.selectedChannel.channelAudioType === "sample-loop" : false
+                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-narrow";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -268,12 +268,12 @@ Zynthian.DialogQuestion {
                     id: sampleKeyzoneDelegate
                     property var channelSample: component.selectedChannel ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
                     property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.channelAudioType === "synth"
+                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
                     Connections {
                         target: clipObj
-                        enabled: clipObj && component.selectedChannel.channelAudioType.startsWith("sample-")
+                        enabled: clipObj && component.selectedChannel.trackType.startsWith("sample-")
                         onKeyZoneStartChanged: zynqtgui.sketchpad.song.schedule_save()
                         onKeyZoneEndChanged: zynqtgui.sketchpad.song.schedule_save()
                         onRootNoteChanged: zynqtgui.sketchpad.song.schedule_save()

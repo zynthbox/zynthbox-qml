@@ -171,7 +171,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType === "sample-loop"
+                            visible: root.selectedPartChannel && root.selectedPartChannel.trackType === "sample-loop"
                             text: root.selectedPartClip ? root.selectedPartClip.path.split("/").pop() : ""
                         }
 
@@ -179,7 +179,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType !== "sample-loop"
+                            visible: root.selectedPartChannel && root.selectedPartChannel.trackType !== "sample-loop"
                             text: root.selectedPartPattern ? qsTr("Pattern %1%2").arg(root.selectedPartChannel.id + 1).arg(root.selectedPartPattern.partName) : ""
                         }
 
@@ -191,7 +191,7 @@ Rectangle {
 
                         QQC2.Button {
                             Layout.fillWidth: true
-                            visible: root.selectedPartChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedPartChannel.channelAudioType) > -1
+                            visible: root.selectedPartChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedPartChannel.trackType) > -1
                             text: qsTr("Swap with...")
                             onClicked: {
                                 bottomStack.slotsBar.pickSlotToSwapWith(root.selectedPartChannel, "pattern", partBarDelegate.selectedPartPattern.partIndex);
@@ -200,7 +200,7 @@ Rectangle {
 
                         QQC2.Button {
                             Layout.fillWidth: true
-                            visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType === "sample-loop"
+                            visible: root.selectedPartChannel && root.selectedPartChannel.trackType === "sample-loop"
                             text: qsTr("Swap with...")
                             onClicked: {
                                 bottomStack.slotsBar.pickSlotToSwapWith(root.selectedPartChannel, "sketch", partBarDelegate.selectedPartPattern.partIndex);

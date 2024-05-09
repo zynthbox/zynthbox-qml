@@ -77,16 +77,12 @@ Rectangle {
         console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
-                if (zynqtgui.sketchpad.selectedTrackId > 0) {
-                    zynqtgui.sketchpad.selectedTrackId -= 1;
-                }
+                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
                 returnValue = true;
                 break;
 
             case "NAVIGATE_RIGHT":
-                if (zynqtgui.sketchpad.selectedTrackId < 9) {
-                    zynqtgui.sketchpad.selectedTrackId += 1;
-                }
+                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
                 returnValue = true;
                 break;
 

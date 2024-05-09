@@ -1944,11 +1944,9 @@ class zynthian_gui(QObject):
             else:
                 self.sketchpad.selectedTrackId = 4 + channelDelta
         elif cuia == "CHANNEL_PREVIOUS":
-            if self.sketchpad.selectedTrackId > 0:
-                self.sketchpad.selectedTrackId -= 1
+            self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId - 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
         elif cuia == "CHANNEL_NEXT":
-            if self.sketchpad.selectedTrackId < 11:
-                self.sketchpad.selectedTrackId += 1
+            self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId + 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
 
         elif cuia == "KEYBOARD":
             logging.info("KEYBOARD")

@@ -202,7 +202,7 @@ class sketchpad_engineRoutingData(QObject):
 
     def humanReadablePortName(self, portName):
         # Heuristics for more pleasant port display names
-        if portName == "events" or portName == "lv2_events_in" or portName == "input":
+        if portName == "events" or portName == "lv2_events_in" or portName == "input" or portName == "in":
             return "Midi Events In"
         if portName.startswith("lv2_audio_in_") or portName.startswith("input_"):
             return "Audio In " + portName.split("_")[-1]

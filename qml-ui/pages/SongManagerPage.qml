@@ -167,13 +167,12 @@ Zynthian.ScreenPage {
                     segment.beatLength = 0;
                 }
             } else {
-            if (segment.beatLength > 0) {
-                segment.beatLength -= 1;
-            } else if (segment.barLength > 0) {
-                segment.barLength -= 1;
-                segment.beatLength = 3;
-            }
-
+                if (segment.beatLength > 0) {
+                    segment.beatLength -= 1;
+                } else if (segment.barLength > 0) {
+                    segment.barLength -= 1;
+                    segment.beatLength = 3;
+                }
             }
         }
     }
@@ -696,13 +695,7 @@ Zynthian.ScreenPage {
                             zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clear();
                         } else {
                             // If there's more than one, we can remove the one we've got selected
-                            if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex === zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count - 1) {
-                                // If we've got the last segment selected, and we're deleting that, we need to go back a step to avoid ouchies
-                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 1;
-                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
-                            } else {
-                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex);
-                            }
+                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex);
                         }
                     }
                     actions: [

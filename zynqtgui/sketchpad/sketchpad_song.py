@@ -103,6 +103,8 @@ class sketchpad_song(QObject):
             for _ in range(0, 10):
                 channel = sketchpad_channel(self.__channels_model__.count, self, self.__channels_model__)
                 self.__channels_model__.add_channel(channel)
+                # Set default audio type settings when creating new channel to reset passthroug clients to default values
+                channel.setAudioTypeSettings(channel.defaultAudioTypeSettings())
 
                 # Create 5 parts per channel
                 for i in range(0, 5):

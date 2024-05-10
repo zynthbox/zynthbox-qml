@@ -36,12 +36,12 @@ Zynthian.DialogQuestion {
     id: component
     function pickRoutingStyle(channel) {
         _private.selectedChannel = channel;
-        _private.newRoutingStyle = channel.channelRoutingStyle;
+        _private.newRoutingStyle = channel.trackRoutingStyle;
         component.open();
     }
     onAccepted: {
-        if (_private.selectedChannel.channelRoutingStyle !== _private.newRoutingStyle) {
-            _private.selectedChannel.channelRoutingStyle = _private.newRoutingStyle;
+        if (_private.selectedChannel.trackRoutingStyle !== _private.newRoutingStyle) {
+            _private.selectedChannel.trackRoutingStyle = _private.newRoutingStyle;
         }
     }
     height: Kirigami.Units.gridUnit * 18

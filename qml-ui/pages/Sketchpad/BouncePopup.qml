@@ -399,7 +399,7 @@ Zynthian.Popup {
                                 "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
                                 "ZYNTHBOX_PATTERN_JSON": pattern.toJson(),
                                 "ZYNTHBOX_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
-                                "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.channelRoutingStyle,
+                                "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.trackRoutingStyle,
                                 "ZYNTHBOX_ACTIVELAYER": sketchpadTrack.getChannelSoundSnapshotJson(), // The layer setup which produced the sounds in this recording
                                 "ZYNTHBOX_AUDIO_TYPE": sketchpadTrack.trackType, // The audio type of this channel
                             };

@@ -75,7 +75,7 @@ Zynthian.DialogQuestion {
         QQC2.Label {
             Layout.fillWidth: true
             wrapMode: Text.Wrap
-            text: _private.selectedChannel === null ? "" : qsTr("Use this dialog to override the default routing for this slot. If you leave this alone, the routing is defined by the Routing option on the Track view (which is currently set to %1 for Track %2). This is useful to be able to do for things like vocoders and other effects which modulate one sound with another.").arg(_private.selectedChannel.channelRoutingStyleName).arg(_private.selectedChannel.name)
+            text: _private.selectedChannel === null ? "" : qsTr("Use this dialog to override the default routing for this slot. If you leave this alone, the routing is defined by the Routing option on the Track view (which is currently set to %1 for Track %2). This is useful to be able to do for things like vocoders and other effects which modulate one sound with another.").arg(_private.selectedChannel.trackRoutingStyleName).arg(_private.selectedChannel.name)
         }
         RowLayout {
             Layout.fillWidth: true

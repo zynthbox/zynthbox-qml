@@ -684,7 +684,7 @@ def audio_autoconnect(force=False):
                     channelSynthRoutingData = channel.synthRoutingData
                     channelFxRoutingData = channel.fxRoutingData
                     channelInputLanes = [1] * 5 # The default is a serial layout, meaning all channel output goes through a single lane
-                    if channel.channelRoutingStyle == "one-to-one":
+                    if channel.trackRoutingStyle == "one-to-one":
                         channelInputLanes = [1, 2, 3, 4, 5]
                     for laneId in range(0, 5):
                         laneInputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-input", is_audio=True, is_output=False, is_input=True)
@@ -828,13 +828,13 @@ def audio_autoconnect(force=False):
                         laneOutputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-dryOut", is_audio=True, is_output=True, is_input=False)
                         portsToConnect = globalPlaybackInputPorts + channelAudioLevelsInputPorts
                         # In standard routing mode, any fx on the channel should result in routing to the first slot with an fx - if there are no fx in the track, route it to global out
-                        if channel.channelRoutingStyle == "standard":
+                        if channel.trackRoutingStyle == "standard":
                             for index, fxlayer in enumerate(channel.chainedFx):
                                 if fxlayer is not None:
                                     portsToConnect = jclient.get_ports(f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-input", is_audio=True, is_output=False, is_input=True)
                                     break
                         # In one-to-one mode, check if the matching fx slot for a sound slot has an effect in it, and if there is one, route to it - if there is not one, route it to global out
-                        elif channel.channelRoutingStyle == "one-to-one":
+                        elif channel.trackRoutingStyle == "one-to-one":
                             if channel.chainedFx[laneId] is not None:
                                 portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId]}:Channel{channelId + 1}-input", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(laneOutputs)):
@@ -895,7 +895,7 @@ def audio_autoconnect(force=False):
                     # TODO Implement overrides
                     process_list = []
 
-                    if channel.channelRoutingStyle == "standard":
+                    if channel.trackRoutingStyle == "standard":
                         # The order should be FXPassthrough + FX layers in order -> global playback / Audio levels
                         # If there are FX in chain, then there will be 2 clients per FX, i.e. one FX Passthrough and the actual FX client
 
@@ -911,7 +911,7 @@ def audio_autoconnect(force=False):
                         if len(fx_client_names) > 0:
                             lane_client_names = fx_client_names + ["GlobalPlayback"]
                             process_list.append(lane_client_names)
-                    elif channel.channelRoutingStyle == "one-to-one":
+                    elif channel.trackRoutingStyle == "one-to-one":
                         for laneId in range(0, 5):
                             fxlayer = channel.chainedFx[laneId]
                             if fxlayer is not None:

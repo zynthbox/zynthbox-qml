@@ -590,9 +590,9 @@ Rectangle {
                                             }
                                             text: {
                                                 if (root.selectedChannel) {
-                                                    if (root.selectedChannel.channelRoutingStyle === "standard") {
+                                                    if (root.selectedChannel.trackRoutingStyle === "standard") {
                                                         return qsTr("Serial");
-                                                    } else if (root.selectedChannel.channelRoutingStyle === "one-to-one") {
+                                                    } else if (root.selectedChannel.trackRoutingStyle === "one-to-one") {
                                                         return qsTr("One-to-One");
                                                     } else {
                                                         return qsTr("Unknown");

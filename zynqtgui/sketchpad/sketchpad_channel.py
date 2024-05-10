@@ -152,7 +152,7 @@ class sketchpad_channel(QObject):
             self.__samples__.append(newSample)
 
         self.__track_type__ = "synth"
-        self.__channel_routing_style__ = "standard"
+        self.__track_routing_style__ = "standard"
         self.__routingData__ = {
             "fx": [],
             "synth": []
@@ -532,7 +532,7 @@ class sketchpad_channel(QObject):
                 "connectedPattern": self.__connected_pattern__,
                 "chainedSounds": self.__chained_sounds__,
                 "trackType": self.__track_type__,
-                "channelRoutingStyle": self.__channel_routing_style__,
+                "trackRoutingStyle": self.__track_routing_style__,
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
                 "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
@@ -577,10 +577,17 @@ class sketchpad_channel(QObject):
             # Set audioTypeSettings even if not found in json to set the default values and emit respective signals
             self.setAudioTypeSettings(_audioTypeSettings)
 
+            # TODO : `channelRoutingStyle` key is deprecated and has been renamed to `trackRoutingStyle`. Remove this fallback later
             if "channelRoutingStyle" in obj:
-                self.set_channel_routing_style(obj["channelRoutingStyle"], True)
+                warnings.warn("`channelRoutingStyle` key is deprecated (will be removed soon) and has been renamed to `trackRoutingStyle`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
+                self.set_track_routing_style(obj["channelRoutingStyle"], True)
             else:
-                self.set_channel_routing_style("standard", True)
+                self.set_track_routing_style("standard", True)
+            if "trackRoutingStyle" in obj:
+                self.set_track_routing_style(obj["trackRoutingStyle"], True)
+            else:
+                self.set_track_routing_style("standard", True)
+
             if "fxRoutingData" in obj:
                 for slotIndex, routingData in enumerate(obj["fxRoutingData"]):
                     if slotIndex > 4:
@@ -1398,33 +1405,33 @@ class sketchpad_channel(QObject):
     trackType = Property(str, get_track_type, set_track_type, notify=track_type_changed)
     ### END Property trackType
 
-    ### BEGIN Property channelRoutingStyle
+    ### BEGIN Property trackRoutingStyle
     # Possible values : "standard", "one-to-one"
     # Standard routes all audio through a serial lane of all effects (so e.g. synth or sample slot 3 will be routed to fx slot 1, which in turn is passed through fx slot 2, and so on, and the final fx through the global fx)
     # One-to-one routes each individual lane to a separate lane (each containing one effect, so e.g. synth or sample slot 3 routes to fx slot 3, and from there to the global fx)
-    def get_channel_routing_style(self):
-        return self.__channel_routing_style__
+    def get_track_routing_style(self):
+        return self.__track_routing_style__
 
-    def set_channel_routing_style(self, newRoutingStyle, force_set=False):
-        if force_set or newRoutingStyle != self.__channel_routing_style__:
-            self.__channel_routing_style__ = newRoutingStyle
-            self.channel_routing_style_changed.emit()
+    def set_track_routing_style(self, newRoutingStyle, force_set=False):
+        if force_set or newRoutingStyle != self.__track_routing_style__:
+            self.__track_routing_style__ = newRoutingStyle
+            self.track_routing_style_changed.emit()
             self.zynqtgui.zynautoconnect();
             if force_set == False:
                 self.__song__.schedule_save()
 
-    channel_routing_style_changed = Signal()
+    track_routing_style_changed = Signal()
 
-    channelRoutingStyle = Property(str, get_channel_routing_style, set_channel_routing_style, notify=channel_routing_style_changed)
+    trackRoutingStyle = Property(str, get_track_routing_style, set_track_routing_style, notify=track_routing_style_changed)
 
-    def get_channel_routing_style_name(self):
-        if self.__channel_routing_style__ == "standard":
+    def get_track_routing_style_name(self):
+        if self.__track_routing_style__ == "standard":
             return "Standard"
-        elif self.__channel_routing_style__ == "one-to-one":
+        elif self.__track_routing_style__ == "one-to-one":
             return "One-to-One"
         return "Unknown"
-    channelRoutingStyleName = Property(str, get_channel_routing_style_name, notify=channel_routing_style_changed)
-    ### END Property channelRoutingStyle
+    trackRoutingStyleName = Property(str, get_track_routing_style_name, notify=track_routing_style_changed)
+    ### END Property trackRoutingStyle
 
     ### BEGIN Property fxRoutingData
     def get_fxRoutingData(self):

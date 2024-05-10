@@ -1335,7 +1335,7 @@ Zynthian.BasePlayGrid {
                                 }
                                 Connections {
                                     target: Zynthbox.PlayGridManager
-                                    onCurrentMidiChannelChanged: sequencerPadNoteApplicator.restart();
+                                    onCurrentSketchpadTrackChanged: sequencerPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: zynqtgui.sketchpad

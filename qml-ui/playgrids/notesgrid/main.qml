@@ -58,7 +58,7 @@ Zynthian.BasePlayGrid {
             : null
         property QtObject model
         property QtObject miniGridModel
-        property int sketchpadTrack: Zynthbox.PlayGridManager.currentMidiChannel
+        property int sketchpadTrack: Zynthbox.PlayGridManager.currentSketchpadTrack
         property int startingNote: component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]
         property int transposeAmount: 0
         property string scale: "chromatic"
@@ -220,12 +220,12 @@ Zynthian.BasePlayGrid {
 
     Connections {
         target: Zynthbox.PlayGridManager
-        onCurrentMidiChannelChanged: {
+        onCurrentSketchpadTrackChanged: {
             if (_private.model) {
-                Qt.callLater(_private.model.changeMidiChannel, Zynthbox.PlayGridManager.currentMidiChannel);
+                Qt.callLater(_private.model.changeMidiChannel, Zynthbox.PlayGridManager.currentSketchpadTrack);
             }
             if (_private.miniGridModel) {
-                Qt.callLater(_private.miniGridModel.changeMidiChannel, Zynthbox.PlayGridManager.currentMidiChannel);
+                Qt.callLater(_private.miniGridModel.changeMidiChannel, Zynthbox.PlayGridManager.currentSketchpadTrack);
             }
         }
     }

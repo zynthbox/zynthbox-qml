@@ -501,7 +501,7 @@ GridLayout {
                     Zynthbox.MidiRecorder.stopPlayback();
                 } else {
                     if (Zynthbox.MidiRecorder.loadFromBase64Midi(waveBar.controlObj.metadataMidiRecording)) {
-                        Zynthbox.MidiRecorder.forceToChannel(Zynthbox.PlayGridManager.currentMidiChannel);
+                        Zynthbox.MidiRecorder.forceToChannel(Zynthbox.PlayGridManager.currentSketchpadTrack);
                         Zynthbox.MidiRecorder.playRecording();
                     } else {
                         console.log("Failed to load recording from clip data, which is:\n", waveBar.controlObj.metadataMidiRecording);

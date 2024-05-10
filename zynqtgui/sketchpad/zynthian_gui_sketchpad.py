@@ -959,7 +959,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if Zynthbox.AudioLevels.instance().isRecording() == False and Zynthbox.MidiRecorder.instance().isRecording() == False:
                 def task():
                     Zynthbox.AudioLevels.instance().clearRecordPorts()
-                    self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentMidiChannel()))
+                    self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentSketchpadTrack()))
                     self.load_recorded_file_to_clip()
 
                     self.set_clip_to_record(None)

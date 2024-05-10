@@ -3195,36 +3195,27 @@ class zynthian_gui(QObject):
 
     def all_sounds_off(self):
         logging.info("All Sounds Off!")
-        for track in range(10): # One for each track and midi channel
-            for chan in range(16):
-                Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0, track)
+        Zynthbox.SyncTimer.instance().sendAllSoundsOffEverywhereImmediately()
 
     def all_notes_off(self):
         logging.info("All Notes Off!")
-        for track in range(10): # One for each track and midi channel
-            for chan in range(16):
-                Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
+        Zynthbox.SyncTimer.instance().sendAllNotesOffEverywhereImmediately()
 
     def raw_all_notes_off(self):
         logging.info("Raw All Notes Off!")
-        for track in range(10): # One for each track and midi channel
-            for chan in range(16):
-                Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
+        Zynthbox.SyncTimer.instance().sendAllNotesOffEverywhereImmediately()
 
     def all_sounds_off_chan(self, track):
         logging.info("All Sounds Off for track {}!".format(track))
-        for chan in range(16):
-            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 120, 0, track)
+        Zynthbox.SyncTimer.instance().sendAllSoundsOffImmediately(track)
 
     def all_notes_off_chan(self, track):
         logging.info("All Notes Off for track {}!".format(track))
-        for chan in range(16):
-            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
+        Zynthbox.SyncTimer.instance().sendAllNotesOffImmediately(track)
 
     def raw_all_notes_off_chan(self, track):
         logging.info("Raw All Notes Off for track {}!".format(track))
-        for chan in range(16):
-            Zynthbox.SyncTimer.instance().sendMidiMessageImmediately(3, 176 + chan, 123, 0, track)
+        Zynthbox.SyncTimer.instance().sendAllNotesOffImmediately(track)
 
     # ------------------------------------------------------------------
     # MPE initialization

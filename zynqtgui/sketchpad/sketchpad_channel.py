@@ -1919,10 +1919,13 @@ class sketchpad_channel(QObject):
 
     def set_wetFx1Amount(self, value, force_set=False):
         if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"] != value or force_set is True:
-            self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"] = value
-            self.wetFx1AmountChanged.emit()
-            if force_set is False:
-                self.__song__.schedule_save()
+            # Set same value to all lanes
+            # TODO If we want to separate the channel passthrough settings for 1-to-1, we will need to individually set the amounts
+            for laneId in range(5):
+                self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] = value
+                self.wetFx1AmountChanged.emit()
+                if force_set is False:
+                    self.__song__.schedule_save()
 
     wetFx1AmountChanged = Signal()
 
@@ -1930,10 +1933,9 @@ class sketchpad_channel(QObject):
     def handleWetFx1AmountChanged(self):
         # Calculate wet amount as per volume
         volume = np.interp(self.__volume__, (-40, 20), (0, 1))
-        for laneId in range(0, 5):
-            # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
+        for laneId in range(5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.setWetFx1Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
+            passthroughClient.setWetFx1Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
     ### END Property wetFx1Amount
@@ -1944,10 +1946,13 @@ class sketchpad_channel(QObject):
 
     def set_wetFx2Amount(self, value, force_set=False):
         if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"] != value or force_set is True:
-            self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"] = value
-            self.wetFx2AmountChanged.emit()
-            if force_set is False:
-                self.__song__.schedule_save()
+            # Set same value to all lanes
+            # TODO If we want to separate the channel passthrough settings for 1-to-1, we will need to individually set the amounts
+            for laneId in range(5):
+                self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] = value
+                self.wetFx2AmountChanged.emit()
+                if force_set is False:
+                    self.__song__.schedule_save()
 
     wetFx2AmountChanged = Signal()
 
@@ -1956,9 +1961,8 @@ class sketchpad_channel(QObject):
         # Calculate wet amount as per volume
         volume = np.interp(self.__volume__, (-40, 20), (0, 1))
         for laneId in range(0, 5):
-            # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.setWetFx2Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
+            passthroughClient.setWetFx2Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
     """
     Store wetFx1Amount for current channel as a property and set it to JackPassthrough when value changes
     Stored value ranges from 0-100 and accepted range by setWetFx1Amount is 0-1

@@ -27,6 +27,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import Zynthian 1.0 as Zynthian
 
@@ -133,6 +134,40 @@ Zynthian.ScreenPage {
                     wrapMode: Text.Wrap
                     text: qsTr("Sorry, you seem to have no network connection right now. Either plug in a network cable, or connect to a wifi network, and then come back here to try again.\n%1").arg(component.connectionErrorDescription)
                 }
+            }
+        }
+        Item {
+            id: busyLoadingPage
+            anchors {
+                bottom: parent.bottom
+                right: parent.right
+                left: parent.left
+                margins: Kirigami.Units.largeSpacing
+            }
+            height: Kirigami.Units.gridUnit * 5
+            visible: contentLoader.status != Loader.Ready
+            Zynthian.Card {
+                anchors {
+                    top: parent.top
+                    left: busyWithEngineStuffLabel.left
+                    right: busyWithEngineStuffLabel.right
+                    bottom: parent.bottom
+                    topMargin: -Kirigami.Units.largeSpacing
+                    leftMargin: -Kirigami.Units.gridUnit * 2.5
+                    rightMargin: -Kirigami.Units.gridUnit * 2.5
+                    bottomMargin: -Kirigami.Units.largeSpacing
+                }
+            }
+            PlasmaComponents.BusyIndicator {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.top
+                    topMargin: Kirigami.Units.largeSpacing
+                }
+                height: Kirigami.Units.gridUnit * 3
+                width: height
+                running: parent.visible
+                background: Item {} // Quiet some warnings
             }
         }
         Loader {

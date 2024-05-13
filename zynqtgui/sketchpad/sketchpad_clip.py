@@ -85,10 +85,13 @@ class sketchpad_clip(QObject):
         self.__autoStopTimer__ = QTimer()
         self.__autoStopTimer__.setSingleShot(True)
         self.__autoStopTimer__.timeout.connect(self.stop_audio)
+
         self.__update_synced_values_throttle = QTimer()
         self.__update_synced_values_throttle.setSingleShot(True)
         self.__update_synced_values_throttle.setInterval(50)
         self.__update_synced_values_throttle.timeout.connect(self.update_synced_values_actual, Qt.QueuedConnection)
+        Zynthbox.SyncTimer.instance().bpmChanged.connect(self.update_synced_values, Qt.QueuedConnection)
+        self.bpm_changed.connect(self.update_synced_values, Qt.QueuedConnection)
 
         try:
             # Check if a dir named <somerandomname>.<channel_id> exists.
@@ -98,7 +101,6 @@ class sketchpad_clip(QObject):
             bank_name = "sample-bank"
         self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
 
-        Zynthbox.SyncTimer.instance().bpmChanged.connect(self.update_synced_values, Qt.QueuedConnection)
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat, Qt.QueuedConnection)
 
         try:

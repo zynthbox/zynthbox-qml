@@ -1162,11 +1162,16 @@ Rectangle {
                                         opacity: waveformContainer.showWaveform ? 1 : 0
 
                                         Zynthbox.WaveFormItem {
+                                            id: waveformItem
                                             anchors.fill: parent
                                             color: Kirigami.Theme.textColor
                                             source: waveformContainer.clip ? waveformContainer.clip.path : ""
-
                                             visible: waveformContainer.clip && !waveformContainer.clip.isEmpty
+                                            // Calculate amount of pixels represented by 1 second
+                                            property real pixelToSecs: (waveformItem.end - waveformItem.start) / waveformItem.width
+                                            // Calculate amount of pixels represented by 1 beat
+                                            property real pixelsPerBeat: (60/Zynthbox.SyncTimer.bpm*waveformContainer.clip.time) / waveformItem.pixelToSecs
+
 
                                             // Mask for wave part before start
                                             Rectangle {
@@ -1203,6 +1208,21 @@ Rectangle {
                                                 x: waveformContainer.clip != null ? (waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width : 0
                                             }
 
+                                            // Loop line
+                                            Rectangle {
+                                                id: loopLine
+                                                anchors {
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                x: waveformContainer.clip
+                                                    ? startLoopLine.x + waveformContainer.clip.loopDelta/waveformItem.pixelToSecs
+                                                    : 0
+                                                color: Kirigami.Theme.highlightColor
+                                                opacity: 0.6
+                                                width: Kirigami.Units.smallSpacing
+                                            }
+
                                             // End loop line
                                             Rectangle {
                                                 id: endLoopLine
@@ -1213,7 +1233,7 @@ Rectangle {
                                                 color: Kirigami.Theme.neutralTextColor
                                                 opacity: 0.6
                                                 width: Kirigami.Units.smallSpacing
-                                                x: waveformContainer.clip != null ? ((((60/Zynthbox.SyncTimer.bpm) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width) : 0
+                                                x: waveformContainer.clip != null ? ((((60/Zynthbox.SyncTimer.bpm*waveformContainer.clip.time) * waveformContainer.clip.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.startPosition / waveformContainer.clip.duration) * parent.width) : 0
                                             }
 
                                             // Progress line

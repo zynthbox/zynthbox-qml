@@ -229,7 +229,7 @@ ColumnLayout {
             }
             controlProperty: "time"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj ? !root.controlObj.shouldSync : false
+            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? !root.controlObj.metadataSyncSpeedToBpm : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -296,10 +296,10 @@ ColumnLayout {
                 id: syncSwitch
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                checked: root.controlObj && root.controlObj.hasOwnProperty("shouldSync") ? root.controlObj.shouldSync : false
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadataSyncSpeedToBpm : false
                 enabled: root.controlObj && root.controlObj.metadataBPM > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
-                    root.controlObj.shouldSync = checked
+                    root.controlObj.metadataSyncSpeedToBpm = checked
                 }
             }
 

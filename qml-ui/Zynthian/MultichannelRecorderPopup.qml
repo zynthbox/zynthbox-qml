@@ -236,7 +236,8 @@ Zynthian.Dialog {
                     let filename = recordingFilenames[filenameIndex];
                     if (filename.length > 0) {
                         let metadata = {
-                            "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm
+                            "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
+                            "ZYNTHBOX_SYNC_SPEED_TO_BPM": true
                         };
                         // If the filename is a thing, it means we have produced a recording
                         if (filenameIndex === 0) {

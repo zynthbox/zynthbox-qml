@@ -67,7 +67,6 @@ class sketchpad_clip(QObject):
         self.__progress__ = 0.0
         self.__audio_level__ = -200
         self.__current_beat__ = -1
-        self.__should_sync__ = False
         self.__playing_started__ = False
         self.audioSource = None
         self.audio_metadata = None
@@ -219,7 +218,7 @@ class sketchpad_clip(QObject):
         self.__update_synced_values_throttle.start()
 
     def update_synced_values_actual(self):
-        if self.__should_sync__:
+        if self.metadataSyncSpeedToBpm:
             new_ratio = Zynthbox.SyncTimer.instance().getBpm() / self.metadataBPM
             logging.info(f"Song BPM : {Zynthbox.SyncTimer.instance().getBpm()} - Sample BPM: {self.metadataBPM} - New Speed Ratio : {new_ratio}")
             self.set_time(new_ratio, True)
@@ -240,7 +239,6 @@ class sketchpad_clip(QObject):
                 "pitch": self.__pitch__,
                 "time": self.__time__,
                 "enabled": self.__enabled__,
-                "shouldSync": self.__should_sync__,
                 "snapLengthToBeat": self.__snap_length_to_beat__}
 
     def deserialize(self, obj):
@@ -274,9 +272,6 @@ class sketchpad_clip(QObject):
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
-            if "shouldSync" in obj:
-                self.__should_sync__ = obj["shouldSync"]
-                self.set_shouldSync(self.__should_sync__, True)
             if "snapLengthToBeat" in obj:
                 self.__snap_length_to_beat__ = obj["snapLengthToBeat"]
                 self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
@@ -318,10 +313,6 @@ class sketchpad_clip(QObject):
 
     @Signal
     def bpm_changed(self):
-        pass
-
-    @Signal
-    def should_sync_changed(self):
         pass
 
     def playable(self):
@@ -539,32 +530,6 @@ class sketchpad_clip(QObject):
             self.reset_beat_count()
 
     time = Property(float, time, set_time, notify=time_changed)
-
-
-    def shouldSync(self):
-        return self.__should_sync__
-
-    def set_shouldSync(self, shouldSync: bool, force_set=False):
-        if self.__should_sync__ != shouldSync or force_set is True:
-            # if shouldSync:
-            #     self.__start_position_before_sync__ = self.__start_position__
-
-            self.__should_sync__ = shouldSync
-            self.should_sync_changed.emit()
-            self.update_synced_values()
-            if force_set is False:
-                self.__song__.schedule_save()
-
-            if not shouldSync:
-                self.set_time(1.0)
-                # Set length to recalculate loop time
-                self.set_length(self.__length__)
-
-                # if self.__start_position_before_sync__ is not None:
-                #     self.startPosition = self.__start_position_before_sync__
-                #     self.__start_position_before_sync__ = None
-
-    shouldSync = Property(bool, shouldSync, set_shouldSync, notify=should_sync_changed)
 
 
     def filename(self):
@@ -1002,6 +967,34 @@ class sketchpad_clip(QObject):
 
     metadataRoutingStyle = Property(str, get_metadataRoutingStyle, set_metadataRoutingStyle, notify=metadataRoutingStyleChanged)
     ### END Property metadataRoutingStyle
+
+    ### BEGIN Property metadataSyncSpeedToBpm
+    def get_metadataSyncSpeedToBpm(self):
+        try:
+            if self.audio_metadata is not None:
+                if "ZYNTHBOX_SYNC_SPEED_TO_BPM" in self.audio_metadata:
+                    return bool(self.audio_metadata["ZYNTHBOX_SYNC_SPEED_TO_BPM"][0])
+                # if there's no field called that, but we do have a bpm saved and it's higher than 0, assume sync should be true, and save that back
+                elif "ZYNTHBOX_BPM" in self.audio_metadata and self.metadataBPM > 0:
+                    self.set_metadataSyncSpeedToBpm(True)
+                    return True
+        except Exception as e:
+            logging.debug(f"Error retrieving from metadata: {str(e)}")
+        return False
+
+    def set_metadataSyncSpeedToBpm(self, shouldSync):
+        self.write_metadata("ZYNTHBOX_SYNC_SPEED_TO_BPM", [str(shouldSync)])
+        self.metadataSyncSpeedToBpmChanged.emit()
+        self.update_synced_values()
+        if not shouldSync:
+            self.set_time(1.0)
+            # Set length to recalculate loop time
+            self.set_length(self.__length__, True)
+
+    metadataSyncSpeedToBpmChanged = Signal()
+
+    metadataSyncSpeedToBpm = Property(bool, get_metadataSyncSpeedToBpm, set_metadataSyncSpeedToBpm, notify=metadataSyncSpeedToBpmChanged)
+    ### END Property metadataSyncSpeedToBpm
 
     @Signal
     def sec_per_beat_changed(self):

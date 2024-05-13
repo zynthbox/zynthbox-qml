@@ -92,7 +92,7 @@ GridLayout {
         property real pixelToSecs: (wav.end - wav.start) / width
 
         // Calculate amount of pixels represented by 1 beat
-        property real pixelsPerBeat: (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.time) / wav.pixelToSecs
+        property real pixelsPerBeat: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("time") ? (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.time) / wav.pixelToSecs : 1
 
         Layout.fillWidth: true
         Layout.fillHeight: true

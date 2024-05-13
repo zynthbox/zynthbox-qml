@@ -397,6 +397,7 @@ Zynthian.Popup {
                             let pattern = details["pattern"];
                             let metadata = {
                                 "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
+                                "ZYNTHBOX_SYNC_SPEED_TO_BPM": true,
                                 "ZYNTHBOX_PATTERN_JSON": pattern.toJson(),
                                 "ZYNTHBOX_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
                                 "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.trackRoutingStyle,

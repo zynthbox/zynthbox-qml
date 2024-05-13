@@ -488,9 +488,8 @@ class sketchpad_clip(QObject):
                 self.__song__.schedule_save()
                 self.saveMetadata()
 
-            if self.audioSource is None:
-                return
-            self.audioSource.setStartPosition(position)
+            if self.audioSource is not None:
+                self.audioSource.setStartPosition(position)
             self.reset_beat_count()
 
     startPosition = Property(float, startPosition, set_start_position, notify=start_position_changed)
@@ -515,9 +514,8 @@ class sketchpad_clip(QObject):
                 self.__song__.schedule_save()
                 self.saveMetadata()
 
-            if self.audioSource is None:
-                return
-            self.audioSource.setPitch(pitch)
+            if self.audioSource is not None:
+                self.audioSource.setPitch(pitch)
             self.reset_beat_count()
 
     pitch = Property(int, pitch, set_pitch, notify=pitch_changed)
@@ -534,9 +532,8 @@ class sketchpad_clip(QObject):
                 self.__song__.schedule_save()
                 self.saveMetadata()
 
-            if self.audioSource is None:
-                return
-            self.audioSource.setSpeedRatio(time)
+            if self.audioSource is not None:
+                self.audioSource.setSpeedRatio(time)
             self.reset_beat_count()
 
     time = Property(float, time, set_time, notify=time_changed)
@@ -587,27 +584,30 @@ class sketchpad_clip(QObject):
     #                   when first selecting a wav for a clip.
     @Slot(str,bool)
     def set_path(self, path, should_copy=True):
-        selected_path = Path(path)
-        new_filename = ""
+        if path is not None:
+            selected_path = Path(path)
+            new_filename = ""
 
-        if self.is_channel_sample:
-            if should_copy:
-                new_filename = self.generate_unique_filename(selected_path, self.bank_path)
-                logging.info(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
-                self.bank_path.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(selected_path, self.bank_path / new_filename)
-        else:
-            if should_copy:
-                new_filename = self.generate_unique_filename(selected_path, self.wav_path)
-                logging.info(f"Copying clip({path}) into sketchpad folder ({self.wav_path / new_filename})")
-                shutil.copy2(selected_path, self.wav_path / new_filename)
+            if self.is_channel_sample:
+                if should_copy:
+                    new_filename = self.generate_unique_filename(selected_path, self.bank_path)
+                    logging.info(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
+                    self.bank_path.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(selected_path, self.bank_path / new_filename)
+            else:
+                if should_copy:
+                    new_filename = self.generate_unique_filename(selected_path, self.wav_path)
+                    logging.info(f"Copying clip({path}) into sketchpad folder ({self.wav_path / new_filename})")
+                    shutil.copy2(selected_path, self.wav_path / new_filename)
 
-        if new_filename == "" :
-            self.__path__ = str(selected_path.name)
+            if new_filename == "" :
+                self.__path__ = str(selected_path.name)
+            else:
+                self.__path__ = str(new_filename)
+            self.__filename__ = self.__path__.split("/")[-1]
+            self.stop()
         else:
-            self.__path__ = str(new_filename)
-        self.__filename__ = self.__path__.split("/")[-1]
-        self.stop()
+            self.__path__ = None
 
         if self.audioSource is not None:
             try: self.audioSource.isPlayingChanged.disconnect(self.is_playing_changed.emit)
@@ -623,80 +623,78 @@ class sketchpad_clip(QObject):
             self.audioSource.deleteLater()
 
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
-        self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
-        self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
-        self.audioSource.setLaneAffinity(self.__lane__)
-        if self.clipChannel is not None and self.__song__.isLoading == False:
-            self.clipChannel.trackType = "sample-loop"
-        self.cppObjIdChanged.emit()
+        if path is not None:
+            self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
+            self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
+            self.audioSource.setLaneAffinity(self.__lane__)
+            if self.clipChannel is not None and self.__song__.isLoading == False:
+                self.clipChannel.trackType = "sample-loop"
+            self.cppObjIdChanged.emit()
+        else:
+            self.audioSource = None
 
         self.__read_metadata__()
 
         playbackStyle = str(self.__get_metadata_prop__("ZYNTHBOX_PLAYBACK_STYLE", ""))
-        if playbackStyle == "":
-            # TODO Probably get rid of this at some point - it's a temporary fallback while there's reasonably still things around without playback style set on them
-            looping = bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True))
-            granular = (self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_ENABLED", 'False').lower() == "true")
-            if looping:
-                if granular:
-                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularLoopingPlaybackStyle)
+        if self.audioSource is not None:
+            if playbackStyle == "":
+                # TODO Probably get rid of this at some point - it's a temporary fallback while there's reasonably still things around without playback style set on them
+                looping = bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True))
+                granular = (self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_ENABLED", 'False').lower() == "true")
+                if looping:
+                    if granular:
+                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularLoopingPlaybackStyle)
+                    else:
+                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
+                elif looping:
+                    if granular:
+                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularNonLoopingPlaybackStyle)
+                    else:
+                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.NonLoopingPlaybackStyle)
+            else:
+                if playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
+                    playbackStyle = playbackStyle.split(".")[-1]
+                if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
                 else:
                     self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
-            elif looping:
-                if granular:
-                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularNonLoopingPlaybackStyle)
-                else:
-                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.NonLoopingPlaybackStyle)
-        else:
-            if playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
-                playbackStyle = playbackStyle.split(".")[-1]
-            if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
-                self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
-            else:
-                self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
 
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
-        self.audioSource.setLoopDelta(self.__loop_delta__)
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
         self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
         self.__progress__ = 0.0
         self.__audio_level__ = -200
         self.__snap_length_to_beat__ = (self.__get_metadata_prop__("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", 'True').lower() == "true")
-        self.audioSource.setADSRAttack(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_ATTACK", 0)))
-        self.audioSource.setADSRDecay(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_DECAY", 0)))
-        self.audioSource.setADSRSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
-        self.audioSource.setADSRRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
-
-        self.audioSource.setGrainPosition(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
-        self.audioSource.setGrainSpray(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
-        self.audioSource.setGrainScan(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
-        self.audioSource.setGrainInterval(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
-        self.audioSource.setGrainIntervalAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
-        self.audioSource.setGrainSize(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SIZE", 100)))
-        self.audioSource.setGrainSizeAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)))
-        self.audioSource.setGrainPanMinimum(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)))
-        self.audioSource.setGrainPanMaximum(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
-        self.audioSource.setGrainSustain(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
-        self.audioSource.setGrainTilt(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
-        self.audioSource.setGrainPitchMinimum1(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)))
-        self.audioSource.setGrainPitchMaximum1(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)))
-        self.audioSource.setGrainPitchMinimum2(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)))
-        self.audioSource.setGrainPitchMaximum2(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)))
-        self.audioSource.setGrainPitchPriority(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)))
+        if self.audioSource is not None:
+            self.audioSource.setLoopDelta(self.__loop_delta__)
+            self.audioSource.setADSRAttack(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_ATTACK", 0)))
+            self.audioSource.setADSRDecay(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_DECAY", 0)))
+            self.audioSource.setADSRSustain(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_SUSTAIN", 1)))
+            self.audioSource.setADSRRelease(float(self.__get_metadata_prop__("ZYNTHBOX_ADSR_RELEASE", 0.05)))
+            self.audioSource.setGrainPosition(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
+            self.audioSource.setGrainSpray(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
+            self.audioSource.setGrainScan(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
+            self.audioSource.setGrainInterval(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
+            self.audioSource.setGrainIntervalAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
+            self.audioSource.setGrainSize(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SIZE", 100)))
+            self.audioSource.setGrainSizeAdditional(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)))
+            self.audioSource.setGrainPanMinimum(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)))
+            self.audioSource.setGrainPanMaximum(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
+            self.audioSource.setGrainSustain(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
+            self.audioSource.setGrainTilt(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
+            self.audioSource.setGrainPitchMinimum1(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)))
+            self.audioSource.setGrainPitchMaximum1(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)))
+            self.audioSource.setGrainPitchMinimum2(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)))
+            self.audioSource.setGrainPitchMaximum2(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)))
+            self.audioSource.setGrainPitchPriority(float(self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)))
+            self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
+            self.audioSource.gainAbsoluteChanged.connect(self.updateGain, Qt.QueuedConnection)
+            self.audioSource.playbackStyleChanged.connect(self.saveMetadata, Qt.QueuedConnection)
 
         self.reset_beat_count()
-
-        self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
-        self.audioSource.gainAbsoluteChanged.connect(self.updateGain, Qt.QueuedConnection)
-        self.audioSource.playbackStyleChanged.connect(self.saveMetadata, Qt.QueuedConnection)
-
-        # self.startPosition = self.__start_position__
-        # self.length = self.__length__
-        # self.pitch - self.__pitch__
-        # self.time = self.__time__
         self.set_length(self.__length__, True)
         self.set_start_position(self.__start_position__, True)
         self.set_loop_delta(self.__loop_delta__, True)
@@ -705,14 +703,12 @@ class sketchpad_clip(QObject):
         self.set_gain(self.__gain__, True)
         self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
 
-        # self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
-        self.sound_data_changed.emit()
+        self.__read_metadata__()
         self.duration_changed.emit()
         self.is_playing_changed.emit()
         if self.is_channel_sample:
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
-
         self.__song__.schedule_save()
 
     path = Property(str, path, set_path, notify=path_changed)
@@ -759,9 +755,8 @@ class sketchpad_clip(QObject):
             self.audioSource = None
             self.cppObjIdChanged.emit()
 
-        self.__path__ = None
+        self.set_path(None, False)
         self.__filename__ = ""
-        self.path_changed.emit()
         if self.is_channel_sample:
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
 
@@ -836,17 +831,16 @@ class sketchpad_clip(QObject):
     def __read_metadata__(self):
         self.audio_metadata = None
 
-        if self.path is not None:
-            try:
+        try:
+            if self.path is not None:
                 self.audio_metadata = taglib.File(self.path).tags
-                self.sound_data_changed.emit()
-                self.metadata_bpm_changed.emit()
-                self.metadata_audio_type_changed.emit()
-                self.metadata_midi_recording_changed.emit()
-                self.samples_data_changed.emit()
-            except Exception as e:
-                # logging.error(f"Cannot read metadata : {str(e)}")
-                pass
+        except:
+            pass
+        self.sound_data_changed.emit()
+        self.metadata_bpm_changed.emit()
+        self.metadata_audio_type_changed.emit()
+        self.metadata_midi_recording_changed.emit()
+        self.samples_data_changed.emit()
 
     def __get_metadata_prop__(self, name, default):
         try:

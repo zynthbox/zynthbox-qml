@@ -47,6 +47,7 @@ Zynthian.DialogQuestion {
             console.log("Can't unbounce if there's no selected sound source, so we should be disabling the accept button in that case... which we need the ability to do first.");
         }
     }
+    onOpened: _private.populateSketchesDetails()
     title: qsTr("Unbounce Track?")
     acceptText: qsTr("Unbounce")
     acceptEnabled: (_private.soundSourceSketch > -1)
@@ -63,6 +64,9 @@ Zynthian.DialogQuestion {
                 property QtObject sketchpadTrack: sketchpadTrackId > -1 ? zynqtgui.sketchpad.song.channelsModel.getChannel(sketchpadTrackId) : null
                 property int soundSourceSketch: -1
                 property var sketches: []
+                property var soundSourceDetails: []
+                property var sketchLacksPatternOrMidi: []
+                property var sketchLacksSoundInfo: []
                 onSketchpadTrackChanged: {
                     _private.soundSourceSketch = -1;
                     if (_private.sketchpadTrack) {
@@ -76,10 +80,8 @@ Zynthian.DialogQuestion {
                         _private.sketches = [];
                     }
                 }
-                property var soundSourceDetails: []
-                property var sketchLacksPatternOrMidi: []
-                property var sketchLacksSoundInfo: []
-                onSketchesChanged: {
+                onSketchesChanged: _private.populateSketchesDetails()
+                function populateSketchesDetails() {
                     // Go through all the sketches, and compare them to each other to work out what options we want to actually show:
                     // - If a sketch lacks pattern or midi recording information, make a note of this and warn
                     // - If a sketch lacks sound information entirely, warn that that sketch cannot be unbounced

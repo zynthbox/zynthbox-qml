@@ -278,7 +278,7 @@ ColumnLayout {
                 validator: RegExpValidator { regExp: /^[0-9]*(\.(0{0}|0[1-9]{0,1}|[1-9]{0,2}))?$/ }
                 inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
                 activeFocusOnTab: false
-                enabled: root.controlObj ? !root.controlObj.shouldSync : false
+                enabled: root.controlObj ? true : false
                 onTextChanged: {
                     var newValue = parseFloat(text);
                     if (text !== "" && root.controlObj.metadataBPM !== newValue) {
@@ -306,7 +306,7 @@ ColumnLayout {
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: TextInput.AlignHCenter
-                text: qsTr("Sync")
+                text: qsTr("Sync Speed")
             }
         }
 

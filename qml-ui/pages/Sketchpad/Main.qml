@@ -411,7 +411,7 @@ Zynthian.ScreenPage {
      */
     function updateClipSpeedRatio(clip, sign) {
         if (clip != null) {
-            clip.time = Zynthian.CommonUtils.clamp(clip.time + sign * 0.1, 0.5, 2)
+            clip.speedRatio = Zynthian.CommonUtils.clamp(clip.speedRatio + sign * 0.1, 0.5, 2)
         }
     }
     /**

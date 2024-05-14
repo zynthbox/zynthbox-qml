@@ -92,7 +92,7 @@ GridLayout {
         property real pixelToSecs: (wav.end - wav.start) / width
 
         // Calculate amount of pixels represented by 1 beat
-        property real pixelsPerBeat: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("time") ? (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.time) / wav.pixelToSecs : 1
+        property real pixelsPerBeat: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("time") ? (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.speedRatio) / wav.pixelToSecs : 1
 
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -379,7 +379,7 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.controlObj
-                    ? ((((60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.time) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
+                    ? ((((60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.speedRatio) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
                     : 0
                 onXChanged: {
                     if (!endHandleDragHandler.drag.active) {

@@ -241,7 +241,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.time = root.controlObj.initialTime;
+                root.controlObj.speedRatio = root.controlObj.initialSpeedRatio;
             }
         }
 

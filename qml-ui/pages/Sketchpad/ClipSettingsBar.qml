@@ -227,7 +227,15 @@ ColumnLayout {
                 target: root
                 onControlObjChanged: timeDialThrottle.restart()
             }
-            controlProperty: "time"
+            Connections {
+                target: root.controlObj
+                onSpeedRatioChanged: {
+                    if (timeDial.dial.value !== root.controlObj.speedRatio) {
+                        timeDial.dial.value = root.controlObj.speedRatio
+                    }
+                }
+            }
+            controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
             enabled: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? !root.controlObj.metadataSyncSpeedToBpm : false
             Layout.fillWidth: true

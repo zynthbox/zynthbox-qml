@@ -180,7 +180,7 @@ class sketchpad_channel(QObject):
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
         try:
-            self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+            self.__song__.scenesModel.selectedSketchpadSongIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         except:
             pass
         self.track_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
@@ -243,7 +243,7 @@ class sketchpad_channel(QObject):
                 # Do not update channel muted state when being played on solo mode
                 # If muted state is changed at all times, when setting solo mode, all channel's muted state is set to True
                 # and hence disabling solo mode does
-                if self.zynqtgui.song.playChannelSolo == -1:
+                if self.__song__.playChannelSolo == -1:
                     self.set_muted(theValue)
             # elif theSomething == "wetFx1Amount":
                 # self.set_wetFx1Amount(theValue)
@@ -1799,7 +1799,7 @@ class sketchpad_channel(QObject):
     def get_selectedPartNames(self):
         partNames = []
         for i in range(5):
-            clip = self.getClipsModelByPart(i).getClip(self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            clip = self.getClipsModelByPart(i).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
 
             if clip.enabled:
                 partNames.append(chr(i+65).lower())
@@ -2418,7 +2418,7 @@ class sketchpad_channel(QObject):
                 if index != newOrder[index]:
                     self.getClipsModelByPart(newOrder[index]).__clips__[0] = clip
                     clip.part = newOrder[index]
-            self.zynqtgui.sketchpad.song.schedule_save()
+            self.__song__.schedule_save()
         elif _trackType in ["sample-trig", "sample-slice"]:
             # Reorder samples
             new_order_samples = [self.samples[index] for index in newOrder]

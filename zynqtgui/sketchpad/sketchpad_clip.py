@@ -267,8 +267,8 @@ class sketchpad_clip(QObject):
                 self.__gain__ = obj["gain"]
                 self.set_gain(self.__gain__, True)
             if "speedRatio" in obj:
-                self.__time__ = obj["speedRatio"]
-                self.set_time(self.__time__, True)
+                self.__speed_ratio = obj["speedRatio"]
+                self.set_speedRatio(self.__speed_ratio, True)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
@@ -669,6 +669,7 @@ class sketchpad_clip(QObject):
         self.set_pitch(self.__pitch__, True)
         self.set_gain(self.__gain__, True)
         self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
+        self.update_synced_values()
 
         self.path_changed.emit()
         self.__read_metadata__()
@@ -807,6 +808,7 @@ class sketchpad_clip(QObject):
         self.metadata_bpm_changed.emit()
         self.metadata_audio_type_changed.emit()
         self.metadata_midi_recording_changed.emit()
+        self.metadataSyncSpeedToBpmChanged.emit()
         self.samples_data_changed.emit()
 
     def __get_metadata_prop__(self, name, default):

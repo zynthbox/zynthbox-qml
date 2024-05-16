@@ -42,442 +42,345 @@ from zynqtgui import zynthian_gui_config
 class sketchpad_clip_metadata(QObject):
     def __init__(self, clip):
         super(sketchpad_clip_metadata, self).__init__(clip)
-        self.clip = clip
-        self.__audioMetadata = None
-        self.__soundSnapshot = self.clip.channel.getChannelSoundSnapshotJson()
-        self.__adsrAttack = 0
-        self.__adsrDecay = 0
-        self.__adsrRelease = 0.05
-        self.__adsrSustain = 1
-        self.__audioType = self.clip.channel.trackType
-        self.__audioTypeSettings = self.clip.getAudioTypeSettings()
-        self.__bpm = Zynthbox.SyncTimer.instance().bpm
-        self.__gain = self.clip.initialGain
-        self.__graineratorEnabled = False
-        self.__graineratorInterval = 10
-        self.__graineratorIntervalAdditional = 10
-        self.__graineratorPanMaximum = 1
-        self.__graineratorPanMinimum = -1
-        self.__graineratorPitchMaximum1 = 1.0
-        self.__graineratorPitchMaximum2 = 1.0
-        self.__graineratorPitchMinimum1 = 1.0
-        self.__graineratorPitchMinimum2 = 1.0
-        self.__graineratorPitchPriority = 0.5
-        self.__graineratorPosition = 0
-        self.__graineratorScan = 0
-        self.__graineratorSize = 100
-        self.__graineratorSizeAdditional = 50
-        self.__graineratorSpray = 1
-        self.__graineratorSustain = 0.3
-        self.__graineratorTilt = 0.5
-        self.__length = self.clip.initialLength
-        self.__loopdelta = 0.0
-        self.__loopdelta2 = 0.0
-        self.__midiRecording = ""
-        self.__patternJson = ""
-        self.__pitch = self.clip.initialPitch
-        self.__playbackStyle = self.clip.audioSource.playbackStyle() if self.clip.audioSource is not None else ''
-        self.__routingStyle = self.clip.channel.trackRoutingStyle
-        self.__samplePickingStyle = self.clip.channel.samplePickingStyle
-        self.__samples = self.clip.channel.getChannelSampleSnapshot()
-        self.__snapLengthToBeat = True
-        self.__speedRatio = self.clip.initialSpeedRatio
-        self.__startPosition = self.clip.initialStartPosition
-        self.__syncSpeedToBpm = True
+        self.__soundSnapshot = None
+        self.__audioType = None
+        self.__audioTypeSettings = None
+        self.__midiRecording = None
+        self.__patternJson = None
+        self.__routingStyle = None
+        self.__samplePickingStyle = None
+        self.__samples = None
 
-    def getMetadataProperty(self, propertyName, defaultValue):
-        try:
-            if self.__audioMetadata is not None:
-                value = self.__audioMetadata[propertyName][0]
-                return value
-        except:
-            return defaultValue
+        self.__adsrAttack = None
+        self.__adsrDecay = None
+        self.__adsrRelease = None
+        self.__adsrSustain = None
+        self.__bpm = None
+        self.__gain = None
+        self.__graineratorEnabled = None
+        self.__graineratorInterval = None
+        self.__graineratorIntervalAdditional = None
+        self.__graineratorPanMaximum = None
+        self.__graineratorPanMinimum = None
+        self.__graineratorPitchMaximum1 = None
+        self.__graineratorPitchMaximum2 = None
+        self.__graineratorPitchMinimum1 = None
+        self.__graineratorPitchMinimum2 = None
+        self.__graineratorPitchPriority = None
+        self.__graineratorPosition = None
+        self.__graineratorScan = None
+        self.__graineratorSize = None
+        self.__graineratorSizeAdditional = None
+        self.__graineratorSpray = None
+        self.__graineratorSustain = None
+        self.__graineratorTilt = None
+        self.__length = None
+        self.__loopdelta = None
+        self.__loopdelta2 = None
+        self.__pitch = None
+        self.__playbackStyle = None
+        self.__snapLengthToBeat = None
+        self.__speedRatio = None
+        self.__startPosition = None
+        self.__syncSpeedToBpm = None
 
-    def readMetadata(self):
-        # TODO : Make sure default values of dynamic props like audioType, audioTypeSettings are updated when reading from metadata
-        if not self.clip.isEmpty:
-            try:
-                file = taglib.File(self.clip.path)
-                self.__audioMetadata = file.tags
-                self.__soundSnapshot = str(self.getMetadataProperty("ZYNTHBOX_SOUND_SNAPSHOT", self.__soundSnapshot))
-                self.__adsrAttack = float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", self.__adsrAttack))
-                self.__adsrDecay = float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", self.__adsrDecay))
-                self.__adsrRelease = float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", self.__adsrRelease))
-                self.__adsrSustain = float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", self.__adsrSustain))
-                self.__audioType = str(self.getMetadataProperty("ZYNTHBOX_AUDIO_TYPE", self.__audioType))
-                self.__audioTypeSettings = str(self.getMetadataProperty("ZYNTHBOX_AUDIOTYPESETTINGS", self.__audioTypeSettings))
-                self.__bpm = int(self.getMetadataProperty("ZYNTHBOX_BPM", self.__bpm))
-                self.__gain = float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.__gain))
-                self.__graineratorEnabled = str(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_ENABLED", self.__graineratorEnabled)).lower() == "true"
-                self.__graineratorInterval = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", self.__graineratorInterval))
-                self.__graineratorIntervalAdditional = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", self.__graineratorIntervalAdditional))
-                self.__graineratorPanMaximum = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", self.__graineratorPanMaximum))
-                self.__graineratorPanMinimum = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", self.__graineratorPanMinimum))
-                self.__graineratorPitchMaximum1 = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", self.__graineratorPitchMaximum1))
-                self.__graineratorPitchMaximum2 = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", self.__graineratorPitchMaximum2))
-                self.__graineratorPitchMinimum1 = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", self.__graineratorPitchMinimum1))
-                self.__graineratorPitchMinimum2 = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", self.__graineratorPitchMinimum2))
-                self.__graineratorPitchPriority = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", self.__graineratorPitchPriority))
-                self.__graineratorPosition = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", self.__graineratorPosition))
-                self.__graineratorScan = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", self.__graineratorScan))
-                self.__graineratorSize = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", self.__graineratorSize))
-                self.__graineratorSizeAdditional = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", self.__graineratorSizeAdditional))
-                self.__graineratorSpray = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", self.__graineratorSpray))
-                self.__graineratorSustain = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", self.__graineratorSustain))
-                self.__graineratorTilt = float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", self.__graineratorTilt))
-                self.__length = float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.__length))
-                self.__loopdelta = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", self.__loopdelta))
-                self.__loopdelta2 = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", self.__loopdelta2))
-                self.__midiRecording = str(self.getMetadataProperty("ZYNTHBOX_MIDI_RECORDING", self.__midiRecording))
-                self.__patternJson = str(self.getMetadataProperty("ZYNTHBOX_PATTERN_JSON", self.__patternJson))
-                self.__pitch = float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.__pitch))
-                self.__playbackStyle = str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", self.__playbackStyle))
-                self.__routingStyle = str(self.getMetadataProperty("ZYNTHBOX_ROUTING_STYLE", self.__routingStyle))
-                self.__samplePickingStyle = str(self.getMetadataProperty("ZYNTHBOX_SAMPLE_PICKING_STYLE", self.__samplePickingStyle))
-                self.__samples = str(self.getMetadataProperty("ZYNTHBOX_SAMPLES", self.__samples))
-                self.__snapLengthToBeat = str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", self.__snapLengthToBeat)).lower() == "true"
-                self.__speedRatio = float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.__speedRatio))
-                self.__startPosition = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.__startPosition))
-                self.__syncSpeedToBpm = str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", self.__syncSpeedToBpm)).lower() == "true"
-                file.close()
-            except Exception as e:
-                logging.error(f"Error while trying to read metadata from sketch : {e}")
+    def get_adsrAttack(self): return self.__adsrAttack
+    def get_adsrDecay(self): return self.__adsrDecay
+    def get_adsrRelease(self): return self.__adsrRelease
+    def get_adsrSustain(self): return self.__adsrSustain
+    def get_bpm(self): return self.__bpm
+    def get_gain(self): return self.__gain
+    def get_graineratorEnabled(self): return self.__graineratorEnabled
+    def get_graineratorInterval(self): return self.__graineratorInterval
+    def get_graineratorIntervalAdditional(self): return self.__graineratorIntervalAdditional
+    def get_graineratorPanMaximum(self): return self.__graineratorPanMaximum
+    def get_graineratorPanMinimum(self): return self.__graineratorPanMinimum
+    def get_graineratorPitchMaximum1(self): return self.__graineratorPitchMaximum1
+    def get_graineratorPitchMaximum2(self): return self.__graineratorPitchMaximum2
+    def get_graineratorPitchMinimum1(self): return self.__graineratorPitchMinimum1
+    def get_graineratorPitchMinimum2(self): return self.__graineratorPitchMinimum2
+    def get_graineratorPitchPriority(self): return self.__graineratorPitchPriority
+    def get_graineratorPosition(self): return self.__graineratorPosition
+    def get_graineratorScan(self): return self.__graineratorScan
+    def get_graineratorSize(self): return self.__graineratorSize
+    def get_graineratorSizeAdditional(self): return self.__graineratorSizeAdditional
+    def get_graineratorSpray(self): return self.__graineratorSpray
+    def get_graineratorSustain(self): return self.__graineratorSustain
+    def get_graineratorTilt(self): return self.__graineratorTilt
+    def get_length(self): return self.__length
+    def get_loopdelta(self): return self.__loopdelta
+    def get_loopdelta2(self): return self.__loopdelta2
+    def get_pitch(self): return self.__pitch
+    def get_playbackStyle(self): return self.__playbackStyle
+    def get_snapLengthToBeat(self): return self.__snapLengthToBeat
+    def get_speedRatio(self): return self.__speedRatio
+    def get_startPosition(self): return self.__startPosition
+    def get_syncSpeedToBpm(self): return self.__syncSpeedToBpm
 
-    def writeMetadata(self):
-        # TODO : Make sure default values of dynamic props like audioType, audioTypeSettings are updated when writing metadata
-        if not self.clip.isEmpty:
-            file = taglib.File(self.clip.path)
-            file.tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.__soundSnapshot)]
-            file.tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.__adsrAttack)]
-            file.tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.__adsrDecay)]
-            file.tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.__adsrRelease)]
-            file.tags["ZYNTHBOX_ADSR_SUSTAIN"] = [str(self.__adsrSustain)]
-            file.tags["ZYNTHBOX_AUDIO_TYPE"] = [str(self.__audioType)]
-            file.tags["ZYNTHBOX_AUDIOTYPESETTINGS"] = [str(self.__audioTypeSettings)]
-            file.tags["ZYNTHBOX_BPM"] = [str(self.__bpm)]
-            file.tags["ZYNTHBOX_GAIN"] = [str(self.__gain)]
-            file.tags["ZYNTHBOX_GRAINERATOR_ENABLED"] = [str(self.__graineratorEnabled)]
-            file.tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.__graineratorInterval)]
-            file.tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.__graineratorIntervalAdditional)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.__graineratorPanMaximum)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PAN_MINIMUM"] = [str(self.__graineratorPanMinimum)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1"] = [str(self.__graineratorPitchMaximum1)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2"] = [str(self.__graineratorPitchMaximum2)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1"] = [str(self.__graineratorPitchMinimum1)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2"] = [str(self.__graineratorPitchMinimum2)]
-            file.tags["ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY"] = [str(self.__graineratorPitchPriority)]
-            file.tags["ZYNTHBOX_GRAINERATOR_POSITION"] = [str(self.__graineratorPosition)]
-            file.tags["ZYNTHBOX_GRAINERATOR_SCAN"] = [str(self.__graineratorScan)]
-            file.tags["ZYNTHBOX_GRAINERATOR_SIZE"] = [str(self.__graineratorSize)]
-            file.tags["ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL"] = [str(self.__graineratorSizeAdditional)]
-            file.tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.__graineratorSpray)]
-            file.tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.__graineratorSustain)]
-            file.tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.__graineratorTilt)]
-            file.tags["ZYNTHBOX_LENGTH"] = [str(self.__length)]
-            file.tags["ZYNTHBOX_LOOPDELTA"] = [str(self.__loopdelta)]
-            file.tags["ZYNTHBOX_LOOPDELTA2"] = [str(self.__loopdelta2)]
-            file.tags["ZYNTHBOX_MIDI_RECORDING"] = [str(self.__midiRecording)]
-            file.tags["ZYNTHBOX_PATTERN_JSON"] = [str(self.__patternJson)]
-            file.tags["ZYNTHBOX_PITCH"] = [str(self.__pitch)]
-            file.tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.__playbackStyle)]
-            file.tags["ZYNTHBOX_ROUTING_STYLE"] = [str(self.__routingStyle)]
-            file.tags["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = [str(self.__samplePickingStyle)]
-            file.tags["ZYNTHBOX_SAMPLES"] = [str(self.__samples)]
-            file.tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.__snapLengthToBeat)]
-            file.tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.__speedRatio)]
-            file.tags["ZYNTHBOX_STARTPOSITION"] = [str(self.__startPosition)]
-            file.tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.__syncSpeedToBpm)]
-            file.save()
-
-    def get_soundSnapshot(self):
-        return self.__soundSnapshot
-    def get_adsrAttack(self):
-        return self.__adsrAttack
-    def get_adsrDecay(self):
-        return self.__adsrDecay
-    def get_adsrRelease(self):
-        return self.__adsrRelease
-    def get_adsrSustain(self):
-        return self.__adsrSustain
-    def get_audioType(self):
-        return self.__audioType
-    def get_audioTypeSettings(self):
-        return self.__audioTypeSettings
-    def get_bpm(self):
-        return self.__bpm
-    def get_gain(self):
-        return self.__gain
-    def get_graineratorEnabled(self):
-        return self.__graineratorEnabled
-    def get_graineratorInterval(self):
-        return self.__graineratorInterval
-    def get_graineratorIntervalAdditional(self):
-        return self.__graineratorIntervalAdditional
-    def get_graineratorPanMaximum(self):
-        return self.__graineratorPanMaximum
-    def get_graineratorPanMinimum(self):
-        return self.__graineratorPanMinimum
-    def get_graineratorPitchMaximum1(self):
-        return self.__graineratorPitchMaximum1
-    def get_graineratorPitchMaximum2(self):
-        return self.__graineratorPitchMaximum2
-    def get_graineratorPitchMinimum1(self):
-        return self.__graineratorPitchMinimum1
-    def get_graineratorPitchMinimum2(self):
-        return self.__graineratorPitchMinimum2
-    def get_graineratorPitchPriority(self):
-        return self.__graineratorPitchPriority
-    def get_graineratorPosition(self):
-        return self.__graineratorPosition
-    def get_graineratorScan(self):
-        return self.__graineratorScan
-    def get_graineratorSize(self):
-        return self.__graineratorSize
-    def get_graineratorSizeAdditional(self):
-        return self.__graineratorSizeAdditional
-    def get_graineratorSpray(self):
-        return self.__graineratorSpray
-    def get_graineratorSustain(self):
-        return self.__graineratorSustain
-    def get_graineratorTilt(self):
-        return self.__graineratorTilt
-    def get_length(self):
-        return self.__length
-    def get_loopdelta(self):
-        return self.__loopdelta
-    def get_loopdelta2(self):
-        return self.__loopdelta2
-    def get_midiRecording(self):
-        return self.__midiRecording
-    def get_patternJson(self):
-        return self.__patternJson
-    def get_pitch(self):
-        return self.__pitch
-    def get_playbackStyle(self):
-        return self.__playbackStyle
-    def get_routingStyle(self):
-        return self.__routingStyle
-    def get_samplePickingStyle(self):
-        return self.__samplePickingStyle
-    def get_samples(self):
-        return self.__samples
-    def get_snapLengthToBeat(self):
-        return self.__snapLengthToBeat
-    def get_speedRatio(self):
-        return self.__speedRatio
-    def get_startPosition(self):
-        return self.__startPosition
-    def get_syncSpeedToBpm(self):
-        return self.__syncSpeedToBpm
-
-    def set_soundSnapshot(self, value, force=False):
-        if value != self.__soundSnapshot or force:
-            self.__soundSnapshot = value
-            self.soundSnapshotChanged.emit()
-            self.saveMetadata()
-    def set_adsrAttack(self, value, force=False):
+    def set_adsrAttack(self, value, write=True, force=False):
         if value != self.__adsrAttack or force:
             self.__adsrAttack = value
             self.adsrAttackChanged.emit()
-            self.saveMetadata()
-    def set_adsrDecay(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setADSRAttack(value)
+            if write:
+                self.scheduleWrite()
+    def set_adsrDecay(self, value, write=True, force=False):
         if value != self.__adsrDecay or force:
             self.__adsrDecay = value
             self.adsrDecayChanged.emit()
-            self.saveMetadata()
-    def set_adsrRelease(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setADSRDecay(value)
+            if write:
+                self.scheduleWrite()
+    def set_adsrRelease(self, value, write=True, force=False):
         if value != self.__adsrRelease or force:
             self.__adsrRelease = value
             self.adsrReleaseChanged.emit()
-            self.saveMetadata()
-    def set_adsrSustain(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setADSRRelease(value)
+            if write:
+                self.scheduleWrite()
+    def set_adsrSustain(self, value, write=True, force=False):
         if value != self.__adsrSustain or force:
             self.__adsrSustain = value
             self.adsrSustainChanged.emit()
-            self.saveMetadata()
-    def set_audioType(self, value, force=False):
-        if value != self.__audioType or force:
-            self.__audioType = value
-            self.audioTypeChanged.emit()
-            self.saveMetadata()
-    def set_audioTypeSettings(self, value, force=False):
-        if value != self.__audioTypeSettings or force:
-            self.__audioTypeSettings = value
-            self.audioTypeSettingsChanged.emit()
-            self.saveMetadata()
-    def set_bpm(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setADSRSustain(value)
+            if write:
+                self.scheduleWrite()
+    def set_bpm(self, value, write=True, force=False):
         if value != self.__bpm or force:
             self.__bpm = value
             self.bpmChanged.emit()
-            self.saveMetadata()
-    def set_gain(self, value, force=False):
+            if write:
+                self.scheduleWrite()
+    def set_gain(self, value, write=True, force=False):
         if value != self.__gain or force:
             self.__gain = value
             self.gainChanged.emit()
-            self.saveMetadata()
-    def set_graineratorEnabled(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgain(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorEnabled(self, value, write=True, force=False):
         if value != self.__graineratorEnabled or force:
             self.__graineratorEnabled = value
             self.graineratorEnabledChanged.emit()
-            self.saveMetadata()
-    def set_graineratorInterval(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorEnabled(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorInterval(self, value, write=True, force=False):
         if value != self.__graineratorInterval or force:
             self.__graineratorInterval = value
             self.graineratorIntervalChanged.emit()
-            self.saveMetadata()
-    def set_graineratorIntervalAdditional(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorInterval(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorIntervalAdditional(self, value, write=True, force=False):
         if value != self.__graineratorIntervalAdditional or force:
             self.__graineratorIntervalAdditional = value
             self.graineratorIntervalAdditionalChanged.emit()
-            self.saveMetadata()
-    def set_graineratorPanMaximum(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorIntervalAdditional(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPanMaximum(self, value, write=True, force=False):
         if value != self.__graineratorPanMaximum or force:
             self.__graineratorPanMaximum = value
             self.graineratorPanMaximumChanged.emit()
-            self.saveMetadata()
-    def set_graineratorPanMinimum(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPanMaximum(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPanMinimum(self, value, write=True, force=False):
         if value != self.__graineratorPanMinimum or force:
             self.__graineratorPanMinimum = value
             self.graineratorPanMinimumChanged.emit()
-            self.saveMetadata()
-    def set_graineratorPitchMaximum1(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPanMinimum(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPitchMaximum1(self, value, write=True, force=False):
         if value != self.__graineratorPitchMaximum1 or force:
             self.__graineratorPitchMaximum1 = value
             self.graineratorPitchMaximum1Changed.emit()
-            self.saveMetadata()
-    def set_graineratorPitchMaximum2(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPitchMaximum1(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPitchMaximum2(self, value, write=True, force=False):
         if value != self.__graineratorPitchMaximum2 or force:
             self.__graineratorPitchMaximum2 = value
             self.graineratorPitchMaximum2Changed.emit()
-            self.saveMetadata()
-    def set_graineratorPitchMinimum1(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPitchMaximum2(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPitchMinimum1(self, value, write=True, force=False):
         if value != self.__graineratorPitchMinimum1 or force:
             self.__graineratorPitchMinimum1 = value
             self.graineratorPitchMinimum1Changed.emit()
-            self.saveMetadata()
-    def set_graineratorPitchMinimum2(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPitchMinimum1(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPitchMinimum2(self, value, write=True, force=False):
         if value != self.__graineratorPitchMinimum2 or force:
             self.__graineratorPitchMinimum2 = value
             self.graineratorPitchMinimum2Changed.emit()
-            self.saveMetadata()
-    def set_graineratorPitchPriority(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPitchMinimum2(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPitchPriority(self, value, write=True, force=False):
         if value != self.__graineratorPitchPriority or force:
             self.__graineratorPitchPriority = value
             self.graineratorPitchPriorityChanged.emit()
-            self.saveMetadata()
-    def set_graineratorPosition(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPitchPriority(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorPosition(self, value, write=True, force=False):
         if value != self.__graineratorPosition or force:
             self.__graineratorPosition = value
             self.graineratorPositionChanged.emit()
-            self.saveMetadata()
-    def set_graineratorScan(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorPosition(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorScan(self, value, write=True, force=False):
         if value != self.__graineratorScan or force:
             self.__graineratorScan = value
             self.graineratorScanChanged.emit()
-            self.saveMetadata()
-    def set_graineratorSize(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorScan(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorSize(self, value, write=True, force=False):
         if value != self.__graineratorSize or force:
             self.__graineratorSize = value
             self.graineratorSizeChanged.emit()
-            self.saveMetadata()
-    def set_graineratorSizeAdditional(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorSize(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorSizeAdditional(self, value, write=True, force=False):
         if value != self.__graineratorSizeAdditional or force:
             self.__graineratorSizeAdditional = value
             self.graineratorSizeAdditionalChanged.emit()
-            self.saveMetadata()
-    def set_graineratorSpray(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorSizeAdditional(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorSpray(self, value, write=True, force=False):
         if value != self.__graineratorSpray or force:
             self.__graineratorSpray = value
             self.graineratorSprayChanged.emit()
-            self.saveMetadata()
-    def set_graineratorSustain(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorSpray(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorSustain(self, value, write=True, force=False):
         if value != self.__graineratorSustain or force:
             self.__graineratorSustain = value
             self.graineratorSustainChanged.emit()
-            self.saveMetadata()
-    def set_graineratorTilt(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorSustain(value)
+            if write:
+                self.scheduleWrite()
+    def set_graineratorTilt(self, value, write=True, force=False):
         if value != self.__graineratorTilt or force:
             self.__graineratorTilt = value
             self.graineratorTiltChanged.emit()
-            self.saveMetadata()
-    def set_length(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setgraineratorTilt(value)
+            if write:
+                self.scheduleWrite()
+    def set_length(self, value, write=True, force=False):
         if value != self.__length or force:
             self.__length = value
             self.lengthChanged.emit()
-            self.saveMetadata()
-    def set_loopdelta(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setlength(value)
+            if write:
+                self.scheduleWrite()
+    def set_loopdelta(self, value, write=True, force=False):
         if value != self.__loopdelta or force:
             self.__loopdelta = value
             self.loopdeltaChanged.emit()
-            self.saveMetadata()
-    def set_loopdelta2(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setloopdelta(value)
+            if write:
+                self.scheduleWrite()
+    def set_loopdelta2(self, value, write=True, force=False):
         if value != self.__loopdelta2 or force:
             self.__loopdelta2 = value
             self.loopdelta2Changed.emit()
-            self.saveMetadata()
-    def set_midiRecording(self, value, force=False):
-        if value != self.__midiRecording or force:
-            self.__midiRecording = value
-            self.midiRecordingChanged.emit()
-            self.saveMetadata()
-    def set_patternJson(self, value, force=False):
-        if value != self.__patternJson or force:
-            self.__patternJson = value
-            self.patternJsonChanged.emit()
-            self.saveMetadata()
-    def set_pitch(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setloopdelta2(value)
+            if write:
+                self.scheduleWrite()
+    def set_pitch(self, value, write=True, force=False):
         if value != self.__pitch or force:
             self.__pitch = value
             self.pitchChanged.emit()
-            self.saveMetadata()
-    def set_playbackStyle(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setpitch(value)
+            if write:
+                self.scheduleWrite()
+    def set_playbackStyle(self, value, write=True, force=False):
         if value != self.__playbackStyle or force:
             self.__playbackStyle = value
             self.playbackStyleChanged.emit()
-            self.saveMetadata()
-    def set_routingStyle(self, value, force=False):
-        if value != self.__routingStyle or force:
-            self.__routingStyle = value
-            self.routingStyleChanged.emit()
-            self.saveMetadata()
-    def set_samplePickingStyle(self, value, force=False):
-        if value != self.__samplePickingStyle or force:
-            self.__samplePickingStyle = value
-            self.samplePickingStyleChanged.emit()
-            self.saveMetadata()
-    def set_samples(self, value, force=False):
-        if value != self.__samples or force:
-            self.__samples = value
-            self.samplesChanged.emit()
-            self.saveMetadata()
-    def set_snapLengthToBeat(self, value, force=False):
+            if self.clip.audioSource is not None:
+                if self.__playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
+                    playbackStyle = self.__playbackStyle.split(".")[-1]
+                if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
+                else:
+                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
+            if write:
+                self.scheduleWrite()
+    def set_snapLengthToBeat(self, value, write=True, force=False):
         if value != self.__snapLengthToBeat or force:
             self.__snapLengthToBeat = value
             self.snapLengthToBeatChanged.emit()
-            self.saveMetadata()
-    def set_speedRatio(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setsnapLengthToBeat(value)
+            if write:
+                self.scheduleWrite()
+    def set_speedRatio(self, value, write=True, force=False):
         if value != self.__speedRatio or force:
             self.__speedRatio = value
             self.speedRatioChanged.emit()
-            self.saveMetadata()
-    def set_startPosition(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setspeedRatio(value)
+            if write:
+                self.scheduleWrite()
+    def set_startPosition(self, value, write=True, force=False):
         if value != self.__startPosition or force:
             self.__startPosition = value
             self.startPositionChanged.emit()
-            self.saveMetadata()
-    def set_syncSpeedToBpm(self, value, force=False):
+            if self.clip.audioSource is not None:
+                self.audioSource.setstartPosition(value)
+            if write:
+                self.scheduleWrite()
+    def set_syncSpeedToBpm(self, value, write=True, force=False):
         if value != self.__syncSpeedToBpm or force:
             self.__syncSpeedToBpm = value
             self.syncSpeedToBpmChanged.emit()
-            self.saveMetadata()
+            if self.clip.audioSource is not None:
+                self.audioSource.setsyncSpeedToBpm(value)
+            if write:
+                self.scheduleWrite()
 
-    soundSnapshotChanged = Signal()
     adsrAttackChanged = Signal()
     adsrDecayChanged = Signal()
     adsrReleaseChanged = Signal()
     adsrSustainChanged = Signal()
-    audioTypeChanged = Signal()
-    audioTypeSettingsChanged = Signal()
     bpmChanged = Signal()
     gainChanged = Signal()
     graineratorEnabledChanged = Signal()
@@ -500,30 +403,22 @@ class sketchpad_clip_metadata(QObject):
     lengthChanged = Signal()
     loopdeltaChanged = Signal()
     loopdelta2Changed = Signal()
-    midiRecordingChanged = Signal()
-    patternJsonChanged = Signal()
     pitchChanged = Signal()
     playbackStyleChanged = Signal()
-    routingStyleChanged = Signal()
-    samplePickingStyleChanged = Signal()
-    samplesChanged = Signal()
     snapLengthToBeatChanged = Signal()
     speedRatioChanged = Signal()
     startPositionChanged = Signal()
     syncSpeedToBpmChanged = Signal()
 
-    soundSnapshot = Property(str, get_soundSnapshot, set_soundSnapshot, notify=soundSnapshotChanged)
     adsrAttack = Property(float, get_adsrAttack, set_adsrAttack, notify=adsrAttackChanged)
     adsrDecay = Property(float, get_adsrDecay, set_adsrDecay, notify=adsrDecayChanged)
     adsrRelease = Property(float, get_adsrRelease, set_adsrRelease, notify=adsrReleaseChanged)
     adsrSustain = Property(float, get_adsrSustain, set_adsrSustain, notify=adsrSustainChanged)
-    audioType = Property(str, get_audioType, set_audioType, notify=audioTypeChanged)
-    audioTypeSettings = Property(str, get_audioTypeSettings, set_audioTypeSettings, notify=audioTypeSettingsChanged)
     bpm = Property(int, get_bpm, set_bpm, notify=bpmChanged)
     gain = Property(float, get_gain, set_gain, notify=gainChanged)
     graineratorEnabled = Property(bool, get_graineratorEnabled, set_graineratorEnabled, notify=graineratorEnabledChanged)
     graineratorInterval = Property(float, get_graineratorInterval, set_graineratorInterval, notify=graineratorIntervalChanged)
-    graineratorIntervalAdditional = Property(int, get_graineratorIntervalAdditional, set_graineratorIntervalAdditional, notify=graineratorIntervalAdditionalChanged)
+    graineratorIntervalAdditional = Property(float, get_graineratorIntervalAdditional, set_graineratorIntervalAdditional, notify=graineratorIntervalAdditionalChanged)
     graineratorPanMaximum = Property(float, get_graineratorPanMaximum, set_graineratorPanMaximum, notify=graineratorPanMaximumChanged)
     graineratorPanMinimum = Property(float, get_graineratorPanMinimum, set_graineratorPanMinimum, notify=graineratorPanMinimumChanged)
     graineratorPitchMaximum1 = Property(float, get_graineratorPitchMaximum1, set_graineratorPitchMaximum1, notify=graineratorPitchMaximum1Changed)
@@ -541,17 +436,109 @@ class sketchpad_clip_metadata(QObject):
     length = Property(float, get_length, set_length, notify=lengthChanged)
     loopdelta = Property(float, get_loopdelta, set_loopdelta, notify=loopdeltaChanged)
     loopdelta2 = Property(float, get_loopdelta2, set_loopdelta2, notify=loopdelta2Changed)
-    midiRecording = Property(str, get_midiRecording, set_midiRecording, notify=midiRecordingChanged)
-    patternJson = Property(str, get_patternJson, set_patternJson, notify=patternJsonChanged)
     pitch = Property(float, get_pitch, set_pitch, notify=pitchChanged)
     playbackStyle = Property(str, get_playbackStyle, set_playbackStyle, notify=playbackStyleChanged)
-    routingStyle = Property(str, get_routingStyle, set_routingStyle, notify=routingStyleChanged)
-    samplePickingStyle = Property(str, get_samplePickingStyle, set_samplePickingStyle, notify=samplePickingStyleChanged)
-    samples = Property(str, get_samples, set_samples, notify=samplesChanged)
     snapLengthToBeat = Property(bool, get_snapLengthToBeat, set_snapLengthToBeat, notify=snapLengthToBeatChanged)
     speedRatio = Property(float, get_speedRatio, set_speedRatio, notify=speedRatioChanged)
     startPosition = Property(float, get_startPosition, set_startPosition, notify=startPositionChanged)
     syncSpeedToBpm = Property(bool, get_syncSpeedToBpm, set_syncSpeedToBpm, notify=syncSpeedToBpmChanged)
+
+    def read(self):
+        self.set_adsrAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)), True)
+        self.set_adsrDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)), True)
+        self.set_adsrRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)), True)
+        self.set_adsrSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)), True)
+        self.set_bpm(int(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().bpm)), True)
+        self.set_gain(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)), True)
+        self.set_graineratorEnabled(str(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_ENABLED", False)).lower() == "true", True)
+        self.set_graineratorInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)), True)
+        self.set_graineratorIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)), True)
+        self.set_graineratorPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)), True)
+        self.set_graineratorPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)), True)
+        self.set_graineratorPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)), True)
+        self.set_graineratorPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)), True)
+        self.set_graineratorPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)), True)
+        self.set_graineratorPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)), True)
+        self.set_graineratorPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)), True)
+        self.set_graineratorPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)), True)
+        self.set_graineratorScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)), True)
+        self.set_graineratorSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)), True)
+        self.set_graineratorSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)), True)
+        self.set_graineratorSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)), True)
+        self.set_graineratorSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)), True)
+        self.set_graineratorTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)), True)
+        self.set_length(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)), True)
+        self.set_loopdelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), True)
+        self.set_loopdelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), True)
+        self.set_pitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)), True)
+        self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", self.clip.audioSource.playbackStyle() if self.clip.audioSource is not None else '')), True)
+        self.set_snapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true", True)
+        self.set_speedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)), True)
+        self.set_startPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)), True)
+        self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", True)
+
+    def write(self):
+        tags = []
+        tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.__adsrAttack)]
+        tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.__adsrDecay)]
+        tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.__adsrRelease)]
+        tags["ZYNTHBOX_ADSR_SUSTAIN"] = [str(self.__adsrSustain)]
+        tags["ZYNTHBOX_AUDIO_TYPE"] = [str(self.__audioType)]
+        tags["ZYNTHBOX_AUDIOTYPESETTINGS"] = [str(self.__audioTypeSettings)]
+        tags["ZYNTHBOX_BPM"] = [str(self.__bpm)]
+        tags["ZYNTHBOX_GAIN"] = [str(self.__gain)]
+        tags["ZYNTHBOX_GRAINERATOR_ENABLED"] = [str(self.__graineratorEnabled)]
+        tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.__graineratorInterval)]
+        tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.__graineratorIntervalAdditional)]
+        tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.__graineratorPanMaximum)]
+        tags["ZYNTHBOX_GRAINERATOR_PAN_MINIMUM"] = [str(self.__graineratorPanMinimum)]
+        tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1"] = [str(self.__graineratorPitchMaximum1)]
+        tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2"] = [str(self.__graineratorPitchMaximum2)]
+        tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1"] = [str(self.__graineratorPitchMinimum1)]
+        tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2"] = [str(self.__graineratorPitchMinimum2)]
+        tags["ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY"] = [str(self.__graineratorPitchPriority)]
+        tags["ZYNTHBOX_GRAINERATOR_POSITION"] = [str(self.__graineratorPosition)]
+        tags["ZYNTHBOX_GRAINERATOR_SCAN"] = [str(self.__graineratorScan)]
+        tags["ZYNTHBOX_GRAINERATOR_SIZE"] = [str(self.__graineratorSize)]
+        tags["ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL"] = [str(self.__graineratorSizeAdditional)]
+        tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.__graineratorSpray)]
+        tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.__graineratorSustain)]
+        tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.__graineratorTilt)]
+        tags["ZYNTHBOX_LENGTH"] = [str(self.__length)]
+        tags["ZYNTHBOX_LOOPDELTA"] = [str(self.__loopdelta)]
+        tags["ZYNTHBOX_LOOPDELTA2"] = [str(self.__loopdelta2)]
+        tags["ZYNTHBOX_PITCH"] = [str(self.__pitch)]
+        tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.__playbackStyle)]
+        tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.__snapLengthToBeat)]
+        tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.__speedRatio)]
+        tags["ZYNTHBOX_STARTPOSITION"] = [str(self.__startPosition)]
+        tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.__syncSpeedToBpm)]
+
+        try:
+            file = taglib.File(self.clip.path)
+            for key, value in tags.items():
+                file.tags[key] = [str(value)]
+            file.save()
+        except Exception as e:
+            logging.error(f"Error writing metadata : {str(e)}")
+            logging.info("Trying to create a new file without metadata")
+
+            try:
+                with tempfile.TemporaryDirectory() as tmp:
+                    logging.info("Creating new temp file without metadata")
+                    logging.debug(f"ffmpeg -i {self.clip.path} -codec copy {Path(tmp) / 'output.wav'}")
+                    check_output(f"ffmpeg -i {self.clip.path} -codec copy {Path(tmp) / 'output.wav'}", shell=True)
+
+                    logging.info("Replacing old file")
+                    logging.debug(f"mv {Path(tmp) / 'output.wav'} {self.clip.path}")
+                    check_output(f"mv {Path(tmp) / 'output.wav'} {self.clip.path}", shell=True)
+
+                    file = taglib.File(self.clip.path)
+                    for key, value in tags.items():
+                        file.tags[key] = [str(value)]
+                    file.save()
+            except Exception as e:
+                logging.error(f"Error creating new file and writing metadata : {str(e)}")
 
 
 class sketchpad_clip(QObject):
@@ -934,31 +921,10 @@ class sketchpad_clip(QObject):
         else:
             self.audioSource = None
 
-        self.__read_metadata__()
+        # read() will read all the available metadata and populate default values if not available
+        self.__metadata.read()
 
-        playbackStyle = str(self.__get_metadata_prop__("ZYNTHBOX_PLAYBACK_STYLE", ""))
-        if self.audioSource is not None:
-            if playbackStyle == "":
-                # TODO Probably get rid of this at some point - it's a temporary fallback while there's reasonably still things around without playback style set on them
-                looping = bool(self.__get_metadata_prop__("ZYNTHBOX_LOOPING_PLAYBACK", True))
-                granular = (self.__get_metadata_prop__("ZYNTHBOX_GRAINERATOR_ENABLED", 'False').lower() == "true")
-                if looping:
-                    if granular:
-                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularLoopingPlaybackStyle)
-                    else:
-                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
-                elif looping:
-                    if granular:
-                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.GranularNonLoopingPlaybackStyle)
-                    else:
-                        self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.NonLoopingPlaybackStyle)
-            else:
-                if playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
-                    playbackStyle = playbackStyle.split(".")[-1]
-                if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
-                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
-                else:
-                    self.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
+
 
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
@@ -1011,6 +977,10 @@ class sketchpad_clip(QObject):
         if self.is_channel_sample:
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
         self.__song__.schedule_save()
+
+
+        # Schedule write as it should ensure metadata are writen for all loaded sketches
+        self.metadata.scheduleWrite()
 
     path = Property(str, path, set_path, notify=path_changed)
     filename = Property(str, filename, notify=path_changed)

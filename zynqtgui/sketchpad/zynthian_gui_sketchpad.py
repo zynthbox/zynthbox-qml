@@ -1028,12 +1028,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.currentTaskMessage = "Storing metadata into clip"
             if layer is not None:
                 self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-            self.clip_to_record.write_metadata("ZYNTHBOX_SYNC_SPEED_TO_BPM", [str(True)])
             self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
             self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.trackType])
             self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
             self.clip_to_record.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [currentChannel.getAudioTypeSettings()])
             self.clip_to_record.write_metadata("ZYNTHBOX_ROUTING_STYLE", [currentChannel.trackRoutingStyle])
+            self.clip_to_record.metadataSyncSpeedToBpm = True
             if (currentChannel.trackType == "sample-trig" or currentChannel.trackType == "sample-slice"):
                 self.clip_to_record.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 

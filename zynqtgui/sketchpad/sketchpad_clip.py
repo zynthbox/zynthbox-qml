@@ -975,7 +975,7 @@ class sketchpad_clip(QObject):
         try:
             if self.audio_metadata is not None:
                 if "ZYNTHBOX_SYNC_SPEED_TO_BPM" in self.audio_metadata:
-                    return bool(self.audio_metadata["ZYNTHBOX_SYNC_SPEED_TO_BPM"][0])
+                    return str(self.audio_metadata["ZYNTHBOX_SYNC_SPEED_TO_BPM"][0]).lower() == "true"
                 # if there's no field called that, but we do have a bpm saved and it's higher than 0, assume sync should be true, and save that back
                 elif "ZYNTHBOX_BPM" in self.audio_metadata and self.metadataBPM > 0:
                     self.set_metadataSyncSpeedToBpm(True)

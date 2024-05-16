@@ -263,9 +263,39 @@ ColumnLayout {
                 Layout.fillHeight: true
             }
 
-            QQC2.Label {
-                Layout.alignment: Qt.AlignHCenter
-                text: qsTr("BPM")
+            RowLayout {
+                Item {
+                    Layout.fillWidth: true
+                }
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: qsTr("BPM")
+                }
+                QQC2.Button {
+                    text: "🎜"
+                    enabled: root.controlObj ? true : false
+                    onClicked: {
+                        zynqtgui.start_loading();
+                        zynqtgui.currentTaskMessage = "Attempting to determine BPM within selected playback area";
+                        bpmGuessedDialog.guessedBPM = root.clipAudioSource.guessBPM(-1); // -1 being the "global" slice
+                        bpmGuessedDialog.open();
+                        zynqtgui.stop_loading();
+                    }
+                    Zynthian.DialogQuestion {
+                        id: bpmGuessedDialog
+                        property double guessedBPM: 0
+                        title: "Estimated BPM"
+                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj.metadataBPM)
+                        acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
+                        rejectText: "No"
+                        onAccepted: {
+                            root.controlObj.metadataBPM = bpmGuessedDialog.guessedBPM;
+                        }
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
             }
 
             QQC2.TextField {

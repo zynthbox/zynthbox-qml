@@ -199,7 +199,7 @@ Zynthian.ScreenPage {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Increment startPosition by 0.01
                     // Clamp values between 0 and duration
-                    component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition + 0.01, 0), component.selectedClip.duration)
+                    component.selectedClip.metadata.startPosition = Math.min(Math.max(component.selectedClip.metadata.startPosition + 0.01, 0), component.selectedClip.duration)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.nextADSRElement();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -212,7 +212,7 @@ Zynthian.ScreenPage {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Decrement startPosition by 0.01
                     // Clamp values between 0 and duration
-                    component.selectedClip.startPosition = Math.min(Math.max(component.selectedClip.startPosition - 0.01, 0), component.selectedClip.duration)
+                    component.selectedClip.metadata.startPosition = Math.min(Math.max(component.selectedClip.metadata.startPosition - 0.01, 0), component.selectedClip.duration)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.previousADSRElement();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -225,7 +225,7 @@ Zynthian.ScreenPage {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Increment loopDelta by 0.01
                     // Clamp values between 0 and length
-                    component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta + 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
+                    component.selectedClip.metadata.loopDelta = Math.min(Math.max(component.selectedClip.metadata.loopDelta + 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.metadata.length)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.increaseCurrentValue();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -238,7 +238,7 @@ Zynthian.ScreenPage {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Decrement loopDelta by 0.01
                     // Clamp values between 0 and length
-                    component.selectedClip.loopDelta = Math.min(Math.max(component.selectedClip.loopDelta - 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.length)
+                    component.selectedClip.metadata.loopDelta = Math.min(Math.max(component.selectedClip.metadata.loopDelta - 0.01, 0), component.selectedClip.secPerBeat * component.selectedClip.metadata.length)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.decreaseCurrentValue();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -251,7 +251,7 @@ Zynthian.ScreenPage {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Increment length by.1
                     // Clamp values between 0 and 64
-                    component.selectedClip.length = Math.min(Math.max(component.selectedClip.length + 1, 0), 64)
+                    component.selectedClip.metadata.length = Math.min(Math.max(component.selectedClip.metadata.length + 1, 0), 64)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
@@ -262,7 +262,7 @@ Zynthian.ScreenPage {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     // Decrement length by.1
                     // Clamp values between 0 and 64
-                    component.selectedClip.length = Math.min(Math.max(component.selectedClip.length - 1, 0), 64)
+                    component.selectedClip.metadata.length = Math.min(Math.max(component.selectedClip.metadata.length - 1, 0), 64)
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }

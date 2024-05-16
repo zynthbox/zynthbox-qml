@@ -118,9 +118,9 @@ QQC2.AbstractButton {
 //                         channel.sceneClip.currentBeat >= 0
 //                            ? (channel.sceneClip.currentBeat+1) + "/"
 //                            : "")
-//                    .arg(channel.sceneClip.snapLengthToBeat
-//                            ? channel.sceneClip.length.toFixed(0)
-//                            : channel.sceneClip.length.toFixed(2))
+//                    .arg(channel.sceneClip.metadata.snapLengthToBeat
+//                            ? channel.sceneClip.metadata.length.toFixed(0)
+//                            : channel.sceneClip.metadata.length.toFixed(2))
 //                : ""
 //        }
 
@@ -268,8 +268,8 @@ QQC2.AbstractButton {
 
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
-            width: visible ? (channel.sceneClip.progress - channel.sceneClip.startPosition)/adjustment : 0
-            property double adjustment: visible ? (((60/Zynthbox.SyncTimer.bpm) * channel.sceneClip.length) / parent.width) : 1
+            width: visible ? (channel.sceneClip.progress - channel.sceneClip.metadata.startPosition)/adjustment : 0
+            property double adjustment: visible ? (((60/Zynthbox.SyncTimer.bpm) * channel.sceneClip.metadata.length) / parent.width) : 1
         }
         Rectangle {
             id: patternProgressRect

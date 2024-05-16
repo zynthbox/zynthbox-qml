@@ -133,7 +133,7 @@ ColumnLayout {
             text: qsTr("Gain (dB)")
             controlObj: root.clipAudioSource
             controlProperty: "gainAbsolute"
-            valueString: root.controlObj && root.controlObj.gain ? root.controlObj.gain.toFixed(1) : 0
+            valueString: root.controlObj && root.controlObj.metadata.gain ? root.controlObj.metadata.gain.toFixed(1) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -145,7 +145,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.gain = root.controlObj.initialGain;
+                root.controlObj.metadata.gain = root.controlObj.initialGain;
             }
         }
 
@@ -167,7 +167,7 @@ ColumnLayout {
         //     }
         //
         //     onDoubleClicked: {
-        //         root.controlObj.startPosition = root.controlObj.initialStartPosition;
+        //         root.controlObj.metadata.startPosition = root.controlObj.initialStartPosition;
         //     }
         // }
 
@@ -188,7 +188,7 @@ ColumnLayout {
         //     }
         //
         //     onDoubleClicked: {
-        //         root.controlObj.length = root.controlObj.initialLength;
+        //         root.controlObj.metadata.length = root.controlObj.initialLength;
         //     }
         // }
 
@@ -208,7 +208,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.pitch = root.controlObj.initialPitch;
+                root.controlObj.metadata.pitch = root.controlObj.initialPitch;
             }
         }
 
@@ -230,14 +230,14 @@ ColumnLayout {
             Connections {
                 target: root.controlObj
                 onSpeedRatioChanged: {
-                    if (timeDial.dial.value !== root.controlObj.speedRatio) {
-                        timeDial.dial.value = root.controlObj.speedRatio
+                    if (timeDial.dial.value !== root.controlObj.metadata.speedRatio) {
+                        timeDial.dial.value = root.controlObj.metadata.speedRatio
                     }
                 }
             }
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? !root.controlObj.metadataSyncSpeedToBpm : false
+            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? !root.controlObj.metadata.syncSpeedToBpm : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -249,7 +249,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.speedRatio = root.controlObj.initialSpeedRatio;
+                root.controlObj.metadata.speedRatio = root.controlObj.initialSpeedRatio;
             }
         }
 
@@ -306,7 +306,7 @@ ColumnLayout {
                 horizontalAlignment: TextInput.AlignHCenter
                 focus: false
                 text: enabled
-                        ? root.controlObj && root.controlObj.metadataBPM ? (root.controlObj.metadataBPM <= 0 ? "" : root.controlObj.metadataBPM) : ""
+                        ? root.controlObj && root.controlObj.metadata.bpm ? (root.controlObj.metadata.bpm <= 0 ? "" : root.controlObj.metadata.bpm) : ""
                         : ""
                 // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
@@ -319,8 +319,8 @@ ColumnLayout {
                 enabled: root.controlObj ? true : false
                 onTextChanged: {
                     var newValue = parseFloat(text);
-                    if (text !== "" && root.controlObj.metadataBPM !== newValue) {
-                        root.controlObj.metadataBPM = newValue;
+                    if (text !== "" && root.controlObj.metadata.bpm !== newValue) {
+                        root.controlObj.metadata.bpm = newValue;
                     }
                 }
             }
@@ -334,10 +334,10 @@ ColumnLayout {
                 id: syncSwitch
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadataSyncSpeedToBpm : true
-                enabled: root.controlObj && root.controlObj.metadataBPM > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadata.syncSpeedToBpm : false
+                enabled: root.controlObj && root.controlObj.metadata.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
-                    root.controlObj.metadataSyncSpeedToBpm = checked
+                    root.controlObj.metadata.syncSpeedToBpm = checked
                 }
             }
 
@@ -473,9 +473,9 @@ ColumnLayout {
             QQC2.Switch {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.snapLengthToBeat : true
+                checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.metadata.snapLengthToBeat : true
                 onToggled: {
-                    root.controlObj.snapLengthToBeat = checked
+                    root.controlObj.metadata.snapLengthToBeat = checked
                 }
             }
             Item {
@@ -502,8 +502,8 @@ ColumnLayout {
     //         text: "<No Metadata>"
     //     }
     //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty && root.controlObj.metadataAudioType
-    //         text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
+    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty && root.controlObj.metadata.audioType
+    //         text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadata.audioType ? root.controlObj.metadata.audioType : "")
     //         font.pointSize: 10
     //     }
     //     QQC2.Label {

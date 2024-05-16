@@ -76,7 +76,7 @@ Zynthian.DialogQuestion {
 
                     // If there's notes in the pattern, ask first
                     replacePattern.hasExistingData = _private.pattern !== null && _private.pattern.hasNotes;
-                    replacePattern.sketchHasData = _private.clip !== null && ((_private.clip.metadataMidiRecording !== null && _private.clip.metadataMidiRecording.length > 10) || (_private.clip.metadataPatternJson !== null && _private.clip.metadataPatternJson.length > 5));
+                    replacePattern.sketchHasData = _private.clip !== null && ((_private.clip.metadata.midiRecording !== null && _private.clip.metadata.midiRecording.length > 10) || (_private.clip.metadata.patternJson !== null && _private.clip.metadata.patternJson.length > 5));
                     replacePattern.checked = !replacePattern.hasExistingData;
                     // If there is synth information in the sketch, ask first
                     replaceSounds.hasExistingData = _private.channel !== null && _private.channel.getChannelSoundSnapshotJson().length > 10;
@@ -91,26 +91,26 @@ Zynthian.DialogQuestion {
                     // Start long-running task
                     zynqtgui.start_loading();
                     zynqtgui.currentTaskMessage = qsTr("Unbouncing Sketch to Track %2").arg(_private.channel.name);
-                    if (_private.clip.metadataAudioType === "sample-trig") {
+                    if (_private.clip.metadata.audioType === "sample-trig") {
                         console.log("Sketch was recorded via sample-trig, so switch to that");
                         _private.channel.trackType = "sample-trig";
-                    } else if (_private.clip.metadataAudioType === "sample-slice") {
+                    } else if (_private.clip.metadata.audioType === "sample-slice") {
                         console.log("Sketch was recorded via sample-slice, so switch to that");
                         _private.channel.trackType = "sample-slice";
-                    } else if (_private.clip.metadataAudioType === "synth") {
+                    } else if (_private.clip.metadata.audioType === "synth") {
                         console.log("Sketch was recorded via synth sounds, so switch to that");
                         _private.channel.trackType = "synth";
                     } else {
-                        console.log("Weird audio type:", _private.clip.metadataAudioType);
+                        console.log("Weird audio type:", _private.clip.metadata.audioType);
                     }
                     if (replacePattern.sketchHasData && replacePattern.checked) {
-                        if (_private.clip.metadataPatternJson !== null && _private.clip.metadataPatternJson.length > 5) {
+                        if (_private.clip.metadata.patternJson !== null && _private.clip.metadata.patternJson.length > 5) {
                             console.log("Replace the slot's pattern content with the stored pattern");
-                            _private.pattern.setFromJson(_private.clip.metadataPatternJson)
-                        } else if (_private.clip.metadataMidiRecording !== null && _private.clip.metadataMidiRecording.length > 10) {
+                            _private.pattern.setFromJson(_private.clip.metadata.patternJson)
+                        } else if (_private.clip.metadata.midiRecording !== null && _private.clip.metadata.midiRecording.length > 10) {
                             console.log("Replace the slot's pattern content by reconstructing from recorded midi");
                             // Load the recording into the global recorder track
-                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(_private.clip.metadataMidiRecording, -1);
+                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(_private.clip.metadata.midiRecording, -1);
                             // Apply that newly loaded recording to the pattern
                             Zynthbox.MidiRecorder.applyToPattern(_private.pattern);
                         } else {
@@ -119,14 +119,14 @@ Zynthian.DialogQuestion {
                     }
                     if (replaceSamples.sketchHasData && replaceSamples.checked) {
                         console.log("Replace the channel's sample selection");
-                        _private.channel.setChannelSamplesFromSnapshot(_private.clip.metadataSamples);
-                        _private.channel.samplePickingStyle = _private.clip.metadataSamplePickingStyle;
+                        _private.channel.setChannelSamplesFromSnapshot(_private.clip.metadata.samples);
+                        _private.channel.samplePickingStyle = _private.clip.metadata.samplePickingStyle;
                     }
                     if (replaceSounds.sketchHasData && replaceSounds.checked) {
                         console.log("Replace the channel's current sound setup with what's stored in the sketch");
-                        _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadataActiveLayer);
-                        _private.channel.setAudioTypeSettings(_private.clip.metadataAudioTypeSettings);
-                        _private.channel.audioRoutingStyle = _private.clip.metadataRoutingStyle;
+                        _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadata.soundSnapshot);
+                        _private.channel.setAudioTypeSettings(_private.clip.metadata.audioTypeSettings);
+                        _private.channel.audioRoutingStyle = _private.clip.metadata.routingStyle;
                     }
                     // In case we unbounced to a different sketchpad track, switch to that one
                     zynqtgui.sketchpad.selectedTrackId = _private.channel.id;

@@ -235,7 +235,7 @@ Zynthian.DialogQuestion {
                     _private.sketchpadTrack.trackRoutingStyle = originSketch.metadata.routingStyle;
                     //   - Set track setAudioTypeSettings to ZYNTHBOX_AUDIOTYPESETTINGS (clip.metadata.audioTypeSettings)
                     _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadata.audioTypeSettings);
-                    //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_ACTIVE_LAYER (clip.metadata.soundSnapshot)
+                    //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
                     _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadata.soundSnapshot);
                     //   - If trackType is sample-trig or sample-slice: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
                     if (_private.sketchpadTrack.trackType === "sample-trig" || _private.sketchpadTrack.trackType === "sample-slice") {

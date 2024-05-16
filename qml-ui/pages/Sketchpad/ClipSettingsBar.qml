@@ -237,7 +237,7 @@ ColumnLayout {
             }
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? !root.controlObj.metadata.syncSpeedToBpm : false
+            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.syncSpeedToBpm : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -334,7 +334,7 @@ ColumnLayout {
                 id: syncSwitch
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadata.syncSpeedToBpm : false
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.syncSpeedToBpm : false
                 enabled: root.controlObj && root.controlObj.metadata.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
                     root.controlObj.metadata.syncSpeedToBpm = checked
@@ -473,7 +473,7 @@ ColumnLayout {
             QQC2.Switch {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.metadata.snapLengthToBeat : true
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.snapLengthToBeat : true
                 onToggled: {
                     root.controlObj.metadata.snapLengthToBeat = checked
                 }

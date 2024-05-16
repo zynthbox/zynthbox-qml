@@ -94,6 +94,7 @@ class sketchpad_clip_metadata(QObject):
             return defaultValue
 
     def readMetadata(self):
+        # TODO : Make sure default values of dynamic props like audioType, audioTypeSettings are updated when reading from metadata
         if not self.clip.isEmpty:
             try:
                 file = taglib.File(self.clip.path)
@@ -143,6 +144,7 @@ class sketchpad_clip_metadata(QObject):
                 logging.error(f"Error while trying to read metadata from sketch : {e}")
 
     def writeMetadata(self):
+        # TODO : Make sure default values of dynamic props like audioType, audioTypeSettings are updated when writing metadata
         if not self.clip.isEmpty:
             file = taglib.File(self.clip.path)
             file.tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.__soundSnapshot)]
@@ -188,85 +190,85 @@ class sketchpad_clip_metadata(QObject):
             file.save()
 
     def get_soundSnapshot(self):
-            return self.__soundSnapshot
+        return self.__soundSnapshot
     def get_adsrAttack(self):
-            return self.__adsrAttack
+        return self.__adsrAttack
     def get_adsrDecay(self):
-            return self.__adsrDecay
+        return self.__adsrDecay
     def get_adsrRelease(self):
-            return self.__adsrRelease
+        return self.__adsrRelease
     def get_adsrSustain(self):
-            return self.__adsrSustain
+        return self.__adsrSustain
     def get_audioType(self):
-            return self.__audioType
+        return self.__audioType
     def get_audioTypeSettings(self):
-            return self.__audioTypeSettings
+        return self.__audioTypeSettings
     def get_bpm(self):
-            return self.__bpm
+        return self.__bpm
     def get_gain(self):
-            return self.__gain
+        return self.__gain
     def get_graineratorEnabled(self):
-            return self.__graineratorEnabled
+        return self.__graineratorEnabled
     def get_graineratorInterval(self):
-            return self.__graineratorInterval
+        return self.__graineratorInterval
     def get_graineratorIntervalAdditional(self):
-            return self.__graineratorIntervalAdditional
+        return self.__graineratorIntervalAdditional
     def get_graineratorPanMaximum(self):
-            return self.__graineratorPanMaximum
+        return self.__graineratorPanMaximum
     def get_graineratorPanMinimum(self):
-            return self.__graineratorPanMinimum
+        return self.__graineratorPanMinimum
     def get_graineratorPitchMaximum1(self):
-            return self.__graineratorPitchMaximum1
+        return self.__graineratorPitchMaximum1
     def get_graineratorPitchMaximum2(self):
-            return self.__graineratorPitchMaximum2
+        return self.__graineratorPitchMaximum2
     def get_graineratorPitchMinimum1(self):
-            return self.__graineratorPitchMinimum1
+        return self.__graineratorPitchMinimum1
     def get_graineratorPitchMinimum2(self):
-            return self.__graineratorPitchMinimum2
+        return self.__graineratorPitchMinimum2
     def get_graineratorPitchPriority(self):
-            return self.__graineratorPitchPriority
+        return self.__graineratorPitchPriority
     def get_graineratorPosition(self):
-            return self.__graineratorPosition
+        return self.__graineratorPosition
     def get_graineratorScan(self):
-            return self.__graineratorScan
+        return self.__graineratorScan
     def get_graineratorSize(self):
-            return self.__graineratorSize
+        return self.__graineratorSize
     def get_graineratorSizeAdditional(self):
-            return self.__graineratorSizeAdditional
+        return self.__graineratorSizeAdditional
     def get_graineratorSpray(self):
-            return self.__graineratorSpray
+        return self.__graineratorSpray
     def get_graineratorSustain(self):
-            return self.__graineratorSustain
+        return self.__graineratorSustain
     def get_graineratorTilt(self):
-            return self.__graineratorTilt
+        return self.__graineratorTilt
     def get_length(self):
-            return self.__length
+        return self.__length
     def get_loopdelta(self):
-            return self.__loopdelta
+        return self.__loopdelta
     def get_loopdelta2(self):
-            return self.__loopdelta2
+        return self.__loopdelta2
     def get_midiRecording(self):
-            return self.__midiRecording
+        return self.__midiRecording
     def get_patternJson(self):
-            return self.__patternJson
+        return self.__patternJson
     def get_pitch(self):
-            return self.__pitch
+        return self.__pitch
     def get_playbackStyle(self):
-            return self.__playbackStyle
+        return self.__playbackStyle
     def get_routingStyle(self):
-            return self.__routingStyle
+        return self.__routingStyle
     def get_samplePickingStyle(self):
-            return self.__samplePickingStyle
+        return self.__samplePickingStyle
     def get_samples(self):
-            return self.__samples
+        return self.__samples
     def get_snapLengthToBeat(self):
-            return self.__snapLengthToBeat
+        return self.__snapLengthToBeat
     def get_speedRatio(self):
-            return self.__speedRatio
+        return self.__speedRatio
     def get_startPosition(self):
-            return self.__startPosition
+        return self.__startPosition
     def get_syncSpeedToBpm(self):
-            return self.__syncSpeedToBpm
+        return self.__syncSpeedToBpm
 
     def set_soundSnapshot(self, value, force=False):
         if value != self.__soundSnapshot or force:

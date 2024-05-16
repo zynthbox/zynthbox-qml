@@ -468,7 +468,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                        text: "Ch" + (index + 1)
+                        text: "T" + (index + 1)
                         onClicked: {
                             zynqtgui.sketchpad.selectedTrackId = index;
                         }

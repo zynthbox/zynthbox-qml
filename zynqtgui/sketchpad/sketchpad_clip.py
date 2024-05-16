@@ -61,7 +61,7 @@ class sketchpad_clip(QObject):
         self.__initial_pitch__ = 0
         self.__pitch__ = self.__initial_pitch__
         self.__initial_speed_ratio = 1
-        self.__speed_ratio = self.__initial_speed_ratio
+        self.__speed_ratio__ = self.__initial_speed_ratio
         self.__initial_gain__ = 0
         self.__gain__ = self.__initial_gain__
         self.__progress__ = 0.0
@@ -237,7 +237,7 @@ class sketchpad_clip(QObject):
                 "bpm": self.metadataBPM,
                 "length": self.__length__,
                 "pitch": self.__pitch__,
-                "speedRatio": self.__speed_ratio,
+                "speedRatio": self.__speed_ratio__,
                 "enabled": self.__enabled__,
                 "snapLengthToBeat": self.__snap_length_to_beat__}
 
@@ -267,8 +267,8 @@ class sketchpad_clip(QObject):
                 self.__gain__ = obj["gain"]
                 self.set_gain(self.__gain__, True)
             if "speedRatio" in obj:
-                self.__speed_ratio = obj["speedRatio"]
-                self.set_speedRatio(self.__speed_ratio, True)
+                self.__speed_ratio__ = obj["speedRatio"]
+                self.set_speedRatio(self.__speed_ratio__, True)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
@@ -515,11 +515,11 @@ class sketchpad_clip(QObject):
 
 
     def get_speedRatio(self):
-        return self.__speed_ratio
+        return self.__speed_ratio__
 
     def set_speedRatio(self, speedRatio: float, force_set=False):
-        if self.__speed_ratio != speedRatio or force_set is True:
-            self.__speed_ratio = speedRatio
+        if self.__speed_ratio__ != speedRatio or force_set is True:
+            self.__speed_ratio__ = speedRatio
             self.speedRatioChanged.emit()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -630,7 +630,7 @@ class sketchpad_clip(QObject):
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
-        self.__speed_ratio = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED_RATIO", self.__initial_speed_ratio))
+        self.__speed_ratio__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED_RATIO", self.__initial_speed_ratio))
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
         self.__progress__ = 0.0
         self.__audio_level__ = -200
@@ -665,7 +665,7 @@ class sketchpad_clip(QObject):
         self.set_length(self.__length__, True)
         self.set_start_position(self.__start_position__, True)
         self.set_loop_delta(self.__loop_delta__, True)
-        self.set_speedRatio(self.__speed_ratio, True)
+        self.set_speedRatio(self.__speed_ratio__, True)
         self.set_pitch(self.__pitch__, True)
         self.set_gain(self.__gain__, True)
         self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
@@ -1098,7 +1098,7 @@ class sketchpad_clip(QObject):
             self.write_metadata("ZYNTHBOX_STARTPOSITION", [str(self.__start_position__)])
             self.write_metadata("ZYNTHBOX_LENGTH", [str(self.__length__)])
             self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
-            self.write_metadata("ZYNTHBOX_SPEED_RATIO", [str(self.__speed_ratio)])
+            self.write_metadata("ZYNTHBOX_SPEED_RATIO", [str(self.__speed_ratio__)])
             self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
             self.write_metadata("ZYNTHBOX_PLAYBACK_STYLE", [str(self.audioSource.playbackStyle())])
             self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])

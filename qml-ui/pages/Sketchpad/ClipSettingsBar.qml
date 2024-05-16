@@ -354,9 +354,9 @@ ColumnLayout {
 
             QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
-                text: root.clipAudioSource ? root.clipAudioSource.playbackStyleLabel : ""
+                text: root.clipAudioSource ? qsTr("Playback Style:\n%1").arg(root.clipAudioSource.playbackStyleLabel) : ""
                 onClicked: {
                     playbackStylePicker.open();
                 }
@@ -389,7 +389,7 @@ ColumnLayout {
                         },
                         Kirigami.Action {
                             text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
-                                ? qsTr("<b>Granular Non-looping</b>\n(experimental)")
+                                ? qsTr("<b>Granular Non-looping</b><br />(experimental)")
                                 : qsTr("Granular Non-looping\n(experimental)")
                             onTriggered: {
                                 root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
@@ -397,7 +397,7 @@ ColumnLayout {
                         },
                         Kirigami.Action {
                             text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle
-                                ? qsTr("<b>Granular Looping</b>\n(experimental)")
+                                ? qsTr("<b>Granular Looping</b><br />(experimental)")
                                 : qsTr("Granular Looping\n(experimental)")
                             onTriggered: {
                                 root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
@@ -406,12 +406,35 @@ ColumnLayout {
                     ]
                 }
             }
-            QQC2.Label {
-                Layout.fillWidth: true
+            QQC2.Button {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
-                horizontalAlignment: TextInput.AlignHCenter
-                wrapMode: Text.Wrap
-                text: qsTr("Playback Style")
+                text: root.clipAudioSource && root.clipAudioSource.timeStretchLive ? "Pitch Shifting:\nTimestretched" : "Pitch Shifting:\nStandard"
+                onClicked: {
+                    timeStretchingPopup.open();
+                }
+                Zynthian.ActionPickerPopup {
+                    id: timeStretchingPopup
+                    actions: [
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.timeStretchLive === true
+                                ? qsTr("<b>Timestretch Pitch Shift</b><br />(retains sample length)")
+                                : qsTr("Timestretch Pitch Shift\n(retains sample length)")
+                            onTriggered: {
+                                root.clipAudioSource.timeStretchLive = true;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.timeStretchLive === false
+                                ? qsTr("<b>Standard Pitch Shift</b><br />(changes playback length)")
+                                : qsTr("Standard Pitch Shift\n(changes playback length)")
+                            onTriggered: {
+                                root.clipAudioSource.timeStretchLive = false;
+                            }
+                        }
+                    ]
+                }
             }
             Item {
                 Layout.fillWidth: true

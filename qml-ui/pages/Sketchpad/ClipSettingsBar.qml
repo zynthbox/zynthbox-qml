@@ -304,7 +304,7 @@ ColumnLayout {
                 id: syncSwitch
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadataSyncSpeedToBpm : false
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadataSyncSpeedToBpm : true
                 enabled: root.controlObj && root.controlObj.metadataBPM > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
                     root.controlObj.metadataSyncSpeedToBpm = checked

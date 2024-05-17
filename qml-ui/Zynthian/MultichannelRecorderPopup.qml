@@ -201,6 +201,7 @@ Zynthian.Dialog {
                     }
                     console.log("Setting channel", channelIndex, "filename prefix to", baseRecordingLocation + "/" + channel.name + "-" + soundIndication);
                     Zynthbox.AudioLevels.setChannelFilenamePrefix(channelIndex, baseRecordingLocation + "/" + channel.name + "-" + soundIndication);
+                    Zynthbox.AudioLevels.setChannelFilenameSuffix(channelIndex, ".sketch.wav");
                 }
                 // Start the recording
                 Zynthbox.AudioLevels.startRecording();

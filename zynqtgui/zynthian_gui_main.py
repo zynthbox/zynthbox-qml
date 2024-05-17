@@ -169,7 +169,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         if (self.__is_recording__ == False):
             Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
-            self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
+            self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.sketch.wav"
 
             audioDeviceName = self.zynqtgui.audio_settings.zynthian_mixer.zynapi_get_device_name()
             self.recorder_process = Popen(("/usr/bin/arecord", "-f", "dat", "-D", f"hw:{audioDeviceName}", self.__recording_file__))
@@ -182,7 +182,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         if (self.__is_recording__ == False):
             Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
-            self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
+            self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.sketch.wav"
 
             self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.__recording_file__))
             logging.info("Started recording into the file " + self.__recording_file__)

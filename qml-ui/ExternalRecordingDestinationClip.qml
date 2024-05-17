@@ -46,7 +46,7 @@ ColumnLayout {
         var date = new Date();
         var recordingTimestamp = date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
         var fileNameFriendlyModuleName = zynqtgui.main.currentModuleName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        component.recordingFilename = baseFolder + "/" + recordingTimestamp + "_" + fileNameFriendlyModuleName + "_" + Zynthbox.SyncTimer.bpm + "-BPM.clip.wav";
+        component.recordingFilename = baseFolder + "/" + recordingTimestamp + "_" + fileNameFriendlyModuleName + "_" + Zynthbox.SyncTimer.bpm + "-BPM.sketch.wav";
         Zynthbox.AudioLevels.clearRecordPorts();
         // If the current module is an alsa thing, don't use jack to record it and instead record using alsa
         if (zynqtgui.main.currentModuleRecordAlsa === true) {

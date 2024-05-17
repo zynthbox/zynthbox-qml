@@ -860,9 +860,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         base_recording_dir = f"{self.__song__.sketchpad_folder}wav"
         base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
         # Check if file exists otherwise append count
-        while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav").exists():
+        while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav").exists():
             count += 1
-        generated_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
+        generated_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav"
         return generated_path
 
     def queue_clip_record(self, clip, do_countin = True):
@@ -907,10 +907,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         # Check if file exists otherwise append count
 
-        while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav").exists():
+        while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav").exists():
             count += 1
 
-        self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
+        self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav"
 
         if do_countin:
             self.ongoingCountIn = self.countInBars + 1
@@ -1048,17 +1048,18 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     clip.set_path(self.clip_to_record_path, True)
                     if layer is not None:
                         clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-                    clip.write_metadata("ZYNTHBOX_SYNC_SPEED_TO_BPM", [str(True)])
                     clip.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
                     clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.trackType])
                     clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+                    clip.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [currentChannel.getAudioTypeSettings()])
+                    clip.write_metadata("ZYNTHBOX_ROUTING_STYLE", [currentChannel.trackRoutingStyle])
+                    clip.metadataSyncSpeedToBpm = True
                     if (currentChannel.trackType == "sample-trig" or currentChannel.trackType == "sample-slice"):
                         clip.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
 
             if self.clip_to_record.isChannelSample:
-                logging.info(f"Recorded clip is a sample")
+                logging.info("Recorded clip is a sample")
                 currentChannel.samples_changed.emit()
-        # self.__song__.save()
 
     def get_next_free_layer(self):
         logging.debug(self.zynqtgui.screens["layers"].layers)

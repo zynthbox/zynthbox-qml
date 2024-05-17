@@ -752,7 +752,7 @@ Zynthian.Popup {
                                         Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
                                         checked: _private.selectedPattern ? _private.selectedPattern.availableBars === model.index + 1 : false
                                         text: (model.index + 1)
-                                        onClicked: { _private.selectedPattern.availableBars = model.index + 1; }
+                                        onClicked: { _private.selectedPattern.patternLength = (model.index + 1) * _private.selectedPattern.width; }
                                     }
                                 }
                                 QQC2.Label {

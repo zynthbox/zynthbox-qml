@@ -2039,7 +2039,7 @@ Zynthian.BasePlayGrid {
                                                 enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && _private.clipBoard !== undefined
                                                 onClicked: {
                                                     // Resize the pattern's banks to match what we're pasting
-                                                    patternsMenuItem.thisPattern.availableBars = Math.floor(_private.clipBoard.notes.length / patternsMenuItem.thisPattern.width) - 1;
+                                                    patternsMenuItem.thisPattern.patternLength = patternsMenuItem.thisPattern.width * Math.floor(_private.clipBoard.notes.length / patternsMenuItem.thisPattern.width) - 1;
                                                     _private.pasteInPlace(patternsMenuItem.thisPattern, patternsMenuItem.thisPattern.bankOffset, _private.bankOffset + patternsMenuItem.thisPattern.bankLength);
                                                     if (_private.activePatternModel == patternsMenuItem.thisPattern) {
                                                         component.setActiveBar(_private.activeBar)
@@ -2051,7 +2051,7 @@ Zynthian.BasePlayGrid {
                                                 enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                                 onClicked: {
                                                     patternsMenuItem.thisPattern.clear();
-                                                    patternsMenuItem.thisPattern.availableBars = 1;
+                                                    patternsMenuItem.thisPattern.patternLength = patternsMenuItem.thisPattern.width;
                                                 }
                                             }
                                         }

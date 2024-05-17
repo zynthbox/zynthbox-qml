@@ -1029,7 +1029,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if layer is not None:
                 self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
             self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
-            self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.trackType])
+            if currentChannel.trackType == "sample-loop":
+                # If the track is set to sample-loop, then the track is actually playing synth sounds
+                self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", ["synth"])
+            else:
+                self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.trackType])
             self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
             self.clip_to_record.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [currentChannel.getAudioTypeSettings()])
             self.clip_to_record.write_metadata("ZYNTHBOX_ROUTING_STYLE", [currentChannel.trackRoutingStyle])

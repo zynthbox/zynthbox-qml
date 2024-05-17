@@ -1301,9 +1301,6 @@ class sketchpad_channel(QObject):
         return self.__muted__
 
     def set_muted(self, muted):
-        import traceback
-        traceback.print_stack()
-
         if self.__muted__ != muted:
             self.__muted__ = muted
             for laneId in range(0, 5):

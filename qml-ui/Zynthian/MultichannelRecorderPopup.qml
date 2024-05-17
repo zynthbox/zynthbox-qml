@@ -156,7 +156,6 @@ Zynthian.Dialog {
                 var date = new Date();
                 var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
                 Zynthbox.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-" + song.name);
-                baseRecordingLocation = baseRecordingLocation + "/channel-";
                 for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                     var channel = _private.song.channelsModel.getChannel(channelIndex);
                     var soundIndication = "(unknown)";
@@ -200,8 +199,8 @@ Zynthian.Dialog {
                     } else {
                         soundIndication = "external";
                     }
-                    console.log("Setting channel", channelIndex, "filename prefix to", baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
-                    Zynthbox.AudioLevels.setChannelFilenamePrefix(channelIndex, baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
+                    console.log("Setting channel", channelIndex, "filename prefix to", baseRecordingLocation + "/" + channel.name + "-" + soundIndication);
+                    Zynthbox.AudioLevels.setChannelFilenamePrefix(channelIndex, baseRecordingLocation + "/" + channel.name + "-" + soundIndication);
                 }
                 // Start the recording
                 Zynthbox.AudioLevels.startRecording();

@@ -129,7 +129,7 @@ Zynthian.Popup {
                             zynqtgui.sketchpad.isRecording = false;
                         } else {
                             zynqtgui.sketchpad.isRecording = true;
-                            _private.selectedPattern.liveRecordingSource = midiSourceCombo.model.get(midiSourceCombo.currentIndex).value;
+                            _private.selectedPattern.liveRecordingSource = Zynthbox.MidiRouter.model.midiInSources[midiSourceCombo.currentIndex].value;
                             _private.selectedPattern.recordLive = true;
                             if (countIn.value > 0) {
                                 Zynthbox.SyncTimer.startWithCountin(countIn.value);
@@ -817,13 +817,10 @@ Zynthian.Popup {
                                     top: parent.top
                                     bottom: parent.bottom
                                 }
-                                visible: patternVisualiser.visible &&
-                                            _private.selectedSequence &&
-                                            _private.selectedSequence.isPlaying &&
-                                            _private.selectedPattern
+                                visible: patternVisualiser.visible && _private.selectedPattern ? _private.selectedPattern.isPlaying : false
                                 color: Kirigami.Theme.highlightColor
-                                width: widthFactor // this way the progress rect is the same width as a step
-                                property double widthFactor: visible && _private.selectedPattern ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
+                                width: Math.max(1, Math.floor(widthFactor)) // this way the progress rect is the same width as a step
+                                property double widthFactor: visible ? parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength) : 1
                                 x: visible ? _private.selectedPattern.bankPlaybackPosition * widthFactor : 0
                             }
                             QQC2.Label {

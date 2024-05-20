@@ -42,98 +42,105 @@ Zynthian.Popup {
 
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
-        switch (cuia) {
-            case "CHANNEL_1":
-            case "CHANNEL_2":
-            case "CHANNEL_3":
-            case "CHANNEL_4":
-            case "CHANNEL_5":
-            case "NAVIGATE_LEFT":
-            case "NAVIGATE_RIGHT":
-            case "SELECT_UP":
-            case "SELECT_DOWN":
-            case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
-            case "MODE_SWITCH_SHORT":
-            case "MODE_SWITCH_BOLD":
-            case "MODE_SWITCH_LONG":
-            case "KNOB0_TOUCHED":
-            case "KNOB0_RELEASED":
-            case "KNOB1_TOUCHED":
-            case "KNOB1_RELEASED":
-            case "KNOB2_TOUCHED":
-            case "KNOB2_RELEASED":
-            case "KNOB3_TOUCHED":
-            case "KNOB3_RELEASED":
-                returnValue = true;
-                break
-            case "KNOB0_UP":
-                zynqtgui.sketchpad.metronomeEnabled = true
-                returnValue = true;
-                break;
-            case "KNOB0_DOWN":
-                zynqtgui.sketchpad.metronomeEnabled = false
-                returnValue = true;
-                break;                
-            case "KNOB1_UP":
-                countIn.value = Zynthian.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
-                returnValue = true;
-                break;
-            case "KNOB1_DOWN":
-                countIn.value = Zynthian.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
-                returnValue = true;
-                break;
-            case "KNOB2_UP":
-                zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
-                returnValue = true;
-                break;
-            case "KNOB2_DOWN":
-                zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
-                returnValue = true;
-                break;
-            case "KNOB3_UP":
-                Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm + 1;
-                returnValue = true;
-                break;
-            case "KNOB3_DOWN":
-                Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm - 1;
-                returnValue = true;
-                break;
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
-                root.close();
-                returnValue = true;
-                break;
-            case "ZL_STOP":
-                if (zynqtgui.sketchpad.recordingType === "midi" && _private.selectedPattern.recordLive) {
-                    _private.selectedPattern.recordLive = false;
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                    zynqtgui.sketchpad.isRecording = false;
+        // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
+        if (root.opened || (zynqtgui.sketchpad.isRecording && ["ZL_STOP", "START_RECORD"].indexOf(cuia) > -1)) {
+            switch (cuia) {
+                case "CHANNEL_1":
+                case "CHANNEL_2":
+                case "CHANNEL_3":
+                case "CHANNEL_4":
+                case "CHANNEL_5":
+                case "NAVIGATE_LEFT":
+                case "NAVIGATE_RIGHT":
+                case "SELECT_UP":
+                case "SELECT_DOWN":
+                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_BOLD":
+                case "SWITCH_SELECT_LONG":
+                case "MODE_SWITCH_SHORT":
+                case "MODE_SWITCH_BOLD":
+                case "MODE_SWITCH_LONG":
+                case "KNOB0_TOUCHED":
+                case "KNOB0_RELEASED":
+                case "KNOB1_TOUCHED":
+                case "KNOB1_RELEASED":
+                case "KNOB2_TOUCHED":
+                case "KNOB2_RELEASED":
+                case "KNOB3_TOUCHED":
+                case "KNOB3_RELEASED":
                     returnValue = true;
-                }
-                break;
-            case "START_RECORD":
-                if (zynqtgui.sketchpad.recordingType === "midi") {
-                    // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
-                    if (_private.selectedPattern.recordLive) {
+                    break
+                case "KNOB0_UP":
+                    zynqtgui.sketchpad.metronomeEnabled = true
+                    returnValue = true;
+                    break;
+                case "KNOB0_DOWN":
+                    if (root.opened) {
+                        zynqtgui.sketchpad.metronomeEnabled = false
+                        returnValue = true;
+                    }
+                    break;
+                case "KNOB1_UP":
+                    countIn.value = Zynthian.CommonUtils.clamp(countIn.value + 1, countIn.from, countIn.to)
+                    returnValue = true;
+                    break;
+                case "KNOB1_DOWN":
+                    countIn.value = Zynthian.CommonUtils.clamp(countIn.value - 1, countIn.from, countIn.to)
+                    returnValue = true;
+                    break;
+                case "KNOB2_UP":
+                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume + 1, 0, 100)
+                    returnValue = true;
+                    break;
+                case "KNOB2_DOWN":
+                    zynqtgui.masterVolume = Zynthian.CommonUtils.clamp(zynqtgui.masterVolume - 1, 0, 100)
+                    returnValue = true;
+                    break;
+                case "KNOB3_UP":
+                    Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm + 1;
+                    returnValue = true;
+                    break;
+                case "KNOB3_DOWN":
+                    Zynthbox.SyncTimer.bpm = Zynthbox.SyncTimer.bpm - 1;
+                    returnValue = true;
+                    break;
+                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_BOLD":
+                case "SWITCH_BACK_LONG":
+                    root.close();
+                    returnValue = true;
+                    break;
+                case "ZL_STOP":
+                    if (zynqtgui.sketchpad.recordingType === "midi" && zynqtgui.sketchpad.isRecording) {
+                        // If stopping the recording using the stop button, don't open the dialog back up again
                         _private.selectedPattern.recordLive = false;
                         Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         zynqtgui.sketchpad.isRecording = false;
-                    } else {
-                        zynqtgui.sketchpad.isRecording = true;
-                        _private.selectedPattern.liveRecordingSource = midiSourceCombo.model.get(midiSourceCombo.currentIndex).value;
-                        _private.selectedPattern.recordLive = true;
-                        if (countIn.value > 0) {
-                            Zynthbox.SyncTimer.startWithCountin(countIn.value);
-                        } else {
-                            Zynthian.CommonUtils.startMetronomeAndPlayback();
-                        }
+                        returnValue = true;
                     }
-                    returnValue = true;
-                }
-                break;
+                    break;
+                case "START_RECORD":
+                    if (zynqtgui.sketchpad.recordingType === "midi") {
+                        // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
+                        if (zynqtgui.sketchpad.isRecording) {
+                            root.open(); // If stopping using the record button, open the dialog
+                            _private.selectedPattern.recordLive = false;
+                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                            zynqtgui.sketchpad.isRecording = false;
+                        } else {
+                            zynqtgui.sketchpad.isRecording = true;
+                            _private.selectedPattern.liveRecordingSource = midiSourceCombo.model.get(midiSourceCombo.currentIndex).value;
+                            _private.selectedPattern.recordLive = true;
+                            if (countIn.value > 0) {
+                                Zynthbox.SyncTimer.startWithCountin(countIn.value);
+                            } else {
+                                Zynthian.CommonUtils.startMetronomeAndPlayback();
+                            }
+                        }
+                        returnValue = true;
+                    }
+                    break;
+            }
         }
 
         return returnValue;

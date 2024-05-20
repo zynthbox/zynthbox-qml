@@ -61,240 +61,247 @@ Kirigami.AbstractApplicationWindow {
     property var cuiaCallback: function(cuia) {
         var result = false;
 
-        switch (cuia) {
-            case "SWITCH_METRONOME_SHORT":
-                zynqtgui.sketchpad.metronomeEnabled = !zynqtgui.sketchpad.metronomeEnabled
-                result = true;
-                break;
-            case "KNOB0_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelVolume(0)
+        // Pass things along to the recording popup explicitly, if it's closed, to ensure things happen that are supposed to
+        // (specifically, this allows that dialog to handle recording stops and such)
+        if (recordingPopup.opened === false) {
+            result = recordingPopup.cuiaCallback(cuia);
+        }
+        if (result === false) {
+            switch (cuia) {
+                case "SWITCH_METRONOME_SHORT":
+                    zynqtgui.sketchpad.metronomeEnabled = !zynqtgui.sketchpad.metronomeEnabled
                     result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    root.updateMetronomeVolume(0)
-                    result = true;
-                }
-                break;
-            case "KNOB0_RELEASED":
-                if (zynqtgui.altButtonPressed) {
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    result = true;
-                }
-                break;
-            case "KNOB0_UP":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelVolume(1)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    root.updateMetronomeVolume(1)
-                    result = true;
-                }
-                break;
-            case "KNOB0_DOWN":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelVolume(-1)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    root.updateMetronomeVolume(-1)
-                    result = true;
-                }
-                break;
-            case "KNOB1_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelDelaySend(0)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    result = true;
-                }
-                break;
-            case "KNOB1_RELEASED":
-                if (zynqtgui.altButtonPressed) {
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    result = true;
-                }
-                break;
-            case "KNOB1_UP":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelDelaySend(1)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    // root.updateGlobalDelayFXAmount(1)
-                    result = true;
-                }
-                break;
-            case "KNOB1_DOWN":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelDelaySend(-1)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    // root.updateGlobalDelayFXAmount(-1)
-                    result = true;
-                }
-                break;
-            case "KNOB2_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelReverbSend(0)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    result = true;
-                }
-                break;
-            case "KNOB2_RELEASED":
-                if (zynqtgui.altButtonPressed) {
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    result = true;
-                }
-                break;
-            case "KNOB2_UP":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelReverbSend(1)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    // root.updateGlobalReverbFXAmount(1)
-                    result = true;
-                }
-                break;
-            case "KNOB2_DOWN":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateSelectedChannelReverbSend(-1)
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    // root.updateGlobalReverbFXAmount(-1)
-                    result = true;
-                }
-                break;
-            case "KNOB3_TOUCHED":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateMasterVolume(0);
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    root.updateSketchpadBpm(0)
-                    result = true;
-                }
-                break;
-            case "KNOB3_RELEASED":
-                if (zynqtgui.altButtonPressed) {
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    result = true;
-                }
-                break;
-            case "KNOB3_UP":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateMasterVolume(1);
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    root.updateSketchpadBpm(1)
-                    result = true;
-                }
-                break;
-            case "KNOB3_DOWN":
-                if (zynqtgui.altButtonPressed) {
-                    root.updateMasterVolume(-1);
-                    result = true;
-                } else if (zynqtgui.metronomeButtonPressed) {
-                    zynqtgui.ignoreNextMetronomeButtonPress = true
-                    root.updateSketchpadBpm(-1)
-                    result = true;
-                }
-                break;
-            case "NAVIGATE_LEFT":
-                if (zynqtgui.modeButtonPressed) {
-                    root.selectedChannel.selectedPart = Math.max(0, root.selectedChannel.selectedPart - 1);
-                    zynqtgui.ignoreNextModeButtonPress = true;
-                    result = true;
-                }
-                break;
-            case "NAVIGATE_RIGHT":
-                if (zynqtgui.modeButtonPressed) {
-                    root.selectedChannel.selectedPart = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, root.selectedChannel.selectedPart + 1);
-                    zynqtgui.ignoreNextModeButtonPress = true;
-                    result = true;
-                }
-                break;
-            case "SCREEN_EDIT_CONTEXTUAL":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                    if (root.selectedChannel.trackType.startsWith("sample-")) {
-                        zynqtgui.show_modal("channel_wave_editor");
-                    } else if (root.selectedChannel.trackType === "synth") {
-                        var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
-                        if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                    break;
+                case "KNOB0_TOUCHED":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelVolume(0)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        root.updateMetronomeVolume(0)
+                        result = true;
+                    }
+                    break;
+                case "KNOB0_RELEASED":
+                    if (zynqtgui.altButtonPressed) {
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        result = true;
+                    }
+                    break;
+                case "KNOB0_UP":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelVolume(1)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        root.updateMetronomeVolume(1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB0_DOWN":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelVolume(-1)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        root.updateMetronomeVolume(-1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB1_TOUCHED":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelDelaySend(0)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        result = true;
+                    }
+                    break;
+                case "KNOB1_RELEASED":
+                    if (zynqtgui.altButtonPressed) {
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        result = true;
+                    }
+                    break;
+                case "KNOB1_UP":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelDelaySend(1)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        // root.updateGlobalDelayFXAmount(1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB1_DOWN":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelDelaySend(-1)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        // root.updateGlobalDelayFXAmount(-1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB2_TOUCHED":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelReverbSend(0)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        result = true;
+                    }
+                    break;
+                case "KNOB2_RELEASED":
+                    if (zynqtgui.altButtonPressed) {
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        result = true;
+                    }
+                    break;
+                case "KNOB2_UP":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelReverbSend(1)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        // root.updateGlobalReverbFXAmount(1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB2_DOWN":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateSelectedChannelReverbSend(-1)
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        // root.updateGlobalReverbFXAmount(-1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB3_TOUCHED":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateMasterVolume(0);
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        root.updateSketchpadBpm(0)
+                        result = true;
+                    }
+                    break;
+                case "KNOB3_RELEASED":
+                    if (zynqtgui.altButtonPressed) {
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        result = true;
+                    }
+                    break;
+                case "KNOB3_UP":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateMasterVolume(1);
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        root.updateSketchpadBpm(1)
+                        result = true;
+                    }
+                    break;
+                case "KNOB3_DOWN":
+                    if (zynqtgui.altButtonPressed) {
+                        root.updateMasterVolume(-1);
+                        result = true;
+                    } else if (zynqtgui.metronomeButtonPressed) {
+                        zynqtgui.ignoreNextMetronomeButtonPress = true
+                        root.updateSketchpadBpm(-1)
+                        result = true;
+                    }
+                    break;
+                case "NAVIGATE_LEFT":
+                    if (zynqtgui.modeButtonPressed) {
+                        root.selectedChannel.selectedPart = Math.max(0, root.selectedChannel.selectedPart - 1);
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        result = true;
+                    }
+                    break;
+                case "NAVIGATE_RIGHT":
+                    if (zynqtgui.modeButtonPressed) {
+                        root.selectedChannel.selectedPart = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, root.selectedChannel.selectedPart + 1);
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        result = true;
+                    }
+                    break;
+                case "SCREEN_EDIT_CONTEXTUAL":
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (root.selectedChannel.trackType.startsWith("sample-")) {
+                            zynqtgui.show_modal("channel_wave_editor");
+                        } else if (root.selectedChannel.trackType === "synth") {
+                            var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
+                            if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                                zynqtgui.show_screen("control");
+                            } else {
+                                applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                            }
+                        } else if (root.selectedChannel.trackType === "external") {
+                            show_modal("channel_external_setup");
+                        }
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
                             zynqtgui.show_screen("control");
                         } else {
                             applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
                         }
-                    } else if (root.selectedChannel.trackType === "external") {
-                        show_modal("channel_external_setup");
-                    }
-                } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                    if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
-                        zynqtgui.show_screen("control");
                     } else {
-                        applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
-                    }
-                } else {
-                    if (root.selectedChannel.trackType.startsWith("sample-")) {
-                        // If we are in any sample mode, switch whatever else is going on (as that page knows what to do about it)
-                        if (root.selectedChannel.trackType === "sample-loop") {
-                            root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedPart;
-                        } else {
+                        if (root.selectedChannel.trackType.startsWith("sample-")) {
+                            // If we are in any sample mode, switch whatever else is going on (as that page knows what to do about it)
+                            if (root.selectedChannel.trackType === "sample-loop") {
+                                root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedPart;
+                            } else {
+                                for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                                    if (root.selectedChannel.samples[slotIndex].cppObjId > -1) {
+                                        // Let's at least make sure there's some sample selected
+                                        root.selectedChannel.selectedSlotRow = slotIndex;
+                                        break;
+                                    }
+                                }
+                            }
+                            zynqtgui.show_modal("channel_wave_editor");
+                        } else if (root.selectedChannel.trackType === "synth") {
+                            // If we are in synth mode, select the first slot explicitly and then switch to the control page, and if there isn't one... throw up the warning
+                            let foundASound = false;
                             for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                                if (root.selectedChannel.samples[slotIndex].cppObjId > -1) {
-                                    // Let's at least make sure there's some sample selected
-                                    root.selectedChannel.selectedSlotRow = slotIndex;
+                                let sound = root.selectedChannel.chainedSounds[slotIndex];
+                                if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                                    root.selectedChannel.selectedSlotRow = sound;
+                                    zynqtgui.show_screen("control");
+                                    foundASound = true;
                                     break;
                                 }
                             }
-                        }
-                        zynqtgui.show_modal("channel_wave_editor");
-                    } else if (root.selectedChannel.trackType === "synth") {
-                        // If we are in synth mode, select the first slot explicitly and then switch to the control page, and if there isn't one... throw up the warning
-                        let foundASound = false;
-                        for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                            let sound = root.selectedChannel.chainedSounds[slotIndex];
-                            if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
-                                root.selectedChannel.selectedSlotRow = sound;
-                                zynqtgui.show_screen("control");
-                                foundASound = true;
-                                break;
+                            if (foundASound === false) {
+                                applicationWindow().showMessageDialog(qsTr("Cannot open edit page: No sounds defined"), 2000);
                             }
+                        } else if (root.selectedChannel.trackType === "external") {
+                            // If we are in external mode, just load up the external setup page
+                            show_modal("channel_external_setup");
                         }
-                        if (foundASound === false) {
-                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: No sounds defined"), 2000);
-                        }
-                    } else if (root.selectedChannel.trackType === "external") {
-                        // If we are in external mode, just load up the external setup page
-                        show_modal("channel_external_setup");
                     }
-                }
-                returnValue = true;
-                break;
+                    returnValue = true;
+                    break;
+            }
         }
-        
+
         // Since VK is not a Zynthian Menu/Popup/Drawer, CUIA events are not sent implicitly
         // If the virtual keyboard is open, pass CUIA events explicitly
         if (virtualKeyboardLoader.item && virtualKeyboardLoader.item.visible) {
             result = virtualKeyboardLoader.item.cuiaCallback(cuia);
         }
-        
+
         return result
     }
 

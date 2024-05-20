@@ -1639,7 +1639,6 @@ class zynthian_gui(QObject):
                     return
         except Exception as e:
             logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
-            pass
 
         # Check if there are any open dialogs. Forward cuia events to cuiaCallback of opened dialog
         if self.opened_dialog is not None:
@@ -1667,7 +1666,6 @@ class zynthian_gui(QObject):
                         pass
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback on openeedDialog, got error: {}".format(e))
-                pass
 
         if cuia != "SCREEN_MAIN" and self.current_qml_page != None:
             try:
@@ -1678,7 +1676,6 @@ class zynthian_gui(QObject):
                         return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
-                pass
 
         if cuia == "POWER_OFF":
             self.screens["admin"].power_off_confirmed()
@@ -2033,7 +2030,7 @@ class zynthian_gui(QObject):
                     zynthian_gui_config.custom_switch_ui_actions[i][t]
                 )
         except Exception as e:
-            logging.warning(e)
+            logging.logging.error(f"Error occurred while attempting to call a cuia action: {e}")
 
     # -------------------------------------------------------------------
     # Switches

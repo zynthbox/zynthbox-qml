@@ -785,7 +785,7 @@ Rectangle {
 
                                             if (root.selectedChannel.trackType == "synth") {
                                                 root.selectedChannel.setCurlayerByType("synth")
-                                            } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) == 0) {
+                                            } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) > -1) {
                                                 root.selectedChannel.setCurlayerByType("sample")
                                             } else if (root.selectedChannel.trackType == "sample-loop") {
                                                 root.selectedChannel.setCurlayerByType("loop")
@@ -800,7 +800,7 @@ Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
                                             property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-                                            property QtObject sample: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0 ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
+                                            property QtObject sample: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) > -1 ? Zynthbox.PlayGridManager.getClipById(root.selectedChannel.samples[index].cppObjId) : null
                                             property QtObject clip: root.selectedChannel.trackType === "sample-loop" ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
 
                                             anchors.fill: parent

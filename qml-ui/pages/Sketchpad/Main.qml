@@ -391,7 +391,7 @@ Zynthian.ScreenPage {
      */
     function updateClipGain(clip, sign) {
         if (clip != null) {
-            clip.metadata.gain = Zynthian.CommonUtils.clamp(clip.metadata.gain + sign, -100, 24)
+            clip.metadata.gain = Zynthian.CommonUtils.clamp(clip.metadata.gain + sign*0.01, 0, 1)
         }
     }
     /**

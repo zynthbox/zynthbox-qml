@@ -139,8 +139,9 @@ Item {
             }
         }
         Connections {
-            target: component.clip
-            onAdsrParametersChanged: {
+            enabled: component.clip != null
+            target: component.clip.metadata
+            function update() {
                 if (component.clip.metadata.adsrAttack !== attackSlider.value) {
                     attackSlider.value = component.clip.metadata.adsrAttack;
                 }
@@ -154,6 +155,10 @@ Item {
                     releaseSlider.value = component.clip.metadata.adsrRelease;
                 }
             }
+            onAdsrAttackChanged: update()
+            onAdsrDecayChanged: update()
+            onAdsrReleaseChanged: update()
+            onAdsrSustainChanged: update()
         }
         InfinitySlider {
             id: attackSlider
@@ -351,7 +356,8 @@ Item {
                 }
             }
             Connections {
-                target: component.clip
+                enabled: component.clip != null
+                target: component.clip.metadata
                 function update() {
                     if (component.visible) {
                         adsrView.requestPaint();

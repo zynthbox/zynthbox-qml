@@ -644,19 +644,18 @@ class sketchpad_clip(QObject):
         copy_dir_path = Path(copy_dir)
         counter = 1
 
-        # Find the base filename excluding our suffix (sketch.wav)
-        categoryPrefix = "sketch"
-        file_basename = file_path.name.split(".wav")[0].split(f".{categoryPrefix}")[0]
+        # Find the base filename excluding our suffix (wav)
+        file_basename = file_path.name.split(".wav")[0]
         # Remove the `counter` part from the string if exists
         file_basename = re.sub('-\d*$', '', file_basename)
 
-        if not (copy_dir_path / f"{file_basename}.{categoryPrefix}.wav").exists():
-            return f"{file_basename}.{categoryPrefix}.wav"
+        if not (copy_dir_path / f"{file_basename}.wav").exists():
+            return f"{file_basename}.wav"
         else:
-            while Path(copy_dir_path / f"{file_basename}-{counter}.{categoryPrefix}.wav").exists():
+            while Path(copy_dir_path / f"{file_basename}-{counter}.wav").exists():
                 counter += 1
 
-            return f"{file_basename}-{counter}.{categoryPrefix}.wav"
+            return f"{file_basename}-{counter}.wav"
 
     def className(self):
         return "sketchpad_clip"

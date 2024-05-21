@@ -487,38 +487,38 @@ class sketchpad_clip_metadata(QObject):
                 logging.error(f"Error reading metadata from sketch {self.clip.path} : {str(e)}")
 
             if not self.clip.isEmpty:
-                self.set_adsrAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)), True)
-                self.set_adsrDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)), True)
-                self.set_adsrRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)), True)
-                self.set_adsrSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)), True)
-                self.set_bpm(int(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())), True)
-                self.set_gain(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)), True)
-                self.set_graineratorEnabled(str(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_ENABLED", False)).lower() == "true", True)
-                self.set_graineratorInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)), True)
-                self.set_graineratorIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)), True)
-                self.set_graineratorPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)), True)
-                self.set_graineratorPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)), True)
-                self.set_graineratorPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)), True)
-                self.set_graineratorPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)), True)
-                self.set_graineratorPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)), True)
-                self.set_graineratorPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)), True)
-                self.set_graineratorPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)), True)
-                self.set_graineratorPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)), True)
-                self.set_graineratorScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)), True)
-                self.set_graineratorSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)), True)
-                self.set_graineratorSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)), True)
-                self.set_graineratorSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)), True)
-                self.set_graineratorSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)), True)
-                self.set_graineratorTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)), True)
-                self.set_length(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)), True)
-                self.set_loopdelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), True)
-                self.set_loopdelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), True)
-                self.set_pitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)), True)
-                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", self.clip.audioSource.playbackStyle() if self.clip.audioSource is not None else '')), True)
-                self.set_snapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true", True)
-                self.set_speedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)), True)
-                self.set_startPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)), True)
-                self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", True)
+                self.set_adsrAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)), force=True)
+                self.set_adsrDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)), force=True)
+                self.set_adsrRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)), force=True)
+                self.set_adsrSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)), force=True)
+                self.set_bpm(int(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())), force=True)
+                self.set_gain(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)), force=True)
+                self.set_graineratorEnabled(str(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_ENABLED", False)).lower() == "true", force=True)
+                self.set_graineratorInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)), force=True)
+                self.set_graineratorIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)), force=True)
+                self.set_graineratorPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)), force=True)
+                self.set_graineratorPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)), force=True)
+                self.set_graineratorPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)), force=True)
+                self.set_graineratorPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)), force=True)
+                self.set_graineratorPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)), force=True)
+                self.set_graineratorPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)), force=True)
+                self.set_graineratorPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)), force=True)
+                self.set_graineratorPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)), force=True)
+                self.set_graineratorScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)), force=True)
+                self.set_graineratorSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)), force=True)
+                self.set_graineratorSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)), force=True)
+                self.set_graineratorSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)), force=True)
+                self.set_graineratorSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)), force=True)
+                self.set_graineratorTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)), force=True)
+                self.set_length(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)), force=True)
+                self.set_loopdelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), force=True)
+                self.set_loopdelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), force=True)
+                self.set_pitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)), force=True)
+                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", self.clip.audioSource.playbackStyle() if self.clip.audioSource is not None else '')), force=True)
+                self.set_snapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true", force=True)
+                self.set_speedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)), force=True)
+                self.set_startPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)), force=True)
+                self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", force=True)
                 self.updateBpmDependantValues()
 
     def write(self):
@@ -562,7 +562,7 @@ class sketchpad_clip_metadata(QObject):
             try:
                 file = taglib.File(self.clip.path)
                 for key, value in tags.items():
-                    file.tags[key] = [str(value)]
+                    file.tags[key] = value
                 file.save()
             except Exception as e:
                 logging.exception(f"Error writing metadata : {str(e)}")
@@ -580,7 +580,7 @@ class sketchpad_clip_metadata(QObject):
 
                         file = taglib.File(self.clip.path)
                         for key, value in tags.items():
-                            file.tags[key] = [str(value)]
+                            file.tags[key] = value
                         file.save()
                 except Exception as e:
                     logging.error(f"Error creating new file and writing metadata : {str(e)}")

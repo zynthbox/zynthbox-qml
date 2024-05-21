@@ -500,7 +500,7 @@ class sketchpad_clip_metadata(QObject):
                 self.set_loopdelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), force=True)
                 self.set_loopdelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), force=True)
                 self.set_pitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)), force=True)
-                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", self.clip.audioSource.playbackStyle() if self.clip.audioSource is not None else '')), force=True)
+                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle")), force=True)
                 self.set_snapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true", force=True)
                 self.set_speedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)), force=True)
                 self.set_startPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)), force=True)

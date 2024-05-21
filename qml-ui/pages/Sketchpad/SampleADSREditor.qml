@@ -122,8 +122,5 @@ GridLayout {
         Layout.fillHeight: true
         Layout.margins: Kirigami.Units.largeSpacing
         clip: component.controlObj
-            ? Zynthbox.PlayGridManager.getClipById(component.controlObj.cppObjId)
-            : null
-        onSaveMetadata: component.controlObj.saveMetadata();
     }
 }

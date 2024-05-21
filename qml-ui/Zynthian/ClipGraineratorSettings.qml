@@ -57,13 +57,13 @@ Item {
                     component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
                     break;
                 case 1:
-                    component.clip.grainPosition = Math.min(1, component.clip.grainPosition + 0.001);
+                    component.clip.metadata.graineratorPosition = Math.min(1, component.clip.metadata.graineratorPosition + 0.001);
                     break;
                 case 2:
-                    component.clip.grainSpray = Math.min(1, component.clip.grainSpray + 0.001);
+                    component.clip.metadata.graineratorSpray = Math.min(1, component.clip.metadata.graineratorSpray + 0.001);
                     break;
                 case 3:
-                    component.clip.grainScan = Math.min(100, component.clip.grainScan + 0.01);
+                    component.clip.metadata.graineratorScan = Math.min(100, component.clip.metadata.graineratorScan + 0.01);
                     break;
                 default:
                     break;
@@ -71,16 +71,16 @@ Item {
         } else if (_private.settingsCategory === 1) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.grainInterval = component.clip.grainInterval + 0.1;
+                    component.clip.metadata.graineratorInterval = component.clip.metadata.graineratorInterval + 0.1;
                     break;
                 case 1:
-                    component.clip.grainIntervalAdditional = component.clip.grainIntervalAdditional + 0.1;
+                    component.clip.metadata.graineratorIntervalAdditional = component.clip.metadata.graineratorIntervalAdditional + 0.1;
                     break;
                 case 2:
-                    component.clip.grainSize = component.clip.grainSize + 0.1;
+                    component.clip.metadata.graineratorSize = component.clip.metadata.graineratorSize + 0.1;
                     break;
                 case 3:
-                    component.clip.grainSizeAdditional = component.clip.grainSizeAdditional + 0.1;
+                    component.clip.metadata.graineratorSizeAdditional = component.clip.metadata.graineratorSizeAdditional + 0.1;
                     break;
                 default:
                     break;
@@ -88,25 +88,25 @@ Item {
         } else if (_private.settingsCategory === 2) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.grainPanMinimum = Math.min(1, component.clip.grainPanMinimum + 0.01);
+                    component.clip.metadata.graineratorPanMinimum = Math.min(1, component.clip.metadata.graineratorPanMinimum + 0.01);
                     break;
                 case 1:
-                    component.clip.grainPanMaximum = Math.min(1, component.clip.grainPanMaximum + 0.01);
+                    component.clip.metadata.graineratorPanMaximum = Math.min(1, component.clip.metadata.graineratorPanMaximum + 0.01);
                     break;
                 case 2:
-                    component.clip.grainPitchMinimum1 = Math.min(2, component.clip.grainPitchMinimum1 + 0.01);
+                    component.clip.metadata.graineratorPitchMinimum1 = Math.min(2, component.clip.metadata.graineratorPitchMinimum1 + 0.01);
                     break;
                 case 3:
-                    component.clip.grainPitchMaximum1 = Math.min(2, component.clip.grainPitchMaximum1 + 0.01);
+                    component.clip.metadata.graineratorPitchMaximum1 = Math.min(2, component.clip.metadata.graineratorPitchMaximum1 + 0.01);
                     break;
                 case 4:
-                    component.clip.grainPitchPriority = Math.min(1, component.clip.grainPitchPriority + 0.01);
+                    component.clip.metadata.graineratorPitchPriority = Math.min(1, component.clip.metadata.graineratorPitchPriority + 0.01);
                     break;
                 case 5:
-                    component.clip.grainPitchMinimum2 = Math.min(2, component.clip.grainPitchMinimum2 + 0.01);
+                    component.clip.metadata.graineratorPitchMinimum2 = Math.min(2, component.clip.metadata.graineratorPitchMinimum2 + 0.01);
                     break;
                 case 6:
-                    component.clip.grainPitchMaximum2 = Math.min(2, component.clip.grainPitchMaximum2 + 0.01);
+                    component.clip.metadata.graineratorPitchMaximum2 = Math.min(2, component.clip.metadata.graineratorPitchMaximum2 + 0.01);
                     break;
                 default:
                     break;
@@ -120,13 +120,13 @@ Item {
                     component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
                     break;
                 case 1:
-                    component.clip.grainPosition = Math.max(0, component.clip.grainPosition - 0.001);
+                    component.clip.metadata.graineratorPosition = Math.max(0, component.clip.metadata.graineratorPosition - 0.001);
                     break;
                 case 2:
-                    component.clip.grainSpray = Math.max(0, component.clip.grainSpray - 0.001);
+                    component.clip.metadata.graineratorSpray = Math.max(0, component.clip.metadata.graineratorSpray - 0.001);
                     break;
                 case 3:
-                    component.clip.grainScan = Math.max(-100, component.clip.grainScan - 0.01);
+                    component.clip.metadata.graineratorScan = Math.max(-100, component.clip.metadata.graineratorScan - 0.01);
                     break;
                 default:
                     break;
@@ -134,16 +134,16 @@ Item {
         } else if (_private.settingsCategory === 1) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.grainInterval = Math.max(1, component.clip.grainInterval - 0.1);
+                    component.clip.metadata.graineratorInterval = Math.max(1, component.clip.metadata.graineratorInterval - 0.1);
                     break;
                 case 1:
-                    component.clip.grainIntervalAdditional = Math.max(0, component.clip.grainIntervalAdditional - 0.1);
+                    component.clip.metadata.graineratorIntervalAdditional = Math.max(0, component.clip.metadata.graineratorIntervalAdditional - 0.1);
                     break;
                 case 2:
-                    component.clip.grainSize = Math.max(1, component.clip.grainSize - 0.1);
+                    component.clip.metadata.graineratorSize = Math.max(1, component.clip.metadata.graineratorSize - 0.1);
                     break;
                 case 3:
-                    component.clip.grainSizeAdditional = Math.max(0, component.clip.grainSizeAdditional - 0.1);
+                    component.clip.metadata.graineratorSizeAdditional = Math.max(0, component.clip.metadata.graineratorSizeAdditional - 0.1);
                     break;
                 default:
                     break;
@@ -151,25 +151,25 @@ Item {
         } else if (_private.settingsCategory === 2) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.grainPanMinimum = Math.max(-1, component.clip.grainPanMinimum - 0.01);
+                    component.clip.metadata.graineratorPanMinimum = Math.max(-1, component.clip.metadata.graineratorPanMinimum - 0.01);
                     break;
                 case 1:
-                    component.clip.grainPanMaximum = Math.max(-1, component.clip.grainPanMaximum - 0.01);
+                    component.clip.metadata.graineratorPanMaximum = Math.max(-1, component.clip.metadata.graineratorPanMaximum - 0.01);
                     break;
                 case 2:
-                    component.clip.grainPitchMinimum1 = Math.max(-2, component.clip.grainPitchMinimum1 - 0.01);
+                    component.clip.metadata.graineratorPitchMinimum1 = Math.max(-2, component.clip.metadata.graineratorPitchMinimum1 - 0.01);
                     break;
                 case 3:
-                    component.clip.grainPitchMaximum1 = Math.max(-2, component.clip.grainPitchMaximum1 - 0.01);
+                    component.clip.metadata.graineratorPitchMaximum1 = Math.max(-2, component.clip.metadata.graineratorPitchMaximum1 - 0.01);
                     break;
                 case 4:
-                    component.clip.grainPitchPriority = Math.max(-1, component.clip.grainPitchPriority - 0.01);
+                    component.clip.metadata.graineratorPitchPriority = Math.max(-1, component.clip.metadata.graineratorPitchPriority - 0.01);
                     break;
                 case 5:
-                    component.clip.grainPitchMinimum2 = Math.max(-2, component.clip.grainPitchMinimum2 - 0.01);
+                    component.clip.metadata.graineratorPitchMinimum2 = Math.max(-2, component.clip.metadata.graineratorPitchMinimum2 - 0.01);
                     break;
                 case 6:
-                    component.clip.grainPitchMaximum2 = Math.max(-2, component.clip.grainPitchMaximum2 - 0.01);
+                    component.clip.metadata.graineratorPitchMaximum2 = Math.max(-2, component.clip.metadata.graineratorPitchMaximum2 - 0.01);
                     break;
                 default:
                     break;
@@ -315,14 +315,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.001
-                value: component.clip ? component.clip.grainPosition : 0
+                value: component.clip ? component.clip.metadata.graineratorPosition : 0
                 from: 0
                 to: 1
-                onMoved: component.clip.grainPosition = value
+                onMoved: component.clip.metadata.graineratorPosition = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.clip ? component.clip.grainPosition : 0).toFixed(3)
+                text: (component.clip ? component.clip.metadata.graineratorPosition : 0).toFixed(3)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -352,14 +352,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.001
-                value: component.clip ? component.clip.grainSpray : 0
+                value: component.clip ? component.clip.metadata.graineratorSpray : 0
                 from: 0
                 to: 1
-                onMoved: component.clip.grainSpray = value
+                onMoved: component.clip.metadata.graineratorSpray = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.clip ? component.clip.grainSpray : 0).toFixed(3)
+                text: (component.clip ? component.clip.metadata.graineratorSpray : 0).toFixed(3)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -386,7 +386,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
-                value: component.clip ? component.clip.grainScan : 0
+                value: component.clip ? component.clip.metadata.graineratorScan : 0
                 decimals: 2
                 increment: 0.1
                 slideIncrement: 0.01
@@ -397,10 +397,10 @@ Item {
                 resetOnTap: true
                 resetValue: 0
                 selected: _private.currentElement === 3
-                onValueChanged: component.clip.grainScan = value
+                onValueChanged: component.clip.metadata.graineratorScan = value
                 Connections {
                     target: component.clip
-                    onGrainScanChanged: grainScanSlider.value = component.clip.grainScan
+                    onGrainScanChanged: grainScanSlider.value = component.clip.metadata.graineratorScan
                 }
             }
         }
@@ -425,17 +425,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.clip ? component.clip.grainInterval : 0
+                value: component.clip ? component.clip.metadata.graineratorInterval : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 0
-                onValueChanged: if (component.clip) { component.clip.grainInterval = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorInterval = value }
                 Connections {
                     target: component.clip
-                    onGrainIntervalChanged: grainIntervalSlider.value = component.clip.grainInterval
+                    onGrainIntervalChanged: grainIntervalSlider.value = component.clip.metadata.graineratorInterval
                 }
             }
             Zynthian.InfinitySlider {
@@ -444,17 +444,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
-                value: component.clip ? component.clip.grainIntervalAdditional : 0
+                value: component.clip ? component.clip.metadata.graineratorIntervalAdditional : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 1
-                onValueChanged: if (component.clip) { component.clip.grainIntervalAdditional = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorIntervalAdditional = value }
                 Connections {
                     target: component.clip
-                    onGrainIntervalAdditionalChanged: grainIntervalAdditionalSlider.value = component.clip.grainIntervalAdditional
+                    onGrainIntervalAdditionalChanged: grainIntervalAdditionalSlider.value = component.clip.metadata.graineratorIntervalAdditional
                 }
             }
         }
@@ -479,17 +479,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.clip ? component.clip.grainSize : 0
+                value: component.clip ? component.clip.metadata.graineratorSize : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 2
-                onValueChanged: if (component.clip) { component.clip.grainSize = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorSize = value }
                 Connections {
                     target: component.clip
-                    onGrainSizeChanged: grainSizeSlider.value = component.clip.grainSize
+                    onGrainSizeChanged: grainSizeSlider.value = component.clip.metadata.graineratorSize
                 }
             }
             Zynthian.InfinitySlider {
@@ -498,17 +498,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
-                value: component.clip ? component.clip.grainSizeAdditional : 0
+                value: component.clip ? component.clip.metadata.graineratorSizeAdditional : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 1
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 3
-                onValueChanged: if (component.clip) { component.clip.grainSizeAdditional = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorSizeAdditional = value }
                 Connections {
                     target: component.clip
-                    onGrainSizeAdditionalChanged: grainSizeAdditionalSlider.value = component.clip.grainSizeAdditional
+                    onGrainSizeAdditionalChanged: grainSizeAdditionalSlider.value = component.clip.metadata.graineratorSizeAdditional
                 }
             }
         }
@@ -531,8 +531,8 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 text: component.clip
                     ? qsTr("Grains\nPer Note:\n%1 to %2")
-                        .arg(Math.ceil(component.clip.grainSize / (component.clip.grainInterval + component.clip.grainIntervalAdditional)))
-                        .arg(Math.floor((component.clip.grainSize + component.clip.grainSizeAdditional) / component.clip.grainInterval))
+                        .arg(Math.ceil(component.clip.metadata.graineratorSize / (component.clip.metadata.graineratorInterval + component.clip.metadata.graineratorIntervalAdditional)))
+                        .arg(Math.floor((component.clip.metadata.graineratorSize + component.clip.metadata.graineratorSizeAdditional) / component.clip.metadata.graineratorInterval))
                     : ""
             }
         }
@@ -557,16 +557,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.clip ? component.clip.grainPanMinimum : 0
+                value: component.clip ? component.clip.metadata.graineratorPanMinimum : 0
                 applyLowerBound: true
                 lowerBound: -1
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 0
-                onValueChanged: if (component.clip) { component.clip.grainPanMinimum = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorPanMinimum = value }
                 Connections {
                     target: component.clip
-                    onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.clip.grainPanMinimum
+                    onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.clip.metadata.graineratorPanMinimum
                 }
             }
             Zynthian.InfinitySlider {
@@ -575,16 +575,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max")
-                value: component.clip ? component.clip.grainPanMaximum : 0
+                value: component.clip ? component.clip.metadata.graineratorPanMaximum : 0
                 applyLowerBound: true
                 lowerBound: -1
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 1
-                onValueChanged: if (component.clip) { component.clip.grainPanMaximum = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorPanMaximum = value }
                 Connections {
                     target: component.clip
-                    onGrainPanMaximumChanged: grainPanMaximumSlider.value = component.clip.grainPanMaximum
+                    onGrainPanMaximumChanged: grainPanMaximumSlider.value = component.clip.metadata.graineratorPanMaximum
                 }
             }
         }
@@ -609,16 +609,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min 1")
-                value: component.clip ? component.clip.grainPitchMinimum1 : 0
+                value: component.clip ? component.clip.metadata.graineratorPitchMinimum1 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 2
-                onValueChanged: if (component.clip) { component.clip.grainPitchMinimum1 = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorPitchMinimum1 = value }
                 Connections {
                     target: component.clip
-                    onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.clip.grainPitchMinimum1
+                    onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.clip.metadata.graineratorPitchMinimum1
                 }
             }
             Zynthian.InfinitySlider {
@@ -627,16 +627,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max 1")
-                value: component.clip ? component.clip.grainPitchMaximum1 : 0
+                value: component.clip ? component.clip.metadata.graineratorPitchMaximum1 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 3
-                onValueChanged: if (component.clip) { component.clip.grainPitchMaximum1 = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorPitchMaximum1 = value }
                 Connections {
                     target: component.clip
-                    onGrainPitchMaximum1Changed: grainPitchMaximum1Slider.value = component.clip.grainPitchMaximum1
+                    onGrainPitchMaximum1Changed: grainPitchMaximum1Slider.value = component.clip.metadata.graineratorPitchMaximum1
                 }
             }
             ColumnLayout {
@@ -645,7 +645,7 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 Kirigami.Heading {
                     level: 2
-                    text: qsTr("%1% ▶").arg(Math.round(component.clip ? 100 - (100 * component.clip.grainPitchPriority) : 0))
+                    text: qsTr("%1% ▶").arg(Math.round(component.clip ? 100 - (100 * component.clip.metadata.graineratorPitchPriority) : 0))
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -657,14 +657,14 @@ Item {
                     Layout.fillHeight: true
                     orientation: Qt.Vertical
                     stepSize: 0.01
-                    value: component.clip ? component.clip.grainPitchPriority : 0
+                    value: component.clip ? component.clip.metadata.graineratorPitchPriority : 0
                     from: 0
                     to: 1
-                    onMoved: component.clip.grainPitchPriority = value
+                    onMoved: component.clip.metadata.graineratorPitchPriority = value
                 }
                 Kirigami.Heading {
                     level: 2
-                    text: qsTr("◀ %1%").arg(Math.round(component.clip ? 100 * component.clip.grainPitchPriority : 0))
+                    text: qsTr("◀ %1%").arg(Math.round(component.clip ? 100 * component.clip.metadata.graineratorPitchPriority : 0))
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -681,16 +681,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min 2")
-                value: component.clip ? component.clip.grainPitchMinimum2 : 0
+                value: component.clip ? component.clip.metadata.graineratorPitchMinimum2 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 5
-                onValueChanged: if (component.clip) { component.clip.grainPitchMinimum2 = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorPitchMinimum2 = value }
                 Connections {
                     target: component.clip
-                    onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.clip.grainPitchMinimum2
+                    onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.clip.metadata.graineratorPitchMinimum2
                 }
             }
             Zynthian.InfinitySlider {
@@ -699,16 +699,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max 2")
-                value: component.clip ? component.clip.grainPitchMaximum2 : 0
+                value: component.clip ? component.clip.metadata.graineratorPitchMaximum2 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 6
-                onValueChanged: if (component.clip) { component.clip.grainPitchMaximum2 = value }
+                onValueChanged: if (component.clip) { component.clip.metadata.graineratorPitchMaximum2 = value }
                 Connections {
                     target: component.clip
-                    onGrainPitchMaximum2Changed: grainPitchMaximum2Slider.value = component.clip.grainPitchMaximum2
+                    onGrainPitchMaximum2Changed: grainPitchMaximum2Slider.value = component.clip.metadata.graineratorPitchMaximum2
                 }
             }
         }

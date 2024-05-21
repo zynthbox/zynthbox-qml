@@ -177,7 +177,7 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setGainAbsolute(value)
             if write:
                 self.scheduleWrite()
-    # TODO : Check if this is still needed
+    # TODO : Metadata Check if this is still needed
     def set_graineratorEnabled(self, value, write=True, force=False):
         if value != self.__graineratorEnabled or force:
             self.__graineratorEnabled = value
@@ -807,7 +807,7 @@ class sketchpad_clip(QObject):
         except:
             pass
         self.row_index_changed.emit()
-    
+
     row = Property(int, row, set_row_index, notify=row_index_changed)
 
 

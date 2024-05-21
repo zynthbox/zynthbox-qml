@@ -67,7 +67,6 @@ class sketchpad_clip_metadata(QObject):
         self.__adsrSustain = None
         self.__bpm = None
         self.__gain = None
-        self.__graineratorEnabled = None
         self.__graineratorInterval = None
         self.__graineratorIntervalAdditional = None
         self.__graineratorPanMaximum = None
@@ -104,7 +103,6 @@ class sketchpad_clip_metadata(QObject):
     def get_adsrSustain(self): return self.__adsrSustain
     def get_bpm(self): return self.__bpm
     def get_gain(self): return self.__gain
-    def get_graineratorEnabled(self): return self.__graineratorEnabled
     def get_graineratorInterval(self): return self.__graineratorInterval
     def get_graineratorIntervalAdditional(self): return self.__graineratorIntervalAdditional
     def get_graineratorPanMaximum(self): return self.__graineratorPanMaximum
@@ -175,14 +173,6 @@ class sketchpad_clip_metadata(QObject):
             self.gainChanged.emit()
             if self.clip.audioSource is not None:
                 self.clip.audioSource.setGainAbsolute(value)
-            if write:
-                self.scheduleWrite()
-    # TODO : Metadata Check if this is still needed
-    def set_graineratorEnabled(self, value, write=True, force=False):
-        if value != self.__graineratorEnabled or force:
-            self.__graineratorEnabled = value
-            self.graineratorEnabledChanged.emit()
-            # TODO : Metadata
             if write:
                 self.scheduleWrite()
     def set_graineratorInterval(self, value, write=True, force=False):
@@ -344,7 +334,6 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setPitch(value)
             if write:
                 self.scheduleWrite()
-    # TODO : Check if the implementation is correct and also if it is related to GRAINERATOR_ENABLED
     def set_playbackStyle(self, value, write=True, force=False):
         if value != self.__playbackStyle or force:
             self.__playbackStyle = value
@@ -393,7 +382,6 @@ class sketchpad_clip_metadata(QObject):
     adsrSustainChanged = Signal()
     bpmChanged = Signal()
     gainChanged = Signal()
-    graineratorEnabledChanged = Signal()
     graineratorIntervalChanged = Signal()
     graineratorIntervalAdditionalChanged = Signal()
     graineratorPanMaximumChanged = Signal()
@@ -426,7 +414,6 @@ class sketchpad_clip_metadata(QObject):
     adsrSustain = Property(float, get_adsrSustain, set_adsrSustain, notify=adsrSustainChanged)
     bpm = Property(int, get_bpm, set_bpm, notify=bpmChanged)
     gain = Property(float, get_gain, set_gain, notify=gainChanged)
-    graineratorEnabled = Property(bool, get_graineratorEnabled, set_graineratorEnabled, notify=graineratorEnabledChanged)
     graineratorInterval = Property(float, get_graineratorInterval, set_graineratorInterval, notify=graineratorIntervalChanged)
     graineratorIntervalAdditional = Property(float, get_graineratorIntervalAdditional, set_graineratorIntervalAdditional, notify=graineratorIntervalAdditionalChanged)
     graineratorPanMaximum = Property(float, get_graineratorPanMaximum, set_graineratorPanMaximum, notify=graineratorPanMaximumChanged)
@@ -493,7 +480,6 @@ class sketchpad_clip_metadata(QObject):
                 self.set_adsrSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)), force=True)
                 self.set_bpm(int(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())), force=True)
                 self.set_gain(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)), force=True)
-                self.set_graineratorEnabled(str(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_ENABLED", False)).lower() == "true", force=True)
                 self.set_graineratorInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)), force=True)
                 self.set_graineratorIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)), force=True)
                 self.set_graineratorPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)), force=True)
@@ -533,7 +519,6 @@ class sketchpad_clip_metadata(QObject):
             tags["ZYNTHBOX_AUDIOTYPESETTINGS"] = [str(self.__audioTypeSettings)]
             tags["ZYNTHBOX_BPM"] = [str(self.__bpm)]
             tags["ZYNTHBOX_GAIN"] = [str(self.__gain)]
-            tags["ZYNTHBOX_GRAINERATOR_ENABLED"] = [str(self.__graineratorEnabled)]
             tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.__graineratorInterval)]
             tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.__graineratorIntervalAdditional)]
             tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.__graineratorPanMaximum)]

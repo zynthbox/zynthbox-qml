@@ -84,8 +84,8 @@ class sketchpad_clip_metadata(QObject):
         self.__graineratorSustain = None
         self.__graineratorTilt = None
         self.__length = None
-        self.__loopdelta = None
-        self.__loopdelta2 = None
+        self.__loopDelta = None
+        self.__loopDelta2 = None
         self.__pitch = None
         self.__playbackStyle = None
         self.__snapLengthToBeat = None
@@ -120,8 +120,8 @@ class sketchpad_clip_metadata(QObject):
     def get_graineratorSustain(self): return self.__graineratorSustain
     def get_graineratorTilt(self): return self.__graineratorTilt
     def get_length(self): return self.__length
-    def get_loopdelta(self): return self.__loopdelta
-    def get_loopdelta2(self): return self.__loopdelta2
+    def get_loopDelta(self): return self.__loopDelta
+    def get_loopDelta2(self): return self.__loopDelta2
     def get_pitch(self): return self.__pitch
     def get_playbackStyle(self): return self.__playbackStyle
     def get_snapLengthToBeat(self): return self.__snapLengthToBeat
@@ -311,19 +311,19 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setLength(value, Zynthbox.SyncTimer.instance().getBpm())
             if write:
                 self.scheduleWrite()
-    def set_loopdelta(self, value, write=True, force=False):
-        if value != self.__loopdelta or force:
-            self.__loopdelta = value
-            self.loopdeltaChanged.emit()
+    def set_loopDelta(self, value, write=True, force=False):
+        if value != self.__loopDelta or force:
+            self.__loopDelta = value
+            self.loopDeltaChanged.emit()
             if self.clip.audioSource is not None:
                 self.clip.audioSource.setLoopDelta(value)
             if write:
                 self.scheduleWrite()
     # TODO : Check if this is still required
-    def set_loopdelta2(self, value, write=True, force=False):
-        if value != self.__loopdelta2 or force:
-            self.__loopdelta2 = value
-            self.loopdelta2Changed.emit()
+    def set_loopDelta2(self, value, write=True, force=False):
+        if value != self.__loopDelta2 or force:
+            self.__loopDelta2 = value
+            self.loopDelta2Changed.emit()
             if write:
                 self.scheduleWrite()
     def set_pitch(self, value, write=True, force=False):
@@ -399,8 +399,8 @@ class sketchpad_clip_metadata(QObject):
     graineratorSustainChanged = Signal()
     graineratorTiltChanged = Signal()
     lengthChanged = Signal()
-    loopdeltaChanged = Signal()
-    loopdelta2Changed = Signal()
+    loopDeltaChanged = Signal()
+    loopDelta2Changed = Signal()
     pitchChanged = Signal()
     playbackStyleChanged = Signal()
     snapLengthToBeatChanged = Signal()
@@ -431,8 +431,8 @@ class sketchpad_clip_metadata(QObject):
     graineratorSustain = Property(float, get_graineratorSustain, set_graineratorSustain, notify=graineratorSustainChanged)
     graineratorTilt = Property(float, get_graineratorTilt, set_graineratorTilt, notify=graineratorTiltChanged)
     length = Property(float, get_length, set_length, notify=lengthChanged)
-    loopdelta = Property(float, get_loopdelta, set_loopdelta, notify=loopdeltaChanged)
-    loopdelta2 = Property(float, get_loopdelta2, set_loopdelta2, notify=loopdelta2Changed)
+    loopDelta = Property(float, get_loopDelta, set_loopDelta, notify=loopDeltaChanged)
+    loopDelta2 = Property(float, get_loopDelta2, set_loopDelta2, notify=loopDelta2Changed)
     pitch = Property(float, get_pitch, set_pitch, notify=pitchChanged)
     playbackStyle = Property(str, get_playbackStyle, set_playbackStyle, notify=playbackStyleChanged)
     snapLengthToBeat = Property(bool, get_snapLengthToBeat, set_snapLengthToBeat, notify=snapLengthToBeatChanged)
@@ -497,8 +497,8 @@ class sketchpad_clip_metadata(QObject):
                 self.set_graineratorSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)), force=True)
                 self.set_graineratorTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)), force=True)
                 self.set_length(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)), force=True)
-                self.set_loopdelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), force=True)
-                self.set_loopdelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), force=True)
+                self.set_loopDelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), force=True)
+                self.set_loopDelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), force=True)
                 self.set_pitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)), force=True)
                 self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle")), force=True)
                 self.set_snapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true", force=True)
@@ -536,8 +536,8 @@ class sketchpad_clip_metadata(QObject):
             tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.__graineratorSustain)]
             tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.__graineratorTilt)]
             tags["ZYNTHBOX_LENGTH"] = [str(self.__length)]
-            tags["ZYNTHBOX_LOOPDELTA"] = [str(self.__loopdelta)]
-            tags["ZYNTHBOX_LOOPDELTA2"] = [str(self.__loopdelta2)]
+            tags["ZYNTHBOX_LOOPDELTA"] = [str(self.__loopDelta)]
+            tags["ZYNTHBOX_LOOPDELTA2"] = [str(self.__loopDelta2)]
             tags["ZYNTHBOX_PITCH"] = [str(self.__pitch)]
             tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.__playbackStyle)]
             tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.__snapLengthToBeat)]

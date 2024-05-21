@@ -117,6 +117,7 @@ GridLayout {
     }
 
     Zynthian.ADSRClipView {
+        // TODO : Metadata Knobs not working here on this tab
         id: clipSettingsADSR
         Layout.fillWidth: true
         Layout.fillHeight: true

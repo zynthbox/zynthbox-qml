@@ -51,7 +51,6 @@ class sketchpad_clip_metadata(QObject):
         self.writeTimer.timeout.connect(self.write)
 
         # Sound metadata
-        self.__soundSnapshot = None
         self.__audioType = None
         self.__audioTypeSettings = None
         self.__midiRecording = None
@@ -59,6 +58,7 @@ class sketchpad_clip_metadata(QObject):
         self.__routingStyle = None
         self.__samplePickingStyle = None
         self.__samples = None
+        self.__soundSnapshot = None
 
         # Sketch metadata
         self.__adsrAttack = None
@@ -97,6 +97,14 @@ class sketchpad_clip_metadata(QObject):
         self.bpmChanged.connect(self.updateBpmDependantValues)
         self.syncSpeedToBpmChanged.connect(self.updateBpmDependantValues)
 
+    def get_audioType(self): return self.__audioType
+    def get_audioTypeSettings(self): return self.__audioTypeSettings
+    def get_midiRecording(self): return self.__midiRecording
+    def get_patternJson(self): return self.__patternJson
+    def get_routingStyle(self): return self.__routingStyle
+    def get_samplePickingStyle(self): return self.__samplePickingStyle
+    def get_samples(self): return self.__samples
+    def get_soundSnapshot(self): return self.__soundSnapshot
     def get_adsrAttack(self): return self.__adsrAttack
     def get_adsrDecay(self): return self.__adsrDecay
     def get_adsrRelease(self): return self.__adsrRelease
@@ -129,6 +137,54 @@ class sketchpad_clip_metadata(QObject):
     def get_startPosition(self): return self.__startPosition
     def get_syncSpeedToBpm(self): return self.__syncSpeedToBpm
 
+    def set_audioType(self, value, write=True, force=False):
+        if value != self.__audioType or force:
+            self.__audioType = value
+            self.audioTypeChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_audioTypeSettings(self, value, write=True, force=False):
+        if value != self.__audioTypeSettings or force:
+            self.__audioTypeSettings = value
+            self.audioTypeSettingsChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_midiRecording(self, value, write=True, force=False):
+        if value != self.__midiRecording or force:
+            self.__midiRecording = value
+            self.midiRecordingChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_patternJson(self, value, write=True, force=False):
+        if value != self.__patternJson or force:
+            self.__patternJson = value
+            self.patternJsonChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_routingStyle(self, value, write=True, force=False):
+        if value != self.__routingStyle or force:
+            self.__routingStyle = value
+            self.routingStyleChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_samplePickingStyle(self, value, write=True, force=False):
+        if value != self.__samplePickingStyle or force:
+            self.__samplePickingStyle = value
+            self.samplePickingStyleChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_samples(self, value, write=True, force=False):
+        if value != self.__samples or force:
+            self.__samples = value
+            self.samplesChanged.emit()
+            if write:
+                self.scheduleWrite()
+    def set_soundSnapshot(self, value, write=True, force=False):
+        if value != self.__soundSnapshot or force:
+            self.__soundSnapshot = value
+            self.soundSnapshotChanged.emit()
+            if write:
+                self.scheduleWrite()
     def set_adsrAttack(self, value, write=True, force=False):
         if value != self.__adsrAttack or force:
             self.__adsrAttack = value

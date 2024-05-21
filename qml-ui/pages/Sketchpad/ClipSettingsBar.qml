@@ -449,27 +449,5 @@ ColumnLayout {
             }
         }
     }
-
-    // TODO : Metadata
-    // ColumnLayout {
-    //     Layout.fillWidth: true
-    //     Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-    //     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-    // 
-    //     QQC2.Label {
-    //         visible: root.controlObj && root.controlObj.soundData ? root.controlObj.soundData.length <= 0 : false
-    //         text: "<No Metadata>"
-    //     }
-    //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty && root.controlObj.metadata.audioType
-    //         text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadata.audioType ? root.controlObj.metadata.audioType : "")
-    //         font.pointSize: 10
-    //     }
-    //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty
-    //         text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
-    //         font.pointSize: 10
-    //     }
-    // }
 }
 

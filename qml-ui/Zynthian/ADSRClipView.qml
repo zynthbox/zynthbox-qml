@@ -355,7 +355,7 @@ Item {
                 function updateAndSave() {
                     if (component.visible) {
                         adsrView.requestPaint();
-                        component.saveMetadata();
+                        component.metadata.save();
                     }
                 }
                 onGrainTiltChanged: updateAndSave()

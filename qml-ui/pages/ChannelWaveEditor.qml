@@ -454,10 +454,9 @@ Zynthian.ScreenPage {
                                 id: clipSettingsADSRClipThrottle
                                 interval: 1; running: false; repeat: false;
                                 onTriggered: {
-                                    clipSettingsADSR.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
+                                    clipSettingsADSR.clip = component.selectedClip;
                                 }
                             }
-                            onSaveMetadata: component.selectedClip.saveMetadata();
                         }
                         Zynthian.ClipGraineratorSettings {
                             id: clipSettingsGrainerator
@@ -469,10 +468,9 @@ Zynthian.ScreenPage {
                                 id: clipSettingsGraineratorClipThrottle
                                 interval: 1; running: false; repeat: false;
                                 onTriggered: {
-                                    clipSettingsGrainerator.clip = Zynthbox.PlayGridManager.getClipById(component.selectedClip.cppObjId);
+                                    clipSettingsGrainerator.clip = component.selectedClip;
                                 }
                             }
-                            onSaveMetadata: component.selectedClip.saveMetadata();
                         }
                         Zynthian.ClipInfoView {
                             id: clipSettingsInfoView

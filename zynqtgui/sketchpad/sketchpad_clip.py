@@ -46,7 +46,7 @@ class sketchpad_clip_metadata(QObject):
         self.clip = clip
         self.__audioMetadata = None
         self.writeTimer = QTimer(self)
-        self.writeTimer.setInterval(100)
+        self.writeTimer.setInterval(1000)
         self.writeTimer.setSingleShot(True)
         self.writeTimer.timeout.connect(self.write)
 
@@ -521,6 +521,7 @@ class sketchpad_clip_metadata(QObject):
                 self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", force=True)
                 self.updateBpmDependantValues()
 
+    @Slot()
     def write(self):
         if not self.clip.isEmpty:
             tags = {}

@@ -35,7 +35,6 @@ import Zynthian 1.0 as Zynthian
 Item {
     id: component
     property QtObject clip
-    signal saveMetadata()
     function nextElement() {
         if (_private.currentElement === _private.elementMax) {
             _private.currentElement = 0;
@@ -181,24 +180,6 @@ Item {
         property int currentElement: 0
         property int elementMax: 9
         property int settingsCategory: 0
-    }
-    Connections {
-        target: component.clip
-        onGranularChanged: component.saveMetadata()
-        onGrainPositionChanged: component.saveMetadata()
-        onGrainSprayChanged: component.saveMetadata()
-        onGrainScanChanged: component.saveMetadata()
-        onGrainIntervalChanged: component.saveMetadata()
-        onGrainIntervalAdditionalChanged: component.saveMetadata()
-        onGrainSizeChanged: component.saveMetadata()
-        onGrainSizeAdditionalChanged: component.saveMetadata()
-        onGrainPanMinimumChanged: component.saveMetadata()
-        onGrainPanMaximumChanged: component.saveMetadata()
-        onGrainPitchMinimum1Changed: component.saveMetadata()
-        onGrainPitchMaximum1Changed: component.saveMetadata()
-        onGrainPitchMinimum2Changed: component.saveMetadata()
-        onGrainPitchMaximum2Changed: component.saveMetadata()
-        onGrainPitchPriorityChanged: component.saveMetadata()
     }
     RowLayout {
         anchors.fill: parent

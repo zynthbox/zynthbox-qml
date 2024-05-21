@@ -166,7 +166,7 @@ Rectangle {
                              && !zynqtgui.bottomBarControlObj.isEmpty
 
                     onClicked: {
-                        zynqtgui.bottomBarControlObj.saveMetadata();
+                        zynqtgui.bottomBarControlObj.metadata.write();
                     }
                 }
 

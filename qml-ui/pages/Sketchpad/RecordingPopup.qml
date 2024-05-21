@@ -243,6 +243,50 @@ Zynthian.Popup {
                         }
                     }
                 }
+                function stepLengthUp() {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        _private.selectedPattern.stepLength = _private.selectedPattern.stepLength + 1;
+                    } else {
+                       _private.selectedPattern.stepLength = _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, 1);
+                    }
+                }
+                function stepLengthDown() {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        _private.selectedPattern.stepLength = _private.selectedPattern.stepLength - 1;
+                    } else {
+                        _private.selectedPattern.stepLength = _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, -1);
+                    }
+                }
+                function patternLengthUp() {
+                    if (_private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            _private.selectedPattern.patternLength = _private.selectedPattern.patternLength + 1;
+                        } else {
+                            if (_private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength) {
+                                _private.selectedPattern.patternLength = _private.selectedPattern.patternLength + _private.selectedPattern.width;
+                            } else {
+                                _private.selectedPattern.patternLength = _private.selectedPattern.availableBars * _private.selectedPattern.width;
+                            }
+                        }
+                    }
+                }
+                function patternLengthDown() {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        _private.selectedPattern.patternLength = _private.selectedPattern.patternLength - 1;
+                    } else {
+                        if (_private.selectedPattern && _private.selectedPattern.patternLength > _private.selectedPattern.width) {
+                            if (_private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength) {
+                                _private.selectedPattern.patternLength = _private.selectedPattern.patternLength - _private.selectedPattern.width;
+                            } else {
+                                _private.selectedPattern.patternLength = (_private.selectedPattern.availableBars - 1) * _private.selectedPattern.width;
+                            }
+                        }
+                    }
+                }
             }
             Connections {
                 target: zynqtgui.sketchpad
@@ -701,70 +745,95 @@ Zynthian.Popup {
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                                    text: qsTr("Step Length:")
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 96 : false
-                                    text: qsTr("1")
-                                    onClicked: { _private.selectedPattern.stepLength = 96; }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 48 : false
-                                    text: qsTr("1/2")
-                                    onClicked: { _private.selectedPattern.stepLength = 48; }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 24 : false
-                                    text: qsTr("1/4")
-                                    onClicked: { _private.selectedPattern.stepLength = 24; }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 12 : false
-                                    text: qsTr("1/8")
-                                    onClicked: { _private.selectedPattern.stepLength = 12; }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 6 : false
-                                    text: qsTr("1/16")
-                                    onClicked: { _private.selectedPattern.stepLength = 6; }
-                                }
-                                QQC2.Button {
-                                    Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                    checked: _private.selectedPattern ? _private.selectedPattern.stepLength === 3 : false
-                                    text: qsTr("1/32")
-                                    onClicked: { _private.selectedPattern.stepLength = 3; }
-                                }
-                                QQC2.Label {
-                                    Layout.preferredWidth: _private.preferredRowHeight
-                                    text: qsTr("notes")
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Zynthian.PlayGridButton {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text:"-"
+                                        enabled: _private.selectedPattern && _private.selectedPattern.stepLength > _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, -1)
+                                        onClicked: {
+                                            _private.stepLengthDown();
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        id:noteLengthLabel
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignHCenter
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: _private.selectedPattern ? qsTr("Step Length: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.stepLength)) : ""
+                                    }
+                                    Zynthian.PlayGridButton {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "+"
+                                        enabled: _private.selectedPattern && _private.selectedPattern.stepLength < _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, 1)
+                                        onClicked: {
+                                            _private.stepLengthUp();
+                                        }
+                                    }
                                 }
                             }
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-                                    text: qsTr("Pattern Length:")
-                                }
-                                Repeater {
-                                    model: 8
-                                    QQC2.Button {
-                                        Layout.fillWidth: true; Layout.preferredHeight: _private.preferredRowHeight; Layout.minimumHeight: Layout.preferredHeight
-                                        checked: _private.selectedPattern ? _private.selectedPattern.availableBars === model.index + 1 : false
-                                        text: (model.index + 1)
-                                        onClicked: { _private.selectedPattern.patternLength = (model.index + 1) * _private.selectedPattern.width; }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Zynthian.PlayGridButton {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text:"-"
+                                        enabled: _private.selectedPattern && _private.selectedPattern.patternLength > _private.selectedPattern.width
+                                        onClicked: {
+                                            _private.patternLengthDown();
+                                        }
                                     }
-                                }
-                                QQC2.Label {
-                                    Layout.preferredWidth: _private.preferredRowHeight
-                                    text: qsTr("bars")
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignHCenter
+                                        Layout.preferredHeight: noteLengthLabel.height
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: _private.selectedPattern
+                                            ? _private.selectedPattern.availableBars * _private.selectedPattern.width === _private.selectedPattern.patternLength
+                                                ? qsTr("Pattern Length: %1 Bars").arg(_private.selectedPattern.availableBars)
+                                                : qsTr("Pattern Length: %1.%2 Bars").arg(_private.selectedPattern.availableBars - 1).arg(_private.selectedPattern.patternLength - ((_private.selectedPattern.availableBars - 1) * _private.selectedPattern.width))
+                                            : ""
+                                        MultiPointTouchArea {
+                                            anchors.fill: parent
+                                            touchPoints: [
+                                                TouchPoint {
+                                                    id: patternLengthSlidePoint;
+                                                    property double increment: 1
+                                                    property double slideIncrement: 0.2
+                                                    property double upperBound: _private.selectedPattern ? _private.selectedPattern.bankLength * _private.selectedPattern.width : 128
+                                                    property double lowerBound: 1
+                                                    property var currentValue: undefined
+                                                    onPressedChanged: {
+                                                        if (pressed) {
+                                                            currentValue = _private.selectedPattern.patternLength;
+                                                        }
+                                                    }
+                                                    onYChanged: {
+                                                        if (pressed && currentValue !== undefined) {
+                                                            var delta = (patternLengthSlidePoint.x - patternLengthSlidePoint.startX) * patternLengthSlidePoint.slideIncrement;
+                                                            _private.selectedPattern.patternLength = Math.min(Math.max(currentValue + delta, patternLengthSlidePoint.lowerBound), patternLengthSlidePoint.upperBound);
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                    Zynthian.PlayGridButton {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        text: "+"
+                                        enabled: _private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)
+                                        onClicked: {
+                                            _private.patternLengthUp();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -811,7 +880,25 @@ Zynthian.Popup {
                             }
                             smooth: false
                             asynchronous: true
-                            source: _private.selectedPattern ? _private.selectedPattern.thumbnailUrl : ""
+                            Timer {
+                                id: patternVisualiserThumbnailUpdater
+                                interval: 10; repeat: false; running: false;
+                                onTriggered: {
+                                    patternVisualiser.source = _private.selectedPattern.thumbnailUrl;
+                                }
+                            }
+                            Connections {
+                                target: _private.selectedPattern
+                                onThumbnailUrlChanged: {
+                                    patternVisualiserThumbnailUpdater.restart();
+                                }
+                            }
+                            Connections {
+                                target: _private
+                                onSelectedPatternChanged: {
+                                    patternVisualiserThumbnailUpdater.restart();
+                                }
+                            }
                             Rectangle { // Progress
                                 anchors {
                                     top: parent.top
@@ -828,14 +915,14 @@ Zynthian.Popup {
                                     top: parent.top
                                     right: parent.right
                                     margins: Kirigami.Units.smallSpacing
-                                    rightMargin: patternVisualiser.visible ? parent.width * (8 - _private.selectedPattern.availableBars) / 8 : 0
+                                    rightMargin: patternVisualiser.visible ? parent.width - (_private.selectedPattern.patternLength * (parent.width / (_private.selectedPattern.width * _private.selectedPattern.bankLength))) : 0
                                 }
-                                text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.availableBars, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
-                                function patternBarsToSeconds(patternBars, noteLength, bpm) {
+                                text: patternVisualiser.visible ? "%1s".arg(patternBarsToSeconds(_private.selectedPattern.patternLength, _private.selectedPattern.stepLength, Zynthbox.SyncTimer.bpm).toFixed(2)) : ""
+                                function patternBarsToSeconds(patternSteps, noteLength, bpm) {
                                     // Set up the loop points in the new recording
                                     let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                                     // Reset this to beats (rather than pattern subbeats)
-                                    let patternDurationInBeats = patternBars * _private.selectedPattern.width * noteLength / patternSubbeatToTickMultiplier;
+                                    let patternDurationInBeats = patternSteps * noteLength / patternSubbeatToTickMultiplier;
                                     let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
                                     return patternDurationInSeconds;
                                 }

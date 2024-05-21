@@ -959,7 +959,7 @@ class sketchpad_clip(QObject):
     @Slot(None)
     def clear(self, loop=True):
         self.stop()
-
+        # TODO : Metadata Clear metadata
         if self.audioSource is not None:
             self.audioSource.deleteLater()
             self.audioSource = None

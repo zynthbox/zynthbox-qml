@@ -352,15 +352,17 @@ Item {
             }
             Connections {
                 target: component.clip
-                function updateAndSave() {
+                function update() {
                     if (component.visible) {
                         adsrView.requestPaint();
-                        component.metadata.save();
                     }
                 }
-                onGrainTiltChanged: updateAndSave()
-                onGrainSustainChanged: updateAndSave();
-                onAdsrParametersChanged: updateAndSave()
+                onGraineratorSustainChanged: update()
+                onGraineratorTiltChanged: update()
+                onAdsrAttackChanged: update()
+                onAdsrDecayChanged: update()
+                onAdsrReleaseChanged: update()
+                onAdsrSustainChanged: update()
             }
         }
     }

@@ -285,7 +285,7 @@ ColumnLayout {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
-                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj.metadataBPM)
+                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj.metadata.bpm)
                         acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
                         rejectText: "No"
                         onAccepted: {
@@ -492,6 +492,7 @@ ColumnLayout {
         }
     }
 
+    // TODO : Metadata
     // ColumnLayout {
     //     Layout.fillWidth: true
     //     Layout.alignment: Qt.AlignRight | Qt.AlignBottom

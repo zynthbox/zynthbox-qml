@@ -61,6 +61,7 @@ GridLayout {
             radius: 4
             color: Kirigami.Theme.backgroundColor
 
+            // TODO : Metadata
             ListView {
                 anchors.fill: parent
                 clip: true

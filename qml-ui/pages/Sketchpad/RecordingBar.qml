@@ -142,6 +142,7 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
 
+    // TODO : Metadata
 //        Repeater {
 //            model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
 

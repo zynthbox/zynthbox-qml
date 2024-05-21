@@ -200,15 +200,15 @@ Zynthian.ScreenPage {
                                         voiceCombo.updateText();
                                     }
                                     function updateText() {
-
-                                        for (var i in root.channel.soundData) {
+                                        // TODO : Metadata
+                                        /*for (var i in root.channel.soundData) {
                                             let data = root.channel.soundData[i];
                                             if (data.midi_chan === channelDelegate.targetMidiChan) {
                                                 currentSoundName.text = data.preset_name;
                                                 return;
                                             }
                                             currentSoundName.text = "";
-                                        }
+                                        }*/
                                     }
                                     Connections {
                                         target: zynqtgui.fixed_layers

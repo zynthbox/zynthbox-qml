@@ -133,6 +133,7 @@ ColumnLayout {
             text: qsTr("Gain (dB)")
             controlObj: root.controlObj.metadata
             controlProperty: "gain"
+            // TODO : Metadata Gain should be in dB
             valueString: root.controlObj && root.controlObj.metadata.gain != null ? root.controlObj.metadata.gain.toFixed(1) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true

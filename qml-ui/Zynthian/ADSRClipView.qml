@@ -139,8 +139,7 @@ Item {
             }
         }
         Connections {
-            enabled: component.clip != null
-            target: component.clip.metadata
+            target: component.clip != null ? component.clip.metadata : null
             function update() {
                 if (component.clip.metadata.adsrAttack !== attackSlider.value) {
                     attackSlider.value = component.clip.metadata.adsrAttack;
@@ -356,8 +355,7 @@ Item {
                 }
             }
             Connections {
-                enabled: component.clip != null
-                target: component.clip.metadata
+                target: component.clip != null ? component.clip.metadata : null
                 function update() {
                     if (component.visible) {
                         adsrView.requestPaint();

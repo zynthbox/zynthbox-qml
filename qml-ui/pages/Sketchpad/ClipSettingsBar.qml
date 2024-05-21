@@ -131,9 +131,9 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
-            controlObj: root.clipAudioSource
-            controlProperty: "gainAbsolute"
-            valueString: root.controlObj && root.controlObj.metadata.gain ? root.controlObj.metadata.gain.toFixed(1) : 0
+            controlObj: root.controlObj.metadata
+            controlProperty: "gain"
+            valueString: root.controlObj && root.controlObj.metadata.gain != null ? root.controlObj.metadata.gain.toFixed(1) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -149,53 +149,10 @@ ColumnLayout {
             }
         }
 
-        // Zynthian.SketchpadDial {
-        //     id: startDial
-        //     text: qsTr("Start (secs)")
-        //     controlObj: root.controlObj
-        //     controlProperty: "startPosition"
-        //     valueString: dial.value.toFixed(2)
-        //     buttonStepSize: 0.01
-        //     Layout.fillWidth: true
-        //     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-        //     Layout.maximumHeight: Kirigami.Units.gridUnit * 8
-        //
-        //     dial {
-        //         stepSize: root.controlObj && root.controlObj.hasOwnProperty("secPerBeat") ? root.controlObj.secPerBeat : 0.01
-        //         from: 0
-        //         to: root.controlObj && root.controlObj.hasOwnProperty("duration") ? root.controlObj.duration : 0
-        //     }
-        //
-        //     onDoubleClicked: {
-        //         root.controlObj.metadata.startPosition = root.controlObj.initialStartPosition;
-        //     }
-        // }
-
-        // Zynthian.SketchpadDial {
-        //     id: lengthDial
-        //     text: qsTr("Length (beats)")
-        //     controlObj: root.controlObj
-        //     controlProperty: "length"
-        //     valueString: dial.value.toFixed(2)
-        //     Layout.fillWidth: true
-        //     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-        //     Layout.maximumHeight: Kirigami.Units.gridUnit * 8
-        //
-        //     dial {
-        //         stepSize: 1
-        //         from: 1
-        //         to: 64
-        //     }
-        //
-        //     onDoubleClicked: {
-        //         root.controlObj.metadata.length = root.controlObj.initialLength;
-        //     }
-        // }
-
         Zynthian.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch")
-            controlObj: root.controlObj
+            controlObj: root.controlObj.metadata
             controlProperty: "pitch"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -215,7 +172,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio")
-            controlObj: root.controlObj
+            controlObj: root.controlObj.metadata
             Timer {
                 id: timeDialThrottle
                 interval: 1; running: false; repeat: false;
@@ -237,7 +194,7 @@ ColumnLayout {
             }
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.syncSpeedToBpm : false
+            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.speedRatio : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -289,7 +246,7 @@ ColumnLayout {
                         acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
                         rejectText: "No"
                         onAccepted: {
-                            root.controlObj.metadataBPM = bpmGuessedDialog.guessedBPM;
+                            root.controlObj.metadata.bpm = bpmGuessedDialog.guessedBPM;
                         }
                     }
                 }

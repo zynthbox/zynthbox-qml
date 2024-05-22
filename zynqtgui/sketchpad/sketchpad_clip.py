@@ -680,6 +680,47 @@ class sketchpad_clip_metadata(QObject):
     def scheduleWrite(self):
         self.writeTimer.start()
 
+    def clear(self):
+        self.set_audioType(None, write=False, force=True)
+        self.set_audioTypeSettings(None, write=False, force=True)
+        self.set_midiRecording(None, write=False, force=True)
+        self.set_patternJson(None, write=False, force=True)
+        self.set_routingStyle(None, write=False, force=True)
+        self.set_samplePickingStyle(None, write=False, force=True)
+        self.set_samples(None, write=False, force=True)
+        self.set_soundSnapshot(None, write=False, force=True)
+        self.set_adsrAttack(None, write=False, force=True)
+        self.set_adsrDecay(None, write=False, force=True)
+        self.set_adsrRelease(None, write=False, force=True)
+        self.set_adsrSustain(None, write=False, force=True)
+        self.set_bpm(None, write=False, force=True)
+        self.set_gain(None, write=False, force=True)
+        self.set_graineratorInterval(None, write=False, force=True)
+        self.set_graineratorIntervalAdditional(None, write=False, force=True)
+        self.set_graineratorPanMaximum(None, write=False, force=True)
+        self.set_graineratorPanMinimum(None, write=False, force=True)
+        self.set_graineratorPitchMaximum1(None, write=False, force=True)
+        self.set_graineratorPitchMaximum2(None, write=False, force=True)
+        self.set_graineratorPitchMinimum1(None, write=False, force=True)
+        self.set_graineratorPitchMinimum2(None, write=False, force=True)
+        self.set_graineratorPitchPriority(None, write=False, force=True)
+        self.set_graineratorPosition(None, write=False, force=True)
+        self.set_graineratorScan(None, write=False, force=True)
+        self.set_graineratorSize(None, write=False, force=True)
+        self.set_graineratorSizeAdditional(None, write=False, force=True)
+        self.set_graineratorSpray(None, write=False, force=True)
+        self.set_graineratorSustain(None, write=False, force=True)
+        self.set_graineratorTilt(None, write=False, force=True)
+        self.set_length(None, write=False, force=True)
+        self.set_loopDelta(None, write=False, force=True)
+        self.set_loopDelta2(None, write=False, force=True)
+        self.set_pitch(None, write=False, force=True)
+        self.set_playbackStyle(None, write=False, force=True)
+        self.set_snapLengthToBeat(None, write=False, force=True)
+        self.set_speedRatio(None, write=False, force=True)
+        self.set_startPosition(None, write=False, force=True)
+        self.set_syncSpeedToBpm(None, write=False, force=True)
+
 
 class sketchpad_clip(QObject):
     def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_channel_sample=False):
@@ -1008,6 +1049,7 @@ class sketchpad_clip(QObject):
             self.stop()
         else:
             self.__path__ = None
+            self.metadata.clear()
 
         if self.audioSource is not None:
             try: self.audioSource.isPlayingChanged.disconnect(self.is_playing_changed.emit)

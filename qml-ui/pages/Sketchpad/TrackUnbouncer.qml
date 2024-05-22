@@ -97,7 +97,7 @@ Zynthian.DialogQuestion {
                     for (let sketchIndex = 0; sketchIndex < _private.sketches.length; ++sketchIndex) {
                         let sketch = _private.sketches[sketchIndex];
                         if (sketch.metadata.audioType.length > 0) {
-                            if (sketch.metadata.patternJson.length > 0 || sketch._private.clip.metadata.midiRecording.length > 10) {
+                            if (sketch.metadata.patternJson.length > 0 || sketch.metadata.midiRecording.length > 10) {
                                 let soundSourceIndex = -1;
                                 for (let detailIndex = 0; detailIndex < newDetails.length; ++detailIndex) {
                                     let otherSketch = newDetails[detailIndex].sketches[0];

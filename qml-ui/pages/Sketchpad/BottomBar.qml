@@ -379,14 +379,6 @@ Rectangle {
                         visible: zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
                         initialProperties: {"bottomBar": root}
                     },
-                    Zynthian.TabbedControlViewAction {
-                        id: channelAction
-                        text: qsTr("Track")
-                        page: Qt.resolvedUrl("ChannelBar.qml")
-                        preload: true
-                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-channel"
-                        initialProperties: {"bottomBar": root}
-                    },
                     // Zynthian.TabbedControlViewAction {
                     //     id: channelSoundsAction
                     //     text: qsTr("Sounds")

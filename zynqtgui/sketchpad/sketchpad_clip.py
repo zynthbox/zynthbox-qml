@@ -689,7 +689,7 @@ class sketchpad_clip(QObject):
         self.__initial_pitch__ = 0
         self.__initial_speed_ratio = 1
         self.__speed_ratio__ = self.__initial_speed_ratio
-        self.__initial_gain__ = 0
+        self.__initial_gain__ = 0.81 # This represents a gainAbsolute value which is roughly equivalent to 0dB
         self.__progress__ = 0.0
         self.audioSource = None
         self.recording_basepath = song.sketchpad_folder

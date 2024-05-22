@@ -133,8 +133,7 @@ ColumnLayout {
             text: qsTr("Gain (dB)")
             controlObj: root.controlObj != null ? root.controlObj.metadata : null
             controlProperty: "gain"
-            // TODO : Metadata Gain should be in dB
-            valueString: root.controlObj && root.controlObj.metadata.gain != null ? root.controlObj.metadata.gain.toFixed(1) : 0
+            valueString: root.controlObj && root.controlObj.metadata.gain != null ? qsTr("%1 dB").arg(parseInt(Zynthian.CommonUtils.interp(root.controlObj.metadata.gain, 0, 1, -100, 24))) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -186,7 +185,7 @@ ColumnLayout {
                 onControlObjChanged: timeDialThrottle.restart()
             }
             Connections {
-                target: root.controlObj
+                target: root.controlObj.metadata
                 onSpeedRatioChanged: {
                     if (timeDial.dial.value !== root.controlObj.metadata.speedRatio) {
                         timeDial.dial.value = root.controlObj.metadata.speedRatio

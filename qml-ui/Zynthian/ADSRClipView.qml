@@ -29,6 +29,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
+import io.zynthbox.components 1.0 as Zynthbox
+
 Item {
     id: component
     property QtObject clip
@@ -109,14 +111,15 @@ Item {
         id: _private
         property int settingsCategory: 0
     }
-    property bool showGranularSettings: clip && clip.granular && _private.settingsCategory === 1
+    property QtObject cppObj: clip && clip.hasOwnProperty("cppObjId") ? Zynthbox.PlayGridManager.getClipById(clip.cppObjId) : null
+    property bool showGranularSettings: cppObj && cppObj.granular ? _private.settingsCategory === 1 : false
     RowLayout {
         anchors.fill: parent
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.clip && component.clip.granular
+            visible: component.cppObj ? component.cppObj.granular : false
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true

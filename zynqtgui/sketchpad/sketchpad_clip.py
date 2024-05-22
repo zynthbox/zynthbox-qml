@@ -1080,9 +1080,6 @@ class sketchpad_clip(QObject):
             self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
         self.__song__.schedule_save()
 
-        # Schedule write as it should ensure metadata are writen for all loaded sketches
-        self.metadata.scheduleWrite()
-
     path = Property(str, path, set_path, notify=path_changed)
     filename = Property(str, filename, notify=path_changed)
 

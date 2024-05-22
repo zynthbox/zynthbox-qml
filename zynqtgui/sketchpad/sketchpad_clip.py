@@ -558,7 +558,7 @@ class sketchpad_clip_metadata(QObject):
                 self.set_adsrDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)), write=False, force=True)
                 self.set_adsrRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)), write=False, force=True)
                 self.set_adsrSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)), write=False, force=True)
-                self.set_bpm(int(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())), write=False, force=True)
+                self.set_bpm(float(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())), write=False, force=True)
                 self.set_gain(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)), write=False, force=True)
                 self.set_graineratorInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)), write=False, force=True)
                 self.set_graineratorIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)), write=False, force=True)

@@ -395,20 +395,6 @@ Zynthian.Popup {
                             console.log("Successfully recorded a new sound file into", filename, "- now building metadata");
                             let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(details["sketchpadTrackId"]);
                             let pattern = details["pattern"];
-                            let metadata = {
-                                "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
-                                "ZYNTHBOX_SYNC_SPEED_TO_BPM": true,
-                                "ZYNTHBOX_PATTERN_JSON": pattern.toJson(),
-                                "ZYNTHBOX_TRACK_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
-                                "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.trackRoutingStyle,
-                                "ZYNTHBOX_ACTIVELAYER": sketchpadTrack.getChannelSoundSnapshotJson(), // The layer setup which produced the sounds in this recording
-                                "ZYNTHBOX_TRACK_TYPE": sketchpadTrack.trackType, // The audio type of this channel
-                            };
-                            if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
-                                // Store the sample data, if we've been playing in a patterny sample mode
-                                metadata["ZYNTHBOX_SAMPLES"] = sketchpadTrack.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
-                                metadata["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = sketchpadTrack.samplePickingStyle; // The method by which samples are picked for playback mode
-                            }
                             // Set up the loop points in the new recording
                             var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
                             // Reset this to beats (rather than pattern subbeats)
@@ -441,23 +427,22 @@ Zynthian.Popup {
                                     // playbackLength = playbackLength + patternDurationInBeats;
                                 }
                             }
-                            metadata["ZYNTHBOX_STARTPOSITION"] = startPosition;
-                            metadata["ZYNTHBOX_LENGTH"] = playbackLength;
-                            metadata["ZYNTHBOX_LOOPDELTA"] = loopDelta;
-                            metadata["ZYNTHBOX_LOOPDELTA2"] = loopDelta2;
-                            // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
-                            metadata["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = (Math.floor(playbackLength) === playbackLength);
-                            // Actually write the metadata to the recording
-                            _private.filePropertiesHelper.writeMetadata(filename, metadata);
-                            console.log("Wrote metadata:", JSON.stringify(metadata));
+                            // Set channel mode to loop
+                            sketchpadTrack.trackType = "sample-loop";
                             console.log("New sample starts at", startPosition, "seconds, has a playback length of", playbackLength, "beats, with a pattern length of", patternDurationInSeconds, "s and loop that starts at", loopDelta, "seconds, second loop point", loopDelta2, "seconds back from the stop point, and a pattern length of", patternDurationInBeats, "beats");
                             // Set the newly recorded file as the current slot's loop clip
                             let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
                             let clip = sketchpadTrack.getClipsModelByPart(details["partId"]).getClip(details["sceneId"]);
                             clip.set_path(filename, false);
+                            // Update metadata properties
+                            clip.metadata.startPosition = startPosition;
+                            clip.metadata.length = playbackLength;
+                            clip.metadata.loopDelta = loopDelta;
+                            clip.metadata.loopDelta2 = loopDelta2;
+                            // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
+                            clip.metadata.snapLengthToBeat = (Math.floor(playbackLength) === playbackLength);
+                            clip.metadata.write(true)
                             console.log("...and the clip says it is", clip.duration, "seconds long");
-                            // Set channel mode to loop
-                            sketchpadTrack.trackType = "sample-loop";
                         }
 
                         // Clean up the temporary segments model

@@ -587,14 +587,17 @@ class sketchpad_clip_metadata(QObject):
                 self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", write=False, force=True)
                 self.updateBpmDependantValues()
 
-    @Slot(bool, str, str)
+    @Slot(bool)
     def write(self, writeSoundMetadata=False):
         if not self.clip.isEmpty:
+            logging.debug(f"Writing metadata : writeSoundMetadata({writeSoundMetadata})")
             tags = {}
             if writeSoundMetadata:
+                # When writing sound metadata, first set updated values to the respective properties and then write
                 self.set_audioType(self.clip.channel.trackType, write=False, force=True)
                 self.set_audioTypeSettings(self.clip.channel.getAudioTypeSettings(), write=False, force=True)
                 self.set_midiRecording(self.clip.zynqtgui.sketchpad.lastRecordingMidi, write=False, force=True)
+                # TODO : Metadata Check if fetching the pattern json is correct or not
                 self.set_patternJson(Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(self.clip.channel.id, self.clip.channel.selectedPart), write=False, force=True)
                 self.set_routingStyle(self.clip.channel.trackRoutingStyle, write=False, force=True)
                 self.set_samplePickingStyle(self.clip.channel.samplePickingStyle, write=False, force=True)

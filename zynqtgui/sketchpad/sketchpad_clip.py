@@ -598,6 +598,7 @@ class sketchpad_clip_metadata(QObject):
                 self.set_patternJson(Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(self.clip.channel.id, self.clip.channel.selectedPart), write=False, force=True)
                 self.set_routingStyle(self.clip.channel.trackRoutingStyle, write=False, force=True)
                 self.set_samplePickingStyle(self.clip.channel.samplePickingStyle, write=False, force=True)
+                # TODO : Metadata Check why serializing samples is throwing the following error : Object of type bytes is not JSON serializable
                 # self.set_samples(self.clip.channel.getChannelSampleSnapshot(), write=False, force=True)
                 self.set_soundSnapshot(self.clip.channel.getChannelSoundSnapshotJson(), write=False, force=True)
 

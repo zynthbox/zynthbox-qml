@@ -131,7 +131,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
-            controlObj: root.controlObj != null ? root.controlObj.metadata : null
+            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             controlProperty: "gain"
             valueString: root.controlObj && root.controlObj.metadata.gain != null ? qsTr("%1 dB").arg(parseInt(Zynthian.CommonUtils.interp(root.controlObj.metadata.gain, 0, 1, -100, 24))) : 0
             Layout.fillWidth: true
@@ -152,7 +152,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch")
-            controlObj: root.controlObj != null ? root.controlObj.metadata : null
+            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             controlProperty: "pitch"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -172,12 +172,12 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio")
-            controlObj: root.controlObj != null ? root.controlObj.metadata : null
+            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             Timer {
                 id: timeDialThrottle
                 interval: 1; running: false; repeat: false;
                 onTriggered: {
-                    timeDial.controlObj = root.controlObj;
+                    timeDial.controlObj = root.controlObj.metadata;
                 }
             }
             Connections {
@@ -185,7 +185,7 @@ ColumnLayout {
                 onControlObjChanged: timeDialThrottle.restart()
             }
             Connections {
-                target: root.controlObj.metadata
+                target: timeDial.controlObj
                 onSpeedRatioChanged: {
                     if (timeDial.dial.value !== root.controlObj.metadata.speedRatio) {
                         timeDial.dial.value = root.controlObj.metadata.speedRatio
@@ -242,7 +242,7 @@ ColumnLayout {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
-                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj != null ? root.controlObj.metadata.bpm : 0)
+                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.bpm : 0)
                         acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
                         rejectText: "No"
                         onAccepted: {

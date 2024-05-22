@@ -131,7 +131,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
-            controlObj: root.controlObj.metadata
+            controlObj: root.controlObj != null ? root.controlObj.metadata : null
             controlProperty: "gain"
             // TODO : Metadata Gain should be in dB
             valueString: root.controlObj && root.controlObj.metadata.gain != null ? root.controlObj.metadata.gain.toFixed(1) : 0
@@ -153,7 +153,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch")
-            controlObj: root.controlObj.metadata
+            controlObj: root.controlObj != null ? root.controlObj.metadata : null
             controlProperty: "pitch"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -173,7 +173,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio")
-            controlObj: root.controlObj.metadata
+            controlObj: root.controlObj != null ? root.controlObj.metadata : null
             Timer {
                 id: timeDialThrottle
                 interval: 1; running: false; repeat: false;
@@ -195,7 +195,7 @@ ColumnLayout {
             }
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.speedRatio : false
+            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.syncSpeedToBpm : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -243,7 +243,7 @@ ColumnLayout {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
-                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj.metadata.bpm)
+                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj != null ? root.controlObj.metadata.bpm : 0)
                         acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
                         rejectText: "No"
                         onAccepted: {

@@ -399,10 +399,10 @@ Zynthian.Popup {
                                 "ZYNTHBOX_BPM": Zynthbox.SyncTimer.bpm,
                                 "ZYNTHBOX_SYNC_SPEED_TO_BPM": true,
                                 "ZYNTHBOX_PATTERN_JSON": pattern.toJson(),
-                                "ZYNTHBOX_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
+                                "ZYNTHBOX_TRACK_AUDIOTYPESETTINGS": sketchpadTrack.getAudioTypeSettings(),
                                 "ZYNTHBOX_ROUTING_STYLE": sketchpadTrack.trackRoutingStyle,
                                 "ZYNTHBOX_ACTIVELAYER": sketchpadTrack.getChannelSoundSnapshotJson(), // The layer setup which produced the sounds in this recording
-                                "ZYNTHBOX_AUDIO_TYPE": sketchpadTrack.trackType, // The audio type of this channel
+                                "ZYNTHBOX_TRACK_TYPE": sketchpadTrack.trackType, // The audio type of this channel
                             };
                             if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
                                 // Store the sample data, if we've been playing in a patterny sample mode

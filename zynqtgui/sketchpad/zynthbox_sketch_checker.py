@@ -37,10 +37,10 @@ def testIsSketch(filename):
             # Basic testing out of the way at this point, time to actually perform Zynthbox Sketch linting
             if "ZYNTHBOX_BPM" in tagFile.tags:
                 if "ZYNTHBOX_PATTERN_JSON" in tagFile.tags:
-                    if "ZYNTHBOX_AUDIOTYPESETTINGS" in tagFile.tags:
+                    if "ZYNTHBOX_TRACK_AUDIOTYPESETTINGS" in tagFile.tags:
                         if "ZYNTHBOX_ROUTING_STYLE" in tagFile.tags:
                             if "ZYNTHBOX_ACTIVELAYER" in tagFile.tags:
-                                if "ZYNTHBOX_AUDIO_TYPE" in tagFile.tags:
+                                if "ZYNTHBOX_TRACK_TYPE" in tagFile.tags:
                                     # This can now be assumed to be a valid Zynthbox Sketch file
                                     # Let's construct some suggested tags to go with the validation
                                     suggestedTags = []
@@ -62,11 +62,11 @@ def testIsSketch(filename):
                                         suggestedTags.append(f"music##scale={scale}")
                                     if "ZYNTHBOX_SAMPLES" in tagFile.tags:
                                         pass
-                                    if len(tagFile.tags["ZYNTHBOX_AUDIOTYPESETTINGS"]) == 1:
+                                    if len(tagFile.tags["ZYNTHBOX_TRACK_AUDIOTYPESETTINGS"]) == 1:
                                         audioType = "synth"
-                                        if tagFile.tags["ZYNTHBOX_AUDIOTYPESETTINGS"][0].startswith("sample-"):
+                                        if tagFile.tags["ZYNTHBOX_TRACK_AUDIOTYPESETTINGS"][0].startswith("sample-"):
                                             audioType = "sample"
-                                        elif tagFile.tags["ZYNTHBOX_AUDIOTYPESETTINGS"][0] == "external":
+                                        elif tagFile.tags["ZYNTHBOX_TRACK_AUDIOTYPESETTINGS"][0] == "external":
                                             audioType = "sample"
                                         suggestedTags.append(f"zynthbox##audiotype={audioType}")
                                     resultData = {"isValid": True, "suggestedTags": suggestedTags}

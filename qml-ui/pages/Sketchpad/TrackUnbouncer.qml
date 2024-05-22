@@ -229,11 +229,11 @@ Zynthian.DialogQuestion {
                     }
                     // - Pick out the specific clip selected for sound source
                     let originSketch = _private.sketches[_private.soundSourceSketch];
-                    //   - Set track trackType to match ZYNTHBOX_AUDIO_TYPE (clip.metadata.audioType)
+                    //   - Set track trackType to match ZYNTHBOX_TRACK_TYPE (clip.metadata.audioType)
                     _private.sketchpadTrack.trackType = originSketch.metadata.audioType;
                     //   - Set track trackRoutingStyle to match ZYNTHBOX_ROUTING_STYLE (clip.metadata.routingStyle)
                     _private.sketchpadTrack.trackRoutingStyle = originSketch.metadata.routingStyle;
-                    //   - Set track setAudioTypeSettings to ZYNTHBOX_AUDIOTYPESETTINGS (clip.metadata.audioTypeSettings)
+                    //   - Set track setAudioTypeSettings to ZYNTHBOX_TRACK_AUDIOTYPESETTINGS (clip.metadata.audioTypeSettings)
                     _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadata.audioTypeSettings);
                     //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
                     _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadata.soundSnapshot);

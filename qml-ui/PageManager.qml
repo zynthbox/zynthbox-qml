@@ -49,7 +49,6 @@ Zynthian.Stack {
         "hardware":"HardwarePage.qml",
         "playgrid": "PlayGrid.qml",
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
-        "channel": "ChannelPage.qml",
         "channel_external_setup": "ChannelExternalSetup.qml",
         "channel_wave_editor": "ChannelWaveEditor.qml",
         "song_manager": "SongManagerPage.qml",

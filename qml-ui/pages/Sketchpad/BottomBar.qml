@@ -166,7 +166,7 @@ Rectangle {
                              && !zynqtgui.bottomBarControlObj.isEmpty
 
                     onClicked: {
-                        zynqtgui.bottomBarControlObj.metadata.write();
+                        zynqtgui.bottomBarControlObj.metadata.writeMetadataWithoutSoundData();
                     }
                 }
 

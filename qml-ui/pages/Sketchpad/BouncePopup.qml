@@ -441,7 +441,7 @@ Zynthian.Popup {
                             clip.metadata.loopDelta2 = loopDelta2;
                             // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
                             clip.metadata.snapLengthToBeat = (Math.floor(playbackLength) === playbackLength);
-                            clip.metadata.write(true)
+                            clip.metadata.writeMetadataWithSoundData()
                             console.log("...and the clip says it is", clip.duration, "seconds long");
                         }
 

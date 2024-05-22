@@ -587,7 +587,14 @@ class sketchpad_clip_metadata(QObject):
                 self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", write=False, force=True)
                 self.updateBpmDependantValues()
 
-    @Slot(bool)
+    @Slot()
+    def writeMetadataWithoutSoundData(self):
+        self.write(writeSoundMetadata=False)
+
+    @Slot()
+    def writeMetadataWithSoundData(self):
+        self.write(writeSoundMetadata=True)
+
     def write(self, writeSoundMetadata=False):
         if not self.clip.isEmpty:
             logging.debug(f"Writing metadata : writeSoundMetadata({writeSoundMetadata})")

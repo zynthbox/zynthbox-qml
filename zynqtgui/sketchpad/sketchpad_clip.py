@@ -740,6 +740,8 @@ class sketchpad_clip(QObject):
         self.__song__.scenesModel.selected_scene_index_changed.connect(self.__sync_in_current_scene_timer__.start)
 
         self.path_changed.connect(self.zynqtgui.zynautoconnect_audio)
+        self.__metadata.soundSnapshotChanged.connect(self.sketchContainsSoundChanged.emit)
+        self.__metadata.samplesChanged.connect(self.sketchContainsSamplesChanged.emit)
 
     # A helper method to generate unique name when copying a wave file into a folder
     # Arg file : Full Path of file to be copied
@@ -1138,22 +1140,23 @@ class sketchpad_clip(QObject):
 
     ### BEGIN Property sketchContainsSound
     def get_sketchContainsSound(self):
-        # TODO : Metadata
-        return False;
-
-    sound_data_changed = Signal()
-
-    sketchContainsSound = Property(bool, get_sketchContainsSound, notify=sound_data_changed)
+        if self.metadata.soundSnapshot is not None:
+            metadata = self.zynqtgui.layer.sound_metadata_from_json(self.metadata.soundSnapshot)
+            # If there are 1 or more layers in snapshot, return True
+            return len(metadata) > 0
+        return False
+    sketchContainsSoundChanged = Signal()
+    sketchContainsSound = Property(bool, get_sketchContainsSound, notify=sketchContainsSoundChanged)
     ### END Property sketchContainsSound
 
     ### BEGIN Property sketchContainsSamples
     def get_sketchContainsSamples(self):
-        # TODO : Metadata
+        if self.metadata.samples is not None:
+            # If there are 1 or more smples in metadata, return True
+            return len(self.metadata.samples) > 0
         return False
-
-    samples_data_changed = Signal()
-
-    sketchContainsSamples = Property(bool, get_sketchContainsSamples, notify=samples_data_changed)
+    sketchContainsSamplesChanged = Signal()
+    sketchContainsSamples = Property(bool, get_sketchContainsSamples, notify=sketchContainsSamplesChanged)
     ### END Property sketchContainsSamples
 
     @Signal

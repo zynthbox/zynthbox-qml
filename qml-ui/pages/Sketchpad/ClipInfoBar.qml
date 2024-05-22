@@ -61,13 +61,12 @@ GridLayout {
             radius: 4
             color: Kirigami.Theme.backgroundColor
 
-            // TODO : Metadata
             ListView {
                 anchors.fill: parent
                 clip: true
-                model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
+                model: controlObj.hasOwnProperty("sketchContainsSound") && controlObj.sketchContainsSound ? zynqtgui.layer.sound_metadata_from_json(controlObj.metadata.soundSnapshot) : []
                 delegate: Kirigami.BasicListItem {
-                    label: modelData
+                    label: "%1 > %2".arg(modelData["name"]).arg(modelData["preset_name"])
                     highlighted: false
                     hoverEnabled: false
                 }

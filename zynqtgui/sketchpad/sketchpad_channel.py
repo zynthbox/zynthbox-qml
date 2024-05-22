@@ -2349,7 +2349,7 @@ class sketchpad_channel(QObject):
             if sample is not None and sample.path is not None and len(sample.path) > 0:
                 thisSample["filename"] = sample.filename
                 with open(sample.path, "rb") as file:
-                    thisSample["sampledata"] = base64.b64encode(file.read())
+                    thisSample["sampledata"] = base64.b64encode(file.read()).decode("utf-8")
             encodedSampleData[index] = thisSample
         return json.dumps(encodedSampleData)
 

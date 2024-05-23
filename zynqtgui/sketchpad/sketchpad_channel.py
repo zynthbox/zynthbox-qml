@@ -223,7 +223,8 @@ class sketchpad_channel(QObject):
         for laneId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
             channelClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.__id__ * 5 + laneId]
             self.__trackPassthroughClients.insert(laneId, channelClient)
-            channelClient.mutedChanged.connect(lambda theClient=channelClient:handlePassthroughClientMutedChanged(theClient))
+            # Make the muted change handler a direct connection so playChannelSolo do not get updated while handling the muted state change
+            channelClient.mutedChanged.connect(lambda theClient=channelClient:handlePassthroughClientMutedChanged(theClient), Qt.DirectConnection)
             # channelClient.wetFx1AmountChanged.connect(lambda theClient=channelClient:handlePassthroughClientWetFx1AmountChanged(theClient))
             # channelClient.wetFx2AmountChanged.connect(lambda theClient=channelClient:handlePassthroughClientWetFx2AmountChanged(theClient))
             fxClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
@@ -1304,6 +1305,7 @@ class sketchpad_channel(QObject):
 
     def set_muted(self, muted):
         if self.__muted__ != muted:
+            logging.debug(f"$$ Setting muted for Track {self.name} to : {muted}")
             self.__muted__ = muted
             for laneId in range(0, 5):
                 Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId].setMuted(muted)

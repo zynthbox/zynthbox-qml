@@ -189,7 +189,8 @@ Rectangle {
 
                                                 anchors.fill: parent
 
-                                                enabled: !model.channel.muted
+                                                // Disable when muted or channel is not being played in solo mode
+                                                enabled: (zynqtgui.sketchpad.song.playChannelSolo === -1 && !model.channel.muted) || zynqtgui.sketchpad.song.playChannelSolo === model.channel.id
                                                 headerTextVisible: false
                                                 audioLeveldB: visible && !model.channel.muted
                                                                 ? Zynthbox.AudioLevels.channels[model.channel.id]

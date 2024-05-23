@@ -664,7 +664,19 @@ class sketchpad_song(QObject):
         return self.__play_channel_solo
 
     def set_playChannelSolo(self, value):
+        """
+        Passthrough client's setMuted change is handled on sketchpad_channel to update the channel muted state. The muted handler on sketchpad_channel
+        depends on playChannelSolo property to determine if the current muted state of channel is due to solo mode. Hence, update the playChannelSolo first
+        before doing any change to muted state when starting solo mode and when ending solo mode, change value after muted state alteration is done
+        TODO : Find a better way to do this later. For now this does the job.
+        """
         if self.__play_channel_solo != value:
+            valueUpdated = False
+            if value > -1:
+                self.__play_channel_solo = value
+                self.playChannelSoloChanged.emit()
+                valueUpdated = True
+
             for channel_index in range(self.channelsModel.count):
                 channel = self.channelsModel.getChannel(channel_index)
                 if value == -1:
@@ -677,8 +689,9 @@ class sketchpad_song(QObject):
                     for laneId in range(0, 5):
                         Zynthbox.Plugin.instance().trackPassthroughClients()[channel.id * 5 + laneId].setMuted(True)
 
-            self.__play_channel_solo = value
-            self.playChannelSoloChanged.emit()
+            if not valueUpdated:
+                self.__play_channel_solo = value
+                self.playChannelSoloChanged.emit()
 
     playChannelSoloChanged = Signal()
 

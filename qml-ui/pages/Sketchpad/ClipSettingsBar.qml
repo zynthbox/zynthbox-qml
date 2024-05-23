@@ -131,9 +131,9 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
-            controlObj: root.clipAudioSource
-            controlProperty: "gainAbsolute"
-            valueString: root.controlObj && root.controlObj.gain ? root.controlObj.gain.toFixed(1) : 0
+            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
+            controlProperty: "gain"
+            valueString: root.controlObj && root.controlObj.metadata.gain != null ? qsTr("%1 dB").arg(parseInt(Zynthian.CommonUtils.interp(root.controlObj.metadata.gain, 0, 1, -100, 24))) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -145,57 +145,14 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.gain = root.controlObj.initialGain;
+                root.controlObj.metadata.gain = root.controlObj.initialGain;
             }
         }
-
-        // Zynthian.SketchpadDial {
-        //     id: startDial
-        //     text: qsTr("Start (secs)")
-        //     controlObj: root.controlObj
-        //     controlProperty: "startPosition"
-        //     valueString: dial.value.toFixed(2)
-        //     buttonStepSize: 0.01
-        //     Layout.fillWidth: true
-        //     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-        //     Layout.maximumHeight: Kirigami.Units.gridUnit * 8
-        //
-        //     dial {
-        //         stepSize: root.controlObj && root.controlObj.hasOwnProperty("secPerBeat") ? root.controlObj.secPerBeat : 0.01
-        //         from: 0
-        //         to: root.controlObj && root.controlObj.hasOwnProperty("duration") ? root.controlObj.duration : 0
-        //     }
-        //
-        //     onDoubleClicked: {
-        //         root.controlObj.startPosition = root.controlObj.initialStartPosition;
-        //     }
-        // }
-
-        // Zynthian.SketchpadDial {
-        //     id: lengthDial
-        //     text: qsTr("Length (beats)")
-        //     controlObj: root.controlObj
-        //     controlProperty: "length"
-        //     valueString: dial.value.toFixed(2)
-        //     Layout.fillWidth: true
-        //     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-        //     Layout.maximumHeight: Kirigami.Units.gridUnit * 8
-        //
-        //     dial {
-        //         stepSize: 1
-        //         from: 1
-        //         to: 64
-        //     }
-        //
-        //     onDoubleClicked: {
-        //         root.controlObj.length = root.controlObj.initialLength;
-        //     }
-        // }
 
         Zynthian.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch")
-            controlObj: root.controlObj
+            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             controlProperty: "pitch"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -208,19 +165,19 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.pitch = root.controlObj.initialPitch;
+                root.controlObj.metadata.pitch = root.controlObj.initialPitch;
             }
         }
 
         Zynthian.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio")
-            controlObj: root.controlObj
+            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             Timer {
                 id: timeDialThrottle
                 interval: 1; running: false; repeat: false;
                 onTriggered: {
-                    timeDial.controlObj = root.controlObj;
+                    timeDial.controlObj = root.controlObj.metadata;
                 }
             }
             Connections {
@@ -228,16 +185,16 @@ ColumnLayout {
                 onControlObjChanged: timeDialThrottle.restart()
             }
             Connections {
-                target: root.controlObj
+                target: timeDial.controlObj
                 onSpeedRatioChanged: {
-                    if (timeDial.dial.value !== root.controlObj.speedRatio) {
-                        timeDial.dial.value = root.controlObj.speedRatio
+                    if (timeDial.dial.value !== root.controlObj.metadata.speedRatio) {
+                        timeDial.dial.value = root.controlObj.metadata.speedRatio
                     }
                 }
             }
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? !root.controlObj.metadataSyncSpeedToBpm : false
+            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.syncSpeedToBpm : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -249,7 +206,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.speedRatio = root.controlObj.initialSpeedRatio;
+                root.controlObj.metadata.speedRatio = root.controlObj.initialSpeedRatio;
             }
         }
 
@@ -285,11 +242,11 @@ ColumnLayout {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
-                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj.metadataBPM)
+                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.bpm : 0)
                         acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
                         rejectText: "No"
                         onAccepted: {
-                            root.controlObj.metadataBPM = bpmGuessedDialog.guessedBPM;
+                            root.controlObj.metadata.bpm = bpmGuessedDialog.guessedBPM;
                         }
                     }
                 }
@@ -306,7 +263,7 @@ ColumnLayout {
                 horizontalAlignment: TextInput.AlignHCenter
                 focus: false
                 text: enabled
-                        ? root.controlObj && root.controlObj.metadataBPM ? (root.controlObj.metadataBPM <= 0 ? "" : root.controlObj.metadataBPM) : ""
+                        ? root.controlObj && root.controlObj.metadata.bpm ? (root.controlObj.metadata.bpm <= 0 ? "" : root.controlObj.metadata.bpm) : ""
                         : ""
                 // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
@@ -319,8 +276,8 @@ ColumnLayout {
                 enabled: root.controlObj ? true : false
                 onTextChanged: {
                     var newValue = parseFloat(text);
-                    if (text !== "" && root.controlObj.metadataBPM !== newValue) {
-                        root.controlObj.metadataBPM = newValue;
+                    if (text !== "" && root.controlObj.metadata.bpm !== newValue) {
+                        root.controlObj.metadata.bpm = newValue;
                     }
                 }
             }
@@ -334,10 +291,10 @@ ColumnLayout {
                 id: syncSwitch
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                checked: root.controlObj && root.controlObj.hasOwnProperty("metadataSyncSpeedToBpm") ? root.controlObj.metadataSyncSpeedToBpm : true
-                enabled: root.controlObj && root.controlObj.metadataBPM > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.syncSpeedToBpm : false
+                enabled: root.controlObj && root.controlObj.metadata.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
-                    root.controlObj.metadataSyncSpeedToBpm = checked
+                    root.controlObj.metadata.syncSpeedToBpm = checked
                 }
             }
 
@@ -473,9 +430,9 @@ ColumnLayout {
             QQC2.Switch {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.snapLengthToBeat : true
+                checked: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.snapLengthToBeat : true
                 onToggled: {
-                    root.controlObj.snapLengthToBeat = checked
+                    root.controlObj.metadata.snapLengthToBeat = checked
                 }
             }
             Item {
@@ -491,26 +448,5 @@ ColumnLayout {
             }
         }
     }
-
-    // ColumnLayout {
-    //     Layout.fillWidth: true
-    //     Layout.alignment: Qt.AlignRight | Qt.AlignBottom
-    //     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-    // 
-    //     QQC2.Label {
-    //         visible: root.controlObj && root.controlObj.soundData ? root.controlObj.soundData.length <= 0 : false
-    //         text: "<No Metadata>"
-    //     }
-    //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty && root.controlObj.metadataAudioType
-    //         text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
-    //         font.pointSize: 10
-    //     }
-    //     QQC2.Label {
-    //         visible: root.controlType === "bottombar-controltype-clip" && !root.controlObj.isEmpty
-    //         text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
-    //         font.pointSize: 10
-    //     }
-    // }
 }
 

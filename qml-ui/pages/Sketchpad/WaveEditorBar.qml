@@ -92,7 +92,7 @@ GridLayout {
         property real pixelToSecs: (wav.end - wav.start) / width
 
         // Calculate amount of pixels represented by 1 beat
-        property real pixelsPerBeat: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("speedRatio") ? (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.speedRatio) / wav.pixelToSecs : 1
+        property real pixelsPerBeat: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("metadata") ? (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.metadata.speedRatio) / wav.pixelToSecs : 1
 
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -179,7 +179,7 @@ GridLayout {
                         let delta = wav.pixelToSecs * (mouse.x - lastX)
 
                         // Set startposition on swipe
-                        waveBar.controlObj.startPosition += delta
+                        waveBar.controlObj.metadata.startPosition += delta
                     }
                 }
             }
@@ -210,7 +210,7 @@ GridLayout {
                 onXChanged: {
                     if (startHandleDragHandler.active) {
                         // Set startposition on swipe
-                        waveBar.controlObj.startPosition = wav.pixelToSecs * x
+                        waveBar.controlObj.metadata.startPosition = wav.pixelToSecs * x
                     }
                 }
 
@@ -252,7 +252,7 @@ GridLayout {
 
                 onXChanged: {
                     if (loopHandleDragHandler.active) {
-                        waveBar.controlObj.loopDelta = (loopHandle.x - startLoopLine.x) * wav.pixelToSecs
+                        waveBar.controlObj.metadata.loopDelta = (loopHandle.x - startLoopLine.x) * wav.pixelToSecs
                     }
                 }
 
@@ -289,8 +289,8 @@ GridLayout {
                 opacity: 1
                 text: waveBar.controlObj
                         ? qsTr("%1:%2 E", "End")
-                            .arg(Math.floor(waveBar.controlObj.length / 4))
-                            .arg((waveBar.controlObj.length % 4).toFixed(waveBar.controlObj.snapLengthToBeat ? 0 : 2))
+                            .arg(Math.floor(waveBar.controlObj.metadata.length / 4))
+                            .arg((waveBar.controlObj.metadata.length % 4).toFixed(waveBar.controlObj.metadata.snapLengthToBeat ? 0 : 2))
                         : ""
                 z: 100
 
@@ -298,19 +298,19 @@ GridLayout {
                     if (endHandleDragHandler.drag.active) {
                         let calculatedLength
 
-                        if (waveBar.controlObj.snapLengthToBeat) {
+                        if (waveBar.controlObj.metadata.snapLengthToBeat) {
                             calculatedLength = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/wav.pixelsPerBeat))
                         } else {
                             calculatedLength = Math.abs((endHandle.x + endHandle.width - startLoopLine.x)/wav.pixelsPerBeat);
                         }
 
-                        if (calculatedLength > 0 || waveBar.controlObj.length !== calculatedLength) {
-                            waveBar.controlObj.length = calculatedLength;
+                        if (calculatedLength > 0 || waveBar.controlObj.metadata.length !== calculatedLength) {
+                            waveBar.controlObj.metadata.length = calculatedLength;
                         }
 
                         // When dragging end handle, check and set loop handle to be not greater than end
                         if (loopLine.x > endLoopLine.x) {
-                            waveBar.controlObj.loopDelta = (endLoopLine.x - startLoopLine.x) * wav.pixelToSecs
+                            waveBar.controlObj.metadata.loopDelta = (endLoopLine.x - startLoopLine.x) * wav.pixelToSecs
                         }
                     }
                 }
@@ -343,7 +343,7 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.controlObj
-                    ? (waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width
+                    ? (waveBar.controlObj.metadata.startPosition / waveBar.controlObj.duration) * parent.width
                     : 0
             }
 
@@ -356,7 +356,7 @@ GridLayout {
                     bottom: parent.bottom
                 }
                 x: waveBar.controlObj
-                    ? startLoopLine.x + waveBar.controlObj.loopDelta/wav.pixelToSecs
+                    ? startLoopLine.x + waveBar.controlObj.metadata.loopDelta/wav.pixelToSecs
                     : 0
                 color: Kirigami.Theme.highlightColor
                 opacity: 0.6
@@ -379,7 +379,7 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.controlObj
-                    ? ((((60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.speedRatio) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
+                    ? ((((60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.metadata.speedRatio) * waveBar.controlObj.metadata.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.metadata.startPosition / waveBar.controlObj.duration) * parent.width)
                     : 0
                 onXChanged: {
                     if (!endHandleDragHandler.drag.active) {
@@ -494,17 +494,17 @@ GridLayout {
             // Slightly odd check - sometimes this will return a longer string, but as it's a
             // base64 encoding of a midi file, it'll be at least the header size of that if
             // it's useful, so... just check for bigger than 10, that'll do
-            visible: waveBar.controlObj != null && waveBar.controlObj.metadataMidiRecording != null && waveBar.controlObj.metadataMidiRecording.length > 10
+            visible: waveBar.controlObj != null && waveBar.controlObj.metadata.midiRecording != null && waveBar.controlObj.metadata.midiRecording.length > 10
             text: Zynthbox.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
             onClicked: {
                 if (Zynthbox.MidiRecorder.isPlaying) {
                     Zynthbox.MidiRecorder.stopPlayback();
                 } else {
-                    if (Zynthbox.MidiRecorder.loadFromBase64Midi(waveBar.controlObj.metadataMidiRecording)) {
+                    if (Zynthbox.MidiRecorder.loadFromBase64Midi(waveBar.controlObj.metadata.midiRecording)) {
                         Zynthbox.MidiRecorder.forceToChannel(Zynthbox.PlayGridManager.currentSketchpadTrack);
                         Zynthbox.MidiRecorder.playRecording();
                     } else {
-                        console.log("Failed to load recording from clip data, which is:\n", waveBar.controlObj.metadataMidiRecording);
+                        console.log("Failed to load recording from clip data, which is:\n", waveBar.controlObj.metadata.midiRecording);
                     }
                 }
             }

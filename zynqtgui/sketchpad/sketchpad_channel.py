@@ -149,6 +149,8 @@ class sketchpad_channel(QObject):
         for i in range(0, 5):
             newSample = sketchpad_clip(self.id, -1, -1, self.__song__, self, True)
             newSample.set_lane(i)
+            # Explicitly set channel as it is a channelSample
+            newSample.channel = self
             self.__samples__.append(newSample)
 
         self.__track_type__ = "synth"
@@ -461,7 +463,7 @@ class sketchpad_channel(QObject):
         obj = []
         for sample in self.__samples__:
             if sample.path is not None and len(sample.path) > 0:
-                sample.saveMetadata()
+                sample.metadata.scheduleWrite()
                 if sample.audioSource:
                     obj.append({"path": Path(sample.path).name,
                                 "keyZoneStart": sample.audioSource.keyZoneStart(),

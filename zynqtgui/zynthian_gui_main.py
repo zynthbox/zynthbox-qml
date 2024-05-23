@@ -340,10 +340,6 @@ class zynthian_gui_main(zynthian_gui_selector):
         logging.info("Play Grid")
         self.zynqtgui.show_modal("playgrid")
 
-    def channel(self):
-        logging.info("Channel")
-        self.zynqtgui.show_modal("channel")
-
     def sketchpad(self):
         logging.info("Sketchpad")
         self.zynqtgui.show_modal("sketchpad")

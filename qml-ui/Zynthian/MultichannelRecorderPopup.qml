@@ -252,7 +252,7 @@ Zynthian.Dialog {
                             let channel = zynqtgui.sketchpad.song.channelsModel.getChannel(filenameIndex - 2);
                             if (channel) { // by all rights this should not be possible, but... best safe
                                 metadata["ZYNTHBOX_ACTIVELAYER"] = channel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
-                                metadata["ZYNTHBOX_AUDIO_TYPE"] = channel.trackType; // The audio type of this channel
+                                metadata["ZYNTHBOX_TRACK_TYPE"] = channel.trackType; // The audio type of this channel
                                 if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
                                     // Store the sample data, if we've been playing in a patterny sample mode
                                     metadata["ZYNTHBOX_SAMPLES"] = channel.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)

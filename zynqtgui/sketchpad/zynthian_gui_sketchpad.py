@@ -1016,32 +1016,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
-            try:
-                layer = self.zynqtgui.layer.generate_snapshot(currentChannel)
-                # logging.debug(f"### Channel({self.zynqtgui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
-            except:
-                layer = None
 
             self.zynqtgui.currentTaskMessage = "Loading recording to clip"
             self.clip_to_record.set_path(self.clip_to_record_path, False)
-
-            self.zynqtgui.currentTaskMessage = "Storing metadata into clip"
-            if layer is not None:
-                self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-            self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
-            if currentChannel.trackType == "sample-loop":
-                # If the track is set to sample-loop, then the track is actually playing synth sounds
-                self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", ["synth"])
-            else:
-                self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.trackType])
-            self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
-            self.clip_to_record.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [currentChannel.getAudioTypeSettings()])
-            self.clip_to_record.write_metadata("ZYNTHBOX_ROUTING_STYLE", [currentChannel.trackRoutingStyle])
-            self.clip_to_record.metadataSyncSpeedToBpm = True
-            if (currentChannel.trackType == "sample-trig" or currentChannel.trackType == "sample-slice"):
-                self.clip_to_record.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
-
             self.clip_to_record.enabled = True
+            self.clip_to_record.metadata.write(writeSoundMetadata=True)
 
             # Set same recorded clip to other additional clips
             for clip in self.clips_to_record:
@@ -1050,16 +1029,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if clip != self.clip_to_record:
                     clip.enabled = True
                     clip.set_path(self.clip_to_record_path, True)
-                    if layer is not None:
-                        clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-                    clip.write_metadata("ZYNTHBOX_BPM", [str(Zynthbox.SyncTimer.instance().getBpm())])
-                    clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [currentChannel.trackType])
-                    clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
-                    clip.write_metadata("ZYNTHBOX_AUDIOTYPESETTINGS", [currentChannel.getAudioTypeSettings()])
-                    clip.write_metadata("ZYNTHBOX_ROUTING_STYLE", [currentChannel.trackRoutingStyle])
-                    clip.metadataSyncSpeedToBpm = True
-                    if (currentChannel.trackType == "sample-trig" or currentChannel.trackType == "sample-slice"):
-                        clip.write_metadata(["ZYNTHBOX_SAMPLES"], [currentChannel.getChannelSampleSnapshot()])
+                    clip.metadata.write(writeSoundMetadata=True)
 
             if self.clip_to_record.isChannelSample:
                 logging.info("Recorded clip is a sample")

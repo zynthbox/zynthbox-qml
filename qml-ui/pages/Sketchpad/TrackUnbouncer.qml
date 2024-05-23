@@ -96,26 +96,26 @@ Zynthian.DialogQuestion {
                     let sketchSamples = [];
                     for (let sketchIndex = 0; sketchIndex < _private.sketches.length; ++sketchIndex) {
                         let sketch = _private.sketches[sketchIndex];
-                        if (sketch.metadataAudioType.length > 0) {
-                            if (sketch.metadataPatternJson.length > 0 || sketch.metadataMidiRecording.length > 10) {
+                        if (sketch.metadata.audioType.length > 0) {
+                            if (sketch.metadata.patternJson.length > 0 || sketch.metadata.midiRecording.length > 10) {
                                 let soundSourceIndex = -1;
                                 for (let detailIndex = 0; detailIndex < newDetails.length; ++detailIndex) {
                                     let otherSketch = newDetails[detailIndex].sketches[0];
-                                    if (sketch.metadataAudioType === otherSketch.metadataAudioType) {
+                                    if (sketch.metadata.audioType === otherSketch.metadata.audioType) {
                                         let stillTheSame = false;
-                                        if (sketch.metadataAudioType === "synth") {
-                                            if (sketch.metadataActiveLayer === otherSketch.metadataActiveLayer) {
+                                        if (sketch.metadata.audioType === "synth") {
+                                            if (sketch.metadata.soundSnapshot === otherSketch.metadata.soundSnapshot) {
                                                 stillTheSame = true;
                                             }
-                                        } else if (sketch.metadataAudioType === "sample-trig" || sketch.metadataAudioType === "sample-slice") {
-                                            if (sketch.metadataSamples === otherSketch.metadataSamples) {
+                                        } else if (sketch.metadata.audioType === "sample-trig" || sketch.metadata.audioType === "sample-slice") {
+                                            if (sketch.metadata.samples === otherSketch.metadata.samples) {
                                                 stillTheSame = true;
                                             }
                                         } else {
                                             _private.sketchLacksSoundInfo.push(sketch);
                                         }
                                         if (stillTheSame) {
-                                            if (sketch.metadataRoutingStyle === otherSketch.metadataRoutingStyle && sketch.metadataAudioTypeSettings === otherSketch.metadataAudioTypeSettings) {
+                                            if (sketch.metadata.routingStyle === otherSketch.metadata.routingStyle && sketch.metadata.audioTypeSettings === otherSketch.metadata.audioTypeSettings) {
                                                 // Then we've compared all the things that make the sounds the same,
                                                 // so... now we can say this matches us, and bail out
                                                 soundSourceIndex = detailIndex;
@@ -134,7 +134,7 @@ Zynthian.DialogQuestion {
                                     let hasSynthSlotDetails = false;
                                     let synthSlotDetails = ["","","","",""];
                                     let fxSlotDetails = ["","","","",""];
-                                    let layersData = zynqtgui.layer.sound_metadata_from_json(sketch.metadataActiveLayer);
+                                    let layersData = zynqtgui.layer.sound_metadata_from_json(sketch.metadata.soundSnapshot);
                                     for (let layerIndex = 0; layerIndex < layersData.length; ++layerIndex) {
                                         let layerData = layersData[layerIndex];
                                         let layerDetails = qsTr("%1 (%2)").arg(layerData["name"]).arg(layerData["preset_name"]);
@@ -170,8 +170,8 @@ Zynthian.DialogQuestion {
                                         }
                                         return createdDescription;
                                     }
-                                    if (sketch.metadataAudioType === "sample-trig" || sketch.metadataAudioType === "sample-slice") {
-                                        let sampleMetadata = sketch.metadataSamples;
+                                    if (sketch.metadata.audioType === "sample-trig" || sketch.metadata.audioType === "sample-slice") {
+                                        let sampleMetadata = sketch.metadata.samples;
                                         for (let sampleSlotIndex = 0; sampleSlotIndex < 5; ++sampleSlotIndex) {
                                             sampleSlotDetails[sampleSlotIndex] = sampleMetadata[sampleSlotIndex]["filename"];
                                         }
@@ -229,17 +229,17 @@ Zynthian.DialogQuestion {
                     }
                     // - Pick out the specific clip selected for sound source
                     let originSketch = _private.sketches[_private.soundSourceSketch];
-                    //   - Set track trackType to match ZYNTHBOX_AUDIO_TYPE (clip.metadataAudioType)
-                    _private.sketchpadTrack.trackType = originSketch.metadataAudioType;
-                    //   - Set track trackRoutingStyle to match ZYNTHBOX_ROUTING_STYLE (clip.metadataRoutingStyle)
-                    _private.sketchpadTrack.trackRoutingStyle = originSketch.metadataRoutingStyle;
-                    //   - Set track setAudioTypeSettings to ZYNTHBOX_AUDIOTYPESETTINGS (clip.metadataAudioTypeSettings)
-                    _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadataAudioTypeSettings);
-                    //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_ACTIVE_LAYER (clip.metadataActiveLayer)
-                    _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadataActiveLayer);
-                    //   - If trackType is sample-trig or sample-slice: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadataSamples))
+                    //   - Set track trackType to match ZYNTHBOX_TRACK_TYPE (clip.metadata.audioType)
+                    _private.sketchpadTrack.trackType = originSketch.metadata.audioType;
+                    //   - Set track trackRoutingStyle to match ZYNTHBOX_ROUTING_STYLE (clip.metadata.routingStyle)
+                    _private.sketchpadTrack.trackRoutingStyle = originSketch.metadata.routingStyle;
+                    //   - Set track setAudioTypeSettings to ZYNTHBOX_TRACK_AUDIOTYPESETTINGS (clip.metadata.audioTypeSettings)
+                    _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadata.audioTypeSettings);
+                    //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
+                    _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadata.soundSnapshot);
+                    //   - If trackType is sample-trig or sample-slice: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
                     if (_private.sketchpadTrack.trackType === "sample-trig" || _private.sketchpadTrack.trackType === "sample-slice") {
-                        _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadataSamples);
+                        _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadata.samples);
                     }
                     // - Run through the track's patterns
                     let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
@@ -253,20 +253,20 @@ Zynthian.DialogQuestion {
                         if (partSketch) {
                             partSketch.enabled = false;
                         }
-                    //   - If there is a sketch at that position, and it has pattern data, fill up the part's pattern data from that sketch (ZYNTHBOX_PATTERN_JSON - setFromJson(clip.metadataPatternJson))
-                        if (partSketch.metadataPatternJson !== null && partSketch.metadataPatternJson.length > 5) {
+                    //   - If there is a sketch at that position, and it has pattern data, fill up the part's pattern data from that sketch (ZYNTHBOX_PATTERN_JSON - setFromJson(clip.metadata.patternJson))
+                        if (partSketch.metadata.patternJson !== null && partSketch.metadata.patternJson.length > 5) {
                             console.log("Replace the slot's pattern content with the stored pattern");
-                            pattern.setFromJson(partSketch.metadataPatternJson)
+                            pattern.setFromJson(partSketch.metadata.patternJson)
                             if (enabledAPart === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
                                 let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 destinationClip.enabled = true;
                                 enabledAPart = true;
                             }
-                        } else if (partSketch.metadataMidiRecording !== null && partSketch.metadataMidiRecording.length > 10) {
+                        } else if (partSketch.metadata.midiRecording !== null && partSketch.metadata.midiRecording.length > 10) {
                             console.log("Replace the slot's pattern content by reconstructing from recorded midi");
                             // Load the recording into the global recorder track
-                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(partSketch.metadataMidiRecording, -1);
+                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(partSketch.metadata.midiRecording, -1);
                             // Apply that newly loaded recording to the pattern
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
                             if (enabledAPart === false) {

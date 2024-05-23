@@ -174,18 +174,18 @@ Zynthian.ScreenPage {
         var sample = root.selectedChannel.samples[slot]
         function valueSetter(value) {
             if (sample != null && !sample.isEmpty) {
-                sample.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
+                sample.gain = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "sample_gain",
                     description: qsTr("%1 Gain").arg(sample.path.split("/").pop()),
-                    start: -100,
-                    stop: 24,
-                    step: 1,
-                    defaultValue: 0,
-                    currentValue: parseInt(sample.gain),
+                    start: 0,
+                    stop: 1,
+                    step: 0.01,
+                    defaultValue: sample.initialGain,
+                    currentValue: parseFloat(sample.metadata.gain),
                     startLabel: "-100 dB",
                     stopLabel: "24 dB",
-                    valueLabel: qsTr("%1 dB").arg(sample.gain),
+                    valueLabel: qsTr("%1 dB").arg(Zynthian.CommonUtils.interp(sample.metadata.gain, 0, 1, -100, 24)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -195,7 +195,7 @@ Zynthian.ScreenPage {
                 applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sample"), 2000)
             }
         }
-        valueSetter(sample.gain + sign)
+        valueSetter(sample.metadata.gain + sign*0.01)
     }
     /**
      * Update selected sketch gain
@@ -208,18 +208,18 @@ Zynthian.ScreenPage {
         var clip = root.selectedChannel.getClipsModelByPart(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
-                clip.gain = Zynthian.CommonUtils.clamp(value, -100, 24)
+                clip.metadata.gain = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "clip_gain",
                     description: qsTr("%1 Gain").arg(clip.path.split("/").pop()),
-                    start: -100,
-                    stop: 24,
-                    step: 1,
-                    defaultValue: 0,
-                    currentValue: parseInt(clip.gain),
+                    start: 0,
+                    stop: 1,
+                    step: 0.01,
+                    defaultValue: clip.initialGain,
+                    currentValue: parseFloat(clip.metadata.gain),
                     startLabel: "-100 dB",
                     stopLabel: "24 dB",
-                    valueLabel: qsTr("%1 dB").arg(clip.gain),
+                    valueLabel: qsTr("%1 dB").arg(parseInt(Zynthian.CommonUtils.interp(clip.metadata.gain, 0, 1, -100, 24))),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -229,7 +229,7 @@ Zynthian.ScreenPage {
                 applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sketch"), 2000)
             }
         }
-        valueSetter(clip.gain + sign)
+        valueSetter(clip.metadata.gain + sign*0.01)
     }
     /**
      * Update selected channel volume
@@ -268,7 +268,7 @@ Zynthian.ScreenPage {
      */
     function updateClipStartPosition(clip, sign) {
         if (clip != null) {
-            clip.startPosition = Zynthian.CommonUtils.clamp(clip.startPosition + sign * 0.01, 0, clip.duration)
+            clip.metadata.startPosition = Zynthian.CommonUtils.clamp(clip.metadata.startPosition + sign * 0.01, 0, clip.duration)
         }
     }
     /**
@@ -326,7 +326,7 @@ Zynthian.ScreenPage {
      */
     function updateClipLoopPosition(clip, sign) {
         if (clip != null) {
-            clip.loopDelta = Zynthian.CommonUtils.clamp(clip.loopDelta + sign * 0.01, 0, clip.secPerBeat * clip.length)
+            clip.metadata.loopDelta = Zynthian.CommonUtils.clamp(clip.metadata.loopDelta + sign * 0.01, 0, clip.secPerBeat * clip.metadata.length)
         }
     }
     /**
@@ -336,10 +336,10 @@ Zynthian.ScreenPage {
      */
     function updateClipLength(clip, sign) {
         if (clip != null) {
-            if (clip.snapLengthToBeat) {
-                clip.length = Zynthian.CommonUtils.clamp(clip.length + sign * 1, 0, 64)
+            if (clip.metadata.snapLengthToBeat) {
+                clip.metadata.length = Zynthian.CommonUtils.clamp(clip.metadata.length + sign * 1, 0, 64)
             } else {
-                clip.length = Zynthian.CommonUtils.clamp(clip.length + sign * 0.01, 0, 64)
+                clip.metadata.length = Zynthian.CommonUtils.clamp(clip.metadata.length + sign * 0.01, 0, 64)
             }
         }
     }
@@ -391,7 +391,7 @@ Zynthian.ScreenPage {
      */
     function updateClipGain(clip, sign) {
         if (clip != null) {
-            clip.gain = Zynthian.CommonUtils.clamp(clip.gain + sign, -100, 24)
+            clip.metadata.gain = Zynthian.CommonUtils.clamp(clip.metadata.gain + sign*0.01, 0, 1)
         }
     }
     /**
@@ -401,7 +401,7 @@ Zynthian.ScreenPage {
      */
     function updateClipPitch(clip, sign) {
         if (clip != null) {
-            clip.pitch = Zynthian.CommonUtils.clamp(clip.pitch + sign, -12, 12)
+            clip.metadata.pitch = Zynthian.CommonUtils.clamp(clip.metadata.pitch + sign, -12, 12)
         }
     }
     /**
@@ -411,7 +411,7 @@ Zynthian.ScreenPage {
      */
     function updateClipSpeedRatio(clip, sign) {
         if (clip != null) {
-            clip.speedRatio = Zynthian.CommonUtils.clamp(clip.speedRatio + sign * 0.1, 0.5, 2)
+            clip.metadata.speedRatio = Zynthian.CommonUtils.clamp(clip.metadata.speedRatio + sign * 0.1, 0.5, 2)
         }
     }
     /**

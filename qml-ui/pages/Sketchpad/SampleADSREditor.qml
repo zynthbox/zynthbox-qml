@@ -117,13 +117,11 @@ GridLayout {
     }
 
     Zynthian.ADSRClipView {
+        // TODO : Metadata Knobs not working here on this tab
         id: clipSettingsADSR
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.margins: Kirigami.Units.largeSpacing
         clip: component.controlObj
-            ? Zynthbox.PlayGridManager.getClipById(component.controlObj.cppObjId)
-            : null
-        onSaveMetadata: component.controlObj.saveMetadata();
     }
 }

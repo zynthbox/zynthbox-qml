@@ -282,7 +282,7 @@ Zynthian.Popup {
                                 for (let partIndex = 0; partIndex < partsToBounce.length; ++partIndex) {
                                     let pattern = _private.sequence.getByPart(sketchpadTrackId, partsToBounce[partIndex]);
                                     if (pattern.hasNotes) {
-                                        let patternDurationInPatternSubbeats = pattern.width * pattern.availableBars * pattern.stepLength / patternSubbeatToTickMultiplier;
+                                        let patternDurationInPatternSubbeats = (pattern.patternLength * pattern.stepLength) / patternSubbeatToTickMultiplier;
                                         let patternRepeatCount = _private.patternRepeatCount; // How long are the tails expected (we just start with 1 here, until we work out how to properly expose this)
                                         let includeLeadin = _private.includeLeadin ? 1 : 0;
                                         let includeMainLoop = 1; // The main part can't be disabled anyway, so this is just a 1
@@ -375,8 +375,6 @@ Zynthian.Popup {
             }
             Timer {
                 id: endOfRecordingTimer
-                // enabled: _private.isRecording
-                // target: Zynthbox.PlayGridManager
                 property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 1
                 interval: 50; repeat: true; running: false;
                 onTriggered: {

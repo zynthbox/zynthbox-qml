@@ -484,7 +484,7 @@ class sketchpad_clip_metadata(QObject):
     adsrDecay = Property(float, get_adsrDecay, set_adsrDecay, notify=adsrDecayChanged)
     adsrRelease = Property(float, get_adsrRelease, set_adsrRelease, notify=adsrReleaseChanged)
     adsrSustain = Property(float, get_adsrSustain, set_adsrSustain, notify=adsrSustainChanged)
-    bpm = Property(int, get_bpm, set_bpm, notify=bpmChanged)
+    bpm = Property(float, get_bpm, set_bpm, notify=bpmChanged)
     gain = Property(float, get_gain, set_gain, notify=gainChanged)
     graineratorInterval = Property(float, get_graineratorInterval, set_graineratorInterval, notify=graineratorIntervalChanged)
     graineratorIntervalAdditional = Property(float, get_graineratorIntervalAdditional, set_graineratorIntervalAdditional, notify=graineratorIntervalAdditionalChanged)

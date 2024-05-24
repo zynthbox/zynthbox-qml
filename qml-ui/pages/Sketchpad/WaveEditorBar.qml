@@ -287,7 +287,7 @@ GridLayout {
                 }
                 font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                 opacity: 1
-                text: waveBar.controlObj
+                text: waveBar.controlObj && waveBar.controlObj.metadata
                         ? qsTr("%1:%2 E", "End")
                             .arg(Math.floor(waveBar.controlObj.metadata.length / 4))
                             .arg((waveBar.controlObj.metadata.length % 4).toFixed(waveBar.controlObj.metadata.snapLengthToBeat ? 0 : 2))
@@ -342,7 +342,7 @@ GridLayout {
                 color: Kirigami.Theme.positiveTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
-                x: waveBar.controlObj
+                x: waveBar.controlObj && waveBar.controlObj.metadata
                     ? (waveBar.controlObj.metadata.startPosition / waveBar.controlObj.duration) * parent.width
                     : 0
             }
@@ -355,7 +355,7 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                x: waveBar.controlObj
+                x: waveBar.controlObj && waveBar.controlObj.metadata
                     ? startLoopLine.x + waveBar.controlObj.metadata.loopDelta/wav.pixelToSecs
                     : 0
                 color: Kirigami.Theme.highlightColor
@@ -378,7 +378,7 @@ GridLayout {
                 color: Kirigami.Theme.neutralTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
-                x: waveBar.controlObj
+                x: waveBar.controlObj && waveBar.controlObj.metadata
                     ? ((((60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.metadata.speedRatio) * waveBar.controlObj.metadata.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.metadata.startPosition / waveBar.controlObj.duration) * parent.width)
                     : 0
                 onXChanged: {
@@ -494,7 +494,7 @@ GridLayout {
             // Slightly odd check - sometimes this will return a longer string, but as it's a
             // base64 encoding of a midi file, it'll be at least the header size of that if
             // it's useful, so... just check for bigger than 10, that'll do
-            visible: waveBar.controlObj != null && waveBar.controlObj.metadata.midiRecording != null && waveBar.controlObj.metadata.midiRecording.length > 10
+            visible: waveBar.controlObj != null && waveBar.controlObj.metadata && waveBar.controlObj.metadata.midiRecording != null && waveBar.controlObj.metadata.midiRecording.length > 10
             text: Zynthbox.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
             onClicked: {
                 if (Zynthbox.MidiRecorder.isPlaying) {

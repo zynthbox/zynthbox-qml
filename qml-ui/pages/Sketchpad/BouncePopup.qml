@@ -297,6 +297,7 @@ Zynthian.Popup {
                                             "sketchpadTrackId": sketchpadTrackId,
                                             "partId": partsToBounce[partIndex],
                                             "sceneId": sceneIndices[_private.trackName],
+                                            "trackType": sketchpadTrack.trackType,
                                             "recordingPrefix": recordingPrefix,
                                             "recordingSuffix": recordingSuffix,
                                             "recordingFilename": ""
@@ -393,12 +394,12 @@ Zynthian.Popup {
                             console.log("Successfully recorded a new sound file into", filename, "- now building metadata");
                             let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(details["sketchpadTrackId"]);
                             let pattern = details["pattern"];
-                            // Set up the loop points in the new recording
                             var patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
-                            // Reset this to beats (rather than pattern subbeats)
-                            let patternDurationInBeats = pattern.width * pattern.availableBars * pattern.stepLength / patternSubbeatToTickMultiplier;
+                            let patternDurationInBeats = _private.patternRepeatCount * (pattern.patternLength * pattern.stepLength) / patternSubbeatToTickMultiplier;
                             let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
+                            // Reset this to beats (rather than pattern subbeats)
                             patternDurationInBeats = patternDurationInBeats / 32;
+                            // Set up the loop points in the new recording
                             let startPosition = 0.0; // This is in seconds
                             let loopDelta = 0.0; // This is in seconds
                             // TODO Loop point 2 would allow us to have a start-at-0, loop-from-first-round, loop-until-fadeout, stop-at-end option (for a very clean recording which does play-into-loop-with-fadeout for playback)
@@ -432,14 +433,15 @@ Zynthian.Popup {
                             let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
                             let clip = sketchpadTrack.getClipsModelByPart(details["partId"]).getClip(details["sceneId"]);
                             clip.set_path(filename, false);
+                            clip.metadata.writeMetadataWithSoundData()
                             // Update metadata properties
+                            clip.metadata.audioType = details["trackType"];
                             clip.metadata.startPosition = startPosition;
                             clip.metadata.length = playbackLength;
                             clip.metadata.loopDelta = loopDelta;
                             clip.metadata.loopDelta2 = loopDelta2;
                             // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
                             clip.metadata.snapLengthToBeat = (Math.floor(playbackLength) === playbackLength);
-                            clip.metadata.writeMetadataWithSoundData()
                             console.log("...and the clip says it is", clip.duration, "seconds long");
                         }
 

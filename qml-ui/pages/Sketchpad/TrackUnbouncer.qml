@@ -230,7 +230,12 @@ Zynthian.DialogQuestion {
                     // - Pick out the specific clip selected for sound source
                     let originSketch = _private.sketches[_private.soundSourceSketch];
                     //   - Set track trackType to match ZYNTHBOX_TRACK_TYPE (clip.metadata.audioType)
-                    _private.sketchpadTrack.trackType = originSketch.metadata.audioType;
+                    if (originSketch.metadata.audioType === "sample-loop") {
+                        console.log("Sketch was recorded via synth sounds (but was in loop mode), so switch to that");
+                        _private.channel.trackType = "synth";
+                    } else {
+                        _private.sketchpadTrack.trackType = originSketch.metadata.audioType;
+                    }
                     //   - Set track trackRoutingStyle to match ZYNTHBOX_ROUTING_STYLE (clip.metadata.routingStyle)
                     _private.sketchpadTrack.trackRoutingStyle = originSketch.metadata.routingStyle;
                     //   - Set track setAudioTypeSettings to ZYNTHBOX_TRACK_AUDIOTYPESETTINGS (clip.metadata.audioTypeSettings)

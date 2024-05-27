@@ -232,7 +232,7 @@ Zynthian.DialogQuestion {
                     //   - Set track trackType to match ZYNTHBOX_TRACK_TYPE (clip.metadata.audioType)
                     if (originSketch.metadata.audioType === "sample-loop") {
                         console.log("Sketch was recorded via synth sounds (but was in loop mode), so switch to that");
-                        _private.channel.trackType = "synth";
+                        _private.sketchpadTrack.trackType = "synth";
                     } else {
                         _private.sketchpadTrack.trackType = originSketch.metadata.audioType;
                     }

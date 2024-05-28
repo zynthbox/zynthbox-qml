@@ -961,6 +961,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     Zynthbox.AudioLevels.instance().clearRecordPorts()
                     self.set_lastRecordingMidi(Zynthbox.MidiRecorder.instance().base64TrackMidi(Zynthbox.PlayGridManager.instance().currentSketchpadTrack()))
                     self.load_recorded_file_to_clip()
+                    self.set_lastRecordingMidi("")
 
                     self.set_clip_to_record(None)
                     self.clip_to_record_path = None

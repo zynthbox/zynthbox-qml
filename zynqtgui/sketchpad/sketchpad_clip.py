@@ -603,8 +603,16 @@ class sketchpad_clip_metadata(QObject):
                 self.set_audioType(self.clip.channel.trackType, write=False, force=True)
                 self.set_audioTypeSettings(self.clip.channel.getAudioTypeSettings(), write=False, force=True)
                 # TODO : Metadata Check if midi recording is correct or not
-                self.set_midiRecording(self.clip.zynqtgui.sketchpad.lastRecordingMidi, write=False, force=True)
-                self.set_patternJson(Zynthbox.PlayGridManager.instance().modelToJson(Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByPart(self.clip.channel.id, self.clip.channel.selectedPart)), write=False, force=True)
+                if self.clip.zynqtgui.sketchpad.lastRecordingMidi == "":
+                    # If there is no midi recording (that is, if this was not a live-recorded bit of audio), then save the clip's pattern data and ensure the midi recording meta is empty
+                    self.set_midiRecording("", write=False, force=True)
+                    sequenceObject = Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+                    patternObject = sequenceObject.getByPart(self.clip.channel.id, self.clip.channel.selectedPart)
+                    self.set_patternJson(patternObject.toJson(), write=False, force=True)
+                else:
+                    # If there is a midi recording, store that, and ensure the pattern json is empty
+                    self.set_midiRecording(self.clip.zynqtgui.sketchpad.lastRecordingMidi, write=False, force=True)
+                    self.set_patternJson("", write=False, force=True)
                 self.set_routingStyle(self.clip.channel.trackRoutingStyle, write=False, force=True)
                 self.set_samplePickingStyle(self.clip.channel.samplePickingStyle, write=False, force=True)
                 self.set_samples(self.clip.channel.getChannelSampleSnapshot(), write=False, force=True)

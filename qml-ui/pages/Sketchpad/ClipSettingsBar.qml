@@ -187,14 +187,14 @@ ColumnLayout {
             Connections {
                 target: timeDial.controlObj
                 onSpeedRatioChanged: {
-                    if (timeDial.dial.value !== root.controlObj.metadata.speedRatio) {
-                        timeDial.dial.value = root.controlObj.metadata.speedRatio
+                    if (timeDial.dial.value !== timeDial.controlObj.speedRatio) {
+                        timeDial.dial.value = timeDial.controlObj.speedRatio
                     }
                 }
             }
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? !root.controlObj.metadata.syncSpeedToBpm : false
+            enabled: timeDial.controlObj ? !timeDial.controlObj.syncSpeedToBpm : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -206,7 +206,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.metadata.speedRatio = root.controlObj.initialSpeedRatio;
+                timeDial.controlObj.speedRatio = root.controlObj.initialSpeedRatio;
             }
         }
 

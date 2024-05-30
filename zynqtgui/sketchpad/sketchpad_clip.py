@@ -1196,10 +1196,19 @@ class sketchpad_clip(QObject):
 
     ### BEGIN Property sketchContainsSamples
     def get_sketchContainsSamples(self):
-        if self.metadata.samples is not None:
-            # If there are 1 or more smples in metadata, return True
-            return len(self.metadata.samples) > 0
-        return False
+        containsSamples = False
+        try:
+            if self.metadata.samples is not None:
+                samples = json.loads(self.metadata.samples)
+                for id in range(5):
+                    sample = samples[f"{id}"]
+                    # Return true only if there is atleast 1 sample available
+                    if "filename" in sample and "sampledata" in sample and not sample["filename"] == "" and not sample["sampledata"] == "":
+                        containsSamples = True
+                        break
+        except:
+            containsSamples = False
+        return containsSamples
     sketchContainsSamplesChanged = Signal()
     sketchContainsSamples = Property(bool, get_sketchContainsSamples, notify=sketchContainsSamplesChanged)
     ### END Property sketchContainsSamples

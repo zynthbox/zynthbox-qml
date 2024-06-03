@@ -235,7 +235,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             if config["blink"] is True:
                 wsleds.setPixelColor(button_id, config['blinkColor'])
 
-        wsleds.show()
+        if self.zynqtgui.rpi_version == 4:
+            wsleds.show()
 
     @Slot()
     def blinkOn(self):
@@ -243,7 +244,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             if config["blink"] is True:
                 wsleds.setPixelColor(button_id, config["color"])
 
-        wsleds.show()
+        if self.zynqtgui.rpi_version == 4:
+            wsleds.show()
 
     def show(self):
         pass
@@ -286,7 +288,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         for i in range(25):
             self.set_button_color(i, led_color_inactive)
 
-        wsleds.show()
+        if self.zynqtgui.rpi_version == 4:
+            wsleds.show()
         self.connect_dependent_property_signals()
 
     @Slot()
@@ -389,4 +392,5 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             self.set_button_color(self.button_right, led_color_inactive)
             self.set_button_color(self.button_global, led_color_active if self.zynqtgui.globalPopupOpened else led_color_inactive)
 
-        wsleds.show()
+        if self.zynqtgui.rpi_version == 4:
+            wsleds.show()

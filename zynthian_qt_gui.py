@@ -421,7 +421,6 @@ class zynthian_gui(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui, self).__init__(parent)
 
-        self.rpi_version = rpi_version
         self.exit_flag = False
         self.bootsplash_thread = Thread(target=self.bootsplash_worker, args=())
         self.bootsplash_thread.daemon = True # thread will exit with the program
@@ -1265,8 +1264,7 @@ class zynthian_gui(QObject):
         logging.info("STOPPING ZYNTHIAN-UI ...")
 
         # Turn off leds
-        if rpi_version == 4:
-            Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "off"))
+        Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "off"))
 
         self.stop_polling()
         self.osc_end()
@@ -3459,9 +3457,8 @@ class zynthian_gui(QObject):
             # Cache back/preset of all selected synths of all channel
             channel.cache_bank_preset_lists()
         # Stop rainbow and initialize LED config and connect to required signals to be able to update LEDs on value change instead
-        if rpi_version == 4:
-            rainbow_led_process.terminate()
-            self.led_config.init()
+        rainbow_led_process.terminate()
+        self.led_config.init()
         boot_end = timer()
         logging.debug("---p Completing stop_splash procedure")
         logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
@@ -4471,18 +4468,9 @@ def delete_window():
 
 if __name__ == "__main__":
     boot_start = timer()
-    rpi_version = 0
-
-    with open("/proc/device-tree/model", "r") as f:
-        model = f.readline()
-        if "Raspberry Pi 4" in model:
-            rpi_version = 4
-        if "Raspberry Pi 5" in model:
-            rpi_version = 5
 
     # Start rainbow led process
-    if rpi_version == 4:
-        rainbow_led_process = Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "rainbow"))
+    rainbow_led_process = Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "rainbow"))
 
     # Enable qml debugger if ZYNTHBOX_DEBUG env variable is set
     if os.environ.get("ZYNTHBOX_DEBUG"):

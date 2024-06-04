@@ -25,7 +25,8 @@
 
 import logging
 import os
-import rpi_ws281x
+from neopixel_spi import NeoPixel_SPI, GRB
+import board
 import sys
 import time
 import Zynthbox
@@ -40,36 +41,23 @@ color_red = QColor.fromRgb(255, 0, 0).darker(darkening_factor)
 color_green = QColor.fromRgb(0, 255, 0).darker(darkening_factor)
 color_blue = QColor.fromRgb(0, 50, 200).darker(darkening_factor)
 
-led_color_off = rpi_ws281x.Color(0, 0, 0)
-led_color_red = rpi_ws281x.Color(color_red.red(), color_red.green(), color_red.blue())
-led_color_green = rpi_ws281x.Color(color_green.red(), color_green.green(), color_green.blue())
-led_color_blue = rpi_ws281x.Color(color_blue.red(), color_blue.green(), color_blue.blue())
+led_color_off = (0, 0, 0)
+led_color_red = (color_red.red(), color_red.green(), color_red.blue())
+led_color_green = (color_green.red(), color_green.green(), color_green.blue())
+led_color_blue = (color_blue.red(), color_blue.green(), color_blue.blue())
 
 led_color_inactive = led_color_blue
 led_color_active = led_color_green
 
-wsleds: rpi_ws281x.PixelStrip = None
+num_leds = 25
+spi_freq = 6400000
+wsleds = None
 
 
 def init_wsleds():
-    global wsleds
-
-    wiring_layout = os.environ.get('ZYNTHIAN_WIRING_LAYOUT', "DUMMIES")
-
+    global wsleds, num_leds, spi_freq
     if wsleds is None:
-        if wiring_layout=="Z2_V1":
-            # LEDS with PWM1 (pin 13, channel 1)
-            pin = 13
-            chan = 1
-        elif wiring_layout in ("Z2_V2", "Z2_V3"):
-            # LEDS with SPI0 (pin 10, channel 0)
-            pin = 10
-            chan = 0
-        else:
-            return 0
-
-        wsleds = rpi_ws281x.PixelStrip(25, pin, dma=10, channel=chan, strip_type=rpi_ws281x.ws.WS2811_STRIP_GRB)
-        wsleds.begin()
+        wsleds = NeoPixel_SPI(board.SPI(), num_leds, pixel_order=GRB, auto_write=False, frequency=spi_freq)
 
 
 ########################################################################################################################
@@ -99,7 +87,7 @@ if __name__ == "__main__":
         while True:
             for i in range(25):
                 color = QColor.fromHsl((rainbow_led_counter + i * 10) % 359, 242, 127, 127).darker(darkening_factor)
-                wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
+                wsleds[i] = (color.red(), color.green(), color.blue())
             wsleds.show()
             rainbow_led_counter += 3
             rainbow_led_counter = rainbow_led_counter % 359
@@ -107,13 +95,13 @@ if __name__ == "__main__":
     elif sys.argv[1] == "on":
         # Turn on all leds with blue color
         for i in range(25):
-            wsleds.setPixelColor(i, led_color_inactive)
+            wsleds[i] = led_color_inactive
         wsleds.show()
         sys.exit(0)
     elif sys.argv[1] == "off":
         # Turn off all leds
         for i in range(25):
-            wsleds.setPixelColor(i, led_color_off)
+            wsleds[i] = led_color_off
         wsleds.show()
         sys.exit(0)
     else:
@@ -179,10 +167,10 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         channelTypeSamplesColorDarkened = zynqtgui.sketchpad.channelTypeSamplesColor.darker(darkening_factor)
         channelTypeExternalColorDarkened = zynqtgui.sketchpad.channelTypeExternalColor.darker(darkening_factor)
 
-        self.led_color_channel_synth = rpi_ws281x.Color(channelTypeSynthColorDarkened.red(), channelTypeSynthColorDarkened.green(), channelTypeSynthColorDarkened.blue())
-        self.led_color_channel_loop = rpi_ws281x.Color(channelTypeSketchesColorDarkened.red(), channelTypeSketchesColorDarkened.green(), channelTypeSketchesColorDarkened.blue())
-        self.led_color_channel_sample = rpi_ws281x.Color(channelTypeSamplesColorDarkened.red(), channelTypeSamplesColorDarkened.green(), channelTypeSamplesColorDarkened.blue())
-        self.led_color_channel_external = rpi_ws281x.Color(channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
+        self.led_color_channel_synth = (channelTypeSynthColorDarkened.red(), channelTypeSynthColorDarkened.green(), channelTypeSynthColorDarkened.blue())
+        self.led_color_channel_loop = (channelTypeSketchesColorDarkened.red(), channelTypeSketchesColorDarkened.green(), channelTypeSketchesColorDarkened.blue())
+        self.led_color_channel_sample = (channelTypeSamplesColorDarkened.red(), channelTypeSamplesColorDarkened.green(), channelTypeSamplesColorDarkened.blue())
+        self.led_color_channel_external = (channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
 
         self.channel = None
         self.button_config = {}
@@ -233,19 +221,17 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     def blinkOff(self):
         for button_id, config in self.button_config.items():
             if config["blink"] is True:
-                wsleds.setPixelColor(button_id, config['blinkColor'])
+                wsleds[button_id] = config['blinkColor']
 
-        if self.zynqtgui.rpi_version == 4:
-            wsleds.show()
+        wsleds.show()
 
     @Slot()
     def blinkOn(self):
         for button_id, config in self.button_config.items():
             if config["blink"] is True:
-                wsleds.setPixelColor(button_id, config["color"])
+                wsleds[button_id] = config['color']
 
-        if self.zynqtgui.rpi_version == 4:
-            wsleds.show()
+        wsleds.show()
 
     def show(self):
         pass
@@ -279,7 +265,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             'blinkColor': led_color_off
         }
 
-        wsleds.setPixelColor(buttonId, buttonColor)
+        wsleds[buttonId] = buttonColor
 
     def init(self):
         init_wsleds()
@@ -288,8 +274,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         for i in range(25):
             self.set_button_color(i, led_color_inactive)
 
-        if self.zynqtgui.rpi_version == 4:
-            wsleds.show()
+        wsleds.show()
         self.connect_dependent_property_signals()
 
     @Slot()
@@ -392,5 +377,4 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             self.set_button_color(self.button_right, led_color_inactive)
             self.set_button_color(self.button_global, led_color_active if self.zynqtgui.globalPopupOpened else led_color_inactive)
 
-        if self.zynqtgui.rpi_version == 4:
-            wsleds.show()
+        wsleds.show()

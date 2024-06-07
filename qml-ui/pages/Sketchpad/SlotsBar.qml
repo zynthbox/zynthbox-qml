@@ -191,6 +191,10 @@ Rectangle {
         channelKeyZoneSetup.open();
     }
 
+    function requestSlotEqualizer(channel, slotType, slotIndex) {
+        slotEqualizer.showEqualizer(channel, slotType, slotIndex);
+    }
+
     Connections {
         target: applicationWindow()
         onRequestSamplePicker: {
@@ -1015,6 +1019,13 @@ Rectangle {
         onRequestChannelKeyZoneSetup: function() {
             channelKeyZoneSetup.open();
         }
+        onRequestSlotEqualizer: function(channel, slotType, slotIndex) {
+            slotEqualizer.showEqualizer(channel, slotType, slotIndex);
+        }
+    }
+
+    SlotEqualizer {
+        id: slotEqualizer
     }
 
     ExternalAudioSourcePicker {
@@ -1056,13 +1067,21 @@ Rectangle {
                 }
             },
             Kirigami.Action {
+                text: "Equalizer..."
+                visible: fxSetupDialog.selectedFx != null
+                onTriggered: {
+                    root.requestSlotEqualizer(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
+                }
+            },
+            Kirigami.Action {
                 text: qsTr("Swap with...")
                 onTriggered: {
                     slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
                 }
             },
-            QQC2.Action {
+            Kirigami.Action {
                 text: "Set Input Overrides..."
+                visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
                     slotInputPicker.pickSlotInputs(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
                 }

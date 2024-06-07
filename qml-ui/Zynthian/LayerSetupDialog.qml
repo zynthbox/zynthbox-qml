@@ -39,6 +39,7 @@ Zynthian.ActionPickerPopup {
     property QtObject selectedChannel: null
     signal requestSlotPicker(QtObject channel, string slotType, int slotIndex)
     signal requestSlotInputPicker(QtObject channel, string slotType, int slotIndex)
+    signal requestSlotEqualizer(QtObject channel, string slotType, int slotIndex)
     signal requestChannelKeyZoneSetup()
 
     Timer {
@@ -73,8 +74,8 @@ Zynthian.ActionPickerPopup {
         }
     }
 
-    columns: 2
-    rows: 4
+    columns: 3
+    rows: 3
     property bool layerExists: root.selectedChannel ? root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]) : false
     actions: [
         Kirigami.Action {
@@ -99,17 +100,17 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            enabled: root.layerExists
-            text: qsTr("Change Preset...")
+            text: qsTr("Load A Sound...")
             onTriggered: {
-                zynqtgui.current_screen_id = "preset"
+                zynqtgui.show_modal("sound_categories")
                 root.close();
             }
         },
         Kirigami.Action {
-            text: qsTr("Load A Sound...")
+            enabled: root.layerExists
+            text: qsTr("Change Preset...")
             onTriggered: {
-                zynqtgui.show_modal("sound_categories")
+                zynqtgui.current_screen_id = "preset"
                 root.close();
             }
         },
@@ -121,19 +122,26 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            text: qsTr("Swap With...")
-            onTriggered: {
-                root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
-            }
-        },
-        QQC2.Action {
             enabled: root.layerExists
             text: "Set Input Overrides..."
             onTriggered: {
                 root.requestSlotInputPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
             }
         },
-        QQC2.Action {
+        Kirigami.Action {
+            enabled: root.layerExists
+            text: "Equalizer..."
+            onTriggered: {
+                root.requestSlotEqualizer(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Swap With...")
+            onTriggered: {
+                root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
+            }
+        },
+        Kirigami.Action {
             enabled: root.layerExists
             text: "Edit Keyzones..."
             onTriggered: {

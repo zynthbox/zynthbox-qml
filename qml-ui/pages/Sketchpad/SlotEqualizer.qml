@@ -26,7 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.15
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -45,8 +45,8 @@ Zynthian.DialogQuestion {
         _private.selectedChannel = null;
     }
 
-    height: Kirigami.Units.gridUnit * 30
-    width: Kirigami.Units.gridUnit * 50
+    height: applicationWindow().height
+    width: applicationWindow().width
 
     acceptText: qsTr("Close")
     rejectText: ""
@@ -102,11 +102,11 @@ Zynthian.DialogQuestion {
                 returnValue = true;
                 break;
             case "KNOB3_UP":
-                _private.goRight();
+                _private.knob3Up();
                 returnValue = true;
                 break;
             case "KNOB3_DOWN":
-                _private.goLeft();
+                _private.knob3Down();
                 returnValue = true;
                 break;
             case "KNOB0_TOUCHED":
@@ -123,11 +123,30 @@ Zynthian.DialogQuestion {
         return returnValue;
     }
 
+    header: RowLayout {
+        Kirigami.Heading {
+            Layout.fillWidth: true
+            level: 2
+            text: component.title
+        }
+        QQC2.Button {
+            text: _private.slotPassthroughClient ? _private.slotPassthroughClient.equaliserEnabled ? qsTr("Equalizer Enabled") :  qsTr("Equalizer Disabled") : ""
+            onClicked: {
+                _private.slotPassthroughClient.equaliserEnabled = !_private.slotPassthroughClient.equaliserEnabled;
+            }
+        }
+        QQC2.Button {
+            text: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorEnabled ? qsTr("Compressor Enabled") :  qsTr("Compressor Disabled") : ""
+            onClicked: {
+                _private.slotPassthroughClient.compressorEnabled = !_private.slotPassthroughClient.compressorEnabled;
+            }
+        }
+    }
     contentItem: ColumnLayout {
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 8
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 10
             QtObject {
                 id: _private
                 property QtObject selectedChannel
@@ -157,21 +176,28 @@ Zynthian.DialogQuestion {
                         }
                     }
                     if (currentObject === null) {
-                        currentObject = _private.slotPassthroughClient.equaliserSettings[0]
-                        currentObject.selected = true;
+                        currentObject = _private.slotPassthroughClient.equaliserSettings[0];
                     }
                     return currentObject;
                 }
                 function goLeft() {
                     let currentObject = getCurrent();
-                    if (currentObject.previous) {
-                        currentObject.previous.selected = true;
+                    if (currentObject.selected) {
+                        if (currentObject.previous) {
+                            currentObject.previous.selected = true;
+                        }
+                    } else {
+                        currentObject.selected = true;
                     }
                 }
                 function goRight() {
                     let currentObject = getCurrent();
-                    if (currentObject.next) {
-                        currentObject.next.selected = true;
+                    if (currentObject.selected) {
+                        if (currentObject.next) {
+                            currentObject.next.selected = true;
+                        }
+                    } else {
+                        currentObject.selected = true;
                     }
                 }
                 function select() {
@@ -185,11 +211,21 @@ Zynthian.DialogQuestion {
                 }
                 function knob0Up() {
                     let currentObject = getCurrent();
-                    currentObject.quality = currentObject.quality + 0.1;
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        currentObject.quality = currentObject.quality + 0.01;
+                    } else {
+                        currentObject.quality = currentObject.quality + 0.1;
+                    }
                 }
                 function knob0Down() {
                     let currentObject = getCurrent();
-                    currentObject.quality = currentObject.quality - 0.1;
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        currentObject.quality = currentObject.quality - 0.01;
+                    } else {
+                        currentObject.quality = currentObject.quality - 0.1;
+                    }
                 }
                 function knob1Up() {
                     let currentObject = getCurrent();
@@ -201,11 +237,33 @@ Zynthian.DialogQuestion {
                 }
                 function knob2Up() {
                     let currentObject = getCurrent();
-                    currentObject.frequency = currentObject.frequency + 1;
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        currentObject.frequency = currentObject.frequency + 1;
+                    } else {
+                        if (currentObject.frequency < 1000.0) {
+                            currentObject.frequency = currentObject.frequency + 1;
+                        } else if (currentObject.frequency < 10000.0) {
+                            currentObject.frequency = currentObject.frequency + 10;
+                        } else {
+                            currentObject.frequency = currentObject.frequency + 100;
+                        }
+                    }
                 }
                 function knob2Down() {
                     let currentObject = getCurrent();
-                    currentObject.frequency = currentObject.frequency - 1;
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        currentObject.frequency = currentObject.frequency - 1;
+                    } else {
+                        if (currentObject.frequency < 1000.0) {
+                            currentObject.frequency = currentObject.frequency - 1;
+                        } else if (currentObject.frequency < 10000.0) {
+                            currentObject.frequency = currentObject.frequency - 10;
+                        } else {
+                            currentObject.frequency = currentObject.frequency - 100;
+                        }
+                    }
                 }
                 function knob3Up() {
                     goRight();
@@ -214,35 +272,22 @@ Zynthian.DialogQuestion {
                     goLeft();
                 }
             }
+            Image {
+                anchors.fill: parent
+                source: _private.slotPassthroughClient ? _private.slotPassthroughClient.equaliserGraphUrl : ""
+                asynchronous: true
+                sourceSize.width: width
+                sourceSize.height: height
+            }
             QQC2.Label {
                 anchors.centerIn: parent
                 text: "(visualisation of equaliser bands goes here)"
                 opacity: 0.3
             }
-            QQC2.Button {
-                anchors {
-                    bottom: parent.bottom
-                    left: parent.left
-                }
-                text: _private.slotPassthroughClient ? _private.slotPassthroughClient.equaliserEnabled ? qsTr("Equalizer Enabled") :  qsTr("Equalizer Disabled") : ""
-                onClicked: {
-                    _private.slotPassthroughClient.equaliserEnabled = !_private.slotPassthroughClient.equaliserEnabled;
-                }
-            }
-            QQC2.Button {
-                anchors {
-                    bottom: parent.bottom
-                    right: parent.right
-                }
-                text: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorEnabled ? qsTr("Compressor Enabled") :  qsTr("Compressor Disabled") : ""
-                onClicked: {
-                    _private.slotPassthroughClient.compressorEnabled = !_private.slotPassthroughClient.compressorEnabled;
-                }
-            }
         }
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 20
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 18
             Repeater {
                 model: 6
                 Item {
@@ -320,20 +365,37 @@ Zynthian.DialogQuestion {
                                     level: 4
                                     text: qsTr("Quality")
                                 }
-                                QQC2.Dial {
+                                Item {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    Layout.leftMargin: Kirigami.Units.smallSpacing
-                                    Layout.rightMargin: Kirigami.Units.smallSpacing
-                                    handle: null
-                                    value: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality : 0
-                                    from: 0
-                                    to: 10
-                                    stepSize: 0.1
-                                    onValueChanged: {
-                                        if (bandDelegate.filterSettings) {
-                                            bandDelegate.filterSettings.quality = value;
+                                    QQC2.Dial {
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                            horizontalCenter: parent.horizontalCenter
+                                        }
+                                        width: height
+                                        handle: null
+                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality : 0
+                                        from: 0
+                                        to: 10
+                                        stepSize: 0.1
+                                        onValueChanged: {
+                                            if (bandDelegate.filterSettings) {
+                                                bandDelegate.filterSettings.quality = value;
+                                            }
+                                        }
+                                        property double lastPressed: 0
+                                        onPressedChanged: {
+                                            if (pressed === false) {
+                                                let newTimestamp = Date.now();
+                                                if (newTimestamp - lastPressed < 300) {
+                                                    // The same as the inverseRootTwo default
+                                                    bandDelegate.filterSettings.quality = 0.70710678118654752440;
+                                                }
+                                                lastPressed = newTimestamp;
+                                            }
                                         }
                                     }
                                 }
@@ -356,20 +418,36 @@ Zynthian.DialogQuestion {
                                     level: 4
                                     text: qsTr("Gain")
                                 }
-                                QQC2.Dial {
+                                Item {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                    Layout.leftMargin: Kirigami.Units.smallSpacing
-                                    Layout.rightMargin: Kirigami.Units.smallSpacing
-                                    handle: null
-                                    value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gain : 0
-                                    from: 0
-                                    to: 2
-                                    stepSize: 0.01
-                                    onValueChanged: {
-                                        if (bandDelegate.filterSettings) {
-                                            bandDelegate.filterSettings.gain = value;
+                                    QQC2.Dial {
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                            horizontalCenter: parent.horizontalCenter
+                                        }
+                                        width: height
+                                        handle: null
+                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gain : 0
+                                        from: 0
+                                        to: 2
+                                        stepSize: 0.01
+                                        onValueChanged: {
+                                            if (bandDelegate.filterSettings) {
+                                                bandDelegate.filterSettings.gain = value;
+                                            }
+                                        }
+                                        property double lastPressed: 0
+                                        onPressedChanged: {
+                                            if (pressed === false) {
+                                                let newTimestamp = Date.now();
+                                                if (newTimestamp - lastPressed < 300) {
+                                                    bandDelegate.filterSettings.gain = 1;
+                                                }
+                                                lastPressed = newTimestamp;
+                                            }
                                         }
                                     }
                                 }
@@ -382,24 +460,47 @@ Zynthian.DialogQuestion {
                                 }
                             }
                         }
-                        QQC2.Dial {
+                        Item {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 6
-                            handle: null
-                            value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequency : 0
-                            stepSize: 1
-                            from: 20
-                            to: 20000
-                            onValueChanged: {
-                                if (bandDelegate.filterSettings) {
-                                    bandDelegate.filterSettings.frequency = value;
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                            QQC2.Dial {
+                                anchors {
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                    horizontalCenter: parent.horizontalCenter
                                 }
-                            }
-                            QQC2.Label {
-                                anchors.fill: parent
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                text: bandDelegate.filterSettings ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(0)) : ""
+                                width: height
+                                handle: null
+                                value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequency : 0
+                                stepSize: 1
+                                from: 20
+                                to: 20000
+                                onValueChanged: {
+                                    if (bandDelegate.filterSettings) {
+                                        bandDelegate.filterSettings.frequency = value;
+                                    }
+                                }
+                                property double lastPressed: 0
+                                property var defaultFrequencies: [20, 250, 500, 1000, 5000, 12000]
+                                onPressedChanged: {
+                                    if (pressed === false) {
+                                        let newTimestamp = Date.now();
+                                        if (newTimestamp - lastPressed < 300) {
+                                            bandDelegate.filterSettings.frequency = defaultFrequencies[model.index];
+                                        }
+                                        lastPressed = newTimestamp;
+                                    }
+                                }
+                                QQC2.Label {
+                                    anchors.fill: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: bandDelegate.filterSettings
+                                        ?  (bandDelegate.filterSettings.frequency < 1000.0 || zynqtgui.modeButtonPressed)
+                                            ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(0))
+                                            : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
+                                        : ""
+                                }
                             }
                         }
                         RowLayout {
@@ -446,7 +547,7 @@ Zynthian.DialogQuestion {
                     color: "transparent"
                     border {
                         width: 1
-                        color: bandDelegate.filterSettings && bandDelegate.filterSettings.selected ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
+                        color: /*bandDelegate.filterSettings && bandDelegate.filterSettings.selected ? Kirigami.Theme.focusColor : */Kirigami.Theme.textColor
                     }
                 }
                 MouseArea {

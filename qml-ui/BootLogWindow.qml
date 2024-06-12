@@ -3,13 +3,15 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Window 2.1
 import QtMultimedia 5.15
+import Qt.labs.settings 1.0
+
 
 QQC2.ApplicationWindow {
     id: root
 
     property int dotCount: 0
-    property url extroVideo: Qt.resolvedUrl("/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4")
-    property bool displayLoadingText: bootLogInterface.bootLog !== "" && videoPlayer.source != root.extroVideo
+    property bool playingExtroVideo: false
+    property bool displayLoadingText: bootLogInterface.bootLog !== "" && !root.playingExtroVideo
 
     flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "#00000000"
@@ -18,6 +20,14 @@ QQC2.ApplicationWindow {
     height: Screen.height
     maximumWidth: width
     maximumHeight: height
+
+    Settings {
+        id: settings
+        category: "Bootsplash"
+        fileName: "/root/.config/zynthbox/zynthbox-qml.conf"
+        property url extroVideo: Qt.resolvedUrl("/usr/share/zynthbox-bootsplash/zynthbox-extro.mp4")
+        property url startupBackgroundVideo: Qt.resolvedUrl("/usr/share/zynthbox-bootsplash/zynthbox-startup-background.mp4")
+    }
 
     Rectangle {
         anchors.fill: parent;
@@ -41,7 +51,7 @@ QQC2.ApplicationWindow {
         loops: MediaPlayer.Infinite
         fillMode: VideoOutput.Stretch
         flushMode: VideoOutput.LastFrame
-        source: "/usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mp4"
+        source: settings.startupBackgroundVideo
         visible: videoPlayer.playbackState == MediaPlayer.PlayingState
     }
 
@@ -77,7 +87,8 @@ QQC2.ApplicationWindow {
         target: bootLogInterface
         function onPlayExtroAndHide() {
             videoPlayer.stop()
-            videoPlayer.source = root.extroVideo
+            root.playingExtroVideo = true
+            videoPlayer.source = settings.extroVideo
             videoPlayer.loops = 1
             videoPlayer.stopped.connect(function() {
                 root.visible = false;

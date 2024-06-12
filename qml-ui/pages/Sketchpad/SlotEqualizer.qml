@@ -229,11 +229,11 @@ Zynthian.DialogQuestion {
                 }
                 function knob1Up() {
                     let currentObject = getCurrent();
-                    currentObject.gain = currentObject.gain + 0.01;
+                    currentObject.gainAbsolute = currentObject.gainAbsolute + 0.01;
                 }
                 function knob1Down() {
                     let currentObject = getCurrent();
-                    currentObject.gain = currentObject.gain - 0.01;
+                    currentObject.gainAbsolute = currentObject.gainAbsolute - 0.01;
                 }
                 function knob2Up() {
                     let currentObject = getCurrent();
@@ -246,7 +246,7 @@ Zynthian.DialogQuestion {
                         } else if (currentObject.frequency < 10000.0) {
                             currentObject.frequency = currentObject.frequency + 10;
                         } else {
-                            currentObject.frequency = currentObject.frequency + 100;
+                            currentObject.frequency = currentObject.frequency + 50;
                         }
                     }
                 }
@@ -261,7 +261,7 @@ Zynthian.DialogQuestion {
                         } else if (currentObject.frequency < 10000.0) {
                             currentObject.frequency = currentObject.frequency - 10;
                         } else {
-                            currentObject.frequency = currentObject.frequency - 100;
+                            currentObject.frequency = currentObject.frequency - 50;
                         }
                     }
                 }
@@ -279,10 +279,57 @@ Zynthian.DialogQuestion {
                 sourceSize.width: width
                 sourceSize.height: height
             }
-            QQC2.Label {
-                anchors.centerIn: parent
-                text: "(visualisation of equaliser bands goes here)"
-                opacity: 0.3
+            Rectangle {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                    bottomMargin: slidePoint.selectedBand === null ? 0 : Math.min(Math.max(parent.height - slidePoint.y, 0), parent.height)
+                }
+                height: 1
+                visible: slidePoint.selectedBand !== null
+                color: slidePoint.selectedBand === null ? "black" : slidePoint.selectedBand.color
+            }
+            MultiPointTouchArea {
+                id: graphTouchArea
+                anchors.fill: parent
+                touchPoints: [
+                    TouchPoint {
+                        id: slidePoint;
+                        property QtObject selectedBand: null
+                        property var pressedTime: undefined
+                        onPressedChanged: {
+                            if (pressed) {
+                                pressedTime = Date.now();
+                                selectedBand = _private.getCurrent();
+                            } else {
+                                // Only select what's underneath if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
+                                if ((Date.now() - pressedTime) < 300) {
+                                    // Find the band underneath the touch point
+                                    let frequencyForPosition = 20.0 * Math.pow(2.0, (slidePoint.startX / graphTouchArea.width) * 10.0);
+                                    let tappedBand = _private.slotPassthroughClient.equaliserNearestToFrequency(frequencyForPosition);
+                                    tappedBand.selected = true;
+                                }
+                                selectedBand = null;
+                            }
+                        }
+                        onYChanged: {
+                            if (pressed && selectedBand) {
+                                let newGain = 1-(slidePoint.y / graphTouchArea.height);
+                                selectedBand.gainAbsolute = Math.min(Math.max(newGain, 0), 1);
+                            }
+                        }
+                        readonly property double frequencyLowerBound: 20
+                        readonly property double frequencyUpperBound: 20000
+                        onXChanged: {
+                            if (pressed && selectedBand) {
+                                // first convert position to a normalised 0 through 1 position along the width of the whole area, and then put that position along the frequency area
+                                let newFrequency = 20.0 * Math.pow(2.0, 10 * (slidePoint.x / graphTouchArea.width));
+                                selectedBand.frequency = Math.min(Math.max(newFrequency, frequencyLowerBound), frequencyUpperBound);
+                            }
+                        }
+                    }
+                ]
             }
         }
         RowLayout {
@@ -430,13 +477,13 @@ Zynthian.DialogQuestion {
                                         }
                                         width: height
                                         handle: null
-                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gain : 0
+                                        value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gainAbsolute : 0
                                         from: 0
-                                        to: 2
+                                        to: 1
                                         stepSize: 0.01
                                         onValueChanged: {
-                                            if (bandDelegate.filterSettings) {
-                                                bandDelegate.filterSettings.gain = value;
+                                            if (bandDelegate.filterSettings && bandDelegate.filterSettings.gainAbsolute !== value) {
+                                                bandDelegate.filterSettings.gainAbsolute = value;
                                             }
                                         }
                                         property double lastPressed: 0

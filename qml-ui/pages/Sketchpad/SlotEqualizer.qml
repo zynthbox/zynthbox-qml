@@ -272,12 +272,9 @@ Zynthian.DialogQuestion {
                     goLeft();
                 }
             }
-            Image {
+            Zynthbox.JackPassthroughVisualiserItem {
                 anchors.fill: parent
-                source: _private.slotPassthroughClient ? _private.slotPassthroughClient.equaliserGraphUrl : ""
-                asynchronous: true
-                sourceSize.width: width
-                sourceSize.height: height
+                source: _private.slotPassthroughClient
             }
             Rectangle {
                 anchors {

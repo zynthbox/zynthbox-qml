@@ -768,11 +768,11 @@ def audio_autoconnect(force=False):
                                                 # hook up to listen to the output of that specific graph port
                                                 splitData = inputSource.split(":")
                                                 portRootName = ""
-                                                theLane = splitData[2][-1]
+                                                theLane = splitData[2][-1] + 1
                                                 if inputSource.port.startswith("sketchpadTrack:"):
-                                                    portRootName = f"FXPassthrough-lane{theLane}-Channel{splitData[1]}"
+                                                    portRootName = f"FXPassthrough-lane{theLane}:Channel{splitData[1] + 1}"
                                                 else:
-                                                    portRootName = f"TrackPassthrough:Channel{splitData[1]}-lane{theLane}"
+                                                    portRootName = f"TrackPassthrough:Channel{splitData[1] + 1}-lane{theLane}"
                                                 if splitData[2].startswith("dry"):
                                                     dryOrWet = "dryOut"
                                                 elif splitData[2].starswith("wet"):
@@ -1089,11 +1089,11 @@ def audio_autoconnect(force=False):
                                         # hook up to listen to the output of that specific graph port
                                         splitData = inputSource.split(":")
                                         portRootName = ""
-                                        theLane = splitData[2][-1]
+                                        theLane = splitData[2][-1] + 1
                                         if inputSource.port.startswith("sketchpadTrack:"):
-                                            portRootName = f"FXPassthrough-lane{theLane}-Channel{splitData[1]}-"
+                                            portRootName = f"FXPassthrough-lane{theLane}:Channel{splitData[1] + 1}-"
                                         else:
-                                            portRootName = f"TrackPassthrough:Channel{splitData[1]}-lane{theLane}-"
+                                            portRootName = f"TrackPassthrough:Channel{splitData[1] + 1}-lane{theLane}-"
                                         if splitData[2].startswith("dry"):
                                             dryOrWet = "dryOut"
                                         elif splitData[2].starswith("wet"):

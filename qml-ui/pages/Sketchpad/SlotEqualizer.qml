@@ -173,14 +173,18 @@ Zynthian.DialogQuestion {
                                 : null
                     function getCurrent() {
                         let currentObject = null;
-                        for (let slotIndex = 0; slotIndex < _private.slotPassthroughClient.equaliserSettings.length; ++slotIndex) {
-                            if (_private.slotPassthroughClient.equaliserSettings[slotIndex].selected) {
-                                currentObject = _private.slotPassthroughClient.equaliserSettings[slotIndex];
-                                break;
+                        if (_private.slotPassthroughClient.compressorSettings.selected === true) {
+                            currentObject = _private.slotPassthroughClient.compressorSettings;
+                        } else {
+                            for (let slotIndex = 0; slotIndex < _private.slotPassthroughClient.equaliserSettings.length; ++slotIndex) {
+                                if (_private.slotPassthroughClient.equaliserSettings[slotIndex].selected) {
+                                    currentObject = _private.slotPassthroughClient.equaliserSettings[slotIndex];
+                                    break;
+                                }
                             }
-                        }
-                        if (currentObject === null) {
-                            currentObject = _private.slotPassthroughClient.equaliserSettings[0];
+                            if (currentObject === null) {
+                                currentObject = _private.slotPassthroughClient.equaliserSettings[0];
+                            }
                         }
                         return currentObject;
                     }
@@ -206,7 +210,12 @@ Zynthian.DialogQuestion {
                                 // nowhere to go right from here
                             } else {
                                 if (currentObject.next) {
+                                    // If there is a next defined, then select that
                                     currentObject.next.selected = true;
+                                } else {
+                                    // Otherwise we're at the end of the equaliser settings and the next object is the compressor
+                                    currentObject.selected = false;
+                                    _private.slotPassthroughClient.compressorSettings.selected = true;
                                 }
                             }
                         } else {

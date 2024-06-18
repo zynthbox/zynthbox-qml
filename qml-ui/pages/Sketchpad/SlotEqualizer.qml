@@ -667,33 +667,59 @@ Zynthian.DialogQuestion {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.slotPassthroughClient
                         ? _private.slotPassthroughClient.compressorSidechannelLeft.length > 0
-                            ? sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text
-                            : qsTr("No Sidechannel")
+                            ? "L: %1".arg(sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text)
+                            : qsTr("L: No Sidechannel")
                         : ""
                     onClicked: {
-                        sideChainSourcePicker.pickSource(_private.slotPassthroughClient);
+                        sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 0);
                     }
-                    Zynthian.ComboBox {
-                        id: sideChainSourcePicker
-                        visible: false;
-                        model: Zynthbox.MidiRouter.model.audioInSources
-                        function pickSource(passthroughClient) {
-                            sideChainSourcePicker.passthroughClient = passthroughClient;
-                            if (passthroughClient.compressorSidechannelLeft.length > 0) {
-                                sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelLeft));
-                            } else {
-                                sideChainSourcePicker.selectIndex(-1);
-                            }
-                            sideChainSourcePicker.onClicked();
+                }
+                Zynthian.PlayGridButton {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                    text: _private.slotPassthroughClient
+                        ? _private.slotPassthroughClient.compressorSidechannelLeft.length > 0
+                            ? "R: %1".arg(sideChainSourcePicker.model[Zynthbox.MidiRouter.model.audioInSourceIndex(_private.slotPassthroughClient.compressorSidechannelLeft)].text)
+                            : qsTr("R: No Sidechannel")
+                        : ""
+                    onClicked: {
+                        sideChainSourcePicker.pickSource(_private.slotPassthroughClient, 1);
+                    }
+                }
+                Zynthian.ComboBox {
+                    id: sideChainSourcePicker
+                    visible: false;
+                    model: Zynthbox.MidiRouter.model.audioInSources
+                    function pickSource(passthroughClient, channel) {
+                        sideChainSourcePicker.passthroughClient = passthroughClient;
+                        sideChainSourcePicker.channel = channel;
+                        if (channel === 0 && passthroughClient.compressorSidechannelLeft.length > 0) {
+                            sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelLeft));
+                        } else if (channel === 1 && passthroughClient.compressorSidechannelRight.length > 0) {
+                            sideChainSourcePicker.selectIndex(Zynthbox.MidiRouter.model.audioInSourceIndex(passthroughClient.compressorSidechannelRight));
+                        } else {
+                            sideChainSourcePicker.selectIndex(-1);
                         }
-                        textRole: "text"
-                        property QtObject passthroughClient: null
-                        onActivated: {
-                            let listElement = sideChainSourcePicker.model[index];
-                            sideChainSourcePicker.passthroughClient.compressorSidechannelLeft = listElement.value;
-                            sideChainSourcePicker.passthroughClient.compressorSidechannelRight = listElement.value;
-                            sideChainSourcePicker.passthroughClient = null;
+                        sideChainSourcePicker.onClicked();
+                    }
+                    textRole: "text"
+                    property QtObject passthroughClient: null
+                    property int channel: -1
+                    onActivated: {
+                        let listElement = sideChainSourcePicker.model[index];
+                        switch (sideChainSourcePicker.channel) {
+                            case 0:
+                                sideChainSourcePicker.passthroughClient.compressorSidechannelLeft = listElement.value;
+                                break;
+                            case 1:
+                                sideChainSourcePicker.passthroughClient.compressorSidechannelRight = listElement.value;
+                                break;
+                            default:
+                                console.log("Got an unexpected channel when setting the compressor sidechain:", channel);
+                                break;
                         }
+                        sideChainSourcePicker.passthroughClient = null;
                     }
                 }
                 RowLayout {
@@ -1020,6 +1046,70 @@ Zynthian.DialogQuestion {
                         }
                     }
                 }
+            }
+        }
+        Item {
+            // id: left channel compressor visualisation
+            Layout.minimumWidth: Kirigami.Units.largeSpacing
+            Layout.maximumWidth: Kirigami.Units.largeSpacing
+            Layout.fillHeight: true
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                }
+                height: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.sidechainPeakLeft * parent.height : 0
+            }
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                    topMargin: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorEnabled ? (1 - _private.slotPassthroughClient.compressorSettings.maxGainReductionLeft) * parent.height : 0
+                }
+                height: 1
+                color: "red"
+            }
+            Rectangle {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                height: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.outputPeakLeft * parent.height : 0
+            }
+        }
+        Item {
+            // id: right channel compressor visualisation
+            Layout.minimumWidth: Kirigami.Units.largeSpacing
+            Layout.maximumWidth: Kirigami.Units.largeSpacing
+            Layout.fillHeight: true
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                }
+                height: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.sidechainPeakRight * parent.height : 0
+            }
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                    topMargin: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorEnabled ? (1 - _private.slotPassthroughClient.compressorSettings.maxGainReductionRight) * parent.height : 0
+                }
+                height: 1
+                color: "red"
+            }
+            Rectangle {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                height: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.outputPeakRight * parent.height : 0
             }
         }
     }

@@ -119,6 +119,12 @@ Zynthian.DialogQuestion {
             case "KNOB3_RELEASED":
                 returnValue = true;
                 break;
+            case "MODE_SWITCH_SHORT":
+            case "MODE_SWITCH_BOLD":
+            case "MODE_SWITCH_LONG":
+                // when this dialog is open, switching tracks or parts would be... a problem in general, so let's not let that happen
+                returnValue = true;
+                break;
         }
         return returnValue;
     }
@@ -228,7 +234,6 @@ Zynthian.DialogQuestion {
                             _private.slotPassthroughClient.compressorEnabled = !_private.slotPassthroughClient.compressorEnabled;
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                zynqtgui.ignoreNextModeButtonPress = true;
                                 currentObject.soloed = !currentObject.soloed;
                             } else {
                                 currentObject.active = !currentObject.active;
@@ -240,7 +245,6 @@ Zynthian.DialogQuestion {
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                zynqtgui.ignoreNextModeButtonPress = true;
                                 currentObject.quality = currentObject.quality + 0.01;
                             } else {
                                 currentObject.quality = currentObject.quality + 0.1;
@@ -252,7 +256,6 @@ Zynthian.DialogQuestion {
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                zynqtgui.ignoreNextModeButtonPress = true;
                                 currentObject.quality = currentObject.quality - 0.01;
                             } else {
                                 currentObject.quality = currentObject.quality - 0.1;
@@ -278,7 +281,6 @@ Zynthian.DialogQuestion {
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                zynqtgui.ignoreNextModeButtonPress = true;
                                 currentObject.frequency = currentObject.frequency + 1;
                             } else {
                                 if (currentObject.frequency < 1000.0) {
@@ -296,7 +298,6 @@ Zynthian.DialogQuestion {
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
                         } else {
                             if (zynqtgui.modeButtonPressed) {
-                                zynqtgui.ignoreNextModeButtonPress = true;
                                 currentObject.frequency = currentObject.frequency - 1;
                             } else {
                                 if (currentObject.frequency < 1000.0) {
@@ -486,6 +487,13 @@ Zynthian.DialogQuestion {
                                                     lastPressed = newTimestamp;
                                                 }
                                             }
+                                            Zynthian.KnobIndicator {
+                                                visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                anchors.centerIn: parent
+                                                height: parent.height / 2
+                                                width: height
+                                                knobId: 0
+                                            }
                                         }
                                     }
                                     QQC2.Label {
@@ -538,6 +546,13 @@ Zynthian.DialogQuestion {
                                                     lastPressed = newTimestamp;
                                                 }
                                             }
+                                            Zynthian.KnobIndicator {
+                                                visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                anchors.centerIn: parent
+                                                height: parent.height / 2
+                                                width: height
+                                                knobId: 1
+                                            }
                                         }
                                     }
                                     QQC2.Label {
@@ -589,6 +604,17 @@ Zynthian.DialogQuestion {
                                                 ? "%1 Hz".arg(bandDelegate.filterSettings.frequency.toFixed(0))
                                                 : "%1 kHz".arg((bandDelegate.filterSettings.frequency / 1000.0).toFixed(2))
                                             : ""
+                                            Zynthian.KnobIndicator {
+                                                visible: bandDelegate.filterSettings && bandDelegate.filterSettings.selected
+                                                anchors {
+                                                    top: parent.verticalCenter
+                                                    horizontalCenter: parent.horizontalCenter
+                                                    topMargin: Kirigami.Units.largeSpacing
+                                                }
+                                                height: parent.paintedHeight
+                                                width: height
+                                                knobId: 2
+                                            }
                                     }
                                 }
                             }
@@ -767,6 +793,13 @@ Zynthian.DialogQuestion {
                                         lastPressed = newTimestamp;
                                     }
                                 }
+                                Zynthian.KnobIndicator {
+                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
+                                    anchors.centerIn: parent
+                                    height: parent.height / 2
+                                    width: height
+                                    knobId: 0
+                                }
                             }
                         }
                         QQC2.Label {
@@ -818,6 +851,13 @@ Zynthian.DialogQuestion {
                                         }
                                         lastPressed = newTimestamp;
                                     }
+                                }
+                                Zynthian.KnobIndicator {
+                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
+                                    anchors.centerIn: parent
+                                    height: parent.height / 2
+                                    width: height
+                                    knobId: 0
                                 }
                             }
                         }
@@ -875,6 +915,13 @@ Zynthian.DialogQuestion {
                                         lastPressed = newTimestamp;
                                     }
                                 }
+                                Zynthian.KnobIndicator {
+                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
+                                    anchors.centerIn: parent
+                                    height: parent.height / 2
+                                    width: height
+                                    knobId: 1
+                                }
                             }
                         }
                         QQC2.Label {
@@ -926,6 +973,13 @@ Zynthian.DialogQuestion {
                                         }
                                         lastPressed = newTimestamp;
                                     }
+                                }
+                                Zynthian.KnobIndicator {
+                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
+                                    anchors.centerIn: parent
+                                    height: parent.height / 2
+                                    width: height
+                                    knobId: 1
                                 }
                             }
                         }
@@ -983,6 +1037,13 @@ Zynthian.DialogQuestion {
                                         lastPressed = newTimestamp;
                                     }
                                 }
+                                Zynthian.KnobIndicator {
+                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === false
+                                    anchors.centerIn: parent
+                                    height: parent.height / 2
+                                    width: height
+                                    knobId: 2
+                                }
                             }
                         }
                         QQC2.Label {
@@ -1034,6 +1095,13 @@ Zynthian.DialogQuestion {
                                         }
                                         lastPressed = newTimestamp;
                                     }
+                                }
+                                Zynthian.KnobIndicator {
+                                    visible: _private.slotPassthroughClient && _private.slotPassthroughClient.compressorSettings && _private.slotPassthroughClient.compressorSettings.selected && zynqtgui.modeButtonPressed === true
+                                    anchors.centerIn: parent
+                                    height: parent.height / 2
+                                    width: height
+                                    knobId: 2
                                 }
                             }
                         }

@@ -36,12 +36,17 @@ Zynthian.DialogQuestion {
     id: component
     function showEqualizer(channel, slotType, slotIndex) {
         _private.slotIndex = slotIndex;
-        _private.slotType = slotType;
         _private.selectedChannel = channel;
+        _private.slotType = slotType;
         component.open();
     }
 
+    onRejected: {
+        _private.slotType = "";
+        _private.selectedChannel = null;
+    }
     onAccepted: {
+        _private.slotType = "";
         _private.selectedChannel = null;
     }
 
@@ -170,13 +175,17 @@ Zynthian.DialogQuestion {
                             : slotType === "fx"
                                 ? selectedChannel.fxRoutingData[slotIndex]
                                 : null
-                    property QtObject slotPassthroughClient: selectedChannel === null
+                    property QtObject slotPassthroughClient: slotType === ""
                         ? null
-                        : slotType === "synth"
-                            ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
-                            : slotType === "fx"
-                                ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
-                                : null
+                        : slotType === "global"
+                            ? Zynthbox.Plugin.globalPlaybackClient
+                            : slotType === "track"
+                                ? Zynthbox.Plugin.trackPassthroughClients[selectedChannel.id]
+                                : slotType === "synth"
+                                    ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
+                                    : slotType === "fx"
+                                        ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
+                                        : null
                     function getCurrent() {
                         let currentObject = null;
                         if (_private.slotPassthroughClient.compressorSettings.selected === true) {

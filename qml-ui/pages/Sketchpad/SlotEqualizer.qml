@@ -39,15 +39,20 @@ Zynthian.DialogQuestion {
         _private.selectedChannel = channel;
         _private.slotType = slotType;
         component.open();
+        _private.slotPassthroughClient.compressorSettings.registerObserver();
     }
 
     onRejected: {
+        _private.slotPassthroughClient.compressorSettings.unregisterObserver();
         _private.slotType = "";
         _private.selectedChannel = null;
+        _private.slotIndex = -1;
     }
     onAccepted: {
+        _private.slotPassthroughClient.compressorSettings.unregisterObserver();
         _private.slotType = "";
         _private.selectedChannel = null;
+        _private.slotIndex = -1;
     }
 
     height: applicationWindow().height

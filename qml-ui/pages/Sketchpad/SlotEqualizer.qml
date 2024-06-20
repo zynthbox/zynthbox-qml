@@ -387,7 +387,12 @@ Zynthian.DialogQuestion {
                             onPressedChanged: {
                                 if (pressed) {
                                     pressedTime = Date.now();
-                                    selectedBand = _private.getCurrent();
+                                    let currentObject = _private.getCurrent();
+                                    if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                                        selectedBand = null;
+                                    } else {
+                                        selectedBand = currentObject;
+                                    }
                                 } else {
                                     // Only select what's underneath if the timing was reasonably a tap (arbitrary number here, should be a global constant somewhere we can use for this)
                                     if ((Date.now() - pressedTime) < 300) {

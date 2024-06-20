@@ -395,6 +395,8 @@ Zynthian.DialogQuestion {
                                         let frequencyForPosition = 20.0 * Math.pow(2.0, (slidePoint.startX / graphTouchArea.width) * 10.0);
                                         let tappedBand = _private.slotPassthroughClient.equaliserNearestToFrequency(frequencyForPosition);
                                         tappedBand.selected = true;
+                                        // Also make sure to de-select the compressor, in case that one's selected
+                                        _private.slotPassthroughClient.compressorSettings.selected = false;
                                     }
                                     selectedBand = null;
                                 }

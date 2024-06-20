@@ -257,6 +257,11 @@ Zynthian.DialogQuestion {
                     function knob0Up() {
                         let currentObject = getCurrent();
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                            if (zynqtgui.modeButtonPressed) {
+                                currentObject.kneeWidth = currentObject.kneeWidth + 0.01;
+                            } else {
+                                currentObject.threshold = currentObject.threshold + 0.01;
+                            }
                         } else {
                             if (zynqtgui.modeButtonPressed) {
                                 currentObject.quality = currentObject.quality + 0.01;
@@ -268,6 +273,11 @@ Zynthian.DialogQuestion {
                     function knob0Down() {
                         let currentObject = getCurrent();
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                            if (zynqtgui.modeButtonPressed) {
+                                currentObject.kneeWidth = currentObject.kneeWidth - 0.01;
+                            } else {
+                                currentObject.threshold = currentObject.threshold - 0.01;
+                            }
                         } else {
                             if (zynqtgui.modeButtonPressed) {
                                 currentObject.quality = currentObject.quality - 0.01;
@@ -279,6 +289,11 @@ Zynthian.DialogQuestion {
                     function knob1Up() {
                         let currentObject = getCurrent();
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                            if (zynqtgui.modeButtonPressed) {
+                                currentObject.makeUpGain = currentObject.makeUpGain + 0.01;
+                            } else {
+                                currentObject.attack = currentObject.attack + 1;
+                            }
                         } else {
                             currentObject.gainAbsolute = currentObject.gainAbsolute + 0.01;
                         }
@@ -286,6 +301,11 @@ Zynthian.DialogQuestion {
                     function knob1Down() {
                         let currentObject = getCurrent();
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                            if (zynqtgui.modeButtonPressed) {
+                                currentObject.makeUpGain = currentObject.makeUpGain - 0.01;
+                            } else {
+                                currentObject.attack = currentObject.attack - 1;
+                            }
                         } else {
                             currentObject.gainAbsolute = currentObject.gainAbsolute - 0.01;
                         }
@@ -293,6 +313,11 @@ Zynthian.DialogQuestion {
                     function knob2Up() {
                         let currentObject = getCurrent();
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                            if (zynqtgui.modeButtonPressed) {
+                                currentObject.ratio = currentObject.ratio + 1;
+                            } else {
+                                currentObject.release = currentObject.release + 1;
+                            }
                         } else {
                             if (zynqtgui.modeButtonPressed) {
                                 currentObject.frequency = currentObject.frequency + 1;
@@ -310,6 +335,11 @@ Zynthian.DialogQuestion {
                     function knob2Down() {
                         let currentObject = getCurrent();
                         if (currentObject === _private.slotPassthroughClient.compressorSettings) {
+                            if (zynqtgui.modeButtonPressed) {
+                                currentObject.ratio = currentObject.ratio - 1;
+                            } else {
+                                currentObject.release = currentObject.release - 1;
+                            }
                         } else {
                             if (zynqtgui.modeButtonPressed) {
                                 currentObject.frequency = currentObject.frequency - 1;

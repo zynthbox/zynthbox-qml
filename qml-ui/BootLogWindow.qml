@@ -94,6 +94,7 @@ QQC2.ApplicationWindow {
                 root.visible = false;
                 videoPlayer.source = "";
                 bootLogInterface.bootCompleted = true;
+                root.playingExtroVideo = false;
             })
             videoPlayer.play()
         }

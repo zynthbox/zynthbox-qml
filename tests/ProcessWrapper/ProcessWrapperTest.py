@@ -33,12 +33,12 @@ class ProcessWrapperTest(QObject):
     @Slot(str)
     def sendCommandToProcess(self, cmd):
         def task():
-            theResult = self.p.call(QByteArray(b"{cmd}\n"))
+            theResult = self.p.call(QByteArray(bytearray(f"{cmd}\n", "utf-8")))
             self.appendConsoleOutput(f"{theResult}")
             self.cmdInProgress = False
         self.appendConsoleOutput(cmd)
         self.cmdInProgress = True
-        QTimer.singleShot(100, task)
+        QTimer.singleShot(0, task)
 
     @Slot(str)
     def handleStandardOutput(self, output):
@@ -71,7 +71,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 if __name__ == "__main__":
     app = QGuiApplication()
     engine = QQmlApplicationEngine()
-    processWrapperTest = ProcessWrapperTest(app)
+    processWrapperTest = ProcessWrapperTest(engine)
 
     QIcon.setThemeName("breeze")
     engine.rootContext().setContextProperty("app", processWrapperTest)

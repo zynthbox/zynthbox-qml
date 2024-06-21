@@ -3653,12 +3653,11 @@ class zynthian_gui(QObject):
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):
         logging.debug("### Start long task")
-
         # Emit long task started if no other long task is already running
         if self.__long_task_count__ == 0:
             self.longTaskStarted.emit()
-
         self.__long_task_count__ += 1
+        self.doingLongTaskChanged.emit()
         if self.__long_task_count__ > 0:
             recent_task_messages.put("command:show")
 
@@ -3667,7 +3666,7 @@ class zynthian_gui(QObject):
     def end_long_task(self):
         logging.debug("### End long task")
         self.__long_task_count__ -= 1
-
+        self.doingLongTaskChanged.emit()
         # Emit long task ended only if all task has ended
         if self.__long_task_count__ == 0:
             self.currentTaskMessage = ""
@@ -4233,6 +4232,15 @@ class zynthian_gui(QObject):
 
     curlayerIsFX = Property(bool, get_curlayerIsFX, notify=curlayerIsFXChanged)
     ### END Property curlayerIsFX
+
+    ### BEGIN Property doingLongTask
+    def get_doingLongTask(self):
+        return self.__long_task_count__ > 0
+
+    doingLongTaskChanged = Signal()
+
+    doingLongTask = Property(bool, get_doingLongTask, notify=doingLongTaskChanged)
+    ### END Property doingLongTask
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

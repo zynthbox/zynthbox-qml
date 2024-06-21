@@ -1035,7 +1035,7 @@ Kirigami.AbstractApplicationWindow {
     footer: Zynthian.ActionBar {
         z: 999999
         currentPage: root.currentPage
-        visible: root.visible && root.controlsVisible
+        visible: root.visible && root.controlsVisible && !zynqtgui.doingLongTask
         height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 2.5)
     }
     Component.onCompleted: {
@@ -1569,7 +1569,7 @@ Kirigami.AbstractApplicationWindow {
                   * the dependendant properties.
                   */
                 rootVisibilityConnections.enabled = false
-                panel.visible = Qt.binding(function() { return root.visible && !root.active })
+                panel.visible = Qt.binding(function() { return root.visible && !root.active && !zynqtgui.doingLongTask })
             }
         }
 

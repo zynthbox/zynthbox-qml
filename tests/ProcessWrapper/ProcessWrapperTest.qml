@@ -2,32 +2,84 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.6 as Kirigami
 
 ApplicationWindow {
     id: root
+    visible: true
+    width: 600
+    height: 600
 
     ColumnLayout {
-        ListView {
+        spacing: 0
+        anchors.fill: parent
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: app.consoleOutput
-            delegate: Label {
-                text: modelData
+            color: "#10000000"
+            ListView {
+                anchors.fill: parent
+                anchors.margins: 10
+                model: app.consoleOutput
+                spacing: 25
+                onCountChanged: {
+                    currentIndex = count - 1
+                }
+                delegate: RowLayout {
+                    Layout.fillWidth: true
+                    Label {
+                        text: "$>"
+                        Layout.alignment: Qt.AlignTop
+                    }
+                    Rectangle {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 1
+                        color: "#33000000"
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: modelData
+                    }
+                }
             }
         }
-        RowLayout {
+        Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.preferredHeight: 50
+            Layout.minimumHeight: 50
+            Layout.maximumHeight: 50
 
-            TextArea {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-            Button {
-                Layout.fillHeight: true
-                Layout.preferredWidth: height
-                source: "keyboard-enter"
+            RowLayout {
+                anchors.fill: parent
+                TextArea {
+                    id: textAreaCmd
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.alignment: Qt.AlignVCenter
+                    enabled: !app.cmdInProgress
+                    opacity: enabled ? 1 : 0.5
+                    focus: true
+                    placeholderText: "Command"
+                    onEditingFinished: buttonSend.clicked()
+                    Keys.onReturnPressed: editingFinished()
+                }
+                Button {
+                    id: buttonSend
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: height
+                    icon.name: "keyboard-enter"
+                    icon.color: "#ffffff"
+                    enabled: !app.cmdInProgress
+                    opacity: enabled ? 1 : 0.5
+                    background: Rectangle {
+                        color: "#2196f3"
+                    }
+                    onClicked: {
+                        if (textAreaCmd.text.trim() != "") {
+                            app.sendCommandToProcess(textAreaCmd.text)
+                            textAreaCmd.text = ""
+                        }
+                    }
+                }
             }
         }
     }

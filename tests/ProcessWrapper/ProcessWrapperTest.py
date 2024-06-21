@@ -1,63 +1,79 @@
 import sys
-from PySide2.QtCore import QByteArray, QGuiApplication, QQmlApplicationEngine, Slot, QTimer, QStringListModel
+from PySide2.QtCore import QObject, QByteArray, Signal, Property, Slot, QTimer, QStringListModel, Qt
+from PySide2.QtGui import QGuiApplication, QIcon
+from PySide2.QtQml import QQmlApplicationEngine
+from pathlib import Path
 import Zynthbox
+import os
+import signal
+import sys
 
 
 class ProcessWrapperTest(QObject):
-    def __init__(self):
-        self.console_output = []
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.__consoleOutput = []
+        self.__cmdInProgress = False
         self.p = Zynthbox.ProcessWrapper(self)
-        self.p.standardOutput.connect(handleStandardOutput)
-        self.p.standardError.connect(handleStandardError)
-        self.p.stateChanged.connect(handleStateChanged)
+        self.p.standardOutput.connect(self.handleStandardOutput)
+        self.p.standardError.connect(self.handleStandardError)
+        self.p.stateChanged.connect(self.handleStateChanged)
         self.appendConsoleOutput("--- Created process wrapper, now starting process")
+        self.appendConsoleOutput(f"jalv -n synthv1-py http://synthv1.sourceforge.net/lv2")
         self.p.start("jalv", ["-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.appendConsoleOutput("--- Process started")
 
     @Slot()
-    def handleStateChanged():
-        self.appendConsoleOutput(f"--- ProcessWrapper state is now {p.state()}\n")
-        if p.state() == Zynthbox.ProcessWrapper.ProcessState.NotRunningState:
+    def handleStateChanged(self):
+        self.appendConsoleOutput(f"--- ProcessWrapper state is now {self.p.state()}\n")
+        if self.p.state() == Zynthbox.ProcessWrapper.ProcessState.NotRunningState:
             app.quit()
 
-    @Slot()
-    def talkToProcess():
-        self.appendConsoleOutput("--- Call a couple of functions - first a non-blocking one: set 15 1")
-        p.send(QByteArray(b"set 15 1\n"))
-        self.appendConsoleOutput("--- Non-blocking function (without output) called - now calling a blocking function (which must return some output)")
-        theResult = p.call(QByteArray(b"preset file:///zynthian/zynthian-data/presets/lv2/synthv1_392Synthv1Patches.presets.lv2/392Synthv1Patches_NoizeExport01.ttl\n"))
-        self.appendConsoleOutput(f"--- The result data from the blocking call was:\n--- START RESULT ---\n{theResult}\n--- END RESULT ---")
-        p.stop()
-
+    @Slot(str)
+    def sendCommandToProcess(self, cmd):
+        def task():
+            theResult = self.p.call(QByteArray(b"{cmd}\n"))
+            self.appendConsoleOutput(f"{theResult}")
+            self.cmdInProgress = False
+        self.appendConsoleOutput(cmd)
+        self.cmdInProgress = True
+        QTimer.singleShot(100, task)
 
     @Slot(str)
-    def handleStandardOutput(output):
+    def handleStandardOutput(self, output):
         self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
-        # We know the last thing output by jalv on startup is the alsa
-        # playback configuration, we can use that here. Other tools will
-        # require other estimates, but that's out test case here, and it
-        # shows how to use that knowledge to perform actions
-        if output.startswith("ALSA: use") and output.endswith("periods for playback\n"):
-            talkToProcess()
+        self.appendConsoleOutput("Process started. Send commands to communicate with process")
 
     @Slot(str)
-    def handleStandardError(output):
+    def handleStandardError(self, output):
         self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
-        # if "Comm buffers" in output and "Update rate: " in output:
 
     def get_consoleOutput(self):
-        return self.console_output
+        return self.__consoleOutput
     def appendConsoleOutput(self, data):
-        self.console_output.append(data)
+        self.__consoleOutput.append(data)
         self.consoleOutputChanged.emit()
     consoleOutputChanged = Signal()
     consoleOutput = Property("QVariantList", get_consoleOutput, notify=consoleOutputChanged)
+
+    def get_cmdInProgress(self):
+        return self.__cmdInProgress
+    def set_cmdInProgress(self, val):
+        self.__cmdInProgress = val
+    cmdInProgressChanged = Signal()
+    cmdInProgress = Property(bool, get_cmdInProgress, set_cmdInProgress, notify=cmdInProgressChanged)
+
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
 
 if __name__ == "__main__":
     app = QGuiApplication()
     engine = QQmlApplicationEngine()
     processWrapperTest = ProcessWrapperTest(app)
 
+    QIcon.setThemeName("breeze")
     engine.rootContext().setContextProperty("app", processWrapperTest)
     engine.load(os.fspath(Path(__file__).resolve().parent / "ProcessWrapperTest.qml"))
     sys.exit(app.exec_())

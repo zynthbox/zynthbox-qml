@@ -89,4 +89,8 @@ ApplicationWindow {
             }
         }
     }
+
+    Component.onCompleted: {
+        app.start()
+    }
 }

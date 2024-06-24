@@ -1,8 +1,9 @@
 import sys
-from PySide2.QtCore import QObject, QByteArray, Signal, Property, Slot, QTimer, QStringListModel, Qt
+from PySide2.QtCore import QObject, QByteArray, Signal, Property, Slot, QTimer
 from PySide2.QtGui import QGuiApplication, QIcon
 from PySide2.QtQml import QQmlApplicationEngine
 from pathlib import Path
+from time import sleep
 import Zynthbox
 import os
 import signal
@@ -13,15 +14,21 @@ class ProcessWrapperTest(QObject):
         super().__init__(parent)
 
         self.__consoleOutput = []
-        self.__cmdInProgress = False
+        self.__cmdInProgress = True
+        self.prompt = "\n> "
         self.p = Zynthbox.ProcessWrapper(self)
-        self.p.standardOutput.connect(self.handleStandardOutput)
-        self.p.standardError.connect(self.handleStandardError)
         self.p.stateChanged.connect(self.handleStateChanged)
-        self.appendConsoleOutput("--- Created process wrapper, now starting process")
+        self.appendConsoleOutput("--- Created process wrapper")
+
+    @Slot()
+    def start(self):
         self.appendConsoleOutput("jalv -n synthv1-py http://synthv1.sourceforge.net/lv2")
+        # self.p.start("stdbuf", ["-oL", "jalv", "-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.p.start("jalv", ["-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.appendConsoleOutput("--- Process started")
+        # self.p.waitForOutput(self.prompt)
+        # self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.getStandardOutput()}\n--- PROCESS START OUTPUT END")
+        self.cmdInProgress = False
 
     @Slot()
     def handleStateChanged(self):
@@ -32,22 +39,17 @@ class ProcessWrapperTest(QObject):
     @Slot(str)
     def sendCommandToProcess(self, cmd):
         def task():
-            theResult = self.p.call(QByteArray(bytearray(f"{cmd}\n", "utf-8")), "\n> ")
-            self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{theResult}\n--- PROC OUTPUT END")
+            self.p.send(QByteArray(bytearray(f"{cmd}\n", "utf-8")))
+            self.p.waitForOutput(self.prompt)
+            self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{self.p.getStandardOutput()}\n--- PROC OUTPUT END")
             self.cmdInProgress = False
-        self.appendConsoleOutput(cmd)
-        self.cmdInProgress = True
-        QTimer.singleShot(0, task)
-
-    @Slot(str)
-    def handleStandardOutput(self, output):
-        # self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
-        pass
-
-    @Slot(str)
-    def handleStandardError(self, output):
-        # self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
-        pass
+        if cmd == "clear":
+            self.__consoleOutput = []
+            self.consoleOutputChanged.emit()
+        else:
+            self.appendConsoleOutput(cmd)
+            self.cmdInProgress = True
+            QTimer.singleShot(0, task)
 
     def get_consoleOutput(self):
         return self.__consoleOutput
@@ -61,6 +63,7 @@ class ProcessWrapperTest(QObject):
         return self.__cmdInProgress
     def set_cmdInProgress(self, val):
         self.__cmdInProgress = val
+        self.cmdInProgressChanged.emit()
     cmdInProgressChanged = Signal()
     cmdInProgress = Property(bool, get_cmdInProgress, set_cmdInProgress, notify=cmdInProgressChanged)
 

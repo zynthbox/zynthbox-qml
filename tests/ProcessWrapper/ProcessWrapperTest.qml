@@ -21,6 +21,10 @@ ApplicationWindow {
                 anchors.margins: 10
                 model: app.consoleOutput
                 spacing: 25
+                flickableDirection: Flickable.VerticalFlick
+                boundsBehavior: Flickable.StopAtBounds
+                interactive: true
+                clip: true
                 onCountChanged: {
                     currentIndex = count - 1
                 }
@@ -42,6 +46,7 @@ ApplicationWindow {
                         selectByMouse: true
                     }
                 }
+                ScrollBar.vertical: ScrollBar {}
             }
         }
         Rectangle {

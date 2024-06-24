@@ -32,7 +32,7 @@ class ProcessWrapperTest(QObject):
     @Slot(str)
     def sendCommandToProcess(self, cmd):
         def task():
-            theResult = self.p.call(QByteArray(bytearray(f"{cmd}\n", "utf-8")))
+            theResult = self.p.call(QByteArray(bytearray(f"{cmd}\n", "utf-8")), "\n> ")
             self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{theResult}\n--- PROC OUTPUT END")
             self.cmdInProgress = False
         self.appendConsoleOutput(cmd)
@@ -41,11 +41,13 @@ class ProcessWrapperTest(QObject):
 
     @Slot(str)
     def handleStandardOutput(self, output):
-        self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
+        # self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
+        pass
 
     @Slot(str)
     def handleStandardError(self, output):
-        self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
+        # self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
+        pass
 
     def get_consoleOutput(self):
         return self.__consoleOutput

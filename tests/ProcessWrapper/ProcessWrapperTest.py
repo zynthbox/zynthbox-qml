@@ -6,7 +6,6 @@ from pathlib import Path
 import Zynthbox
 import os
 import signal
-import sys
 
 
 class ProcessWrapperTest(QObject):
@@ -20,7 +19,7 @@ class ProcessWrapperTest(QObject):
         self.p.standardError.connect(self.handleStandardError)
         self.p.stateChanged.connect(self.handleStateChanged)
         self.appendConsoleOutput("--- Created process wrapper, now starting process")
-        self.appendConsoleOutput(f"jalv -n synthv1-py http://synthv1.sourceforge.net/lv2")
+        self.appendConsoleOutput("jalv -n synthv1-py http://synthv1.sourceforge.net/lv2")
         self.p.start("jalv", ["-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.appendConsoleOutput("--- Process started")
 
@@ -34,7 +33,7 @@ class ProcessWrapperTest(QObject):
     def sendCommandToProcess(self, cmd):
         def task():
             theResult = self.p.call(QByteArray(bytearray(f"{cmd}\n", "utf-8")))
-            self.appendConsoleOutput(f"{theResult}")
+            self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{theResult}\n--- PROC OUTPUT END")
             self.cmdInProgress = False
         self.appendConsoleOutput(cmd)
         self.cmdInProgress = True
@@ -43,7 +42,6 @@ class ProcessWrapperTest(QObject):
     @Slot(str)
     def handleStandardOutput(self, output):
         self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
-        self.appendConsoleOutput("Process started. Send commands to communicate with process")
 
     @Slot(str)
     def handleStandardError(self, output):

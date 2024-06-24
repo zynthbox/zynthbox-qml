@@ -17,6 +17,8 @@ class ProcessWrapperTest(QObject):
         self.__cmdInProgress = True
         self.prompt = "\n> "
         self.p = Zynthbox.ProcessWrapper(self)
+        self.p.standardOutputChanged.connect(self.handleStandardOutput)
+        self.p.standardErrorChanged.connect(self.handleStandardError)
         self.p.stateChanged.connect(self.handleStateChanged)
         self.appendConsoleOutput("--- Created process wrapper")
 
@@ -27,7 +29,7 @@ class ProcessWrapperTest(QObject):
         self.p.start("jalv", ["-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.appendConsoleOutput("--- Process started")
         # self.p.waitForOutput(self.prompt)
-        # self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.getStandardOutput()}\n--- PROCESS START OUTPUT END")
+        # self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROCESS START OUTPUT END")
         self.cmdInProgress = False
 
     @Slot()
@@ -41,7 +43,7 @@ class ProcessWrapperTest(QObject):
         def task():
             self.p.send(QByteArray(bytearray(f"{cmd}\n", "utf-8")))
             self.p.waitForOutput(self.prompt)
-            self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{self.p.getStandardOutput()}\n--- PROC OUTPUT END")
+            self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROC OUTPUT END")
             self.cmdInProgress = False
         if cmd == "clear":
             self.__consoleOutput = []
@@ -50,6 +52,16 @@ class ProcessWrapperTest(QObject):
             self.appendConsoleOutput(cmd)
             self.cmdInProgress = True
             QTimer.singleShot(0, task)
+
+    @Slot(str)
+    def handleStandardOutput(self, output):
+        # self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
+        pass
+
+    @Slot(str)
+    def handleStandardError(self, output):
+        self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
+        pass
 
     def get_consoleOutput(self):
         return self.__consoleOutput

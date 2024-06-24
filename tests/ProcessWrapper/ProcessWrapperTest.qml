@@ -35,9 +35,11 @@ ApplicationWindow {
                         Layout.preferredWidth: 1
                         color: "#33000000"
                     }
-                    Label {
+                    TextEdit {
                         Layout.fillWidth: true
                         text: modelData
+                        readOnly: true
+                        selectByMouse: true
                     }
                 }
             }
@@ -59,8 +61,7 @@ ApplicationWindow {
                     opacity: enabled ? 1 : 0.5
                     focus: true
                     placeholderText: "Command"
-                    onEditingFinished: buttonSend.clicked()
-                    Keys.onReturnPressed: editingFinished()
+                    Keys.onReturnPressed: buttonSend.clicked()
                 }
                 Button {
                     id: buttonSend

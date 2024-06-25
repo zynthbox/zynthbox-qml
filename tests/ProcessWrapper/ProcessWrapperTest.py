@@ -40,7 +40,7 @@ class ProcessWrapperTest(QObject):
     @Slot(str)
     def sendCommandToProcess(self, cmd):
         def task():
-            self.p.send(QByteArray(bytearray(f"{cmd}\n", "utf-8")))
+            self.p.sendLine(cmd)
             self.p.waitForOutput(self.prompt)
             self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROC OUTPUT END")
             self.cmdInProgress = False

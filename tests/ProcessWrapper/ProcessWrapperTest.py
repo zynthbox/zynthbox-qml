@@ -17,8 +17,6 @@ class ProcessWrapperTest(QObject):
         self.__cmdInProgress = True
         self.prompt = "\n> "
         self.p = Zynthbox.ProcessWrapper(self)
-        self.p.standardOutputChanged.connect(self.handleStandardOutput)
-        self.p.standardErrorChanged.connect(self.handleStandardError)
         self.p.stateChanged.connect(self.handleStateChanged)
         self.appendConsoleOutput("--- Created process wrapper")
 

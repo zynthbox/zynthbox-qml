@@ -25,11 +25,10 @@ class ProcessWrapperTest(QObject):
     @Slot()
     def start(self):
         self.appendConsoleOutput("jalv -n synthv1-py http://synthv1.sourceforge.net/lv2")
-        # self.p.start("stdbuf", ["-oL", "jalv", "-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.p.start("jalv", ["-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.appendConsoleOutput("--- Process started")
-        # self.p.waitForOutput(self.prompt)
-        # self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROCESS START OUTPUT END")
+        self.p.waitForOutput(self.prompt)
+        self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROCESS START OUTPUT END")
         self.cmdInProgress = False
 
     @Slot()
@@ -52,16 +51,6 @@ class ProcessWrapperTest(QObject):
             self.appendConsoleOutput(cmd)
             self.cmdInProgress = True
             QTimer.singleShot(0, task)
-
-    @Slot(str)
-    def handleStandardOutput(self, output):
-        # self.appendConsoleOutput(f"--- STDOUT BEGIN\n{output}\n--- STDOUT END")
-        pass
-
-    @Slot(str)
-    def handleStandardError(self, output):
-        self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
-        pass
 
     def get_consoleOutput(self):
         return self.__consoleOutput

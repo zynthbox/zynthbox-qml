@@ -85,6 +85,9 @@ class zynthian_basic_engine:
             logging.info(f"Starting Engine {self.name}")
             logging.debug(f"Engine start command : {self.command}")
             self.proc.start(command, command_args)
+            self.proc.waitForOutput(self.command_prompt)
+            output = self.proc.standardOutput()
+            logging.debug(f"--- Engine Start Output BEGIN\n{output}\n--- Engine Start Output END")
 
     def stop(self):
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
@@ -111,7 +114,7 @@ class zynthian_basic_engine:
                 self.proc.sendLine(cmd)
                 if wait_for_output:
                     out = self.proc_get_output()
-                    logging.debug("proc output:\n{}".format(out))
+                    logging.debug(f"--- proc_cmd Output BEGIN\n{out}--- proc_cmd Output END")
             except Exception as err:
                 logging.error("Can't exec engine command: {} => {}".format(cmd, err))
             return out

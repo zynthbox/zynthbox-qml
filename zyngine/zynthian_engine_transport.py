@@ -50,9 +50,9 @@ class zynthian_engine_transport(zynthian_basic_engine):
 
     def stop(self):
         try:
-            self.proc.sendline("quit")
-            self.proc.expect(pexpect.EOF)
-            self.proc = None
+            self.proc.sendLine("quit")
+            # PROCESSWRAPPER TODO : Check how to wait fo EOF
+            # self.proc.waitForOutput(pexpect.EOF)
         except Exception as e:
             logging.error("Can't stop engine {} => {}".format(self.name, e))
             super().stop()

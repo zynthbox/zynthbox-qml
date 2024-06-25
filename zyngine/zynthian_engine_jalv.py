@@ -171,6 +171,7 @@ class zynthian_engine_jalv(zynthian_engine):
         self.nickname = "JV/" + plugin_name
         self.plugin_name = plugin_name
         self.plugin_url = self.plugins_dict[plugin_name]['URL']
+        self.jackname = self.get_jalv_jackname()
 
         self.ui = False
         if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
@@ -185,24 +186,14 @@ class zynthian_engine_jalv(zynthian_engine):
 
         if not dryrun:
             if self.config_remote_display() and self.ui:
-                self.command = ("jalv.gtk --jack-name {} {}".format(self.get_jalv_jackname(), self.plugin_url))
+                self.command = ("jalv.gtk --jack-name {} {}".format(self.jackname, self.plugin_url))
             else:
                 self.command_env['DISPLAY'] = ":0"
                 self.command_env['QT_QPA_PLATFORM'] = "offscreen"
-                self.command = ("jalv -n {} {}".format(self.get_jalv_jackname(), self.plugin_url))
+                self.command = ("jalv -n {} {}".format(self.jackname, self.plugin_url))
 
             self.command_prompt = "\n> "
-
-            output = self.start()
-
-            # Get Plugin & Jack names from Jalv starting text ...
-            self.jackname = None
-            if output:
-                for line in output.split("\n"):
-                    if line[0:10]=="JACK Name:":
-                        self.jackname = line[11:].strip()
-                        logging.debug("Jack Name => {}".format(self.jackname))
-                        break
+            self.start()
 
             # Set static MIDI Controllers from hardcoded plugin info
             try:
@@ -288,7 +279,7 @@ class zynthian_engine_jalv(zynthian_engine):
     def set_preset(self, layer, preset, preload=False):
         if not preset[0]:
             return
-        output=self.proc_cmd("preset {}".format(preset[0]))
+        output=self.proc_cmd("preset {}".format(preset[0]), wait_for_output=True)
 
         #Parse new controller values
         for line in output.split("\n"):
@@ -420,7 +411,7 @@ class zynthian_engine_jalv(zynthian_engine):
 
     def get_lv2_monitors_dict(self):
         self.lv2_monitors_dict = OrderedDict()
-        for line in self.proc_cmd("monitors").split("\n"):
+        for line in self.proc_cmd("monitors", wait_for_output=True).split("\n"):
             try:
                 parts=line.split(" = ")
                 if len(parts)==2:
@@ -775,13 +766,13 @@ class zynthian_engine_jalv(zynthian_engine):
     def sanitize_text(text):
         # Remove bad chars
         bad_chars = ['.', ',', ';', ':', '!', '*', '+', '?', '@', '&', '$', '%', '=', '"', '\'', '`', '/', '\\', '^', '<', '>', '[', ']', '(', ')', '{', '}']
-        for i in bad_chars: 
+        for i in bad_chars:
             text = text.replace(i, ' ')
-            
+
         # Strip and replace (multi)spaces by single underscore
         text = '_'.join(text.split())
         text = '_'.join(filter(None,text.split('_')))
-    
+
         return text
 
 

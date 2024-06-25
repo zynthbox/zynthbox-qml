@@ -99,8 +99,8 @@ class zynthian_engine_sfizz(zynthian_engine):
 
     def stop(self):
         try:
-            self.proc.sendline("quit")
-            self.proc.expect("Closing...")
+            self.proc.sendLine("quit")
+            self.proc.waitForOutput("Closing...")
         except:
             super().stop()
 

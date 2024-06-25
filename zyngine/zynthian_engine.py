@@ -24,15 +24,16 @@
 
 #import sys
 import os
-import copy
 import json
 import liblo
 import logging
-import pexpect
-from time import sleep
+import shlex
+import Zynthbox
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
+from zynqtgui import zynthian_gui_config
+from PySide2.QtCore import Slot
 
 from . import zynthian_controller
 
@@ -57,90 +58,63 @@ class zynthian_basic_engine:
 
     def __init__(self, name=None, command=None, prompt=None):
         self.name = name
-
-        self.proc = None
-        self.proc_timeout = 20
-        self.proc_start_sleep = None
+        self.proc = Zynthbox.ProcessWrapper(zynthian_gui_config.zynqtgui)
+        self.proc.stateChanged.connect(self.handleStateChanged)
         self.command = command
         self.command_env = os.environ.copy()
         self.command_prompt = prompt
-
+        self.is_running = False
 
     def __del__(self):
         self.stop()
-
 
     # ---------------------------------------------------------------------------
     # Subproccess Management & IPC
     # ---------------------------------------------------------------------------
 
+    @Slot()
+    def handleStateChanged(self):
+        logging.debug(f"--- {self.name} state is now {self.proc.state()}")
+        if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
+            self.is_running = True
+
     def start(self):
-        def task():
-            logging.debug("Command: {}".format(self.command))
-            self.proc=pexpect.spawn(self.command, timeout=self.proc_timeout, env=self.command_env)
-            #os.sched_setaffinity(self.proc.pid, [0,1,2])
-
-            self.proc.delaybeforesend = 0
-
-            output = self.proc_get_output()
-
-            if self.proc_start_sleep:
-                sleep(self.proc_start_sleep)
-
-            return output
-
-        restart_count = 0
-
-        if not self.proc:
-            output = None
-            logging.info("Starting Engine {}".format(self.name))
-            while output is None:
-                try:
-                    output = task()
-                except Exception as err:
-                    restart_count += 1
-                    logging.error("Can't start engine {} => {}".format(self.name, err))
-                    logging.debug(f"Engine {self.name} Restart Count : {restart_count}")
-
-                if restart_count >= 5:
-                    # Tried restarting engine 5 times but failed. Force restart the entire application
-                    self.zynqtgui.exit(102)
-            return output
-
+        command = shlex.split(self.command)[0]
+        command_args = shlex.split(self.command)[1:]
+        if not self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
+            logging.info(f"Starting Engine {self.name}")
+            logging.debug(f"Engine start command : {self.command}")
+            self.proc.start(command, command_args)
 
     def stop(self):
-        if self.proc:
+        if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             try:
                 logging.info("Stoping Engine " + self.name)
-                self.proc.terminate()
-                sleep(0.2)
-                self.proc.terminate(True)
-                self.proc=None
+                self.proc.stop()
             except Exception as err:
                 logging.error("Can't stop engine {} => {}".format(self.name, err))
 
-
     def proc_get_output(self):
         if self.command_prompt:
-            self.proc.expect(self.command_prompt)
-            return self.proc.before.decode()
+            self.proc.waitForOutput(self.command_prompt)
+            output = self.proc.standardOutput().split(self.command_prompt)[0]
+            return output
         else:
             logging.warning("Command Prompt is not defined!")
             return None
 
-
-    def proc_cmd(self, cmd):
-        if self.proc:
+    def proc_cmd(self, cmd:str, wait_for_output=False):
+        if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
+            out = ""
             try:
-                #logging.debug("proc command: "+cmd)
-                self.proc.sendline(cmd)
-                out=self.proc_get_output()
-                #logging.debug("proc output:\n{}".format(out))
+                logging.debug("proc command: "+cmd)
+                self.proc.sendLine(cmd)
+                if wait_for_output:
+                    out = self.proc_get_output()
+                    logging.debug("proc output:\n{}".format(out))
             except Exception as err:
-                out=""
                 logging.error("Can't exec engine command: {} => {}".format(cmd, err))
             return out
-
 
 #------------------------------------------------------------------------------
 # Synth Engine Base Class

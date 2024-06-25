@@ -195,6 +195,11 @@ class zynthian_engine_jalv(zynthian_engine):
             self.command_prompt = "\n> "
             self.start()
 
+            # Run presets command explicitly after starting otherwise loading a preset does not work
+            self.proc.sendLine("presets")
+            self.proc.waitForOutput(self.command_prompt)
+            logging.debug(f"--- presets command output BEGIN\n{self.proc.standardOutput()}\n--- presets command output END")
+
             # Set static MIDI Controllers from hardcoded plugin info
             try:
                 self._ctrls = self.plugin_ctrl_info[self.plugin_name]['ctrls']

@@ -44,8 +44,13 @@ class ProcessWrapperTest(QObject):
     def sendCommandToProcess(self, cmd):
         def task():
             self.p.sendLine(cmd)
-            self.p.waitForOutput(self.prompt)
-            self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROC OUTPUT END")
+            if self.p.waitForOutput(self.prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
+                if self.p.awaitedOutput() == "":
+                    self.appendConsoleOutput("Call succeeded without output")
+                else:
+                    self.appendConsoleOutput(f"--- PROC OUTPUT BEGIN\n{self.p.awaitedOutput()}\n--- PROC OUTPUT END")
+            else:
+                self.appendConsoleOutput("An error occurred while waiting for the function to return")
             self.cmdInProgress = False
         if cmd == "clear":
             self.__consoleOutput = []

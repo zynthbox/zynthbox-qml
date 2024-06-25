@@ -84,9 +84,10 @@ class zynthian_basic_engine:
         if not self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             logging.info(f"Starting Engine {self.name}")
             logging.debug(f"Engine start command : {self.command}")
+            # PROCESSWRAPPER TODO : Handle engines with no command prompt
             self.proc.start(command, command_args)
             self.proc.waitForOutput(self.command_prompt)
-            output = self.proc.standardOutput()
+            output = self.proc.standardOutput().split(self.command_prompt)[0]
             logging.debug(f"--- Engine Start Output BEGIN\n{output}\n--- Engine Start Output END")
 
     def stop(self):

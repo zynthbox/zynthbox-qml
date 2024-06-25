@@ -17,6 +17,7 @@ class ProcessWrapperTest(QObject):
         self.__cmdInProgress = True
         self.prompt = "\n> "
         self.p = Zynthbox.ProcessWrapper(self)
+        self.p.standardErrorChanged.connect(self.handleStandardError)
         self.p.stateChanged.connect(self.handleStateChanged)
         self.appendConsoleOutput("--- Created process wrapper")
 
@@ -34,6 +35,10 @@ class ProcessWrapperTest(QObject):
         self.appendConsoleOutput(f"--- ProcessWrapper state is now {self.p.state()}\n")
         if self.p.state() == Zynthbox.ProcessWrapper.ProcessState.NotRunningState:
             app.quit()
+
+    @Slot(str)
+    def handleStandardError(self, output):
+        self.appendConsoleOutput(f"--- STDERR BEGIN\n{output}\n--- STDERR END")
 
     @Slot(str)
     def sendCommandToProcess(self, cmd):

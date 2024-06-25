@@ -16,7 +16,15 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: "#10000000"
+            Timer {
+                id: viewPositioner
+                interval: 100; repeat: false; running: false;
+                onTriggered: {
+                    consoleOutputView.positionViewAtEnd();
+                }
+            }
             ListView {
+                id: consoleOutputView
                 anchors.fill: parent
                 anchors.margins: 10
                 model: app.consoleOutput
@@ -26,6 +34,7 @@ ApplicationWindow {
                 interactive: true
                 clip: true
                 onCountChanged: {
+                    viewPositioner.restart();
                     currentIndex = count - 1
                 }
                 delegate: RowLayout {

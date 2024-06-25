@@ -27,6 +27,7 @@ import re
 import json
 import shutil
 import logging
+import Zynthbox
 from os.path import isfile
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
@@ -197,8 +198,10 @@ class zynthian_engine_jalv(zynthian_engine):
 
             # Run presets command explicitly after starting otherwise loading a preset does not work
             self.proc.sendLine("presets")
-            self.proc.waitForOutput(self.command_prompt)
-            logging.debug(f"--- presets command output BEGIN\n{self.proc.standardOutput()}\n--- presets command output END")
+            if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
+                logging.debug(f"--- presets command output BEGIN\n{self.proc.awaitedOutput()}\n--- presets command output END")
+            else:
+                logging.error("An error occurred while waiting for the function to return")
 
             # Set static MIDI Controllers from hardcoded plugin info
             try:

@@ -174,7 +174,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
             sfi = self.load_bank(bank[0], False)
 
         if sfi:
-            output=self.proc_cmd("inst {}".format(sfi))
+            output=self.proc_cmd("inst {}".format(sfi), wait_for_output=True)
             for f in output.split("\n"):
                 try:
                     prg=int(f[4:7])
@@ -233,7 +233,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         if sf not in self.soundfont_index:
             logging.info("Loading SoundFont '{}' ...".format(sf))
             # Send command to FluidSynth
-            output=self.proc_cmd("load \"{}\"".format(sf))
+            output=self.proc_cmd("load \"{}\"".format(sf), wait_for_output=True)
             # Parse ouput ...
             sfi=None
             cre=re.compile(r"loaded SoundFont has ID (\d+)")

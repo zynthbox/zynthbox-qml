@@ -1070,6 +1070,8 @@ class sketchpad_clip(QObject):
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
             self.audioSource.setLaneAffinity(self.__lane__)
+            if self.clipChannel is not None:
+                self.audioSource.sketchpadTrack = self.channel.id
             if self.clipChannel is not None and self.__song__.isLoading == False:
                 self.clipChannel.trackType = "sample-loop"
             self.cppObjIdChanged.emit()

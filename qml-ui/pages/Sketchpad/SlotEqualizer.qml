@@ -169,9 +169,9 @@ Zynthian.DialogQuestion {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 10
                 QtObject {
                     id: _private
-                    property QtObject selectedChannel
-                    property string slotType
-                    property int slotIndex
+                    property QtObject selectedChannel: null
+                    property string slotType: ""
+                    property int slotIndex: 0
                     property int displayedSection: 0
                     property QtObject engineData: selectedChannel === null
                         ? null
@@ -183,9 +183,9 @@ Zynthian.DialogQuestion {
                     property QtObject slotPassthroughClient: slotType === ""
                         ? null
                         : slotType === "sketch"
-                            ? Zynthbox.Plugin.getClipById(slotIndex)
+                            ? Zynthbox.PlayGridManager.getClipById(slotIndex)
                             : slotType === "sample"
-                                ? Zynthbox.Plugin.getClipById(slotIndex)
+                                ? Zynthbox.PlayGridManager.getClipById(slotIndex)
                                 : slotType === "global"
                                     ? Zynthbox.Plugin.globalPlaybackClient
                                     : slotType === "track"

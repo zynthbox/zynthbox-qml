@@ -32,8 +32,7 @@ import Zynthbox
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
-from zynqtgui import zynthian_gui_config
-from PySide2.QtCore import Slot
+from PySide2.QtCore import QObject, Slot
 
 from . import zynthian_controller
 
@@ -41,7 +40,7 @@ from . import zynthian_controller
 # Basic Engine Class: Spawn a proccess & manage IPC communication using pexpect
 #--------------------------------------------------------------------------------
 
-class zynthian_basic_engine:
+class zynthian_basic_engine(QObject):
 
     # ---------------------------------------------------------------------------
     # Data dirs 
@@ -56,9 +55,10 @@ class zynthian_basic_engine:
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, name=None, command=None, prompt=None):
+    def __init__(self, name=None, command=None, prompt=None, zynqtgui=None):
+        super(zynthian_basic_engine, self).__init__(zynqtgui)
         self.name = name
-        self.proc = Zynthbox.ProcessWrapper(zynthian_gui_config.zynqtgui)
+        self.proc = Zynthbox.ProcessWrapper(zynqtgui)
         self.proc.stateChanged.connect(self.handleStateChanged)
         self.command = command
         self.command_env = os.environ.copy()
@@ -157,7 +157,7 @@ class zynthian_engine(zynthian_basic_engine):
     # ---------------------------------------------------------------------------
 
     def __init__(self, zynqtgui=None):
-        super().__init__()
+        super().__init__(zynqtgui=zynqtgui)
 
         self.zynqtgui=zynqtgui
 

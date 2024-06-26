@@ -182,15 +182,19 @@ Zynthian.DialogQuestion {
                                 : null
                     property QtObject slotPassthroughClient: slotType === ""
                         ? null
-                        : slotType === "global"
-                            ? Zynthbox.Plugin.globalPlaybackClient
-                            : slotType === "track"
-                                ? Zynthbox.Plugin.trackPassthroughClients[selectedChannel.id]
-                                : slotType === "synth"
-                                    ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
-                                    : slotType === "fx"
-                                        ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
-                                        : null
+                        : slotType === "sketch"
+                            ? Zynthbox.Plugin.getClipById(slotIndex)
+                            : slotType === "sample"
+                                ? Zynthbox.Plugin.getClipById(slotIndex)
+                                : slotType === "global"
+                                    ? Zynthbox.Plugin.globalPlaybackClient
+                                    : slotType === "track"
+                                        ? Zynthbox.Plugin.trackPassthroughClients[selectedChannel.id]
+                                        : slotType === "synth"
+                                            ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
+                                            : slotType === "fx"
+                                                ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
+                                                : null
                     function getCurrent() {
                         let currentObject = null;
                         if (_private.slotPassthroughClient.compressorSettings.selected === true) {

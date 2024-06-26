@@ -883,8 +883,8 @@ Rectangle {
     Zynthian.ActionPickerPopup {
         id: sketchPickerPopup
         objectName: "sketchPickerPopup"
-        columns: 2
-        rows: 4
+        columns: 3
+        rows: 3
         property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         actions: [
             QQC2.Action {
@@ -910,12 +910,6 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: "Swap With..."
-                onTriggered: {
-                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlotRow);
-                }
-            },
-            QQC2.Action {
                 text: qsTr("Pick Recording...")
                 onTriggered: {
                     loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "recording");
@@ -934,6 +928,19 @@ Rectangle {
                 }
             },
             QQC2.Action {
+                text: "Swap With..."
+                onTriggered: {
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlotRow);
+                }
+            },
+            QQC2.Action {
+                text: "Equalizer..."
+                enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
+                onTriggered: {
+                    root.requestSlotEqualizer(root.selectedChannel, "sketch", sketchPickerPopup.sketch.cppObjId);
+                }
+            },
+            QQC2.Action {
                 text: qsTr("Download Sketches...")
                 onTriggered: {
                     zynqtgui.current_modal_screen_id = "sketch_downloader"
@@ -946,8 +953,8 @@ Rectangle {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
         property QtObject sketch: root.selectedSlotRowItem && root.selectedSlotRowItem.channel ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow] : null
-        columns: 2
-        rows: 4
+        columns: 3
+        rows: 3
         actions: [
             QQC2.Action {
                 text: qsTr("Save A Copy...")
@@ -972,12 +979,6 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: "Swap with..."
-                onTriggered: {
-                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sample", root.selectedChannel.selectedSlotRow);
-                }
-            },
-            QQC2.Action {
                 text: qsTr("Pick recording")
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "recording");
@@ -993,6 +994,19 @@ Rectangle {
                 text: qsTr("Pick sketch")
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sketch");
+                }
+            },
+            QQC2.Action {
+                text: "Swap with..."
+                onTriggered: {
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sample", root.selectedChannel.selectedSlotRow);
+                }
+            },
+            QQC2.Action {
+                text: "Equalizer..."
+                enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
+                onTriggered: {
+                    root.requestSlotEqualizer(root.selectedChannel, "sample", samplePickerPopup.sketch.cppObjId);
                 }
             },
             QQC2.Action {

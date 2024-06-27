@@ -618,7 +618,7 @@ def audio_autoconnect(force=False):
     #                 release_lock()
     #                 return
     # ### END Bluetooth ports connection
-    globalPlaybackInputPorts = jclient.get_ports("GlobalPlayback", is_audio=True, is_input=True)
+    globalPlaybackInputPorts = jclient.get_ports("GlobalPlayback:input", is_audio=True, is_input=True)
 
     # BEGIN Connect global FX ports to system playback
     for port in zip(globalFx1OutputPorts, globalPlaybackInputPorts):

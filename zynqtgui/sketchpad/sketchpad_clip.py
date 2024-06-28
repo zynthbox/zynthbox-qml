@@ -38,6 +38,58 @@ from subprocess import check_output
 from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal, Slot
 from zynqtgui import zynthian_gui_config
 
+def restorePassthroughClientData(passthroughClient, dataChunk):
+    for index, filterValues in enumerate(dataChunk["equaliserSettings"]):
+        passthroughClient.equaliserSettings()[index].setFilterType(Zynthbox.JackPassthroughFilter.FilterType.values[filterValues["filterType"]])
+        passthroughClient.equaliserSettings()[index].setFrequency(filterValues["frequency"])
+        passthroughClient.equaliserSettings()[index].setQuality(filterValues["quality"])
+        passthroughClient.equaliserSettings()[index].setSoloed(filterValues["soloed"])
+        passthroughClient.equaliserSettings()[index].setGain(filterValues["gain"])
+        passthroughClient.equaliserSettings()[index].setActive(filterValues["active"])
+    passthroughClient.compressorSettings().setThresholdDB(dataChunk["compressorSettings"]["thresholdDB"])
+    passthroughClient.compressorSettings().setMakeUpGainDB(dataChunk["compressorSettings"]["makeUpGainDB"])
+    passthroughClient.compressorSettings().setKneeWidthDB(dataChunk["compressorSettings"]["kneeWidthDB"])
+    passthroughClient.compressorSettings().setRelease(dataChunk["compressorSettings"]["release"])
+    passthroughClient.compressorSettings().setAttack(dataChunk["compressorSettings"]["attack"])
+    passthroughClient.compressorSettings().setRatio(dataChunk["compressorSettings"]["ratio"])
+    passthroughClient.setEqualiserEnabled(dataChunk["equaliserEnabled"])
+    passthroughClient.setCompressorEnabled(dataChunk["compressorEnabled"])
+    passthroughClient.setCompressorSidechannelLeft(dataChunk["compressorSidechannelLeft"])
+    passthroughClient.setCompressorSidechannelRight(dataChunk["compressorSidechannelRight"])
+def setPassthroughClientDefaults(passthroughClient):
+    passthroughClient.setEqualiserEnabled(False)
+    passthroughClient.setCompressorEnabled(False)
+    passthroughClient.setCompressorSidechannelLeft("")
+    passthroughClient.setCompressorSidechannelRight("")
+    for filterObject in passthroughClient.equaliserSettings():
+        filterObject.setDefaults()
+    passthroughClient.compressorSettings().setDefaults()
+def serializePassthroughData(passthroughClient):
+    equaliserSettingsData = []
+    for client in passthroughClient.equaliserSettings():
+        equaliserSettingsData.append({
+            "filterType": client.filterType().name.decode().split(".")[-1],
+            "frequency": client.frequency(),
+            "quality": client.quality(),
+            "soloed": client.soloed(),
+            "gain": client.gain(),
+            "active": client.active()
+        })
+    return {
+        "equaliserSettings": equaliserSettingsData,
+        "equaliserEnabled": passthroughClient.equaliserEnabled(),
+        "compressorEnabled": passthroughClient.compressorEnabled(),
+        "compressorSidechannelLeft": passthroughClient.compressorSidechannelLeft(),
+        "compressorSidechannelRight": passthroughClient.compressorSidechannelRight(),
+        "compressorSettings": {
+            "thresholdDB": passthroughClient.compressorSettings().thresholdDB(),
+            "makeUpGainDB": passthroughClient.compressorSettings().makeUpGainDB(),
+            "kneeWidthDB": passthroughClient.compressorSettings().kneeWidthDB(),
+            "release": passthroughClient.compressorSettings().release(),
+            "attack": passthroughClient.compressorSettings().attack(),
+            "ratio": passthroughClient.compressorSettings().ratio()
+        }
+    }
 
 class sketchpad_clip_metadata(QObject):
     def __init__(self, clip):
@@ -92,6 +144,7 @@ class sketchpad_clip_metadata(QObject):
         self.__speedRatio = None
         self.__startPosition = None
         self.__syncSpeedToBpm = None
+        self.__equaliserSettings = None
 
         Zynthbox.SyncTimer.instance().bpmChanged.connect(self.updateBpmDependantValues, Qt.QueuedConnection)
         self.bpmChanged.connect(self.updateBpmDependantValues)
@@ -136,6 +189,7 @@ class sketchpad_clip_metadata(QObject):
     def get_speedRatio(self): return self.__speedRatio
     def get_startPosition(self): return self.__startPosition
     def get_syncSpeedToBpm(self): return self.__syncSpeedToBpm
+    def get_equaliserSettings(self): return self.__equaliserSettings
 
     def set_audioType(self, value, write=True, force=False):
         if value != self.__audioType or force:
@@ -431,6 +485,22 @@ class sketchpad_clip_metadata(QObject):
             self.syncSpeedToBpmChanged.emit()
             if write:
                 self.scheduleWrite()
+    def set_equaliserSettings(self, value, write=True, force=False):
+        if value != self.__equaliserSettings or force:
+            self.__equaliserSettings = value
+            self.equaliserSettingsChanged.emit()
+            if self.clip.audioSource is not None:
+                if self.__equaliserSettings is None or self.__equaliserSettings == "":
+                    setPassthroughClientDefaults(self.clip.audioSource)
+                else:
+                    # This really shouldn't happen in the general case, but... occasionally we might have something weird in that json data, and it's just nicer to not crash quite so hard when that happens
+                    try:
+                        restorePassthroughClientData(self.clip.audioSource, json.loads(self.__equaliserSettings))
+                    except:
+                        logging.error(f"Failed to restore (and so restoring to defaults) the equaliser/compressor settings for {self.clip} from the data: {self.__equaliserSettings}")
+                        setPassthroughClientDefaults(self.clip.audioSource)
+            if write:
+                self.scheduleWrite()
 
     audioTypeChanged = Signal()
     audioTypeSettingsChanged = Signal()
@@ -471,6 +541,7 @@ class sketchpad_clip_metadata(QObject):
     speedRatioChanged = Signal()
     startPositionChanged = Signal()
     syncSpeedToBpmChanged = Signal()
+    equaliserSettingsChanged = Signal()
 
     audioType = Property(str, get_audioType, set_audioType, notify=audioTypeChanged)
     audioTypeSettings = Property(str, get_audioTypeSettings, set_audioTypeSettings, notify=audioTypeSettingsChanged)
@@ -511,6 +582,7 @@ class sketchpad_clip_metadata(QObject):
     speedRatio = Property(float, get_speedRatio, set_speedRatio, notify=speedRatioChanged)
     startPosition = Property(float, get_startPosition, set_startPosition, notify=startPositionChanged)
     syncSpeedToBpm = Property(bool, get_syncSpeedToBpm, set_syncSpeedToBpm, notify=syncSpeedToBpmChanged)
+    equaliserSettings = Property(str, get_equaliserSettings, set_equaliserSettings, notify=equaliserSettingsChanged)
 
     def updateBpmDependantValues(self):
         if not self.clip.isEmpty:
@@ -585,6 +657,7 @@ class sketchpad_clip_metadata(QObject):
                 self.set_speedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)), write=False, force=True)
                 self.set_startPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)), write=False, force=True)
                 self.set_syncSpeedToBpm(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true", write=False, force=True)
+                self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")), write=False, force=True)
                 self.updateBpmDependantValues()
 
     @Slot()
@@ -657,6 +730,11 @@ class sketchpad_clip_metadata(QObject):
             tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.__speedRatio)]
             tags["ZYNTHBOX_STARTPOSITION"] = [str(self.__startPosition)]
             tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.__syncSpeedToBpm)]
+            if self.clip.audioSource:
+                equaliserSettings = json.dumps(serializePassthroughData(self.clip.audioSource))
+                if equaliserSettings != self.__equaliserSettings:
+                    self.set_equaliserSettings(equaliserSettings, write=False, force=True)
+            tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(self.__equaliserSettings)]
 
             try:
                 file = taglib.File(self.clip.path)
@@ -727,6 +805,7 @@ class sketchpad_clip_metadata(QObject):
         self.set_speedRatio(None, write=False, force=True)
         self.set_startPosition(None, write=False, force=True)
         self.set_syncSpeedToBpm(None, write=False, force=True)
+        self.set_equaliserSettings(None, write=False, force=True)
 
 
 class sketchpad_clip(QObject):
@@ -1070,6 +1149,25 @@ class sketchpad_clip(QObject):
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
             self.audioSource.setLaneAffinity(self.__lane__)
+            def connectPassthroughClientForSaving(passthroughClient):
+                passthroughClient.equaliserEnabledChanged.connect(self.__metadata.scheduleWrite)
+                for filterObject in passthroughClient.equaliserSettings():
+                    filterObject.filterTypeChanged.connect(self.__metadata.scheduleWrite)
+                    filterObject.frequencyChanged.connect(self.__metadata.scheduleWrite)
+                    filterObject.qualityChanged.connect(self.__metadata.scheduleWrite)
+                    filterObject.soloedChanged.connect(self.__metadata.scheduleWrite)
+                    filterObject.gainChanged.connect(self.__metadata.scheduleWrite)
+                    filterObject.activeChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorEnabledChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSidechannelLeftChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSidechannelRightChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSettings().thresholdChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSettings().makeUpGainChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSettings().kneeWidthChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSettings().releaseChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSettings().attackChanged.connect(self.__metadata.scheduleWrite)
+                passthroughClient.compressorSettings().ratioChanged.connect(self.__metadata.scheduleWrite)
+            connectPassthroughClientForSaving(self.audioSource)
             if self.clipChannel is not None:
                 self.audioSource.setSketchpadTrack(self.clipChannel.id)
             if self.clipChannel is not None and self.__song__.isLoading == False:

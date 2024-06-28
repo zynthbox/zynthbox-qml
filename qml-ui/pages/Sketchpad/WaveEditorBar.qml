@@ -394,7 +394,7 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                visible: waveBar.visible && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
+                visible: waveBar.visible && waveBar.channel.trackType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
                 color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
                 x: visible ? progressDots.cppClipObject.position * parent.width : 0

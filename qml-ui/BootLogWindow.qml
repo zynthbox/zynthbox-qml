@@ -18,6 +18,8 @@ QQC2.ApplicationWindow {
     visible: true
     width: Screen.width
     height: Screen.height
+    minimumWidth: width
+    minimumHeight: height
     maximumWidth: width
     maximumHeight: height
 

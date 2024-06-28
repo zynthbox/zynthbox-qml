@@ -1,9 +1,8 @@
 import sys
-from PySide2.QtCore import QObject, QByteArray, Signal, Property, Slot, QTimer
+from PySide2.QtCore import QObject, Signal, Property, Slot, QTimer
 from PySide2.QtGui import QGuiApplication, QIcon
 from PySide2.QtQml import QQmlApplicationEngine
 from pathlib import Path
-from time import sleep
 import Zynthbox
 import os
 import signal
@@ -27,7 +26,7 @@ class ProcessWrapperTest(QObject):
         self.p.start("jalv", ["-n", "synthv1-py", "http://synthv1.sourceforge.net/lv2"])
         self.appendConsoleOutput("--- Process started")
         self.p.waitForOutput(self.prompt)
-        self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.standardOutput()}\n--- PROCESS START OUTPUT END")
+        self.appendConsoleOutput(f"--- PROCESS START OUTPUT BEGIN\n{self.p.awaitedOutput()}\n--- PROCESS START OUTPUT END")
         self.cmdInProgress = False
 
     @Slot()

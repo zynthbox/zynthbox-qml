@@ -87,6 +87,11 @@ ColumnLayout {
 
     function cuiaCallback(cuia) {
         switch (cuia) {
+            case "KNOB0_TOUCHED":
+            case "KNOB1_TOUCHED":
+            case "KNOB2_TOUCHED":
+            case "KNOB3_TOUCHED":
+                return true;
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
@@ -133,7 +138,7 @@ ColumnLayout {
             text: qsTr("Gain (dB)")
             controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             controlProperty: "gain"
-            valueString: root.controlObj && root.controlObj.metadata.gain != null ? qsTr("%1 dB").arg(parseInt(Zynthian.CommonUtils.interp(root.controlObj.metadata.gain, 0, 1, -100, 24))) : 0
+            valueString: root.clipAudioSource ? qsTr("%1 dB").arg(root.clipAudioSource.gainDb.toFixed(2)) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5

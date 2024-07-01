@@ -401,7 +401,7 @@ Zynthian.ScreenPage {
      */
     function updateClipPitch(clip, sign) {
         if (clip != null) {
-            clip.metadata.pitch = Zynthian.CommonUtils.clamp(clip.metadata.pitch + sign, -12, 12)
+            clip.metadata.pitch = Zynthian.CommonUtils.clamp(clip.metadata.pitch + sign, -48, 48)
         }
     }
     /**

@@ -102,10 +102,20 @@ ColumnLayout {
                 pageManager.getPage("sketchpad").updateClipGain(root.controlObj, -1)
                 return true;
             case "KNOB1_UP":
-                pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, 1)
+                if (zynqtgui.modeButtonPressed) {
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, 0.01)
+                } else {
+                    pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, 1)
+                }
                 return true;
             case "KNOB1_DOWN":
-                pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, -1)
+                if (zynqtgui.modeButtonPressed) {
+                    zynqtgui.ignoreNextModeButtonPress = true;
+                    pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, -0.01)
+                } else {
+                    pageManager.getPage("sketchpad").updateClipPitch(root.controlObj, -1)
+                }
                 return true;
             case "KNOB2_UP":
                 pageManager.getPage("sketchpad").updateClipSpeedRatio(root.controlObj, 1)
@@ -159,14 +169,15 @@ ColumnLayout {
             text: qsTr("Pitch")
             controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
             controlProperty: "pitch"
+            fixedPointTrail: 2
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
             dial {
                 stepSize: 1
-                from: -12
-                to: 12
+                from: -48
+                to: 48
             }
 
             onDoubleClicked: {

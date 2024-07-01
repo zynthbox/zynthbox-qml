@@ -1146,6 +1146,9 @@ class sketchpad_clip(QObject):
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
         if path is not None:
             self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
+            if self.is_channel_sample == False:
+                # If we are using this as a Sketch, we should be time-stretching things like pitch shifts, so... let's do that explicitly here to be sure
+                self.audioSource.setTimeStretchLive(True)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
             self.audioSource.setLaneAffinity(self.__lane__)

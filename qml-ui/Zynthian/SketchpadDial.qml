@@ -14,6 +14,10 @@ ColumnLayout {
     property QtObject controlObj
     property string controlProperty
     property real buttonStepSize
+
+    property bool showDecimalsAtInteger: false
+    property int fixedPointTrail: 9 // How many decimal point values do you want to display on this value when a decimal point is required (this should be small enough that the resulting string fits inside the dial's ring)
+
     signal pressed(var mouse)
     signal clicked()
     signal doubleClicked()
@@ -63,7 +67,11 @@ ColumnLayout {
             QQC2.Label {
                 id: valueLabel
                 anchors.centerIn: parent
-                text: dial.value
+                text: root.showDecimalsAtInteger
+                    ? dial.value.toFixed(root.fixedPointTrail)
+                    : Math.floor(dial.value) == dial.value
+                        ? Math.floor(dial.value)
+                        : dial.value.toFixed(root.fixedPointTrail)
             }
 
             //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical

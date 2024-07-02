@@ -138,6 +138,7 @@ class sketchpad_clip_metadata(QObject):
         self.__length = None
         self.__loopDelta = None
         self.__loopDelta2 = None
+        self.__timeStretchStyle = None
         self.__pitch = None
         self.__playbackStyle = None
         self.__snapLengthToBeat = None
@@ -183,6 +184,7 @@ class sketchpad_clip_metadata(QObject):
     def get_length(self): return self.__length
     def get_loopDelta(self): return self.__loopDelta
     def get_loopDelta2(self): return self.__loopDelta2
+    def get_timeStretchStyle(self): return self.__timeStretchStyle
     def get_pitch(self): return self.__pitch
     def get_playbackStyle(self): return self.__playbackStyle
     def get_snapLengthToBeat(self): return self.__snapLengthToBeat
@@ -436,6 +438,24 @@ class sketchpad_clip_metadata(QObject):
             self.loopDelta2Changed.emit()
             if write:
                 self.scheduleWrite()
+    def set_timeStretchStyle(self, value, write=True, force=False):
+        if value != self.__timeStretchStyle or force:
+            self.__timeStretchStyle = value
+            self.timeStretchStyleChanged.emit()
+            if self.clip.audioSource is not None:
+                if self.__timeStretchStyle.startswith("Zynthbox.ClipAudioSource.TimeStretchStyle."):
+                    playbackStyle = self.__timeStretchStyle.split(".")[-1]
+                if self.__timeStretchStyle in Zynthbox.ClipAudioSource.TimeStretchStyle.values:
+                    self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.values[self.__timeStretchStyle])
+                else:
+                    if self.clip.is_channel_sample == False:
+                        # If we are using this as a Sketch, we should be time-stretching things like pitch shifts
+                        # We already do this when loading, but let's make properly sure our Sketches are working like they're supposed to
+                        self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchBetter)
+                    else:
+                        self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchOff)
+            if write:
+                self.scheduleWrite()
     def set_pitch(self, value, write=True, force=False):
         if value != self.__pitch or force:
             self.__pitch = value
@@ -450,9 +470,9 @@ class sketchpad_clip_metadata(QObject):
             self.playbackStyleChanged.emit()
             if self.clip.audioSource is not None:
                 if self.__playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
-                    playbackStyle = self.__playbackStyle.split(".")[-1]
-                if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
-                    self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
+                    self.__playbackStyle = self.__playbackStyle.split(".")[-1]
+                if self.__playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
+                    self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[self.__playbackStyle])
                 else:
                     self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
             if write:
@@ -535,6 +555,7 @@ class sketchpad_clip_metadata(QObject):
     lengthChanged = Signal()
     loopDeltaChanged = Signal()
     loopDelta2Changed = Signal()
+    timeStretchStyleChanged = Signal()
     pitchChanged = Signal()
     playbackStyleChanged = Signal()
     snapLengthToBeatChanged = Signal()
@@ -576,6 +597,7 @@ class sketchpad_clip_metadata(QObject):
     length = Property(float, get_length, set_length, notify=lengthChanged)
     loopDelta = Property(float, get_loopDelta, set_loopDelta, notify=loopDeltaChanged)
     loopDelta2 = Property(float, get_loopDelta2, set_loopDelta2, notify=loopDelta2Changed)
+    timeStretchStyle = Property(str, get_timeStretchStyle, set_timeStretchStyle, notify=timeStretchStyleChanged)
     pitch = Property(float, get_pitch, set_pitch, notify=pitchChanged)
     playbackStyle = Property(str, get_playbackStyle, set_playbackStyle, notify=playbackStyleChanged)
     snapLengthToBeat = Property(bool, get_snapLengthToBeat, set_snapLengthToBeat, notify=snapLengthToBeatChanged)
@@ -651,6 +673,7 @@ class sketchpad_clip_metadata(QObject):
                 self.set_length(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)), write=False, force=True)
                 self.set_loopDelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)), write=False, force=True)
                 self.set_loopDelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)), write=False, force=True)
+                self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")), write=False, force=True)
                 self.set_pitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)), write=False, force=True)
                 self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle")), write=False, force=True)
                 self.set_snapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true", write=False, force=True)
@@ -724,6 +747,7 @@ class sketchpad_clip_metadata(QObject):
             tags["ZYNTHBOX_LENGTH"] = [str(self.__length)]
             tags["ZYNTHBOX_LOOPDELTA"] = [str(self.__loopDelta)]
             tags["ZYNTHBOX_LOOPDELTA2"] = [str(self.__loopDelta2)]
+            tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.__timeStretchStyle)]
             tags["ZYNTHBOX_PITCH"] = [str(self.__pitch)]
             tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.__playbackStyle)]
             tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.__snapLengthToBeat)]
@@ -799,6 +823,7 @@ class sketchpad_clip_metadata(QObject):
         self.set_length(None, write=False, force=True)
         self.set_loopDelta(None, write=False, force=True)
         self.set_loopDelta2(None, write=False, force=True)
+        self.set_timeStretchStyle(None, write=False, force=True)
         self.set_pitch(None, write=False, force=True)
         self.set_playbackStyle(None, write=False, force=True)
         self.set_snapLengthToBeat(None, write=False, force=True)
@@ -1148,7 +1173,7 @@ class sketchpad_clip(QObject):
             self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
             if self.is_channel_sample == False:
                 # If we are using this as a Sketch, we should be time-stretching things like pitch shifts, so... let's do that explicitly here to be sure
-                self.audioSource.setTimeStretchLive(True)
+                self.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchBetter)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
             self.audioSource.setLaneAffinity(self.__lane__)

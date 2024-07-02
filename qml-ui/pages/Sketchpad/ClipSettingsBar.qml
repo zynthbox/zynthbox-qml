@@ -413,7 +413,13 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
-                text: root.clipAudioSource && root.clipAudioSource.timeStretchLive ? "Pitch Shifting:\nTimestretched" : "Pitch Shifting:\nStandard"
+                text: root.clipAudioSource
+                    ? root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
+                        ? "Pitch Shifting:\nHQ Timestretched"
+                        : root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchStandard
+                            ? "Pitch Shifting:\nTimestretched"
+                            : "Pitch Shifting:\nStandard"
+                    : ""
                 onClicked: {
                     timeStretchingPopup.open();
                 }
@@ -421,19 +427,27 @@ ColumnLayout {
                     id: timeStretchingPopup
                     actions: [
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.timeStretchLive === true
-                                ? qsTr("<b>Timestretch Pitch Shift</b><br />(retains sample length)")
-                                : qsTr("Timestretch Pitch Shift\n(retains sample length)")
+                            text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
+                                ? qsTr("<b>HQ Timestretch Pitch Shift</b><br />(retains sample length<br />slower, better quality)")
+                                : qsTr("HQ Timestretch Pitch Shift\n(retains sample length,\nmost cpu, better quality)")
                             onTriggered: {
-                                root.clipAudioSource.timeStretchLive = true;
+                                root.controlObj.metadata.timeStretchStyle = "TimeStretchBetter";
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.timeStretchLive === false
-                                ? qsTr("<b>Standard Pitch Shift</b><br />(changes playback length)")
-                                : qsTr("Standard Pitch Shift\n(changes playback length)")
+                            text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchStandard
+                                ? qsTr("<b>Timestretch Pitch Shift</b><br />(retains sample length<br />faster, good quality)")
+                                : qsTr("Timestretch Pitch Shift\n(retains sample length,\nmore cpu, good quality)")
                             onTriggered: {
-                                root.clipAudioSource.timeStretchLive = false;
+                                root.controlObj.metadata.timeStretchStyle = "TimeStretchStandard";
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchOff
+                                ? qsTr("<b>Standard Pitch Shift</b><br />(changes playback length,<br />least cpu, highest quality)")
+                                : qsTr("Standard Pitch Shift\n(changes playback length\nleast cpu, highest quality)")
+                            onTriggered: {
+                                root.controlObj.metadata.timeStretchStyle = "TimeStretchOff";
                             }
                         }
                     ]

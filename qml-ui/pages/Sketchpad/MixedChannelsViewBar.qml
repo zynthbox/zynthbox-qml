@@ -741,6 +741,8 @@ Rectangle {
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
                                         property int slotIndex: index
+                                        property bool isSketchpadClip: synthRepeater.synthData[index] != null && synthRepeater.synthData[index].hasOwnProperty("className") && synthRepeater.synthData[index].className == "sketchpad_clip"
+                                        property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
@@ -800,7 +802,6 @@ Rectangle {
                                             id: delegate
                                             property int midiChannel: root.selectedChannel.chainedSounds[index]
                                             property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-                                            property bool isSketchpadClip: synthRepeater.synthData[index] != null && synthRepeater.synthData[index].hasOwnProperty("className") && synthRepeater.synthData[index].className == "sketchpad_clip"
 
                                             anchors.fill: parent
                                             anchors.margins: 4
@@ -837,7 +838,7 @@ Rectangle {
                                                     color: Kirigami.Theme.highlightColor
                                                 }
                                                 Rectangle {
-                                                    width: delegate.isSketchpadClip ? parent.width * synthRepeater.synthData[index].metadata.gain : 0
+                                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.gain : 0
                                                     anchors {
                                                         left: parent.left
                                                         top: parent.top
@@ -845,7 +846,7 @@ Rectangle {
                                                     }
                                                     radius: 4
                                                     opacity: 0.8
-                                                    visible: delegate.isSketchpadClip
+                                                    visible: slotDelegate.cppClipObject
                                                     color: Kirigami.Theme.highlightColor
                                                 }
                                             }
@@ -898,7 +899,7 @@ Rectangle {
                                                     } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0 && synthRepeater.synthData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
-                                                        synthRepeater.synthData[index].metadata.gain = newVal;
+                                                        slotDelegate.cppClipObject.gain = newVal;
                                                     }
                                                 }
                                                 onPressAndHold: {
@@ -1157,7 +1158,7 @@ Rectangle {
                                             // Calculate amount of pixels represented by 1 second
                                             property real pixelToSecs: (waveformItem.end - waveformItem.start) / waveformItem.width
                                             // Calculate amount of pixels represented by 1 beat
-                                            property real pixelsPerBeat: (60/Zynthbox.SyncTimer.bpm*waveformContainer.clip.metadata.speedRatio) / waveformItem.pixelToSecs
+                                            property real pixelsPerBeat: progressDots.cppClipObject ? (60/Zynthbox.SyncTimer.bpm*progressDots.cppClipObject.speedRatio) / waveformItem.pixelToSecs : 1
 
 
                                             // Mask for wave part before start
@@ -1192,7 +1193,7 @@ Rectangle {
                                                 color: Kirigami.Theme.positiveTextColor
                                                 opacity: 0.6
                                                 width: Kirigami.Units.smallSpacing
-                                                x: waveformContainer.clip != null ? (waveformContainer.clip.metadata.startPosition / waveformContainer.clip.duration) * parent.width : 0
+                                                x: progressDots.cppClipObject != null ? (progressDots.cppClipObject.startPositionSeconds / progressDots.cppClipObject.durationSeconds) * parent.width : 0
                                             }
 
                                             // Loop line
@@ -1202,8 +1203,8 @@ Rectangle {
                                                     top: parent.top
                                                     bottom: parent.bottom
                                                 }
-                                                x: waveformContainer.clip
-                                                    ? startLoopLine.x + waveformContainer.clip.metadata.loopDelta/waveformItem.pixelToSecs
+                                                x: progressDots.cppClipObject
+                                                    ? startLoopLine.x + progressDots.cppClipObject.loopDelta/waveformItem.pixelToSecs
                                                     : 0
                                                 color: Kirigami.Theme.highlightColor
                                                 opacity: 0.6
@@ -1220,7 +1221,7 @@ Rectangle {
                                                 color: Kirigami.Theme.neutralTextColor
                                                 opacity: 0.6
                                                 width: Kirigami.Units.smallSpacing
-                                                x: waveformContainer.clip != null ? ((((60/Zynthbox.SyncTimer.bpm*waveformContainer.clip.metadata.speedRatio) * waveformContainer.clip.metadata.length) / waveformContainer.clip.duration) * parent.width) + ((waveformContainer.clip.metadata.startPosition / waveformContainer.clip.duration) * parent.width) : 0
+                                                x: progressDots.cppClipObject != null ? ((((60/Zynthbox.SyncTimer.bpm*progressDots.cppClipObject.speedRatio) * progressDots.cppClipObject.lengthBeats) / progressDots.cppClipObject.durationSeconds) * parent.width) + ((progressDots.cppClipObject.startPositionSeconds / progressDots.cppClipObject.durationSeconds) * parent.width) : 0
                                             }
 
                                             // Progress line

@@ -146,7 +146,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)")
-            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
+            controlObj: root.clipAudioSource
             controlProperty: "gain"
             valueString: root.clipAudioSource ? qsTr("%1 dB").arg(root.clipAudioSource.gainDb.toFixed(2)) : 0
             Layout.fillWidth: true
@@ -160,14 +160,14 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.metadata.gain = root.controlObj.initialGain;
+                root.clipAudioSource.gainAbsolute = root.controlObj.initialGain;
             }
         }
 
         Zynthian.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch")
-            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
+            controlObj: root.clipAudioSource
             controlProperty: "pitch"
             fixedPointTrail: 2
             Layout.fillWidth: true
@@ -181,36 +181,17 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.controlObj.metadata.pitch = root.controlObj.initialPitch;
+                root.clipAudioSource.pitch = root.controlObj.initialPitch;
             }
         }
 
         Zynthian.SketchpadDial {
             id: timeDial
             text: qsTr("Speed Ratio")
-            controlObj: root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata : null
-            Timer {
-                id: timeDialThrottle
-                interval: 1; running: false; repeat: false;
-                onTriggered: {
-                    timeDial.controlObj = root.controlObj.metadata;
-                }
-            }
-            Connections {
-                target: root
-                onControlObjChanged: timeDialThrottle.restart()
-            }
-            Connections {
-                target: timeDial.controlObj
-                onSpeedRatioChanged: {
-                    if (timeDial.dial.value !== timeDial.controlObj.speedRatio) {
-                        timeDial.dial.value = timeDial.controlObj.speedRatio
-                    }
-                }
-            }
+            controlObj: root.clipAudioSource
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
-            enabled: timeDial.controlObj ? !timeDial.controlObj.syncSpeedToBpm : false
+            enabled: timeDial.controlObj ? !timeDial.controlObj.autoSynchroniseSpeedRatio : false
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -222,7 +203,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                timeDial.controlObj.speedRatio = root.controlObj.initialSpeedRatio;
+                root.clipAudioSource.speedRatio = root.controlObj.initialSpeedRatio;
             }
         }
 
@@ -258,11 +239,11 @@ ColumnLayout {
                         id: bpmGuessedDialog
                         property double guessedBPM: 0
                         title: "Estimated BPM"
-                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.controlObj != null && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.bpm : 0)
+                        text: "The estimated BPM was %1\nWould you like to set that as the new BPM for this clip, changing it from %2?".arg(bpmGuessedDialog.guessedBPM).arg(root.clipAudioSource ? root.clipAudioSource.bpm : 0)
                         acceptText: "Yes: Set clip BPM to %1".arg(bpmGuessedDialog.guessedBPM)
                         rejectText: "No"
                         onAccepted: {
-                            root.controlObj.metadata.bpm = bpmGuessedDialog.guessedBPM;
+                            root.clipAudioSource.bpm = bpmGuessedDialog.guessedBPM;
                         }
                     }
                 }
@@ -279,7 +260,7 @@ ColumnLayout {
                 horizontalAlignment: TextInput.AlignHCenter
                 focus: false
                 text: enabled
-                        ? root.controlObj && root.controlObj.metadata.bpm ? (root.controlObj.metadata.bpm <= 0 ? "" : root.controlObj.metadata.bpm) : ""
+                        ? root.clipAudioSource ? (root.clipAudioSource.bpm <= 0 ? "" : root.clipAudioSource.bpm) : ""
                         : ""
                 // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
@@ -289,11 +270,11 @@ ColumnLayout {
                 validator: RegExpValidator { regExp: /^[0-9]*(\.(0{0}|0[1-9]{0,1}|[1-9]{0,2}))?$/ }
                 inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
                 activeFocusOnTab: false
-                enabled: root.controlObj ? true : false
+                enabled: root.clipAudioSource ? true : false
                 onTextChanged: {
                     var newValue = parseFloat(text);
-                    if (text !== "" && root.controlObj.metadata.bpm !== newValue) {
-                        root.controlObj.metadata.bpm = newValue;
+                    if (text !== "" && root.clipAudioSource.bpm !== newValue) {
+                        root.clipAudioSource.bpm = newValue;
                     }
                 }
             }
@@ -307,10 +288,10 @@ ColumnLayout {
                 id: syncSwitch
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                checked: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.syncSpeedToBpm : false
-                enabled: root.controlObj && root.controlObj.metadata.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
+                checked: root.clipAudioSource ? root.clipAudioSource.autoSynchroniseSpeedRatio : false
+                enabled: root.clipAudioSource && root.clipAudioSource.bpm > 0 // This also ensures we check that it actually exists, since a null or undefined also becomes a zero for numerical comparisons
                 onToggled: {
-                    root.controlObj.metadata.syncSpeedToBpm = checked
+                    root.clipAudioSource.autoSynchroniseSpeedRatio = checked
                 }
             }
 
@@ -391,6 +372,14 @@ ColumnLayout {
                             }
                         },
                         Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.WavetableStyle
+                                ? qsTr("<b>Wavetable</b>")
+                                : qsTr("Wavetable")
+                            onTriggered: {
+                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.WavetableStyle;
+                            }
+                        },
+                        Kirigami.Action {
                             text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
                                 ? qsTr("<b>Granular Non-looping</b><br />(experimental)")
                                 : qsTr("Granular Non-looping\n(experimental)")
@@ -431,7 +420,7 @@ ColumnLayout {
                                 ? qsTr("<b>HQ Timestretch Pitch Shift</b><br />(retains sample length<br />slower, better quality)")
                                 : qsTr("HQ Timestretch Pitch Shift\n(retains sample length,\nmost cpu, better quality)")
                             onTriggered: {
-                                root.controlObj.metadata.timeStretchStyle = "TimeStretchBetter";
+                                root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchBetter;
                             }
                         },
                         Kirigami.Action {
@@ -439,7 +428,7 @@ ColumnLayout {
                                 ? qsTr("<b>Timestretch Pitch Shift</b><br />(retains sample length<br />faster, good quality)")
                                 : qsTr("Timestretch Pitch Shift\n(retains sample length,\nmore cpu, good quality)")
                             onTriggered: {
-                                root.controlObj.metadata.timeStretchStyle = "TimeStretchStandard";
+                                root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchStandard;
                             }
                         },
                         Kirigami.Action {
@@ -447,7 +436,7 @@ ColumnLayout {
                                 ? qsTr("<b>Standard Pitch Shift</b><br />(changes playback length,<br />least cpu, highest quality)")
                                 : qsTr("Standard Pitch Shift\n(changes playback length\nleast cpu, highest quality)")
                             onTriggered: {
-                                root.controlObj.metadata.timeStretchStyle = "TimeStretchOff";
+                                root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchOff;
                             }
                         }
                     ]
@@ -460,9 +449,9 @@ ColumnLayout {
             QQC2.Switch {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                checked: root.controlObj && root.controlObj.hasOwnProperty("metadata") ? root.controlObj.metadata.snapLengthToBeat : true
+                checked: root.clipAudioSource ? root.clipAudioSource.snapLengthToBeat : true
                 onToggled: {
-                    root.controlObj.metadata.snapLengthToBeat = checked
+                    root.clipAudioSource.snapLengthToBeat = checked
                 }
             }
             Item {

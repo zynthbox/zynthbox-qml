@@ -34,6 +34,9 @@ import io.zynthbox.components 1.0 as Zynthbox
 Item {
     id: component
     property QtObject clip
+    property QtObject cppClipObject: component.clip && component.clip.hasOwnProperty("cppObjId")
+                                        ? Zynthbox.PlayGridManager.getClipById(component.clip.cppObjId)
+                                        : null
     property int currentADSRElement: 0
     function nextADSRElement() {
         if (currentADSRElement === 3) {
@@ -54,26 +57,26 @@ Item {
             switch(currentADSRElement) {
                 case 0:
                 case 2:
-                    clip.metadata.graineratorSustain = Math.min(1, clip.metadata.graineratorSustain + 0.01);
+                    cppClipObject.grainSustain = Math.min(1, cppClipObject.grainSustain + 0.01);
                     break;
                 case 1:
                 case 3:
-                    clip.metadata.graineratorTilt = Math.min(1, clip.metadata.graineratorTilt + 0.01);
+                    cppClipObject.grainTilt = Math.min(1, cppClipObject.grainTilt + 0.01);
                     break;
             }
         } else {
             switch(currentADSRElement) {
                 case 0:
-                    clip.metadata.adsrAttack = clip.metadata.adsrAttack + 0.01;
+                    cppClipObject.adsrAttack = cppClipObject.adsrAttack + 0.01;
                     break;
                 case 1:
-                    clip.metadata.adsrDecay = clip.metadata.adsrDecay + 0.01;
+                    cppClipObject.adsrDecay = cppClipObject.adsrDecay + 0.01;
                     break;
                 case 2:
-                    clip.metadata.adsrSustain = Math.min(1, clip.metadata.adsrSustain + 0.01);
+                    cppClipObject.adsrSustain = Math.min(1, cppClipObject.adsrSustain + 0.01);
                     break;
                 case 3:
-                    clip.metadata.adsrRelease = clip.metadata.adsrRelease + 0.01;
+                    cppClipObject.adsrRelease = cppClipObject.adsrRelease + 0.01;
                     break;
             }
         }
@@ -83,26 +86,26 @@ Item {
             switch(currentADSRElement) {
                 case 0:
                 case 2:
-                    clip.metadata.graineratorSustain = Math.max(0, clip.metadata.graineratorSustain - 0.01);
+                    cppClipObject.grainSustain = Math.max(0, cppClipObject.grainSustain - 0.01);
                     break;
                 case 1:
                 case 3:
-                    clip.metadata.graineratorTilt = Math.max(0, clip.metadata.graineratorTilt - 0.01);
+                    cppClipObject.grainTilt = Math.max(0, cppClipObject.grainTilt - 0.01);
                     break;
             }
         } else {
             switch(currentADSRElement) {
                 case 0:
-                    clip.metadata.adsrAttack = Math.max(0, clip.metadata.adsrAttack - 0.01);
+                    cppClipObject.adsrAttack = Math.max(0, cppClipObject.adsrAttack - 0.01);
                     break;
                 case 1:
-                    clip.metadata.adsrDecay = Math.max(0, clip.metadata.adsrDecay - 0.01);
+                    cppClipObject.adsrDecay = Math.max(0, cppClipObject.adsrDecay - 0.01);
                     break;
                 case 2:
-                    clip.metadata.adsrSustain = Math.max(0, clip.metadata.adsrSustain - 0.01);
+                    cppClipObject.adsrSustain = Math.max(0, cppClipObject.adsrSustain - 0.01);
                     break;
                 case 3:
-                    clip.metadata.adsrRelease = Math.max(0, clip.metadata.adsrRelease - 0.01);
+                    cppClipObject.adsrRelease = Math.max(0, cppClipObject.adsrRelease - 0.01);
                     break;
             }
         }
@@ -142,25 +145,22 @@ Item {
             }
         }
         Connections {
-            target: component.clip != null && component.clip.metadata ? component.clip.metadata : null
+            target: component.cppClipObject
             function update() {
-                if (component.clip.metadata.adsrAttack !== attackSlider.value) {
-                    attackSlider.value = component.clip.metadata.adsrAttack;
+                if (component.cppClipObject.adsrAttack !== attackSlider.value) {
+                    attackSlider.value = component.cppClipObject.adsrAttack;
                 }
-                if (component.clip.metadata.adsrDecay !== decaySlider.value) {
-                    decaySlider.value = component.clip.metadata.adsrDecay;
+                if (component.cppClipObject.adsrDecay !== decaySlider.value) {
+                    decaySlider.value = component.cppClipObject.adsrDecay;
                 }
-                if (component.clip.metadata.adsrSustain !== sustainSlider.value) {
-                    sustainSlider.value = component.clip.metadata.adsrSustain;
+                if (component.cppClipObject.adsrSustain !== sustainSlider.value) {
+                    sustainSlider.value = component.cppClipObject.adsrSustain;
                 }
-                if (component.clip.metadata.adsrRelease !== releaseSlider.value) {
-                    releaseSlider.value = component.clip.metadata.adsrRelease;
+                if (component.cppClipObject.adsrRelease !== releaseSlider.value) {
+                    releaseSlider.value = component.cppClipObject.adsrRelease;
                 }
             }
-            onAdsrAttackChanged: update()
-            onAdsrDecayChanged: update()
-            onAdsrReleaseChanged: update()
-            onAdsrSustainChanged: update()
+            onAdsrParametersChanged: update()
         }
         InfinitySlider {
             id: attackSlider
@@ -170,7 +170,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
             unitLabel: "\n" + qsTr("seconds")
-            value: component.clip && component.clip.metadata ? component.clip.metadata.adsrAttack : 0
+            value: component.cppClipObject ? component.cppClipObject.adsrAttack : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -180,8 +180,8 @@ Item {
             resetValue: 0
             selected: component.currentADSRElement === 0
             onValueChanged: {
-                if (component.clip && component.clip.metadata.adsrAttack != attackSlider.value) {
-                    component.clip.metadata.adsrAttack = attackSlider.value
+                if (component.cppClipObject && component.cppClipObject.adsrAttack != attackSlider.value) {
+                    component.cppClipObject.adsrAttack = attackSlider.value
                 }
             }
         }
@@ -193,7 +193,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
             unitLabel: "\n" + qsTr("seconds")
-            value: component.clip && component.clip.metadata ? component.clip.metadata.adsrDecay : 0
+            value: component.cppClipObject ? component.cppClipObject.adsrDecay : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -203,8 +203,8 @@ Item {
             resetValue: 0
             selected: component.currentADSRElement === 1
             onValueChanged: {
-                if (component.clip && component.clip.metadata.adsrDecay != decaySlider.value) {
-                    component.clip.metadata.adsrDecay = decaySlider.value
+                if (component.cppClipObject && component.cppClipObject.adsrDecay != decaySlider.value) {
+                    component.cppClipObject.adsrDecay = decaySlider.value
                 }
             }
         }
@@ -216,7 +216,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
             unitLabel: "%"
-            value: component.clip && component.clip.metadata ? component.clip.metadata.adsrSustain : 0
+            value: component.cppClipObject ? component.cppClipObject.adsrSustain : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -228,8 +228,8 @@ Item {
             resetValue: 1
             selected: component.currentADSRElement === 2
             onValueChanged: {
-                if (component.clip && component.clip.metadata.adsrSustain != sustainSlider.value) {
-                    component.clip.metadata.adsrSustain = sustainSlider.value
+                if (component.cppClipObject && component.cppClipObject.adsrSustain != sustainSlider.value) {
+                    component.cppClipObject.adsrSustain = sustainSlider.value
                 }
             }
         }
@@ -241,7 +241,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showGranularSettings === false
             unitLabel: "\n" + qsTr("seconds")
-            value: component.clip && component.clip.metadata ? component.clip.metadata.adsrRelease : 0
+            value: component.cppClipObject ? component.cppClipObject.adsrRelease : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -251,8 +251,8 @@ Item {
             resetValue: 0
             selected: component.currentADSRElement === 3
             onValueChanged: {
-                if (component.clip && component.clip.metadata.adsrRelease != releaseSlider.value) {
-                    component.clip.metadata.adsrRelease = releaseSlider.value
+                if (component.cppClipObject && component.cppClipObject.adsrRelease != releaseSlider.value) {
+                    component.cppClipObject.adsrRelease = releaseSlider.value
                 }
             }
         }
@@ -274,14 +274,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.01
-                value: component.clip && component.clip.metadata ? component.clip.metadata.graineratorSustain : 0
+                value: component.cppClipObject ? component.cppClipObject.grainSustain : 0
                 from: 0
                 to: 1
-                onMoved: component.clip.metadata.graineratorSustain = value
+                onMoved: component.cppClipObject.grainSustain = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.clip && component.clip.metadata ? component.clip.metadata.graineratorSustain : 0).toFixed(2)
+                text: (component.cppClipObject ? component.cppClipObject.grainSustain : 0).toFixed(2)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -310,14 +310,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.01
-                value: component.clip && component.clip.metadata ? component.clip.metadata.graineratorTilt : 0
+                value: component.cppClipObject ? component.cppClipObject.grainTilt : 0
                 from: 0
                 to: 1
-                onMoved: component.clip.metadata.graineratorTilt = value
+                onMoved: component.cppClipObject.grainTilt = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.clip && component.clip.metadata ? component.clip.metadata.graineratorTilt : 0).toFixed(2)
+                text: (component.cppClipObject ? component.cppClipObject.grainTilt : 0).toFixed(2)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -333,17 +333,17 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-            property double grainRemaining: component.clip && component.clip.metadata ? (1 - component.clip.metadata.graineratorSustain) : 1;
-            attackValue: component.clip && component.clip.metadata ? (component.showGranularSettings ? grainRemaining * component.clip.metadata.graineratorTilt : component.clip.metadata.adsrAttack) : 0
-            attackMax: component.showGranularSettings ? 1 : Math.max(1, component.clip && component.clip.metadata ? component.clip.metadata.adsrAttack : 1)
-            decayValue: component.clip && component.clip.metadata ? (component.showGranularSettings ? 0 : component.clip.metadata.adsrDecay) : 0
-            decayMax: component.showGranularSettings ? 2 : Math.max(1, component.clip && component.clip.metadata ? component.clip.metadata.adsrDecay : 2)
+            property double grainRemaining: component.cppClipObject ? (1 - component.cppClipObject.grainSustain) : 1;
+            attackValue: component.cppClipObject ? (component.showGranularSettings ? grainRemaining * component.cppClipObject.grainTilt : component.cppClipObject.adsrAttack) : 0
+            attackMax: component.showGranularSettings ? 1 : Math.max(1, component.cppClipObject ? component.cppClipObject.adsrAttack : 1)
+            decayValue: component.cppClipObject ? (component.showGranularSettings ? 0 : component.cppClipObject.adsrDecay) : 0
+            decayMax: component.showGranularSettings ? 2 : Math.max(1, component.cppClipObject ? component.cppClipObject.adsrDecay : 2)
             decayWidth: component.showGranularSettings ? 0 : decayMax;
-            sustainValue: component.clip && component.clip.metadata ? (component.showGranularSettings ? 1 : component.clip.metadata.adsrSustain) : 0
+            sustainValue: component.cppClipObject ? (component.showGranularSettings ? 1 : component.cppClipObject.adsrSustain) : 0
             sustainMax: 1
-            sustainWidth: component.clip && component.clip.metadata ? (component.showGranularSettings ? component.clip.metadata.graineratorSustain : 1) : 1
-            releaseValue: component.clip && component.clip.metadata ? (component.showGranularSettings ? grainRemaining * (1.0 - component.clip.metadata.graineratorTilt) : component.clip.metadata.adsrRelease) : 0
-            releaseMax: component.showGranularSettings ? 1 : Math.max(1, component.clip && component.clip.metadata ? component.clip.metadata.adsrRelease : 1)
+            sustainWidth: component.cppClipObject ? (component.showGranularSettings ? component.cppClipObject.grainSustain : 1) : 1
+            releaseValue: component.cppClipObject ? (component.showGranularSettings ? grainRemaining * (1.0 - component.cppClipObject.grainTilt) : component.cppClipObject.adsrRelease) : 0
+            releaseMax: component.showGranularSettings ? 1 : Math.max(1, component.cppClipObject ? component.cppClipObject.adsrRelease : 1)
             Connections {
                 target: component
                 onClipChanged: {
@@ -358,14 +358,14 @@ Item {
                 }
             }
             Connections {
-                target: component.clip != null && component.clip.metadata ? component.clip.metadata : null
+                target: component.cppClipObject
                 function update() {
                     if (component.visible) {
                         adsrView.requestPaint();
                     }
                 }
-                onGraineratorSustainChanged: update()
-                onGraineratorTiltChanged: update()
+                onGrainSustainChanged: update()
+                onGrainTiltChanged: update()
                 onAdsrAttackChanged: update()
                 onAdsrDecayChanged: update()
                 onAdsrReleaseChanged: update()

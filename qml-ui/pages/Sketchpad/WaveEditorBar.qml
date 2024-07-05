@@ -46,6 +46,9 @@ GridLayout {
                                     : zynqtgui.bottomBarControlObj != null && zynqtgui.bottomBarControlObj.samples != null
                                         ? zynqtgui.bottomBarControlObj.samples[zynqtgui.bottomBarControlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
                                         : null
+    property QtObject cppClipObject: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("cppObjId")
+                                        ? Zynthbox.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
+                                        : null
     property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
     function cuiaCallback(cuia) {
@@ -59,22 +62,84 @@ GridLayout {
             case "KNOB3_TOUCHED":
                 return true;
             case "KNOB0_UP":
-                pageManager.getPage("sketchpad").updateClipStartPosition(waveBar.controlObj, 1)
+                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + 1, 0, waveBar.cppClipObject.getDurationSamples() - waveBar.cppClipObject.lengthSamples);
+                    } else {
+                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples, 0, waveBar.cppClipObject.getDurationSamples() - waveBar.cppClipObject.lengthSamples);
+                    }
+                } else {
+                    waveBar.cppClipObject.startPositionSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSeconds + 0.01, 0, clip.duration);
+                }
                 return true;
             case "KNOB0_DOWN":
-                pageManager.getPage("sketchpad").updateClipStartPosition(waveBar.controlObj, -1)
+                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - 1, 0, waveBar.cppClipObject.getDurationSamples() - waveBar.cppClipObject.lengthSamples);
+                    } else {
+                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - waveBar.cppClipObject.lengthSamples, 0, waveBar.cppClipObject.getDurationSamples() - waveBar.cppClipObject.lengthSamples);
+                    }
+                } else {
+                    waveBar.cppClipObject.startPositionSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSeconds - 0.01, 0, clip.duration);
+                }
                 return true;
             case "KNOB1_UP":
-                pageManager.getPage("sketchpad").updateClipLoopPosition(waveBar.controlObj, 1)
+                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    // No loop delta to work on with the wavetable style sounds (it's locked to 0)
+                } else {
+                    waveBar.cppClipObject.loopDelta = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDelta + 0.01, 0, clip.secPerBeat * waveBar.cppClipObject.lengthSeconds);
+                }
                 return true;
             case "KNOB1_DOWN":
-                pageManager.getPage("sketchpad").updateClipLoopPosition(waveBar.controlObj, -1)
+                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    // No loop delta to work on with the wavetable style sounds (it's locked to 0)
+                } else {
+                    waveBar.cppClipObject.loopDelta = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDelta - 0.01, 0, clip.secPerBeat * waveBar.cppClipObject.lengthSeconds);
+                }
                 return true;
             case "KNOB2_UP":
-                pageManager.getPage("sketchpad").updateClipLength(waveBar.controlObj, 1)
+                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        if (waveBar.cppClipObject.lengthSamples < waveBar.cppClipObject.getDurationSamples()) {
+                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.lengthSamples + 1;
+                        }
+                    } else {
+                        let currentDivision = Math.round(waveBar.cppClipObject.getDurationSamples() / Math.max(1, waveBar.cppClipObject.lengthSamples));
+                        if (currentDivision > 1) {
+                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.getDurationSamples() / (currentDivision - 1);
+                        }
+                    }
+                } else {
+                    if (waveBar.cppClipObject.snapLengthToBeat) {
+                        waveBar.cppClipObject.lengthSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthSeconds + 1, 0, 64);
+                    } else {
+                        waveBar.cppClipObject.lengthSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthSeconds + 0.01, 0, 64);
+                    }
+                }
                 return true;
             case "KNOB2_DOWN":
-                pageManager.getPage("sketchpad").updateClipLength(waveBar.controlObj, -1)
+                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        if (waveBar.cppClipObject.lengthSamples > 1) {
+                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.lengthSamples - 1;
+                        }
+                    } else {
+                        let currentDivision = Math.round(waveBar.cppClipObject.getDurationSamples() / Math.max(1, waveBar.cppClipObject.lengthSamples));
+                        if (currentDivision < waveBar.cppClipObject.getDurationSamples()) {
+                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.getDurationSamples() / (currentDivision + 1);
+                        }
+                    }
+                } else {
+                    if (waveBar.cppClipObject.snapLengthToBeat) {
+                        waveBar.cppClipObject.lengthSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthSeconds - 1, 0, 64);
+                    } else {
+                        waveBar.cppClipObject.lengthSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthSeconds - 0.01, 0, 64);
+                    }
+                }
                 return true;
             case "KNOB3_UP":
                 return true;
@@ -92,7 +157,7 @@ GridLayout {
         property real pixelToSecs: (wav.end - wav.start) / width
 
         // Calculate amount of pixels represented by 1 beat
-        property real pixelsPerBeat: waveBar.controlObj && waveBar.controlObj.hasOwnProperty("metadata") ? (60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.metadata.speedRatio) / wav.pixelToSecs : 1
+        property real pixelsPerBeat: waveBar.cppClipObject ? (60/Zynthbox.SyncTimer.bpm*waveBar.cppClipObject.speedRatio) / wav.pixelToSecs : 1
 
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -179,7 +244,7 @@ GridLayout {
                         let delta = wav.pixelToSecs * (mouse.x - lastX)
 
                         // Set startposition on swipe
-                        waveBar.controlObj.metadata.startPosition += delta
+                        waveBar.cppClipObject.startPosition += delta
                     }
                 }
             }
@@ -210,7 +275,12 @@ GridLayout {
                 onXChanged: {
                     if (startHandleDragHandler.active) {
                         // Set startposition on swipe
-                        waveBar.controlObj.metadata.startPosition = wav.pixelToSecs * x
+                        if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                            let nearestWindow = ((x / width) * waveBar.cppClipObject.lengthSamples) / waveBar.cppClipObject.getDurationSamples();
+                            waveBar.cppClipObject.startPositionSamples = nearestWindowStart * waveBar.cppClipObject.lengthSamples;
+                        } else {
+                            waveBar.cppClipObject.startPositionSeconds = wav.pixelToSecs * x;
+                        }
                     }
                 }
 
@@ -231,7 +301,7 @@ GridLayout {
             QQC2.Button {
                 id: loopHandle
 
-                visible: waveBar.channel.trackType !== "sample-slice"
+                visible: waveBar.channel.trackType !== "sample-slice" && waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle
                 anchors.verticalCenter: startLoopLine.verticalCenter
                 padding: Kirigami.Units.largeSpacing * 1.5
                 background: Item {
@@ -252,7 +322,7 @@ GridLayout {
 
                 onXChanged: {
                     if (loopHandleDragHandler.active) {
-                        waveBar.controlObj.metadata.loopDelta = (loopHandle.x - startLoopLine.x) * wav.pixelToSecs
+                        waveBar.cppClipObject.loopDelta = (loopHandle.x - startLoopLine.x) * wav.pixelToSecs
                     }
                 }
 
@@ -285,32 +355,53 @@ GridLayout {
                         source: "../../Zynthian/img/breadcrumb-separator.svg"
                     }
                 }
-                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                 opacity: 1
-                text: waveBar.controlObj && waveBar.controlObj.metadata
-                        ? qsTr("%1:%2 E", "End")
-                            .arg(Math.floor(waveBar.controlObj.metadata.length / 4))
-                            .arg((waveBar.controlObj.metadata.length % 4).toFixed(waveBar.controlObj.metadata.snapLengthToBeat ? 0 : 2))
+                font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
+                property double currentDivision: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Math.round(waveBar.cppClipObject.getDurationSamples() / Math.max(1, waveBar.cppClipObject.lengthSamples)) : 1
+                text: waveBar.cppClipObject
+                        ? waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle
+                            ? "1/%1".arg(Number.isInteger(currentDivision) ? currentDivision : currentDivision.toFixed(2))
+                            : qsTr("%1:%2 E", "End")
+                                .arg(Math.floor(waveBar.cppClipObject.lengthBeats / 4))
+                                .arg((waveBar.cppClipObject.lengthBeats % 4).toFixed(waveBar.cppClipObject.snapLengthToBeat ? 0 : 2))
                         : ""
+                Text {
+                    visible: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    color: Kirigami.Theme.textColor
+                    font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
+                    anchors {
+                        top: parent.top
+                        left: parent.right
+                        bottom: parent.bottom
+                        margins: Kirigami.Units.largeSpacing * 1.5
+                    }
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+                    text: visible
+                        ? qsTr("%1\nsamples").arg(waveBar.cppClipObject.lengthSamples)
+                        : ""
+                }
                 z: 100
 
                 onXChanged: {
                     if (endHandleDragHandler.drag.active) {
                         let calculatedLength
 
-                        if (waveBar.controlObj.metadata.snapLengthToBeat) {
+                        if (waveBar.cppClipObject.snapLengthToBeat) {
                             calculatedLength = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/wav.pixelsPerBeat))
                         } else {
                             calculatedLength = Math.abs((endHandle.x + endHandle.width - startLoopLine.x)/wav.pixelsPerBeat);
                         }
 
-                        if (calculatedLength > 0 || waveBar.controlObj.metadata.length !== calculatedLength) {
-                            waveBar.controlObj.metadata.length = calculatedLength;
+                        if (calculatedLength > 0 || waveBar.cppClipObject.lengthBeats !== calculatedLength) {
+                            waveBar.cppClipObject.lengthBeats = calculatedLength;
                         }
 
                         // When dragging end handle, check and set loop handle to be not greater than end
                         if (loopLine.x > endLoopLine.x) {
-                            waveBar.controlObj.metadata.loopDelta = (endLoopLine.x - startLoopLine.x) * wav.pixelToSecs
+                            waveBar.cppClipObject.loopDelta = (endLoopLine.x - startLoopLine.x) * wav.pixelToSecs
                         }
                     }
                 }
@@ -342,8 +433,8 @@ GridLayout {
                 color: Kirigami.Theme.positiveTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
-                x: waveBar.controlObj && waveBar.controlObj.metadata
-                    ? (waveBar.controlObj.metadata.startPosition / waveBar.controlObj.duration) * parent.width
+                x: waveBar.cppClipObject
+                    ? (waveBar.cppClipObject.startPositionSeconds / waveBar.cppClipObject.durationSeconds) * parent.width
                     : 0
             }
 
@@ -355,8 +446,8 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                x: waveBar.controlObj && waveBar.controlObj.metadata
-                    ? startLoopLine.x + waveBar.controlObj.metadata.loopDelta/wav.pixelToSecs
+                x: waveBar.cppClipObject
+                    ? startLoopLine.x + waveBar.cppClipObject.loopDelta/wav.pixelToSecs
                     : 0
                 color: Kirigami.Theme.highlightColor
                 opacity: 0.6
@@ -378,8 +469,8 @@ GridLayout {
                 color: Kirigami.Theme.neutralTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
-                x: waveBar.controlObj && waveBar.controlObj.metadata
-                    ? ((((60/Zynthbox.SyncTimer.bpm*waveBar.controlObj.metadata.speedRatio) * waveBar.controlObj.metadata.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.metadata.startPosition / waveBar.controlObj.duration) * parent.width)
+                x: waveBar.cppClipObject
+                    ? ((((60/Zynthbox.SyncTimer.bpm * waveBar.cppClipObject.speedRatio) * waveBar.cppClipObject.lengthBeats) / waveBar.cppClipObject.durationSeconds) * parent.width) + ((waveBar.cppClipObject.startPositionSeconds / waveBar.cppClipObject.durationSeconds) * parent.width)
                     : 0
                 onXChanged: {
                     if (!endHandleDragHandler.drag.active) {
@@ -394,20 +485,17 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                visible: waveBar.visible && waveBar.channel.trackType === "sample-loop" && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
+                visible: waveBar.visible && waveBar.channel.trackType === "sample-loop" && waveBar.cppClipObject && waveBar.cppClipObject.isPlaying
                 color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
-                x: visible ? progressDots.cppClipObject.position * parent.width : 0
+                x: visible ? waveBar.cppClipObject.position * parent.width : 0
             }
 
             // SamplerSynth progress dots
             Repeater {
                 id: progressDots
-                property QtObject cppClipObject: waveBar.controlObj
-                                                    ? Zynthbox.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
-                                                    : null
-                model: (waveBar.visible && waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && cppClipObject
-                        ? cppClipObject.playbackPositions
+                model: (waveBar.visible && waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
+                        ? waveBar.cppClipObject.playbackPositions
                         : 0
                 delegate: Item {
                     visible: model.positionID > -1

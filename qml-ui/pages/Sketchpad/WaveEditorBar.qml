@@ -582,7 +582,7 @@ GridLayout {
             // Slightly odd check - sometimes this will return a longer string, but as it's a
             // base64 encoding of a midi file, it'll be at least the header size of that if
             // it's useful, so... just check for bigger than 10, that'll do
-            visible: waveBar.controlObj != null && waveBar.controlObj.metadata && waveBar.controlObj.metadata.midiRecording != null && waveBar.controlObj.metadata.midiRecording.length > 10
+            visible: waveBar.controlObj != null && waveBar.controlObj.hasOwnProperty("metadata") && waveBar.controlObj.metadata.midiRecording != null && waveBar.controlObj.metadata.midiRecording.length > 10
             text: Zynthbox.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
             onClicked: {
                 if (Zynthbox.MidiRecorder.isPlaying) {

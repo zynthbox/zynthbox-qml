@@ -70,6 +70,33 @@ GridLayout {
                 _private.goRight();
                 returnValue = true;
                 break;
+            case "KNOB0_TOUCHED":
+            case "KNOB1_TOUCHED":
+            case "KNOB2_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB0_UP":
+                _private.knob0Up();
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                _private.knob0Down();
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                _private.knob1Up();
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                _private.knob1Down();
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                returnValue = true;
+                break;
         }
         return returnValue;
     }
@@ -82,7 +109,8 @@ GridLayout {
             clipSettingsADSR.nextADSRElement();
         }
         function goUp() {
-            if (zynqtgui.altButtonPressed) {
+            if (zynqtgui.modeButtonPressed) {
+                zynqtgui.ignoreNextModeButtonPress = true;
                 for (var i = 0; i < 10; ++i) {
                     clipSettingsADSR.increaseCurrentValue();
                 }
@@ -91,7 +119,8 @@ GridLayout {
             }
         }
         function goDown() {
-            if (zynqtgui.altButtonPressed) {
+            if (zynqtgui.modeButtonPressed) {
+                zynqtgui.ignoreNextModeButtonPress = true;
                 for (var i = 0; i < 10; ++i) {
                     clipSettingsADSR.decreaseCurrentValue();
                 }
@@ -99,20 +128,21 @@ GridLayout {
                 clipSettingsADSR.decreaseCurrentValue();
             }
         }
-        function knob1Up() {
+        function knob0Up() {
             clipSettingsADSR.nextADSRElement();
         }
-        function knob1Down() {
+        function knob0Down() {
             clipSettingsADSR.previousADSRElement();
         }
-        function knob2Up() {
+        function knob1Up() {
             clipSettingsADSR.increaseCurrentValue();
         }
+        function knob1Down() {
+            clipSettingsADSR.decreaseCurrentValue();
+        }
+        function knob2Up() {
+        }
         function knob2Down() {
-        }
-        function knob3Up() {
-        }
-        function knob3Down() {
         }
     }
 

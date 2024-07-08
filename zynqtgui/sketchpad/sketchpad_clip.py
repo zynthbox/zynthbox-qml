@@ -318,6 +318,10 @@ class sketchpad_clip_metadata(QObject):
                 self.set_samples(str(self.getMetadataProperty("ZYNTHBOX_SAMPLES", None)), write=False, force=True)
                 self.set_soundSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SNAPSHOT", None)), write=False, force=True)
                 # The clip's playback related settings
+                self.clip.audioSource.setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
+                self.clip.audioSource.setKeyZoneStart(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_START", 0)))
+                self.clip.audioSource.setKeyZoneEnd(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_END", 127)))
+                self.clip.audioSource.setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
                 self.clip.audioSource.setADSRAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)))
                 self.clip.audioSource.setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
                 self.clip.audioSource.setADSRRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)))
@@ -394,10 +398,10 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_SAMPLES"] = [str(self.__samples)]
                     tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.clip.audioSource.soundSnapshot)]
                 if self.clip.audioSource:
-                    # tags["ZYNTHBOX_KEYZONE_START"= = [str(self.clip.audioSource.keyZoneStart())]
-                    # tags["ZYNTHBOX_KEYZONE_END"= = [str(self.clip.audioSource.keyZoneEnd())]
-                    # tags["ZYNTHBOX_ROOT_NOTE"= = [str(self.clip.audioSource.rootNote())]
-                    # tags["ZYNTHBOX_PAN"= = [str(self.clip.audioSource.pan())]
+                    tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.keyZoneStart())]
+                    tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.keyZoneEnd())]
+                    tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootNote())]
+                    tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.pan())]
                     tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.adsrAttack())]
                     tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.clip.audioSource.adsrDecay())]
                     tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.clip.audioSource.adsrRelease())]

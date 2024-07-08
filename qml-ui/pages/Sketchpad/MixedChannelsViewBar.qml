@@ -838,7 +838,7 @@ Rectangle {
                                                     color: Kirigami.Theme.highlightColor
                                                 }
                                                 Rectangle {
-                                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.gain : 0
+                                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.gainAbsolute : 0
                                                     anchors {
                                                         left: parent.left
                                                         top: parent.top
@@ -899,7 +899,7 @@ Rectangle {
                                                     } else if (["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0 && synthRepeater.synthData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
-                                                        slotDelegate.cppClipObject.gain = newVal;
+                                                        slotDelegate.cppClipObject.gainAbsolute = newVal;
                                                     }
                                                 }
                                                 onPressAndHold: {

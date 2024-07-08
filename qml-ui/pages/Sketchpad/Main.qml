@@ -360,7 +360,7 @@ Zynthian.ScreenPage {
     function updateClipGain(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.gain = Zynthian.CommonUtils.clamp(clipCppObj.gain + sign*0.01, 0, 1)
+            clipCppObj.gain = Zynthian.CommonUtils.clamp(clipCppObj.gainAbsolute + sign*0.01, 0, 1)
         }
     }
     /**

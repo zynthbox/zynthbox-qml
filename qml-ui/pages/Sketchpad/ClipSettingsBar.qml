@@ -96,10 +96,24 @@ ColumnLayout {
                 bottomStack.slotsBar.channelButton.checked = true
                 return true;
             case "KNOB0_UP":
-                pageManager.getPage("sketchpad").updateClipGain(root.controlObj, 1)
+                if (root.clipAudioSource) {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        root.clipAudioSource.pan = root.clipAudioSource.pan + 0.01;
+                    } else {
+                        root.clipAudioSource.gainAbsolute = root.clipAudioSource.gainAbsolute + 0.01;
+                    }
+                }
                 return true;
             case "KNOB0_DOWN":
-                pageManager.getPage("sketchpad").updateClipGain(root.controlObj, -1)
+                if (root.clipAudioSource) {
+                    if (zynqtgui.modeButtonPressed) {
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                        root.clipAudioSource.pan = root.clipAudioSource.pan - 0.01;
+                    } else {
+                        root.clipAudioSource.gainAbsolute = root.clipAudioSource.gainAbsolute - 0.01;
+                    }
+                }
                 return true;
             case "KNOB1_UP":
                 if (zynqtgui.modeButtonPressed) {
@@ -147,7 +161,7 @@ ColumnLayout {
             id: gainDial
             text: qsTr("Gain (dB)")
             controlObj: root.clipAudioSource
-            controlProperty: "gain"
+            controlProperty: "gainAbsolute"
             valueString: root.clipAudioSource ? qsTr("%1 dB").arg(root.clipAudioSource.gainDb.toFixed(2)) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -161,6 +175,27 @@ ColumnLayout {
 
             onDoubleClicked: {
                 root.clipAudioSource.gainAbsolute = root.controlObj.initialGain;
+            }
+        }
+
+        Zynthian.SketchpadDial {
+            id: panDial
+            text: qsTr("Pan")
+            controlObj: root.clipAudioSource
+            controlProperty: "pan"
+            valueString: root.clipAudioSource ? root.clipAudioSource.pan.toFixed(2) : 0
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+
+            dial {
+                stepSize: 0.01
+                from: -1
+                to: 1
+            }
+
+            onDoubleClicked: {
+                root.clipAudioSource.pan = 0;
             }
         }
 

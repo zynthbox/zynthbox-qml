@@ -135,10 +135,10 @@ GridLayout {
             clipSettingsADSR.previousADSRElement();
         }
         function knob1Up() {
-            clipSettingsADSR.increaseCurrentValue();
+            _private.goUp();
         }
         function knob1Down() {
-            clipSettingsADSR.decreaseCurrentValue();
+            _private.goDown();
         }
         function knob2Up() {
         }

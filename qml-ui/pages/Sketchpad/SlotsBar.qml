@@ -979,19 +979,19 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick recording")
+                text: qsTr("Pick recording...")
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "recording");
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick sample")
+                text: qsTr("Pick sample...")
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sample");
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick sketch")
+                text: qsTr("Pick sketch...")
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sketch");
                 }

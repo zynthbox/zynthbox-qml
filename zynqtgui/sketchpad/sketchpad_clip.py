@@ -820,8 +820,6 @@ class sketchpad_clip(QObject):
             self.audioSource.setLaneAffinity(self.__lane__)
             if self.clipChannel is not None:
                 self.audioSource.setSketchpadTrack(self.clipChannel.id)
-            if self.clipChannel is not None and self.__song__.isLoading == False:
-                self.clipChannel.trackType = "sample-loop"
         else:
             self.audioSource = None
 

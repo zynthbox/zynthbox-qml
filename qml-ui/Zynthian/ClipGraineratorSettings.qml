@@ -191,7 +191,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit
-            enabled: component.clip && component.clip.granular
+            enabled: component.cppClipObject && component.cppClipObject.granular
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -268,7 +268,7 @@ Item {
                     checked: component.clip ? (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) : false
                     onToggled: toggleGraineratorLooping()
                     Connections {
-                        target: component.clip
+                        target: component.cppClipObject
                         onGranularChanged: granularEnabledSwitch.checked = (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle)
                     }
                 }
@@ -565,7 +565,7 @@ Item {
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 1
-                onValueChanged: if (component.clip) { component.cppClipObject.grainPanMaximum = value }
+                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPanMaximum = value }
                 Connections {
                     target: component.cppClipObject
                     onGrainPanMaximumChanged: grainPanMaximumSlider.value = component.cppClipObject.grainPanMaximum

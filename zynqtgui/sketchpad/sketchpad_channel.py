@@ -465,13 +465,7 @@ class sketchpad_channel(QObject):
         for sample in self.__samples__:
             if sample.path is not None and len(sample.path) > 0:
                 sample.metadata.scheduleWrite()
-                if sample.audioSource:
-                    obj.append({"path": Path(sample.path).name,
-                                "keyZoneStart": sample.audioSource.keyZoneStart(),
-                                "keyZoneEnd": sample.audioSource.keyZoneEnd(),
-                                "rootNote": sample.audioSource.rootNote()})
-                else:
-                    obj.append({"path": Path(sample.path).name})
+                obj.append({"path": Path(sample.path).name})
             else:
                 obj.append(None)
 
@@ -504,19 +498,6 @@ class sketchpad_channel(QObject):
                         if clip is not None:
                             if (bank_dir / clip["path"]).exists():
                                 self.__samples__[i].set_path(str(bank_dir / clip["path"]), False) # Do not copy file when restoring
-                            if self.__samples__[i].audioSource:
-                                if "keyZoneStart" in clip:
-                                    self.__samples__[i].audioSource.setKeyZoneStart(clip["keyZoneStart"])
-                                else:
-                                    self.__samples__[i].audioSource.setKeyZoneStart(0)
-                                if "keyZoneEnd" in clip:
-                                    self.__samples__[i].audioSource.setKeyZoneEnd(clip["keyZoneEnd"])
-                                else:
-                                    self.__samples__[i].audioSource.setKeyZoneEnd(127)
-                                if "rootNote" in clip:
-                                    self.__samples__[i].audioSource.setRootNote(clip["rootNote"])
-                                else:
-                                    self.__samples__[i].audioSource.setRootNote(60)
 
                     self.samples_changed.emit()
             except Exception as e:

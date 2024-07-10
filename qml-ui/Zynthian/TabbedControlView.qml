@@ -257,12 +257,16 @@ Item {
                 return;
             } else {
                 var component = Qt.createComponent(pageUrl);
-                if (typeof initialProperties !== "undefined") {
-                    pageCache[pageUrl] = component.createObject(root, initialProperties);
+                if (component.status == Component.Error) {
+                    console.log("Error while loading", pageUrl, "reported error was:\n", component.errorString());
                 } else {
-                    pageCache[pageUrl] = component.createObject(root);
+                    if (typeof initialProperties !== "undefined") {
+                        pageCache[pageUrl] = component.createObject(root, initialProperties);
+                    } else {
+                        pageCache[pageUrl] = component.createObject(root);
+                    }
+                    pageCache[pageUrl].visible = false;
                 }
-                pageCache[pageUrl].visible = false;
             }
         }
         function pushAndCachePage(pageUrl, initialProperties) {

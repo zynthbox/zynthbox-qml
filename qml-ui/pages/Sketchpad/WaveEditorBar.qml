@@ -59,7 +59,7 @@ GridLayout {
             case "KNOB0_TOUCHED":
                 if (waveBar.cppClipObject) {
                     if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                     } else {
                         if (pinchZoomer.scale > 1) {
                             wav.focusPosition(waveBar.cppClipObject.startPositionSamples);
@@ -71,7 +71,7 @@ GridLayout {
             case "KNOB1_TOUCHED":
                 if (waveBar.cppClipObject) {
                     if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                     } else {
                         if (pinchZoomer.scale > 1) {
                             wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.loopDeltaSamples);
@@ -83,7 +83,7 @@ GridLayout {
             case "KNOB2_TOUCHED":
                 if (waveBar.cppClipObject) {
                     if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                     } else {
                         if (pinchZoomer.scale > 1) {
                             wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples);
@@ -102,7 +102,7 @@ GridLayout {
                     } else {
                         waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                 } else {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
@@ -123,7 +123,7 @@ GridLayout {
                     } else {
                         waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - waveBar.cppClipObject.lengthSamples, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                 } else {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
@@ -187,7 +187,7 @@ GridLayout {
                             waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision - 1);
                         }
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                 } else {
                     if (waveBar.cppClipObject.snapLengthToBeat) {
                         waveBar.cppClipObject.lengthBeats = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthBeats + 1, 0, 64);
@@ -217,7 +217,7 @@ GridLayout {
                             waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision + 1);
                         }
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                 } else {
                     if (waveBar.cppClipObject.snapLengthToBeat) {
                         waveBar.cppClipObject.lengthBeats = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthBeats - 1, 0, 64);
@@ -267,14 +267,12 @@ GridLayout {
         function focusPosition(positionToFocus) {
             pinchZoomer.position = Math.max(0, Math.min((positionToFocus - (wav.windowSizeSamples * 0.5)) / (waveBar.cppClipObject.durationSamples - wav.windowSizeSamples), 1));
         }
-        function focusSection(startPointInSamples, sectionLengthInSamples, focusOffset) {
-            if (focusOffset == undefined) {
-                focusOffset = 0.5;
+        function focusSection(startPointInSamples, sectionLengthInSamples, windowSize) {
+            if (windowSize == undefined) {
+                windowSize = 2.0;
             }
-            pinchZoomer.scale = (waveBar.cppClipObject.durationSamples) / (sectionLengthInSamples * 2);
-            let zoomPoint = (startPointInSamples - (sectionLengthInSamples * focusOffset));
-            pinchZoomer.position = Math.max(0, Math.min(zoomPoint / (waveBar.cppClipObject.durationSamples - (sectionLengthInSamples * 2)), 1));
-            // console.log("Setting new scale and position to fit the selected window", pinchZoomer.scale, pinchZoomer.position);
+            pinchZoomer.scale = (waveBar.cppClipObject.durationSamples) / (sectionLengthInSamples * windowSize);
+            focusPosition(startPointInSamples + (sectionLengthInSamples * 0.5));
         }
 
         Layout.fillWidth: true
@@ -288,7 +286,7 @@ GridLayout {
             onTriggered: {
                 wav.source = waveBar.controlObj && waveBar.controlObj.path != null ? waveBar.controlObj.path : ""
                 if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                 } else {
                     pinchZoomer.scale = 1;
                     pinchZoomer.position = 0;
@@ -342,8 +340,11 @@ GridLayout {
                 anchors.fill: parent
                 onDoubleClicked: {
                     if (pinchZoomer.scale == 1) {
-                        // Zoom in to fit the current window size (that is, fit twice the size of the window, and then position it in the centre of the viewport)
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                        // Don't zoom in if... there's nothing small enough to zoom to
+                        if (waveBar.cppClipObject.lengthSamples <= waveBar.cppClipObject.durationSamples / 2) {
+                            // Zoom in to fit the current window size (that is, fit twice the size of the window, and then position it in the centre of the viewport)
+                            wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                        }
                     } else {
                         pinchZoomer.scale = 1;
                         pinchZoomer.position = 0;
@@ -504,13 +505,50 @@ GridLayout {
             }
             MouseArea {
                 anchors.fill: parent
+                readonly property real leftPosition: scrollGrooveLeft.width / width
+                readonly property real rightPosition: scrollGrooveRight.x / width
+                property int handleIndex: -1
+                // -1 is "no handle", just move the position
+                // 0 is left handle
+                // 1 is right handle
+                property real initialStart: 0
+                property real initialEnd: 0
+                property real initialX: 0
+                onPressed: {
+                    initialX = mouse.x;
+                    initialStart = leftPosition;
+                    initialEnd = rightPosition;
+                    let relativePressPosition = mouse.x / width;
+                    if (relativePressPosition < leftPosition - 0.05 || relativePressPosition > rightPosition + 0.05) {
+                        // console.log("Entirely outside the centre area");
+                        handleIndex = -1
+                    } else if (relativePressPosition < leftPosition + 0.05) {
+                        // console.log("Pressing left handle");
+                        handleIndex = 0;
+                    } else if (relativePressPosition > rightPosition - 0.05) {
+                        // console.log("Pressing right handle");
+                        handleIndex = 1;
+                    } else {
+                        // console.log("Pressed between the two handles");
+                        handleIndex = -1;
+                    }
+                }
                 onPositionChanged: {
-                    pinchZoomer.position = Math.max(0, Math.min(mouse.x / width, 1));
+                    let deltaX = mouse.x - initialX;
+                    if (handleIndex === 0) {
+                        let newStartPosition = waveBar.cppClipObject.durationSamples * (initialStart + (deltaX / width));
+                        let newEndPosition = waveBar.cppClipObject.durationSamples * initialEnd
+                        wav.focusSection(newStartPosition, newEndPosition - newStartPosition, 1.0);
+                    } else if (handleIndex === 1) {
+                        let newStartPosition = waveBar.cppClipObject.durationSamples * initialStart;
+                        let newEndPosition = waveBar.cppClipObject.durationSamples * (initialEnd + (deltaX / width));
+                        wav.focusSection(newStartPosition, newEndPosition - newStartPosition, 1.0);
+                    } else {
+                        pinchZoomer.position = Math.max(0, Math.min(mouse.x / width, 1));
+                    }
                 }
             }
         }
-
-        // TODO Port underneath to match new zoom/pan logic
 
         // Handle for setting start position
         Item {
@@ -634,12 +672,13 @@ GridLayout {
                 color: Kirigami.Theme.textColor
                 font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
                 anchors {
-                    top: parent.top
-                    left: parent.right
-                    bottom: parent.bottom
+                    right: parent.right
+                    bottom: parent.top
                     margins: Kirigami.Units.largeSpacing * 1.5
+                    bottomMargin: parent.height // To anchors the thing to the top of the parent's container...
                 }
-                horizontalAlignment: Text.AlignLeft
+                height: parent.height
+                horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
                 text: visible
                     ? qsTr("%1\nsamples").arg(waveBar.cppClipObject.lengthSamples)

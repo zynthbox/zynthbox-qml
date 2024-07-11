@@ -344,17 +344,34 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setGrainSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
                 self.clip.audioSource.setGrainSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
                 self.clip.audioSource.setGrainTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
-                self.clip.audioSource.setLengthBeats(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)))
-                self.clip.audioSource.setLoopDelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)))
-                self.clip.audioSource.setLoopDelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)))
                 self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")))
                 self.clip.audioSource.setPitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)))
                 self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "LoopingPlaybackStyle")))
                 self.clip.audioSource.setSnapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true")
                 self.clip.audioSource.setSpeedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)))
-                self.clip.audioSource.setStartPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)))
                 self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
                 self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
+                # Some fallbackery that we can likely remove at some point (or also perhaps get rid of entirely when we switch to using the industry version of slice and loop definitions...)
+                startPositionSamples = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION_SAMPLES", -1))
+                if startPositionSamples == -1:
+                    self.clip.audioSource.setStartPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)))
+                else:
+                    self.clip.audioSource.setStartPositionSamples(startPositionSamples)
+                lengthSamples = float(self.getMetadataProperty("ZYNTHBOX_LENGTH_SAMPLES", -1))
+                if lengthSamples == -1:
+                    self.clip.audioSource.setLengthBeats(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)))
+                else:
+                    self.clip.audioSource.setLengthSamples(lengthSamples)
+                loopDeltaSamples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA_SAMPLES", -1))
+                if loopDeltaSamples == -1:
+                    self.clip.audioSource.setLoopDelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)))
+                else:
+                    self.clip.audioSource.setLoopDeltaSamples(loopDeltaSamples)
+                loopDelta2Samples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2_SAMPLES", -1))
+                if loopDelta2Samples == -1:
+                    self.clip.audioSource.setLoopDelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)))
+                else:
+                    self.clip.audioSource.setLoopDelta2Samples(loopDelta2Samples)
         self.__isReading = False
 
     @Slot()
@@ -424,15 +441,15 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.clip.audioSource.grainSpray())]
                     tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.clip.audioSource.grainSustain())]
                     tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.clip.audioSource.grainTilt())]
-                    tags["ZYNTHBOX_LENGTH"] = [str(self.clip.audioSource.getLengthBeats())]
-                    tags["ZYNTHBOX_LOOPDELTA"] = [str(self.clip.audioSource.loopDelta())]
-                    tags["ZYNTHBOX_LOOPDELTA2"] = [str(self.clip.audioSource.loopDelta2())]
+                    tags["ZYNTHBOX_STARTPOSITION_SAMPLES"] = [str(self.clip.audioSource.getStartPositionSamples())]
+                    tags["ZYNTHBOX_LENGTH_SAMPLES"] = [str(self.clip.audioSource.getLengthSamples())]
+                    tags["ZYNTHBOX_LOOPDELTA_SAMPLES"] = [str(self.clip.audioSource.loopDeltaSamples())]
+                    tags["ZYNTHBOX_LOOPDELTA2_SAMPLES"] = [str(self.clip.audioSource.loopDelta2Samples())]
                     tags["ZYNTHBOX_PITCH"] = [str(self.clip.audioSource.pitch())]
                     tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.clip.audioSource.playbackStyle()).split(".")[-1]]
                     tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.clip.audioSource.snapLengthToBeat())]
                     tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.clip.audioSource.timeStretchStyle()).split(".")[-1]]
                     tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
-                    tags["ZYNTHBOX_STARTPOSITION"] = [str(self.clip.audioSource.getStartPosition())]
                     tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
                     tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializePassthroughData(self.clip.audioSource)))]
 
@@ -463,7 +480,7 @@ class sketchpad_clip_metadata(QObject):
                         logging.error(f"Error creating new file and writing metadata : {str(e)}")
 
     def scheduleWrite(self):
-        if self.__isReading == False:
+        if self.__isReading == False and self.clip.__song__.isLoading == False:
             self.writeTimer.start()
 
     def clear(self):

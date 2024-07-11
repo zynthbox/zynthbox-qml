@@ -747,13 +747,13 @@ GridLayout {
             visible: waveBar.visible && waveBar.channel.trackType === "sample-loop" && waveBar.cppClipObject && waveBar.cppClipObject.isPlaying
             color: Kirigami.Theme.highlightColor
             width: Kirigami.Units.smallSpacing
-            x: visible ? wav.fitInWindow(waveBar.cppClipObject.position, wav.relativeStart, wav.relativeEnd) * parent.width * parent.width : 0
+            x: visible ? wav.fitInWindow(waveBar.cppClipObject.position, wav.relativeStart, wav.relativeEnd) * parent.width : 0
         }
 
         // SamplerSynth progress dots
         Repeater {
             id: progressDots
-            model: (waveBar.visible && waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
+            model: waveBar.visible && (waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
                     ? waveBar.cppClipObject.playbackPositions
                     : 0
             delegate: Item {

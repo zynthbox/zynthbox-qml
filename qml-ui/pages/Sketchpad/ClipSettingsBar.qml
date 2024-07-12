@@ -469,7 +469,7 @@ ColumnLayout {
                         Kirigami.Action {
                             text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchOff
                                 ? qsTr("<b>Standard Pitch Shift</b><br />(changes playback length,<br />least cpu, highest quality)")
-                                : qsTr("Standard Pitch Shift\n(changes playback length\nleast cpu, highest quality)")
+                                : qsTr("Standard Pitch Shift\n(changes playback length\nleast cpu, best quality)")
                             onTriggered: {
                                 root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchOff;
                             }

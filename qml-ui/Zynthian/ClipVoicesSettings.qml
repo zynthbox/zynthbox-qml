@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-General information panel for sketchpad clips
+Voice details editor for sketchpad clips
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 
@@ -36,6 +36,6 @@ Item {
     property QtObject clip
     QQC2.Label {
         anchors.centerIn: parent
-        text: "MAKE INFORMATIONAL THINGS GO HERE!"
+        text: "MAKE VOICY THINGS GO HERE (HERE) Here (Here) here (here)!"
     }
 }

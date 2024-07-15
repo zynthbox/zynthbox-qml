@@ -413,6 +413,18 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            text: qsTr("Voices")
+                            enabled: component.selectedClipHasWav
+                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
+                            MouseArea {
+                                anchors.fill: parent;
+                                enabled: component.selectedClipHasWav
+                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsVoices }
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                             text: qsTr("Envelope")
                             enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
@@ -464,6 +476,7 @@ Zynthian.ScreenPage {
                             target: component
                             onSelectedClipChanged: {
                                 clipSettingsBarControlObjThrottle.restart();
+                                clipSettingsVoicesClipThrottle.restart();
                                 clipSettingsADSRClipThrottle.restart();
                                 clipSettingsGraineratorClipThrottle.restart();
                                 clipSettingsInfoViewClipThrottle.restart();
@@ -493,6 +506,20 @@ Zynthian.ScreenPage {
                                             : "bottombar-controltype-channel"
                                         : ""
                             showCopyPasteButtons: false
+                        }
+                        Zynthian.ClipVoicesSettings {
+                            id: clipSettingsVoices
+                            objectName: "clipSettingsVoices"
+                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                            anchors.fill: parent
+                            clip: null
+                            Timer {
+                                id: clipSettingsVoicesClipThrottle
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    clipSettingsVoices.clip = component.cppClipObject;
+                                }
+                            }
                         }
                         Zynthian.ADSRClipView {
                             id: clipSettingsADSR

@@ -56,3 +56,4 @@ InfinitySlider 1.0 InfinitySlider.qml
 ClipInfoView 1.0 ClipInfoView.qml
 ActionPickerPopup 1.0 ActionPickerPopup.qml
 DialogQuestionButtonFocusHighlight 1.0 DialogQuestionButtonFocusHighlight.qml
+ClipVoicesSettings 1.0 ClipVoicesSettings.qml

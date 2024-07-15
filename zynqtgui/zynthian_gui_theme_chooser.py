@@ -83,16 +83,21 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         self.audiofx_layer = None
         self.audiofx_layers = None
 
+        # Prepare installed themes list
+        self.fill_list()
+
         # Read existing config to find previously selected theme name
         try:
             config = ConfigParser()
             config.read("/root/.config/plasmarc")
-            selected_theme_name = config.get("Theme", "name")
+            selected_theme_name = config["Theme"]["name"]
         except Exception as e:
-            selected_theme_name = None
-
-        # Prepare installed themes list
-        self.fill_list()
+            # If theme config is not found or unable to read config, force set theme to zynthian
+            for index, theme in enumerate(self.list_data):
+                if theme[0] == "zynthian":
+                    self.select_action(index)
+                    break
+            selected_theme_name = "zynthian"
 
         # Select correct index as per previously selected theme
         if selected_theme_name is not None:
@@ -122,7 +127,9 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
         config_file = Path("/root/.config/plasmarc")
         config = ConfigParser()
         config.read(config_file)
-        config.set("Theme", "name", self.list_data[self.current_index][0])
+        if not "Theme" in config:
+            config["Theme"] = {}
+        config["Theme"]["name"] = self.list_data[self.current_index][0]
         with open(config_file, "w") as fd:
             config.write(fd)
 

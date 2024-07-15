@@ -90,7 +90,8 @@ Zynthian.Stack {
         "layer_midi_effects",
         "sound_categories",
         "engine",
-        "song_manager"
+        "song_manager",
+        "theme_chooser" // Cache theme_chooser to allow default theme selection in case of any issues with config
     ]
     property string currentPage: ""
     property var pageCache: ({})

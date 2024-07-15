@@ -413,7 +413,7 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_ROUTING_STYLE"] = [str(self.__routingStyle)]
                     tags["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = [str(self.__samplePickingStyle)]
                     tags["ZYNTHBOX_SAMPLES"] = [str(self.__samples)]
-                    tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.clip.audioSource.soundSnapshot)]
+                    tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.__soundSnapshot)]
                 if self.clip.audioSource:
                     tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.keyZoneStart())]
                     tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.keyZoneEnd())]

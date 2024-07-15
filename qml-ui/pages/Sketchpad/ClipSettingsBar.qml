@@ -159,7 +159,7 @@ ColumnLayout {
         Layout.maximumHeight: Kirigami.Units.gridUnit * 10
         Zynthian.SketchpadDial {
             id: gainDial
-            text: qsTr("Gain (dB)")
+            text: qsTr("Gain (dB)") + "\n"
             controlObj: root.clipAudioSource
             controlProperty: "gainAbsolute"
             valueString: root.clipAudioSource ? qsTr("%1 dB").arg(root.clipAudioSource.gainDb.toFixed(2)) : 0
@@ -180,7 +180,7 @@ ColumnLayout {
 
         Zynthian.SketchpadDial {
             id: panDial
-            text: qsTr("Pan")
+            text: qsTr("Pan") + "\n"
             controlObj: root.clipAudioSource
             controlProperty: "pan"
             valueString: root.clipAudioSource ? root.clipAudioSource.pan.toFixed(2) : 0
@@ -201,7 +201,7 @@ ColumnLayout {
 
         Zynthian.SketchpadDial {
             id: pitchDial
-            text: qsTr("Pitch")
+            text: qsTr("Pitch") + "\n"
             controlObj: root.clipAudioSource
             controlProperty: "pitch"
             fixedPointTrail: 2
@@ -222,7 +222,7 @@ ColumnLayout {
 
         Zynthian.SketchpadDial {
             id: timeDial
-            text: qsTr("Speed Ratio")
+            text: qsTr("Speed Ratio") + "\n"
             controlObj: root.clipAudioSource
             controlProperty: "speedRatio"
             valueString: dial.value.toFixed(2)
@@ -333,7 +333,7 @@ ColumnLayout {
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: TextInput.AlignHCenter
-                text: qsTr("Sync Speed")
+                text: qsTr("Auto-Sync\nSpeed Ratio")
             }
         }
 
@@ -498,9 +498,14 @@ ColumnLayout {
                 Layout.fillWidth: true
                 horizontalAlignment: TextInput.AlignHCenter
                 wrapMode: Text.Wrap
-                text: qsTr("Snap Length to beat")
+                text: qsTr("Snap Length\nto Beat")
             }
         }
+    }
+
+    Item {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
     }
 }
 

@@ -131,24 +131,45 @@ Item {
         Repeater {
             id: progressDots
             property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId) : null;
-            model: component.visible && _private.progressStyle === 2 && cppClipObject
-                ? cppClipObject.playbackPositions
-                : 0
+            model: Zynthbox.Plugin.clipMaximumPositionCount
+            property QtObject playbackPositions: null
+            Timer {
+                id: dotFetcher
+                interval: 1; repeat: false; running: false;
+                onTriggered: {
+                    progressDots.playbackPositions = component.visible && _private.progressStyle === 2 && progressDots.cppClipObject
+                        ? progressDots.cppClipObject.playbackPositions
+                        : null
+                }
+            }
+            Connections {
+                target: component
+                onVisibleChanged: dotFetcher.restart();
+            }
+            Connections {
+                target: progressDots
+                onCppClipObjectChanged: dotFetcher.restart();
+            }
+            Connections {
+                target: _private
+                onProgressStyleChanged: dotFetcher.restart();
+            }
             delegate: Item {
-                visible: model.positionID > -1
+                property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                visible: progressEntry && progressEntry.id > -1
                 Rectangle {
                     anchors.centerIn: parent
                     rotation: 45
                     color: Kirigami.Theme.highlightColor
                     width: Kirigami.Units.largeSpacing
                     height:  Kirigami.Units.largeSpacing
-                    scale: 0.5 + model.positionGain
+                    scale: progressEntry ? 0.5 + progressEntry.gain : 1
                 }
                 anchors {
                     top: parent.verticalCenter
-                    topMargin: model.positionPan * (parent.height / 2)
+                    topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                 }
-                x: Math.floor(model.positionProgress * parent.width)
+                x: visible ? Math.floor(progressEntry.progress * parent.width) : 0
             }
         }
     }

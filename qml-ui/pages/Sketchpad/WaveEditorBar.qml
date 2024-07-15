@@ -753,24 +753,42 @@ GridLayout {
         // SamplerSynth progress dots
         Repeater {
             id: progressDots
-            model: waveBar.visible && (waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
-                    ? waveBar.cppClipObject.playbackPositions
-                    : 0
+            model: Zynthbox.Plugin.clipMaximumPositionCount
+            property QtObject playbackPositions: null
+            Timer {
+                id: dotFetcher
+                interval: 1; repeat: false; running: false;
+                onTriggered: {
+                    progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
+                        ? waveBar.cppClipObject.playbackPositions
+                        : null
+                }
+            }
+            Connections {
+                target: waveBar
+                onVisibleChanged: dotFetcher.restart();
+                onCppClipObjectChanged: dotFetcher.restart();
+            }
+            Connections {
+                target: waveBar.channel
+                onTrack_type_changed: dotFetcher.restart();
+            }
             delegate: Item {
-                visible: model.positionID > -1
+                property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                visible: progressEntry && progressEntry.id > -1
                 Rectangle {
                     anchors.centerIn: parent
                     rotation: 45
                     color: Kirigami.Theme.highlightColor
                     width: Kirigami.Units.largeSpacing
                     height:  Kirigami.Units.largeSpacing
-                    scale: 0.5 + model.positionGain
+                    scale: progressEntry ? 0.5 + progressEntry.gain : 1
                 }
                 anchors {
                     top: parent.verticalCenter
-                    topMargin: model.positionPan * (parent.height / 2)
+                    topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                 }
-                x: wav.fitInWindow(model.positionProgress, wav.relativeStart, wav.relativeEnd) * parent.width
+                x: visible ? wav.fitInWindow(progressEntry.progress, wav.relativeStart, wav.relativeEnd) * parent.width : 0
             }
         }
 

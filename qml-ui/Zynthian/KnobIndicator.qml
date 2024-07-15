@@ -54,16 +54,17 @@ Item {
      * @default No knob is inspected
      */
     property int knobId: -1
+    property int rotationFactor: 1
     signal knobUp()
     signal knobDown()
 
     onKnobUp: {
         //indicatorRect.movingDirection = 1;
-        ridges.currentPointRotation = ridges.currentPointRotation + 1;
+        ridges.currentPointRotation = ridges.currentPointRotation + component.rotationFactor;
     }
     onKnobDown: {
         //indicatorRect.movingDirection = -1;
-        ridges.currentPointRotation = ridges.currentPointRotation - 1;
+        ridges.currentPointRotation = ridges.currentPointRotation - component.rotationFactor;
     }
     Rectangle {
         id: indicatorRect

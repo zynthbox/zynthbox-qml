@@ -108,28 +108,44 @@ Zynthian.ScreenPage {
                 _private.goRight();
                 returnValue = true;
                 break;
+            case "KNOB0_TOUCHED":
+                _private.knob0Touched(cuia);
+                returnValue = true;
+                break;
             case "KNOB0_UP":
-                _private.knob0Up();
+                _private.knob0Up(cuia);
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                _private.knob0Down();
+                _private.knob0Down(cuia);
+                returnValue = true;
+                break;
+            case "KNOB1_TOUCHED":
+                _private.knob0Touched(cuia);
                 returnValue = true;
                 break;
             case "KNOB1_UP":
-                _private.knob1Up();
+                _private.knob1Up(cuia);
                 returnValue = true;
                 break;
             case "KNOB1_DOWN":
-                _private.knob1Down();
+                _private.knob1Down(cuia);
+                returnValue = true;
+                break;
+            case "KNOB2_TOUCHED":
+                _private.knob0Touched(cuia);
                 returnValue = true;
                 break;
             case "KNOB2_UP":
-                _private.knob2Up();
+                _private.knob2Up(cuia);
                 returnValue = true;
                 break;
             case "KNOB2_DOWN":
-                _private.knob2Down();
+                _private.knob2Down(cuia);
+                returnValue = true;
+                break;
+            case "KNOB3_TOUCHED":
+                _private.knob0Touched(cuia);
                 returnValue = true;
                 break;
             case "KNOB3_UP":
@@ -197,12 +213,19 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        function knob0Up() {
+        function knob0Touched(cuia) {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    // Increment startPosition by 0.01
-                    // Clamp values between 0 and duration
-                    component.cppClipObject.startPositionSeconds = Math.min(Math.max(component.cppClipObject.startPosition + 0.01, 0), component.selectedClip.duration)
+                    waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                }
+            }
+        }
+        function knob0Up(cuia) {
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    waveBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.nextADSRElement();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -210,12 +233,10 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        function knob0Down() {
+        function knob0Down(cuia) {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    // Decrement startPosition by 0.01
-                    // Clamp values between 0 and duration
-                    component.cppClipObject.startPositionSeconds = Math.min(Math.max(component.cppClipObject.startPosition - 0.01, 0), component.selectedClip.duration)
+                    waveBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.previousADSRElement();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -223,12 +244,19 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        function knob1Up() {
+        function knob1Touched(cuia) {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    // Increment loopDelta by 0.01
-                    // Clamp values between 0 and length
-                    component.cppClipObject.loopDelta = Math.min(Math.max(component.cppClipObject.loopDelta + 0.01, 0), component.selectedClip.secPerBeat * component.cppClipObject.lengthBeats)
+                    waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                }
+            }
+        }
+        function knob1Up(cuia) {
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    waveBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.increaseCurrentValue();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -236,12 +264,10 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        function knob1Down() {
+        function knob1Down(cuia) {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    // Decrement loopDelta by 0.01
-                    // Clamp values between 0 and length
-                    component.cppClipObject.loopDelta = Math.min(Math.max(component.cppClipObject.loopDelta - 0.01, 0), component.selectedClip.secPerBeat * component.cppClipObject.lengthBeats)
+                    waveBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.decreaseCurrentValue();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
@@ -249,23 +275,37 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        function knob2Up() {
+        function knob2Touched(cuia) {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    // Increment length by.1
-                    // Clamp values between 0 and 64
-                    component.cppClipObject.lengthBeats = Math.min(Math.max(component.cppClipObject.lengthBeats + 1, 0), 64)
+                    waveBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
         }
-        function knob2Down() {
+        function knob2Up(cuia) {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    // Decrement length by.1
-                    // Clamp values between 0 and 64
-                    component.cppClipObject.lengthBeats = Math.min(Math.max(component.cppClipObject.lengthBeats - 1, 0), 64)
+                    waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                }
+            }
+        }
+        function knob2Down(cuia) {
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                }
+            }
+        }
+        function knob3Touched(cuia) {
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    waveBar.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
@@ -304,7 +344,7 @@ Zynthian.ScreenPage {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Kirigami.Units.gridUnit
+        spacing: Kirigami.Units.largeSpacing
 
         QQC2.Label {
             Layout.fillHeight: false
@@ -315,17 +355,17 @@ Zynthian.ScreenPage {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Kirigami.Units.gridUnit
+            spacing: Kirigami.Units.largeSpacing
 
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Kirigami.Units.gridUnit
+                spacing: Kirigami.Units.largeSpacing
 
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 10
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 9
                     color: "#222222"
                     border.width: 1
                     border.color: "#ff999999"
@@ -334,7 +374,9 @@ Zynthian.ScreenPage {
                     opacity: enabled ? 1 : 0.5
 
                     Sketchpad.WaveEditorBar {
+                        id: waveBar
                         anchors.fill: parent
+                        internalMargin: 0
                         clip: true
                         controlObj: component.selectedClip
                         controlType: component.selectedChannel
@@ -349,11 +391,13 @@ Zynthian.ScreenPage {
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 10
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 11
+                    spacing: 0
                     ColumnLayout {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                        spacing: 0
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -429,8 +473,11 @@ Zynthian.ScreenPage {
                             id: clipSettingsBar
                             objectName: "clipSettingsBar"
                             visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                            anchors.fill: parent
-                            anchors.margins: Kirigami.Units.gridUnit
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.largeSpacing
+                                topMargin: 0
+                            }
                             controlObjIsManual: true
                             controlObj: component.selectedClip
                             Timer {

@@ -51,6 +51,8 @@ GridLayout {
                                         : null
     property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
 
+    property int internalMargin: Kirigami.Units.largeSpacing
+
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
@@ -277,8 +279,8 @@ GridLayout {
 
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.margins: Kirigami.Units.gridUnit
-        Layout.bottomMargin: pinchZoomer.scale > 1 ? Kirigami.Units.gridUnit + waveBar.height * 0.1 : Kirigami.Units.gridUnit
+        Layout.margins: waveBar.internalMargin
+        Layout.bottomMargin: pinchZoomer.scale > 1 ? waveBar.internalMargin + waveBar.height * 0.1 : waveBar.internalMargin
         color: Kirigami.Theme.textColor
         Timer {
             id: waveFormThrottle

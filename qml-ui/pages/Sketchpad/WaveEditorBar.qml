@@ -474,6 +474,7 @@ GridLayout {
             }
             height: waveBar.height * 0.1
             visible: pinchZoomer.scale > 1
+            color: Kirigami.Theme.textColor
             source: wav.source
             Rectangle {
                 id: scrollGrooveLeft

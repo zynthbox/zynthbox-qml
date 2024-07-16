@@ -1237,32 +1237,29 @@ Rectangle {
                                             }
 
                                             // SamplerSynth progress dots
+                                            Timer {
+                                                id: dotFetcher
+                                                interval: 1; repeat: false; running: false;
+                                                onTriggered: {
+                                                    progressDots.playbackPositions = root.visible && (root.selectedChannel.trackType === "sample-slice" || root.selectedChannel.trackType === "sample-trig") && progressDots.cppClipObject
+                                                        ? progressDots.cppClipObject.playbackPositions
+                                                        : null
+                                                }
+                                            }
+                                            Connections {
+                                                target: root
+                                                onVisibleChanged: dotFetcher.restart();
+                                            }
+                                            Connections {
+                                                target: root.selectedChannel
+                                                onTrack_type_changed: dotFetcher.restart();
+                                            }
                                             Repeater {
                                                 id: progressDots
                                                 property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(waveformContainer.clip.cppObjId) : null;
                                                 model: Zynthbox.Plugin.clipMaximumPositionCount
                                                 property QtObject playbackPositions: null
-                                                Timer {
-                                                    id: dotFetcher
-                                                    interval: 1; repeat: false; running: false;
-                                                    onTriggered: {
-                                                        progressDots.playbackPositions = root.visible && (root.selectedChannel.trackType === "sample-slice" || root.selectedChannel.trackType === "sample-trig") && progressDots.cppClipObject
-                                                            ? progressDots.cppClipObject.playbackPositions
-                                                            : null
-                                                    }
-                                                }
-                                                Connections {
-                                                    target: root
-                                                    onVisibleChanged: dotFetcher.restart();
-                                                }
-                                                Connections {
-                                                    target: progressDots
-                                                    onCppClipObjectChanged: dotFetcher.restart();
-                                                }
-                                                Connections {
-                                                    target: root.selectedChannel
-                                                    onTrack_type_changed: dotFetcher.restart();
-                                                }
+                                                onCppClipObjectChanged: dotFetcher.restart();
                                                 delegate: Item {
                                                     property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
                                                     visible: progressEntry && progressEntry.id > -1

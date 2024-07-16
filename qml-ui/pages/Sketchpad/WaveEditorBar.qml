@@ -754,28 +754,28 @@ GridLayout {
         }
 
         // SamplerSynth progress dots
+        Timer {
+            id: dotFetcher
+            interval: 1; repeat: false; running: false;
+            onTriggered: {
+                progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
+                    ? waveBar.cppClipObject.playbackPositions
+                    : null
+            }
+        }
+        Connections {
+            target: waveBar
+            onVisibleChanged: dotFetcher.restart();
+            onCppClipObjectChanged: dotFetcher.restart();
+        }
+        Connections {
+            target: waveBar.channel
+            onTrack_type_changed: dotFetcher.restart();
+        }
         Repeater {
             id: progressDots
             model: Zynthbox.Plugin.clipMaximumPositionCount
             property QtObject playbackPositions: null
-            Timer {
-                id: dotFetcher
-                interval: 1; repeat: false; running: false;
-                onTriggered: {
-                    progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
-                        ? waveBar.cppClipObject.playbackPositions
-                        : null
-                }
-            }
-            Connections {
-                target: waveBar
-                onVisibleChanged: dotFetcher.restart();
-                onCppClipObjectChanged: dotFetcher.restart();
-            }
-            Connections {
-                target: waveBar.channel
-                onTrack_type_changed: dotFetcher.restart();
-            }
             delegate: Item {
                 property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
                 visible: progressEntry && progressEntry.id > -1

@@ -367,10 +367,30 @@ Zynthian.DialogQuestion {
                             left: sampleHandle.right
                         }
                         spacing: 0
+                        Timer {
+                            id: dotFetcher
+                            interval: 1; running: false; repeat: false;
+                            onTriggered: {
+                                progressDots.playbackPositions = component.visible && sampleKeyzoneDelegate.clipObj
+                                    ? sampleKeyzoneDelegate.clipObj.playbackPositions
+                                    : null
+                            }
+                        }
+                        Connections {
+                            target: component
+                            onVisibleChanged: dotFetcher.restart()
+                        }
+                        Connections {
+                            target: sampleKeyzoneDelegate
+                            onClipObjChanged: dotFetcher.restart()
+                        }
                         Repeater {
-                            model: clipObj ? clipObj.playbackPositions : 0
+                            id: progressDots
+                            model: Zynthbox.Plugin.clipMaximumPositionCount
+                            property QtObject playbackPositions: null
                             delegate: Item {
-                                visible: model.positionID > -1
+                                property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                                visible: progressEntry && progressEntry.id > -1
                                 height: 5
                                 width: 5
                                 Rectangle {
@@ -379,7 +399,7 @@ Zynthian.DialogQuestion {
                                     height: 4
                                     width: 4
                                     color: sampleKeyzoneDelegate.lineColor
-                                    scale: 0.5 + model.positionGain
+                                    scale: progressEntry ? 0.5 + progressEntry.gain : 1
                                 }
                             }
                         }

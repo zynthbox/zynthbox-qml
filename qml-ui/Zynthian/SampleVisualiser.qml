@@ -128,32 +128,32 @@ Item {
         }
 
         // SamplerSynth progress dots
+        Timer {
+            id: dotFetcher
+            interval: 1; repeat: false; running: false;
+            onTriggered: {
+                progressDots.playbackPositions = component.visible && _private.progressStyle === 2 && progressDots.cppClipObject
+                    ? progressDots.cppClipObject.playbackPositions
+                    : null
+            }
+        }
+        Connections {
+            target: component
+            onVisibleChanged: dotFetcher.restart();
+        }
+        Connections {
+            target: progressDots
+            onCppClipObjectChanged: dotFetcher.restart();
+        }
+        Connections {
+            target: _private
+            onProgressStyleChanged: dotFetcher.restart();
+        }
         Repeater {
             id: progressDots
             property QtObject cppClipObject: parent.visible ? Zynthbox.PlayGridManager.getClipById(_private.sample.cppObjId) : null;
             model: Zynthbox.Plugin.clipMaximumPositionCount
             property QtObject playbackPositions: null
-            Timer {
-                id: dotFetcher
-                interval: 1; repeat: false; running: false;
-                onTriggered: {
-                    progressDots.playbackPositions = component.visible && _private.progressStyle === 2 && progressDots.cppClipObject
-                        ? progressDots.cppClipObject.playbackPositions
-                        : null
-                }
-            }
-            Connections {
-                target: component
-                onVisibleChanged: dotFetcher.restart();
-            }
-            Connections {
-                target: progressDots
-                onCppClipObjectChanged: dotFetcher.restart();
-            }
-            Connections {
-                target: _private
-                onProgressStyleChanged: dotFetcher.restart();
-            }
             delegate: Item {
                 property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
                 visible: progressEntry && progressEntry.id > -1

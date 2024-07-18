@@ -639,6 +639,9 @@ Zynthian.ScreenPage {
                         property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
                                                             ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                                             : component.selectedChannel.samples[index]
+                        property QtObject cppClipObject: partDelegate.clip && partDelegate.clip.hasOwnProperty("cppObjId")
+                                                            ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId)
+                                                            : null
                         property bool clipHasWav: partDelegate.clip && !partDelegate.isEmpty
 
                         Layout.fillWidth: true
@@ -654,6 +657,8 @@ Zynthian.ScreenPage {
                             anchors.fill: parent
                             color: Kirigami.Theme.textColor
                             source: partDelegate.clip ? partDelegate.clip.path : ""
+                            start: partDelegate.cppClipObject ? partDelegate.cppClipObject.startPositionSeconds : 0
+                            end: partDelegate.cppClipObject ? partDelegate.cppClipObject.startPositionSeconds + partDelegate.cppClipObject.lengthSeconds : 0
 
                             visible: partDelegate.clipHasWav
                         }

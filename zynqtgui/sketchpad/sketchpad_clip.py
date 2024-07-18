@@ -91,6 +91,31 @@ def serializePassthroughData(passthroughClient):
         }
     }
 
+def restoreSubvoiceData(audioSource, dataChunk):
+    for index, subvoiceValues in enumerate(dataChunk["settings"]):
+        audioSource.subvoiceSettings()[index].setPan(subvoiceValues["pan"])
+        audioSource.subvoiceSettings()[index].setPitch(subvoiceValues["pitch"])
+        audioSource.subvoiceSettings()[index].setGain(subvoiceValues["gain"])
+    audioSource.setSubvoiceCount(dataChunk["count"])
+def setSubvoiceDefaults(audioSource):
+    for subvoiceSettingsObject in audioSource.subvoiceSettings():
+        subvoiceSettingsObject.setPan(0)
+        subvoiceSettingsObject.setPitch(0)
+        subvoiceSettingsObject.setGain(1)
+    audioSource.setSubvoiceCount(0)
+def serializeSubvoiceSettings(audioSource):
+    subvoiceSettingsData = []
+    for subvoiceSettingsObject in audioSource.subvoiceSettings():
+        subvoiceSettingsData.append({
+            "pan": subvoiceSettingsObject.pan(),
+            "pitch": subvoiceSettingsObject.pitch(),
+            "gain": subvoiceSettingsObject.gain()
+        })
+    return {
+        "settings": subvoiceSettingsData,
+        "count": audioSource.subvoiceCount()
+    }
+
 class sketchpad_clip_metadata(QObject):
     def __init__(self, clip):
         super(sketchpad_clip_metadata, self).__init__(clip)
@@ -205,6 +230,16 @@ class sketchpad_clip_metadata(QObject):
                 except:
                     logging.error(f"Failed to restore (and so restoring to defaults) the equaliser/compressor settings for {self.clip} from the data: {value}")
                     setPassthroughClientDefaults(self.clip.audioSource)
+    def set_subvoiceSettings(self, value):
+        if self.clip.audioSource is not None:
+            if value is None or value == "":
+                setSubvoiceDefaults(self.clip.audioSource)
+            else:
+                try:
+                    restoreSubvoiceData(self.clip.audioSource, json.loads(value))
+                except:
+                    logging.error(f"Failed to restore (and so restoring to defaults) the subvoice settings for {self.clip} from the data: {value}")
+                    setSubvoiceDefaults(self.clip.audioSource)
 
     audioTypeChanged = Signal()
     audioTypeSettingsChanged = Signal()
@@ -289,10 +324,22 @@ class sketchpad_clip_metadata(QObject):
             self.clip.audioSource.grainPitchPriorityChanged.connect(self.scheduleWrite)
             self.clip.audioSource.grainSustainChanged.connect(self.scheduleWrite)
             self.clip.audioSource.grainTiltChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.subvoiceCountChanged.connect(self.scheduleWrite)
+            for subvoiceSettingsObject in self.clip.audioSource.subvoiceSettings():
+                subvoiceSettingsObject.panChanged.connect(self.scheduleWrite)
+                subvoiceSettingsObject.pitchChanged.connect(self.scheduleWrite)
+                subvoiceSettingsObject.gainChanged.connect(self.scheduleWrite)
+
     # This disconnects all our watcher signals from the clip's current ClipAudioSource instance, if there is one
     def unhook(self):
         if self.clip.audioSource:
-            try: self.clip.audioSource.disconnect(self)
+            try:
+                self.clip.audioSource.disconnect(self)
+                for filterObject in self.clip.audioSource.equaliserSettings():
+                    filterObject.disconnect(self)
+                passthroughClient.compressorSettings().disconnect(self)
+                for subvoiceSettingsObject in self.clip.audioSource.subvoiceSettings():
+                    subvoiceSettingsObject.disconnect(self)
             except: pass
 
     def read(self):
@@ -351,6 +398,7 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setSpeedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)))
                 self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
                 self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
+                self.set_subvoiceSettings(str(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_SETTINGS", "")))
                 # Some fallbackery that we can likely remove at some point (or also perhaps get rid of entirely when we switch to using the industry version of slice and loop definitions...)
                 startPositionSamples = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION_SAMPLES", -1))
                 if startPositionSamples == -1:
@@ -452,6 +500,7 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
                     tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
                     tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializePassthroughData(self.clip.audioSource)))]
+                    tags["ZYNTHBOX_SUBVOICE_SETTINGS"] = [str(json.dumps(serializeSubvoiceSettings(self.clip.audioSource)))]
 
                 try:
                     file = taglib.File(self.clip.path)

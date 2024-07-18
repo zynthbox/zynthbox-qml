@@ -34,8 +34,425 @@ import Zynthian 1.0 as Zynthian
 Item {
     id: component
     property QtObject clip
-    QQC2.Label {
-        anchors.centerIn: parent
-        text: "MAKE VOICY THINGS GO HERE (HERE) Here (Here) here (here)!"
+    property QtObject cppClipObject
+    onCppClipObjectChanged: {
+        _private.editVoice = 0;
+    }
+    function cuiaCallback(cuia) {
+        let returnValue = false;
+        switch (cuia) {
+            case "SELECT_UP":
+                _private.goUp();
+                returnValue = true;
+                break;
+            case "SELECT_DOWN":
+                _private.goDown();
+                returnValue = true;
+                break;
+            case "NAVIGATE_LEFT":
+                _private.goLeft();
+                returnValue = true;
+                break;
+            case "NAVIGATE_RIGHT":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "KNOB0_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB0_UP":
+                _private.knob0Up();
+                returnValue = true;
+                break;
+            case "KNOB0_DOWN":
+                _private.knob0Down();
+                returnValue = true;
+                break;
+            case "KNOB1_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB1_UP":
+                _private.knob1Up();
+                returnValue = true;
+                break;
+            case "KNOB1_DOWN":
+                _private.knob1Down();
+                returnValue = true;
+                break;
+            case "KNOB2_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB2_UP":
+                _private.knob2Up();
+                returnValue = true;
+                break;
+            case "KNOB2_DOWN":
+                _private.knob2Down();
+                returnValue = true;
+                break;
+            case "KNOB3_TOUCHED":
+                returnValue = true;
+                break;
+            case "KNOB3_UP":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "KNOB3_DOWN":
+                _private.goLeft();
+                returnValue = true;
+                break;
+        };
+        return returnValue;
+    }
+    QtObject {
+        id: _private
+        property int currentElement: 0
+        property int elementMax: 1
+
+        property int editVoice: 0
+
+        function goLeft() {
+            if (currentElement === 0) {
+                if (component.cppClipObject.subvoiceCount > 0) {
+                    currentElement = elementMax;
+                } else {
+                    currentElement = elementMax  - 1;
+                }
+            } else {
+                currentElement = currentElement - 1;
+            }
+        }
+        function goRight() {
+            if (currentElement === elementMax) {
+                currentElement = 0;
+            } else {
+                if (component.cppClipObject.subvoiceCount > 0) {
+                    currentElement = currentElement + 1;
+                }
+            }
+        }
+        function goUp() {
+        }
+        function goDown() {
+        }
+        function knob0Up() {
+            switch (currentElement) {
+                case 0:
+                    if (component.cppClipObject) {
+                        component.cppClipObject.subvoiceCount = Math.min(16, component.cppClipObject.subvoiceCount + 1);
+                    }
+                    break;
+                case 1:
+                    if (component.cppClipObject) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                        } else {
+                            if (component.cppClipObject.subvoiceCount > 0) {
+                                component.cppClipObject.subvoiceSettings[_private.editVoice].pan = Math.min(1, component.cppClipObject.subvoiceSettings[_private.editVoice].pan + 0.01);
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    console.log("Somehow ended up on element", currentElement, "which doesn't really exist");
+                    break;
+            }
+        }
+        function knob0Down() {
+            switch (currentElement) {
+                case 0:
+                    if (component.cppClipObject) {
+                        component.cppClipObject.subvoiceCount = Math.max(0, component.cppClipObject.subvoiceCount - 1);
+                    }
+                    break;
+                case 1:
+                    if (component.cppClipObject) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            _private.editVoice = Math.max(0, _private.editVoice - 1);
+                        } else {
+                            if (component.cppClipObject.subvoiceCount > 0) {
+                                component.cppClipObject.subvoiceSettings[_private.editVoice].pan = Math.max(-1, component.cppClipObject.subvoiceSettings[_private.editVoice].pan - 0.01);
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    console.log("Somehow ended up on element", currentElement, "which doesn't really exist");
+                    break;
+            }
+        }
+        function knob1Up() {
+            switch (currentElement) {
+                case 0:
+                    if (component.cppClipObject) {
+                        _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                    }
+                    break;
+                case 1:
+                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.min(48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch + 0.01);
+                        } else {
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.min(48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch + 0.1);
+                        }
+                    }
+                    break;
+                default:
+                    console.log("Somehow ended up on element", currentElement, "which doesn't really exist");
+                    break;
+            }
+        }
+        function knob1Down() {
+            switch (currentElement) {
+                case 0:
+                    if (component.cppClipObject) {
+                        _private.editVoice = Math.max(0, _private.editVoice - 1);
+                    }
+                    break;
+                case 1:
+                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.max(-48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch - 0.01);
+                        } else {
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.max(-48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch - 0.1);
+                        }
+                    }
+                    break;
+                default:
+                    console.log("Somehow ended up on element", currentElement, "which doesn't really exist");
+                    break;
+            }
+        }
+        function knob2Up() {
+            switch (currentElement) {
+                case 0:
+                    break;
+                case 1:
+                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
+                        component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = Math.min(1, component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute + 0.01);
+                    }
+                    break;
+                default:
+                    console.log("Somehow ended up on element", currentElement, "which doesn't really exist");
+                    break;
+            }
+        }
+        function knob2Down() {
+            switch (currentElement) {
+                case 0:
+                    break;
+                case 1:
+                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
+                        component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = Math.max(-1, component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute - 0.01);
+                    }
+                    break;
+                default:
+                    console.log("Somehow ended up on element", currentElement, "which doesn't really exist");
+                    break;
+            }
+        }
+    }
+    RowLayout {
+        anchors.fill: parent
+        spacing: 0
+        Zynthian.InfinitySlider {
+            id: subvoiceCountSlider
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit
+            text: qsTr("Sub-voices")
+            value: component.cppClipObject ? component.cppClipObject.subvoiceCount : 0
+            valueString: component.cppClipObject ? component.cppClipObject.subvoiceCount : 0
+            decimals: 0
+            increment: 1
+            slideIncrement: 1
+            applyLowerBound: true
+            lowerBound: 0
+            applyUpperBound: true
+            upperBound: 16
+            resetOnTap: true
+            resetValue: 0
+            selected: _private.currentElement === 0
+            onValueChanged: component.cppClipObject.subvoiceCount = value
+            Connections {
+                target: component.cppClipObject
+                onSubvoiceCountChanged: {
+                    subvoiceCountSlider.value = component.cppClipObject.subvoiceCount;
+                    if (_private.editVoice > subvoiceCountSlider.value - 1) {
+                        _private.editVoice = Math.max(0, subvoiceCountSlider.value - 1);
+                    }
+                    if (component.cppClipObject.subvoiceCount === 0) {
+                        _private.currentElement = 0;
+                    }
+                }
+            }
+        }
+        Zynthian.InfinitySlider {
+            id: editVoiceSlider
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit
+            text: qsTr("Sub-voice ►")
+            value: _private.editVoice
+            valueString: _private.editVoice + 1
+            decimals: 0
+            increment: 1
+            slideIncrement: 1
+            applyLowerBound: true
+            lowerBound: 0
+            applyUpperBound: true
+            upperBound: component.cppClipObject ? component.cppClipObject.subvoiceCount - 1 : 1
+            resetOnTap: true
+            resetValue: 0
+            selected: _private.currentElement === 0
+            onValueChanged: _private.editVoice = value
+            Connections {
+                target: _private
+                onEditVoiceChanged: editVoiceSlider.value = _private.editVoice
+            }
+        }
+
+        Item {
+            Layout.fillHeight: true
+            Layout.minimumWidth: Kirigami.Units.largeSpacing * 2
+            Layout.maximumWidth: Kirigami.Units.largeSpacing * 2
+        }
+
+        ColumnLayout {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            enabled: component.cppClipObject && component.cppClipObject.subvoiceCount > 0
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Sub-voice %1 Changes").arg(_private.editVoice + 1)
+                Layout.fillWidth: true
+                Layout.margins: Kirigami.Units.smallSpacing
+                horizontalAlignment: Text.AlignHCenter
+            }
+            RowLayout {
+                spacing: 0
+                Layout.bottomMargin: 2 // To give even space for the selected indicator that sits two pixels below the thing
+                Zynthian.SketchpadDial {
+                    id: panDial
+                    text: qsTr("Pan")
+                    controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                    controlProperty: "pan"
+                    valueString: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice].pan.toFixed(2) : 0
+                    selected: _private.currentElement === 1
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                    dial {
+                        stepSize: 0.01
+                        from: -1
+                        to: 1
+                    }
+                    onDoubleClicked: {
+                        component.cppClipObject.subvoiceSettings[_private.editVoice].pan = 0;
+                    }
+                }
+
+                Zynthian.SketchpadDial {
+                    id: pitchDial
+                    text: qsTr("Pitch")
+                    controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                    controlProperty: "pitch"
+                    fixedPointTrail: 2
+                    selected: _private.currentElement === 1
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                    dial {
+                        stepSize: 0.1
+                        from: -48
+                        to: 48
+                    }
+                    onDoubleClicked: {
+                        component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = 0;
+                    }
+                }
+
+                Zynthian.SketchpadDial {
+                    id: gainDial
+                    text: qsTr("Gain (dB)")
+                    controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                    controlProperty: "gainAbsolute"
+                    valueString: component.cppClipObject ? qsTr("%1 dB").arg(component.cppClipObject.subvoiceSettings[_private.editVoice].gainDb.toFixed(2)) : 0
+                    selected: _private.currentElement === 1
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit
+
+                    dial {
+                        stepSize: 0.01
+                        from: 0
+                        to: 1
+                    }
+
+                    onDoubleClicked: {
+                        component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
+                    }
+                }
+            }
+        }
+
+        Item {
+            Layout.fillHeight: true
+            Layout.minimumWidth: Kirigami.Units.largeSpacing * 3
+            Layout.maximumWidth: Kirigami.Units.largeSpacing * 3
+        }
+
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit
+            Layout.margins: Kirigami.Units.smallSpacing
+            spacing: Kirigami.Units.smallSpacing
+            enabled: component.cppClipObject
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                text: component.cppClipObject && component.cppClipObject.equaliserEnabled === true ? qsTr("Equalizer:\nEnabled") : qsTr("Equalizer:\nDisabled")
+                checked: _private.settingsCategory === 0
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        component.cppClipObject.equaliserEnabled = !component.cppClipObject.equaliserEnabled;
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                text: component.cppClipObject && component.cppClipObject.compressorEnabled === true ? qsTr("Compressor:\nEnabled") : qsTr("Compressor:\nDisabled")
+                checked: _private.settingsCategory === 1
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        component.cppClipObject.compressorEnabled = !component.cppClipObject.compressorEnabled;
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                text: qsTr("Equalizer...")
+                checked: _private.settingsCategory === 2
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        let channel = zynqtgui.sketchpad.song.channelsModel.getChannel(component.cppClipObject.sketchpadTrack);
+                        if (component.clip.isChannelSample) {
+                            pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(channel, "sample", component.clip.lane);
+                        } else {
+                            pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(channel, "sketch", component.clip.part);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

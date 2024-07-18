@@ -648,10 +648,8 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
                         color: "#000000"
                         border{
-                            color: Kirigami.Theme.highlightColor
-                            width: index === component.selectedChannel.selectedSlotRow
-                                    ? 1
-                                    : 0
+                            color: index === component.selectedChannel.selectedSlotRow ? Kirigami.Theme.highlightColor : "transparent"
+                            width: 1
                         }
                         Zynthbox.WaveFormItem {
                             anchors.fill: parent
@@ -668,6 +666,7 @@ Zynthian.ScreenPage {
                                 left: parent.left
                                 top: parent.top
                                 right: parent.right
+                                margins: 1
                             }
                             color: "#99888888"
                             visible: detailsLabel.text && detailsLabel.text.trim().length > 0

@@ -33,6 +33,7 @@ Item {
     id: component
     property alias text: descriptionLabel.text
     property double value: 0
+    property string valueString: "" // If this is set to anything other than an empty string, it will be used in place of the value and unit logic
     property string unitLabel: "" // If this is set to "%", value will be reinterpreted as a percentage (that is, 0 through 1 will become 0 through 100, and the decimals will be reduced by 2)
     property double increment: 0.1
     property double slideIncrement: 0.01
@@ -133,7 +134,9 @@ Item {
                 id: valueLabelThrottle
                 interval: 0; running: false; repeat: false;
                 onTriggered: {
-                    if (component.unitLabel === "%") {
+                    if (component.valueString.length > 0) {
+                        valueLabel.text = component.valueString;
+                    } else if (component.unitLabel === "%") {
                         valueLabel.text = (100 *component.value).toFixed(Math.max(0, component.decimals - 2)) + component.unitLabel;
                     } else {
                         valueLabel.text = component.value.toFixed(component.decimals) + component.unitLabel;
@@ -145,6 +148,7 @@ Item {
                 onValueChanged: valueLabelThrottle.restart()
                 onDecimalsChanged: valueLabelThrottle.restart()
                 onUnitLabelChanged: valueLabelThrottle.restart()
+                onValueStringChanged: valueLabelThrottle.restart()
             }
         }
         QQC2.Button {

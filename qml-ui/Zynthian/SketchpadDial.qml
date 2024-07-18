@@ -18,6 +18,8 @@ ColumnLayout {
     property bool showDecimalsAtInteger: false
     property int fixedPointTrail: 9 // How many decimal point values do you want to display on this value when a decimal point is required (this should be small enough that the resulting string fits inside the dial's ring)
 
+    property bool selected: false
+
     signal pressed(var mouse)
     signal clicked()
     signal doubleClicked()
@@ -145,5 +147,14 @@ ColumnLayout {
         visible: text !== ""
         Layout.fillWidth: parent
         horizontalAlignment: Text.AlignHCenter
+        Rectangle {
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.bottom
+            }
+            height: 2
+            color: root.selected ? Kirigami.Theme.highlightedTextColor : "transparent"
+        }
     }
 }

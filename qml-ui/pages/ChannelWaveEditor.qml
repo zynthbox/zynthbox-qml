@@ -92,224 +92,279 @@ Zynthian.ScreenPage {
         var returnValue = false;
         switch (cuia) {
             case "SELECT_UP":
-                _private.goUp();
-                returnValue = true;
+                returnValue = _private.goUp(cuia);
                 break;
             case "SELECT_DOWN":
-                _private.goDown();
-                returnValue = true;
+                returnValue = _private.goDown(cuia);
                 break;
             case "NAVIGATE_LEFT":
-                _private.goLeft();
-                returnValue = true;
+                returnValue = _private.goLeft(cuia);
                 break;
-
             case "NAVIGATE_RIGHT":
-                _private.goRight();
-                returnValue = true;
+                returnValue = _private.goRight(cuia);
                 break;
             case "KNOB0_TOUCHED":
-                _private.knob0Touched(cuia);
-                returnValue = true;
+                returnValue = _private.knob0Touched(cuia);
                 break;
             case "KNOB0_UP":
-                _private.knob0Up(cuia);
-                returnValue = true;
+                returnValue = _private.knob0Up(cuia);
                 break;
             case "KNOB0_DOWN":
-                _private.knob0Down(cuia);
-                returnValue = true;
+                returnValue = _private.knob0Down(cuia);
                 break;
             case "KNOB1_TOUCHED":
-                _private.knob0Touched(cuia);
-                returnValue = true;
+                returnValue = _private.knob1Touched(cuia);
                 break;
             case "KNOB1_UP":
-                _private.knob1Up(cuia);
-                returnValue = true;
+                returnValue = _private.knob1Up(cuia);
                 break;
             case "KNOB1_DOWN":
-                _private.knob1Down(cuia);
-                returnValue = true;
+                returnValue = _private.knob1Down(cuia);
                 break;
             case "KNOB2_TOUCHED":
-                _private.knob0Touched(cuia);
-                returnValue = true;
+                returnValue = _private.knob2Touched(cuia);
                 break;
             case "KNOB2_UP":
-                _private.knob2Up(cuia);
-                returnValue = true;
+                returnValue = _private.knob2Up(cuia);
                 break;
             case "KNOB2_DOWN":
-                _private.knob2Down(cuia);
-                returnValue = true;
+                returnValue = _private.knob2Down(cuia);
                 break;
             case "KNOB3_TOUCHED":
-                _private.knob0Touched(cuia);
-                returnValue = true;
+                returnValue = _private.knob3Touched(cuia);
                 break;
             case "KNOB3_UP":
-                _private.goRight();
-                returnValue = true;
+                returnValue = _private.goRight(cuia);
                 break;
             case "KNOB3_DOWN":
-                _private.goLeft();
-                returnValue = true;
+                returnValue = _private.goLeft(cuia);
                 break;
         }
         return returnValue;
     }
     QtObject {
         id: _private
-        function goLeft() {
-            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                clipSettingsADSR.previousADSRElement();
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
-                clipSettingsGrainerator.previousElement();
-            }
-        }
-        function goRight() {
-            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                clipSettingsADSR.nextADSRElement();
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
-                clipSettingsGrainerator.nextElement();
-            }
-        }
-        function goUp() {
-            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                if (zynqtgui.altButtonPressed) {
-                    for (var i = 0; i < 10; ++i) {
-                        clipSettingsADSR.increaseCurrentValue();
-                    }
-                } else {
-                    clipSettingsADSR.increaseCurrentValue();
-                }
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
-                if (zynqtgui.altButtonPressed) {
-                    for (var i = 0; i < 10; ++i) {
-                        clipSettingsGrainerator.increaseCurrentValue();
-                    }
-                } else {
-                    clipSettingsGrainerator.increaseCurrentValue();
-                }
-            }
-        }
-        function goDown() {
-            if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                if (zynqtgui.altButtonPressed) {
-                    for (var i = 0; i < 10; ++i) {
-                        clipSettingsADSR.decreaseCurrentValue();
-                    }
-                } else {
-                    clipSettingsADSR.decreaseCurrentValue();
-                }
-            } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
-                if (zynqtgui.altButtonPressed) {
-                    for (var i = 0; i < 10; ++i) {
-                        clipSettingsGrainerator.decreaseCurrentValue();
-                    }
-                } else {
-                    clipSettingsGrainerator.decreaseCurrentValue();
-                }
-            }
-        }
-        function knob0Touched(cuia) {
+        function goLeft(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
-                }
-            }
-        }
-        function knob0Up(cuia) {
-            if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                    clipSettingsADSR.nextADSRElement();
-                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
-                    clipSettingsGrainerator.nextElement();
-                }
-            }
-        }
-        function knob0Down(cuia) {
-            if (component.selectedClipHasWav) {
-                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.previousADSRElement();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                     clipSettingsGrainerator.previousElement();
                 }
             }
+            return returnValue;
         }
-        function knob1Touched(cuia) {
+        function goRight(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                    clipSettingsADSR.nextADSRElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.nextElement();
+                }
+            }
+            return returnValue;
+        }
+        function goUp(cuia) {
+            let returnValue = true;
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                    if (zynqtgui.altButtonPressed) {
+                        for (var i = 0; i < 10; ++i) {
+                            clipSettingsADSR.increaseCurrentValue();
+                        }
+                    } else {
+                        clipSettingsADSR.increaseCurrentValue();
+                    }
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    if (zynqtgui.altButtonPressed) {
+                        for (var i = 0; i < 10; ++i) {
+                            clipSettingsGrainerator.increaseCurrentValue();
+                        }
+                    } else {
+                        clipSettingsGrainerator.increaseCurrentValue();
+                    }
+                }
+            }
+            return returnValue;
+        }
+        function goDown(cuia) {
+            let returnValue = true;
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                    if (zynqtgui.altButtonPressed) {
+                        for (var i = 0; i < 10; ++i) {
+                            clipSettingsADSR.decreaseCurrentValue();
+                        }
+                    } else {
+                        clipSettingsADSR.decreaseCurrentValue();
+                    }
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    if (zynqtgui.altButtonPressed) {
+                        for (var i = 0; i < 10; ++i) {
+                            clipSettingsGrainerator.decreaseCurrentValue();
+                        }
+                    } else {
+                        clipSettingsGrainerator.decreaseCurrentValue();
+                    }
+                }
+            }
+            return returnValue;
+        }
+        function knob0Touched(cuia) {
+            let returnValue = true;
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
+            return returnValue;
         }
-        function knob1Up(cuia) {
+        function knob0Up(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                    clipSettingsADSR.nextADSRElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.nextElement();
+                }
+            }
+            return returnValue;
+        }
+        function knob0Down(cuia) {
+            let returnValue = true;
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                    clipSettingsADSR.previousADSRElement();
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                    clipSettingsGrainerator.previousElement();
+                }
+            }
+            return returnValue;
+        }
+        function knob1Touched(cuia) {
+            let returnValue = true;
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                }
+            }
+            return returnValue;
+        }
+        function knob1Up(cuia) {
+            let returnValue = true;
+            if (component.selectedClipHasWav) {
+                if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.increaseCurrentValue();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                     clipSettingsGrainerator.increaseCurrentValue();
                 }
             }
+            return returnValue;
         }
         function knob1Down(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                     clipSettingsADSR.decreaseCurrentValue();
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                     clipSettingsGrainerator.decreaseCurrentValue();
                 }
             }
+            return returnValue;
         }
         function knob2Touched(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
+            return returnValue;
         }
         function knob2Up(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
+            return returnValue;
         }
         function knob2Down(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
+            return returnValue;
         }
         function knob3Touched(cuia) {
+            let returnValue = true;
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
-                    waveBar.cuiaCallback(cuia);
+                    returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                    returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
                 }
             }
+            return returnValue;
         }
     }
     Connections {
@@ -413,7 +468,7 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            text: qsTr("Voices")
+                            text: qsTr("Voices/EQ")
                             enabled: component.selectedClipHasWav
                             checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
                             MouseArea {
@@ -517,7 +572,8 @@ Zynthian.ScreenPage {
                                 id: clipSettingsVoicesClipThrottle
                                 interval: 1; running: false; repeat: false;
                                 onTriggered: {
-                                    clipSettingsVoices.clip = component.cppClipObject;
+                                    clipSettingsVoices.clip = component.selectedClip;
+                                    clipSettingsVoices.cppClipObject = component.cppClipObject;
                                 }
                             }
                         }

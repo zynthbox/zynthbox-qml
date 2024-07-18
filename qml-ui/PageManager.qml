@@ -91,6 +91,7 @@ Zynthian.Stack {
         "sound_categories",
         "engine",
         "song_manager",
+        "channel_wave_editor", // Cache to ensure switching is instant the first time you switch to the sample edit page (it's fast, but not quite fast enough)
         "theme_chooser" // Cache theme_chooser to allow default theme selection in case of any issues with config
     ]
     property string currentPage: ""

@@ -269,15 +269,13 @@ Item {
             valueString: component.cppClipObject ? component.cppClipObject.subvoiceCount : 0
             decimals: 0
             increment: 1
-            slideIncrement: 1
+            slideIncrement: 0.05
             applyLowerBound: true
             lowerBound: 0
             applyUpperBound: true
             upperBound: 16
-            resetOnTap: true
-            resetValue: 0
             selected: _private.currentElement === 0
-            onValueChanged: component.cppClipObject.subvoiceCount = value
+            onValueChanged: if (component.cppClipObject) { component.cppClipObject.subvoiceCount = value; }
             Connections {
                 target: component.cppClipObject
                 onSubvoiceCountChanged: {
@@ -301,7 +299,7 @@ Item {
             valueString: _private.editVoice + 1
             decimals: 0
             increment: 1
-            slideIncrement: 1
+            slideIncrement: 0.05
             applyLowerBound: true
             lowerBound: 0
             applyUpperBound: true
@@ -351,7 +349,9 @@ Item {
                         to: 1
                     }
                     onDoubleClicked: {
-                        component.cppClipObject.subvoiceSettings[_private.editVoice].pan = 0;
+                        if (component.cppClipObject) {
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].pan = 0;
+                        }
                     }
                 }
 
@@ -371,7 +371,9 @@ Item {
                         to: 48
                     }
                     onDoubleClicked: {
-                        component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = 0;
+                        if (component.cppClipObject) {
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = 0;
+                        }
                     }
                 }
 
@@ -393,7 +395,9 @@ Item {
                     }
 
                     onDoubleClicked: {
-                        component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
+                        if (component.cppClipObject) {
+                            component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
+                        }
                     }
                 }
             }

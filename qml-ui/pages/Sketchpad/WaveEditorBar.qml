@@ -384,9 +384,9 @@ GridLayout {
                                     zynqtgui.ignoreNextModeButtonPress = true;
                                     waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + deltaX, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
                                 } else {
-                                    waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + (deltaX * waveBar.cppClipObject.lengthSamples), 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                                    waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + (Math.round(deltaX / Kirigami.Units.gridUnit) * waveBar.cppClipObject.lengthSamples), 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
                                 }
-                                wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                                wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                             } else {
                                 if (zynqtgui.modeButtonPressed) {
                                     zynqtgui.ignoreNextModeButtonPress = true;
@@ -423,7 +423,7 @@ GridLayout {
                                         waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision - Math.round(deltaX / Kirigami.Units.gridUnit));
                                     }
                                 }
-                                wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                                wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                             } else {
                                 if (waveBar.cppClipObject.snapLengthToBeat) {
                                     waveBar.cppClipObject.lengthBeats = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLengthBeats + Math.round(deltaX / wav.pixelsPerBeat), 0, 64);
@@ -502,9 +502,13 @@ GridLayout {
                     left: scrollGrooveLeft.right
                     right: scrollGrooveRight.left
                     bottom: parent.bottom
+                    margins: -1
                 }
-                color: Kirigami.Theme.focusColor
-                opacity: 0.5
+                border {
+                    width: 1
+                    color: Kirigami.Theme.focusColor
+                }
+                color: "transparent"
             }
             MouseArea {
                 anchors.fill: parent

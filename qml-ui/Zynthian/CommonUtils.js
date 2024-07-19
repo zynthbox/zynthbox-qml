@@ -99,3 +99,16 @@ function instantiateComponent(url, params) {
         pageObject: obj
     }
 }
+
+/**
+ * Position some position (from 0 through 1) in a window at the same
+ * relative position inside the new position given by the start and
+ * end points (given as relative positions from 0 through 1 based on
+ * the logical start and end points of the position's original window)
+ */
+function fitInWindow(originalX, windowStart, windowEnd) {
+    let movedX = originalX - windowStart;
+    let windowSize = windowEnd - windowStart;
+    let windowRatio = windowSize / 1;
+    return movedX / windowRatio;
+}

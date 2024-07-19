@@ -175,18 +175,18 @@ Zynthian.ScreenPage {
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
         function valueSetter(value) {
             if (sample != null && !sample.isEmpty) {
-                clipCppObj.gain = Zynthian.CommonUtils.clamp(value, 0, 1)
+                clipCppObj.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "sample_gain",
                     description: qsTr("%1 Gain").arg(sample.path.split("/").pop()),
                     start: 0,
                     stop: 1,
                     step: 0.01,
-                    defaultValue: sample.initialGain,
-                    currentValue: parseFloat(clipCppObj.gain),
+                    defaultValue: 0.5,
+                    currentValue: parseFloat(clipCppObj.gainAbsolute),
                     startLabel: "-100 dB",
                     stopLabel: "24 dB",
-                    valueLabel: qsTr("%1 dB").arg(Zynthian.CommonUtils.interp(clipCppObj.gain, 0, 1, -100, 24)),
+                    valueLabel: qsTr("%1 dB").arg(clipCppObj.gainDb.toFixed(2)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -196,7 +196,7 @@ Zynthian.ScreenPage {
                 applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sample"), 2000)
             }
         }
-        valueSetter(clipCppObj.gain + sign*0.01)
+        valueSetter(clipCppObj.gainAbsolute + sign*0.01)
     }
     /**
      * Update selected sketch gain
@@ -210,18 +210,18 @@ Zynthian.ScreenPage {
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
-                clipCppObj.gain = Zynthian.CommonUtils.clamp(value, 0, 1)
+                clipCppObj.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "clip_gain",
                     description: qsTr("%1 Gain").arg(clip.path.split("/").pop()),
                     start: 0,
                     stop: 1,
                     step: 0.01,
-                    defaultValue: clip.initialGain,
-                    currentValue: parseFloat(clipCppObj.gain),
+                    defaultValue: 0.5,
+                    currentValue: parseFloat(clipCppObj.gainAbsolute),
                     startLabel: "-100 dB",
                     stopLabel: "24 dB",
-                    valueLabel: qsTr("%1 dB").arg(parseInt(Zynthian.CommonUtils.interp(clipCppObj.gain, 0, 1, -100, 24))),
+                    valueLabel: qsTr("%1 dB").arg(clipCppObj.gainDb.toFixed(2)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -231,7 +231,7 @@ Zynthian.ScreenPage {
                 applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sketch"), 2000)
             }
         }
-        valueSetter(clipCppObj.gain + sign*0.01)
+        valueSetter(clipCppObj.gainAbsolute + sign*0.01)
     }
     /**
      * Update selected channel volume

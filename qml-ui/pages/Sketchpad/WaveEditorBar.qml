@@ -260,12 +260,6 @@ GridLayout {
         // Calculate amount of pixels represented by 1 beat
         property real pixelsPerBeat: waveBar.cppClipObject ? (60/waveBar.cppClipObject.bpm) / wav.pixelToSecs : 1
 
-        function fitInWindow(originalX, windowStart, windowEnd) {
-            let movedX = originalX - windowStart;
-            let windowSize = windowEnd - windowStart;
-            let windowRatio = windowSize / 1;
-            return movedX / windowRatio;
-        }
         function focusPosition(positionToFocus) {
             pinchZoomer.position = Math.max(0, Math.min((positionToFocus - (wav.windowSizeSamples * 0.5)) / (waveBar.cppClipObject.durationSamples - wav.windowSizeSamples), 1));
         }
@@ -707,7 +701,7 @@ GridLayout {
                 ? waveBar.cppClipObject.startPositionSamples / waveBar.cppClipObject.durationSamples
                 : 1
             x: waveBar.cppClipObject
-                ? wav.fitInWindow(startPositionRelative, wav.relativeStart, wav.relativeEnd) * parent.width
+                ? Zynthian.CommonUtils.fitInWindow(startPositionRelative, wav.relativeStart, wav.relativeEnd) * parent.width
                 : 0
         }
 
@@ -726,7 +720,7 @@ GridLayout {
                 ? waveBar.cppClipObject.loopDeltaSamples / waveBar.cppClipObject.durationSamples
                 : 0
             x: waveBar.cppClipObject
-                ? wav.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, wav.relativeStart, wav.relativeEnd) * parent.width
+                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, wav.relativeStart, wav.relativeEnd) * parent.width
                 : 0
         }
 
@@ -741,7 +735,7 @@ GridLayout {
             opacity: 0.6
             width: startLoopLine.width
             x: waveBar.cppClipObject
-                ? wav.fitInWindow(startLoopLine.startPositionRelative + (waveBar.cppClipObject.lengthSamples / waveBar.cppClipObject.durationSamples), wav.relativeStart, wav.relativeEnd) * parent.width
+                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (waveBar.cppClipObject.lengthSamples / waveBar.cppClipObject.durationSamples), wav.relativeStart, wav.relativeEnd) * parent.width
                 : 0
         }
 
@@ -754,7 +748,7 @@ GridLayout {
             visible: waveBar.visible && waveBar.channel.trackType === "sample-loop" && waveBar.cppClipObject && waveBar.cppClipObject.isPlaying
             color: Kirigami.Theme.highlightColor
             width: Kirigami.Units.smallSpacing
-            x: visible ? wav.fitInWindow(waveBar.cppClipObject.position, wav.relativeStart, wav.relativeEnd) * parent.width : 0
+            x: visible ? Zynthian.CommonUtils.fitInWindow(waveBar.cppClipObject.position, wav.relativeStart, wav.relativeEnd) * parent.width : 0
         }
 
         // SamplerSynth progress dots
@@ -795,7 +789,7 @@ GridLayout {
                     top: parent.verticalCenter
                     topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                 }
-                x: visible ? wav.fitInWindow(progressEntry.progress, wav.relativeStart, wav.relativeEnd) * parent.width : 0
+                x: visible ? Zynthian.CommonUtils.fitInWindow(progressEntry.progress, wav.relativeStart, wav.relativeEnd) * parent.width : 0
             }
         }
 

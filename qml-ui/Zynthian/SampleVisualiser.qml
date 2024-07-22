@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 
 /**
@@ -41,7 +42,7 @@ Item {
         value: component.sample
         when: component.visible
         delayed: true
-        restoreMode: Binding.RestoreBinding
+        restoreMode: Binding.RestoreBindingOrValue
     }
     Binding {
         target: _private
@@ -53,17 +54,14 @@ Item {
                 : 0
     }
     Zynthbox.WaveFormItem {
-        id: waveForm
+        id: waveformItem
         anchors.fill: parent
         color: Kirigami.Theme.textColor
-        Binding {
-            target: waveForm
-            property: "source"
-            value: _private.sample ? _private.sample.path : ""
-            when: parent.visible
-            delayed: true
-            restoreMode: Binding.RestoreBinding
-        }
+        source: _private.sample ? _private.sample.path : ""
+        start: progressDots.cppClipObject != null ? progressDots.cppClipObject.startPositionSeconds : 0
+        end: progressDots.cppClipObject != null ? progressDots.cppClipObject.startPositionSeconds + progressDots.cppClipObject.lengthSeconds : 0
+        readonly property real relativeStart: waveformItem.start / waveformItem.length
+        readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
         visible: component.visible && _private.sample && !_private.sample.isEmpty
 
@@ -97,9 +95,29 @@ Item {
                 bottom: parent.bottom
             }
             color: Kirigami.Theme.positiveTextColor
-            opacity: 0.6
-            width: Kirigami.Units.smallSpacing
-            x: _private.sample ? (_private.sample.startPosition / _private.sample.duration) * parent.width : 0
+            opacity: 0.8
+            width: 1
+            property real startPositionRelative: progressDots.cppClipObject
+                ? progressDots.cppClipObject.startPositionSamples / progressDots.cppClipObject.durationSamples
+                : 1
+            x: progressDots.cppClipObject != null ? Zynthian.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
+        }
+
+        // Loop line
+        Rectangle {
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+            }
+            color: Kirigami.Theme.highlightColor
+            opacity: 0.8
+            width: 1
+            property real loopDeltaRelative: progressDots.cppClipObject
+                ? progressDots.cppClipObject.loopDeltaSamples / progressDots.cppClipObject.durationSamples
+                : 0
+            x: progressDots.cppClipObject
+                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                : 0
         }
 
         // End loop line
@@ -110,9 +128,11 @@ Item {
                 bottom: parent.bottom
             }
             color: Kirigami.Theme.neutralTextColor
-            opacity: 0.6
-            width: Kirigami.Units.smallSpacing
-            x: _private.sample ? ((((60/Zynthbox.SyncTimer.bpm) * _private.sample.length) / _private.sample.duration) * parent.width) + ((_private.sample.startPosition / _private.sample.duration) * parent.width) : 0
+            opacity: 0.8
+            width: 1
+            x: progressDots.cppClipObject
+                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                : 0
         }
 
         // Progress line
@@ -124,7 +144,7 @@ Item {
             visible: component.visible && _private.progressStyle === 1 && progressDots.cppClipObject && progressDots.cppClipObject.isPlaying
             color: Kirigami.Theme.highlightColor
             width: Kirigami.Units.smallSpacing
-            x: visible ? progressDots.cppClipObject.progress * parent.width : 0
+            x: visible ? Zynthian.CommonUtils.fitInWindow(progressDots.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
         }
 
         // SamplerSynth progress dots
@@ -169,7 +189,7 @@ Item {
                     top: parent.verticalCenter
                     topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
                 }
-                x: visible ? Math.floor(progressEntry.progress * parent.width) : 0
+                x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
             }
         }
     }

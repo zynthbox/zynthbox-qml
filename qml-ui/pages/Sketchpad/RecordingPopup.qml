@@ -859,6 +859,8 @@ Zynthian.Popup {
                             anchors.fill: parent
                             color: Kirigami.Theme.textColor
                             visible: recordingTypeSettingsStack.currentIndex === 0
+                            start: 0
+                            end: length
                             source: {
                                 if (zynqtgui.sketchpad.isRecording) {
                                     return "audioLevelsChannel:/ports"

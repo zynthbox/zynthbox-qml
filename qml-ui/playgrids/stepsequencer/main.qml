@@ -1813,8 +1813,9 @@ Zynthian.BasePlayGrid {
                                                             value: patternsMenuItem.associatedChannel
                                                             when: patternPopupSampleVisualiser.sampleVisible
                                                             delayed: true
+                                                            restoreMode: Binding.RestoreBindingOrValue
                                                         }
-                                                        property QtObject sample: channel && channel.samples ? channel.samples[_private.activePattern] : null
+                                                        property QtObject sample: channel && channel.samples ? channel.samples[patternsMenuItem.thisPattern.partIndex] : null
                                                         Zynthian.SampleVisualiser {
                                                             anchors.fill: parent
                                                             opacity: 0.2

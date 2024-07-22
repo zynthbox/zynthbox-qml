@@ -77,9 +77,14 @@ ColumnLayout {
                 width: 1
             }
             Zynthbox.WaveFormItem {
+                id: waveformItem
                 anchors.fill: parent
                 color: Kirigami.Theme.textColor
                 source: partDelegate.clip ? partDelegate.clip.path : ""
+                start: partDelegate.cppClipObject != null ? partDelegate.cppClipObject.startPositionSeconds : 0
+                end: partDelegate.cppClipObject != null ? partDelegate.cppClipObject.startPositionSeconds + partDelegate.cppClipObject.lengthSeconds : 0
+                readonly property real relativeStart: waveformItem.start / waveformItem.length
+                readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
                 visible: root.visible && root.channel.trackType === "sample-loop" && partDelegate.clipHasWav
                 // Progress line
@@ -91,7 +96,7 @@ ColumnLayout {
                     visible: parent.visible && partDelegate.cppClipObject && partDelegate.cppClipObject.isPlaying
                     color: Kirigami.Theme.highlightColor
                     width: 1
-                    x: partDelegate.cppClipObject ? partDelegate.cppClipObject.position * parent.width : 0
+                    x: visible ? Zynthian.CommonUtils.fitInWindow(partDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
                 }
             }
             Image {

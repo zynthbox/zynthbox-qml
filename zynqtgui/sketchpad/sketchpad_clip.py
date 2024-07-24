@@ -205,8 +205,7 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.values[timeStretchStyle])
             else:
                 if self.clip.is_channel_sample == False:
-                    # If we are using this as a Sketch, we should be time-stretching things like pitch shifts
-                    # We already do this when loading, but let's make properly sure our Sketches are working like they're supposed to
+                    # If we are using this as a Sketch, we should be time-stretching things like pitch shifts by default
                     self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchBetter)
                 else:
                     self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchOff)
@@ -881,9 +880,6 @@ class sketchpad_clip(QObject):
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
         if path is not None:
             self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
-            if self.is_channel_sample == False:
-                # If we are using this as a Sketch, we should be time-stretching things like pitch shifts, so... let's do that explicitly here to be sure
-                self.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchBetter)
             self.audioSource.lengthChanged.connect(self.sec_per_beat_changed.emit)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)

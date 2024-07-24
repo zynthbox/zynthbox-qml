@@ -415,8 +415,156 @@ Zynthian.ScreenPage {
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                spacing: Kirigami.Units.largeSpacing
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                spacing: 0
+                GridLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
+                    rows: 3
+                    columns: 2
+                    rowSpacing: 0
+                    columnSpacing: 0
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "+1"
+                        onClicked: {
+                            testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 1);
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "+12"
+                        onClicked: {
+                            testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
+                        }
+                    }
+                    Zynthian.NotePad {
+                        id: testNotePad
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        Layout.columnSpan: 2
+                        positionalVelocity: true
+                        highlightOctaveStart: false
+                        property int midiNote: 60
+                        note: component.selectedChannel ? Zynthbox.PlayGridManager.getNote(midiNote, component.selectedChannel.id) : null
+                    }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "-1"
+                        onClicked: {
+                            testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 1);
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                        text: "-12"
+                        onClicked: {
+                            testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 12);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
+                    icon.name: component.cppClipObject && component.cppClipObject.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    onClicked: {
+                        if (component.cppClipObject.isPlaying) {
+                            component.cppClipObject.stop();
+                        } else {
+                            component.cppClipObject.play(false, component.selectedChannel.id);
+                        }
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: Kirigami.Units.largeSpacing
+                    Layout.maximumHeight: Kirigami.Units.largeSpacing
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    text: qsTr("General")
+                    enabled: component.selectedClipHasWav
+                    checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
+                    MouseArea {
+                        anchors.fill: parent;
+                        enabled: component.selectedClipHasWav
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsBar }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    text: qsTr("Voices/EQ")
+                    enabled: component.selectedClipHasWav
+                    checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
+                    MouseArea {
+                        anchors.fill: parent;
+                        enabled: component.selectedClipHasWav
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsVoices }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    text: qsTr("Envelope")
+                    enabled: component.selectedClipHasWav
+                    checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
+                    MouseArea {
+                        anchors.fill: parent;
+                        enabled: component.selectedClipHasWav
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsADSR }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    text: qsTr("Granular")
+                    visible: clipSettingsGrainerator.clip && (clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
+                    enabled: component.selectedClipHasWav
+                    checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
+                    MouseArea {
+                        anchors.fill: parent;
+                        enabled: component.selectedClipHasWav
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsGrainerator }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    text: qsTr("Clip Info")
+                    enabled: component.selectedClipHasWav
+                    checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
+                    MouseArea {
+                        anchors.fill: parent;
+                        enabled: component.selectedClipHasWav
+                        onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
+                    }
+                }
+            }
 
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 16
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -442,181 +590,107 @@ Zynthian.ScreenPage {
                         visible: component.selectedClipHasWav
                     }
                 }
-
-                RowLayout {
+                Rectangle {
+                    id: clipSettingsSectionView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 11
-                    spacing: 0
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                        spacing: 0
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            text: qsTr("General")
-                            enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsBar"
-                            MouseArea {
-                                anchors.fill: parent;
-                                enabled: component.selectedClipHasWav
-                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsBar }
+                    color: "#222222"
+                    border.width: 1
+                    border.color: "#ff999999"
+                    radius: 4
+                    enabled: component.selectedClipHasWav
+                    opacity: enabled ? 1 : 0.5
+                    property Item currentItem: clipSettingsBar
+                    Connections {
+                        target: component
+                        onSelectedClipChanged: {
+                            clipSettingsBarControlObjThrottle.restart();
+                            clipSettingsVoicesClipThrottle.restart();
+                            clipSettingsADSRClipThrottle.restart();
+                            clipSettingsGraineratorClipThrottle.restart();
+                            clipSettingsInfoViewClipThrottle.restart();
+                        }
+                    }
+                    Sketchpad.ClipSettingsBar {
+                        id: clipSettingsBar
+                        objectName: "clipSettingsBar"
+                        visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.largeSpacing
+                            topMargin: 0
+                        }
+                        controlObjIsManual: true
+                        controlObj: component.selectedClip
+                        Timer {
+                            id: clipSettingsBarControlObjThrottle
+                            interval: 1; running: false; repeat: false;
+                            onTriggered: {
+                                clipSettingsBar.controlObj = component.selectedClip;
                             }
                         }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            text: qsTr("Voices/EQ")
-                            enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
-                            MouseArea {
-                                anchors.fill: parent;
-                                enabled: component.selectedClipHasWav
-                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsVoices }
-                            }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            text: qsTr("Envelope")
-                            enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR"
-                            MouseArea {
-                                anchors.fill: parent;
-                                enabled: component.selectedClipHasWav
-                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsADSR }
-                            }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            text: qsTr("Granular")
-                            visible: clipSettingsGrainerator.clip && (clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
-                            enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
-                            MouseArea {
-                                anchors.fill: parent;
-                                enabled: component.selectedClipHasWav
-                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsGrainerator }
-                            }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            text: qsTr("Clip Info")
-                            enabled: component.selectedClipHasWav
-                            checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView"
-                            MouseArea {
-                                anchors.fill: parent;
-                                enabled: component.selectedClipHasWav
-                                onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsInfoView }
+                        controlType: component.selectedChannel
+                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
+                                        ? "bottombar-controltype-clip"
+                                        : "bottombar-controltype-channel"
+                                    : ""
+                        showCopyPasteButtons: false
+                    }
+                    Zynthian.ClipVoicesSettings {
+                        id: clipSettingsVoices
+                        objectName: "clipSettingsVoices"
+                        visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                        anchors.fill: parent
+                        clip: null
+                        Timer {
+                            id: clipSettingsVoicesClipThrottle
+                            interval: 1; running: false; repeat: false;
+                            onTriggered: {
+                                clipSettingsVoices.clip = component.selectedClip;
+                                clipSettingsVoices.cppClipObject = component.cppClipObject;
                             }
                         }
                     }
-                    Rectangle {
-                        id: clipSettingsSectionView
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                        color: "#222222"
-                        border.width: 1
-                        border.color: "#ff999999"
-                        radius: 4
-                        enabled: component.selectedClipHasWav
-                        opacity: enabled ? 1 : 0.5
-                        property Item currentItem: clipSettingsBar
-                        Connections {
-                            target: component
-                            onSelectedClipChanged: {
-                                clipSettingsBarControlObjThrottle.restart();
-                                clipSettingsVoicesClipThrottle.restart();
-                                clipSettingsADSRClipThrottle.restart();
-                                clipSettingsGraineratorClipThrottle.restart();
-                                clipSettingsInfoViewClipThrottle.restart();
+                    Zynthian.ADSRClipView {
+                        id: clipSettingsADSR
+                        objectName: "clipSettingsADSR"
+                        visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                        anchors.fill: parent
+                        clip: null
+                        Timer {
+                            id: clipSettingsADSRClipThrottle
+                            interval: 1; running: false; repeat: false;
+                            onTriggered: {
+                                clipSettingsADSR.clip = component.selectedClip;
                             }
                         }
-                        Sketchpad.ClipSettingsBar {
-                            id: clipSettingsBar
-                            objectName: "clipSettingsBar"
-                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                            anchors {
-                                fill: parent
-                                margins: Kirigami.Units.largeSpacing
-                                topMargin: 0
-                            }
-                            controlObjIsManual: true
-                            controlObj: component.selectedClip
-                            Timer {
-                                id: clipSettingsBarControlObjThrottle
-                                interval: 1; running: false; repeat: false;
-                                onTriggered: {
-                                    clipSettingsBar.controlObj = component.selectedClip;
-                                }
-                            }
-                            controlType: component.selectedChannel
-                                        ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
-                                            ? "bottombar-controltype-clip"
-                                            : "bottombar-controltype-channel"
-                                        : ""
-                            showCopyPasteButtons: false
-                        }
-                        Zynthian.ClipVoicesSettings {
-                            id: clipSettingsVoices
-                            objectName: "clipSettingsVoices"
-                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                            anchors.fill: parent
-                            clip: null
-                            Timer {
-                                id: clipSettingsVoicesClipThrottle
-                                interval: 1; running: false; repeat: false;
-                                onTriggered: {
-                                    clipSettingsVoices.clip = component.selectedClip;
-                                    clipSettingsVoices.cppClipObject = component.cppClipObject;
-                                }
+                    }
+                    Zynthian.ClipGraineratorSettings {
+                        id: clipSettingsGrainerator
+                        objectName: "clipSettingsGrainerator"
+                        visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                        anchors.fill: parent;
+                        clip: null
+                        Timer {
+                            id: clipSettingsGraineratorClipThrottle
+                            interval: 1; running: false; repeat: false;
+                            onTriggered: {
+                                clipSettingsGrainerator.clip = component.selectedClip;
                             }
                         }
-                        Zynthian.ADSRClipView {
-                            id: clipSettingsADSR
-                            objectName: "clipSettingsADSR"
-                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                            anchors.fill: parent
-                            clip: null
-                            Timer {
-                                id: clipSettingsADSRClipThrottle
-                                interval: 1; running: false; repeat: false;
-                                onTriggered: {
-                                    clipSettingsADSR.clip = component.selectedClip;
-                                }
-                            }
-                        }
-                        Zynthian.ClipGraineratorSettings {
-                            id: clipSettingsGrainerator
-                            objectName: "clipSettingsGrainerator"
-                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                            anchors.fill: parent;
-                            clip: null
-                            Timer {
-                                id: clipSettingsGraineratorClipThrottle
-                                interval: 1; running: false; repeat: false;
-                                onTriggered: {
-                                    clipSettingsGrainerator.clip = component.selectedClip;
-                                }
-                            }
-                        }
-                        Zynthian.ClipInfoView {
-                            id: clipSettingsInfoView
-                            objectName: "clipSettingsInfoView"
-                            visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
-                            anchors.fill: parent
-                            clip: null
-                            Timer {
-                                id: clipSettingsInfoViewClipThrottle
-                                interval: 1; running: false; repeat: false;
-                                onTriggered: {
-                                    clipSettingsInfoView.clip = component.cppClipObject;
-                                }
+                    }
+                    Zynthian.ClipInfoView {
+                        id: clipSettingsInfoView
+                        objectName: "clipSettingsInfoView"
+                        visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                        anchors.fill: parent
+                        clip: null
+                        Timer {
+                            id: clipSettingsInfoViewClipThrottle
+                            interval: 1; running: false; repeat: false;
+                            onTriggered: {
+                                clipSettingsInfoView.clip = component.cppClipObject;
                             }
                         }
                     }

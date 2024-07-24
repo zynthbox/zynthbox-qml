@@ -436,7 +436,6 @@ ColumnLayout {
             QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
                 text: root.clipAudioSource
                     ? root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
                         ? "Pitch Shifting:\nHQ Timestretched"

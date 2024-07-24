@@ -244,7 +244,6 @@ GridLayout {
 
         return false;
     }
-    clip: true
 
     Zynthbox.WaveFormItem {
         id: wav

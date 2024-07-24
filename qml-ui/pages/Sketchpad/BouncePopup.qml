@@ -433,16 +433,21 @@ Zynthian.Popup {
                             let sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
                             let clip = sketchpadTrack.getClipsModelByPart(details["partId"]).getClip(details["sceneId"]);
                             clip.set_path(filename, false);
+                            // Generate the initial metadata for the clip
                             clip.metadata.writeMetadataWithSoundData()
-                            // Update metadata properties
+                            // The track type will be incorrect (as it will generate to whatever is currently true for the clip's track)
                             clip.metadata.audioType = details["trackType"];
-                            clip.metadata.startPosition = startPosition;
-                            clip.metadata.length = playbackLength;
-                            clip.metadata.loopDelta = loopDelta;
-                            clip.metadata.loopDelta2 = loopDelta2;
+                            // Set the loop points
+                            let cppClipObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
+                            cppClipObj.startPositionSeconds = startPosition;
+                            cppClipObj.lengthBeats = playbackLength;
+                            cppClipObj.loopDelta = loopDelta;
+                            cppClipObj.loopDelta2 = loopDelta2;
+                            // Make sure sketches timestretch in a high quality fashion by default
+                            cppClipObj.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchBetter;
                             // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
                             clip.metadata.snapLengthToBeat = (Math.floor(playbackLength) === playbackLength);
-                            console.log("...and the clip says it is", clip.duration, "seconds long");
+                            console.log("...and the clip says it is", cppClipObj.durationSeconds, "seconds long");
                         }
 
                         // Clean up the temporary segments model

@@ -821,6 +821,7 @@ Rectangle {
                                             visible: enabled
 
                                             Item {
+                                                id: slotDelegateVisualsContainer
                                                 anchors {
                                                     fill: parent
                                                     margins: Kirigami.Units.smallSpacing
@@ -848,6 +849,30 @@ Rectangle {
                                                     opacity: 0.8
                                                     visible: slotDelegate.cppClipObject
                                                     color: Kirigami.Theme.highlightColor
+                                                }
+                                                property int availableWidth: width - 6
+                                                Rectangle {
+                                                    anchors {
+                                                        top: parent.top
+                                                        left: parent.left
+                                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
+                                                    }
+                                                    height: 1
+                                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
+                                                    opacity: width > 1 ? 0.8 : 0
+                                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
+                                                }
+                                                Rectangle {
+                                                    anchors {
+                                                        left: parent.left
+                                                        bottom: parent.bottom
+                                                        bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
+                                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
+                                                    }
+                                                    height: 1
+                                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
+                                                    opacity: width > 1 ? 0.8 : 0
+                                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
                                                 }
                                             }
 

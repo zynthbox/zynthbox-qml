@@ -1011,18 +1011,15 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def load_recorded_file_to_clip(self):
         if self.recordingType == "audio":
             logging.info(f"Loading recorded wav to ({self.clip_to_record_path}) clip({self.clip_to_record})")
-
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
-
             currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-
-
+            # When recording a sketch, set track type to Sketch explicitly
+            currentChannel.trackType = "sample-loop"
             self.zynqtgui.currentTaskMessage = "Loading recording to clip"
             self.clip_to_record.set_path(self.clip_to_record_path, False)
             self.clip_to_record.enabled = True
             self.clip_to_record.metadata.write(writeSoundMetadata=True)
-
             # Set same recorded clip to other additional clips
             for clip in self.clips_to_record:
                 # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
@@ -1031,7 +1028,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     clip.enabled = True
                     clip.set_path(self.clip_to_record_path, True)
                     clip.metadata.write(writeSoundMetadata=True)
-
             if self.clip_to_record.isChannelSample:
                 logging.info("Recorded clip is a sample")
                 currentChannel.samples_changed.emit()

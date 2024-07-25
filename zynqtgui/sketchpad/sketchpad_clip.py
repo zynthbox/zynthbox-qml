@@ -38,35 +38,35 @@ from subprocess import check_output
 from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal, Slot
 from zynqtgui import zynthian_gui_config
 
-def restorePassthroughClientData(passthroughClient, dataChunk):
+def restoreEqualiserAndCompressorSettings(equaliserCompressorObject, dataChunk):
     for index, filterValues in enumerate(dataChunk["equaliserSettings"]):
-        passthroughClient.equaliserSettings()[index].setFilterType(Zynthbox.JackPassthroughFilter.FilterType.values[filterValues["filterType"]])
-        passthroughClient.equaliserSettings()[index].setFrequency(filterValues["frequency"])
-        passthroughClient.equaliserSettings()[index].setQuality(filterValues["quality"])
-        passthroughClient.equaliserSettings()[index].setSoloed(filterValues["soloed"])
-        passthroughClient.equaliserSettings()[index].setGain(filterValues["gain"])
-        passthroughClient.equaliserSettings()[index].setActive(filterValues["active"])
-    passthroughClient.compressorSettings().setThresholdDB(dataChunk["compressorSettings"]["thresholdDB"])
-    passthroughClient.compressorSettings().setMakeUpGainDB(dataChunk["compressorSettings"]["makeUpGainDB"])
-    passthroughClient.compressorSettings().setKneeWidthDB(dataChunk["compressorSettings"]["kneeWidthDB"])
-    passthroughClient.compressorSettings().setRelease(dataChunk["compressorSettings"]["release"])
-    passthroughClient.compressorSettings().setAttack(dataChunk["compressorSettings"]["attack"])
-    passthroughClient.compressorSettings().setRatio(dataChunk["compressorSettings"]["ratio"])
-    passthroughClient.setEqualiserEnabled(dataChunk["equaliserEnabled"])
-    passthroughClient.setCompressorEnabled(dataChunk["compressorEnabled"])
-    passthroughClient.setCompressorSidechannelLeft(dataChunk["compressorSidechannelLeft"])
-    passthroughClient.setCompressorSidechannelRight(dataChunk["compressorSidechannelRight"])
-def setPassthroughClientDefaults(passthroughClient):
-    passthroughClient.setEqualiserEnabled(False)
-    passthroughClient.setCompressorEnabled(False)
-    passthroughClient.setCompressorSidechannelLeft("")
-    passthroughClient.setCompressorSidechannelRight("")
-    for filterObject in passthroughClient.equaliserSettings():
+        equaliserCompressorObject.equaliserSettings()[index].setFilterType(Zynthbox.JackPassthroughFilter.FilterType.values[filterValues["filterType"]])
+        equaliserCompressorObject.equaliserSettings()[index].setFrequency(filterValues["frequency"])
+        equaliserCompressorObject.equaliserSettings()[index].setQuality(filterValues["quality"])
+        equaliserCompressorObject.equaliserSettings()[index].setSoloed(filterValues["soloed"])
+        equaliserCompressorObject.equaliserSettings()[index].setGain(filterValues["gain"])
+        equaliserCompressorObject.equaliserSettings()[index].setActive(filterValues["active"])
+    equaliserCompressorObject.compressorSettings().setThresholdDB(dataChunk["compressorSettings"]["thresholdDB"])
+    equaliserCompressorObject.compressorSettings().setMakeUpGainDB(dataChunk["compressorSettings"]["makeUpGainDB"])
+    equaliserCompressorObject.compressorSettings().setKneeWidthDB(dataChunk["compressorSettings"]["kneeWidthDB"])
+    equaliserCompressorObject.compressorSettings().setRelease(dataChunk["compressorSettings"]["release"])
+    equaliserCompressorObject.compressorSettings().setAttack(dataChunk["compressorSettings"]["attack"])
+    equaliserCompressorObject.compressorSettings().setRatio(dataChunk["compressorSettings"]["ratio"])
+    equaliserCompressorObject.setEqualiserEnabled(dataChunk["equaliserEnabled"])
+    equaliserCompressorObject.setCompressorEnabled(dataChunk["compressorEnabled"])
+    equaliserCompressorObject.setCompressorSidechannelLeft(dataChunk["compressorSidechannelLeft"])
+    equaliserCompressorObject.setCompressorSidechannelRight(dataChunk["compressorSidechannelRight"])
+def setEqualiserAndCompressorDefaults(equaliserCompressorObject):
+    equaliserCompressorObject.setEqualiserEnabled(False)
+    equaliserCompressorObject.setCompressorEnabled(False)
+    equaliserCompressorObject.setCompressorSidechannelLeft("")
+    equaliserCompressorObject.setCompressorSidechannelRight("")
+    for filterObject in equaliserCompressorObject.equaliserSettings():
         filterObject.setDefaults()
-    passthroughClient.compressorSettings().setDefaults()
-def serializePassthroughData(passthroughClient):
+    equaliserCompressorObject.compressorSettings().setDefaults()
+def serializeEqualiserAndCompressorSettings(equaliserCompressorObject):
     equaliserSettingsData = []
-    for client in passthroughClient.equaliserSettings():
+    for client in equaliserCompressorObject.equaliserSettings():
         equaliserSettingsData.append({
             "filterType": client.filterType().name.decode().split(".")[-1],
             "frequency": client.frequency(),
@@ -77,17 +77,17 @@ def serializePassthroughData(passthroughClient):
         })
     return {
         "equaliserSettings": equaliserSettingsData,
-        "equaliserEnabled": passthroughClient.equaliserEnabled(),
-        "compressorEnabled": passthroughClient.compressorEnabled(),
-        "compressorSidechannelLeft": passthroughClient.compressorSidechannelLeft(),
-        "compressorSidechannelRight": passthroughClient.compressorSidechannelRight(),
+        "equaliserEnabled": equaliserCompressorObject.equaliserEnabled(),
+        "compressorEnabled": equaliserCompressorObject.compressorEnabled(),
+        "compressorSidechannelLeft": equaliserCompressorObject.compressorSidechannelLeft(),
+        "compressorSidechannelRight": equaliserCompressorObject.compressorSidechannelRight(),
         "compressorSettings": {
-            "thresholdDB": passthroughClient.compressorSettings().thresholdDB(),
-            "makeUpGainDB": passthroughClient.compressorSettings().makeUpGainDB(),
-            "kneeWidthDB": passthroughClient.compressorSettings().kneeWidthDB(),
-            "release": passthroughClient.compressorSettings().release(),
-            "attack": passthroughClient.compressorSettings().attack(),
-            "ratio": passthroughClient.compressorSettings().ratio()
+            "thresholdDB": equaliserCompressorObject.compressorSettings().thresholdDB(),
+            "makeUpGainDB": equaliserCompressorObject.compressorSettings().makeUpGainDB(),
+            "kneeWidthDB": equaliserCompressorObject.compressorSettings().kneeWidthDB(),
+            "release": equaliserCompressorObject.compressorSettings().release(),
+            "attack": equaliserCompressorObject.compressorSettings().attack(),
+            "ratio": equaliserCompressorObject.compressorSettings().ratio()
         }
     }
 
@@ -221,14 +221,14 @@ class sketchpad_clip_metadata(QObject):
     def set_equaliserSettings(self, value):
         if self.clip.audioSource is not None:
             if value is None or value == "":
-                setPassthroughClientDefaults(self.clip.audioSource)
+                setEqualiserAndCompressorDefaults(self.clip.audioSource)
             else:
                 # This really shouldn't happen in the general case, but... occasionally we might have something weird in that json data, and it's just nicer to not crash quite so hard when that happens
                 try:
-                    restorePassthroughClientData(self.clip.audioSource, json.loads(value))
+                    restoreEqualiserAndCompressorSettings(self.clip.audioSource, json.loads(value))
                 except:
                     logging.error(f"Failed to restore (and so restoring to defaults) the equaliser/compressor settings for {self.clip} from the data: {value}")
-                    setPassthroughClientDefaults(self.clip.audioSource)
+                    setEqualiserAndCompressorDefaults(self.clip.audioSource)
     def set_subvoiceSettings(self, value):
         if self.clip.audioSource is not None:
             if value is None or value == "":
@@ -271,25 +271,25 @@ class sketchpad_clip_metadata(QObject):
     # This hooks up the clip's current ClipAudioSource
     def hook(self):
         if self.clip.audioSource:
-            def connectPassthroughClientForSaving(passthroughClient):
-                passthroughClient.equaliserEnabledChanged.connect(self.scheduleWrite)
-                for filterObject in passthroughClient.equaliserSettings():
+            def connectEqualiserAndCompressorForSaving(equaliserCompressorObject):
+                equaliserCompressorObject.equaliserEnabledChanged.connect(self.scheduleWrite)
+                for filterObject in equaliserCompressorObject.equaliserSettings():
                     filterObject.filterTypeChanged.connect(self.scheduleWrite)
                     filterObject.frequencyChanged.connect(self.scheduleWrite)
                     filterObject.qualityChanged.connect(self.scheduleWrite)
                     filterObject.soloedChanged.connect(self.scheduleWrite)
                     filterObject.gainChanged.connect(self.scheduleWrite)
                     filterObject.activeChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorEnabledChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSidechannelLeftChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSidechannelRightChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSettings().thresholdChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSettings().makeUpGainChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSettings().kneeWidthChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSettings().releaseChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSettings().attackChanged.connect(self.scheduleWrite)
-                passthroughClient.compressorSettings().ratioChanged.connect(self.scheduleWrite)
-            connectPassthroughClientForSaving(self.clip.audioSource)
+                equaliserCompressorObject.compressorEnabledChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSidechannelLeftChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSidechannelRightChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSettings().thresholdChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSettings().makeUpGainChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSettings().kneeWidthChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSettings().releaseChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSettings().attackChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.compressorSettings().ratioChanged.connect(self.scheduleWrite)
+            connectEqualiserAndCompressorForSaving(self.clip.audioSource)
             self.clip.audioSource.playbackStyleChanged.connect(self.scheduleWrite)
             self.clip.audioSource.timeStretchStyleChanged.connect(self.scheduleWrite)
             self.clip.audioSource.pitchChanged.connect(self.scheduleWrite)
@@ -498,7 +498,7 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.clip.audioSource.timeStretchStyle()).split(".")[-1]]
                     tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
                     tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
-                    tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializePassthroughData(self.clip.audioSource)))]
+                    tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializeEqualiserAndCompressorSettings(self.clip.audioSource)))]
                     tags["ZYNTHBOX_SUBVOICE_SETTINGS"] = [str(json.dumps(serializeSubvoiceSettings(self.clip.audioSource)))]
 
                 try:

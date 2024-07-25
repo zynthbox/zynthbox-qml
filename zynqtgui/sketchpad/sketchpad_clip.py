@@ -874,7 +874,7 @@ class sketchpad_clip(QObject):
 
         if self.audioSource is not None:
             self.__metadata.unhook()
-            try: self.audioSource.disconnect(this)
+            try: self.audioSource.disconnect(self)
             except: pass
 
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"

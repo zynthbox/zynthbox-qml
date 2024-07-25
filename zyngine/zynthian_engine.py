@@ -84,7 +84,7 @@ class zynthian_basic_engine(QObject):
         if not self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             logging.info(f"Starting Engine {self.name}")
             logging.debug(f"Engine start command : {self.command}")
-            self.proc.start(command, command_args)
+            self.proc.start(command, command_args, self.command_env)
             if self.command_prompt:
                 if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
                     logging.debug(f"--- Engine Start Output BEGIN\n{self.proc.awaitedOutput()}\n--- Engine Start Output END")

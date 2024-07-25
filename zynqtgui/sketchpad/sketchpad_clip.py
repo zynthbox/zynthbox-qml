@@ -336,7 +336,7 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.disconnect(self)
                 for filterObject in self.clip.audioSource.equaliserSettings():
                     filterObject.disconnect(self)
-                passthroughClient.compressorSettings().disconnect(self)
+                self.clip.audioSource.compressorSettings().disconnect(self)
                 for subvoiceSettingsObject in self.clip.audioSource.subvoiceSettings():
                     subvoiceSettingsObject.disconnect(self)
             except: pass

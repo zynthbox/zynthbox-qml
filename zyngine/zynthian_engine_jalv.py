@@ -199,7 +199,8 @@ class zynthian_engine_jalv(zynthian_engine):
             # Run presets command explicitly after starting otherwise loading a preset does not work
             self.proc.sendLine("presets")
             if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
-                logging.debug(f"--- presets command output BEGIN\n{self.proc.awaitedOutput()}\n--- presets command output END")
+                # logging.debug(f"--- presets command output BEGIN\n{self.proc.awaitedOutput()}\n--- presets command output END")
+                pass
             else:
                 logging.error("An error occurred while waiting for the function to return")
 

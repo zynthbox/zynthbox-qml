@@ -87,7 +87,8 @@ class zynthian_basic_engine(QObject):
             self.proc.start(command, command_args, self.command_env)
             if self.command_prompt:
                 if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
-                    logging.debug(f"--- Engine Start Output BEGIN\n{self.proc.awaitedOutput()}\n--- Engine Start Output END")
+                    # logging.debug(f"--- Engine Start Output BEGIN\n{self.proc.awaitedOutput()}\n--- Engine Start Output END")
+                    pass
                 else:
                     logging.error("An error occurred while waiting for the function to return")
 
@@ -116,11 +117,11 @@ class zynthian_basic_engine(QObject):
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             out = ""
             try:
-                logging.debug("proc command: "+cmd)
+                # logging.debug("proc command: "+cmd)
                 self.proc.sendLine(cmd)
                 if wait_for_output:
                     out = self.proc_get_output()
-                    logging.debug(f"--- proc_cmd Output BEGIN\n{out}--- proc_cmd Output END")
+                    # logging.debug(f"--- proc_cmd Output BEGIN\n{out}--- proc_cmd Output END")
             except Exception as err:
                 logging.error("Can't exec engine command: {} => {}".format(cmd, err))
             return out

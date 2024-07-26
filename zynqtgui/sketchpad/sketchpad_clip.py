@@ -666,11 +666,6 @@ class sketchpad_clip(QObject):
     initialGain = Property(float, get_initial_gain, constant=True)
     ### END Property initialGain
 
-    @Slot(int)
-    def setVolume(self, vol):
-        if self.audioSource is not None:
-            self.audioSource.setVolume(vol)
-
     def serialize(self):
         return {
             "path": self.__path__,

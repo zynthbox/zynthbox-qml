@@ -480,16 +480,6 @@ Zynthian.ScreenPage {
                 }
             }
         }
-
-        // Disable undo for now
-        /*Kirigami.Action {
-            text: qsTr("Undo")
-            enabled: root.song.historyLength > 0
-            visible: !root.song.isTemp
-            onTriggered: {
-                root.song.undo();
-            }
-        }*/
     ]
 
     cuiaCallback: function(cuia) {

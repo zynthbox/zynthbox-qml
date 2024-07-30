@@ -443,11 +443,6 @@ Rectangle {
         id: pickerDialog
         parent: zlScreen.parent
 
-        width: parent.width
-        height: parent.height
-        x: parent.x
-        y: parent.y
-
         headerText: qsTr("%1 : Pick an audio file").arg(zynqtgui.bottomBarControlObj ? zynqtgui.bottomBarControlObj.channelName : "")
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {

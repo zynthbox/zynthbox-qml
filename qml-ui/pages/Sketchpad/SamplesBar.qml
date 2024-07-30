@@ -155,11 +155,6 @@ Zynthian.Card {
         id: samplePickerDialog
         parent: zlScreen.parent
 
-        width: parent.width
-        height: parent.height
-        x: parent.x
-        y: parent.y
-
         headerText: qsTr("%1 : Pick an audio file").arg(controlObj ? controlObj.name : "")
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {

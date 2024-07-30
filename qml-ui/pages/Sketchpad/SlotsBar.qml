@@ -726,11 +726,6 @@ Rectangle {
         id: samplePickerDialog
         parent: zlScreen.parent
 
-        width: parent.width
-        height: parent.height
-        x: parent.x
-        y: parent.y
-
         function pickSampleForSlot(slot, pickWhat) {
             samplePickerDialog.sampleSlot = slot;
             samplePickerDialog.clipToSave = root.selectedSlotRowItem.channel.samples[slot];
@@ -806,11 +801,6 @@ Rectangle {
         }
         property QtObject theClip: null
 
-        width: parent.width
-        height: parent.height
-        x: parent.x
-        y: parent.y
-
         headerText: saveMode
             ? qsTr("Pick Save Location For %1%2")
                 .arg(root.selectedChannel.name)
@@ -860,11 +850,6 @@ Rectangle {
     // Zynthian.FilePickerDialog {
     //     id: bankPickerDialog
     //     parent: zlScreen.parent
-    //
-    //     width: parent.width
-    //     height: parent.height
-    //     x: parent.x
-    //     y: parent.y
     //
     //     headerText: root.selectedSlotRowItem
     //                 ? qsTr("%1-S%2 : Pick a bank")

@@ -65,40 +65,6 @@ GridLayout {
         }
     }
 
-    // Disable showing versions here in SongBar
-    /*ColumnLayout {
-        Layout.fillHeight: true
-        Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        Layout.leftMargin: 12
-        visible: !zynqtgui.bottomBarControlObj.isTemp
-
-        QQC2.Label {
-            Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Versions")
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            radius: 4
-            border.color: Kirigami.Theme.highlightColor
-            color: Kirigami.Theme.backgroundColor
-
-            ListView {
-                anchors.fill: parent
-                model: zynqtgui.bottomBarControlObj.versions
-                delegate: Kirigami.BasicListItem {
-                    label: modelData
-                    highlighted: zynqtgui.bottomBarControlObj.name === modelData
-                    onClicked: {
-                        zynqtgui.sketchpad.loadSketchpadVersion(modelData)
-                    }
-                }
-            }
-        }
-    }*/
-
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false

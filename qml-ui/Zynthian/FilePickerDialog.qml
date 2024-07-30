@@ -1,7 +1,7 @@
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
-import QtQuick.Window 2.1
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Window 2.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
@@ -56,7 +56,14 @@ Zynthian.Dialog {
         var result = true;
         switch (cuia) {
             case "NAVIGATE_LEFT":
+                root.goBack();
+                result = true;
+                break;
             case "NAVIGATE_RIGHT":
+                // If the currently selected thing is a directory, then enter that directory
+                if (root.currentFileInfo !== null && root.currentFileInfo.fileIsDir) {
+                    root.filesListView.currentItem.selectItem();
+                }
                 result = true;
                 break;
             case "SELECT_UP":
@@ -83,7 +90,7 @@ Zynthian.Dialog {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                root.goBack();
+                root.close();
                 result = true;
                 break;
             case "KNOB0_UP":
@@ -110,7 +117,8 @@ Zynthian.Dialog {
     }
 
     function goBack() {
-        var newPath = String(folderModel.folder).replace("file://", "").split("/");
+        root.oldPath = folderModel.folder;
+        let newPath = String(folderModel.folder).replace("file://", "").split("/");
         newPath.pop();
         newPath = newPath.join("/");
 
@@ -120,16 +128,25 @@ Zynthian.Dialog {
             folderModel.folder = rootFolder;
         }
     }
+    property var oldPath: undefined
+    Connections {
+        target: folderModel
+        onStatusChanged: {
+            if (folderModel.status == FolderListModel.Ready && root.oldPath != undefined) {
+                root.filesListView.currentIndex = folderModel.indexOf(root.oldPath);
+                root.oldPath = undefined;
+            }
+        }
+    }
 
     modal: true
     closePolicy: QQC2.Popup.CloseOnPressOutside
 
-    y: root.parent.mapFromGlobal(0, saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(header.Window.height/2 - height/2)).y
-    x: root.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x
-
+    x: Math.round(parent.width/2 - width/2)
+    y: Math.round(parent.height/2 - height/2)
     width: header.Window.width
-    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : Math.round(header.Window.height * 0.8)
-    z: 999999999
+    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : header.Window.height
+    parent: QQC2.Overlay.overlay
 
     onOpenedChanged: {
         if (opened) {
@@ -615,19 +632,19 @@ Zynthian.Dialog {
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
                             visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Size: %1 MB").arg((filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.size : 0/1024/1024).toFixed(2))
+                            label: qsTr("Size: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.humanSize : "")
                         }
 
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
                             visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Sample Rate: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.sampleRate : 0)
+                            label: qsTr("Sample Rate: %1KHz").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.sampleRate / 1000 : 0)
                         }
 
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
                             visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Tracks: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels : 0)
+                            label: qsTr("Channels: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels : 0)
                         }
 
                         Kirigami.BasicListItem {
@@ -637,6 +654,38 @@ Zynthian.Dialog {
                                     .arg(filePropertiesColumn.filePropertiesHelperObj
                                             ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1)
                                             : 0)
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isSketch && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.bpm > 0
+                            label: qsTr("BPM: %1").arg(visible ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.bpm : 0)
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isSketch
+                            label: visible
+                                ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle === "NonLoopingPlaybackStyle"
+                                    ? qsTr("Playback Style: %1").arg("Non-looping")
+                                    : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle === "LoopingPlaybackStyle"
+                                        ? qsTr("Playback Style: %1").arg("Looping")
+                                        : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle === "OneshotPlaybackStyle"
+                                            ? qsTr("Playback Style: %1").arg("One-shot")
+                                            : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle === "GranularNonLoopingPlaybackStyle"
+                                                ? qsTr("Playback Style: %1").arg("Granular Non-looping")
+                                                : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle === "GranularLoopingPlaybackStyle"
+                                                    ? qsTr("Playback Style: %1").arg("Granular Looping")
+                                                    : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle === "WavetableStyle"
+                                                        ? qsTr("Playback Style: %1").arg("Wavetable")
+                                                        : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.playbackStyle
+                                : ""
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isSketch && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.soundDescriptions.length > 0
+                            label: visible ? qsTr("Sounds: %1").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.zynthbox.soundDescriptions.join(", ")) : "(no sound snapshot)"
                         }
                     }
                 }

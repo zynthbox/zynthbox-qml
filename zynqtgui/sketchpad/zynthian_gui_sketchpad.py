@@ -200,7 +200,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.layer_effects.fx_layers_changed.connect(self.emit_chained_sounds_changed, Qt.QueuedConnection)
         if lastSelectedSketchpad is not None and Path(lastSelectedSketchpad).exists():
             # Existing sketch found. Load last_state snapshot after loading sketchpad
-            self.loadSketchpad(lastSelectedSketchpad, load_history=True, load_snapshot=False, cb=_cb, load_last_state_snapshot=True)
+            self.loadSketchpad(lastSelectedSketchpad, load_autosave=True, load_snapshot=False, cb=_cb, load_last_state_snapshot=True)
         else:
             # Existing sketch not found. Load default snapshot after loading sketchpad
             self.newSketchpad(base_sketchpad=None, cb=_cb, load_snapshot=False, load_last_state_snapshot=True)
@@ -659,16 +659,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(str)
     def createSketchpad(self, name):
         def task():
+            obj = {}
             self.stopAllPlayback()
-            self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
+            self.zynqtgui.screens["playgrid"].stopMetronomeRequest()            
+            if self.__song__ is not None:
+                self.__song__.to_be_deleted()
 
             # Rename temp sketchpad folder to the user defined name
             Path(self.__sketchpad_basepath__ / 'temp').rename(self.__sketchpad_basepath__ / name)
-
             # Rename temp sketchpad json filename to user defined name
             Path(self.__sketchpad_basepath__ / name / (self.__song__.name + ".sketchpad.json")).rename(self.__sketchpad_basepath__ / name / (name + ".sketchpad.json"))
-
-            obj = {}
 
             # Read sketchpad json data to dict
             try:
@@ -719,7 +719,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.do_long_task(task)
 
     @Slot(str, bool)
-    def loadSketchpad(self, sketchpad, load_history, load_snapshot=True, cb=None, load_last_state_snapshot=False):
+    def loadSketchpad(self, sketchpad, load_autosave, load_snapshot=True, cb=None, load_last_state_snapshot=False):
         def task():
             logging.info(f"Loading sketchpad : {sketchpad}")
 
@@ -753,7 +753,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
                 self.zynqtgui.currentTaskMessage = "Loading Sketchpad"
                 self.sketchpadLoadingInProgress = True
-                self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_history)
+                if self.__song__ is not None:
+                    self.__song__.to_be_deleted()
+                self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_autosave)
                 self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_path))
 
                 if load_snapshot:
@@ -804,16 +806,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.show_confirm("You have unsaved changes. Do you really want to continue?", confirmLoadSketchpad)
         else:
             confirmLoadSketchpad()
-
-    @Slot(str)
-    def loadSketchpadVersion(self, version):
-        sketchpad_folder = self.__song__.sketchpad_folder
-
-        self.stopAllPlayback()
-        self.zynqtgui.screens["playgrid"].stopMetronomeRequest()
-
-        self.__song__ = sketchpad_song.sketchpad_song(sketchpad_folder, version, self)
-        self.song_changed.emit()
 
     @Slot(str, result=bool)
     def sketchpadExists(self, name):

@@ -22,12 +22,8 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-import ctypes as ctypes
 import math
 import shutil
-import traceback
-import uuid
-import zynautoconnect
 import Zynthbox
 import logging
 import json
@@ -46,7 +42,6 @@ from .sketchpad_clip import sketchpad_clip
 from .sketchpad_parts_model import sketchpad_parts_model
 from .sketchpad_channels_model import sketchpad_channels_model
 from zynqtgui import zynthian_gui_config
-from zynqtgui.zynthian_gui_config import zynqtgui
 
 def restorePassthroughClientData(passthroughClient, dataChunk):
     for index, filterValues in enumerate(dataChunk["equaliserSettings"]):
@@ -78,7 +73,7 @@ def setPassthroughClientDefaults(passthroughClient):
 class sketchpad_song(QObject):
     __instance__ = None
 
-    def __init__(self, sketchpad_folder: str, name, parent=None, load_history=True):
+    def __init__(self, sketchpad_folder: str, name, parent=None, load_autosave=True):
         super(sketchpad_song, self).__init__(parent)
 
         self.zynqtgui = zynthian_gui_config.zynqtgui
@@ -99,7 +94,6 @@ class sketchpad_song(QObject):
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
-        self.__history_length__ = 0
         self.__scale_model__ = ['C', 'G', 'D', 'A', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F']
         self.__selected_scale_index__ = 0
         # The octave is -1 indexed, as we operate with C4 == midi note 60, so this makes our default a key of C2
@@ -110,7 +104,7 @@ class sketchpad_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__name__ = name
-        self.__initial_name__ = name # To be used while storing cache details when name changes
+        # self.__initial_name__ = name # To be used while storing cache details when name changes
         self.__to_be_deleted__ = False
 
         def connectPassthroughClientForSaving(passthroughClient):
@@ -139,7 +133,9 @@ class sketchpad_song(QObject):
             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
                 connectPassthroughClientForSaving(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
 
-        if not self.restore(load_history):
+        if not self.restore(load_autosave):
+            # Creating new temp sketchpad. So set hasUnsavedChanges to True
+            self.hasUnsavedChanges = True
             self.__is_loading__ = True
             self.isLoadingChanged.emit()
             # First, clear out any cruft that might have occurred during a failed load attempt
@@ -259,161 +255,93 @@ class sketchpad_song(QObject):
             "synthPassthroughClients": synthPassthroughClientsData
         }
 
-    def save(self, cache=True):
+    def save(self, autosave=True):
         if self.__to_be_deleted__:
             return
 
-        cache_dir = Path(self.sketchpad_folder) / ".cache"
-        cache_dir.mkdir(parents=True, exist_ok=True)
+        sketchpad_file = None
+        save_snapshot = None
+        soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
 
-        if self.isTemp or not cache:
-            if not self.isTemp:
-                # Since sketchpad is not temp and this is not a cache save hence set hasUnsavedChanges to False
-                self.hasUnsavedChanges = False
-                # Clear previous history and remove cache files if not temp
-                with open(self.sketchpad_folder + self.__initial_name__ + ".sketchpad.json", "r+") as f:
-                    obj = json.load(f)
-                    f.seek(0)
+        if not self.isTemp and autosave is True:
+            # When trying to do autosave, write autosave only if current differs from saved state
+            if (Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json").exists():
+                with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:
+                    saved_obj = json.load(f)
 
-                    if "history" in obj and len(obj["history"]) > 0:
-                        for history in obj["history"]:
-                            try:
-                                Path(cache_dir / (history + ".sketchpad.json")).unlink()
-                            except Exception as e:
-                                logging.error(f"Error while trying to remove cache file .cache/{history}.sketchpad.json : {str(e)}")
-
-                    obj["history"] = []
-                    self.__history_length__ = 0
-                    self.history_length_changed.emit()
-
-                    json.dump(obj, f)
-                    f.truncate()
-                    f.flush()
-                    os.fsync(f.fileno())
-            else:
-                # Since sketchpad is temp hence set hasUnsavedChanges to True
+            if saved_obj is not None and not saved_obj == self.serialize():
+                logging.debug("Writing autosave")
+                # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                save_snapshot = False
+                # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
+                # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
+                sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
+                # Since this is an autosave, sketchpad has unsaved changes
                 self.hasUnsavedChanges = True
-
-            filename = self.__name__ + ".sketchpad.json"
-            self.__initial_name__ = self.name
-
-            logging.info(f"Storing to {filename} : {self}")
-
-            # Handle saving to sketchpad json file
-            try:
-                Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
-
-                with open(self.sketchpad_folder + filename, "w") as f:
-                    f.write(json.dumps(self.serialize()))
-                    f.flush()
-                    os.fsync(f.fileno())
-            except Exception as e:
-                logging.exception(e)
-
-            # Save snapshot with sketchpad if not temp
-            if not self.isTemp:
-                try:
-                    soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
-                    soundsets_dir.mkdir(parents=True, exist_ok=True)
-
-                    self.__metronome_manager__.zynqtgui.screens["layer"].save_snapshot(
-                        str(soundsets_dir) + "/" + self.__name__ + ".zss")
-                except Exception as e:
-                    logging.error(f"Error saving snapshot to sketchpad folder : {str(e)}")
-
-            self.versions_changed.emit()
+            else:
+                # Saved sketchpad json is the same as current. Do not write autosave
+                logging.debug("Not writing autosave")
+                return
         else:
-            self.hasUnsavedChanges = True
-            filename = self.__initial_name__ + ".sketchpad.json"
+            if self.isTemp:
+                # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                save_snapshot = False
+                # temp sketchpad should always have hasUnsavedChanges set to True
+                self.hasUnsavedChanges = True
+            else:
+                # For non temp sketchpads, do save snapshot
+                save_snapshot = True
+                # For non temp sketchpads, saving sketchpad deletes the autosave and hence mark hasUnsavedChanges to False
+                self.hasUnsavedChanges = False
+            # Since this is not an autosave, set sketchpad file name to fullname
+            sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
+            logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
+            # Also delete the cache file as we are performing a sketchpad save initiated by user
+            Path(self.sketchpad_folder + ".autosave.sketchpad.json").unlink(missing_ok=True)
 
-            # Handle saving to cache
-            cache_id = str(uuid.uuid1())
+        try:
+            Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
+            with open(sketchpad_file, "w") as f:
+                f.write(json.dumps(self.serialize()))
+                f.flush()
+                os.fsync(f.fileno())
+        except Exception as e:
+            logging.exception(f"Error writing sketchpad json to {str(sketchpad_file)} : {e}")
 
-            logging.info(f"Storing to cache {cache_id}.sketchpad.json")
-
+        if save_snapshot:
+            snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
             try:
-                with open(self.sketchpad_folder + filename, "r+") as f:
-                    obj = json.load(f)
-                    f.seek(0)
-
-                    comparing_obj = {}
-                    if "history" in obj and len(obj["history"]) > 0:
-                        with open(self.sketchpad_folder + filename, "r+") as f_last_cache:
-                            comparing_obj = json.load(f_last_cache)
-                    else:
-                        comparing_obj = obj
-
-                    comparing_obj.pop("history", None)
-
-                    # logging.error(f"Comparing cache and saved dicts : {self.serialize()}")
-                    # logging.error(f"Comparing cache and saved dicts : {comparing_obj}")
-                    # logging.error(f"Comparing cache and saved dicts : {self.serialize() == comparing_obj}")
-
-                    if self.serialize() != comparing_obj:
-                        with open(cache_dir / (cache_id + ".sketchpad.json"), "w") as f_cache:
-                            f_cache.write(json.dumps(self.serialize()))
-                            f_cache.flush()
-                            os.fsync(f_cache.fileno())
-
-                        if "history" not in obj:
-                            obj["history"] = []
-
-                        obj["history"].append(cache_id)
-
-                        self.__history_length__ = len(obj["history"])
-                        self.history_length_changed.emit()
-
-                        json.dump(obj, f)
-                        f.truncate()
-                        f.flush()
-                        os.fsync(f.fileno())
+                soundsets_dir.mkdir(parents=True, exist_ok=True)
+                self.zynqtgui.layer.save_snapshot(snapshot_file)
             except Exception as e:
-                logging.exception(e)
+                logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
 
     @Slot(None)
     def schedule_save(self):
         if self.__is_loading__ == False:
             QMetaObject.invokeMethod(self.__save_timer__, "start", Qt.QueuedConnection)
 
-    def restore(self, load_history):
+    def restore(self, load_autosave):
+        sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
         self.__is_loading__ = True
         self.isLoadingChanged.emit()
-        filename = self.__name__ + ".sketchpad.json"
-
         self.zynqtgui.currentTaskMessage = "Loading Sketchpad : Restoring Data"
 
+        if load_autosave is True and (Path(self.sketchpad_folder) / ".autosave.sketchpad.json").exists():
+            sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
+            # Since this is an autosave, sketchpad has unsaved changes
+            self.hasUnsavedChanges = True
+        else:
+            # Since this is NOT an autosave, sketchpad does not have any unsaved changes
+            self.hasUnsavedChanges = False
+            # Also delete the cache file if there are any (for fallback purposes)
+            Path(self.sketchpad_folder + ".autosave.sketchpad.json").unlink(missing_ok=True)
+
         try:
-            sketchpadFile = self.sketchpad_folder + filename
-            if os.path.exists(sketchpadFile):
-                logging.info(f"Restoring {sketchpadFile}, loadHistory({load_history})")
-                with open(self.sketchpad_folder + filename, "r") as f:
+            if sketchpad_file.exists():
+                logging.info(f"Restoring sketchpad {sketchpad_file}")
+                with open(sketchpad_file, "r") as f:
                     sketchpad = json.loads(f.read())
-
-                    try:
-                        cache_dir = Path(self.sketchpad_folder) / ".cache"
-
-                        if load_history and "history" in sketchpad and len(sketchpad["history"]) > 0:
-                            logging.info("Loading History")
-                            with open(cache_dir / (sketchpad["history"][-1] + ".sketchpad.json"), "r") as f_cache:
-                                sketchpad = json.load(f_cache)
-                                self.hasUnsavedChanges = True
-                        else:
-                            logging.info("Not loading History")
-                            # If sketchpad is temp then set hasUnsavedChanges to True otherwise set ot to False as it has no history
-                            if self.isTemp:
-                                self.hasUnsavedChanges = True
-                            else:
-                                self.hasUnsavedChanges = False
-                            for history in sketchpad["history"]:
-                                try:
-                                    Path(cache_dir / (history + ".sketchpad.json")).unlink()
-                                except Exception as e:
-                                    logging.error(
-                                        f"Error while trying to remove cache file .cache/{history}.sketchpad.json : {str(e)}")
-
-                            sketchpad["history"] = []
-                    except:
-                        logging.error(f"Error loading cache file. Continuing with sketchpad loading")
 
                     if "name" in sketchpad and sketchpad["name"] != "":
                         if self.__name__ != sketchpad["name"]:
@@ -482,7 +410,7 @@ class sketchpad_song(QObject):
                     self.isLoadingChanged.emit()
                     return True
             else:
-                logging.info(f"Sketchpad not restored - no such file (expected when creating a new sketchpad): {sketchpadFile}")
+                logging.info(f"Sketchpad not restored - no such file (expected when creating a new sketchpad): {sketchpad_file}")
                 self.__is_loading__ = False
                 self.isLoadingChanged.emit()
                 return False
@@ -552,16 +480,6 @@ class sketchpad_song(QObject):
     nameEditable = Property(bool, nameEditable, constant=True)
 
     @Signal
-    def versions_changed(self):
-        pass
-
-    def get_versions(self):
-        versions = [f.name.replace(".sketchpad.json", "") for f in Path(self.sketchpad_folder).glob("*.sketchpad.json")]
-        return versions
-
-    versions = Property('QVariantList', get_versions, notify=versions_changed)
-
-    @Signal
     def is_temp_changed(self):
         pass
 
@@ -583,7 +501,6 @@ class sketchpad_song(QObject):
             self.__name__ = name
             self.__name_changed__.emit()
             self.is_temp_changed.emit()
-            self.versions_changed.emit()
             self.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
@@ -681,46 +598,6 @@ class sketchpad_song(QObject):
         self.index_changed.emit()
 
     index = Property(int, index, set_index, notify=index_changed)
-
-
-    @Signal
-    def history_length_changed(self):
-        pass
-
-    def get_history_length(self):
-        return self.__history_length__
-
-    historyLength = Property(int, get_history_length, notify=history_length_changed)
-
-    @Slot(None)
-    def undo(self):
-        cache_dir = Path(self.sketchpad_folder) / ".cache"
-
-        try:
-            with open(self.sketchpad_folder + self.__initial_name__ + ".sketchpad.json", "r+") as f:
-                obj = json.load(f)
-                f.seek(0)
-
-                if "history" in obj and len(obj["history"]) > 0:
-                    cache_file = obj["history"].pop()
-
-                try:
-                    Path(cache_dir / (cache_file + ".sketchpad.json")).unlink()
-                except:
-                    pass
-
-                self.__history_length__ = len(obj["history"])
-                self.history_length_changed.emit()
-
-                json.dump(obj, f)
-                f.truncate()
-                f.flush()
-                os.fsync(f.fileno())
-        except Exception as e:
-            logging.error(e)
-            return False
-
-        self.__metronome_manager__.loadSketchpadVersion(self.__initial_name__)
 
     ### Property metronomeManager
     def get_metronomeManager(self):

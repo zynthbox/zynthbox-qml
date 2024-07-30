@@ -520,7 +520,6 @@ class sketchpad_channel(QObject):
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
                 "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
-                "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
                 "externalAudioSource": self.__externalAudioSource__,
@@ -611,8 +610,6 @@ class sketchpad_channel(QObject):
             if "keyzone_mode" in obj:
                 self.__keyzone_mode__ = obj["keyzone_mode"]
                 self.keyZoneModeChanged.emit();
-            if "selectedPart" in obj:
-                self.set_selected_part(obj["selectedPart"])
             if "routeThroughGlobalFX" in obj:
                 self.set_routeThroughGlobalFX(obj["routeThroughGlobalFX"], True)
                 # Run autoconnect to update jack connections when routeThrouGlobalFX is set
@@ -1709,25 +1706,12 @@ class sketchpad_channel(QObject):
     #        Update all references of selectedPart to selectedSlotRow and selectedFxSlotRow as required
     def get_selected_part(self):
         return self.__selected_part__
-
     def set_selected_part(self, selected_part):
         if selected_part != self.__selected_part__:
             self.__selected_part__ = selected_part
             self.selectedSlotRow = selected_part
-
-            # old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSketchpadSongIndex, old_selected_part)
-            # if old_clip is not None:
-            #     old_clip.stop()
-            #
-            # clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSketchpadSongIndex, selected_part)
-            # if clip is not None and clip.inCurrentScene:
-            #     clip.play()
-
             self.selectedPartChanged.emit()
-            self.__song__.schedule_save()
-
     selectedPartChanged = Signal()
-
     selectedPart = Property(int, get_selected_part, set_selected_part, notify=selectedPartChanged)
     ### END Property selectedPart
 

@@ -25,6 +25,7 @@ class file_properties_helper(QObject):
         self.file_metadata = []
         self.preview_clip = None
         self.is_preview_playing = False
+        self.__user_folders = [Path("/zynthian/zynthian-my-data/sketches/my-sketches"), Path("/zynthian/zynthian-my-data/samples/my-samples"), Path("/zynthian/zynthian-my-data/sketchpads/my-sketchpads")]
 
     ### Property filePath
     def get_file_path(self):
@@ -44,6 +45,13 @@ class file_properties_helper(QObject):
 
         file_stat = self.file_path.stat()
 
+        is_read_write = False
+        # If the a file or directory is in one of our user-folders (the ones called something with "my-"), then we define them as read-write
+        for testPath in self.__user_folders:
+            if testPath != self.file_path and self.file_path.is_relative_to(testPath):
+                is_read_write = True
+                break
+
         self.file_metadata = {
             "filepath": str(self.file_path),
             "filename": self.file_path.name,
@@ -53,6 +61,7 @@ class file_properties_helper(QObject):
             "isSketch": is_sketch,
             "isDir": self.file_path.is_dir(),
             "isFile": self.file_path.is_file(),
+            "isReadWrite": is_read_write,
             "properties": properties
         }
         self.file_metadata_changed.emit()

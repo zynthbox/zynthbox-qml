@@ -67,24 +67,18 @@ Zynthian.DialogQuestion {
     }
     rejectText: qsTr("Back")
     acceptText: qsTr("Select")
+    title: qsTr("Pick External Audio Source For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
     onAccepted: {
         _private.selectedChannel.externalAudioSource = _private.newAudioSource;
     }
 
-    ColumnLayout {
-        anchors.fill: parent
+    contentItem: ColumnLayout {
         implicitWidth: Kirigami.Units.gridUnit * 50
         implicitHeight: Kirigami.Units.gridUnit * 25
-        Kirigami.Heading {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: qsTr("Pick External Audio Source For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
- 
-            QtObject {
-                id: _private
-                property QtObject selectedChannel
-                property string newAudioSource
-            }
+        QtObject {
+            id: _private
+            property QtObject selectedChannel
+            property string newAudioSource
         }
         QQC2.Button {
             Layout.fillWidth: true

@@ -94,11 +94,7 @@ Zynthian.DialogQuestion {
         return returnValue;
     }
 
-    ColumnLayout {
-        anchors {
-            fill: parent
-            margins: Kirigami.Units.largeSpacing
-        }
+    contentItem: ColumnLayout {
         QtObject {
             id: _private
             property QtObject selectedChannel

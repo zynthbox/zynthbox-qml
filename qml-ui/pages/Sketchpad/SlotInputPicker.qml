@@ -53,11 +53,7 @@ Zynthian.DialogQuestion {
     rejectText: ""
     title: _private.engineData === null ? "" : qsTr("Select Inputs for %1").arg(_private.engineData.name)
 
-    ColumnLayout {
-        anchors {
-            fill: parent
-            margins: Kirigami.Units.largeSpacing
-        }
+    contentItem: ColumnLayout {
         QtObject {
             id: _private
             property QtObject selectedChannel

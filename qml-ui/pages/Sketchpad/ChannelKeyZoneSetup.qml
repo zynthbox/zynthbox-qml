@@ -129,7 +129,7 @@ Zynthian.DialogQuestion {
         return returnValue;
     }
 
-    ColumnLayout {
+    contentItem: ColumnLayout {
         Timer {
             id: keyZoneSetupSelectedChannelThrottle
             interval: 1; running: false; repeat: false;
@@ -140,10 +140,6 @@ Zynthian.DialogQuestion {
         Connections {
             target: zynqtgui.sketchpad
             onSelected_track_id_changed: keyZoneSetupSelectedChannelThrottle.restart()
-        }
-        anchors {
-            fill: parent
-            margins: Kirigami.Units.largeSpacing
         }
         spacing: 0
         RowLayout {

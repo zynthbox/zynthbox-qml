@@ -138,11 +138,7 @@ Zynthian.DialogQuestion {
     rejectText: qsTr("Back")
     title: qsTr("Pick the other slot...")
 
-    ColumnLayout {
-        anchors {
-            fill: parent
-            margins: Kirigami.Units.largeSpacing
-        }
+    contentItem: ColumnLayout {
         QtObject {
             id: _private
             property QtObject selectedChannel

@@ -50,11 +50,7 @@ Zynthian.DialogQuestion {
     rejectText: qsTr("Back")
     title: qsTr("Pick Audio Routing Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
-    ColumnLayout {
-        anchors {
-            fill: parent
-            margins: Kirigami.Units.largeSpacing
-        }
+    contentItem: ColumnLayout {
         QtObject {
             id: _private
             property QtObject selectedChannel

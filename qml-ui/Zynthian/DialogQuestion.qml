@@ -23,9 +23,9 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -55,13 +55,22 @@ Zynthian.Dialog {
      */
     property alias rejectEnabled: rejectButton.enabled
 
+    /**
+     * Whether or not there is a text input field shown above the buttons
+     */
+    property alias textInputVisible: textInput.visible
+    /**
+     * The text in the text input field shown above the buttons
+     */
+    property alias inputText: textInput.text
+
     property alias textHorizontalAlignment: contentText.horizontalAlignment
     property alias textVerticalAlignment: contentText.verticalAlignment
 
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
     width: Kirigami.Units.gridUnit * 20
-    height: Kirigami.Units.gridUnit * 10
+    height: component.textInputVisible ? Kirigami.Units.gridUnit * 13 : Kirigami.Units.gridUnit * 10
     parent: QQC2.Overlay.overlay
 
     property var additionalButtons: []
@@ -120,12 +129,23 @@ Zynthian.Dialog {
             }
         }
     }
-    contentItem: QQC2.Label {
-        id: contentText
-        wrapMode: Text.Wrap
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        text: component.text
+    contentItem: ColumnLayout {
+        spacing: 0
+        QQC2.Label {
+            id: contentText
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: component.text
+        }
+        QQC2.TextField {
+            id: textInput
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            visible: false
+        }
     }
     footer: RowLayout {
         PlayGridButton {

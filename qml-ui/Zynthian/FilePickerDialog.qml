@@ -49,7 +49,7 @@ Zynthian.Dialog {
 
     property alias listCurrentIndex: filesListView.currentIndex
     property alias listCount: filesListView.count
-    readonly property alias selectedFile: filesListView.selectedModelData
+    readonly property var selectedFile: filesListView.saveModelData ? filesListView.saveModelData : filesListView.selectedModelData
     property var folderInfoStrings: ({})
 
     property var cuiaCallback: function (cuia) {
@@ -77,11 +77,11 @@ Zynthian.Dialog {
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
-                if (root.saveMode === false && root.filesListView.selectedModelData !== null && root.filesListView.selectedModelData !== null && root.filesListView.selectedModelData.filePath === root.filesListView.selectedModelData.filePath) {
-                    // We are loading, and have a file selected, and that file is what's in the sidebar now too
-                    acceptSaveButton.clicked();
-                } else if (root.filesListView.currentIndex >= 0 &&
-                    root.filesListView.currentIndex < root.filesListView.count) {
+                if (root.saveMode === false && filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isFile) {
+                    // We are loading, and have something selected which is a file
+                    root.fileSelected(root.selectedFile);
+                    root.accept();
+                } else if (root.filesListView.currentIndex >= 0 && root.filesListView.currentIndex < root.filesListView.count) {
                     console.log("ZL Filepicker SELECT :", root.filesListView.currentItem, root.filesListView.currentItem.selectItem)
                     root.filesListView.currentItem.selectItem();
                 }
@@ -135,6 +135,8 @@ Zynthian.Dialog {
             if (folderModel.status == FolderListModel.Ready && root.oldPath != undefined) {
                 root.filesListView.currentIndex = folderModel.indexOf(root.oldPath);
                 root.oldPath = undefined;
+            } else {
+                filesListView.currentIndex = 0;
             }
         }
     }
@@ -150,50 +152,67 @@ Zynthian.Dialog {
 
     onOpenedChanged: {
         if (opened) {
-            filesListView.selectedModelData = null;
+            filesListView.saveModelData = null;
             namedFile.text = "";
             filesListView.currentIndex = -1;
         }
     }
 
-    header: ColumnLayout{
-        spacing: 8
-
+    header: RowLayout {
+        Layout.margins: Kirigami.Units.smallSpacing
         Kirigami.Heading {
             id: heading
 
             text: qsTr("Pick a file")
             font.pointSize: 16
-            Layout.leftMargin: 12
-            Layout.topMargin: 12
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
-
-        RowLayout {
-            property var folderSplitArray: String(folderModel.folder).replace("file://"+root.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
-
-            id: folderBreadcrumbs
-            Layout.leftMargin: 12
-            spacing: 2
-
-            Zynthian.BreadcrumbButton {
-                id: homeButton
-                icon.name: "user-home-symbolic"
-                onClicked: {
-                    folderModel.folder = root.rootFolder + "/"
-                }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        QQC2.ToolButton {
+            Layout.fillHeight: true
+            display: QQC2.AbstractButton.TextBesideIcon
+            icon.name: "view-list-details"
+            text: qsTr("View...")
+        }
+        QQC2.ToolButton {
+            Layout.fillHeight: true
+            display: QQC2.AbstractButton.TextBesideIcon
+            icon.name: "entry-edit"
+            text: qsTr("New Folder...")
+            readonly property var userEditableFolders: ["file:///zynthian/zynthian-my-data/sketches/my-sketches", "file:///zynthian/zynthian-my-data/samples/my-samples", "file:///zynthian/zynthian-my-data/sketchpads/my-sketchpads"]
+            enabled: userEditableFolders.includes(String(folderModel.folder)) || (filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite)
+            onClicked: {
             }
-
-            Repeater {
-                id: breadcrumbsRepeater
-                model: folderBreadcrumbs.folderSplitArray
-                delegate: Zynthian.BreadcrumbButton {
-                    text: modelData
-                    onClicked: {
-                        folderModel.folder = root.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
-                        filesListView.currentIndex = 0;
-                    }
-                }
-            }
+        }
+        Item {
+            Layout.fillHeight: true
+            Layout.minimumWidth: Kirigami.Units.gridUnit
+            Layout.maximumWidth: Kirigami.Units.gridUnit
+        }
+        QQC2.ToolButton {
+            Layout.fillHeight: true
+            display: QQC2.AbstractButton.TextBesideIcon
+            icon.name: "entry-edit"
+            text: qsTr("Rename...")
+            enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
+        }
+        QQC2.ToolButton {
+            Layout.fillHeight: true
+            display: QQC2.AbstractButton.TextBesideIcon
+            icon.name: "edit-move"
+            text: qsTr("Move...")
+            enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
+        }
+        QQC2.ToolButton {
+            Layout.fillHeight: true
+            display: QQC2.AbstractButton.TextBesideIcon
+            icon.name: "entry-delete"
+            text: qsTr("Delete...")
+            enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
         }
     }
     footer: QQC2.Control {
@@ -212,15 +231,10 @@ Zynthian.Dialog {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.6
                     onTextChanged: {
-                        if (filesListView.selectedModelData) {
-                            filesListView.selectedModelData.fileName = text;
-                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
-                        } else {
-                            filesListView.selectedModelData = {};
-                            filesListView.selectedModelData.fileName = namedFile.text;
-                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
-                            root.fileSelected(filesListView.selectedModelData);
-                        }
+                        filesListView.saveModelData = {};
+                        filesListView.saveModelData.fileName = namedFile.text;
+                        filesListView.saveModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
+                        root.fileSelected(root.selectedFile);
                     }
                 }
             }
@@ -240,7 +254,6 @@ Zynthian.Dialog {
             RowLayout {
                 Layout.fillWidth: true
                 QQC2.Button {
-                    id: cancelSaveButton
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
@@ -248,317 +261,327 @@ Zynthian.Dialog {
                     onClicked: root.close();
                 }
                 QQC2.Button {
-                    id: acceptSaveButton
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                    text: {
-                        if (root.saveMode) {
-                            return conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save");
-                        } else {
-                            return qsTr("Load")
-                        }
-                    }
-                    enabled: filesListView.selectedModelData !== null
+                    text: root.saveMode
+                        ? conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save")
+                        : qsTr("Load")
+                    enabled: root.saveMode
+                        ? root.selectedFile !== null
+                        : filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isFile
                     onClicked: {
-                        /*if (root.saveMode) {
-                            if (namedFile.text.length > 0) {
-                                let file = {};
-                                file.fileName = namedFile.text;
-                                file.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
-                                root.fileSelected(file);
-                                root.accept();
-                            }
-                        } else*/ {
-                            fileSelected(filesListView.selectedModelData);
-                            root.accept();
-                            filesListView.currentIndex = 0;
-                        }
+                        root.fileSelected(root.selectedFile);
+                        root.accept();
                     }
                 }
             }
         }
     }
 
+    contentItem: Row {
+        spacing: 0
+        ColumnLayout {
+            width: parent.width * 0.75
+            height: parent.height
+            RowLayout {
+                readonly property var folderSplitArray: String(folderModel.folder).replace("file://"+root.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
 
-    contentItem: RowLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+                id: folderBreadcrumbs
+                Layout.fillWidth: true
+                Layout.minimumHeight: Kirigami.Units.gridUnit * 2
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 2
+                Layout.leftMargin: 6
+                spacing: 2
 
-        QtObject {
-            id: filesListViewDimensions
-
-            property var rowHeight: Kirigami.Units.gridUnit*2
-            property var rowMargin: Kirigami.Units.gridUnit
-        }
-
-        QQC2.ScrollView {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            contentItem: ListView {
-                id: filesListView
-
-                focus: true
-                onCurrentIndexChanged: {
-                    positionViewAtIndex(currentIndex, ListView.Contain);
-                    filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
-                }
-                Layout.leftMargin: 8
-                clip: true
-
-                property var selectedModelData: null
-
-                function selectItem(model) {
-                    console.log(model.fileName, model.filePath, model.index)
-                    root.currentFileInfo = model;
-                    if (model.fileIsDir) {
-                        var path = model.filePath;
-
-                        if (path.endsWith("/")) {
-                            path = path.slice(0, path.length - 1);
-                        }
-
-                        folderModel.folder = path;
-                        filesListView.currentIndex = 0;
-                    } else {
-                        filesListView.selectedModelData = model;
-                        if (root.saveMode) {
-                            namedFile.text = model.fileName;
-                        }
-                        root.filesListView.currentIndex = model.index;
+                Zynthian.BreadcrumbButton {
+                    id: homeButton
+                    icon.name: "user-home-symbolic"
+                    onClicked: {
+                        folderModel.folder = root.rootFolder + "/"
                     }
                 }
 
-                QQC2.Label {
-                    id: noFilesMessage
-                    parent: filesListView
-                    anchors.centerIn: parent
-                    visible: filesListView.count === 0
-                    text: qsTr("There are no files present")
-                    QQC2.Label {
-                        anchors {
-                            top: parent.bottom
-                            margins: Kirigami.Units.largeSpacing
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        function getHelp(folderName) {
-                            if (folderName == "file:///zynthian/zynthian-my-data/sketches/community-sketches") {
-                                return qsTr("When you download Sketches from the popup in Sample and Sketch slots, you will be able to find them here");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/sketches/my-sketches") {
-                                return qsTr("This is where you should store your own Sketches.\nUse Save A Copy... in the Sketch slot popup after bouncing");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/samples/my-samples") {
-                                return qsTr("This is where you should store your own samples.\nUse Save A Copy... in the Sample slot popup after recording.\nYou can also use WebConf to easily access the file system");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
-                                return qsTr("When you use Get New Sounds, you will be able to find them here");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
-                                return qsTr("This is where you should store your own sounds");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/community-soundsets") {
-                                return qsTr("When you use Get New Soundsets, you will be able to find them here");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
-                                return qsTr("This is where you should store your own soundsets");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/community-sequences") {
-                                return qsTr("When you use Get New Sequences, you will be able to find them here");
-                            } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
-                                return qsTr("This is where you should store sequences you create");
-                            }
-                            return "";
-                        }
-                        text: getHelp(folderModel.folder)
-                    }
-                }
-
-                headerPositioning: ListView.PullBackHeader
-                header: Rectangle {
-                    width: ListView.view.width
-                    height: Kirigami.Units.gridUnit*2
-                    z: 2
-                    color: "#110000"
-
-                    ColumnLayout {
-                        spacing: 0
-                        anchors.fill: parent
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            spacing: Kirigami.Units.gridUnit
-
-                            Kirigami.Icon {
-                                Layout.preferredWidth: parent.height
-                                Layout.maximumWidth: parent.height
-                                Layout.fillHeight: true
-                                Layout.margins: 8
-                                source: "file-library-symbolic"
-                            }
-
-                            RowLayout {
-                                QQC2.Label {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    text: qsTr("Filename")
-                                }
-
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                                    Layout.maximumWidth: Kirigami.Units.gridUnit*8
-                                    Layout.fillHeight: true
-                                    text: qsTr("Duration")
-                                }
-                            }
-                        }
-
-                        Kirigami.Separator {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 1
-                        }
-                    }
-                }
-
-                footerPositioning: ListView.OverlayFooter
-                footer: Item {
-                    width: ListView.view.width
-                    height: fileListFooterLayout.height
-                    visible: folderInfoLabel.text !== ""
-                    z: 3
-                    Rectangle {
-                        anchors {
-                            fill: parent
-                            margins: 1
-                        }
-                        color: "#110000"
-                    }
-
-                    ColumnLayout {
-                        id: fileListFooterLayout
-                        spacing: 0
-                        anchors {
-                            top: parent.top
-                            left: parent.left
-                            right: parent.right
-                            margins: 2
-                        }
-                        Kirigami.Separator {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 1
-                        }
-                        QQC2.Label {
-                            id: folderInfoLabel
-                            Layout.fillWidth: true
-                            wrapMode: Text.Wrap
-                            horizontalAlignment: Text.AlignHCenter
-                            Connections {
-                                target: folderModel
-                                onFolderChanged: {
-                                    let foundOne = false;
-                                    for (const folder in root.folderInfoStrings) {
-                                        if (folderModel.folder.toString().startsWith(folder)) {
-                                            folderInfoLabel.text = root.folderInfoStrings[folder];
-                                            foundOne = true;
-                                            break;
-                                        }
-                                    }
-                                    if (foundOne === false) {
-                                        folderInfoLabel.text = "";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                model: FolderListModel {
-                    id: folderModel
-                    caseSensitive: false
-                    showDirs: true
-                    showDirsFirst: true
-                    showDotAndDotDot: false
-                    onFolderChanged: {
-                        if (root.saveMode) {
-                            filesListView.currentIndex = -1;
-                        } else {
+                Repeater {
+                    id: breadcrumbsRepeater
+                    model: folderBreadcrumbs.folderSplitArray
+                    delegate: Zynthian.BreadcrumbButton {
+                        text: modelData
+                        onClicked: {
+                            folderModel.folder = root.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
                             filesListView.currentIndex = 0;
                         }
-                        filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
                     }
                 }
-                delegate: Rectangle {
-                    property var fileProperties: Helpers.FilePropertiesHelper {
-                        filePath: model.filePath
-                    }
+            }
+            QQC2.ScrollView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                    id: fileListDelegate
-                    width: ListView.view.width
-                    height: Kirigami.Units.gridUnit*2
-                    z: 1
-                    color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
-                    property bool isCurrentItem: ListView.isCurrentItem
-                    onIsCurrentItemChanged: {
-                        if (isCurrentItem) {
-                            root.currentFileInfo = model;
+                contentItem: ListView {
+                    id: filesListView
+                    focus: true
+                    onCurrentIndexChanged: {
+                        positionViewAtIndex(currentIndex, ListView.Contain);
+                    }
+                    Layout.leftMargin: 8
+                    clip: true
+
+                    readonly property var selectedModelData: filesListView.currentItem ? filesListView.currentItem.itemModelData : null
+                    property var saveModelData: null
+
+                    function selectItem(model) {
+                        console.log(model.fileName, model.filePath, model.index)
+                        root.currentFileInfo = model;
+                        if (model.fileIsDir) {
+                            var path = model.filePath;
+
+                            if (path.endsWith("/")) {
+                                path = path.slice(0, path.length - 1);
+                            }
+
+                            folderModel.folder = path;
+                        } else {
+                            if (root.saveMode) {
+                                namedFile.text = model.fileName;
+                            }
+                            root.filesListView.currentIndex = model.index;
                         }
                     }
 
-                    function selectItem() {
-                        filesListView.selectItem(model)
+                    QQC2.Label {
+                        id: noFilesMessage
+                        parent: filesListView
+                        anchors.centerIn: parent
+                        visible: filesListView.count === 0
+                        text: qsTr("There are no files present")
+                        verticalAlignment: Text.AlignVCenter
+                        QQC2.Label {
+                            anchors {
+                                top: parent.bottom
+                                margins: Kirigami.Units.largeSpacing
+                                horizontalCenter: parent.horizontalCenter
+                            }
+                            verticalAlignment: Text.AlignTop
+                            horizontalAlignment: Text.AlignHCenter
+                            function getHelp(folderName) {
+                                if (folderName == "file:///zynthian/zynthian-my-data/sketches/community-sketches") {
+                                    return qsTr("When you download Sketches from the popup in Sample and Sketch slots, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sketches/my-sketches") {
+                                    return qsTr("This is where you should store your own Sketches.\nUse Save A Copy... in the Sketch slot popup after bouncing");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/samples/my-samples") {
+                                    return qsTr("This is where you should store your own samples.\nUse Save A Copy... in the Sample slot popup after recording.\nYou can also use WebConf to easily access the file system");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
+                                    return qsTr("When you use Get New Sounds, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
+                                    return qsTr("This is where you should store your own sounds");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/community-soundsets") {
+                                    return qsTr("When you use Get New Soundsets, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
+                                    return qsTr("This is where you should store your own soundsets");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/community-sequences") {
+                                    return qsTr("When you use Get New Sequences, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
+                                    return qsTr("This is where you should store sequences you create");
+                                }
+                                return "";
+                            }
+                            text: getHelp(folderModel.folder)
+                        }
                     }
 
-                    ColumnLayout {
-                        spacing: 0
-                        anchors.fill: parent
+                    headerPositioning: ListView.PullBackHeader
+                    header: Rectangle {
+                        width: ListView.view.width
+                        height: Kirigami.Units.gridUnit*2
+                        z: 2
+                        color: "#110000"
 
-                        RowLayout {
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            spacing: Kirigami.Units.gridUnit
-
-                            Kirigami.Icon {
-                                Layout.preferredWidth: parent.height
-                                Layout.maximumWidth: parent.height
-                                Layout.fillHeight: true
-                                Layout.margins: 8
-
-                                source: {
-                                    if (model.fileIsDir) {
-                                        return "folder-symbolic"
-                                    }
-                                    else if (model.filePath.endsWith(".wav")) {
-                                        return "folder-music-symbolic"
-                                    } else {
-                                        return "file-catalog-symbolic"
-                                    }
-                                }
-                            }
+                        ColumnLayout {
+                            spacing: 0
+                            anchors.fill: parent
 
                             RowLayout {
-                                QQC2.Label {
-                                    Layout.fillWidth: true
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                spacing: Kirigami.Units.gridUnit
+
+                                Kirigami.Icon {
+                                    Layout.preferredWidth: parent.height
+                                    Layout.maximumWidth: parent.height
                                     Layout.fillHeight: true
-                                    text: model.fileName
+                                    Layout.margins: 8
+                                    source: "file-library-symbolic"
                                 }
 
-                                QQC2.Label {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                                    Layout.maximumWidth: Kirigami.Units.gridUnit*8
-                                    Layout.fillHeight: true
-                                    text: fileProperties.fileMetadata.isWav
-                                            ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))
-                                            : ""
+                                RowLayout {
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        text: qsTr("Filename")
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                                        Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                        Layout.fillHeight: true
+                                        text: qsTr("Duration")
+                                    }
                                 }
                             }
-                        }
 
-                        Kirigami.Separator {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 1
+                            Kirigami.Separator {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 1
+                            }
                         }
                     }
 
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        onClicked: fileListDelegate.selectItem()
+                    footerPositioning: ListView.OverlayFooter
+                    footer: Item {
+                        width: ListView.view.width
+                        height: fileListFooterLayout.height
+                        visible: folderInfoLabel.text !== ""
+                        z: 3
+                        Rectangle {
+                            anchors {
+                                fill: parent
+                                margins: 1
+                            }
+                            color: "#110000"
+                        }
+
+                        ColumnLayout {
+                            id: fileListFooterLayout
+                            spacing: 0
+                            anchors {
+                                top: parent.top
+                                left: parent.left
+                                right: parent.right
+                                margins: 2
+                            }
+                            Kirigami.Separator {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 1
+                            }
+                            QQC2.Label {
+                                id: folderInfoLabel
+                                Layout.fillWidth: true
+                                wrapMode: Text.Wrap
+                                horizontalAlignment: Text.AlignHCenter
+                                Connections {
+                                    target: folderModel
+                                    onFolderChanged: {
+                                        let foundOne = false;
+                                        for (const folder in root.folderInfoStrings) {
+                                            if (folderModel.folder.toString().startsWith(folder)) {
+                                                folderInfoLabel.text = root.folderInfoStrings[folder];
+                                                foundOne = true;
+                                                break;
+                                            }
+                                        }
+                                        if (foundOne === false) {
+                                            folderInfoLabel.text = "";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    model: FolderListModel {
+                        id: folderModel
+                        caseSensitive: false
+                        showDirs: true
+                        showDirsFirst: true
+                        showDotAndDotDot: false
+                        onFolderChanged: {
+                            if (root.saveMode) {
+                                filesListView.currentIndex = -1;
+                            } else {
+                                filesListView.currentIndex = 0;
+                            }
+                        }
+                    }
+                    delegate: Rectangle {
+                        property var fileProperties: Helpers.FilePropertiesHelper {
+                            filePath: model.filePath
+                        }
+
+                        id: fileListDelegate
+                        width: ListView.view.width
+                        height: Kirigami.Units.gridUnit*2
+                        z: 1
+                        color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
+                        property bool isCurrentItem: ListView.isCurrentItem
+                        onIsCurrentItemChanged: {
+                            if (isCurrentItem) {
+                                root.currentFileInfo = model;
+                            }
+                        }
+
+                        readonly property var itemModelData: model
+                        function selectItem() {
+                            filesListView.selectItem(model)
+                        }
+
+                        ColumnLayout {
+                            spacing: 0
+                            anchors.fill: parent
+
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                spacing: Kirigami.Units.gridUnit
+
+                                Kirigami.Icon {
+                                    Layout.preferredWidth: parent.height
+                                    Layout.maximumWidth: parent.height
+                                    Layout.fillHeight: true
+                                    Layout.margins: 8
+
+                                    source: {
+                                        if (model.fileIsDir) {
+                                            return "folder-symbolic"
+                                        }
+                                        else if (model.filePath.endsWith(".wav")) {
+                                            return "folder-music-symbolic"
+                                        } else {
+                                            return "file-catalog-symbolic"
+                                        }
+                                    }
+                                }
+
+                                RowLayout {
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        text: model.fileName
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                                        Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                        Layout.fillHeight: true
+                                        text: fileProperties.fileMetadata.isWav
+                                                ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))
+                                                : ""
+                                    }
+                                }
+                            }
+
+                            Kirigami.Separator {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 1
+                            }
+                        }
+
+                        MouseArea {
+                            id: mouseArea
+                            anchors.fill: parent
+                            onClicked: fileListDelegate.selectItem()
+                        }
                     }
                 }
             }
@@ -566,10 +589,9 @@ Zynthian.Dialog {
 
         Loader {
             id: filePropertiesColumn
-            property var filePropertiesHelperObj: null
-            Layout.preferredWidth: Kirigami.Units.gridUnit*12
-            Layout.maximumWidth: Kirigami.Units.gridUnit*12
-            Layout.fillHeight: true
+            readonly property var filePropertiesHelperObj: filesListView.currentItem ? filesListView.currentItem.fileProperties : null
+            width: parent.width * 0.25
+            height: parent.height
             sourceComponent: Component {
                 Flickable {
                     clip: true

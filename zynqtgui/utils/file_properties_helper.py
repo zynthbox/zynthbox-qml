@@ -1,6 +1,8 @@
 import logging
 import taglib
 import tempfile
+import os
+import os.path
 from subprocess import check_output
 import Zynthbox
 
@@ -76,6 +78,53 @@ class file_properties_helper(QObject):
     fileMetadata = Property('QVariantMap', get_file_metadata, notify=file_metadata_changed)
     ### END Property fileMetadata
 
+    ### BEGIN A bunch of helper functions that only really require a container object, and this is a file operations related one, so they can go here
+    @Slot(str, result=bool)
+    def checkFileExists(self, pathname):
+        if Path(pathname).exists():
+            return True
+        return False
+
+    @Slot(str, str)
+    def renameFile(self, oldPathname, newPathname):
+        fileToRename = Path(oldPathname)
+        if fileToRename.exists():
+            fileToRename.rename(newPathname)
+
+    @Slot(str, result=bool)
+    def directoryHasContents(self, pathname):
+        directory = Path(pathname)
+        if directory.is_dir():
+            if any(directory.iterdir()):
+                return True
+        return False
+
+    @Slot(str)
+    def deleteFile(self, pathname):
+        fileToDelete = Path(pathname)
+        if fileToDelete.exists():
+            if fileToDelete.is_dir():
+                fileToDelete.rmdir()
+            else:
+                fileToDelete.unlink()
+
+    @Slot(str)
+    def makePath(self, pathname):
+        pathToCreate = Path(pathname)
+        pathToCreate.mkdir(parents=True, exist_ok=True)
+
+    # Returns an ordered list of subdirectories for the given pathname, containing objects with the keys path, subpath and name
+    # path contains the fill file system path of the entry
+    # subpath contains the last part of the path, including the search path's last directory, including the /
+    # name contains only the entry's directory name
+    @Slot(str, result='QVariantList')
+    def getSubdirectoryList(self, pathname):
+        subdirectories = []
+        pathStringLength = pathname.rfind("/")
+        for dirpath, dirnames, filenames in os.walk(pathname, onerror=print, followlinks=False):
+            subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
+        return subdirectories
+
     @Slot(str, 'QVariantMap')
     def writeMetadata(self, filename, values: dict):
         # for key, value in values.items():
@@ -106,6 +155,8 @@ class file_properties_helper(QObject):
                         file.save()
                 except Exception as e:
                     logging.error(f"Error creating new file and writing metadata : {str(e)}")
+
+    ### END A bunch of helper functions that only really require a container object, and this is a file operations related one, so they can go here
 
     ### Property isPreviewPlaying
     def get_is_preview_playing(self):

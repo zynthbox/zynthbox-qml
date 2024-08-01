@@ -273,9 +273,15 @@ Zynthian.Dialog {
                 let subfolderSubpaths = [];
                 let currentLocationIndex = -1;
                 for (let subfolderIndex = 0; subfolderIndex < moveEntryLocationPicker.subfolders.length; ++subfolderIndex) {
-                    subfolderSubpaths.push(moveEntryLocationPicker.subfolders[subfolderIndex].subpath);
-                    if (moveEntryLocationPicker.subfolders[subfolderIndex].path === moveEntryLocationPicker.currentSubfolder) {
+                    let subfolder = moveEntryLocationPicker.subfolders[subfolderIndex];
+                    let newFilename = subfolder.path + "/" + filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename;
+                    if (subfolder.path === moveEntryLocationPicker.currentSubfolder) {
                         currentLocationIndex = subfolderIndex;
+                        subfolderSubpaths.push(subfolder.subpath + " (current location)");
+                    } else if (filePropertiesColumn.filePropertiesHelperObj.checkFileExists(newFilename)) {
+                        subfolderSubpaths.push(subfolder.subpath + " (filename exists)");
+                    } else {
+                        subfolderSubpaths.push(subfolder.subpath);
                     }
                 }
                 moveEntryLocationPicker.subfolderSubpaths = subfolderSubpaths;
@@ -298,10 +304,14 @@ Zynthian.Dialog {
                             // console.log("Attempting to move to the same location we're already in, aborting...");
                         } else {
                             let newFilename = destination.path + "/" + filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename;
-                            // console.log("Moving file from", filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, "to", newFilename);
-                            filePropertiesColumn.filePropertiesHelperObj.renameFile(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, newFilename);
-                            root.oldPath = "file://" + newFilename;
-                            folderModel.folder = destination.path;
+                            if (filePropertiesColumn.filePropertiesHelperObj.checkFileExists(newFilename)) {
+                                // console.log("Attempting to move to a location which already has a file with that name, aborting...");
+                            } else {
+                                // console.log("Moving file from", filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, "to", newFilename);
+                                filePropertiesColumn.filePropertiesHelperObj.renameFile(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, newFilename);
+                                root.oldPath = "file://" + newFilename;
+                                folderModel.folder = destination.path;
+                            }
                         }
                     }
                 }

@@ -4,7 +4,7 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import Qt.labs.folderlistmodel 2.11
+import Qt.labs.folderlistmodel 2.15
 
 import Helpers 1.0 as Helpers
 
@@ -118,7 +118,7 @@ Zynthian.Dialog {
 
     function goBack() {
         root.oldPath = folderModel.folder;
-        let newPath = String(folderModel.folder).replace("file://", "").split("/");
+        let newPath = folderModel.folder.toString().replace("file://", "").split("/");
         newPath.pop();
         newPath = newPath.join("/");
 
@@ -133,6 +133,7 @@ Zynthian.Dialog {
         target: folderModel
         onStatusChanged: {
             if (folderModel.status == FolderListModel.Ready && root.oldPath != undefined) {
+                // console.log("Resetting current index to match", root.oldPath, "at index", folderModel.indexOf(root.oldPath));
                 root.filesListView.currentIndex = folderModel.indexOf(root.oldPath);
                 root.oldPath = undefined;
             } else {
@@ -179,13 +180,41 @@ Zynthian.Dialog {
             text: qsTr("View...")
         }
         QQC2.ToolButton {
+            id: newFolderButton
             Layout.fillHeight: true
             display: QQC2.AbstractButton.TextBesideIcon
-            icon.name: "entry-edit"
+            icon.name: "folder-new"
             text: qsTr("New Folder...")
             readonly property var userEditableFolders: ["file:///zynthian/zynthian-my-data/sketches/my-sketches", "file:///zynthian/zynthian-my-data/samples/my-samples", "file:///zynthian/zynthian-my-data/sketchpads/my-sketchpads"]
-            enabled: userEditableFolders.includes(String(folderModel.folder)) || (filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite)
-            onClicked: {
+            Connections {
+                target: folderModel
+                onFolderChanged: {
+                    let newFolderButtonEnabled = false;
+                    for (let userEditableFolderIndex = 0; userEditableFolderIndex < newFolderButton.userEditableFolders.length; ++userEditableFolderIndex) {
+                        if (folderModel.folder.toString().startsWith(newFolderButton.userEditableFolders[userEditableFolderIndex])) {
+                            newFolderButtonEnabled = true;
+                            break;
+                        }
+                    }
+                    newFolderButton.enabled = newFolderButtonEnabled;
+                }
+            }
+            onClicked: newFolderDialog.open()
+            Zynthian.DialogQuestion {
+                id: newFolderDialog
+                textInputVisible: true
+                title: qsTr("New Folder")
+                text: qsTr("Enter the name for your new folder below\n%1").arg(newFolderPath)
+                acceptText: qsTr("Yes, Create Folder")
+                acceptEnabled: inputText.length > 0 && folderModel.folderPropertiesHelper.checkFileExists(newFolderDialog.newFolderPath) === false
+                rejectText: qsTr("No, Don't Create Folder")
+                readonly property string newFolderName: folderModel.folder + "/" + newFolderDialog.inputText
+                readonly property string newFolderPath: newFolderName.substring(7) // There's a file:// at the start of this string, so get rid of that before throwing it at python
+                onAccepted: {
+                    // console.log("Creating new folder named", newFolderDialog.newFolderName, "and then entering it");
+                    folderModel.folderPropertiesHelper.makePath(newFolderDialog.newFolderPath);
+                    folderModel.folder = newFolderDialog.newFolderName;
+                }
             }
         }
         Item {
@@ -199,6 +228,31 @@ Zynthian.Dialog {
             icon.name: "entry-edit"
             text: qsTr("Rename...")
             enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
+            onClicked: {
+                let suffixStartIndex = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.indexOf(".");
+                renameEntryDialog.inputText = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.substring(0, suffixStartIndex);
+                renameEntryDialog.suffix = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.substring(suffixStartIndex);
+                renameEntryDialog.containingDirectory = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.substring(0, filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.lastIndexOf("/"));
+                renameEntryDialog.open();
+            }
+            Zynthian.DialogQuestion {
+                id: renameEntryDialog
+                textInputVisible: true
+                title: qsTr("Rename?")
+                text: filePropertiesColumn.filePropertiesHelperObj ? qsTr("Are you sure you wish to rename the file:\n%1\nto\n%2").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename).arg(renameEntryDialog.newFilename) : ""
+                acceptText: qsTr("Yes, Rename")
+                acceptEnabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.checkFileExists(renameEntryDialog.newPathname) === false
+                rejectText: qsTr("No, Don't Rename")
+                // We only allow people to rename the base name here (that is, no suffixes), so we also disallow periods in the name, or it gets weird...
+                readonly property string newPathname: containingDirectory + "/" + newFilename
+                readonly property string newFilename: renameEntryDialog.inputText.replace(".", "_") + suffix
+                property string containingDirectory: ""
+                property string suffix: ""
+                onAccepted: {
+                    root.oldPath = "file://" + renameEntryDialog.newPathname;
+                    filePropertiesColumn.filePropertiesHelperObj.renameFile(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, renameEntryDialog.newPathname);
+                }
+            }
         }
         QQC2.ToolButton {
             Layout.fillHeight: true
@@ -206,6 +260,52 @@ Zynthian.Dialog {
             icon.name: "edit-move"
             text: qsTr("Move...")
             enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
+            onClicked: {
+                let currentFileRoot = "";
+                for (let userEditableFolderIndex = 0; userEditableFolderIndex < newFolderButton.userEditableFolders.length; ++userEditableFolderIndex) {
+                    if (folderModel.folder.toString().startsWith(newFolderButton.userEditableFolders[userEditableFolderIndex])) {
+                        currentFileRoot = newFolderButton.userEditableFolders[userEditableFolderIndex].substring(7);
+                        break;
+                    }
+                }
+                moveEntryLocationPicker.subfolders = filePropertiesColumn.filePropertiesHelperObj.getSubdirectoryList(currentFileRoot);
+                moveEntryLocationPicker.currentSubfolder = filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.substring(0, filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath.lastIndexOf("/"));
+                let subfolderSubpaths = [];
+                let currentLocationIndex = -1;
+                for (let subfolderIndex = 0; subfolderIndex < moveEntryLocationPicker.subfolders.length; ++subfolderIndex) {
+                    subfolderSubpaths.push(moveEntryLocationPicker.subfolders[subfolderIndex].subpath);
+                    if (moveEntryLocationPicker.subfolders[subfolderIndex].path === moveEntryLocationPicker.currentSubfolder) {
+                        currentLocationIndex = subfolderIndex;
+                    }
+                }
+                moveEntryLocationPicker.subfolderSubpaths = subfolderSubpaths;
+                moveEntryLocationPicker.currentIndex = currentLocationIndex;
+                moveEntryLocationPicker.onClicked();
+            }
+            // Show the type-local hierarchy (don't allow moving samples to sketches etc) as potential destinations
+            // TODO and also any removable drives and their file system structure
+            Zynthian.ComboBox {
+                id: moveEntryLocationPicker
+                visible: false;
+                model: subfolderSubpaths
+                property var subfolderSubpaths: []
+                property var subfolders: []
+                property string currentSubfolder: ""
+                onActivated: {
+                    if (moveEntryLocationPicker.currentIndex > -1) {
+                        let destination = moveEntryLocationPicker.subfolders[moveEntryLocationPicker.currentIndex];
+                        if (destination.path === moveEntryLocationPicker.currentSubfolder) {
+                            // console.log("Attempting to move to the same location we're already in, aborting...");
+                        } else {
+                            let newFilename = destination.path + "/" + filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename;
+                            // console.log("Moving file from", filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, "to", newFilename);
+                            filePropertiesColumn.filePropertiesHelperObj.renameFile(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath, newFilename);
+                            root.oldPath = "file://" + newFilename;
+                            folderModel.folder = destination.path;
+                        }
+                    }
+                }
+            }
         }
         QQC2.ToolButton {
             Layout.fillHeight: true
@@ -213,6 +313,30 @@ Zynthian.Dialog {
             icon.name: "entry-delete"
             text: qsTr("Delete...")
             enabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isReadWrite
+            onClicked: deleteEntryDialog.open()
+            Zynthian.DialogQuestion {
+                id: deleteEntryDialog
+                title: qsTr("Delete?")
+                text: filePropertiesColumn.filePropertiesHelperObj
+                    ? isFolderAndHasContents
+                        ? qsTr("To delete the folder %1, you will need to first remove its contents.").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename)
+                        : qsTr("Are you sure you wish to delete:\n\n%1").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename)
+                    : ""
+                readonly property bool isFolderAndHasContents: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isDir && filePropertiesColumn.filePropertiesHelperObj.directoryHasContents(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath)
+                acceptText: qsTr("Yes, Delete")
+                acceptEnabled: isFolderAndHasContents === false
+                rejectText: qsTr("No, Don't Delete")
+                onAccepted: {
+                    if (filesListView.currentIndex + 1 <= filesListView.count) {
+                        // This option is "leave the highlight where it is" in a visual sense
+                        root.oldPath = folderModel.get(filesListView.currentIndex + 1, "fileUrl");
+                    } else if (filesListView.currentIndex > 0) {
+                        // This option is "at least have /something/ highlighted
+                        root.oldPath = folderModel.get(filesListView.currentIndex - 1, "fileUrl");
+                    }
+                    filePropertiesColumn.filePropertiesHelperObj.deleteFile(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filepath);
+                }
+            }
         }
     }
     footer: QQC2.Control {
@@ -233,7 +357,7 @@ Zynthian.Dialog {
                     onTextChanged: {
                         filesListView.saveModelData = {};
                         filesListView.saveModelData.fileName = namedFile.text;
-                        filesListView.saveModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
+                        filesListView.saveModelData.filePath = folderModel.folder.toString().replace("file://", "") + "/" + namedFile.text;
                         root.fileSelected(root.selectedFile);
                     }
                 }
@@ -241,8 +365,8 @@ Zynthian.Dialog {
             QQC2.Label {
                 id: conflictLabel
                 opacity: namedFile.text !== "" && (root.autoExtension === "" || namedFile.text.endsWith(root.autoExtension)
-                    ? zynqtgui.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text)
-                    : zynqtgui.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text + root.autoExtension)
+                    ? zynqtgui.file_exists(folderModel.folder.toString().replace("file://", "") + "/" + namedFile.text)
+                    : zynqtgui.file_exists(folderModel.folder.toString().replace("file://", "") + "/" + namedFile.text + root.autoExtension)
                     )
                 visible: opacity > 0
                 Layout.preferredHeight: opacity > 0 ? implicitHeight : 0
@@ -285,7 +409,7 @@ Zynthian.Dialog {
             width: parent.width * 0.75
             height: parent.height
             RowLayout {
-                readonly property var folderSplitArray: String(folderModel.folder).replace("file://"+root.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
+                readonly property var folderSplitArray: folderModel.folder.toString().replace("file://"+root.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
 
                 id: folderBreadcrumbs
                 Layout.fillWidth: true
@@ -495,6 +619,7 @@ Zynthian.Dialog {
                         showDirs: true
                         showDirsFirst: true
                         showDotAndDotDot: false
+                        sortCaseSensitive: false
                         onFolderChanged: {
                             if (root.saveMode) {
                                 filesListView.currentIndex = -1;
@@ -502,9 +627,12 @@ Zynthian.Dialog {
                                 filesListView.currentIndex = 0;
                             }
                         }
+                        readonly property var folderPropertiesHelper: Helpers.FilePropertiesHelper {
+                            filePath: folderModel.folder.toString().substring(7) // There's a file:// at the start of this string, so get rid of that before throwing it at python
+                        }
                     }
                     delegate: Rectangle {
-                        property var fileProperties: Helpers.FilePropertiesHelper {
+                        readonly property var fileProperties: Helpers.FilePropertiesHelper {
                             filePath: model.filePath
                         }
 

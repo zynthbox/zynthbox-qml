@@ -50,7 +50,7 @@ QQC2.Button {
         radius: 3
         border {
             width: 1
-            color: component.borderColor
+            color: component.flat ? "transparent" : component.borderColor
         }
         color: component.backgroundColor
     }

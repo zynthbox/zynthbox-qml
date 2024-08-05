@@ -76,7 +76,8 @@ Zynthian.Dialog {
                 id: adjectiveNounButton
                 height: parent.height
                 width: parent.height
-                icon.name: "randomize"
+                icon.name: "roll"
+                flat: true
                 onClicked: {
                     let suffixStart = fileName.text.indexOf(".");
                     let fileSuffix = "";

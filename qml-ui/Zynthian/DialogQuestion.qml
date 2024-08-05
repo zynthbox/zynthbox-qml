@@ -164,7 +164,8 @@ Zynthian.Dialog {
                 Layout.minimumWidth: height
                 Layout.maximumWidth: height
                 visible: false
-                icon.name: "randomize"
+                icon.name: "roll"
+                flat: true
                 onClicked: {
                     textInput.text = Zynthbox.AdjectiveNoun.adjectiveNoun();
                 }

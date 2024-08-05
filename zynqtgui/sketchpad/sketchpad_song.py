@@ -264,6 +264,7 @@ class sketchpad_song(QObject):
         soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
 
         if not self.isTemp and autosave is True:
+            saved_obj = None
             # When trying to do autosave, write autosave only if current differs from saved state
             if (Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json").exists():
                 with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:

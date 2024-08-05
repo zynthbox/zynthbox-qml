@@ -173,12 +173,13 @@ Zynthian.Dialog {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
-        QQC2.ToolButton {
-            Layout.fillHeight: true
-            display: QQC2.AbstractButton.TextBesideIcon
-            icon.name: "view-list-details"
-            text: qsTr("View...")
-        }
+        // TODO When we get to adding in tagging support, this is where we want to add switching to that view
+        // QQC2.ToolButton {
+        //     Layout.fillHeight: true
+        //     display: QQC2.AbstractButton.TextBesideIcon
+        //     icon.name: "view-list-details"
+        //     text: qsTr("View...")
+        // }
         QQC2.ToolButton {
             id: newFolderButton
             Layout.fillHeight: true

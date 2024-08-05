@@ -203,6 +203,7 @@ Zynthian.Dialog {
             Zynthian.DialogQuestion {
                 id: newFolderDialog
                 textInputVisible: true
+                adjectiveNounButtonVisible: true
                 title: qsTr("New Folder")
                 text: qsTr("Enter the name for your new folder below\n%1").arg(newFolderPath)
                 acceptText: qsTr("Yes, Create Folder")
@@ -238,8 +239,13 @@ Zynthian.Dialog {
             Zynthian.DialogQuestion {
                 id: renameEntryDialog
                 textInputVisible: true
+                adjectiveNounButtonVisible: true
                 title: qsTr("Rename?")
-                text: filePropertiesColumn.filePropertiesHelperObj ? qsTr("Are you sure you wish to rename the file:\n%1\nto\n%2").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename).arg(renameEntryDialog.newFilename) : ""
+                text: filePropertiesColumn.filePropertiesHelperObj
+                    ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isDir
+                        ? qsTr("Are you sure you wish to rename the folder:\n%1\nto\n%2").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename).arg(renameEntryDialog.newFilename)
+                        : qsTr("Are you sure you wish to rename the file:\n%1\nto\n%2").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename).arg(renameEntryDialog.newFilename)
+                    : ""
                 acceptText: qsTr("Yes, Rename")
                 acceptEnabled: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.checkFileExists(renameEntryDialog.newPathname) === false
                 rejectText: qsTr("No, Don't Rename")

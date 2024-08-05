@@ -797,11 +797,13 @@ Zynthian.ScreenPage {
 
         headerText: {
             if (fileNameDialog.dialogType == "savecopy")
-                return qsTr("Clone Sketchpad")
+                return qsTr("Enter Name for Sketchpad Copy")
             else if (fileNameDialog.dialogType === "saveas")
-                return qsTr("New version")
+                return qsTr("Enter New Version's Name")
+            else if (fileNameDialog.dialogType === "save")
+                return qsTr("Enter Sketchpad Name")
             else
-                return qsTr("New Sketchpad")
+                return qsTr("Enter New Sketchpad Name")
         }
         conflictText: {
             if (dialogType == "savecopy")

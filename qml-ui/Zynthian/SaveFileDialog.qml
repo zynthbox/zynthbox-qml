@@ -6,10 +6,11 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.Dialog {
     property alias headerText: header.text
-    property alias conflict: conflictRow.visible
+    property bool conflict: false
     property alias fileName: fileName.text
     property string conflictText: qsTr("File Exists")
     property bool overwriteOnConflict: true
@@ -54,23 +55,41 @@ Zynthian.Dialog {
         }
     }
     contentItem: ColumnLayout {
-        QQC2.TextField {
-            id: fileName
+        Row {
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-            onAccepted: {
-                if (fileName.text.length > 0) {
-                    if (overwriteOnConflict && conflict)
-                        return
-
-                    saveDialog.accept();
+            QQC2.TextField {
+                id: fileName
+                height: parent.height
+                width: parent.width - parent.height
+                onAccepted: {
+                    if (fileName.text.length > 0) {
+                        if (overwriteOnConflict && saveDialog.conflict) {
+                            return;
+                        }
+                        saveDialog.accept();
+                    }
                 }
             }
-            onTextChanged: fileNameChanged(fileName.text)
+            PlayGridButton {
+                id: adjectiveNounButton
+                height: parent.height
+                width: parent.height
+                icon.name: "randomize"
+                onClicked: {
+                    let suffixStart = fileName.text.indexOf(".");
+                    let fileSuffix = "";
+                    if (suffixStart > -1) {
+                        fileSuffix = fileName.text.substring(suffixStart);
+                    }
+                    fileName.text = Zynthbox.AdjectiveNoun.formatted("%1-%2") + fileSuffix;
+                }
+            }
         }
         RowLayout {
             id: conflictRow
-            visible: false
+            opacity: saveDialog.conflict ? 1 : 0
             QQC2.Label {
                 Layout.fillWidth: true
                 text: conflictText
@@ -98,10 +117,10 @@ Zynthian.Dialog {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                text: conflict && overwriteOnConflict ? qsTr("Overwrite") : qsTr("Save")
+                text: saveDialog.conflict && overwriteOnConflict ? qsTr("Overwrite") : qsTr("Save")
                 enabled: {
                     if (fileName.text.length > 0) {
-                        if (conflict && !overwriteOnConflict)
+                        if (saveDialog.conflict && !overwriteOnConflict)
                             return false
 
                         return true

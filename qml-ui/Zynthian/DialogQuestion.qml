@@ -29,6 +29,7 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.Dialog {
     id: component
@@ -63,6 +64,10 @@ Zynthian.Dialog {
      * The text in the text input field shown above the buttons
      */
     property alias inputText: textInput.text
+    /**
+     * Whether a button for automatically inputting a semi-random combination of an adjective and a noun
+     */
+    property alias adjectiveNounButtonVisible: adjectiveNounButton.visible
 
     property alias textHorizontalAlignment: contentText.horizontalAlignment
     property alias textVerticalAlignment: contentText.verticalAlignment
@@ -70,7 +75,7 @@ Zynthian.Dialog {
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
     width: Kirigami.Units.gridUnit * 20
-    height: component.textInputVisible ? Kirigami.Units.gridUnit * 13 : Kirigami.Units.gridUnit * 10
+    height: inputRow.visible ? Kirigami.Units.gridUnit * 13 : Kirigami.Units.gridUnit * 10
     parent: QQC2.Overlay.overlay
 
     property var additionalButtons: []
@@ -135,16 +140,35 @@ Zynthian.Dialog {
             id: contentText
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 10
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             text: component.text
         }
-        QQC2.TextField {
-            id: textInput
+        RowLayout {
+            id: inputRow
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-            visible: false
+            QQC2.TextField {
+                id: textInput
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: false
+            }
+            PlayGridButton {
+                id: adjectiveNounButton
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+                Layout.minimumWidth: height
+                Layout.maximumWidth: height
+                visible: false
+                icon.name: "randomize"
+                onClicked: {
+                    textInput.text = Zynthbox.AdjectiveNoun.adjectiveNoun();
+                }
+            }
         }
     }
     footer: RowLayout {

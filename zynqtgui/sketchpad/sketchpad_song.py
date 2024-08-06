@@ -262,15 +262,16 @@ class sketchpad_song(QObject):
         sketchpad_file = None
         save_snapshot = None
         soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
+        saved_state_obj = None
+        current_state_obj = self.serialize()
 
         if not self.isTemp and autosave is True:
-            saved_obj = None
             # When trying to do autosave, write autosave only if current differs from saved state
             if (Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json").exists():
                 with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:
-                    saved_obj = json.load(f)
+                    saved_state_obj = json.load(f)
 
-            if saved_obj is not None and not saved_obj == self.serialize():
+            if saved_state_obj is not None and not saved_state_obj == current_state_obj:
                 logging.debug("Writing autosave")
                 # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
                 save_snapshot = False
@@ -303,7 +304,7 @@ class sketchpad_song(QObject):
         try:
             Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
             with open(sketchpad_file, "w") as f:
-                f.write(json.dumps(self.serialize()))
+                f.write(json.dumps(current_state_obj))
                 f.flush()
                 os.fsync(f.fileno())
         except Exception as e:
@@ -416,8 +417,7 @@ class sketchpad_song(QObject):
                 self.isLoadingChanged.emit()
                 return False
         except Exception as e:
-            logging.error(f"Error during sketchpad restoration: {e}")
-            traceback.print_exception(None, e, e.__traceback__)
+            logging.exception(f"Error during sketchpad restoration: {e}")
 
             self.__is_loading__ = False
             self.isLoadingChanged.emit()

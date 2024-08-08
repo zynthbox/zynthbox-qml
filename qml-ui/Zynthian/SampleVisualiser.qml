@@ -57,7 +57,7 @@ Item {
         id: waveformItem
         anchors.fill: parent
         color: Kirigami.Theme.textColor
-        source: _private.sample ? _private.sample.path : ""
+        source: progressDots.cppClipObject ? "clip:/%1".arg(progressDots.cppClipObject.id) : ""
         start: progressDots.cppClipObject != null ? progressDots.cppClipObject.startPositionSeconds : 0
         end: progressDots.cppClipObject != null ? progressDots.cppClipObject.startPositionSeconds + progressDots.cppClipObject.lengthSeconds : 0
         readonly property real relativeStart: waveformItem.start / waveformItem.length

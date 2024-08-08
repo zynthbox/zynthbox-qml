@@ -1178,7 +1178,7 @@ Rectangle {
                                             id: waveformItem
                                             anchors.fill: parent
                                             color: Kirigami.Theme.textColor
-                                            source: waveformContainer.clip ? waveformContainer.clip.path : ""
+                                            source: progressDots.cppClipObject ? "clip:/%1".arg(progressDots.cppClipObject.id) : ""
                                             visible: waveformContainer.clip && !waveformContainer.clip.isEmpty
                                             // Calculate amount of pixels represented by 1 second
                                             property real pixelToSecs: (waveformItem.end - waveformItem.start) / waveformItem.width

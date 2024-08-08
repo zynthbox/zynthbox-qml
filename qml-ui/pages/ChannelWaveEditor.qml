@@ -719,7 +719,7 @@ Zynthian.ScreenPage {
                     Zynthbox.WaveFormItem {
                         anchors.fill: parent
                         color: Kirigami.Theme.textColor
-                        source: partDelegate.clip ? partDelegate.clip.path : ""
+                        source: partDelegate.cppClipObject ? "clip:/%1".arg(partDelegate.cppClipObject.id) : ""
                         start: partDelegate.cppClipObject ? partDelegate.cppClipObject.startPositionSeconds : 0
                         end: partDelegate.cppClipObject ? partDelegate.cppClipObject.startPositionSeconds + partDelegate.cppClipObject.lengthSeconds : 0
 

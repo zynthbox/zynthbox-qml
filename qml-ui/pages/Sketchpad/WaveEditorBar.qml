@@ -279,7 +279,7 @@ GridLayout {
             id: waveFormThrottle
             interval: 1; running: false; repeat: false;
             onTriggered: {
-                wav.source = waveBar.controlObj && waveBar.controlObj.path != null ? waveBar.controlObj.path : ""
+                wav.source = waveBar.cppClipObject ? "clip:/%1".arg(waveBar.cppClipObject.id) : ""
                 if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
                 } else {

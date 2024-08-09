@@ -9,6 +9,7 @@ import Qt.labs.folderlistmodel 2.15
 import Helpers 1.0 as Helpers
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 /**
   * EXAMPLE :
@@ -26,8 +27,8 @@ import Zynthian 1.0 as Zynthian
   *          folder: '/zynthian/zynthian-my-data/sketchpads'
   *          nameFilters: ["*.wav"]
   *      }
-  *      onFileSelected: {
-  *          console.log(filePath)
+  *      onAccepted: {
+  *          console.log(selectedFile.filePath)
   *      }
   * }
   */
@@ -90,7 +91,7 @@ Zynthian.Dialog {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                root.close();
+                root.reject();
                 result = true;
                 break;
             case "KNOB0_UP":
@@ -378,6 +379,23 @@ Zynthian.Dialog {
                         root.fileSelected(root.selectedFile);
                     }
                 }
+                PlayGridButton {
+                    id: adjectiveNounButton
+                    Layout.fillHeight: true
+                    Layout.fillWidth: false
+                    Layout.minimumWidth: height
+                    Layout.maximumWidth: height
+                    icon.name: "roll"
+                    flat: true
+                    onClicked: {
+                        let suffixStart = namedFile.text.indexOf(".");
+                        let fileSuffix = "";
+                        if (suffixStart > -1) {
+                            fileSuffix = namedFile.text.substring(suffixStart);
+                        }
+                        namedFile.text = Zynthbox.AdjectiveNoun.formatted("%1-%2") + fileSuffix;
+                    }
+                }
             }
             QQC2.Label {
                 id: conflictLabel
@@ -399,7 +417,7 @@ Zynthian.Dialog {
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: qsTr("Cancel")
-                    onClicked: root.close();
+                    onClicked: root.reject();
                 }
                 QQC2.Button {
                     Layout.fillWidth: true

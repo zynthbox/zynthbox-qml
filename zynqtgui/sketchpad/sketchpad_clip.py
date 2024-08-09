@@ -123,6 +123,7 @@ class sketchpad_clip_metadata(QObject):
         self.clip = clip
         self.__audioMetadata = None
         self.__isReading = False
+        self.__isWriting = False
         self.writeTimer = QTimer(self)
         self.writeTimer.setInterval(1000)
         self.writeTimer.setSingleShot(True)
@@ -430,7 +431,7 @@ class sketchpad_clip_metadata(QObject):
         self.write(writeSoundMetadata=True)
 
     def write(self, writeSoundMetadata=False):
-        if self.__isReading == False and self.clip.__song__.isLoading == False:
+        if self.__isReading == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
             if not self.clip.isEmpty:
                 tags = {}
                 if writeSoundMetadata:
@@ -526,10 +527,13 @@ class sketchpad_clip_metadata(QObject):
                             file.save()
                     except Exception as e:
                         logging.error(f"Error creating new file and writing metadata : {str(e)}")
+            self.__isWriting = False
 
     def scheduleWrite(self):
-        if self.__isReading == False and self.clip.__song__.isLoading == False:
+        if self.__isReading == False and self.__isWriting == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
+            self.__isWriting = True
             self.writeTimer.start()
+            self.clip.__song__.schedule_save()
 
     def clear(self):
         # Channel settings for the clip (stored in metadata when bouncing, but not settable from the UI)

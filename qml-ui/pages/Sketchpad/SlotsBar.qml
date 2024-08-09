@@ -731,10 +731,10 @@ Rectangle {
             samplePickerDialog.clipToSave = root.selectedSlotRowItem.channel.samples[slot];
             samplePickerDialog.saveMode = (pickWhat === "save-location");
             if (pickWhat === "sample" || pickWhat === "save-location") {
-                samplePickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/samples/my-samples";
+                samplePickerDialog.folderModel.folder = samplePickerDialog.saveMode ? "/zynthian/zynthian-my-data/samples/my-samples" : "/zynthian/zynthian-my-data/samples";
                 samplePickerDialog.folderModel.nameFilters = ["*.wav"];
             } else if (pickWhat === "sketch") {
-                samplePickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/sketches";
+                samplePickerDialog.folderModel.folder = samplePickerDialog.saveMode ? "/zynthian/zynthian-my-data/sketches/my-sketches" :  "/zynthian/zynthian-my-data/sketches";
                 samplePickerDialog.folderModel.nameFilters = ["*.sketch.wav"];
             } else if (pickWhat === "recording") {
                 samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir;
@@ -759,9 +759,9 @@ Rectangle {
         onAccepted: {
             if (samplePickerDialog.saveMode === true) {
                 let copyTo = samplePickerDialog.selectedFile.filePath;
-                let originalSuffix = clipToSave.path.split(".").slice(-1).toString().toLowerCase();
+                let originalSuffix = clipToSave.path.split(".").slice(-1).join(".").toLowerCase();
                 console.log("Testing", copyTo, "has the suffix", originalSuffix);
-                if (copyTo.split(".").slice(-1).toString().toLowerCase() != originalSuffix) {
+                if (copyTo.split(".").slice(-1).join(".").toLowerCase() != originalSuffix) {
                     console.log("It does not, append it");
                     copyTo = copyTo + "." + originalSuffix;
                 }
@@ -785,11 +785,11 @@ Rectangle {
             loopPickerDialog.theClip = clip;
             loopPickerDialog.saveMode = (pickWhat === "save-location");
             if (pickWhat === "sketch" || pickWhat === "save-location") {
-                loopPickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/sketches";
+                loopPickerDialog.folderModel.folder = loopPickerDialog.saveMode ? "/zynthian/zynthian-my-data/sketches/my-sketches" :  "/zynthian/zynthian-my-data/sketches";
                 loopPickerDialog.folderModel.nameFilters = ["*.sketch.wav"];
                 loopPickerDialog.thingToPick = qsTr("Sketch");
             } else if (pickWhat === "sample") {
-                loopPickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/samples";
+                loopPickerDialog.folderModel.folder = loopPickerDialog.saveMode ? "/zynthian/zynthian-my-data/samples/my-samples" : "/zynthian/zynthian-my-data/samples";
                 loopPickerDialog.folderModel.nameFilters = ["*.wav"];
                 loopPickerDialog.thingToPick = qsTr("Sample");
             } else if (pickWhat === "recording") {
@@ -814,12 +814,12 @@ Rectangle {
         folderModel {
             nameFilters: ["*.sketch.wav"]
         }
-        onFileSelected: {
+        onAccepted: {
             if (loopPickerDialog.saveMode === true) {
                 let copyTo = loopPickerDialog.selectedFile.filePath;
-                let originalSuffix = loopPickerDialog.theClip.path.split(".").slice(-2).toString().toLowerCase();
+                let originalSuffix = loopPickerDialog.theClip.path.split(".").slice(-2).join(".").toLowerCase();
                 console.log("Testing", copyTo, "has the suffix", originalSuffix);
-                if (copyTo.split(".").slice(-2).toString().toLowerCase() != originalSuffix) {
+                if (copyTo.split(".").slice(-2).join(".").toLowerCase() != originalSuffix) {
                     console.log("It does not, append it");
                     copyTo = copyTo + "." + originalSuffix;
                 }
@@ -829,7 +829,7 @@ Rectangle {
                     console.log("Failed to copy the clip with path name", loopPickerDialog.theClip.path, "to", copyTo)
                 }
             } else {
-                loopPickerDialog.theClip.path = file.filePath;
+                loopPickerDialog.theClip.path = loopPickerDialog.selectedFile.filePath;
                 loopPickerDialog.theClip.enabled = true;
             }
         }
@@ -860,8 +860,8 @@ Rectangle {
     //     folderModel {
     //         nameFilters: ["sample-bank.json"]
     //     }
-    //     onFileSelected: {
-    //         root.selectedSlotRowItem.channel.setBank(file.filePath)
+    //     onAccepted: {
+    //         root.selectedSlotRowItem.channel.setBank(bankPickerDialog.selectedFile.filePath)
     //     }
     // }
 

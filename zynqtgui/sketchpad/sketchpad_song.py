@@ -81,6 +81,7 @@ class sketchpad_song(QObject):
         self.sketchpad_folder = sketchpad_folder
 
         self.__is_loading__ = True
+        self.__is_saving__ = False
         self.isLoadingChanged.emit()
         self.__channels_model__ = sketchpad_channels_model(self)
         self.__parts_model__ = sketchpad_parts_model(self)
@@ -256,71 +257,75 @@ class sketchpad_song(QObject):
         }
 
     def save(self, autosave=True):
-        if self.__to_be_deleted__:
-            return
-
-        sketchpad_file = None
-        save_snapshot = None
-        soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
-        saved_state_obj = None
-        current_state_obj = self.serialize()
-
-        if not self.isTemp and autosave is True:
-            # When trying to do autosave, write autosave only if current differs from saved state
-            if (Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json").exists():
-                with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:
-                    saved_state_obj = json.load(f)
-
-            if saved_state_obj is not None and not saved_state_obj == current_state_obj:
-                logging.debug("Writing autosave")
-                # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
-                save_snapshot = False
-                # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
-                # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
-                sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
-                # Since this is an autosave, sketchpad has unsaved changes
-                self.hasUnsavedChanges = True
-            else:
-                # Saved sketchpad json is the same as current. Do not write autosave
-                logging.debug("Not writing autosave")
+        if self.__is_saving__ == False:
+            if self.__to_be_deleted__:
                 return
-        else:
-            if self.isTemp:
-                # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
-                save_snapshot = False
-                # temp sketchpad should always have hasUnsavedChanges set to True
-                self.hasUnsavedChanges = True
+            self.set_isSaving(True)
+
+            sketchpad_file = None
+            save_snapshot = None
+            soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
+            saved_state_obj = None
+            current_state_obj = self.serialize()
+
+            if not self.isTemp and autosave is True:
+                # When trying to do autosave, write autosave only if current differs from saved state
+                if (Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json").exists():
+                    with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:
+                        saved_state_obj = json.load(f)
+
+                if saved_state_obj is not None and not saved_state_obj == current_state_obj:
+                    logging.debug("Writing autosave")
+                    # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                    save_snapshot = False
+                    # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
+                    # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
+                    sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
+                    # Since this is an autosave, sketchpad has unsaved changes
+                    self.hasUnsavedChanges = True
+                else:
+                    # Saved sketchpad json is the same as current. Do not write autosave
+                    logging.debug("Not writing autosave")
+                    self.set_isSaving(False)
+                    return
             else:
-                # For non temp sketchpads, do save snapshot
-                save_snapshot = True
-                # For non temp sketchpads, saving sketchpad deletes the autosave and hence mark hasUnsavedChanges to False
-                self.hasUnsavedChanges = False
-            # Since this is not an autosave, set sketchpad file name to fullname
-            sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
-            logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
-            # Also delete the cache file as we are performing a sketchpad save initiated by user
-            Path(self.sketchpad_folder + ".autosave.sketchpad.json").unlink(missing_ok=True)
+                if self.isTemp:
+                    # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                    save_snapshot = False
+                    # temp sketchpad should always have hasUnsavedChanges set to True
+                    self.hasUnsavedChanges = True
+                else:
+                    # For non temp sketchpads, do save snapshot
+                    save_snapshot = True
+                    # For non temp sketchpads, saving sketchpad deletes the autosave and hence mark hasUnsavedChanges to False
+                    self.hasUnsavedChanges = False
+                # Since this is not an autosave, set sketchpad file name to fullname
+                sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
+                logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
+                # Also delete the cache file as we are performing a sketchpad save initiated by user
+                Path(self.sketchpad_folder + ".autosave.sketchpad.json").unlink(missing_ok=True)
 
-        try:
-            Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
-            with open(sketchpad_file, "w") as f:
-                f.write(json.dumps(current_state_obj))
-                f.flush()
-                os.fsync(f.fileno())
-        except Exception as e:
-            logging.exception(f"Error writing sketchpad json to {str(sketchpad_file)} : {e}")
-
-        if save_snapshot:
-            snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
             try:
-                soundsets_dir.mkdir(parents=True, exist_ok=True)
-                self.zynqtgui.layer.save_snapshot(snapshot_file)
+                Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
+                with open(sketchpad_file, "w") as f:
+                    f.write(json.dumps(current_state_obj))
+                    f.flush()
+                    os.fsync(f.fileno())
             except Exception as e:
-                logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
+                logging.exception(f"Error writing sketchpad json to {str(sketchpad_file)} : {e}")
+
+            if save_snapshot:
+                snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
+                try:
+                    soundsets_dir.mkdir(parents=True, exist_ok=True)
+                    self.zynqtgui.layer.save_snapshot(snapshot_file)
+                except Exception as e:
+                    logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
+            self.set_isSaving(False)
 
     @Slot(None)
     def schedule_save(self):
-        if self.__is_loading__ == False:
+        if self.__is_loading__ == False and self.__is_saving__ == False:
             QMetaObject.invokeMethod(self.__save_timer__, "start", Qt.QueuedConnection)
 
     def restore(self, load_autosave):
@@ -707,6 +712,20 @@ class sketchpad_song(QObject):
 
     isLoading = Property(bool, get_isLoading, notify=isLoadingChanged)
     ### END Property isLoading
+
+    ### BEGIN Property isSaving
+    def get_isSaving(self):
+        return self.__is_saving__
+
+    def set_isSaving(self, newIsSaving):
+        if self.__is_saving__ != newIsSaving:
+            self.__is_saving__ = newIsSaving
+            self.isSavingChanged.emit()
+
+    isSavingChanged = Signal()
+
+    isSaving = Property(bool, get_isSaving, notify=isSavingChanged)
+    ### END Property isSaving
 
     ### BEGIN Property hasUnsavedChanges
     def get_hasUnsavedChanges(self):

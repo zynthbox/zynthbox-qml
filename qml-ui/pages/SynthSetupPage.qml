@@ -964,12 +964,12 @@ Zynthian.ScreenPage {
 //                onClicked: saveDialog.filesListView.selectItem(model)
 //            }
 
-//            onFileSelected: {
-//                console.log(file.filePath);
+//            onAccepted: {
+//                console.log(saveDialog.selectedFile.filePath);
 //                if (mode === "soundset") {
-//                    zynqtgui.layer.save_soundset_to_file(file.filePath);
+//                    zynqtgui.layer.save_soundset_to_file(saveDialog.selectedFile.filePath);
 //                } else { //Sound
-//                    zynqtgui.layer.save_curlayer_to_file(file.filePath);
+//                    zynqtgui.layer.save_curlayer_to_file(saveDialog.selectedFile.filePath);
 //                }
 //            }
 
@@ -1042,20 +1042,20 @@ Zynthian.ScreenPage {
 //                }
 //                onClicked: pickerDialog.filesListView.selectItem(model)
 //            }
-//            onFileSelected: {
-//                console.log(file.filePath);
+//            onAccepted: {
+//                console.log(pickerDialog.selectedFile.filePath);
 //                if (pickerDialog.mode === "soundset") {
-//                    zynqtgui.layer.load_soundset_from_file(file.filePath)
+//                    zynqtgui.layer.load_soundset_from_file(pickerDialog.selectedFile.filePath)
 //                } else {
-//                    //zynqtgui.layer.load_layer_from_file(file.filePath)
-//                    layerReplaceDialog.sourceChannels = zynqtgui.layer.load_layer_channels_from_file(file.filePath);
+//                    //zynqtgui.layer.load_layer_from_file(pickerDialog.selectedFile.filePath)
+//                    layerReplaceDialog.sourceChannels = zynqtgui.layer.load_layer_channels_from_file(pickerDialog.selectedFile.filePath);
 //                    if (layerReplaceDialog.sourceChannels.length > 1) {
-//                        layerReplaceDialog.fileToLoad = file.filePath;
+//                        layerReplaceDialog.fileToLoad = pickerDialog.selectedFile.filePath;
 //                        layerReplaceDialog.open();
 //                    } else {
 //                        let map = {}
 //                        map[layerReplaceDialog.sourceChannels[0].toString()] = zynqtgui.fixed_layers.index_to_midi(zynqtgui.fixed_layers.current_index);
-//                        zynqtgui.layer.load_layer_from_file(file.filePath, map);
+//                        zynqtgui.layer.load_layer_from_file(pickerDialog.selectedFile.filePath, map);
 //                    }
 //                }
 //                zynqtgui.bank.show_top_sounds = false;

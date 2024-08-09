@@ -274,8 +274,8 @@ Item {
                 }
             }
         }
-        onFileSelected: {
-            mostRecentlyPicked = file.filePath;
+        onAccepted: {
+            mostRecentlyPicked = sequenceFilePicker.selectedFile.filePath;
         }
     }
 

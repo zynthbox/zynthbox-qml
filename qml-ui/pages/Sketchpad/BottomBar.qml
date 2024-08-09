@@ -448,8 +448,8 @@ Rectangle {
         folderModel {
             nameFilters: ["*.wav"]
         }
-        onFileSelected: {
-            zynqtgui.bottomBarControlObj.path = file.filePath
+        onAccepted: {
+            zynqtgui.bottomBarControlObj.path = pickerDialog.selectedFile.filePath
         }
     }
 }

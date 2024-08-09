@@ -872,9 +872,9 @@ Zynthian.ScreenPage {
         folderInfoStrings: {
             "file:///zynthian/zynthian-my-data/sketchpads/community-sketchpads": qsTr("When you open a Community Sketchpad, it gets copied over to my-sketchpads under the same name (or with a numbered suffix if you already have something there - we'll not overwrite other sketchpads)")
         }
-        onFileSelected: {
-            console.log("Selected Sketchpad : " + file.fileName + "("+ file.filePath +")")
-            zynqtgui.sketchpad.loadSketchpad(file.filePath, false)
+        onAccepted: {
+            console.log("Selected Sketchpad : " + sketchpadPickerDialog.selectedFile.fileName + "("+ sketchpadPickerDialog.selectedFile.filePath +")")
+            zynqtgui.sketchpad.loadSketchpad(sketchpadPickerDialog.selectedFile.filePath, false)
         }
     }
 

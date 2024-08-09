@@ -160,8 +160,8 @@ Zynthian.Card {
         folderModel {
             nameFilters: ["*.wav"]
         }
-        onFileSelected: {
-            controlObj.set_sample(file.filePath, controlObj.selectedSlotRow)
+        onAccepted: {
+            controlObj.set_sample(samplePickerDialog.selectedFile.filePath, controlObj.selectedSlotRow)
         }
     }
 } 

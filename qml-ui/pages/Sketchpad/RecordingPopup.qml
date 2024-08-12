@@ -259,6 +259,30 @@ Zynthian.Popup {
                         _private.selectedPattern.stepLength = _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.stepLength, -1);
                     }
                 }
+                function patternQuantizingAmountUp() {
+                    if (_private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount < 1536) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            _private.selectedPattern.liveRecordingQuantizingAmount = _private.selectedPattern.liveRecordingQuantizingAmount + 1;
+                        } else {
+                            _private.selectedPattern.liveRecordingQuantizingAmount = _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.liveRecordingQuantizingAmount, 1);
+                        }
+                    }
+                }
+                function patternQuantizingAmountDown() {
+                    if (_private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount > 0) {
+                        if (zynqtgui.modeButtonPressed) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            _private.selectedPattern.liveRecordingQuantizingAmount = _private.selectedPattern.liveRecordingQuantizingAmount -0;
+                        } else {
+                            if (_private.selectedPattern.liveRecordingQuantizingAmount === 1) {
+                                _private.selectedPattern.liveRecordingQuantizingAmount = 0;
+                            } else {
+                                _private.selectedPattern.liveRecordingQuantizingAmount = _private.selectedPattern.nextStepLengthStep(_private.selectedPattern.liveRecordingQuantizingAmount, -1);
+                            }
+                        }
+                    }
+                }
                 function patternLengthUp() {
                     if (_private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)) {
                         if (zynqtgui.modeButtonPressed) {
@@ -780,9 +804,68 @@ Zynthian.Popup {
                                 Layout.preferredHeight: _private.preferredRowHeight
                                 RowLayout {
                                     Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                        text:"-"
+                                        enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount > 0
+                                        onClicked: {
+                                            _private.patternQuantizingAmountDown();
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignHCenter
+                                        Layout.preferredHeight: noteLengthLabel.height
                                         Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: _private.selectedPattern
+                                            ? _private.selectedPattern.liveRecordingQuantizingAmount === 0
+                                                ? qsTr("Quantize To Step")
+                                                : qsTr("Quantize To: %1").arg(_private.selectedPattern.stepLengthName(_private.selectedPattern.liveRecordingQuantizingAmount))
+                                            : ""
+                                        MultiPointTouchArea {
+                                            anchors.fill: parent
+                                            touchPoints: [
+                                                TouchPoint {
+                                                    id: patternQuantizingAmountSlidePoint;
+                                                    property double increment: 1
+                                                    property double slideIncrement: 0.1
+                                                    property double upperBound: 1536
+                                                    property double lowerBound: 0
+                                                    property var currentValue: undefined
+                                                    onPressedChanged: {
+                                                        if (pressed) {
+                                                            currentValue = _private.selectedPattern.liveRecordingQuantizingAmount;
+                                                        }
+                                                    }
+                                                    onYChanged: {
+                                                        if (pressed && currentValue !== undefined) {
+                                                            var delta = (patternQuantizingAmountSlidePoint.x - patternQuantizingAmountSlidePoint.startX) * patternQuantizingAmountSlidePoint.slideIncrement;
+                                                            _private.selectedPattern.liveRecordingQuantizingAmount = Math.min(Math.max(currentValue + delta, patternQuantizingAmountSlidePoint.lowerBound), patternQuantizingAmountSlidePoint.upperBound);
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                    Zynthian.PlayGridButton {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                                        text: "+"
+                                        enabled: _private.selectedPattern && _private.selectedPattern.liveRecordingQuantizingAmount < 1536
+                                        onClicked: {
+                                            _private.patternQuantizingAmountUp();
+                                        }
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                                    Zynthian.PlayGridButton {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         text:"-"
                                         enabled: _private.selectedPattern && _private.selectedPattern.patternLength > _private.selectedPattern.width
                                         onClicked: {
@@ -827,7 +910,7 @@ Zynthian.Popup {
                                     }
                                     Zynthian.PlayGridButton {
                                         Layout.fillWidth: true
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
                                         text: "+"
                                         enabled: _private.selectedPattern && _private.selectedPattern.patternLength < (_private.selectedPattern.bankLength * _private.selectedPattern.width)
                                         onClicked: {

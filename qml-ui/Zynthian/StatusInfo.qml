@@ -262,9 +262,16 @@ MouseArea {
             font.pointSize: 9
         }
         QQC2.Label {
+            visible: Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length > 0
+            text: visible
+                ? Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalControllerPassthroughActiveNotes.length - 1) : "")
+                : ""
+            font.pointSize: 9
+        }
+        QQC2.Label {
             visible: Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 0
             text: visible
-                ? Zynthbox.PlayGridManager.internalPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
+                ? "<font size=\"1\">S:</font>" + Zynthbox.PlayGridManager.internalPassthroughActiveNotes[0] + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (Zynthbox.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
                 : ""
             font.pointSize: 9
         }

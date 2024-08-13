@@ -552,34 +552,12 @@ Zynthian.BasePlayGrid {
             _private.positionalVelocity = value;
         }
     }
-    Timer {
-        id: wasStoppedRecentlyTimer
-        property bool wasStoppedRecently: false
-        interval: 100; running: false; repeat: false;
-        onTriggered: {
-            wasStoppedRecently = false;
-        }
-    }
-    Connections {
-        target: Zynthbox.SyncTimer
-        onTimerRunningChanged: {
-            if (Zynthbox.SyncTimer.timerRunning === false) {
-                wasStoppedRecentlyTimer.wasStoppedRecently = true;
-                wasStoppedRecentlyTimer.restart();
-            }
-        }
-    }
     Connections {
         target: Zynthbox.MidiRouter
         enabled: component.isVisible
         onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
-            let listenToPort = Zynthbox.MidiRouter.PassthroughPort;
-            if (Zynthbox.SyncTimer.timerRunning || component.listeningStartedDuringPlayback || wasStoppedRecentlyTimer.wasStoppedRecently) {
-                // Internal stuff is handled by the DrumsGrid, so limit to external only during playback (and immediately after it)
-                listenToPort = Zynthbox.MidiRouter.HardwareInPassthroughPort;
-            }
             // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.sketchpadTrack, "listening on port", listenToPort);
-            if (port == listenToPort && sketchpadTrack === _private.activePatternModel.sketchpadTrack && size === 3) {
+            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === _private.activePatternModel.sketchpadTrack && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = true;
                     // By convention, an "off" note can be either a midi off message, or an off message with a velocity of 0
@@ -593,9 +571,6 @@ Zynthian.BasePlayGrid {
                             // Clear the current state, in case there's something there (otherwise things look a little weird)
                             component.heardNotes = [];
                             component.heardVelocities = [];
-                            if (Zynthbox.SyncTimer.timerRunning) {
-                                component.listeningStartedDuringPlayback = true;
-                            }
                         }
                         // Count up one tick for a note on message
                         component.noteListeningActivations = component.noteListeningActivations + 1;
@@ -622,7 +597,6 @@ Zynthian.BasePlayGrid {
                         component.noteListeningActivations = 0;
                         component.noteListeningNotes = [];
                         component.noteListeningVelocities = [];
-                        component.listeningStartedDuringPlayback = false;
                     }
                     if (component.noteListeningActivations === 0) {
                         // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
@@ -630,19 +604,16 @@ Zynthian.BasePlayGrid {
                         component.heardVelocities = component.noteListeningVelocities;
                         component.noteListeningNotes = [];
                         component.noteListeningVelocities = [];
-                        component.listeningStartedDuringPlayback = false;
                     }
                 } else if (175 < byte1 && byte1 < 192 && byte2 === 123) {
                     // console.log("Registering all-off, resetting to empty, bytes are", byte1, byte2, byte3);
                     component.noteListeningActivations = 0;
                     component.noteListeningNotes = [];
                     component.noteListeningVelocities = [];
-                    component.listeningStartedDuringPlayback = false;
                 }
             }
         }
     }
-    property bool listeningStartedDuringPlayback: false;
     property int noteListeningActivations: 0
     property var noteListeningNotes: []
     property var noteListeningVelocities: []

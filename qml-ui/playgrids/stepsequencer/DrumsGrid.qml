@@ -41,36 +41,6 @@ ColumnLayout {
     property Item playgrid
     signal removeNote(QtObject note)
     signal notePressAndHold(QtObject note)
-
-    property bool noteListeningStartedDuringPlayback: false
-    property int noteListeningActivations: 0
-    property var noteListeningNotes: []
-    property var noteListeningVelocities: []
-    function updateNoteListeningActivations() {
-        updateNoteListeningActivationsTimer.restart();
-    }
-    Timer {
-        id: updateNoteListeningActivationsTimer
-        interval: 1; running: false; repeat: false;
-        onTriggered: {
-            if (component.noteListeningStartedDuringPlayback) {
-                component.playgrid.heardNotes = component.noteListeningNotes;
-                component.playgrid.heardVelocities = component.noteListeningVelocities;
-                if (component.noteListeningActivations === 0) {
-                    // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                    component.noteListeningStartedDuringPlayback = false;
-                } else if (component.noteListeningActivations < 0) {
-                    console.debug("stepsequencer drumsgrid: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
-                    component.noteListeningActivations = 0;
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                    component.noteListeningStartedDuringPlayback = false;
-                }
-            }
-        }
-    }
     Repeater {
         model: visible ? component.model : null
         delegate: RowLayout {
@@ -92,33 +62,6 @@ ColumnLayout {
                     backgroundColor: component.showChosenPads && weAreChosen ? noteColor : Kirigami.Theme.textColor
                     playingBackgroundColor: component.showChosenPads && weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false
-                    onNoteOn: {
-                        if (Zynthbox.SyncTimer.timerRunning || component.noteListeningStartedDuringPlayback) {
-                            component.noteListeningStartedDuringPlayback = true;
-                            if (component.noteListeningActivations === 0) {
-                                // Clear the current state, in case there's something there (otherwise things look a little weird)
-                                component.playgrid.heardNotes = [];
-                                component.playgrid.heardVelocities = [];
-                            }
-                            // Count up one tick for a note on message
-                            component.noteListeningActivations = component.noteListeningActivations + 1;
-                            var existingIndex = component.noteListeningNotes.indexOf(note);
-                            if (existingIndex > -1) {
-                                component.noteListeningNotes.splice(existingIndex, 1);
-                                component.noteListeningVelocities.splice(existingIndex, 1);
-                            }
-                            component.noteListeningNotes.push(note);
-                            component.noteListeningVelocities.push(velocity);
-                            component.updateNoteListeningActivations();
-                        }
-                    }
-                    onNoteOff: {
-                        if (component.noteListeningStartedDuringPlayback) {
-                            // Count down one for a note off message
-                            component.noteListeningActivations = component.noteListeningActivations - 1;
-                            component.updateNoteListeningActivations();
-                        }
-                    }
                     onNotePlayed: {
                         if (zynqtgui.backButtonPressed) {
                             component.removeNote(note);

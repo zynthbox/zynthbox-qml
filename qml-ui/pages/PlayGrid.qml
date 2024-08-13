@@ -639,7 +639,7 @@ don't want to have to dig too far...
             applicationWindow().showPassiveNotification("Device removed: " + humanReadableName);
         }
         onMidiMessage: {
-            if (port == 2 && 191 < byte1 && byte1 < 208) {
+            if (port == Zynthbox.MidiRouter.HardwareInPassthroughPort && 191 < byte1 && byte1 < 208) {
                 let midiChannel = byte1 - 192;
                 let delta = byte2 - 64;
                 if (delta > 0) {

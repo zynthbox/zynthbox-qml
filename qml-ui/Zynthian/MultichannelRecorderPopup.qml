@@ -153,8 +153,7 @@ Zynthian.Dialog {
             function startRecording() {
                 _private.recordingProgress = 0;
                 // Set the filenames for each channel (never mind whether they're being recorded or not, it doesn't hurt)
-                var date = new Date();
-                var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
+                var baseRecordingLocation = _private.song.sketchpadFolder + "exports/exported-" + Zynthbox.Plugin.currentTimestamp();
                 Zynthbox.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-" + song.name);
                 for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                     var channel = _private.song.channelsModel.getChannel(channelIndex);

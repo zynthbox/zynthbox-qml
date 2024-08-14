@@ -29,6 +29,7 @@ import threading
 from time import sleep
 from datetime import datetime
 from subprocess import check_output, Popen, PIPE, STDOUT
+import Zynthbox
 
 # Zynthian specific modules
 from . import zynthian_gui_selector, zynthian_gui_config
@@ -168,7 +169,7 @@ class zynthian_gui_main(zynthian_gui_selector):
     def start_recording_alsa(self):
         if (self.__is_recording__ == False):
             Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
+            timestamp = Zynthbox.Plugin.instance().currentTimestamp();
             self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.sketch.wav"
 
             audioDeviceName = self.zynqtgui.audio_settings.zynthian_mixer.zynapi_get_device_name()
@@ -181,7 +182,7 @@ class zynthian_gui_main(zynthian_gui_selector):
     def start_recording(self):
         if (self.__is_recording__ == False):
             Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
+            timestamp = Zynthbox.Plugin.instance().currentTimestamp();
             self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.sketch.wav"
 
             self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.__recording_file__))

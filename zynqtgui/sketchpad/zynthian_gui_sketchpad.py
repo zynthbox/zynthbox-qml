@@ -848,7 +848,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             preset_name = "samples"
         count = 0
         base_recording_dir = f"{self.__song__.sketchpad_folder}wav"
-        base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
+        base_filename = f"{Zynthbox.Plugin.instance().currentTimestamp()}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
         # Check if file exists otherwise append count
         while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.sketch.wav").exists():
             count += 1
@@ -893,7 +893,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         else:
             base_recording_dir = f"{clip.recording_basepath}/wav"
 
-        base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
+        base_filename = f"{Zynthbox.Plugin.instance().currentTimestamp()}_{preset_name}_{Zynthbox.SyncTimer.instance().getBpm()}-BPM"
 
         # Check if file exists otherwise append count
 

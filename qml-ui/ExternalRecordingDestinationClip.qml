@@ -43,8 +43,7 @@ ColumnLayout {
         isRecording = true;
         component.recordingSample = component.selectedSample;
         var baseFolder = zynqtgui.sketchpad.song.channelsModel.getChannel(channelsList.currentIndex).bankDir;
-        var date = new Date();
-        var recordingTimestamp = date.toLocaleString(Qt.locale(), "yyyyMMdd-HHmm");
+        var recordingTimestamp = Zynthbox.Plugin.currentTimestamp();
         var fileNameFriendlyModuleName = zynqtgui.main.currentModuleName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         component.recordingFilename = baseFolder + "/" + recordingTimestamp + "_" + fileNameFriendlyModuleName + "_" + Zynthbox.SyncTimer.bpm + "-BPM.sketch.wav";
         Zynthbox.AudioLevels.clearRecordPorts();

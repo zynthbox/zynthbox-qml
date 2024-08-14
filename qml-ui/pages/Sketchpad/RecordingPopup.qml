@@ -1073,7 +1073,7 @@ Zynthian.Popup {
                         onClicked: {
                             switch(recordingTypeSettingsStack.currentIndex) {
                                 case 0: // Audio Recording
-                                    confirmClearClipDialog.open()
+                                    applicationWindow().confirmClearClip(_private.selectedClip);
                                     break;
                                 case 1: // MIDI Recording
                                     if (_private.selectedPattern.hasNotes) {
@@ -1126,16 +1126,6 @@ Zynthian.Popup {
             onClicked: {
                 root.close()
             }
-        }
-    }
-    Zynthian.DialogQuestion {
-        id: confirmClearClipDialog
-        parent: applicationWindow()
-        text: _private.selectedClip != null ? qsTr("Are you sure you want to clear %1 from clip %2").arg(_private.selectedClip.path.split("/").pop()).arg(_private.selectedClip.name) : ""
-        acceptText: qsTr("Clear Clip")
-        rejectText: qsTr("Don't Clear")
-        onAccepted: {
-            _private.selectedClip.clear()
         }
     }
 }

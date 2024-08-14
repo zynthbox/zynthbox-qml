@@ -1203,6 +1203,25 @@ Kirigami.AbstractApplicationWindow {
             confirmClearPatternDialog.pattern.clear();
         }
     }
+    function confirmClearClip(clipToClear) {
+        confirmClearClipDialog.clipToClear = clipToClear;
+        confirmClearClipDialog.open();
+    }
+    Zynthian.DialogQuestion {
+        id: confirmClearClipDialog
+        property QtObject clipToClear: null
+        text: confirmClearClipDialog.clipToClear != null ? qsTr("Are you sure you want to clear %1 from clip %2").arg(confirmClearClipDialog.clipToClear.path.split("/").pop()).arg(confirmClearClipDialog.clipToClear.name) : ""
+        acceptText: qsTr("Clear Clip")
+        rejectText: qsTr("Don't Clear")
+        onOpenedChanged: {
+            if (opened === false) {
+                confirmClearClipDialog.clipToClear = null;
+            }
+        }
+        onAccepted: {
+            confirmClearClipDialog.clipToClear.clear();
+        }
+    }
 
     Zynthian.Drawer {
         id: miniPlayGridDrawer

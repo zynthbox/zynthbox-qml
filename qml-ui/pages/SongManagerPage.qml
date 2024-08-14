@@ -376,11 +376,11 @@ Zynthian.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     Repeater {
                         id: segmentsRepeater
-                        property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                        property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.SyncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
                         model: component.isVisible && totalDuration > 0 ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel : 0
                         delegate: Item {
                             property QtObject segment: model.segment
-                            property int duration: Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segment.barLength * 4 + segment.beatLength)
+                            property int duration: Zynthbox.SyncTimer.getMultiplier() * (segment.barLength * 4 + segment.beatLength)
                             Layout.fillWidth: true
                             Layout.preferredWidth: component.width * (duration / segmentsRepeater.totalDuration)
                             Layout.preferredHeight: Kirigami.Units.gridUnit / 2
@@ -627,12 +627,12 @@ Zynthian.ScreenPage {
                         ", durationInBeats",
                         (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength),
                         ", durationInTicks",
-                        Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
+                        Zynthbox.SyncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
                     )
 
                     Zynthbox.SegmentHandler.startPlayback(
-                        Zynthbox.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
-                        Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
+                        Zynthbox.SyncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
+                        Zynthbox.SyncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
                     )
                 }
             }
@@ -649,7 +649,7 @@ Zynthian.ScreenPage {
                     )
 
                     Zynthbox.SegmentHandler.startPlayback(
-                        Zynthbox.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
+                        Zynthbox.SyncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
                         0
                     )
                 }

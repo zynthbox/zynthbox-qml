@@ -143,10 +143,10 @@ Zynthian.Dialog {
             property bool songMode: zynqtgui.current_screen_id === "song_manager"
 
             property int songDurationInTicks: song && _private.songMode
-                ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
-                : Zynthbox.PlayGridManager.syncTimer.getMultiplier() * songDurationSpin.value
-            property int leadinDurationInTicks: leadinSpin.value * Zynthbox.PlayGridManager.syncTimer.getMultiplier()
-            property int fadeoutDurationInTicks: fadeoutSpin.value * Zynthbox.PlayGridManager.syncTimer.getMultiplier()
+                ? Zynthbox.SyncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
+                : Zynthbox.SyncTimer.getMultiplier() * songDurationSpin.value
+            property int leadinDurationInTicks: leadinSpin.value * Zynthbox.SyncTimer.getMultiplier()
+            property int fadeoutDurationInTicks: fadeoutSpin.value * Zynthbox.SyncTimer.getMultiplier()
 
             property bool isRecording: false
             property int cumulativeBeats
@@ -273,7 +273,7 @@ Zynthian.Dialog {
         Timer {
             id: recordingPlaybackStarter
             repeat: false; running: false;
-            interval: Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, _private.leadinDurationInTicks) * 1000
+            interval: Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, _private.leadinDurationInTicks) * 1000
             onTriggered: {
                 console.log("Starting playback after", interval);
                 Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -282,7 +282,7 @@ Zynthian.Dialog {
         Timer {
             id: recordingStopper
             repeat: false; running: false;
-            interval: Zynthbox.PlayGridManager.syncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, _private.fadeoutDurationInTicks) * 1000
+            interval: Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, _private.fadeoutDurationInTicks) * 1000
             onTriggered: {
                 console.log("Stopping the recording after", interval);
                 _private.stopRecording();
@@ -459,12 +459,12 @@ Zynthian.Dialog {
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 Repeater {
                     id: segmentsRepeater
-                    property double totalDuration: _private.song ? Zynthbox.PlayGridManager.syncTimer.getMultiplier() * _private.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                    property double totalDuration: _private.song ? Zynthbox.SyncTimer.getMultiplier() * _private.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
                     model: component.visible && totalDuration > 0 ? _private.song.sketchesModel.selectedSketch.segmentsModel : 0
                     delegate: Item {
                         id: segmentDelegate
                         property QtObject segment: model.segment
-                        property double duration: Zynthbox.PlayGridManager.syncTimer.getMultiplier() * (segmentDelegate.segment.barLength * 4 + segmentDelegate.segment.beatLength)
+                        property double duration: Zynthbox.SyncTimer.getMultiplier() * (segmentDelegate.segment.barLength * 4 + segmentDelegate.segment.beatLength)
                         width: parent.width * (segmentDelegate.duration / segmentsRepeater.totalDuration)
                         height: parent.height
                         Rectangle {

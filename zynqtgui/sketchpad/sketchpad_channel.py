@@ -1506,17 +1506,18 @@ class sketchpad_channel(QObject):
     ### END Property recordingDir
 
     ### Property bankDir
+    """
+    bankDir points to the directory where samples are saved for the specific sketchpad version
+    The path gets resolved to /zynthian/zynthian-my-data/sketchpads/my-sketchpads/<sketchpad dir name>/wav/sampleset/<sketchpad version name>/*.<track id>
+    """
     def get_bank_dir(self):
         try:
             # Check if a dir named <somerandomname>.<channel_id> exists.
             # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
-            bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
+            bank_name = (self.__base_samples_dir__.glob(f"*.{self.id + 1}")[0]).name.split(".")[0]
         except:
             bank_name = "sample-bank"
-        path = self.__base_samples_dir__ / f"{bank_name}.{self.id + 1}"
-
-        logging.debug(f"get_bank_dir channel{self.id + 1} : bankDir({path})")
-
+        path = self.__base_samples_dir__ / self.__song__.name / f"{bank_name}.{self.id + 1}"
         return str(path)
 
     bankDir = Property(str, get_bank_dir, constant=True)

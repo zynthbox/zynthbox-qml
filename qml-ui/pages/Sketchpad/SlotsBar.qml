@@ -847,24 +847,6 @@ Rectangle {
         id: channelKeyZoneSetup
     }
 
-    // Zynthian.FilePickerDialog {
-    //     id: bankPickerDialog
-    //     parent: zlScreen.parent
-    //
-    //     headerText: root.selectedSlotRowItem
-    //                 ? qsTr("%1-S%2 : Pick a bank")
-    //                     .arg(root.selectedSlotRowItem.channel.name)
-    //                     .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
-    //                 : ""
-    //     rootFolder: "/zynthian/zynthian-my-data"
-    //     folderModel {
-    //         nameFilters: ["sample-bank.json"]
-    //     }
-    //     onAccepted: {
-    //         root.selectedSlotRowItem.channel.setBank(bankPickerDialog.selectedFile.filePath)
-    //     }
-    // }
-
     Zynthian.ActionPickerPopup {
         id: sketchPickerPopup
         objectName: "sketchPickerPopup"

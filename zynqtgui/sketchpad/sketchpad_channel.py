@@ -997,29 +997,6 @@ class sketchpad_channel(QObject):
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
 
-    @Slot(str)
-    def setBank(self, path):
-        bank_path = Path(path)
-        self_bank_path = Path(self.bankDir)
-
-        self_bank_path.mkdir(parents=True, exist_ok=True)
-
-        # Delete existing sample-bank.json if it exists
-        try:
-            (self_bank_path / "sample-bank.json").unlink()
-        except:
-            pass
-
-        # Copy bank json from selected bank
-        shutil.copy2(bank_path, self_bank_path / "sample-bank.json")
-
-        # Copy all wavs from selected bank
-        for wav in bank_path.parent.glob("*.wav"):
-            shutil.copy2(wav, self_bank_path / wav.name)
-
-        # Populate samples
-        self.restore_bank()
-
     ### Property chainedSoundNames
     ### An array of 5 elements with sound name if available or empty string
     def get_chainedSoundsNames(self):

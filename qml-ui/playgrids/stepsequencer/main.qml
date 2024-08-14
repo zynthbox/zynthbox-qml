@@ -1617,15 +1617,16 @@ Zynthian.BasePlayGrid {
                     Zynthian.Card {
                         anchors.fill: parent
                     }
-                    ColumnLayout {
+                    Column {
                         anchors {
                             fill: parent
                             margins: Kirigami.Units.smallSpacing
                         }
+                        spacing: Kirigami.Units.smallSpacing
                         QQC2.ScrollView {
-                            id:patternsMenuList
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
+                            id: patternsMenuList
+                            width: parent.width
+                            height: parent.height - (Kirigami.Units.gridUnit * 2) - Kirigami.Units.smallSpacing
                             QQC2.ScrollBar.horizontal.visible: false
                             QQC2.ScrollBar.vertical.x: patternsMenuListView.x + patternsMenuListView.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
                             contentItem: ListView {
@@ -2032,7 +2033,8 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         RowLayout {
-                            Layout.fillWidth: true
+                            width: parent.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
+                            height: Kirigami.Units.gridUnit * 2
                             Zynthian.PlayGridButton {
                                 text: "Track 1-5"
                                 onClicked: {

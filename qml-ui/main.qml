@@ -861,7 +861,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
             visible: root.selectedChannel.trackType === "synth" && zynqtgui.curlayerEngineName.length > 0
-            text: synthButton.updateSoundName();
+            Component.onCompleted: synthButton.updateSoundName();
             // Open preset screen on clicking this synth button
             onClicked: {
                 if (zynqtgui.curlayerIsFX) {

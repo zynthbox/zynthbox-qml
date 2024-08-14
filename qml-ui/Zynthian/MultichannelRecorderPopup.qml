@@ -387,6 +387,8 @@ Zynthian.Dialog {
                 id: leadinSpin
                 Layout.fillWidth: true
                 Kirigami.FormData.label: qsTr("Lead-in in beats:")
+                implicitHeight: Kirigami.Units.gridUnit * 2
+                implicitWidth: component.width / 2
                 enabled: !_private.isRecording
                 value: 4
                 from: 0
@@ -408,6 +410,8 @@ Zynthian.Dialog {
                 Layout.fillWidth: true
                 visible: _private.song && !(zynqtgui.current_screen_id == "song_manager")
                 Kirigami.FormData.label: qsTr("Recording duration in beats:")
+                implicitHeight: Kirigami.Units.gridUnit * 2
+                implicitWidth: component.width / 2
                 enabled: !_private.isRecording
                 value: 32
                 from: 0
@@ -417,6 +421,8 @@ Zynthian.Dialog {
                 id: fadeoutSpin
                 Layout.fillWidth: true
                 Kirigami.FormData.label: qsTr("Fade-out in beats:")
+                implicitHeight: Kirigami.Units.gridUnit * 2
+                implicitWidth: component.width / 2
                 enabled: !_private.isRecording
                 value: 4
                 from: 0

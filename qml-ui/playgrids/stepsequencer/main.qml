@@ -108,6 +108,10 @@ Zynthian.BasePlayGrid {
                         // Remember to set this, or things will look a bit weird
                         ignoreNextBack = false;
                     } else {
+                        if (_private.activePatternModel.performanceActive) {
+                            zynqtgui.ignoreNextModeButtonPress = true;
+                            _private.activePatternModel.stopPerformance();
+                        }
                         if (component.patternsMenuVisible) {
                             component.hidePatternsMenu();
                         } else if (_private.hasSelection) {
@@ -152,6 +156,8 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_BOLD":
+                case "SWITCH_SELECT_LONGT":
                     _private.activateSelectedItem();
                     returnValue = true;
                     break;
@@ -195,12 +201,29 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "KNOB3_UP":
-                    _private.goRight();
+                    if (zynqtgui.modeButtonPressed) {
+                        _private.nudgeRight();
+                    } else {
+                        _private.goRight();
+                    }
                     returnValue = true;
                     break;
                 case "KNOB3_DOWN":
-                    _private.goLeft();
+                    if (zynqtgui.modeButtonPressed) {
+                        _private.nudgeLeft();
+                    } else {
+                        _private.goLeft();
+                    }
                     returnValue = true;
+                    break;
+                case "MODE_SWITCH_SHORT":
+                case "MODE_SWITCH_BOLD":
+                case "MODE_SWITCH_LONG":
+                    if (_private.activePatternModel.performanceActive) {
+                        _private.activePatternModel.applyPerformance();
+                        _private.activePatternModel.stopPerformance();
+                        returnValue = true;
+                    }
                     break;
                 default:
                     break;
@@ -245,8 +268,9 @@ Zynthian.BasePlayGrid {
         property QtObject sequence
         property int activePattern: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePattern : -1
         property QtObject activePatternModel: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null;
-        property QtObject activeBarModel: activePatternModel && activeBar > -1 && activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
-            ? activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
+        property QtObject workingPatternModel: activePatternModel ? activePatternModel.workingModel : null;
+        property QtObject activeBarModel: workingPatternModel && activeBar > -1 && workingPatternModel.data(workingPatternModel.index(activeBar + bankOffset, 0), workingPatternModel.roles["rowModel"])
+            ? workingPatternModel.data(workingPatternModel.index(activeBar + bankOffset, 0), workingPatternModel.roles["rowModel"])
             : null;
 
         property bool patternHasUnsavedChanged: false
@@ -335,6 +359,36 @@ Zynthian.BasePlayGrid {
                 _private.sequence.activePatternObject.activeBar = _private.sequence.activePatternObject.activeBar + 1;
             }
         }
+        function nudgeLeft() {
+            if (activePatternModel) {
+                if (workingPatternModel.performanceActive === false) {
+                    activePatternModel.startPerformance();
+                }
+                let nudgeAmount = -1;
+                let firstStep = (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset) * _private.workingPatternModel.width;
+                let lastStep = Math.min(firstStep + _private.workingPatternModel.width, (_private.workingPatternModel.bankOffset * _private.workingPatternModel.width) + _private.workingPatternModel.patternLength) - 1;
+                if (zynqtgui.altButtonPressed) {
+                    firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
+                    lastStep = _private.workingPatternModel.patternLength - 1;
+                }
+                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount);
+            }
+        }
+        function nudgeRight() {
+            if (activePatternModel) {
+                if (workingPatternModel.performanceActive === false) {
+                    activePatternModel.startPerformance();
+                }
+                let nudgeAmount = 1;
+                let firstStep = (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset) * _private.workingPatternModel.width;
+                let lastStep = Math.min(firstStep + _private.workingPatternModel.width, (_private.workingPatternModel.bankOffset * _private.workingPatternModel.width) + _private.workingPatternModel.patternLength) - 1;
+                if (zynqtgui.altButtonPressed) {
+                    firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
+                    lastStep = _private.workingPatternModel.patternLength - 1;
+                }
+                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount);
+            }
+        }
 
         function octaveUp() {
             let numberOfMoves = 1;
@@ -344,10 +398,10 @@ Zynthian.BasePlayGrid {
             }
             for (let moveNumber = 0; moveNumber < numberOfMoves; ++moveNumber) {
                 // Don't scroll past the end
-                if (_private.activePatternModel.gridModelStartNote < 112) {
+                if (_private.workingPatternModel.gridModelStartNote < 112) {
                     // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
-                    _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote + 4;
-                    _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+                    _private.workingPatternModel.gridModelStartNote = _private.workingPatternModel.gridModelStartNote + 4;
+                    _private.workingPatternModel.gridModelEndNote = _private.workingPatternModel.gridModelStartNote + 16;
                 }
             }
         }
@@ -359,10 +413,10 @@ Zynthian.BasePlayGrid {
             }
             for (let moveNumber = 0; moveNumber < numberOfMoves; ++moveNumber) {
                 // Don't scroll past the end
-                if (_private.activePatternModel.gridModelStartNote > 0) {
+                if (_private.workingPatternModel.gridModelStartNote > 0) {
                     // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
-                    _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote - 4;
-                    _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
+                    _private.workingPatternModel.gridModelStartNote = _private.workingPatternModel.gridModelStartNote - 4;
+                    _private.workingPatternModel.gridModelEndNote = _private.workingPatternModel.gridModelStartNote + 16;
                 }
             }
         }
@@ -371,17 +425,17 @@ Zynthian.BasePlayGrid {
         function stepLengthUp() {
             if (zynqtgui.modeButtonPressed) {
                 zynqtgui.ignoreNextModeButtonPress = true;
-                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.stepLength + 1);
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.workingPatternModel.stepLength + 1);
             } else {
-                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, 1));
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, 1));
             }
         }
         function stepLengthDown() {
             if (zynqtgui.modeButtonPressed) {
                 zynqtgui.ignoreNextModeButtonPress = true;
-                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.stepLength - 1);
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.workingPatternModel.stepLength - 1);
             } else {
-                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, -1));
+                _private.sequence.setPatternProperty(_private.activePattern, "stepLength", _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, -1));
             }
         }
         function swingUp() {
@@ -395,15 +449,15 @@ Zynthian.BasePlayGrid {
             }
         }
         function patternLengthUp() {
-            if (_private.activePatternModel && _private.activePatternModel.patternLength < (_private.activePatternModel.bankLength * _private.activePatternModel.width)) {
+            if (_private.workingPatternModel && _private.workingPatternModel.patternLength < (_private.workingPatternModel.bankLength * _private.workingPatternModel.width)) {
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
-                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + 1);
+                    _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.workingPatternModel.patternLength + 1);
                 } else {
-                    if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
-                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength + _private.activePatternModel.width);
+                    if (_private.workingPatternModel.availableBars * _private.workingPatternModel.width === _private.workingPatternModel.patternLength) {
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.workingPatternModel.patternLength + _private.workingPatternModel.width);
                     } else {
-                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.availableBars * _private.activePatternModel.width);
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.workingPatternModel.availableBars * _private.workingPatternModel.width);
                     }
                 }
             }
@@ -411,13 +465,13 @@ Zynthian.BasePlayGrid {
         function patternLengthDown() {
             if (zynqtgui.modeButtonPressed) {
                 zynqtgui.ignoreNextModeButtonPress = true;
-                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - 1);
+                _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.workingPatternModel.patternLength - 1);
             } else {
-                if (_private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width) {
-                    if (_private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength) {
-                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.activePatternModel.patternLength - _private.activePatternModel.width);
+                if (_private.workingPatternModel && _private.workingPatternModel.patternLength > _private.workingPatternModel.width) {
+                    if (_private.workingPatternModel.availableBars * _private.workingPatternModel.width === _private.workingPatternModel.patternLength) {
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", _private.workingPatternModel.patternLength - _private.workingPatternModel.width);
                     } else {
-                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", (_private.activePatternModel.availableBars - 1) * _private.activePatternModel.width);
+                        _private.sequence.setPatternProperty(_private.activePattern, "patternLength", (_private.workingPatternModel.availableBars - 1) * _private.workingPatternModel.width);
                     }
                 }
             }
@@ -486,7 +540,7 @@ Zynthian.BasePlayGrid {
             }
         }
         function updateUniqueCurrentRowNotes() {
-            component.currentRowUniqueNotes = activePatternModel.uniqueRowNotes(activeBar + bankOffset);
+            component.currentRowUniqueNotes = workingPatternModel.uniqueRowNotes(activeBar + bankOffset);
             let tempCurrentRowUniqueMidiNotes = [];
             for (var noteIndex = 0; noteIndex < component.currentRowUniqueNotes.length; ++noteIndex) {
                 tempCurrentRowUniqueMidiNotes.push(component.currentRowUniqueNotes[noteIndex].midiNote);
@@ -494,8 +548,8 @@ Zynthian.BasePlayGrid {
             component.currentRowUniqueMidiNotes = tempCurrentRowUniqueMidiNotes;
             var currentBarNotes = [];
             var currentBankNotes = [];
-            for (var bar = 0; bar < _private.activePatternModel.availableBars; ++bar) {
-                var barNotes = _private.activePatternModel.getRow(_private.bankOffset + bar);
+            for (var bar = 0; bar < _private.workingPatternModel.availableBars; ++bar) {
+                var barNotes = _private.workingPatternModel.getRow(_private.bankOffset + bar);
                 for (var positionIndex = 0; positionIndex < barNotes.length; ++positionIndex) {
                     var positionNote = barNotes[positionIndex];
                     if (positionNote) {
@@ -642,18 +696,18 @@ Zynthian.BasePlayGrid {
                     playgrid: component
                     onRemoveNote: {
                         component.ignoreNextBack = true;
-                        if (_private.activePatternModel) {
-                            for (var row = _private.activePatternModel.bankOffset; row < _private.activePatternModel.bankOffset + _private.activePatternModel.bankLength; ++row) {
-                                for (var column = 0; column < _private.activePatternModel.width; ++column) {
-                                    var subNoteIndex = _private.activePatternModel.subnoteIndex(row, column, note.midiNote);
+                        if (_private.workingPatternModel) {
+                            for (var row = _private.workingPatternModel.bankOffset; row < _private.workingPatternModel.bankOffset + _private.workingPatternModel.bankLength; ++row) {
+                                for (var column = 0; column < _private.workingPatternModel.width; ++column) {
+                                    var subNoteIndex = _private.workingPatternModel.subnoteIndex(row, column, note.midiNote);
                                     if (subNoteIndex > -1) {
-                                        if (row == _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset && column == drumPadRepeater.selectedIndex) {
+                                        if (row == _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset && column == drumPadRepeater.selectedIndex) {
                                             var seqPad = drumPadRepeater.itemAt(column);
                                             if (seqPad.currentSubNote == subNoteIndex) {
                                                 seqPad.currentSubNote = -1;
                                             }
                                         }
-                                        _private.activePatternModel.removeSubnote(row, column, subNoteIndex);
+                                        _private.workingPatternModel.removeSubnote(row, column, subNoteIndex);
                                     }
                                 }
                             }
@@ -826,7 +880,7 @@ Zynthian.BasePlayGrid {
                             noteLengthVisualiser.lastLoopIndex = -1;
                         }
                         function visualiseNote(note, noteDuration, noteDelay, noteOffset) {
-                            noteLengthVisualiser.singleStepLength = noteLengthVisualiser.noteLengths[_private.activePatternModel.stepLength]
+                            noteLengthVisualiser.singleStepLength = noteLengthVisualiser.noteLengths[_private.workingPatternModel.stepLength]
                             noteLengthVisualiser.totalStepLength = noteDuration / noteLengthVisualiser.singleStepLength;
                             noteLengthVisualiser.lastLoopIndex = (noteLengthVisualiser.totalStepLength + noteOffset) / 16;
                             noteLengthVisualiser.noteDuration = noteDuration;
@@ -965,17 +1019,17 @@ Zynthian.BasePlayGrid {
                             }
                             function updateMostRecentFromSelection() {
                                 var seqPad = drumPadRepeater.itemAt(selectedIndex);
-                                var note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, selectedIndex);
+                                var note = _private.workingPatternModel.getNote(_private.activeBar + _private.bankOffset, selectedIndex);
                                 var stepNotes = [];
                                 var stepVelocities = [];
                                 if (seqPad && seqPad.currentSubNote > -1) {
                                     if (note && seqPad.currentSubNote < note.subnotes.length) {
-                                        stepVelocities.push(_private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "velocity"));
+                                        stepVelocities.push(_private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "velocity"));
                                         stepNotes.push(note.subnotes[seqPad.currentSubNote]);
                                     }
                                 } else if (note) {
                                     for (var i = 0; i < note.subnotes.length; ++i) {
-                                        stepVelocities.push(_private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, i, "velocity"));
+                                        stepVelocities.push(_private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, i, "velocity"));
                                         stepNotes.push(note.subnotes[i]);
                                     }
                                 }
@@ -985,11 +1039,11 @@ Zynthian.BasePlayGrid {
                                     noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                 }
                                 if (seqPad && seqPad.currentSubNote > -1) {
-                                    var noteLength = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "duration");
+                                    var noteLength = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "duration");
                                     if (!noteLength) {
                                         noteLength = 0;
                                     }
-                                    var noteDelay = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "delay");
+                                    var noteDelay = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "delay");
                                     if (!noteDelay) {
                                         noteDelay = 0;
                                     }
@@ -1077,11 +1131,11 @@ Zynthian.BasePlayGrid {
                                         if (seqPad.currentSubNote === -1) {
                                             // Then we're handling the position itself
                                             // console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
-                                            noteSettingsPopup.showSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], selectedIndex, selectedIndex);
+                                            noteSettingsPopup.showSettings(_private.workingPatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], selectedIndex, selectedIndex);
                                         } else {
                                             // Then we're handling the specific subnote
                                             // console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
-                                            noteSettingsPopup.showSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], selectedIndex, selectedIndex);
+                                            noteSettingsPopup.showSettings(_private.workingPatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], selectedIndex, selectedIndex);
                                         }
                                     } else {
                                         let filter = []
@@ -1090,19 +1144,19 @@ Zynthian.BasePlayGrid {
                                                 filter.push(component.heardNotes[i].midiNote);
                                             }
                                         }
-                                        component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter, -1, -1);
+                                        component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
                                     }
                                 }
                             }
                             function changeStepValue(barIndex, stepIndex, indicesToChange, valueName, howMuch, minValue, maxValue, defaultValue) {
                                 for (var i = 0; i < indicesToChange.length; ++i) {
-                                    var currentValue = _private.activePatternModel.subnoteMetadata(barIndex, stepIndex, indicesToChange[i], valueName);
+                                    var currentValue = _private.workingPatternModel.subnoteMetadata(barIndex, stepIndex, indicesToChange[i], valueName);
                                     if (currentValue === undefined || currentValue === 0 || isNaN(currentValue)) {
                                         currentValue = defaultValue;
                                     }
                                     //console.log("Current", valueName, currentValue);
                                     if (currentValue + howMuch >= minValue && currentValue + howMuch <= maxValue) {
-                                        _private.activePatternModel.setSubnoteMetadata(barIndex, stepIndex, indicesToChange[i], valueName, currentValue + howMuch);
+                                        _private.workingPatternModel.setSubnoteMetadata(barIndex, stepIndex, indicesToChange[i], valueName, currentValue + howMuch);
                                     }
                                 }
                             }
@@ -1119,11 +1173,11 @@ Zynthian.BasePlayGrid {
                                     }
                                     changeStepValue(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, indicesToChange, valueName, howMuch, minValue, maxValue, defaultValue);
                                     if (seqPad.note && seqPad.currentSubNote > -1) {
-                                        var noteLength = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, seqPad.currentSubNote, "duration");
+                                        var noteLength = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, seqPad.currentSubNote, "duration");
                                         if (!noteLength) {
                                             noteLength = 0;
                                         }
-                                        var noteDelay = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, seqPad.currentSubNote, "delay");
+                                        var noteDelay = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, seqPad.currentSubNote, "delay");
                                         if (!noteDelay) {
                                             noteDelay = 0;
                                         }
@@ -1161,7 +1215,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.activePatternModel.stepLength]
+                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.workingPatternModel.stepLength]
                                         changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
@@ -1172,7 +1226,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.activePatternModel.stepLength]
+                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.workingPatternModel.stepLength]
                                         changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
@@ -1218,13 +1272,13 @@ Zynthian.BasePlayGrid {
                                 // this particular magic number comes from)
                                 Layout.bottomMargin: component.showPatternSettings ? 6 : 0
                                 playgrid: component
-                                patternModel: _private.activePatternModel
+                                patternModel: _private.workingPatternModel
                                 activeBar:_private.activeBar
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
-                                opacity: padNoteNumber < _private.activePatternModel.patternLength ? 1 : 0.3
+                                opacity: padNoteNumber < _private.workingPatternModel.patternLength ? 1 : 0.3
                                 enabled: opacity === 1
-                                note: visible && _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
+                                note: visible && _private.workingPatternModel ? _private.workingPatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
                                 isCurrent: visible && model.index == drumPadRepeater.selectedIndex
                                 function setSelected(subNoteIndex) {
                                     if (drumPadRepeater.selectedIndex > -1) {
@@ -1240,7 +1294,7 @@ Zynthian.BasePlayGrid {
                                 }
                                 onPressAndHold: {
                                     setSelected(subNoteIndex);
-                                    noteSettingsPopup.showSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], model.index, model.index);
+                                    noteSettingsPopup.showSettings(_private.workingPatternModel, _private.activeBar + _private.bankOffset, _private.activeBar + _private.bankOffset, [], model.index, model.index);
                                 }
                                 onCurrentSubNoteChanged: {
                                     if (drumPadRepeater.selectedIndex != model.index) {
@@ -1254,8 +1308,8 @@ Zynthian.BasePlayGrid {
                                 property bool doUpdate: false
                                 function updatePadNote() {
                                     sequencerPad.note = null;
-                                    if (_private.activePatternModel) {
-                                        sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                    if (_private.workingPatternModel) {
+                                        sequencerPad.note = _private.workingPatternModel.getNote(_private.activeBar + _private.bankOffset, model.index);
                                         _private.updateChannel();
                                         sequencerPad.doUpdate = false;
                                     } else {
@@ -1344,7 +1398,7 @@ Zynthian.BasePlayGrid {
                                     Layout.maximumWidth: Layout.minimumWidth
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: _private.activePatternModel && _private.activePatternModel.stepLength < _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, 1)
+                                        enabled: _private.workingPatternModel && _private.workingPatternModel.stepLength < _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, 1)
                                         onClicked: {
                                             _private.stepLengthUp();
                                         }
@@ -1353,12 +1407,12 @@ Zynthian.BasePlayGrid {
                                         id:noteLengthLabel
                                         Layout.alignment: Qt.AlignHCenter
                                         horizontalAlignment: Text.AlignHCenter
-                                        text: "step length:\n%1".arg(_private.activePatternModel.stepLengthName(_private.stepLength))
+                                        text: "step length:\n%1".arg(_private.workingPatternModel.stepLengthName(_private.stepLength))
                                     }
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: _private.activePatternModel && _private.activePatternModel.stepLength > _private.activePatternModel.nextStepLengthStep(_private.activePatternModel.stepLength, -1)
+                                        enabled: _private.workingPatternModel && _private.workingPatternModel.stepLength > _private.workingPatternModel.nextStepLengthStep(_private.workingPatternModel.stepLength, -1)
                                         onClicked: {
                                             _private.stepLengthDown();
                                         }
@@ -1452,7 +1506,7 @@ Zynthian.BasePlayGrid {
                                     Layout.maximumWidth: Layout.minimumWidth
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: _private.activePatternModel && _private.activePatternModel.patternLength < (_private.activePatternModel.bankLength * _private.activePatternModel.width)
+                                        enabled: _private.workingPatternModel && _private.workingPatternModel.patternLength < (_private.workingPatternModel.bankLength * _private.workingPatternModel.width)
                                         onClicked: {
                                             _private.patternLengthUp();
                                         }
@@ -1460,9 +1514,9 @@ Zynthian.BasePlayGrid {
                                     QQC2.Label {
                                         Layout.alignment: Qt.AlignHCenter
                                         Layout.preferredHeight: noteLengthLabel.height
-                                        text: _private.activePatternModel.availableBars * _private.activePatternModel.width === _private.activePatternModel.patternLength
-                                            ? _private.activePatternModel.availableBars + " Bars"
-                                            : "%1.%2 Bars".arg(_private.activePatternModel.availableBars - 1).arg(_private.activePatternModel.patternLength - ((_private.activePatternModel.availableBars - 1) * _private.activePatternModel.width))
+                                        text: _private.workingPatternModel.availableBars * _private.workingPatternModel.width === _private.workingPatternModel.patternLength
+                                            ? _private.workingPatternModel.availableBars + " Bars"
+                                            : "%1.%2 Bars".arg(_private.workingPatternModel.availableBars - 1).arg(_private.workingPatternModel.patternLength - ((_private.workingPatternModel.availableBars - 1) * _private.workingPatternModel.width))
                                         MultiPointTouchArea {
                                             anchors.fill: parent
                                             touchPoints: [
@@ -1470,12 +1524,12 @@ Zynthian.BasePlayGrid {
                                                     id: patternLengthSlidePoint;
                                                     property double increment: 1
                                                     property double slideIncrement: 0.2
-                                                    property double upperBound: _private.activePatternModel.bankLength * _private.activePatternModel.width
+                                                    property double upperBound: _private.workingPatternModel.bankLength * _private.workingPatternModel.width
                                                     property double lowerBound: 1
                                                     property var currentValue: undefined
                                                     onPressedChanged: {
                                                         if (pressed) {
-                                                            currentValue = _private.activePatternModel.patternLength;
+                                                            currentValue = _private.workingPatternModel.patternLength;
                                                         }
                                                     }
                                                     onYChanged: {
@@ -1491,7 +1545,7 @@ Zynthian.BasePlayGrid {
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: _private.activePatternModel && _private.activePatternModel.patternLength > _private.activePatternModel.width
+                                        enabled: _private.workingPatternModel && _private.workingPatternModel.patternLength > _private.workingPatternModel.width
                                         onClicked: {
                                             _private.patternLengthDown();
                                         }
@@ -1573,7 +1627,7 @@ Zynthian.BasePlayGrid {
                                 delegate: BarStep {
                                     availableBars: _private.availableBars
                                     activeBar: _private.activeBar
-                                    playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.activePatternModel.bankOffset : 0
+                                    playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.workingPatternModel.bankOffset : 0
                                     playgrid: component
                                 }
                             }
@@ -1653,7 +1707,7 @@ Zynthian.BasePlayGrid {
                                     interval: 1; running: false; repeat: false;
                                     onTriggered: {
                                         if (_private.activePatternModel) {
-                                            patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.sketchpadTrack / 5), ListView.Beginning);
+                                            patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.sketchpadTrack / Zynthbox.Plugin.sketchpadPartCount), ListView.Beginning);
                                         }
                                     }
                                 }
@@ -2307,12 +2361,12 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     text: "Note:\n" + (component.heardNotes.length > 0
-                        ? Zynthbox.Chords.symbol(component.heardNotes, _private.activePatternModel.scaleKey, _private.activePatternModel.pitchKey, _private.activePatternModel.octaveKey, "\n—\n")
+                        ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
                         : "(all)")
                     onClicked: {
-                        if (zynqtgui.backButtonPressed && _private.activePatternModel) {
+                        if (zynqtgui.backButtonPressed && _private.workingPatternModel) {
                             component.ignoreNextBack = true;
-                            _private.activePatternModel.clear();
+                            _private.workingPatternModel.clear();
                         } else {
                             if (_private.selectedStep > -1) {
                                 while (_private.hasSelection) {
@@ -2339,7 +2393,7 @@ Zynthian.BasePlayGrid {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     id: defaultNoteSettingsButton
                     text: _private.selectedStep > -1
-                        ? "Step\n%1".arg((_private.activePatternModel.width * (_private.activePatternModel.activeBar + _private.activePatternModel.bankOffset)) + _private.selectedStep + 1)
+                        ? "Step\n%1".arg((_private.workingPatternModel.width * (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset)) + _private.selectedStep + 1)
                         : component.heardNotes.length > 0
                             ? "%1\n%2".arg(noteLength).arg(velocity)
                             : (component.currentBarNotes.length > 0 ? component.currentBarNotes.length : "-") + " in\nBar"
@@ -2362,25 +2416,25 @@ Zynthian.BasePlayGrid {
                         896: "7",
                         1024: "8"
                     }
-                    property string noteLength: _private.activePatternModel
-                        ? _private.activePatternModel.defaultNoteDuration === 0
-                            ? _private.activePatternModel.stepLengthName(_private.activePatternModel.stepLength)
-                            : defaultNoteSettingsButton.stepNames.hasOwnProperty(_private.activePatternModel.defaultNoteDuration)
-                                ? defaultNoteSettingsButton.stepNames[_private.activePatternModel.defaultNoteDuration]
-                                : _private.activePatternModel.defaultNoteDuration + "/128th"
+                    property string noteLength: _private.workingPatternModel
+                        ? _private.workingPatternModel.defaultNoteDuration === 0
+                            ? _private.workingPatternModel.stepLengthName(_private.workingPatternModel.stepLength)
+                            : defaultNoteSettingsButton.stepNames.hasOwnProperty(_private.workingPatternModel.defaultNoteDuration)
+                                ? defaultNoteSettingsButton.stepNames[_private.workingPatternModel.defaultNoteDuration]
+                                : _private.workingPatternModel.defaultNoteDuration + "/128th"
                         : ""
                     property string velocity: component.heardVelocities.length === 0 ? "" : "Vel " + component.heardVelocities[0]
                     onClicked: {
                         if (_private.selectedStep > -1) {
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
+                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
                         } else if (component.heardNotes.length > 0) {
                             var filter = []
                             for (var i = 0; i < component.heardNotes.length; ++i) {
                                 filter.push(component.heardNotes[i].midiNote);
                             }
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, filter, -1, -1);
+                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
                         } else {
-                            component.showNoteSettingsPopup(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [], -1, -1);
+                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], -1, -1);
                         }
                     }
                     Kirigami.Icon {

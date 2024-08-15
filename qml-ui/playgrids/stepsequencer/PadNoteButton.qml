@@ -101,9 +101,9 @@ QQC2.Button {
                                             var removedAtLeastOne = false;
                                             // First, let's see if any of the notes in our list are already on this position, and if so, remove them
                                             for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                                                var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
+                                                var subNoteIndex = component.patternModel.workingModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
                                                 if (subNoteIndex > -1) {
-                                                    component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
+                                                    component.patternModel.workingModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
                                                     removedAtLeastOne = true;
                                                 }
                                             }
@@ -112,15 +112,15 @@ QQC2.Button {
                                             if (!removedAtLeastOne) {
                                                 var subNoteIndex = -1;
                                                 for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                                                    subNoteIndex = component.patternModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
-                                                    component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
-                                                    if (component.patternModel.defaultNoteDuration > 0) {
-                                                        component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.defaultNoteDuration);
+                                                    subNoteIndex = component.patternModel.workingModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
+                                                    component.patternModel.workingModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
+                                                    if (component.patternModel.workingModel.defaultNoteDuration > 0) {
+                                                        component.patternModel.workingModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.workingModel.defaultNoteDuration);
                                                     }
                                                 }
                                             }
                                             component.currentSubNote = -1;
-                                            component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
+                                            component.note = component.patternModel.workingModel.getNote(component.padNoteRow, component.padNoteIndex);
                                         }
                                     } else {
                                         component.tapped(-1);
@@ -152,7 +152,7 @@ QQC2.Button {
                 delegate: Item {
                     id:padSubNoteRect
                     property var subNote: modelData
-                    property var subNoteVelocity: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
+                    property var subNoteVelocity: component.patternModel.workingModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
 
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
@@ -244,7 +244,7 @@ QQC2.Button {
             QQC2.Label {
                 id: padNoteLabel
                 anchors.centerIn: parent
-                text: component.patternModel ? (component.padNoteNumber - component.patternModel.bankOffset * component.patternModel.width) + 1 : ""
+                text: component.patternModel ? (component.padNoteNumber - component.patternModel.workingModel.bankOffset * component.patternModel.workingModel.width) + 1 : ""
                 color: component.foregroundColor
             }
         }

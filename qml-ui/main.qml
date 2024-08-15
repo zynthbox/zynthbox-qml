@@ -186,8 +186,11 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB3_TOUCHED":
                     if (zynqtgui.altButtonPressed) {
-                        root.updateMasterVolume(0);
-                        result = true;
+                        // Allows us to use alt+mode as a modifier in stepsequencer
+                        if (zynqtgui.modeButtonPressed === false) {
+                            root.updateMasterVolume(0);
+                            result = true;
+                        }
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
                         root.updateSketchpadBpm(0)
@@ -196,7 +199,10 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB3_RELEASED":
                     if (zynqtgui.altButtonPressed) {
-                        result = true;
+                        // Allows us to use alt+mode as a modifier in stepsequencer
+                        if (zynqtgui.modeButtonPressed === false) {
+                            result = true;
+                        }
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
                         result = true;
@@ -204,8 +210,11 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB3_UP":
                     if (zynqtgui.altButtonPressed) {
-                        root.updateMasterVolume(1);
-                        result = true;
+                        // Allows us to use alt+mode as a modifier in stepsequencer
+                        if (zynqtgui.modeButtonPressed === false) {
+                            root.updateMasterVolume(1);
+                            result = true;
+                        }
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
                         root.updateSketchpadBpm(1)
@@ -214,8 +223,11 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB3_DOWN":
                     if (zynqtgui.altButtonPressed) {
-                        root.updateMasterVolume(-1);
-                        result = true;
+                        // Allows us to use alt+mode as a modifier in stepsequencer
+                        if (zynqtgui.modeButtonPressed === false) {
+                            root.updateMasterVolume(-1);
+                            result = true;
+                        }
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
                         root.updateSketchpadBpm(-1)
@@ -1200,7 +1212,7 @@ Kirigami.AbstractApplicationWindow {
         acceptText: qsTr("Clear Pattern")
         rejectText: qsTr("Don't Clear")
         onAccepted: {
-            confirmClearPatternDialog.pattern.clear();
+            confirmClearPatternDialog.pattern.workingModel.clear();
         }
     }
     function confirmClearClip(clipToClear) {

@@ -371,7 +371,7 @@ Zynthian.BasePlayGrid {
                     firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
                     lastStep = _private.workingPatternModel.patternLength - 1;
                 }
-                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount);
+                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, component.heardNotes);
             }
         }
         function nudgeRight() {
@@ -386,7 +386,7 @@ Zynthian.BasePlayGrid {
                     firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
                     lastStep = _private.workingPatternModel.patternLength - 1;
                 }
-                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount);
+                workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, component.heardNotes);
             }
         }
 

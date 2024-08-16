@@ -334,13 +334,13 @@ class sketchpad_song(QObject):
                     os.removedirs(bank_dir)
                 # Write sample metadata
                 for sample in track.samples:
-                    sample.metadata.write(writeSoundMetadata=False, isAutosave=autosave)
+                    sample.metadata.write(writeSoundMetadata=False, isAutosave=not self.isTemp and autosave)
                 # Write clip metadata
                 for part_index in range(5):
                     clips_model = track.getClipsModelByPart(part_index)
                     for clip_index in range(clips_model.count):
                         clip = clips_model.getClip(clip_index)
-                        clip.metadata.write(writeSoundMetadata=True, isAutosave=autosave)
+                        clip.metadata.write(writeSoundMetadata=True, isAutosave=not self.isTemp and autosave)
 
     @Slot(None)
     def schedule_save(self):
@@ -392,9 +392,9 @@ class sketchpad_song(QObject):
                     # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback later
                     if "channels" in sketchpad:
                         warnings.warn("`channels` key is deprecated (will be removed soon) and has been renamed to `track`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
-                        self.__channels_model__.deserialize(sketchpad["channels"], load_autosave=self.hasUnsavedChanges)
+                        self.__channels_model__.deserialize(sketchpad["channels"], load_autosave=not self.isTemp and load_autosave)
                     if "tracks" in sketchpad:
-                        self.__channels_model__.deserialize(sketchpad["tracks"], load_autosave=self.hasUnsavedChanges)
+                        self.__channels_model__.deserialize(sketchpad["tracks"], load_autosave=not self.isTemp and load_autosave)
 
                     if "scenes" in sketchpad:
                         self.__scenes_model__.deserialize(sketchpad["scenes"])

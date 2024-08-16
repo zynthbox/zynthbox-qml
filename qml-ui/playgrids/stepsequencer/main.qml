@@ -109,10 +109,9 @@ Zynthian.BasePlayGrid {
                         ignoreNextBack = false;
                     } else {
                         if (_private.activePatternModel.performanceActive) {
-                            zynqtgui.ignoreNextModeButtonPress = true;
-                            _private.activePatternModel.stopPerformance();
-                        }
-                        if (component.patternsMenuVisible) {
+                            // Restart the performance
+                            _private.activePatternModel.startPerformance();
+                        } else if (component.patternsMenuVisible) {
                             component.hidePatternsMenu();
                         } else if (_private.hasSelection) {
                             _private.deselectSelectedItem();
@@ -361,7 +360,7 @@ Zynthian.BasePlayGrid {
         }
         function nudgeLeft() {
             if (activePatternModel) {
-                if (workingPatternModel.performanceActive === false) {
+                if (activePatternModel.performanceActive === false) {
                     activePatternModel.startPerformance();
                 }
                 let nudgeAmount = -1;
@@ -376,7 +375,7 @@ Zynthian.BasePlayGrid {
         }
         function nudgeRight() {
             if (activePatternModel) {
-                if (workingPatternModel.performanceActive === false) {
+                if (activePatternModel.performanceActive === false) {
                     activePatternModel.startPerformance();
                 }
                 let nudgeAmount = 1;
@@ -1020,36 +1019,40 @@ Zynthian.BasePlayGrid {
                             function updateMostRecentFromSelection() {
                                 var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                 var note = _private.workingPatternModel.getNote(_private.activeBar + _private.bankOffset, selectedIndex);
-                                var stepNotes = [];
-                                var stepVelocities = [];
-                                if (seqPad && seqPad.currentSubNote > -1) {
-                                    if (note && seqPad.currentSubNote < note.subnotes.length) {
-                                        stepVelocities.push(_private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "velocity"));
-                                        stepNotes.push(note.subnotes[seqPad.currentSubNote]);
+                                if (note) {
+                                    var stepNotes = [];
+                                    var stepVelocities = [];
+                                    if (seqPad && seqPad.currentSubNote > -1) {
+                                        if (note && seqPad.currentSubNote < note.subnotes.length) {
+                                            stepVelocities.push(_private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "velocity"));
+                                            stepNotes.push(note.subnotes[seqPad.currentSubNote]);
+                                        }
+                                    } else if (note) {
+                                        for (var i = 0; i < note.subnotes.length; ++i) {
+                                            stepVelocities.push(_private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, i, "velocity"));
+                                            stepNotes.push(note.subnotes[i]);
+                                        }
                                     }
-                                } else if (note) {
-                                    for (var i = 0; i < note.subnotes.length; ++i) {
-                                        stepVelocities.push(_private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, i, "velocity"));
-                                        stepNotes.push(note.subnotes[i]);
+                                    component.heardNotes = stepNotes;
+                                    component.heardVelocities = stepVelocities;
+                                    if (noteSettings.visible) {
+                                        noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                     }
-                                }
-                                component.heardNotes = stepNotes;
-                                component.heardVelocities = stepVelocities;
-                                if (noteSettings.visible) {
-                                    noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
-                                }
-                                if (seqPad && seqPad.currentSubNote > -1) {
-                                    var noteLength = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "duration");
-                                    if (!noteLength) {
-                                        noteLength = 0;
+                                    if (seqPad && seqPad.currentSubNote > -1) {
+                                        var noteLength = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "duration");
+                                        if (!noteLength) {
+                                            noteLength = 0;
+                                        }
+                                        var noteDelay = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "delay");
+                                        if (!noteDelay) {
+                                            noteDelay = 0;
+                                        }
+                                        noteLengthVisualiser.visualiseNote(note.subnotes[seqPad.currentSubNote], noteLength, noteDelay, selectedIndex % 16);
+                                    } else {
+                                        noteLengthVisualiser.clearVisualisation();
                                     }
-                                    var noteDelay = _private.workingPatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "delay");
-                                    if (!noteDelay) {
-                                        noteDelay = 0;
-                                    }
-                                    noteLengthVisualiser.visualiseNote(note.subnotes[seqPad.currentSubNote], noteLength, noteDelay, selectedIndex % 16);
                                 } else {
-                                    noteLengthVisualiser.clearVisualisation();
+                                    Qt.callLater(updateMostRecentFromSelection);
                                 }
                             }
                             function goNext() {

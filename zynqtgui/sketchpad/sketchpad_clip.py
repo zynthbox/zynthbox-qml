@@ -342,12 +342,17 @@ class sketchpad_clip_metadata(QObject):
                     subvoiceSettingsObject.disconnect(self)
             except: pass
 
-    def read(self):
+    def read(self, readAutosave=True):
         self.__isReading = True
         if not self.clip.isEmpty:
             try:
                 file = taglib.File(self.clip.path)
-                self.__audioMetadata = file.tags
+                if readAutosave:
+                    logging.debug("Clip metadata reading : autosave")
+                    self.__audioMetadata = json.loads(file.tags["AUTOSAVE"][0])
+                else:
+                    logging.debug("Clip metadata reading : NOT autosave")
+                    self.__audioMetadata = file.tags
                 file.close()
             except Exception as e:
                 self.__audioMetadata = None
@@ -430,7 +435,7 @@ class sketchpad_clip_metadata(QObject):
     def writeMetadataWithSoundData(self):
         self.write(writeSoundMetadata=True)
 
-    def write(self, writeSoundMetadata=False):
+    def write(self, writeSoundMetadata=False, isAutosave=True):
         if self.__isReading == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
             if not self.clip.isEmpty:
                 tags = {}
@@ -504,8 +509,13 @@ class sketchpad_clip_metadata(QObject):
 
                 try:
                     file = taglib.File(self.clip.path)
-                    for key, value in tags.items():
-                        file.tags[key] = value
+                    if isAutosave:
+                        logging.debug("Clip metadata writing : autosave")
+                        file.tags["AUTOSAVE"] = [str(json.dumps(tags))]
+                    else:
+                        logging.debug("Clip metadata writing : NOT autosave")
+                        for key, value in tags.items():
+                            file.tags[key] = value
                     file.save()
                 except Exception as e:
                     logging.exception(f"Error writing metadata : {str(e)}")
@@ -522,8 +532,13 @@ class sketchpad_clip_metadata(QObject):
                             check_output(f"mv {Path(tmp) / 'output.wav'} {self.clip.path}", shell=True)
 
                             file = taglib.File(self.clip.path)
-                            for key, value in tags.items():
-                                file.tags[key] = value
+                            if isAutosave:
+                                logging.debug("Clip metadata writing : autosave")
+                                file.tags["AUTOSAVE"] = [str(json.dumps(tags))]
+                            else:
+                                logging.debug("Clip metadata writing : NOT autosave")
+                                for key, value in tags.items():
+                                    file.tags[key] = value
                             file.save()
                     except Exception as e:
                         logging.error(f"Error creating new file and writing metadata : {str(e)}")

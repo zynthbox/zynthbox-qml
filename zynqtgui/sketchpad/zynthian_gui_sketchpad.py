@@ -650,7 +650,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def saveSketchpad(self):
         def task():
-            self.__song__.save(False)
+            self.__song__.save(autosave=False)
             QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.currentTaskMessage = "Saving sketchpad"

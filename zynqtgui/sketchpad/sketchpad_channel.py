@@ -480,7 +480,8 @@ class sketchpad_channel(QObject):
                 "keyzone_mode": self.__keyzone_mode__,
                 "routeThroughGlobalFX": self.route_through_global_fx}
 
-    def deserialize(self, obj):
+    def deserialize(self, obj, load_autosave=True):
+        logging.debug(f"channel_deserialize : {load_autosave}")
         try:
             if "name" in obj:
                 self.__name__ = obj["name"]
@@ -555,11 +556,11 @@ class sketchpad_channel(QObject):
                 for i, clip in enumerate(obj["samples"]):
                     if clip is not None:
                         if (bank_dir / clip["path"]).exists():
-                            self.__samples__[i].set_path(str(bank_dir / clip["path"]), False) # Do not copy file when restoring
+                            self.__samples__[i].set_path(str(bank_dir / clip["path"]), False, load_autosave) # Do not copy file when restoring
                 self.samples_changed.emit()
             if "clips" in obj:
                 for x in range(0, 5):
-                    self.__clips_model__[x].deserialize(obj["clips"][x], x)
+                    self.__clips_model__[x].deserialize(obj["clips"][x], x, load_autosave)
             if "layers_snapshot" in obj:
                 self.__layers_snapshot = obj["layers_snapshot"]
                 self.sound_data_changed.emit()

@@ -321,17 +321,26 @@ class sketchpad_song(QObject):
                     self.zynqtgui.layer.save_snapshot(snapshot_file)
                 except Exception as e:
                     logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
+            self.set_isSaving(False)
 
-            # Do some cleanup
             for trackId in range(self.__channels_model__.count):
                 track = self.__channels_model__.getChannel(trackId)
                 bank_dir = Path(track.bankDir)
-                # # If there's a sample bank there already, get rid of it
-                # if (bank_dir / 'sample-bank.json').exists():
-                #     os.remove(bank_dir / 'sample-bank.json')
+                # Do some cleanup
+                # If there's a sample bank there already, get rid of it
+                if (bank_dir / 'sample-bank.json').exists():
+                    os.remove(bank_dir / 'sample-bank.json')
                 if bank_dir.exists() and len(os.listdir(bank_dir)) == 0:
                     os.removedirs(bank_dir)
-            self.set_isSaving(False)
+                # Write sample metadata
+                for sample in track.samples:
+                    sample.metadata.write(writeSoundMetadata=False, isAutosave=autosave)
+                # Write clip metadata
+                for part_index in range(5):
+                    clips_model = track.getClipsModelByPart(part_index)
+                    for clip_index in range(clips_model.count):
+                        clip = clips_model.getClip(clip_index)
+                        clip.metadata.write(writeSoundMetadata=True, isAutosave=autosave)
 
     @Slot(None)
     def schedule_save(self):
@@ -383,9 +392,9 @@ class sketchpad_song(QObject):
                     # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback later
                     if "channels" in sketchpad:
                         warnings.warn("`channels` key is deprecated (will be removed soon) and has been renamed to `track`. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
-                        self.__channels_model__.deserialize(sketchpad["channels"])
+                        self.__channels_model__.deserialize(sketchpad["channels"], load_autosave=self.hasUnsavedChanges)
                     if "tracks" in sketchpad:
-                        self.__channels_model__.deserialize(sketchpad["tracks"])
+                        self.__channels_model__.deserialize(sketchpad["tracks"], load_autosave=self.hasUnsavedChanges)
 
                     if "scenes" in sketchpad:
                         self.__scenes_model__.deserialize(sketchpad["scenes"])

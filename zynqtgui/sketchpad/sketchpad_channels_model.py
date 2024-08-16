@@ -44,7 +44,8 @@ class sketchpad_channels_model(QAbstractListModel):
             data.append(t.serialize())
         return data
 
-    def deserialize(self, arr):
+    def deserialize(self, arr, load_autosave=True):
+        logging.debug(f"channels_model_deserialize : {load_autosave}")
         if not isinstance(arr, list):
             raise Exception("Invalid json format for channels")
         self.beginResetModel()
@@ -52,7 +53,7 @@ class sketchpad_channels_model(QAbstractListModel):
         for i, t in enumerate(arr):
             channel = sketchpad_channel(i, self.__song__, self)
             self.add_channel(channel)
-            channel.deserialize(t)
+            channel.deserialize(t, load_autosave)
         self.endResetModel()
 
     def data(self, index, role=None):

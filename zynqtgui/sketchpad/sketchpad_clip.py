@@ -342,16 +342,16 @@ class sketchpad_clip_metadata(QObject):
                     subvoiceSettingsObject.disconnect(self)
             except: pass
 
-    def read(self, readAutosave=True):
+    def read(self, load_autosave=True):
         self.__isReading = True
         if not self.clip.isEmpty:
             try:
                 file = taglib.File(self.clip.path)
-                if readAutosave:
-                    logging.debug("Clip metadata reading : autosave")
+                if load_autosave:
+                    logging.debug(f"Clip metadata reading {self.clip} : autosave")
                     self.__audioMetadata = json.loads(file.tags["AUTOSAVE"][0])
                 else:
-                    logging.debug("Clip metadata reading : NOT autosave")
+                    logging.debug(f"Clip metadata reading {self.clip} : NOT autosave")
                     self.__audioMetadata = file.tags
                 file.close()
             except Exception as e:
@@ -510,10 +510,10 @@ class sketchpad_clip_metadata(QObject):
                 try:
                     file = taglib.File(self.clip.path)
                     if isAutosave:
-                        logging.debug("Clip metadata writing : autosave")
+                        logging.debug(f"Clip metadata writing {self.clip} : autosave")
                         file.tags["AUTOSAVE"] = [str(json.dumps(tags))]
                     else:
-                        logging.debug("Clip metadata writing : NOT autosave")
+                        logging.debug(f"Clip metadata writing {self.clip} : NOT autosave")
                         for key, value in tags.items():
                             file.tags[key] = value
                     file.save()
@@ -691,16 +691,17 @@ class sketchpad_clip(QObject):
             "enabled": self.__enabled__
         }
 
-    def deserialize(self, obj):
+    def deserialize(self, obj, load_autosave=True):
+        logging.debug(f"clip_deserialize : {load_autosave}")
         try:
             if "path" in obj:
                 if obj["path"] is None:
                     self.__path__ = None
                 else:
                     if self.is_channel_sample:
-                        self.set_path(str(self.bank_path / obj["path"]), False)
+                        self.set_path(str(self.bank_path / obj["path"]), False, load_autosave)
                     else:
-                        self.set_path(str(self.wav_path / obj["path"]), False)
+                        self.set_path(str(self.wav_path / obj["path"]), False, load_autosave)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
@@ -859,7 +860,8 @@ class sketchpad_clip(QObject):
     #                   a different name. Otherwise when path is set from UI, it makes sure to always create a new file
     #                   when first selecting a wav for a clip.
     @Slot(str,bool)
-    def set_path(self, path, should_copy=True):
+    def set_path(self, path, should_copy=True, load_autosave=True):
+        logging.debug(f"{path}, {should_copy}, {load_autosave}")
         if path is not None:
             selected_path = Path(path)
             new_filename = ""
@@ -904,7 +906,7 @@ class sketchpad_clip(QObject):
             self.audioSource = None
 
         # read() will read all the available metadata and populate default values if not available
-        self.__metadata.read()
+        self.__metadata.read(load_autosave)
         self.__metadata.hook()
         self.__progress__ = 0.0
 

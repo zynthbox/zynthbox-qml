@@ -53,7 +53,8 @@ class sketchpad_clips_model(QAbstractListModel):
             data.append(c.serialize())
         return data
 
-    def deserialize(self, arr, part_index):
+    def deserialize(self, arr, part_index, load_autosave=True):
+        logging.debug(f"clips_model_deserialize : {load_autosave}")
         if not isinstance(arr, list):
             for i in range(2):
                 clip = sketchpad_clip(self.__channel__.id, i, part_index, self.__song__, self)
@@ -67,7 +68,7 @@ class sketchpad_clips_model(QAbstractListModel):
             return
         for i, c in enumerate(arr):
             clip = sketchpad_clip(self.__channel__.id, i, part_index, self.__song__, self)
-            clip.deserialize(c)
+            clip.deserialize(c, load_autosave)
             self.add_clip(clip)
             #self.__song__.add_clip_to_part(clip, i)
 

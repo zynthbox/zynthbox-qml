@@ -1007,17 +1007,17 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             # When recording a sketch, set track type to Sketch explicitly
             currentChannel.trackType = "sample-loop"
             self.zynqtgui.currentTaskMessage = "Loading recording to clip"
-            self.clip_to_record.set_path(self.clip_to_record_path, False)
+            # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
+            self.clip_to_record.set_path(self.clip_to_record_path, should_copy=False)
             self.clip_to_record.enabled = True
-            self.clip_to_record.metadata.write(writeSoundMetadata=True)
             # Set same recorded clip to other additional clips
             for clip in self.clips_to_record:
                 # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
                 # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
                 if clip != self.clip_to_record:
                     clip.enabled = True
-                    clip.set_path(self.clip_to_record_path, True)
-                    clip.metadata.write(writeSoundMetadata=True)
+                    # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
+                    clip.set_path(self.clip_to_record_path, should_copy=True)
             if self.clip_to_record.isChannelSample:
                 logging.info("Recorded clip is a sample")
                 currentChannel.samples_changed.emit()

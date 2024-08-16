@@ -450,64 +450,14 @@ class sketchpad_channel(QObject):
             for clip_index in range(0, self.getClipsModelByPart(part_index).count):
                 self.__song__.getClipByPart(self.__id__, clip_index, part_index).stop()
 
-    def save_bank(self):
-        bank_dir = Path(self.bankDir)
-
-        # If there's a sample bank there already, get rid of it (we could also check
-        # to make sure we only do this if there's no samples at the same time, but
-        # we're writing that out anyway anyway, so... no good reason for that)
-        if (bank_dir / 'sample-bank.json').exists():
-            os.remove(bank_dir / 'sample-bank.json')
-            if len(os.listdir(bank_dir)) == 0:
-                os.removedirs(bank_dir)
-
-        obj = []
+    def serialize(self):
+        samplesObj = []
         for sample in self.__samples__:
             if sample.path is not None and len(sample.path) > 0:
                 sample.metadata.scheduleWrite()
-                obj.append({"path": Path(sample.path).name})
+                samplesObj.append({"path": Path(sample.path).name})
             else:
-                obj.append(None)
-
-        # Create bank dir and write bank json only if channel has some samples loaded
-        for c in obj:
-            if c is not None:
-                bank_dir.mkdir(parents=True, exist_ok=True)
-                try:
-                    logging.info(f"Writing to sample-bank.json {bank_dir}/sample-bank.json")
-                    with open(bank_dir / 'sample-bank.json', "w") as f:
-                        json.dump(obj, f)
-                        f.truncate()
-                        f.flush()
-                        os.fsync(f.fileno())
-                except Exception as e:
-                    logging.error(f"Error writing sample-bank.json to {bank_dir} : {str(e)}")
-
-                break
-
-    def restore_bank(self):
-        bank_dir = Path(self.bankDir)
-
-        if (bank_dir / 'sample-bank.json').exists():
-            # logging.info(f"Restoring sample-bank.json for channel {self.id + 1}")
-            try:
-                with open(bank_dir / 'sample-bank.json', "r") as f:
-                    obj = json.loads(f.read())
-
-                    for i, clip in enumerate(obj):
-                        if clip is not None:
-                            if (bank_dir / clip["path"]).exists():
-                                self.__samples__[i].set_path(str(bank_dir / clip["path"]), False) # Do not copy file when restoring
-
-                    self.samples_changed.emit()
-            except Exception as e:
-                logging.error(f"Error reading sample-bank.json from {bank_dir} : {str(e)}")
-        else:
-            logging.info(f"sample-bank.json does not exist for channel {self.id + 1}. Skipping restoration")
-
-    def serialize(self):
-        # Save bank when serializing so that bank is saved everytime song is saved
-        self.save_bank()
+                samplesObj.append(None)
 
         return {"name": self.__name__,
                 "color": self.__color__,
@@ -524,6 +474,7 @@ class sketchpad_channel(QObject):
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
                 "externalAudioSource": self.__externalAudioSource__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
+                "samples": samplesObj,
                 "layers_snapshot": self.__layers_snapshot,
                 "sample_picking_style": self.__sample_picking_style__,
                 "keyzone_mode": self.__keyzone_mode__,
@@ -599,6 +550,13 @@ class sketchpad_channel(QObject):
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "externalCaptureVolume" in obj:
                 self.set_externalCaptureVolume(obj["externalCaptureVolume"])
+            if "samples" in obj:
+                bank_dir = Path(self.bankDir)
+                for i, clip in enumerate(obj["samples"]):
+                    if clip is not None:
+                        if (bank_dir / clip["path"]).exists():
+                            self.__samples__[i].set_path(str(bank_dir / clip["path"]), False) # Do not copy file when restoring
+                self.samples_changed.emit()
             if "clips" in obj:
                 for x in range(0, 5):
                     self.__clips_model__[x].deserialize(obj["clips"][x], x)
@@ -617,9 +575,6 @@ class sketchpad_channel(QObject):
         except Exception as e:
             logging.error(f"Error during channel deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
-
-        # Restore bank after restoring channel
-        self.restore_bank()
 
     def set_layers_snapshot(self, snapshot):
         self.__layers_snapshot = snapshot
@@ -864,8 +819,8 @@ class sketchpad_channel(QObject):
         for file in source_bank_dir.glob("*"):
             shutil.copy2(file, dest_bank_dir / file.name)
 
-        # Restore bank after copying
-        self.restore_bank()
+        # # Restore bank after copying
+        # self.restore_bank()
 
     @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):
@@ -1507,8 +1462,8 @@ class sketchpad_channel(QObject):
 
     ### Property bankDir
     """
-    bankDir points to the directory where samples are saved for the specific sketchpad version
-    The path gets resolved to /zynthian/zynthian-my-data/sketchpads/my-sketchpads/<sketchpad dir name>/wav/sampleset/<sketchpad version name>/*.<track id>
+    bankDir points to the directory where samples are saved
+    The path gets resolved to /zynthian/zynthian-my-data/sketchpads/my-sketchpads/<sketchpad dir name>/wav/sampleset/*.<track id>
     """
     def get_bank_dir(self):
         try:
@@ -1517,7 +1472,7 @@ class sketchpad_channel(QObject):
             bank_name = (self.__base_samples_dir__.glob(f"*.{self.id + 1}")[0]).name.split(".")[0]
         except:
             bank_name = "sample-bank"
-        path = self.__base_samples_dir__ / self.__song__.name / f"{bank_name}.{self.id + 1}"
+        path = self.__base_samples_dir__ / f"{bank_name}.{self.id + 1}"
         return str(path)
 
     bankDir = Property(str, get_bank_dir, constant=True)

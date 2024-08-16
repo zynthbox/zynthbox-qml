@@ -321,6 +321,16 @@ class sketchpad_song(QObject):
                     self.zynqtgui.layer.save_snapshot(snapshot_file)
                 except Exception as e:
                     logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
+
+            # Do some cleanup
+            for trackId in range(self.__channels_model__.count):
+                track = self.__channels_model__.getChannel(trackId)
+                bank_dir = Path(track.bankDir)
+                # # If there's a sample bank there already, get rid of it
+                # if (bank_dir / 'sample-bank.json').exists():
+                #     os.remove(bank_dir / 'sample-bank.json')
+                if bank_dir.exists() and len(os.listdir(bank_dir)) == 0:
+                    os.removedirs(bank_dir)
             self.set_isSaving(False)
 
     @Slot(None)

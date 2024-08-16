@@ -161,16 +161,6 @@ Rectangle {
                 }
 
                 SidebarButton {
-                    icon.name: "document-save-symbolic"
-                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
-                             && !zynqtgui.bottomBarControlObj.isEmpty
-
-                    onClicked: {
-                        zynqtgui.bottomBarControlObj.metadata.writeMetadataWithoutSoundData();
-                    }
-                }
-
-                SidebarButton {
                     icon.name: "document-open"
                     active: zynqtgui.bottomBarControlType === "bottombar-controltype-clip" || zynqtgui.bottomBarControlType === "bottombar-controltype-pattern"
                     enabled: zynqtgui.bottomBarControlObj ? !zynqtgui.bottomBarControlObj.isPlaying : false

@@ -334,13 +334,13 @@ class sketchpad_song(QObject):
                     os.removedirs(bank_dir)
                 # Write sample metadata
                 for sample in track.samples:
-                    sample.metadata.write(writeSoundMetadata=False, isAutosave=not self.isTemp and autosave)
+                    sample.metadata.write(isAutosave=autosave)
                 # Write clip metadata
                 for part_index in range(5):
                     clips_model = track.getClipsModelByPart(part_index)
                     for clip_index in range(clips_model.count):
                         clip = clips_model.getClip(clip_index)
-                        clip.metadata.write(writeSoundMetadata=True, isAutosave=not self.isTemp and autosave)
+                        clip.metadata.write(isAutosave=autosave)
 
     @Slot(None)
     def schedule_save(self):

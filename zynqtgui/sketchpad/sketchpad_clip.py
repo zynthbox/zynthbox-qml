@@ -347,7 +347,7 @@ class sketchpad_clip_metadata(QObject):
         if not self.clip.isEmpty:
             try:
                 file = taglib.File(self.clip.path)
-                if load_autosave:
+                if load_autosave and "AUTOSAVE" in file.tags:
                     logging.debug(f"Clip metadata reading {self.clip} : autosave")
                     self.__audioMetadata = json.loads(file.tags["AUTOSAVE"][0])
                 else:

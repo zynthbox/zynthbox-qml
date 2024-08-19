@@ -547,7 +547,7 @@ class sketchpad_clip_metadata(QObject):
     def scheduleWrite(self):
         if self.__isReading == False and self.__isWriting == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
             self.__isWriting = True
-            self.writeTimer.start()
+            # Do not explicitly make a call to write as song save will be saving metadata as required
             self.clip.__song__.schedule_save()
 
     def clear(self):

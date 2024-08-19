@@ -237,6 +237,9 @@ Zynthian.BasePlayGrid {
     property bool showPatternSettings: false
     signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter, int firstStep, int lastStep);
 
+    property bool nudgeOverlayEnabled: false
+    property bool nudgePerformed: false
+
     property var heardNotes: []
     property var heardVelocities: []
     property var currentRowUniqueNotes: []
@@ -1372,6 +1375,51 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                    Item {
+                        id: nudgeOverlay
+                        anchors.fill: parent
+                        visible: component.nudgeOverlayEnabled
+                        MultiPointTouchArea {
+                            anchors.fill: parent
+                            touchPoints: [
+                                TouchPoint {
+                                    id: nudgeTouchPoint
+                                    property int nudgeInterval: _private.workingPatternModel ? nudgeOverlay.width / _private.workingPatternModel.width : nudgeOverlay.width
+                                    property var mostRecentNudgePosition: undefined
+                                    onPressedChanged: {
+                                        if (pressed) {
+                                            if (component.nudgePerformed === false) {
+                                                component.nudgePerformed = true;
+                                                _private.activePatternModel.startPerformance();
+                                            }
+                                            nudgeTouchPoint.mostRecentNudgePosition = nudgeTouchPoint.startX;
+                                        } else {
+                                            nudgeTouchPoint.mostRecentNudgePosition = undefined;
+                                        }
+                                    }
+                                    onYChanged: {
+                                        if (pressed && nudgeTouchPoint.mostRecentNudgePosition !== undefined) {
+                                            var delta = nudgeTouchPoint.x - nudgeTouchPoint.mostRecentNudgePosition;
+                                            if (Math.abs(delta) > nudgeInterval) {
+                                                nudgeTouchPoint.mostRecentNudgePosition = nudgeTouchPoint.x;
+                                                let nudgeAmount = -1;
+                                                if (delta > 0) {
+                                                    nudgeAmount = 1;
+                                                }
+                                                let firstStep = (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset) * _private.workingPatternModel.width;
+                                                let lastStep = Math.min(firstStep + _private.workingPatternModel.width, (_private.workingPatternModel.bankOffset * _private.workingPatternModel.width) + _private.workingPatternModel.patternLength) - 1;
+                                                if (zynqtgui.altButtonPressed) {
+                                                    firstStep = _private.workingPatternModel.bankOffset * _private.workingPatternModel.width;
+                                                    lastStep = _private.workingPatternModel.patternLength - 1;
+                                                }
+                                                _private.workingPatternModel.nudge(firstStep, lastStep, nudgeAmount, component.heardNotes);
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 }
 
                 // pad & sequencer settings
@@ -2366,18 +2414,30 @@ Zynthian.BasePlayGrid {
                     text: "Note:\n" + (component.heardNotes.length > 0
                         ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
                         : "(all)")
-                    onClicked: {
-                        if (zynqtgui.backButtonPressed && _private.workingPatternModel) {
-                            component.ignoreNextBack = true;
-                            _private.workingPatternModel.clear();
-                        } else {
-                            if (_private.selectedStep > -1) {
-                                while (_private.hasSelection) {
-                                    _private.deselectSelectedItem();
-                                }
+                    onPressed: {
+                        component.nudgeOverlayEnabled = true;
+                    }
+                    onReleased: {
+                        component.nudgeOverlayEnabled = false;
+                        if (component.nudgePerformed) {
+                            component.nudgePerformed = false;
+                            if (_private.activePatternModel.performanceActive) {
+                                _private.activePatternModel.applyPerformance();
+                                _private.activePatternModel.stopPerformance();
                             }
-                            component.heardNotes = [];
-                            component.heardVelocities = [];
+                        } else {
+                            if (zynqtgui.backButtonPressed && _private.workingPatternModel) {
+                                component.ignoreNextBack = true;
+                                _private.workingPatternModel.clear();
+                            } else {
+                                if (_private.selectedStep > -1) {
+                                    while (_private.hasSelection) {
+                                        _private.deselectSelectedItem();
+                                    }
+                                }
+                                component.heardNotes = [];
+                                component.heardVelocities = [];
+                            }
                         }
                     }
                     Kirigami.Icon {
@@ -2393,8 +2453,8 @@ Zynthian.BasePlayGrid {
                     }
                 }
                 Zynthian.PlayGridButton {
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     id: defaultNoteSettingsButton
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: _private.selectedStep > -1
                         ? "Step\n%1".arg((_private.workingPatternModel.width * (_private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset)) + _private.selectedStep + 1)
                         : component.heardNotes.length > 0

@@ -579,7 +579,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 new_sketchpad_name = self.generate_unique_mysketchpad_name(base_sketchpad_path.parent.name)
                 shutil.copytree(base_sketchpad_path.parent, self.__sketchpad_basepath__ / new_sketchpad_name)
                 logging.info(f"Loading new sketchpad from community sketchpad : {str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)}")
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/", base_sketchpad_path.stem.replace(".sketchpad", ""), self)
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/", base_sketchpad_path.stem.replace(".sketchpad", ""), self, load_autosave=False)
                 self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
                 # Load sketchpad snapshot if available or else load default snapshot
                 snapshot_path = f"{str(self.__sketchpad_basepath__ / new_sketchpad_name / 'soundsets')}/{base_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
@@ -599,7 +599,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.global_fx_engines[0][1].value = self.zynqtgui.global_fx_engines[0][1].value_max
                 self.zynqtgui.global_fx_engines[1][1].value = self.zynqtgui.global_fx_engines[1][1].value_max
                 self.zynqtgui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self, load_autosave=False)
                 # When zynqtgui is starting, it will load last_state or default snapshot
                 # based on the value of self.init_should_load_last_state
                 # Do not load snapshot again otherwise it will create multiple processes for same synths
@@ -688,7 +688,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except Exception as e:
                 logging.error(e)
 
-            self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / name) + "/", name, self)
+            self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / name) + "/", name, self, load_autosave=False)
 
             # FX layers gets added to channel fx slots during snapshot loading
             # Since snapshot is not loaded when creating a sketchpad from temp, add FX layers to channels explicitly here

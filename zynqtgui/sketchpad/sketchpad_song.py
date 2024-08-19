@@ -265,15 +265,9 @@ class sketchpad_song(QObject):
             sketchpad_file = None
             save_snapshot = None
             soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
-            saved_state_obj = None
             current_state_obj = self.serialize()
 
             if not self.isTemp and autosave is True:
-                # When trying to do autosave, write autosave only if current differs from saved state
-                if (Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json").exists():
-                    with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:
-                        saved_state_obj = json.load(f)
-
                 logging.debug("Writing autosave")
                 # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
                 save_snapshot = False

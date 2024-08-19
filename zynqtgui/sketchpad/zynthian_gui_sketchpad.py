@@ -1017,7 +1017,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if clip != self.clip_to_record:
                     clip.enabled = True
                     # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
-                    clip.set_path(self.clip_to_record_path, should_copy=True)
+                    clip.set_path(self.clip_to_record_path, should_copy=True)                
+                ### Save clip metadata
+                # When processing a sample, do not write sound metadata. It does not need to have sound metadata
+                # When processing a clip, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data
+                ###
+                clip.metadata.write(writeSoundMetadata=not clip.is_channel_sample, isAutosave=True)
             if self.clip_to_record.isChannelSample:
                 logging.info("Recorded clip is a sample")
                 currentChannel.samples_changed.emit()

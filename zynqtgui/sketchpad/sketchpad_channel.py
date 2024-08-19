@@ -551,6 +551,25 @@ class sketchpad_channel(QObject):
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "externalCaptureVolume" in obj:
                 self.set_externalCaptureVolume(obj["externalCaptureVolume"])
+            if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
+                # TODO : `sample-bank.json` file is deprecated. sample data is now stored in sketchpad json. Remove this fallback later
+                # Read sample-bank.json and inject sample data to all saved versions as it should have with new latest sketchpad structure
+                warnings.warn("`sample-bank.json` is deprecated (will be removed soon) and is now stored in sketchpad json. Update any existing references to avoid issues with loading sketchpad", DeprecationWarning)
+                with open(Path(self.bankDir) / "sample-bank.json", "r") as f:
+                    samples_obj = json.load(f)
+                for sketchpad_file in Path(self.__song__.sketchpad_folder).glob("*.sketchpad.json"):
+                    logging.debug(f"Injecting sample-bank to sketchpad {sketchpad_file}")
+                    with open(sketchpad_file, "r+") as f:
+                        _obj = json.load(f)
+                        _obj["tracks"][self.id]["samples"] = samples_obj
+                        f.seek(0)
+                        f.write(json.dumps(_obj))
+                        f.flush()
+                        os.fsync(f.fileno())
+                # Inject samples to current sketchpad data
+                obj["samples"] = samples_obj
+                # Delete sample-bank.json as we now have modified existing sketchpad files
+                (Path(self.bankDir) / "sample-bank.json").unlink(missing_ok=True)
             if "samples" in obj:
                 bank_dir = Path(self.bankDir)
                 for i, clip in enumerate(obj["samples"]):

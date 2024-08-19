@@ -581,8 +581,8 @@ Zynthian.Dialog {
                                     }
 
                                     QQC2.Label {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                                        Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*6
+                                        Layout.maximumWidth: Kirigami.Units.gridUnit*6
                                         Layout.fillHeight: true
                                         text: qsTr("Duration")
                                     }
@@ -628,6 +628,7 @@ Zynthian.Dialog {
                                 Layout.fillWidth: true
                                 wrapMode: Text.Wrap
                                 horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                                 Connections {
                                     target: folderModel
                                     onFolderChanged: {
@@ -664,6 +665,19 @@ Zynthian.Dialog {
                         }
                         readonly property var folderPropertiesHelper: Helpers.FilePropertiesHelper {
                             filePath: folderModel.folder.toString().substring(7) // There's a file:// at the start of this string, so get rid of that before throwing it at python
+                        }
+                        function describeFile(filePath) {
+                            let description = "";
+                            if (filePath.endsWith("Autosave.sketchpad.json")) {
+                                description = qsTr("Active Working Copy");
+                            } else if (filePath.endsWith(".sketchpad.json")) {
+                                description = qsTr("Saved Snapshot");
+                            } else if (filePath.endsWith(".sketch.wav")) {
+                                description = qsTr("Sketch");
+                            } else if (filePath.endsWith(".wav")) {
+                                description = qsTr("Sample");
+                            }
+                            return description;
                         }
                     }
                     delegate: Rectangle {
@@ -717,15 +731,19 @@ Zynthian.Dialog {
                                 }
 
                                 RowLayout {
+                                    spacing: Kirigami.Units.largeSpacing
                                     QQC2.Label {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        text: model.fileName
+                                        elide: Text.ElideMiddle
+                                        textFormat: Text.StyledText
+                                        property string fileDescription: folderModel.describeFile(model.filePath)
+                                        text: fileDescription === "" ? model.fileName : "%1 <i>(%2)</i>".arg(model.fileName).arg(fileDescription)
                                     }
 
                                     QQC2.Label {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                                        Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*6
+                                        Layout.maximumWidth: Kirigami.Units.gridUnit*6
                                         Layout.fillHeight: true
                                         text: fileProperties.fileMetadata.isWav
                                                 ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))

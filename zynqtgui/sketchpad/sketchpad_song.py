@@ -274,20 +274,14 @@ class sketchpad_song(QObject):
                     with open(Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json", "r") as f:
                         saved_state_obj = json.load(f)
 
-                if saved_state_obj is not None and not saved_state_obj == current_state_obj:
-                    logging.debug("Writing autosave")
-                    # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
-                    save_snapshot = False
-                    # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
-                    # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
-                    sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
-                    # Since this is an autosave, sketchpad has unsaved changes
-                    self.hasUnsavedChanges = True
-                else:
-                    # Saved sketchpad json is the same as current. Do not write autosave
-                    logging.debug("Not writing autosave")
-                    self.set_isSaving(False)
-                    return
+                logging.debug("Writing autosave")
+                # Since this is an autosave or a temp sketchpad, do not save snapshot as it relies on last_state snapshot
+                save_snapshot = False
+                # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
+                # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
+                sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
+                # Since this is an autosave, sketchpad has unsaved changes
+                self.hasUnsavedChanges = True
             else:
                 if self.isTemp:
                     # For temp sketchpad, do not save snapshot as it relies on last_state snapshot

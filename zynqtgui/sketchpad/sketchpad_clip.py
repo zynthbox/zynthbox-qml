@@ -509,7 +509,7 @@ class sketchpad_clip_metadata(QObject):
 
                 try:
                     file = taglib.File(self.clip.path)
-                    if isAutosave:
+                    if isAutosave and not self.clip.__song__.isTemp:
                         logging.debug(f"Clip metadata writing {self.clip} : autosave")
                         file.tags["AUTOSAVE"] = [str(json.dumps(tags))]
                     else:

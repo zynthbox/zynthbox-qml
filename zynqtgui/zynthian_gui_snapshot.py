@@ -27,6 +27,7 @@ import os
 import sys
 import logging
 from os.path import isfile, isdir, join, basename
+from pathlib import Path
 
 # Zynthian specific modules
 from . import zynthian_gui_config
@@ -44,7 +45,6 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
         super(zynthian_gui_snapshot, self).__init__('Snapshot', parent)
         self.base_dir = os.environ.get('ZYNTHIAN_MY_DATA_DIR',"/zynthian/zynthian-my-data") + "/snapshots"
         self.default_snapshot_fpath = join(self.base_dir,"default.zss")
-        self.last_state_snapshot_fpath = join(self.base_dir,"last_state.zss")
         self.bank_dir = None
         self.bankless_mode = False
         self.action = "LOAD"
@@ -58,6 +58,12 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
         self.save_last_state_timer.setSingleShot(True)
         self.save_last_state_timer.timeout.connect(self.save_last_state_snapshot)
         self.save_last_state_timer_requested.connect(self.save_last_state_timer.start)
+
+
+    def get_last_state_snapshot_fpath(self):
+        lastSelectedSketchpad = Path(self.zynqtgui.global_settings.value("Sketchpad/lastSelectedSketchpad", "/zynthian/zynthian-my-data/sketchpads/temp/Sketchpad-1.sketchpad.json"))
+        (lastSelectedSketchpad.parent / "soundsets").mkdir(parents=True, exist_ok=True)
+        return str(lastSelectedSketchpad.parent / "soundsets" / "Autosave.zss")
 
 
     def get_snapshot_fpath(self,f):
@@ -119,8 +125,8 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
             self.list_data.append((self.default_snapshot_fpath,i,"Default"))
             i=i+1
 
-        if self.action=="LOAD" and isfile(self.last_state_snapshot_fpath):
-            self.list_data.append((self.last_state_snapshot_fpath,i,"Last State"))
+        if self.action=="LOAD" and isfile(self.get_last_state_snapshot_fpath()):
+            self.list_data.append((self.get_last_state_snapshot_fpath(),i,"Last State"))
             i += 1
 
         self.change_index_offset(i)
@@ -153,15 +159,15 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
             if self.bankless_mode:
                 self.list_data.append((self.default_snapshot_fpath,i,"Default"))
                 i += 1
-                self.list_data.append((self.last_state_snapshot_fpath,i,"Last State"))
+                self.list_data.append((self.get_last_state_snapshot_fpath(),i,"Last State"))
                 i += 1
         elif self.action=="LOAD": 
             if self.bankless_mode:
                 if isfile(self.default_snapshot_fpath):
                     self.list_data.append((self.default_snapshot_fpath,i,"Default"))
                     i += 1
-                if isfile(self.last_state_snapshot_fpath):
-                    self.list_data.append((self.last_state_snapshot_fpath,i,"Last State"))
+                if isfile(self.get_last_state_snapshot_fpath()):
+                    self.list_data.append((self.get_last_state_snapshot_fpath(),i,"Last State"))
                     i += 1
 
         self.change_index_offset(i)
@@ -281,7 +287,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
     def save_last_state_snapshot(self):
         if self.isLoading == 0 and self.zynqtgui.sketchpad is not None and self.zynqtgui.sketchpad.song is not None and not self.zynqtgui.sketchpad.song.isLoading and not self.zynqtgui.sketchpad.sketchpadLoadingInProgress:
-            self.zynqtgui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)
+            self.zynqtgui.screens['layer'].save_snapshot(self.get_last_state_snapshot_fpath())
         else:
             logging.debug("Not saving snapshot while we're loading. Rescheduling")
             # HACK to use a timer from another thread
@@ -289,16 +295,16 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 
     def load_last_state_snapshot(self, quiet=False):
-        if isfile(self.last_state_snapshot_fpath):
+        if isfile(self.get_last_state_snapshot_fpath()):
             self.isLoading += 1
-            result = self.zynqtgui.screens['layer'].load_snapshot(self.last_state_snapshot_fpath, quiet)
+            result = self.zynqtgui.screens['layer'].load_snapshot(self.get_last_state_snapshot_fpath(), quiet)
             self.isLoading -= 1
             return result
 
 
     def delete_last_state_snapshot(self):
         try:
-            os.remove(self.last_state_snapshot_fpath)
+            os.remove(self.get_last_state_snapshot_fpath())
         except:
             pass
 

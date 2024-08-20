@@ -273,9 +273,10 @@ class sketchpad_song(QObject):
                 save_snapshot = False
                 # If this is an autosave or if it is a temp sketchpad set sketchpad name to autosave
                 # (temp sketchpads do not have autosave file. Sketchpad-1.sketchpad.json acts as the autosave file)
-                sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
+                sketchpad_file = Path(self.sketchpad_folder) / "Autosave.sketchpad.json"
                 # Since this is an autosave, sketchpad has unsaved changes
                 self.hasUnsavedChanges = True
+                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
             else:
                 if self.isTemp:
                     # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
@@ -291,7 +292,7 @@ class sketchpad_song(QObject):
                 sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
                 logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
                 # Also delete the cache file as we are performing a sketchpad save initiated by user
-                Path(self.sketchpad_folder + ".autosave.sketchpad.json").unlink(missing_ok=True)
+                Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
 
             try:
                 Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
@@ -341,15 +342,15 @@ class sketchpad_song(QObject):
         self.isLoadingChanged.emit()
         self.zynqtgui.currentTaskMessage = "Loading Sketchpad : Restoring Data"
 
-        if load_autosave is True and (Path(self.sketchpad_folder) / ".autosave.sketchpad.json").exists():
-            sketchpad_file = Path(self.sketchpad_folder) / ".autosave.sketchpad.json"
+        if load_autosave is True and (Path(self.sketchpad_folder) / "Autosave.sketchpad.json").exists():
+            sketchpad_file = Path(self.sketchpad_folder) / "Autosave.sketchpad.json"
             # Since this is an autosave, sketchpad has unsaved changes
             self.hasUnsavedChanges = True
         else:
             # Since this is NOT an autosave, sketchpad does not have any unsaved changes
             self.hasUnsavedChanges = False
             # Also delete the cache file if there are any (for fallback purposes)
-            Path(self.sketchpad_folder + ".autosave.sketchpad.json").unlink(missing_ok=True)
+            Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
 
         try:
             if sketchpad_file.exists():
@@ -358,7 +359,11 @@ class sketchpad_song(QObject):
                     sketchpad = json.loads(f.read())
 
                     if "name" in sketchpad and sketchpad["name"] != "":
-                        if self.__name__ != sketchpad["name"]:
+                        if self.__name__ == "Autosave":
+                            # If Sketchpad name is Autosave, make sure to update self.__name__ to the one saved in json
+                            self.__name__ = sketchpad["name"]
+                            self.__name_changed__.emit()
+                        elif self.__name__ != sketchpad["name"]:
                             logging.info(f"Sketchpad filename changed from '{sketchpad['name']}' to '{self.__name__}'. "
                                         f"Trying to rename soundset file.")
                             logging.info(f'Renaming {self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss to {self.sketchpad_folder}/soundsets/{self.__name__}.zss')

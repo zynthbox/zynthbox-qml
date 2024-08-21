@@ -1330,6 +1330,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
         # logging.debug(json)
 
         try:
+            Path(fpath).parent.mkdir(parents=True, exist_ok=True)
             with open(fpath,"w") as fh:
                 fh.write(json)
                 fh.flush()

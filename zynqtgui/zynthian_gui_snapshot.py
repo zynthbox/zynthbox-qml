@@ -62,7 +62,6 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
     def get_last_state_snapshot_fpath(self):
         lastSelectedSketchpad = Path(self.zynqtgui.global_settings.value("Sketchpad/lastSelectedSketchpad", "/zynthian/zynthian-my-data/sketchpads/temp/Sketchpad-1.sketchpad.json"))
-        (lastSelectedSketchpad.parent / "soundsets").mkdir(parents=True, exist_ok=True)
         return str(lastSelectedSketchpad.parent / "soundsets" / "Autosave.zss")
 
 

@@ -670,6 +670,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             # Rename temp sketchpad json filename to user defined name
             Path(self.__sketchpad_basepath__ / name / (self.__song__.name + ".sketchpad.json")).rename(self.__sketchpad_basepath__ / name / (name + ".sketchpad.json"))
 
+            # Save a sequence for this version to the user defined name
+            sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.__song__.scenesModel.selectedSequenceName)
+            sequenceModel.exportTo(f"{self.__sketchpad_basepath__ / name}/sequences/{name}/{sequenceModel.objectName().lower().replace(' ', '-')}/metadata.sequence.json")
+
             # Read sketchpad json data to dict
             try:
                 with open(self.__sketchpad_basepath__ / name / (name + ".sketchpad.json"), "r") as f:

@@ -294,6 +294,11 @@ class sketchpad_song(QObject):
                 # Also delete the cache file as we are performing a sketchpad save initiated by user
                 Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
 
+            # Save a sequence for this version if not a temp sketchpad and not an autosave version
+            if not self.isTemp and not autosave:
+                sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.scenesModel.selectedSequenceName)
+                sequenceModel.exportTo(f"{self.sketchpad_folder}/sequences/{self.name}/{sequenceModel.objectName().lower().replace(' ', '-')}/metadata.sequence.json")
+
             try:
                 Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
                 with open(sketchpad_file, "w") as f:
@@ -424,6 +429,11 @@ class sketchpad_song(QObject):
                     else:
                         for midiChannel in range(0, 16):
                             setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
+
+                    # Load sequence model for this version explicitly after restoring sketchpad if it is not a temp sketchpad and not an autosave version
+                    if not self.isTemp and not load_autosave:
+                        sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.scenesModel.selectedSequenceName)
+                        sequenceModel.importFrom(f"{self.sketchpad_folder}/sequences/{self.name}/{sequenceModel.objectName().lower().replace(' ', '-')}/metadata.sequence.json")
 
                     self.__is_loading__ = False
                     self.isLoadingChanged.emit()

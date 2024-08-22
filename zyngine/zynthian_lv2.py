@@ -66,6 +66,10 @@ JALV_LV2_CONFIG_FILE_ALL = "{}/jalv/all_plugins.json".format(os.environ.get('ZYN
 plugins = None
 plugin_by_type = None
 plugins_mtime = None
+# A Dict of plugin that wants to have a different class name other than the one reported by lilv
+custom_plugin_class = {
+    "Airwindows Consolidated": "Airwindows"
+}
 
 
 def get_plugins():
@@ -119,15 +123,22 @@ def is_plugin_enabled(plugin_name):
 
 
 def    is_plugin_ui(plugin):
-    for uri in plugin.get_data_uris():
-        try:
-            with open(urllib.parse.unquote(str(uri)[7:])) as f:
-                if f.read().find("a ui:X11UI") > 0:
-                    return True
-        except:
-            logging.error("Failed to get UI for plugin %s", str(plugin.get_name()))
-            pass
-    return False
+    global plugins
+    # Check if plugin details is already available. If already available, return previous value for UI enabled
+    try:
+        plugin_name = str(plugin.get_name())
+        if plugin_name in plugins:
+            return plugins[plugin_name]['UI']
+    except:
+        for uri in plugin.get_data_uris():
+            try:
+                with open(urllib.parse.unquote(str(uri)[7:])) as f:
+                    if f.read().find("a ui:X11UI") > 0:
+                        return True
+            except:
+                logging.error("Failed to get UI for plugin %s", str(plugin.get_name()))
+                pass
+        return False
 
 
 def generate_plugins_config_file(refresh=True):
@@ -142,10 +153,14 @@ def generate_plugins_config_file(refresh=True):
         for plugin in world.get_all_plugins():
             name = str(plugin.get_name())
             logging.info("Plugin '{}'".format(name))
+            if name in custom_plugin_class:
+                plugin_class = custom_plugin_class[name]
+            else:
+                plugin_class = re.sub(' Plugin', '', str(plugin.get_class().get_label()))
             genplugins[name] = {
                 'URL': str(plugin.get_uri()),
                 'TYPE': get_plugin_type(plugin).value,
-                'CLASS': re.sub(' Plugin', '', str(plugin.get_class().get_label())),
+                'CLASS': plugin_class,
                 'ENABLED': is_plugin_enabled(name),
                 'UI': is_plugin_ui(plugin),
                 'BUNDLE_URI': str(plugin.get_bundle_uri())

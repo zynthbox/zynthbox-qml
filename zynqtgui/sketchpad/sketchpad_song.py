@@ -342,6 +342,9 @@ class sketchpad_song(QObject):
             QMetaObject.invokeMethod(self.__save_timer__, "start", Qt.QueuedConnection)
 
     def restore(self, load_autosave):
+        if self.__name__ == "Autosave":
+            # If user is explicitly loading Autosave, set load_autosave to True to mimic automatic loading an autosave sketchpad
+            load_autosave = True
         sketchpad_file = Path(self.sketchpad_folder) / f"{self.__name__}.sketchpad.json"
         self.__is_loading__ = True
         self.isLoadingChanged.emit()

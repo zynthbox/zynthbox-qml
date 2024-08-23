@@ -123,22 +123,15 @@ def is_plugin_enabled(plugin_name):
 
 
 def    is_plugin_ui(plugin):
-    global plugins
-    # Check if plugin details is already available. If already available, return previous value for UI enabled
-    try:
-        plugin_name = str(plugin.get_name())
-        if plugin_name in plugins:
-            return plugins[plugin_name]['UI']
-    except:
-        for uri in plugin.get_data_uris():
-            try:
-                with open(urllib.parse.unquote(str(uri)[7:])) as f:
-                    if f.read().find("a ui:X11UI") > 0:
-                        return True
-            except:
-                logging.error("Failed to get UI for plugin %s", str(plugin.get_name()))
-                pass
-        return False
+    for uri in plugin.get_data_uris():
+        try:
+            with open(urllib.parse.unquote(str(uri)[7:])) as f:
+                if f.read().find("a ui:X11UI") > 0:
+                    return True
+        except:
+            logging.error("Failed to get UI for plugin %s", str(plugin.get_name()))
+            pass
+    return False
 
 
 def generate_plugins_config_file(refresh=True):

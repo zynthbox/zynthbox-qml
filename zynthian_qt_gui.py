@@ -656,6 +656,7 @@ class zynthian_gui(QObject):
         Zynthbox.Plugin.instance().initialize()
         # Hook up message passing
         Zynthbox.MidiRouter.instance().midiMessage.connect(self.handleMidiMessage)
+        Zynthbox.MidiRouter.instance().cuiaEvent.connect(self.handleMidiRouterCuiaEvent)
 
     @Slot(int, int, int, int, int, int, bool)
     def handleMidiMessage(self, port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal):
@@ -1624,8 +1625,12 @@ class zynthian_gui(QObject):
     # Callable UI Actions
     # -------------------------------------------------------------------
 
-    @Slot(str)
-    def callable_ui_action(self, cuia, params=None):
+    @Slot(str,int,int,int,int)
+    def handleMidiRouterCuiaEvent(self, cuia, originId, track, part, value):
+        self.callable_ui_action(cuia, [value], originId, track, part)
+
+    @Slot(str, 'QVariantList', int, int, int)
+    def callable_ui_action(self, cuia, params=[-1], originId=-1, track=-1, part=-1):
         # logging.debug(f"CUIA : {cuia}")
 
         channelDelta = 5 if self.channelsModActive else 0
@@ -1634,8 +1639,9 @@ class zynthian_gui(QObject):
         try:
             cuia_callback = zynthian_gui_config.top.property("cuiaCallback")
             if cuia_callback is not None and cuia_callback.isCallable():
-                _result = cuia_callback.call([cuia])
+                _result = cuia_callback.call([cuia, originId, track, part, params[0]])
                 if _result is not None and _result.toBool():
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
                     return
         except Exception as e:
             logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
@@ -1647,10 +1653,11 @@ class zynthian_gui(QObject):
                 visible = self.opened_dialog.property("visible")
 
                 if cuia_callback is not None and cuia_callback.isCallable() and visible:
-                    _result = cuia_callback.call([cuia])
+                    _result = cuia_callback.call([cuia, originId, track, part, params[0]])
 
                     if _result is not None and _result.toBool():
                         # If cuiaCallback returned true, then CUIA event has been handled by qml. Return
+                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
                         return
 
                 if visible:
@@ -1660,6 +1667,7 @@ class zynthian_gui(QObject):
                         if cuia.startswith("SWITCH_BACK"):
                             logging.debug(f"SWITCH_BACK pressed. Dialog does not have a cuiaCallback property. Try closing.")
                             QMetaObject.invokeMethod(self.opened_dialog, "close", Qt.QueuedConnection)
+                            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
                             return
                     except Exception as e:
                         logging.debug(f"Attempted to close openedDialog, got error: {e}")
@@ -1671,8 +1679,9 @@ class zynthian_gui(QObject):
             try:
                 js_value = self.current_qml_page_prop.property("cuiaCallback")
                 if js_value is not None and js_value.isCallable():
-                    _result = js_value.call([cuia])
+                    _result = js_value.call([cuia, originId, track, part, params[0]])
                     if _result is not None and _result.toBool():
+                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
                         return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
@@ -2028,6 +2037,34 @@ class zynthian_gui(QObject):
 
         # elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
         #     self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
+        elif cuia == "SWITCH_PRESSED":
+            pass
+        elif cuia == "SWITCH_RELEASED":
+            pass
+        elif cuia == "ACTIVATE_TRACK":
+            pass
+        elif cuia == "TOGGLE_TRACK_MUTED":
+            pass
+        elif cuia == "TOGGLE_TRACK_SOLOED":
+            pass
+        elif cuia == "SET_TRACK_VOLUME":
+            pass
+        elif cuia == "SET_TRACK_PAN":
+            pass
+        elif cuia == "SET_TRACK_SEND1_AMOUNT":
+            pass
+        elif cuia == "SET_TRACK_SEND2_AMOUNT":
+            pass
+        elif cuia == "SET_PART_ACTIVE_STATE":
+            pass
+        elif cuia == "TOGGLE_PART":
+            pass
+        elif cuia == "SET_PART_GAIN":
+            pass
+        elif cuia == "SET_FX_AMOUNT":
+            pass
+        # Finally, report back to MidiRouter that we've handled the action
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -2037,7 +2074,7 @@ class zynthian_gui(QObject):
                     zynthian_gui_config.custom_switch_ui_actions[i][t]
                 )
         except Exception as e:
-            logging.logging.error(f"Error occurred while attempting to call a cuia action: {e}")
+            logging.error(f"Error occurred while attempting to call a cuia action: {e}")
 
     # -------------------------------------------------------------------
     # Switches

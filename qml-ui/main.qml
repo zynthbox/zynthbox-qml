@@ -58,7 +58,7 @@ Kirigami.AbstractApplicationWindow {
     property QtObject selectedChannel: {
         return root.channels[0]
     }
-    property var cuiaCallback: function(cuia) {
+    property var cuiaCallback: function(cuia, originId, track, part, value) {
         var result = false;
 
         // Pass things along to the recording popup explicitly, if it's closed, to ensure things happen that are supposed to

@@ -825,24 +825,13 @@ class sketchpad_channel(QObject):
     # source : Source sketchpad_channel object
     @Slot(QObject)
     def copyFrom(self, source):
-        # TODO : Re-implement copyFrom
-        pass
-        # for part in range(5):
-        #     # Copy all clips from source channel to self
-        #     for clip_index in range(0, self.parts[part].count):
-        #         self.parts[part].getClip(clip_index).copyFrom(source.parts[part].getClip(clip_index))
+        for part in range(5):
+            # Copy all clips from source channel to self
+            for clip_index in range(0, self.parts[part].count):
+                self.parts[part].getClip(clip_index).copyFrom(source.parts[part].getClip(clip_index))
 
-        # source_bank_dir = Path(source.bankDir)
-        # dest_bank_dir = Path(self.bankDir)
-
-        # dest_bank_dir.mkdir(parents=True, exist_ok=True)
-
-        # # Copy all samples from source channel
-        # for file in source_bank_dir.glob("*"):
-        #     shutil.copy2(file, dest_bank_dir / file.name)
-
-        # # # Restore bank after copying
-        # # self.restore_bank()
+        for sample_id in range(5):
+            self.samples[sample_id].copyFrom(source.samples[sample_id])
 
     @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):

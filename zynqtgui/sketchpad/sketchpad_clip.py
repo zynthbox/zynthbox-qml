@@ -1077,7 +1077,8 @@ class sketchpad_clip(QObject):
     @Slot(QObject)
     def copyFrom(self, clip):
         self.clear()
-        self.deserialize(clip.serialize())
+        self.set_path(clip.path, True, True)
+        self.enabled = clip.enabled
 
     @Slot()
     def deleteClip(self):

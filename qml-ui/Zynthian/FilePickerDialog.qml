@@ -579,13 +579,6 @@ Zynthian.Dialog {
                                         Layout.fillHeight: true
                                         text: qsTr("Filename")
                                     }
-
-                                    QQC2.Label {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*6
-                                        Layout.maximumWidth: Kirigami.Units.gridUnit*6
-                                        Layout.fillHeight: true
-                                        text: qsTr("Duration")
-                                    }
                                 }
                             }
 
@@ -669,9 +662,9 @@ Zynthian.Dialog {
                         function describeFile(filePath) {
                             let description = "";
                             if (filePath.endsWith("Autosave.sketchpad.json")) {
-                                description = qsTr("Active Working Copy");
+                                description = qsTr("Active Working Version");
                             } else if (filePath.endsWith(".sketchpad.json")) {
-                                description = qsTr("Saved Snapshot");
+                                description = qsTr("Saved Version");
                             } else if (filePath.endsWith(".sketch.wav")) {
                                 description = qsTr("Sketch");
                             } else if (filePath.endsWith(".wav")) {
@@ -733,21 +726,22 @@ Zynthian.Dialog {
                                 RowLayout {
                                     spacing: Kirigami.Units.largeSpacing
                                     QQC2.Label {
-                                        Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         elide: Text.ElideMiddle
                                         textFormat: Text.StyledText
-                                        property string fileDescription: folderModel.describeFile(model.filePath)
-                                        text: fileDescription === "" ? model.fileName : "%1 <i>(%2)</i>".arg(model.fileName).arg(fileDescription)
+                                        text: model.fileName
+                                    }
+                                    Item { // Spacer
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
                                     }
 
                                     QQC2.Label {
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*6
-                                        Layout.maximumWidth: Kirigami.Units.gridUnit*6
+                                        property string fileDescription: folderModel.describeFile(model.filePath)
                                         Layout.fillHeight: true
-                                        text: fileProperties.fileMetadata.isWav
-                                                ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))
-                                                : ""
+                                        Layout.alignment: Qt.AlignRight
+                                        textFormat: Text.StyledText
+                                        text: fileDescription == "" ? "" : "<i>(%1)</i>".arg(fileDescription)
                                     }
                                 }
                             }

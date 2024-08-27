@@ -276,7 +276,6 @@ class sketchpad_song(QObject):
                 sketchpad_file = Path(self.sketchpad_folder) / "Autosave.sketchpad.json"
                 # Since this is an autosave, sketchpad has unsaved changes
                 self.hasUnsavedChanges = True
-                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
             else:
                 if self.isTemp:
                     # For temp sketchpad, do not save snapshot as it relies on last_state snapshot
@@ -293,6 +292,9 @@ class sketchpad_song(QObject):
                 logging.info(f"Storing sketchpad to {str(sketchpad_file)}")
                 # Also delete the cache file as we are performing a sketchpad save initiated by user
                 Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
+
+            # Save current operating sketchpad file to lastSelectedSketchpad
+            self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
 
             # Save a sequence for this version if not a temp sketchpad and not an autosave version
             if not self.isTemp and not autosave:

@@ -159,10 +159,15 @@ class zynthian_layer:
         if len(self.bank_list_cache) == 0 or force:
             self.bank_list_cache = self.engine.get_bank_list(self)
 
-        if len(self.engine.get_preset_favs(self)) > 0:
-            self.bank_list = [["*FAVS*",0,"Favorites (%d)" % len(self.engine.get_preset_favs(self))]] + self.bank_list_cache.copy()
-        else:
-            self.bank_list = self.bank_list_cache.copy()
+        # Disable FAVS entry in bank list. Favorites are now toggled via a button on qml side
+        # if len(self.engine.get_preset_favs(self)) > 0:
+        #     self.bank_list = [["*FAVS*",0,"Favorites (%d)" % len(self.engine.get_preset_favs(self))]] + self.bank_list_cache.copy()
+        # else:
+        #     self.bank_list = self.bank_list_cache.copy()
+
+        # Explicitly call get_preset_favs to generate preset fav list. Otherwise *BOOM*
+        self.engine.get_preset_favs(self)
+        self.bank_list = self.bank_list_cache.copy()
         # logging.debug("BANK LIST => \n%s" % str(self.bank_list))
 
 

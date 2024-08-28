@@ -33,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
     property var screenIds: ["effect_types", "layer_effect_chooser", "effect_preset"]
-    property var screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), qsTr("%1 Preset (%2)").arg(zynqtgui.preset.engine_name).arg(zynqtgui.preset.effective_count)]
+    property var screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)]
 
     contextualActions: [
         Kirigami.Action {
@@ -158,12 +158,25 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            Kirigami.Heading {
-                level: 2
-                text: root.screenTitles[2]
-                Kirigami.Theme.inherit: false
-                // TODO: this should eventually go to Window and the panels to View
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            RowLayout {
+                Layout.fillWidth: true
+                Kirigami.Heading {
+                    level: 2
+                    text: root.screenTitles[2]
+                    Kirigami.Theme.inherit: false
+                    // TODO: this should eventually go to Window and the panels to View
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                QQC2.Button {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                    text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
+                    onClicked: {
+                        zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                    }
+                }
             }
             Zynthian.SelectorView {
                 id: effectPresetView
@@ -174,6 +187,14 @@ Zynthian.ScreenPage {
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                 autoActivateIndexOnChange: true
+                onIconClicked: {
+                    if (effectPresetView.selector.current_index != index) {
+                        effectPresetView.selector.current_index = index;
+                        effectPresetView.selector.activate_index(index);
+                    }
+                    zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
+                    zynqtgui.current_screen_id = "effect_preset";
+                }
                 Component.onCompleted: {
                     effectPresetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
                 }

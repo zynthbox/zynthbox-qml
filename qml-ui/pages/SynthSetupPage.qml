@@ -731,35 +731,22 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
             RowLayout {
+                Layout.fillWidth: true
                 Kirigami.Heading {
                     id: presetHeading
-                    Layout.fillWidth: true
                     level: 2
                     text: visible ? qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count) : "";
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
+                Item {
+                    Layout.fillWidth: true
+                }
                 QQC2.Button {
-                    id: favToggleButton
-                    icon.name: zynqtgui.preset.current_is_favorite ? "starred-symbolic" : "non-starred-symbolic"
-                    text: qsTr("Toggle")
-                    LayoutMirroring.enabled: true
-                    LayoutMirroring.childrenInherit: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                    text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
                     onClicked: {
-                        zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
-                        zynqtgui.current_screen_id = "preset";
-                    }
-                    MouseArea { //HACK: try to enlarge hit area a bit, probably useless
-                        anchors {
-                            fill: parent
-                            leftMargin: -16
-                            topMargin: -16
-                            rightMargin: -16
-                        }
-                        onClicked: {
-                            zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
-                            zynqtgui.current_screen_id = "preset";
-                        }
+                        zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
                     }
                 }
             }

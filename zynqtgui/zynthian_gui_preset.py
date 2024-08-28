@@ -119,6 +119,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         if not self.zynqtgui.curlayer.get_preset_name():
             self.zynqtgui.curlayer.set_preset(self.zynqtgui.curlayer.get_preset_index())
 
+        self.show_only_favorites_changed.emit()
         self.set_select_path()
         super().show()
 

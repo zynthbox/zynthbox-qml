@@ -33,6 +33,7 @@ import "private"
 QQC2.ItemDelegate {
     id: delegate
     width: ListView.view.width
+    height: model.large !== undefined && model.large === true ? Kirigami.Units.iconSizes.large : undefined
 
     enabled: delegate.visible && model.action_id !== undefined
 

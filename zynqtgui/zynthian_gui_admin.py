@@ -62,16 +62,26 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
     def fill_list(self):
         self.list_data = []
+        self.list_metadata = []
 
         self.list_data.append((self.audio_settings, 0, "Audio Settings"))
+        self.list_metadata.append({"icon": "audio-speakers-symbolic", "large": True });
         self.list_data.append((self.midi_controllers, 0, "Midi Controllers"))
+        self.list_metadata.append({"icon": "input-dialpad", "large": True });
         self.list_data.append((self.synth_behaviour, 0, "Synth Behaviour"))
+        self.list_metadata.append({"icon": "folder-music-symbolic", "large": True });
         self.list_data.append((self.network, 0, "Network"))
+        self.list_metadata.append({"icon": "network-wireless", "large": True });
         self.list_data.append((self.hardware, 0, "Hardware"))
+        self.list_metadata.append({"icon": "audio-card", "large": True });
         self.list_data.append((None, 0, "-----------------------------"))
+        self.list_metadata.append({"icon": "", "large": False });
         self.list_data.append((self.check_for_updates, 0, "Check for software updates"))
+        self.list_metadata.append({"icon": "update-none", "large": True });
         self.list_data.append((None, 0, "-----------------------------"))
+        self.list_metadata.append({"icon": "", "large": False });
         self.list_data.append((self.about_page,0,"About"))
+        self.list_metadata.append({"icon": "help-about-symbolic", "large": True });
         super().fill_list()
 
     def select_action(self, i, t="S"):

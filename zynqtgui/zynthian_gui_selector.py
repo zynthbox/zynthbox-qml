@@ -49,6 +49,7 @@ class selector_list_model(QAbstractListModel):
     ICON = Qt.UserRole + 4
     SHOW_NUMBERS = Qt.UserRole + 5
     METADATA = Qt.UserRole + 6
+    LARGE = Qt.UserRole + 7
 
     def __init__(self, parent=None):
         super(selector_list_model, self).__init__(parent)
@@ -87,6 +88,7 @@ class selector_list_model(QAbstractListModel):
             selector_list_model.ICON : QByteArray(b'icon'),
             selector_list_model.SHOW_NUMBERS : QByteArray(b'show_numbers'),
             selector_list_model.METADATA : QByteArray(b'metadata'),
+            selector_list_model.LARGE : QByteArray(b'large'),
             }
         return keys
 
@@ -136,6 +138,8 @@ class selector_list_model(QAbstractListModel):
             return self.get_metadata(index, 'show_numbers')
         elif role == selector_list_model.METADATA:
             return self.get_metadata(index, None)
+        elif role == selector_list_model.LARGE:
+            return self.get_metadata(index, 'large')
         else:
             return None
 

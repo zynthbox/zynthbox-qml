@@ -63,7 +63,8 @@ Zynthian.Stack {
         "network_info": "NetworkInfoPage.qml",
         "sound_categories": "SoundCategories/Main.qml",
         "wifi_settings":"WifiSettingsPage.qml",
-        "test_knobs":"TestKnobsPage.qml"
+        "test_knobs":"TestKnobsPage.qml",
+        "midicontroller_settings": "MidiControllerSettings.qml"
     }
     readonly property var pageDisplayNames: {
         "main": "Main Menu",

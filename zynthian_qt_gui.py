@@ -78,6 +78,7 @@ from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugins_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
+from zynqtgui.zynthian_gui_midicontroller_settings import zynthian_gui_midicontroller_settings
 from zynqtgui.zynthian_gui_multi_controller import MultiController
 
 sys.path.insert(1, "/zynthian/zynthbox-qml/")
@@ -1184,6 +1185,7 @@ class zynthian_gui(QObject):
         self.screens["admin"] = zynthian_gui_admin(self)
         self.screens["audio_settings"] = zynthian_gui_audio_settings(self)
         self.screens["wifi_settings"] = zynthian_gui_wifi_settings(self)
+        self.screens["midicontroller_settings"] = zynthian_gui_midicontroller_settings(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
         self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
         self.screens["sound_categories"] = zynthian_gui_sound_categories(self)
@@ -3661,6 +3663,9 @@ class zynthian_gui(QObject):
     def wifi_settings(self):
         return self.screens["wifi_settings"]
 
+    def midicontroller_settings(self):
+        return self.screens["midicontroller_settings"]
+
     def test_knobs(self):
         return self.screens["test_knobs"]
 
@@ -4315,6 +4320,7 @@ class zynthian_gui(QObject):
     sketchpad = Property(QObject, sketchpad, constant=True)
     audio_settings = Property(QObject, audio_settings, constant=True)
     wifi_settings = Property(QObject, wifi_settings, constant=True)
+    midicontroller_settings = Property(QObject, midicontroller_settings, constant=True)
     test_knobs = Property(QObject, test_knobs, constant=True)
     synth_behaviour = Property(QObject, synth_behaviour, constant=True)
     snapshots_menu = Property(QObject, snapshots_menu, constant=True)

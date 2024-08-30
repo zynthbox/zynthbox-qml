@@ -31,7 +31,7 @@ import org.kde.kirigami 2.0 as Kirigami
  * \brief Used to indicate whether a knob will control something, and passes information to the listener
  *
  * Use is deliberately simple. For example, the following code will write "down" and "up"
- * to the log when the component is visible and knob 2 (the second small knob) is twisted:
+ * to the log when the component is visible and knob 2 (the third small knob) is twisted:
  * \code
 KnobIndicator {
     knobId: 2
@@ -49,8 +49,8 @@ Item {
     enabled: visible
     /**
      * \brief Which knob to operate on (from 0 through 3)
-     * The large knob is id 0
-     * The three smaller knobs, from top to bottom, are ID 1, 2, and 3
+     * The large knob is id 3
+     * The three smaller knobs, from top to bottom, are ID 0, 1, and 2
      * @default No knob is inspected
      */
     property int knobId: -1

@@ -475,6 +475,7 @@ Zynthian.ScreenPage {
                                 deviceComponentScroller.currentRow = pickTrackForAllChannelsButton;
                             } else {
                                 deviceComponentScroller.currentRow = inputFiltersRepeater.itemAt(0);
+                                inputFiltersRepeater.currentlySelectedFilter = deviceComponentScroller.currentRow.filterObject;
                             }
                         }
                         function goPrevious() { deviceComponentScroller.currentRow = secondDeviceSettingsRow; }
@@ -489,65 +490,101 @@ Zynthian.ScreenPage {
                         checked: deviceComponentScroller.currentRow === addNewInputFilterButton
                     }
                 }
+                Connections {
+                    target: _private.selectedDeviceObject ? _private.selectedDeviceObject.inputEventFilter : null
+                    onEntriesChanged: {
+                        // console.log("Things match, currently selected filter is", inputFiltersRepeater.currentlySelectedFilter);
+                        if (inputFiltersRepeater.currentlySelectedFilter !== null) {
+                            // This is only likely to happen when an input filter is added, removed, or moved
+                            let selectedIndex = _private.selectedDeviceObject.inputEventFilter.entries.indexOf(inputFiltersRepeater.currentlySelectedFilter);
+                            // console.log(inputFiltersRepeater.currentlySelectedFilter, selectedIndex);
+                            if (selectedIndex === -1) {
+                                deviceComponentScroller.currentRow = addNewInputFilterButton;
+                                inputFiltersRepeater.currentlySelectedFilter = null;
+                            } else {
+                                deviceComponentScroller.currentRow = inputFiltersRepeater.itemAt(selectedIndex);
+                            }
+                        }
+                    }
+                }
                 Repeater {
                     id: inputFiltersRepeater
                     model: _private.selectedDeviceObject ? _private.selectedDeviceObject.inputEventFilter.entries : 0
+                    property QtObject currentlySelectedFilter: null
                     delegate: RowLayout {
                         id: inputFiltersRepeaterDelegate
+                        readonly property QtObject filterObject: modelData
                         function goNext() {
                             if (model.index === inputFiltersRepeater.count - 1) {
                                 deviceComponentScroller.currentRow = pickTrackForAllChannelsButton;
+                                inputFiltersRepeater.currentlySelectedFilter = null;
                             } else {
                                 deviceComponentScroller.currentRow = inputFiltersRepeater.itemAt(model.index + 1);
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                             }
                         }
                         function goPrevious() {
                             if (model.index === 0) {
                                 deviceComponentScroller.currentRow = addNewInputFilterButton;
+                                inputFiltersRepeater.currentlySelectedFilter = null;
                             } else {
                                 deviceComponentScroller.currentRow = inputFiltersRepeater.itemAt(model.index - 1);
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                             }
                         }
                         function knob0up() {
-                                _private.selectedDeviceObject.inputEventFilter.swap(_private.selectedDeviceObject.inputEventFilter.entries[model.index - 1], modelData);
+                            if (model.index < inputFiltersRepeater.count - 1) {
+                                _private.selectedDeviceObject.inputEventFilter.swap(modelData, _private.selectedDeviceObject.inputEventFilter.entries[model.index + 1]);
+                            }
                         }
                         function knob0down() {
-                                _private.selectedDeviceObject.inputEventFilter.swap(modelData, _private.selectedDeviceObject.inputEventFilter.entries[model.index + 1]);
+                            if (model.index > 0) {
+                                _private.selectedDeviceObject.inputEventFilter.swap(_private.selectedDeviceObject.inputEventFilter.entries[model.index - 1], modelData);
+                            }
                         }
                         function selectPressed() {
                                 _private.selectedInputFilterIndex = model.index;
                                 contentStack.push(inputFilterComponent);
                         }
                         Layout.fillWidth: true
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "edit-delete"
                             onClicked: {
+                                deviceComponentScroller.currentRow = parent;
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                             }
                         }
                         QQC2.Label {
                             Layout.fillWidth: true
                             text: "Filter %1:\n%2".arg(model.index + 1).arg(modelData.description)
                         }
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "go-up"
                             enabled: model.index > 0
                             onClicked: {
+                                deviceComponentScroller.currentRow = parent;
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                                 inputFiltersRepeaterDelegate.knob0up();
                             }
                         }
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "go-down"
                             enabled: model.index < inputFiltersRepeater.count - 1
                             onClicked: {
+                                deviceComponentScroller.currentRow = parent;
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                                 inputFiltersRepeaterDelegate.knob0down();
                             }
                             Zynthian.KnobIndicator {
@@ -562,12 +599,15 @@ Zynthian.ScreenPage {
                                 visible: deviceComponentScroller.currentRow === inputFiltersRepeaterDelegate
                             }
                         }
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "document-edit"
                             onClicked: {
+                                deviceComponentScroller.currentRow = parent;
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                                 inputFiltersRepeaterDelegate.selectPressed();
                             }
                             checked: deviceComponentScroller.currentRow === inputFiltersRepeaterDelegate
@@ -589,6 +629,7 @@ Zynthian.ScreenPage {
                                 deviceComponentScroller.currentRow = addNewInputFilterButton;
                             } else {
                                 deviceComponentScroller.currentRow = inputFiltersRepeater.itemAt(inputFiltersRepeater.count - 1);
+                                    inputFiltersRepeater.currentlySelectedFilter = deviceComponentScroller.currentRow.filterObject;
                             }
                         }
                         function selectPressed() { onClicked(); }
@@ -652,6 +693,7 @@ Zynthian.ScreenPage {
                                 deviceComponentScroller.currentRow = enableAllOutputChannelsButton;
                             } else {
                                 deviceComponentScroller.currentRow = outputFiltersRepeater.itemAt(0);
+                                inputFiltersRepeater.currentlySelectedFilter = deviceComponentScroller.currentRow.filterObject;
                             }
                         }
                         function goPrevious() { deviceComponentScroller.currentRow = midiChannelTargetTrackRepeater.itemAt(15); }
@@ -666,40 +708,66 @@ Zynthian.ScreenPage {
                         checked: deviceComponentScroller.currentRow === addOutputFilterButton
                     }
                 }
+                Connections {
+                    target: _private.selectedDeviceObject ? _private.selectedDeviceObject.outputEventFilter : null
+                    onEntriesChanged: {
+                        if (currentlySelectedFilter !== null) {
+                            // This is only likely to happen when an output filter is added, removed, or moved
+                            let selectedIndex = _private.selectedDeviceObject.outputEventFilter.entries.indexOf(currentlySelectedFilter);
+                            if (selectedIndex === -1) {
+                                deviceComponentScroller.currentRow = addNewOutputFilterButton;
+                                outputFiltersRepeater.currentlySelectedFilter = null;
+                            } else {
+                                deviceComponentScroller.currentRow = outputFiltersRepeater.itemAt(selectedIndex);
+                            }
+                        }
+                    }
+                }
                 Repeater {
                     id: outputFiltersRepeater
                     model: _private.selectedDeviceObject ? _private.selectedDeviceObject.outputEventFilter.entries : 0
+                    property QtObject currentlySelectedFilter: null
                     delegate: RowLayout {
                         id: outputFiltersRepeaterDelegate
+                        readonly property QtObject filterObject: modelData
                         function goNext() {
                             if (model.index === outputFiltersRepeater.count - 1) {
                                 deviceComponentScroller.currentRow = enableAllOutputChannelsButton;
+                                inputFiltersRepeater.currentlySelectedFilter = null;
                             } else {
                                 deviceComponentScroller.currentRow = outputFiltersRepeater.itemAt(model.index + 1);
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                             }
                         }
                         function goPrevious() {
                             if (model.index === 0) {
                                 deviceComponentScroller.currentRow = addOutputFilterButton;
+                                inputFiltersRepeater.currentlySelectedFilter = null;
                             } else {
                                 deviceComponentScroller.currentRow = outputFiltersRepeater.itemAt(model.index - 1);
+                                inputFiltersRepeater.currentlySelectedFilter = modelData;
                             }
                         }
                         function knob0up() {
-                            _private.selectedDeviceObject.outputEventFilter.swap(_private.selectedDeviceObject.outputEventFilter.entries[model.index - 1], modelData);
+                            if (model.index < outputFiltersRepeater.count - 1) {
+                                _private.selectedDeviceObject.outputEventFilter.swap(modelData, _private.selectedDeviceObject.outputEventFilter.entries[model.index + 1]);
+                            }
                         }
                         function knob0down() {
-                            _private.selectedDeviceObject.outputEventFilter.swap(modelData, _private.selectedDeviceObject.outputEventFilter.entries[model.index + 1]);
+                            if (model.index > 0) {
+                                _private.selectedDeviceObject.outputEventFilter.swap(_private.selectedDeviceObject.outputEventFilter.entries[model.index - 1], modelData);
+                            }
                         }
                         function selectPressed() {
                             _private.selectedOutputFilterIndex = model.index;
                             contentStack.push(outputFilterComponent);
                         }
                         Layout.fillWidth: true
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "edit-delete"
                             onClicked: {
                             }
@@ -708,20 +776,22 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             text: "Filter %1:\n%2".arg(model.index + 1).arg(modelData.description)
                         }
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "go-up"
                             enabled: model.index > 0
                             onClicked: {
                                 outputFiltersRepeaterDelegate.knob0up();
                             }
                         }
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "go-down"
                             enabled: model.index < outputFiltersRepeater.count - 1
                             onClicked: {
@@ -739,10 +809,11 @@ Zynthian.ScreenPage {
                                 visible: deviceComponentScroller.currentRow === outputFiltersRepeaterDelegate
                             }
                         }
-                        Zynthian.PlayGridButton {
+                        QQC2.Button {
                             Layout.fillWidth: false
                             Layout.minimumWidth: height
                             Layout.maximumWidth: height
+                            display: QQC2.AbstractButton.IconOnly
                             icon.name: "document-edit"
                             onClicked: {
                                 outputFiltersRepeaterDelegate.selectPressed();
@@ -764,6 +835,7 @@ Zynthian.ScreenPage {
                                 deviceComponentScroller.currentRow = addOutputFilterButton;
                             } else {
                                 deviceComponentScroller.currentRow = outputFiltersRepeater.itemAt(outputFiltersRepeater.count - 1);
+                                outputFiltersRepeater.currentlySelectedFilter = deviceComponentScroller.currentRow.filterObject;
                             }
                         }
                         function selectPressed() { onClicked(); }

@@ -1629,11 +1629,12 @@ class zynthian_gui(QObject):
 
     @Slot(str,int,int,int,int)
     def handleMidiRouterCuiaEvent(self, cuia, originId, track, part, value):
-        self.callable_ui_action(cuia, [value], originId, track, part)
+        # logging.error(f"midi router cuia event: {cuia}, origin ID: {originId}, track: {track} aka {int(track)}, part: {part} aka {int(part)}, value: {value}")
+        self.callable_ui_action(cuia, [value], originId, int(track), int(part))
 
     @Slot(str, 'QVariantList', int, int, int)
     def callable_ui_action(self, cuia, params=[-1], originId=-1, track=-1, part=-1):
-        # logging.debug(f"CUIA : {cuia}")
+        # logging.error(f"CUIA : {cuia} {params} {originId} {track} {part}")
 
         channelDelta = 5 if self.channelsModActive else 0
 

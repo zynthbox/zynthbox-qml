@@ -122,6 +122,10 @@ QQC2.ScrollView {
             id: inputFilterComponent
             MidiControllerSettingsInputFilter {}
         }
+        Component {
+            id: outputFilterComponent
+            MidiControllerSettingsOutputFilter {}
+        }
         RowLayout {
             id: deviceComponentHeader
             function goNext() { component.currentRow = firstDeviceSettingsRow; }
@@ -570,7 +574,7 @@ QQC2.ScrollView {
         Connections {
             target: _private.selectedDeviceObject ? _private.selectedDeviceObject.outputEventFilter : null
             onEntriesChanged: {
-                if (currentlySelectedFilter !== null) {
+                if (outputFiltersRepeater.currentlySelectedFilter !== null) {
                     // This is only likely to happen when an output filter is added, removed, or moved
                     let selectedIndex = _private.selectedDeviceObject.outputEventFilter.entries.indexOf(currentlySelectedFilter);
                     if (selectedIndex === -1) {

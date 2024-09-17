@@ -192,44 +192,6 @@ Zynthian.ScreenPage {
         MidiControllerSettingsDevice {}
     }
 
-    Component {
-        id: outputFilterComponent
-        Item {
-            function cuiaCallback(cuia) {
-                let result = false;
-                switch (cuia) {
-                    case "SWITCH_BACK_SHORT":
-                    case "SWITCH_BACK_BOLD":
-                    case "SWITCH_BACK_LONG":
-                        contentStack.pop();
-                        returnValue = true;
-                        break;
-                    default:
-                        break;
-                }
-                return result;
-            }}
-    }
-
-    Component {
-        id: outputFilterRuleComponent
-        Item {
-            function cuiaCallback(cuia) {
-                let result = false;
-                switch (cuia) {
-                    case "SWITCH_BACK_SHORT":
-                    case "SWITCH_BACK_BOLD":
-                    case "SWITCH_BACK_LONG":
-                        contentStack.pop();
-                        returnValue = true;
-                        break;
-                    default:
-                        break;
-                }
-                return result;
-            }}
-    }
-
     QQC2.StackView {
         id: contentStack
         anchors.fill: parent
@@ -259,6 +221,7 @@ Zynthian.ScreenPage {
         }
         property var callbackFunction: null
         model: ListModel {
+            ListElement { text: "Any Track"; value: -2 }
             ListElement { text: "Current Track"; value: -1 }
             ListElement { text: "Track 1"; value: 0 }
             ListElement { text: "Track 2"; value: 1 }
@@ -354,9 +317,6 @@ Zynthian.ScreenPage {
                 trackPicker.callbackFunction(trackPicker.channelValue);
             }
         }
-    }
-
-    Zynthian.Popup {
     }
 
     Zynthian.ComboBox {

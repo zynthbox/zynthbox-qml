@@ -395,6 +395,11 @@ QQC2.ScrollView {
                     display: QQC2.AbstractButton.IconOnly
                     icon.name: "edit-delete"
                     onClicked: {
+                        component.currentRow = outputFilterRewriteRulesRepeater.itemAt(model.index);
+                        outputFilterRewriteRulesRepeater.currentlySelectedRule = modelData;
+                        confirmer.confirmSomething(qsTr("Delete Filter Rule?"), qsTr("Are you sure that you want to delete output filter rule %1:\n%2").arg(model.index + 1).arg(modelData.description), function() {
+                            component.filterObject.deleteRewriteRule(model.index);
+                        });
                     }
                 }
                 QQC2.Label {

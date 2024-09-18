@@ -192,6 +192,22 @@ Zynthian.ScreenPage {
         MidiControllerSettingsDevice {}
     }
 
+    Zynthian.DialogQuestion {
+        id: confirmer
+        function confirmSomething(title, description, callbackFunction) {
+            confirmer.title = title;
+            confirmer.text = description;
+            confirmer.callbackFunction = callbackFunction;
+            confirmer.open();
+        }
+        property var callbackFunction: null
+        onAccepted: {
+            if (confirmer.callbackFunction) {
+                confirmer.callbackFunction();
+            }
+        }
+    }
+
     QQC2.StackView {
         id: contentStack
         anchors.fill: parent

@@ -419,6 +419,9 @@ QQC2.ScrollView {
                     onClicked: {
                         component.currentRow = parent;
                         inputFiltersRepeater.currentlySelectedFilter = modelData;
+                        confirmer.confirmSomething(qsTr("Delete Input Filter?"), qsTr("Are you sure that you want to delete input filter %1:\n%2").arg(model.index + 1).arg(modelData.description), function() {
+                            _private.selectedDeviceObject.inputEventFilter.deleteEntry(model.index);
+                        });
                     }
                 }
                 QQC2.Label {
@@ -576,7 +579,7 @@ QQC2.ScrollView {
             onEntriesChanged: {
                 if (outputFiltersRepeater.currentlySelectedFilter !== null) {
                     // This is only likely to happen when an output filter is added, removed, or moved
-                    let selectedIndex = _private.selectedDeviceObject.outputEventFilter.entries.indexOf(currentlySelectedFilter);
+                    let selectedIndex = _private.selectedDeviceObject.outputEventFilter.entries.indexOf(outputFiltersRepeater.currentlySelectedFilter);
                     if (selectedIndex === -1) {
                         component.currentRow = addNewOutputFilterButton;
                         outputFiltersRepeater.currentlySelectedFilter = null;
@@ -633,6 +636,11 @@ QQC2.ScrollView {
                     display: QQC2.AbstractButton.IconOnly
                     icon.name: "edit-delete"
                     onClicked: {
+                        component.currentRow = parent;
+                        outputFiltersRepeater.currentlySelectedFilter = modelData;
+                        confirmer.confirmSomething(qsTr("Delete Output Filter?"), qsTr("Are you sure that you want to delete output filter %1:\n%2").arg(model.index + 1).arg(modelData.description), function() {
+                            _private.selectedDeviceObject.outputEventFilter.deleteEntry(model.index);
+                        });
                     }
                 }
                 QQC2.Label {

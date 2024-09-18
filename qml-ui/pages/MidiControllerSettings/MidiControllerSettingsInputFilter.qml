@@ -583,7 +583,6 @@ QQC2.ScrollView {
             property QtObject currentlySelectedRule: null
             delegate: RowLayout {
                 id: inputFilterRulesRepeaterDelegate
-                readonly property QtObject ruleObject: modelData
                 function goNext() {
                     if (model.index === inputFilterRewriteRulesRepeater.count - 1) {
                         // Do nothing, there's nothing beyond this place...
@@ -623,6 +622,11 @@ QQC2.ScrollView {
                     display: QQC2.AbstractButton.IconOnly
                     icon.name: "edit-delete"
                     onClicked: {
+                        component.currentRow = inputFilterRewriteRulesRepeater.itemAt(model.index);
+                        inputFilterRewriteRulesRepeater.currentlySelectedRule = modelData;
+                        confirmer.confirmSomething(qsTr("Delete Filter Rule?"), qsTr("Are you sure that you want to delete input filter rule %1:\n%2").arg(model.index + 1).arg(modelData.description), function() {
+                            component.filterObject.deleteRewriteRule(model.index);
+                        });
                     }
                 }
                 QQC2.Label {

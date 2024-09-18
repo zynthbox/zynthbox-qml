@@ -203,8 +203,7 @@ Item {
             id: patternFileInfoComponent
             ColumnLayout {
                 Layout.fillWidth: true
-                property string layerJson: model.pattern === undefined ? sequenceFilePicker.currentFileObject.layerData : model.pattern.layerData
-                property var soundInfo: layerJson.length > 0 ? zynqtgui.layer.sound_metadata_from_json(layerJson) : [];
+                property var soundInfo: [];
                 QQC2.Label {
                     Layout.fillWidth: true
                     text: qsTr("Pattern %1").arg(model.index + 1);
@@ -212,6 +211,7 @@ Item {
                 QQC2.Label {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
+                    visible: false
                     text: qsTr("Sound (%1)").arg(soundInfo ? (soundInfo.length === 1 ? qsTr("1 Layer") : qsTr("%1 Layers").arg(soundInfo.length)) : "0");
                 }
                 Repeater {
@@ -404,13 +404,6 @@ Item {
 
                 // Now apply our loaded pattern onto the global one
                 importToPattern.cloneOther(theItem.patternObject);
-
-                // Finally, actually import the sound if requested
-                var jsonToLoad = theItem.patternObject.layerData;
-                if (jsonToLoad.length > 0 && theItem.importSound) {
-                    var channelToAssociate = zynqtgui.sketchpad.song.channelsModel.getChannel(theItem.targetTrackIndex);
-                    channelToAssociate.setChannelSoundFromSnapshotJson(jsonToLoad);
-                }
             }
         }
     }
@@ -426,7 +419,7 @@ Item {
             property int targetTrackIndex: -1
             property QtObject targetTrack: zynqtgui.sketchpad.song.channelsModel.getChannel(patternOptionsRoot.targetTrackIndex)
             property int targetPartIndex: -1
-            property var soundInfo: patternObject.layerData.length > 0 ? zynqtgui.layer.sound_metadata_from_json(patternObject.layerData) : [];
+            property var soundInfo: []
             Component.onCompleted: {
                 targetTrackIndex = zynqtgui.sketchpad.selectedTrackId;
                 targetPartIndex = parent.singlePatternImport ? targetTrack.selectedPart : model.index;
@@ -484,18 +477,6 @@ Item {
                         }
                     }
                     popup.z: 1999999999
-                }
-                QQC2.CheckBox {
-                    id: importSoundCheck
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 1.5
-                    text: qsTr("Import Sound")
-                    enabled: patternOptionsRoot.importPattern && patternOptionsRoot.soundInfo.length > 0
-                    opacity: enabled ? 1 : 0.5
-                    checked: patternOptionsRoot.importSound
-                    onToggled: {
-                        patternOptionsRoot.importSound = checked
-                    }
                 }
             }
         }

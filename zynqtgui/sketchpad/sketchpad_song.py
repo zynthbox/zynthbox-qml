@@ -705,9 +705,13 @@ class sketchpad_song(QObject):
         """
         if self.__play_channel_solo != value:
             valueUpdated = False
+            if self.__play_channel_solo > -1:
+                # We're switching soloed track, so inform others the current one is no longer soloed
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
             if value > -1:
                 self.__play_channel_solo = value
                 self.playChannelSoloChanged.emit()
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Part.AnyPart, 1)
                 valueUpdated = True
 
             for channel_index in range(self.channelsModel.count):
@@ -725,6 +729,7 @@ class sketchpad_song(QObject):
             if not valueUpdated:
                 self.__play_channel_solo = value
                 self.playChannelSoloChanged.emit()
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Part.AnyPart, 1)
 
     playChannelSoloChanged = Signal()
 

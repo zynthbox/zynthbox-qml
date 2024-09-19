@@ -454,6 +454,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.__update_channel_sounds_timer.timeout.connect(self.zynqtgui.layers_for_channel.update_channel_sounds, Qt.QueuedConnection)
             self.__fixed_layers_fill_list_timer.start()
             self.__update_channel_sounds_timer.start()
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("ACTIVATE_TRACK", -1, Zynthbox.ZynthboxBasics.Track(self.__selected_track_id), Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
     selected_track_id_changed = Signal()
     selectedTrackId = Property(int, get_selected_track_id, set_selected_track_id, notify=selected_track_id_changed)
     ### END Property selectedTrackId

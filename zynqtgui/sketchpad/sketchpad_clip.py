@@ -329,6 +329,16 @@ class sketchpad_clip_metadata(QObject):
                 subvoiceSettingsObject.panChanged.connect(self.scheduleWrite)
                 subvoiceSettingsObject.pitchChanged.connect(self.scheduleWrite)
                 subvoiceSettingsObject.gainChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.gainChanged.connect(self.handleGainChanged)
+            self.clip.audioSource.panChanged.connect(self.handlePanChanged)
+
+    @Slot()
+    def handleGainChanged(self):
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__part_index__), np.interp(self.clip.audioSource.gainAbsolute(), (0, 1), (0, 127)))
+
+    @Slot()
+    def handlePanChanged(self):
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__part_index__), np.interp(self.clip.audioSource.pan(), (0, 1), (0, 127)))
 
     # This disconnects all our watcher signals from the clip's current ClipAudioSource instance, if there is one
     def unhook(self):
@@ -1152,6 +1162,7 @@ class sketchpad_clip(QObject):
                     self.__song__.scenesModel.removeClipFromCurrentScene(self)
 
             self.enabled_changed.emit(self.col, self.part)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_ACTIVE_STATE", -1, Zynthbox.ZynthboxBasics.Track(self.col), Zynthbox.ZynthboxBasics.Part(self.part), 1 if self.__enabled__ else 0)
 
     enabled_changed = Signal(int, int, arguments=["trackIndex", "partIndex"])
 

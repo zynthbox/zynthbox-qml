@@ -59,7 +59,10 @@ class sketchpad_channel(QObject):
         self.__name__ = None
         self.__song__ = song
         self.__initial_volume__ = 0
-        self.__volume__ = self.__initial_volume__
+        self.__volume__ = Zynthbox.GainHandler(self)
+        self.__volume__.setMinimumDecibel(-40)
+        self.__volume__.setMaximumDecibel(20)
+        self.__volume__.gainChanged.connect(self.handleGainChanged)
         self.__initial_pan__ = 0
         self.__audio_level__ = -200
         self.__clips_model__ = [sketchpad_clips_model(song, self, 0), sketchpad_clips_model(song, self, 1), sketchpad_clips_model(song, self, 2), sketchpad_clips_model(song, self, 3), sketchpad_clips_model(song, self, 4)]
@@ -461,7 +464,7 @@ class sketchpad_channel(QObject):
 
         return {"name": self.__name__,
                 "color": self.__color__,
-                "volume": self.__volume__,
+                "volume": self.__volume__.gainDb(),
                 "audioTypeSettings": self.__audioTypeSettings__,
                 "connectedPattern": self.__connected_pattern__,
                 "chainedSounds": self.__chained_sounds__,
@@ -488,8 +491,7 @@ class sketchpad_channel(QObject):
             if "color" in obj:
                 self.__color__ = obj["color"]
             if "volume" in obj:
-                self.__volume__ = obj["volume"]
-                self.set_volume(self.__volume__, True)
+                self.set_volume(obj["volume"], True)
             if "connectedPattern" in obj:
                 self.__connected_pattern__ = obj["connectedPattern"]
                 self.set_connected_pattern(self.__connected_pattern__)
@@ -737,15 +739,25 @@ class sketchpad_channel(QObject):
         self.handleWetFx2AmountChanged()
 
     def get_volume(self):
-        return self.__volume__
+        return self.__volume__.gainDb()
 
     def set_volume(self, volume:int, force_set=False):
-        if self.__volume__ != round(volume) or force_set is True:
-            self.__volume__ = round(volume)
-            self.volume_changed.emit()
-            self.__song__.schedule_save()
+        if self.__volume__.gainDb() != round(volume) or force_set is True:
+            self.__volume__.setGainDb(round(volume))
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
+
+    ### BEGIN Property gainHandler
+    def handleGainChanged(self):
+        self.volume_changed.emit()
+        self.__song__.schedule_save()
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
+        if self.zynqtgui.sketchpad.selectedTrackId == self.__id__:
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
+    def get_gainHandler(self):
+        return self.__volume__
+    gainHandler = Property(QObject, get_gainHandler, constant=True)
+    ### END Property gainHandler
 
     ### Property initialPan
     def get_initial_pan(self):
@@ -805,7 +817,7 @@ class sketchpad_channel(QObject):
         return self.__audio_level__
 
     def set_audioLevel(self, leveldB):
-        self.__audio_level__ = leveldB + self.__volume__ + self.master_volume
+        self.__audio_level__ = leveldB + self.__volume__.gainDb() + self.master_volume
         self.audioLevelChanged.emit()
 
     audioLevel = Property(float, get_audioLevel, set_audioLevel, notify=audioLevelChanged)
@@ -1231,6 +1243,7 @@ class sketchpad_channel(QObject):
             for laneId in range(0, 5):
                 Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId].setMuted(muted)
             self.mutedChanged.emit()
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, (1 if self.__muted__ == True else 0))
 
     mutedChanged = Signal()
 
@@ -1790,6 +1803,7 @@ class sketchpad_channel(QObject):
             # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             passthroughClient.setPanAmount(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"])
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"], (-1, 1), (0, 127)))
 
     panChanged = Signal()
 
@@ -1811,7 +1825,7 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handleDryAmountChanged(self):
-        volume = np.interp(self.__volume__, (-40, 20), (0, 1))
+        volume = self.__volume__.gain()
         # Calculate dry amount as per volume
         for laneId in range(0, 5):
             # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
@@ -1842,10 +1856,11 @@ class sketchpad_channel(QObject):
     @Slot(None)
     def handleWetFx1AmountChanged(self):
         # Calculate wet amount as per volume
-        volume = np.interp(self.__volume__, (-40, 20), (0, 1))
+        volume = self.__volume__.gain()
         for laneId in range(5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             passthroughClient.setWetFx1Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
     ### END Property wetFx1Amount
@@ -1869,10 +1884,11 @@ class sketchpad_channel(QObject):
     @Slot(None)
     def handleWetFx2AmountChanged(self):
         # Calculate wet amount as per volume
-        volume = np.interp(self.__volume__, (-40, 20), (0, 1))
+        volume = self.__volume__.gain()
         for laneId in range(0, 5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             passthroughClient.setWetFx2Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
     """
     Store wetFx1Amount for current channel as a property and set it to JackPassthrough when value changes
     Stored value ranges from 0-100 and accepted range by setWetFx1Amount is 0-1
@@ -1886,8 +1902,12 @@ class sketchpad_channel(QObject):
         self.__audioTypeSettings__[self.audioTypeKey()][passthroughKey][laneIndex][valueType] = newValue
         if passthroughKey == "synthPassthrough":
             self.synthPassthroughMixingChanged.emit()
+            if valueType == "dryAmount":
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part(laneIndex), np.interp(newValue, (0, 1), (0, 127)))
         elif passthroughKey == "fxPassthrough":
             self.fxPassthroughMixingChanged.emit()
+            if valueType == "dryWetMixAmount":
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part(laneIndex), np.interp(newValue, (0, 2), (0, 127)))
 
     ### BEGIN synthPassthrough properties
     @Slot(None)

@@ -74,7 +74,7 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB0_TOUCHED":
                     if (zynqtgui.altButtonPressed) {
-                        root.updateSelectedChannelVolume(0)
+                        root.updateSelectedChannelVolume(0, true)
                         result = true;
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
@@ -92,7 +92,7 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB0_UP":
                     if (zynqtgui.altButtonPressed) {
-                        root.updateSelectedChannelVolume(1)
+                        root.updateSelectedChannelVolume(1, true)
                         result = true;
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
@@ -102,7 +102,7 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "KNOB0_DOWN":
                     if (zynqtgui.altButtonPressed) {
-                        root.updateSelectedChannelVolume(-1)
+                        root.updateSelectedChannelVolume(-1, true)
                         result = true;
                     } else if (zynqtgui.metronomeButtonPressed) {
                         zynqtgui.ignoreNextMetronomeButtonPress = true
@@ -565,29 +565,31 @@ Kirigami.AbstractApplicationWindow {
      * Update volume of selected channel
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSelectedChannelVolume(sign) {
+    function updateSelectedChannelVolume(sign, showOsd=true) {
         function valueSetter(value) {
-            root.selectedChannel.volume = Zynthian.CommonUtils.clamp(value, -40, 20)
-            applicationWindow().showOsd({
-                parameterName: "channel_volume",
-                description: qsTr("%1 Volume").arg(root.selectedChannel.name),
-                start: -40,
-                stop: 20,
-                step: 1,
-                defaultValue: 0,
-                visualZero: -40,
-                currentValue: root.selectedChannel.volume,
-                startLabel: qsTr("%1 dB").arg(-40),
-                stopLabel: qsTr("%1 dB").arg(20),
-                valueLabel: qsTr("%1 dB").arg(root.selectedChannel.volume),
-                setValueFunction: valueSetter,
-                showValueLabel: true,
-                showResetToDefault: true,
-                showVisualZero: true
-            })
+            root.selectedChannel.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
+            if (showOsd) {
+                applicationWindow().showOsd({
+                    parameterName: "channel_volume",
+                    description: qsTr("%1 Volume").arg(root.selectedChannel.name),
+                    start: 0,
+                    stop: 1,
+                    step: 0.01,
+                    defaultValue: parseFloat(root.selectedChannel.gainHandler.absoluteGainAtZeroDb),
+                    currentValue: parseFloat(root.selectedChannel.gainHandler.gainAbsolute),
+                    startLabel: qsTr("%1 dB").arg(root.selectedChannel.gainHandler.minimumDecibel),
+                    stopLabel: qsTr("%1 dB").arg(root.selectedChannel.gainHandler.maximumDecibel),
+                    valueLabel: qsTr("%1 dB").arg(root.selectedChannel.gainHandler.gainDb.toFixed(2)),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: true,
+                    visualZero: parseFloat(root.selectedChannel.gainHandler.absoluteGainAtZeroDb),
+                    showVisualZero: true
+                })
+            }
         }
 
-        valueSetter(root.selectedChannel.volume + sign)
+        valueSetter(root.selectedChannel.gainHandler.gainAbsolute + sign*0.01)
     }
     /**
      * Update delay send amount of selected channel

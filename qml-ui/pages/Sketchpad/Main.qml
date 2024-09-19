@@ -234,36 +234,6 @@ Zynthian.ScreenPage {
         valueSetter(clipCppObj.gainAbsolute + sign*0.01)
     }
     /**
-     * Update selected channel volume
-     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
-     */
-    function updateSelectedChannelVolume(sign, showOsd=false) {
-        function valueSetter(value) {
-            root.selectedChannel.volume = Zynthian.CommonUtils.clamp(value, -40, 20)
-            if (showOsd) {
-                applicationWindow().showOsd({
-                    parameterName: "channel_volume",
-                    description: qsTr("%1 Volume").arg(root.selectedChannel.name),
-                    start: -40,
-                    stop: 20,
-                    step: 1,
-                    defaultValue: 0,
-                    visualZero: -40,
-                    currentValue: root.selectedChannel.volume,
-                    startLabel: qsTr("%1 dB").arg(-40),
-                    stopLabel: qsTr("%1 dB").arg(20),
-                    valueLabel: qsTr("%1 dB").arg(root.selectedChannel.volume),
-                    setValueFunction: valueSetter,
-                    showValueLabel: true,
-                    showResetToDefault: true,
-                    showVisualZero: true
-                })
-            }
-        }
-
-        valueSetter(root.selectedChannel.volume + sign)
-    }
-    /**
      * Update selected channel pan
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by 1
      */
@@ -575,7 +545,7 @@ Zynthian.ScreenPage {
 
             case "KNOB0_TOUCHED":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                    root.updateSelectedChannelVolume(0, true)
+                    applicationWindow().updateSelectedChannelVolume(0)
                 }
                 returnValue = true;
                 break;
@@ -584,12 +554,12 @@ Zynthian.ScreenPage {
                 break;
             case "KNOB0_UP":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                    root.updateSelectedChannelVolume(1, true)
+                    applicationWindow().updateSelectedChannelVolume(1)
                 }
                 return true
             case "KNOB0_DOWN":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                    root.updateSelectedChannelVolume(-1, true)
+                    applicationWindow().updateSelectedChannelVolume(-1)
                 }
                 return true
             case "KNOB1_TOUCHED":

@@ -77,10 +77,10 @@ Rectangle {
                 // Eat these two events to stop the OSD from showing up
                 return true;
             case "KNOB0_UP":
-                pageManager.getPage("sketchpad").updateSelectedChannelVolume(1)
+                applicationWindow().updateSelectedChannelVolume(1, false)
                 return true;
             case "KNOB0_DOWN":
-                pageManager.getPage("sketchpad").updateSelectedChannelVolume(-1)
+                applicationWindow().updateSelectedChannelVolume(-1, false)
                 return true;
             case "KNOB1_UP":
                 pageManager.getPage("sketchpad").updateSelectedChannelPan(1)
@@ -185,8 +185,6 @@ Rectangle {
                                             VolumeControl {
                                                 id: volumeControl
 
-                                                property QtObject sampleClipObject: Zynthbox.PlayGridManager.getClipById(model.channel.samples[model.channel.selectedSlotRow].cppObjId);
-
                                                 anchors.fill: parent
 
                                                 // Disable when muted or channel is not being played in solo mode
@@ -198,20 +196,24 @@ Rectangle {
                                                 inputAudioLevelVisible: false
 
                                                 onValueChanged: {
-                                                     model.channel.volume = slider.value
+                                                    model.channel.gainHandler.gainDb = slider.value
+                                                }
+                                                slider {
+                                                    from: model.channel.gainHandler.minimumDecibel
+                                                    to: model.channel.gainHandler.maximumDecibel
                                                 }
 
                                                 onClicked: {
                                                     channelsVolumeRow.handleClick(channel);
                                                 }
                                                 onDoubleClicked: {
-                                                    model.channel.volume = model.channel.initialVolume;
+                                                    model.channel.gainHandler.gainDb = model.channel.initialVolume;
                                                 }
 
                                                 Binding {
                                                     target: volumeControl.slider
                                                     property: "value"
-                                                    value: model.channel.volume
+                                                    value: model.channel.gainHandler.gainDb
                                                 }
                                             }
 

@@ -658,6 +658,7 @@ class zynthian_gui(QObject):
         # Hook up message passing
         Zynthbox.MidiRouter.instance().midiMessage.connect(self.handleMidiMessage)
         Zynthbox.MidiRouter.instance().cuiaEvent.connect(self.handleMidiRouterCuiaEvent)
+        self.current_screen_id_changed.connect(self.handleCurrentScreenIDChanged)
 
     @Slot(int, int, int, int, int, int, bool)
     def handleMidiMessage(self, port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal):
@@ -673,6 +674,36 @@ class zynthian_gui(QObject):
                     self.screens["layer"].midi_control_change(chan, byte2, byte3)
                     # TODO Our hook for external track midi routing would be here (set up on sketchpad.channel, send through sketchpad, which routes to current song, and then to all channels, who can handle the logic of what to do)
                     # Also where we can hook in the k0 through k3 knobs and clickiness and such for learning...
+
+    @Slot()
+    def handleCurrentScreenIDChanged(self):
+        theScreenID = self.current_screen_id
+        if theScreenID == "layer":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "layer_effects":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER_FX", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "main":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_MAIN", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        # elif theScreenID == "":
+            # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_EDIT_CONTEXTUAL", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "admin":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_ADMIN", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "bank":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_BANK", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "preset":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PRESET", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "control":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_CONTROL", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "sketchpad":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SKETCHPAD", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "song_manager":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SONG_MANAGER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "playgrid":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PLAYGRID", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "audio_recorder":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_AUDIO_RECORDER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+        elif theScreenID == "alsa_mixer":
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
 
     @Slot()
     def channelsModTimerHandler(self):
@@ -1630,6 +1661,11 @@ class zynthian_gui(QObject):
     @Slot(str,int,int,int,int)
     def handleMidiRouterCuiaEvent(self, cuia, originId, track, part, value):
         # logging.error(f"midi router cuia event: {cuia}, origin ID: {originId}, track: {track} aka {int(track)}, part: {part} aka {int(part)}, value: {value}")
+        if int(track) < 0:
+            track = self.sketchpad.selectedTrackId
+        if int(part) < 0:
+            part = 0 # FIXME This needs to also sniff the currently selected part/fx slot when valid
+            # theTrack.selectedFxSlotRow - the property holding that information...
         self.callable_ui_action(cuia, [value], originId, int(track), int(part))
 
     @Slot(str, 'QVariantList', int, int, int)
@@ -1689,6 +1725,7 @@ class zynthian_gui(QObject):
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
 
+        sendCuiaEventFeedback = True
         if cuia == "POWER_OFF":
             self.screens["admin"].power_off_confirmed()
 
@@ -1883,32 +1920,41 @@ class zynthian_gui(QObject):
                 self.show_screen("preset")
             else:
                 self.showMessageDialog.emit("Selected slot is empty. Cannot open preset page for empty slot", 2000)
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_LAYER_FX":
             self.show_screen("layer_effects")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_BANK":
             self.show_screen("bank")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_PRESET":
             self.show_screen("preset")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_CONTROL":
             self.show_screen("control")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_SKETCHPAD":
             self.show_modal("sketchpad")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_SONG_MANAGER":
             self.show_modal("song_manager")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_PLAYGRID":
             self.show_modal("playgrid")
+            sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_AUDIO_SETTINGS":
             # Toggle global top right popup instead of opening audio settings page
             # self.toggle_modal("audio_settings")
             self.globalPopupOpened = not self.globalPopupOpened
+            sendCuiaEventFeedback = False
 
         elif cuia == "MODAL_SNAPSHOT_LOAD":
             self.toggle_modal("snapshot", "LOAD")
@@ -1925,9 +1971,7 @@ class zynthian_gui(QObject):
         elif cuia == "MODAL_ALSA_MIXER":
             self.toggle_modal("alsa_mixer")
 
-        elif (
-            cuia == "MODAL_STEPSEQ"
-        ):
+        elif (cuia == "MODAL_STEPSEQ"):
             pass
 
         elif cuia == "CHANNEL_1":
@@ -2045,29 +2089,96 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_RELEASED":
             pass
         elif cuia == "ACTIVATE_TRACK":
-            pass
+            self.sketchpad.selectedTrackId = max(0, min(track, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_TRACK_MUTED":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.muted = not theTrack.muted
+        elif cuia == "SET_TRACK_MUTED":
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.muted = True if params[0] > 0 else False
+            sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_TRACK_SOLOED":
-            pass
+            if self.sketchpad.song.playChannelSolo == track:
+                self.sketchpad.song.playChannelSolo = -1
+            else:
+                self.sketchpad.song.playChannelSolo = track
+        elif cuia == "SET_TRACK_SOLOED":
+            if params[0] == 0 and self.sketchpad.song.playChannelSolo == track:
+                self.sketchpad.song.playChannelSolo = -1
+            elif params[0] > 0:
+                self.sketchpad.song.playChannelSolo = track
+            sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_VOLUME":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.gainHandler.setGainAbsolute(np.interp(param[0], (0, 127), (0, 1)))
+            sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_PAN":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.pan = np.interp(param[0], (0, 127), (-1, 1))
+            sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_SEND1_AMOUNT":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.wetFx1Amount = np.interp(param[0], (0, 127), (0, 1))
+            sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_SEND2_AMOUNT":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.wetFx2Amount = np.interp(param[0], (0, 127), (0, 1))
+            sendCuiaEventFeedback = False
         elif cuia == "SET_PART_ACTIVE_STATE":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip.enabled = True if params[0] > 1 else False
+            sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_PART":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip.enabled = not theClip.enabled
         elif cuia == "SET_PART_GAIN":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            if theTrack.audioTypeKey() == "synth":
+                synthIndex = theTrack.chainedSounds[part]
+                if synthIndex > -1:
+                    theTrack.set_passthroughValue("synthPassthrough", part, "dryAmount", np.interp(params[0], (0, 127), (0, 1)))
+            elif theTrack.audioTypeKey() == "sample":
+                sample = theTrack.samples[part]
+                if sample.audioSource:
+                    sample.audioSource.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
+            elif theTrack.audioTypeKey() == "sketch":
+                theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                if theClip.audioSource:
+                    theClip.audioSource.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
+            elif theTrack.audioTypeKey() == "external":
+                # TODO Should we be sending something out for external tracks? Is there anything reasonable for this? probably control 7 (channel volume)? (cc 0x07 for MSB and 0x27 for LSB)
+                pass
+            sendCuiaEventFeedback = False
+        elif cuia == "SET_PART_PAN":
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            if theTrack.audioTypeKey() == "synth":
+                synthIndex = theTrack.chainedSounds[part]
+                if synthIndex > -1:
+                    theTrack.set_passthroughValue("synthPassthrough", part, "panAmount", np.interp(params[0], (0, 127), (-1, 1)))
+            elif theTrack.audioTypeKey() == "sample":
+                sample = theTrack.samples[part]
+                if sample.audioSource:
+                    sample.audioSource.setPan(np.interp(params[0], (0, 127), (-1, 1)))
+            elif theTrack.audioTypeKey() == "sketch":
+                theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                if theClip.audioSource:
+                    theClip.audioSource.setPanAbsolute(np.interp(params[0], (0, 127), (-1, 1)))
+            elif theTrack.audioTypeKey() == "external":
+                # TODO Should we be sending something out for external tracks? Is there anything reasonable for this? probably control 7 (channel volume)? (cc 0x07 for MSB and 0x27 for LSB)
+                pass
+            sendCuiaEventFeedback = False
         elif cuia == "SET_FX_AMOUNT":
-            pass
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            if theTrack.chainedFx[slot]:
+                theTrack.set_passthroughValue("fxPassthrough", part, "dryWetMixAmount", np.interp(params[0], (0, 127), (0, 2)))
+            sendCuiaEventFeedback = False
+
         # Finally, report back to MidiRouter that we've handled the action
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
+        if sendCuiaEventFeedback == True:
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -4090,6 +4201,10 @@ class zynthian_gui(QObject):
         if self.__global_popup_opened__ != opened:
             self.__global_popup_opened__ = opened
             self.globalPopupOpenedChanged.emit()
+            if self.__global_popup_opened__:
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_AUDIO_SETTINGS", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            else:
+                self.handleCurrentScreenIDChanged() # Technically a bit odd, but logically this is what's happening
 
     globalPopupOpenedChanged = Signal()
 

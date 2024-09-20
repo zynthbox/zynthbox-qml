@@ -4329,7 +4329,7 @@ class zynthian_gui(QObject):
 
     ### Property initialMasterVolume
     def get_initialMasterVolume(self):
-        return 100
+        return 50
 
     initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
     ### END Property initialMasterVolume

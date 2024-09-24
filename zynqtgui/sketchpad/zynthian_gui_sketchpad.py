@@ -179,6 +179,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         Path('/zynthian/zynthian-my-data/sketches/default-sketches').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sketches/my-sketches').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sketches/community-sketches').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/device-settings/my-device-settings').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/device-settings/community-device-settings').mkdir(exist_ok=True, parents=True)
 #        Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
 #        Path('/zynthian/zynthian-my-data/sample-banks/community-samplebanks').mkdir(exist_ok=True, parents=True)
 

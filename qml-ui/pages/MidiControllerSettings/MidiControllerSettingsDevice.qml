@@ -39,6 +39,7 @@ QQC2.ScrollView {
     property QtObject _private
     clip: true
     contentWidth: availableWidth
+    readonly property QtObject actionPicker: deviceActionPicker
     function cuiaCallback(cuia) {
         let result = false;
         switch (cuia) {
@@ -776,6 +777,65 @@ QQC2.ScrollView {
                         knobId: 0
                         visible: component.currentRow === outputChannelTogglesRepeaterDelegate
                     }
+                }
+            }
+        }
+    }
+    Zynthian.ActionPickerPopup {
+        id: deviceActionPicker
+        actions: [
+            Kirigami.Action {
+                text: qsTr("Load Device Settings...")
+                onTriggered: {
+                    deviceFilePickerDialog.pick(false);
+                }
+            },
+            Kirigami.Action {
+                text: qsTr("Save Device Settings...")
+                onTriggered: {
+                    deviceFilePickerDialog.pick(true);
+                }
+            }
+        ]
+    }
+    Zynthian.FilePickerDialog {
+        id: deviceFilePickerDialog
+
+        function pick(save) {
+            deviceFilePickerDialog.saveMode = save;
+            deviceFilePickerDialog.folderModel.folder = "/zynthian/zynthian-my-data/device-settings/my-device-settings";
+            deviceFilePickerDialog.open();
+            if (save) {
+                deviceFilePickerDialog.fileNameToSave = component._private.selectedDeviceObject.humanReadableName.replace(" ", "-");
+            }
+        }
+
+        headerText: saveMode
+            ? qsTr("Pick Save Location For The %1 Settings")
+                .arg(component._private.selectedDeviceObject.humanReadableName)
+            : qsTr("Pick Device Settings To Load For %1")
+                .arg(component._private.selectedDeviceObject.humanReadableName)
+        rootFolder: "/zynthian/zynthian-my-data/device-settings"
+        folderModel {
+            nameFilters: ["*.zynthbox.device"]
+        }
+        property QtObject clipToSave
+        onAccepted: {
+            if (deviceFilePickerDialog.saveMode === true) {
+                let saveToPath = deviceFilePickerDialog.selectedFile.filePath;
+                if (saveToPath.toLowerCase().endsWith(".zynthbox.device") === false) {
+                    saveToPath = saveToPath + ".zynthbox.device";
+                }
+                if (component._private.selectedDeviceObject.saveDeviceSettings(saveToPath)) {
+                    applicationWindow().showPassiveNotification(qsTr("Successfully saved settings"));
+                } else {
+                    applicationWindow().showPassiveNotification(qsTr("Failed to save settings - see logs for details"));
+                }
+            } else {
+                if (component._private.selectedDeviceObject.loadDeviceSettings(deviceFilePickerDialog.selectedFile.filePath)) {
+                    applicationWindow().showPassiveNotification(qsTr("Successfully loaded settings"));
+                } else {
+                    applicationWindow().showPassiveNotification(qsTr("Failed to load settings - see logs for details"));
                 }
             }
         }

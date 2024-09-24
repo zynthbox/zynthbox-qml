@@ -39,13 +39,22 @@ Zynthian.ScreenPage {
     screenId: "midicontroller_settings"
     property bool isVisible: ["midicontroller_settings"].indexOf(zynqtgui.current_screen_id) >= 0
 
-    // We'll need store integration for this stuff at some point...
-    // contextualActions: [
-    //     Kirigami.Action {
-    //         text: qsTr("Get More...")
-    //         onTriggered: zynqtgui.show_modal("midicontroller_settings_downloader")
-    //     }
-    // ]
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Actions...")
+            enabled: contentStack.currentItem.hasOwnProperty("actionPicker")
+            onTriggered: {
+                contentStack.currentItem.actionPicker.open();
+            }
+        },
+        Kirigami.Action {
+        },
+        Kirigami.Action {
+            // We'll need store integration for this stuff at some point...
+            // text: qsTr("Get More...")
+            // onTriggered: zynqtgui.show_modal("midicontroller_settings_downloader")
+        }
+    ]
 
     backAction: Kirigami.Action {
         text: qsTr("Back")

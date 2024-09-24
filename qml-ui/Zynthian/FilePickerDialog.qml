@@ -542,6 +542,10 @@ Zynthian.Dialog {
                                     return qsTr("When you use Get New Sequences, you will be able to find them here");
                                 } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
                                     return qsTr("This is where you should store sequences you create");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/device-settings/my-device-settings") {
+                                    return qsTr("This is where you should store any device settings files you create");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/device-settings/community-device-settings") {
+                                    return qsTr("When you use Get New Device Settings, you will be able to find them here");
                                 }
                                 return "";
                             }

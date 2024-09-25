@@ -2091,6 +2091,10 @@ class zynthian_gui(QObject):
         elif cuia == "ACTIVATE_TRACK":
             self.sketchpad.selectedTrackId = max(0, min(track, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
             sendCuiaEventFeedback = False
+        elif cuia == "ACTIVATE_TRACK_RELATIVE":
+            trackDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadTrackCount());
+            self.sketchpad.selectedTrackId = max(0, min((value / trackDivisor), Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_TRACK_MUTED":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             theTrack.muted = not theTrack.muted
@@ -2112,6 +2116,19 @@ class zynthian_gui(QObject):
         elif cuia == "SET_TRACK_VOLUME":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             theTrack.gainHandler.setGainAbsolute(np.interp(param[0], (0, 127), (0, 1)))
+            sendCuiaEventFeedback = False
+        elif cuia == "SET_PART_CURRENT":
+            if -1 < track and track < Zynthbox.Plugin.instance().sketchpadTrackCount():
+                self.sketchpad.selectedTrackId = max(0, min(track, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.selectedPart = max(0, min(part, Zynthbox.Plugin.instance().sketchpadPartCount() - 1))
+            sendCuiaEventFeedback = False
+        elif cuia == "SET_PART_CURRENT_RELATIVE":
+            if -1 < track and track < Zynthbox.Plugin.instance().sketchpadTrackCount():
+                self.sketchpad.selectedTrackId = max(0, min(track, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            partDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadPartCount());
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.selectedPart = max(0, min((value / partDivisor), Zynthbox.Plugin.instance().sketchpadPartCount() - 1))
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_PAN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
@@ -2174,6 +2191,15 @@ class zynthian_gui(QObject):
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.chainedFx[slot]:
                 theTrack.set_passthroughValue("fxPassthrough", part, "dryWetMixAmount", np.interp(params[0], (0, 127), (0, 2)))
+            sendCuiaEventFeedback = False
+        elif cuia == "SET_TRACK_AND_PART_CURRRENT_RELATIVE":
+            trackPartDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadPartCount() * Zynthbox.Plugin.instance().sketchpadTrackCount())
+            cumulativePart = value / trackPartDivisor
+            theTrackIndex = floor(cumulativePart / Zynthbox.Plugin.instance().sketchpadPartCount())
+            thePartIndex = cumulativePart - (theTrackIndex * Zynthbox.Plugin.instance().sketchpadPartCount())
+            self.sketchpad.selectedTrackId = max(0, min(theTrackIndex, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            theTrack.selectedPart = max(0, min(thePartIndex, Zynthbox.Plugin.instance().sketchpadPartCount() - 1))
             sendCuiaEventFeedback = False
 
         # Finally, report back to MidiRouter that we've handled the action

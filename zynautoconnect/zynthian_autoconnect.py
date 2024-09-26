@@ -98,6 +98,11 @@ def get_fixed_midi_port_name(port_name):
 
     return port_name
 
+# This will return the port name from any Jack port, or if we were passed a string, just return that string
+def get_jack_port_name(port):
+    if isinstance(port, str):
+        return port
+    return port.name
 #------------------------------------------------------------------------------
 
 def midi_autoconnect(force=False):
@@ -108,6 +113,8 @@ def midi_autoconnect(force=False):
     acquire_lock()
 
     logger.info("ZynAutoConnect: MIDI ...")
+
+    zbjack = Zynthbox.JackConnectionHandler.instance()
 
     #------------------------------------
     # Get Input/Output MIDI Ports:
@@ -209,6 +216,7 @@ def midi_autoconnect(force=False):
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True;
+        zbjack.clear()
         release_lock()
         return
 
@@ -237,9 +245,9 @@ def midi_autoconnect(force=False):
     #     #logger.debug("Connecting MIDI Input {} => {}".format(hw,zmr_in['main_in']))
     #     try:
     #         if get_port_alias_id(hw) in zynthian_gui_config.disabled_midi_in_ports:
-    #             jclient.disconnect(hw,zmr_in['main_in'])
+    #             zbjack.disconnectPorts(get_jack_port_name(hw), get_jack_port_name(zmr_in['main_in']))
     #         else:
-    #             jclient.connect(hw,zmr_in['main_in'])
+    #             zbjack.connectPorts(get_jack_port_name(hw), get_jack_port_name(zmr_in['main_in']))
     #     except Exception as e:
     #         #logger.debug("Exception {}".format(e))
     #         pass
@@ -249,27 +257,27 @@ def midi_autoconnect(force=False):
     #Connect RTP-MIDI output to ZynMidiRouter:net_in
     # if zynthian_gui_config.midi_rtpmidi_enabled:
     #     try:
-    #         jclient.connect("jackrtpmidid:rtpmidi_out", zmr_in['net_in'])
+    #         zbjack.connectPorts("jackrtpmidid:rtpmidi_out", get_jack_port_name(zmr_in['net_in']))
     #     except:
     #         pass
 
     #Connect QMidiNet output to ZynMidiRouter:net_in
     # if zynthian_gui_config.midi_network_enabled:
     #     try:
-    #         jclient.connect("QmidiNet:out_1",zmr_in['net_in'])
+    #         zbjack.connectPorts("QmidiNet:out_1", get_jack_port_name(zmr_in['net_in']))
     #     except:
     #         pass
 
     #Connect ZynthStep output to ZynMidiRouter:step_in
     # try:
-    #     jclient.connect("zynthstep:output", zmr_in['step_in'])
+    #     zbjack.connectPorts("zynthstep:output", get_jack_port_name(zmr_in['step_in']))
     # except:
     #     pass
 
     #Connect Engine's Controller-FeedBack to ZynMidiRouter:ctrl_in
     # try:
     #     for efbp in engines_fb:
-    #         jclient.connect(efbp,zmr_in['ctrl_in'])
+    #         zbjack.connectPorts(get_jack_port_name(efbp), get_jack_port_name(zmr_in['ctrl_in']))
     # except:
     #     pass
 
@@ -289,19 +297,10 @@ def midi_autoconnect(force=False):
                     #logger.debug(" => Probing {} => {}".format(port_name, mi))
                     if mi in layer.get_midi_out():
                         #logger.debug(" => Connecting {} => {}".format(port_name, mi))
-                        try:
-                            jclient.connect(ports[0],engines_in[mi])
-                        except:
-                            pass
-                        try:
-                            jclient.disconnect(zmr_out['Zynthian-Channel{}'.format(layer.midi_chan)], engines_in[mi])
-                        except:
-                            pass
+                        zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(engines_in[mi]))
+                        zbjack.disconnectPorts(get_jack_port_name(zmr_out['Zynthian-Channel{}'.format(layer.midi_chan)]), get_jack_port_name(engines_in[mi]))
                     else:
-                        try:
-                            jclient.disconnect(ports[0],engines_in[mi])
-                        except:
-                            pass
+                        zbjack.disconnectPorts(get_jack_port_name(ports[0]), get_jack_port_name(engines_in[mi]))
 
 
     #Connect ZynMidiRouter to MIDI-chain roots
@@ -327,20 +326,14 @@ def midi_autoconnect(force=False):
     for jn, info in root_engine_info.items():
         #logger.debug("MIDI ROOT ENGINE INFO: {} => {}".format(jn, info))
         if None in info['chans']:
-            try:
-                jclient.connect(zmr_out['main_out'], info['port'])
-            except:
-                pass
+            zbjack.connectPorts(get_jack_port_name(zmr_out['main_out']), get_jack_port_name(info['port'].name))
 
         else:
             for ch in range(0,16):
-                try:
-                    if ch in info['chans']:
-                        jclient.connect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
-                    else:
-                        jclient.disconnect(zmr_out['Zynthian-Channel{}'.format(ch)], info['port'])
-                except:
-                    pass
+                if ch in info['chans']:
+                    zbjack.connectPorts(get_jack_port_name(zmr_out['Zynthian-Channel{}'.format(ch)]), get_jack_port_name(info['port']))
+                else:
+                    zbjack.disconnectPorts(get_jack_port_name(zmr_out['Zynthian-Channel{}'.format(ch)]), get_jack_port_name(info['port']))
 
     # If there are any overrides set on that slot (information is on sketchpad_channel), use those instead:
     #   - sketchpadTrack:(-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9) where -1 is whatever the current is
@@ -382,21 +375,16 @@ def midi_autoconnect(force=False):
                                             if hardwareDevice is not None:
                                                 eventPorts.append(hardwareDevice.inputPortName())
                                     # First disconnect anything already hooked up
-                                    try:
-                                        for connectedTo in jclient.get_all_connections(midiInPort.jackname):
-                                            jclient.disconnect(connectedTo, midiInPort.jackname)
-                                    except Exception as e:
-                                        logging.error(f"Error while trying to disconnect other midi in port connections due to : {e} - we attempted to disconnect {connectedTo} from {midiInPort.jackname}")
-                                        pass
+                                    for connectedTo in zbjack.getAllConnections(midiInPort.jackname):
+                                        zbjack.disconnectPorts(connectedTo, midiInPort.jackname)
                                     # Then hook up what we've been asked to
                                     for eventPort in eventPorts:
-                                        try:
-                                            jclient.connect(eventPort, midiInPort.jackname)
-                                        except: pass
+                                        zbjack.connectPorts(eventPort, midiInPort.jackname)
                         # END Midi Routing Overrides
     except Exception as e:
         logging.debug(f"Error while trying to run midi_autoconnect due to : {e}. Postponing midi_autoconnect request")
         force_next_autoconnect = True
+        zbjack.clear()
         release_lock()
         return
 
@@ -416,103 +404,64 @@ def midi_autoconnect(force=False):
 
                 # Connect to MIDI-chain root layers ...
                 for jn, info in root_engine_info.items():
-                    try:
-                        if jn in layer.get_midi_out():
-                            jclient.connect(port_from, info['port'])
-                        else:
-                            jclient.disconnect(port_from, info['port'])
-                    except:
-                        pass
+                    if jn in layer.get_midi_out():
+                        zbjack.connectPorts(get_jack_port_name(port_from), get_jack_port_name(info['port']))
+                    else:
+                        zbjack.disconnectPorts(get_jack_port_name(port_from), get_jack_port_name(info['port']))
 
                 # Connect to enabled Hardware MIDI Output Ports ...
                 if "MIDI-OUT" in layer.get_midi_out():
                     for hw in hw_in:
-                        try:
-                            if get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_out_ports:
-                                jclient.connect(port_from, hw)
-                            else:
-                                jclient.disconnect(port_from, hw)
-                        except:
-                            pass
+                        if get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_out_ports:
+                            zbjack.connectPorts(get_jack_port_name(port_from), get_jack_port_name(hw))
+                        else:
+                            zbjack.disconnectPorts(get_jack_port_name(port_from), get_jack_port_name(hw))
                 else:
                     for hw in hw_in:
-                        try:
-                            jclient.disconnect(port_from, hw)
-                        except:
-                            pass
+                        zbjack.disconnectPorts(get_jack_port_name(port_from), get_jack_port_name(hw))
 
                 # Connect to enabled Network MIDI Output Ports ...
                 if "NET-OUT" in layer.get_midi_out():
-                    try:
-                        jclient.connect(port_from, "QmidiNet:in_1")
-                    except:
-                        pass
-                    try:
-                        jclient.connect(port_from, "jackrtpmidid:rtpmidi_in")
-                    except:
-                        pass
+                    zbjack.connectPorts(get_jack_port_name(port_from), "QmidiNet:in_1")
+                    zbjack.connectPorts(get_jack_port_name(port_from), "jackrtpmidid:rtpmidi_in")
                 else:
-                    try:
-                        jclient.disconnect(port_from, "QmidiNet:in_1")
-                    except:
-                        pass
-                    try:
-                        jclient.disconnect(port_from, "jackrtpmidid:rtpmidi_in")
-                    except:
-                        pass
+                    zbjack.disconnectPorts(get_jack_port_name(port_from), "QmidiNet:in_1")
+                    zbjack.disconnectPorts(get_jack_port_name(port_from), "jackrtpmidid:rtpmidi_in")
 
     #Connect ZynMidiRouter:midi_out to enabled Hardware MIDI Output Ports
-    for hw in hw_in:
-        try:
-            if zynthian_gui_config.midi_filter_output and (get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_out_ports or hw.name in  zynthian_gui_config.enabled_midi_out_ports):
-                jclient.connect(zmr_out['midi_out'],hw)
-            else:
-                jclient.disconnect(zmr_out['midi_out'],hw)
-        except:
-            pass
+    # for hw in hw_in:
+        # if zynthian_gui_config.midi_filter_output and (get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_out_ports or hw.name in  zynthian_gui_config.enabled_midi_out_ports):
+            # zbjack.connectPorts(get_jack_port_name(zmr_out['midi_out']), get_jack_port_name(hw))
+        # else:
+            # zbjack.disconnectPorts(get_jack_port_name(zmr_out['midi_out']), get_jack_port_name(hw))
 
-    if zynthian_gui_config.midi_filter_output:
-        #Connect ZynMidiRouter:net_out to QMidiNet input
-        if zynthian_gui_config.midi_network_enabled:
-            try:
-                jclient.connect(zmr_out['net_out'],"QmidiNet:in_1")
-            except:
-                pass
-        #Connect ZynMidiRouter:net_out to RTP-MIDI input
-        if zynthian_gui_config.midi_rtpmidi_enabled:
-            try:
-                jclient.connect(zmr_out['net_out'],"jackrtpmidid:rtpmidi_in")
-            except:
-                pass
-    else:
-        #Disconnect ZynMidiRouter:net_out to QMidiNet input
-        if zynthian_gui_config.midi_network_enabled:
-            try:
-                jclient.disconnect(zmr_out['net_out'],"QmidiNet:in_1")
-            except:
-                pass
-        #Disconnect ZynMidiRouter:net_out to RTP-MIDI input
-        if zynthian_gui_config.midi_rtpmidi_enabled:
-            try:
-                jclient.disconnect(zmr_out['net_out'],"jackrtpmidid:rtpmidi_in")
-            except:
-                pass
+    # if zynthian_gui_config.midi_filter_output:
+    #     #Connect ZynMidiRouter:net_out to QMidiNet input
+    #     if zynthian_gui_config.midi_network_enabled:
+    #         zbjack.connectPorts(get_jack_port_name(zmr_out['net_out']), "QmidiNet:in_1")
+    #     #Connect ZynMidiRouter:net_out to RTP-MIDI input
+    #     if zynthian_gui_config.midi_rtpmidi_enabled:
+    #         zbjack.connectPorts(get_jack_port_name(zmr_out['net_out']), "jackrtpmidid:rtpmidi_in")
+    # else:
+    #     #Disconnect ZynMidiRouter:net_out to QMidiNet input
+    #     if zynthian_gui_config.midi_network_enabled:
+    #         zbjack.disconnectPorts(get_jack_port_name(zmr_out['net_out']), "QmidiNet:in_1")
+    #     #Disconnect ZynMidiRouter:net_out to RTP-MIDI input
+    #     if zynthian_gui_config.midi_rtpmidi_enabled:
+    #         zbjack.disconnectPorts(get_jack_port_name(zmr_out['net_out']), "jackrtpmidid:rtpmidi_in")
 
     #Connect ZynMidiRouter:step_out to ZynthStep input
-    try:
-        jclient.connect(zmr_out['step_out'], "zynthstep:input")
-    except:
-        pass
+    # zbjack.connectPorts(get_jack_port_name(zmr_out['step_out']), "zynthstep:input")
 
     #Connect ZynMidiRouter:ctrl_out to enabled MIDI-FB ports (MIDI-Controller FeedBack)
-    for hw in hw_in:
-        try:
-            if get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_fb_ports:
-                jclient.connect(zmr_out['ctrl_out'],hw)
-            else:
-                jclient.disconnect(zmr_out['ctrl_out'],hw)
-        except:
-            pass
+    # for hw in hw_in:
+        # if get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_fb_ports:
+            # zbjack.connectPorts(get_jack_port_name(zmr_out['ctrl_out']), get_jack_port_name(hw))
+        # else:
+            # zbjack.disconnectPorts(get_jack_port_name(zmr_out['ctrl_out']), get_jack_port_name(hw))
+
+    #Finally, commit all the connections and disconnections
+    zbjack.commit()
 
     #Release Mutex Lock
     release_lock()
@@ -539,6 +488,8 @@ def audio_autoconnect(force=False):
     #Get Mutex Lock
     acquire_lock()
 
+    zbjack = Zynthbox.JackConnectionHandler.instance()
+
     logger.info("ZynAutoConnect: Audio ...")
 
     #Get Audio Input Ports (ports receiving audio => inputs => you write on it!!)
@@ -549,11 +500,9 @@ def audio_autoconnect(force=False):
 
     #Disconnect Monitor from System Output
     mon_in=jclient.get_ports("mod-monitor", is_output=True, is_audio=True)
-    try:
-        jclient.disconnect(mon_in[0],'system:playback_1')
-        jclient.disconnect(mon_in[1],'system:playback_2')
-    except:
-        pass
+    if len(mon_in) == 2:
+        zbjack.disconnectPorts(get_jack_port_name(mon_in[0]),'system:playback_1')
+        zbjack.disconnectPorts(get_jack_port_name(mon_in[1]),'system:playback_2')
 
     try:
         # This assumes FX input and output ports to have left and right channel stereo input and output respectively
@@ -565,6 +514,7 @@ def audio_autoconnect(force=False):
         logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True
+        zbjack.clear()
         release_lock()
         return
 
@@ -589,13 +539,12 @@ def audio_autoconnect(force=False):
     #     # Connect GlobalFXPassthrough dry ports to bluealsa (if available)
     #     try:
     #         for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), bluealsa_ports):
-    #             try:
-    #                 jclient.connect(port[0], port[1])
-    #             except: pass
+    #             zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     #     except Exception as e:
     #         logging.error(f"Failed to connect global fx passthrough to bluealsa playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
     #         # Logic below the return statement will be eventually evaluated when called again after the timeout
     #         force_next_autoconnect = True
+    #         zbjack.clear()
     #         release_lock()
     #         return
     #
@@ -608,13 +557,12 @@ def audio_autoconnect(force=False):
     #                 if len(engineOutPorts) == 1:
     #                     engineOutPorts[1] = engineOutPorts[0]
     #                 for port in zip(engineOutPorts, bluealsa_ports):
-    #                     try:
-    #                         jclient.connect(port[0], port[1])
-    #                     except: pass
+    #                     zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     #             except Exception as e:
     #                 logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
     #                 # Logic below the return statement will be eventually evaluated when called again after the timeout
     #                 force_next_autoconnect = True
+    #                 zbjack.clear()
     #                 release_lock()
     #                 return
     # ### END Bluetooth ports connection
@@ -622,13 +570,9 @@ def audio_autoconnect(force=False):
 
     # BEGIN Connect global FX ports to system playback
     for port in zip(globalFx1OutputPorts, globalPlaybackInputPorts):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     for port in zip(globalFx2OutputPorts, globalPlaybackInputPorts):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     # END Connect global FX ports to system playback
 
     # TODO We are only connecting the first pair of ports here (since the global channels don't really have advanced routing anyway).
@@ -636,17 +580,11 @@ def audio_autoconnect(force=False):
     # BEGIN Connect SamplerSynth's global effected to the global effects passthrough
     samplerSynthEffectedPorts =jclient.get_ports("SamplerSynth:global-lane2", is_audio=True, is_output=True)
     for port in zip(samplerSynthEffectedPorts, globalFx1InputPorts):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     for port in zip(samplerSynthEffectedPorts, globalFx2InputPorts):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     for port in zip(samplerSynthEffectedPorts, globalPlaybackInputPorts):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     # END Connect SamplerSynth's global effected to the global effects passthrough
 
     # logging.info("Clear out any connections TrackPassthrough and FXPassthrough might already have")
@@ -657,16 +595,15 @@ def audio_autoconnect(force=False):
         # Also disconnect all the TrackPassthrough ports
         passthrough_ports.extend(jclient.get_ports("TrackPassthrough", is_audio=True))
         for port in passthrough_ports:
-            for connected_port in jclient.get_all_connections(port):
+            for connected_port in zbjack.getAllConnections(get_jack_port_name(port)):
                 # logging.info(f"Disonnecting {connected_port} from {port}")
-                try:
-                    jclient.disconnect(connected_port, port)
-                except: pass
+                zbjack.disconnectPorts(connected_port, get_jack_port_name(port))
     except Exception as e:
         logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during passthrough connection clearing. Reported error: {e}")
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True;
+        zbjack.clear()
         release_lock()
         return
     # END Clear out any connections TrackPassthrough and FXPassthrough might already have
@@ -700,7 +637,7 @@ def audio_autoconnect(force=False):
                                     if len(externalSourcePorts) < 2:
                                         externalSourcePorts.append(externalSourcePorts[0])
                                     for port in zip(externalSourcePorts, laneInputs):
-                                        jclient.connect(port[0], port[1])
+                                        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                                 except: pass
                         # END Handle external inputs for external mode channels
                         # BEGIN Handle sample slots
@@ -712,15 +649,11 @@ def audio_autoconnect(force=False):
                             if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
                             # logging.info(f"Connecting {samplerOutputPorts} to {laneInputs}")
                             for port in zip(samplerOutputPorts, laneInputs):
-                                try:
-                                    # Make sure this is the only connection we've got
-                                    for connectedTo in jclient.get_all_connections(port[0]):
-                                        try:
-                                            jclient.disconnect(port[0], connectedTo)
-                                        except: pass
-                                    # logging.info(f"Connecting {port[0]} to {port[1]}")
-                                    jclient.connect(port[0], port[1])
-                                except: pass
+                                # Make sure this is the only connection we've got
+                                for connectedTo in zbjack.getAllConnections(get_jack_port_name(port[0])):
+                                    zbjack.disconnectPorts(get_jack_port_name(port[0]), connectedTo)
+                                # logging.info(f"Connecting {port[0]} to {port[1]}")
+                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Handle sample slots
                         # BEGIN Handle synth slots
                         # If there are any overrides set on that slot, use those instead:
@@ -782,15 +715,11 @@ def audio_autoconnect(force=False):
                                                 if splitData[3] == "right" or splitData[3] == "both":
                                                     capture_ports.append(f"{portRootName}-{dryOrWet}Right")
                                         # First disconnect anything already hooked up
-                                        try:
-                                            for connectedTo in jclient.get_all_connections(audioInPort.jackname):
-                                                jclient.disconnect(audioInPort.jackname, connectedTo)
-                                        except: pass
+                                        for connectedTo in zbjack.getAllConnections(audioInPort.jackname):
+                                            zbjack.disconnectPorts(audioInPort.jackname, connectedTo)
                                         # Then hook up what we've been asked to
                                         for capture_port in capture_ports:
-                                            try:
-                                                jclient.connect(capture_port, audioInPort.jackname)
-                                            except: pass
+                                            zbjack.connectPorts(get_jack_port_name(capture_port), audioInPort.jackname)
                                 # END Synth Inputs
                                 # BEGIN Synth Outputs
                                 engineOutPorts = jclient.get_ports(layer.jackname, is_output=True, is_input=False, is_audio=True)
@@ -805,23 +734,17 @@ def audio_autoconnect(force=False):
                                         break
                                 if engineIsConnectedToSystem:
                                     for port in zip(engineOutPorts, playback_ports):
-                                        try:
-                                            # logging.info(f"Disconnecting {port[0]} from {port[1]} in favour of the channel's passthrough client")
-                                            jclient.disconnect(port[0], port[1])
-                                        except: pass
+                                        # logging.info(f"Disconnecting {port[0]} from {port[1]} in favour of the channel's passthrough client")
+                                        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                                 # Connect synth engine to synth passthrough ports
                                 for port in zip(engineOutPorts, synthPassthroughInputPorts):
-                                    try:
-                                        # logging.info(f"Connecting {port[0]} to synth passthrough client {port[1]}")
-                                        jclient.connect(port[0], port[1])
-                                    except: pass
+                                    # logging.info(f"Connecting {port[0]} to synth passthrough client {port[1]}")
+                                    zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
 
                                 # Connect synth passthrough ports to channel passthrough ports
                                 for port in zip(synthPassthroughOutputPorts, laneInputs):
-                                    try:
-                                        # logging.info(f"Connecting {port[0]} to channel passthrough client {port[1]}")
-                                        jclient.connect(port[0], port[1])
-                                    except: pass
+                                    # logging.info(f"Connecting {port[0]} to channel passthrough client {port[1]}")
+                                    zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                                 # END Synth Outputs
                         # END Handle synth slots
                         # BEGIN Connect lane to its relevant FX input port (or disconnect if there's no audio input)
@@ -839,42 +762,32 @@ def audio_autoconnect(force=False):
                                 portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId]}:Channel{channelId + 1}-input", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(laneOutputs)):
                             # The order of the ports is uncommonly reversed here, to ensure we can use cycle() without causing trouble
-                            try:
-                                if laneHasInput[channelInputLanes[laneId]]:
-                                    jclient.connect(port[1], port[0])
-                            except: pass
+                            if laneHasInput[channelInputLanes[laneId]]:
+                                zbjack.connectPorts(get_jack_port_name(port[1]), get_jack_port_name(port[0]))
                         # END Connect lane to its relevant FX or GlobalPlayback input port (or disconnect if there's no audio input)
                         # BEGIN Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
                         laneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
                         laneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
                         for port in zip(laneOutputsFx1, channelAudioLevelsInputPorts):
-                            try:
-                                if laneHasInput[channelInputLanes[laneId]]:
-                                    jclient.connect(port[0], port[1])
-                                else:
-                                    jclient.disconnect(port[0], port[1])
-                            except: pass
+                            if laneHasInput[channelInputLanes[laneId]]:
+                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+                            else:
+                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(laneOutputsFx2, channelAudioLevelsInputPorts):
-                            try:
-                                if laneHasInput[channelInputLanes[laneId]]:
-                                    jclient.connect(port[0], port[1])
-                                else:
-                                    jclient.disconnect(port[0], port[1])
-                            except: pass
+                            if laneHasInput[channelInputLanes[laneId]]:
+                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+                            else:
+                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(laneOutputsFx1, globalFx1InputPorts):
-                            try:
-                                if laneHasInput[channelInputLanes[laneId]]:
-                                    jclient.connect(port[0], port[1])
-                                else:
-                                    jclient.disconnect(port[0], port[1])
-                            except: pass
+                            if laneHasInput[channelInputLanes[laneId]]:
+                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+                            else:
+                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(laneOutputsFx2, globalFx2InputPorts):
-                            try:
-                                if laneHasInput[channelInputLanes[laneId]]:
-                                    jclient.connect(port[0], port[1])
-                                else:
-                                    jclient.disconnect(port[0], port[1])
-                            except: pass
+                            if laneHasInput[channelInputLanes[laneId]]:
+                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+                            else:
+                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         # END Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
                     ### BEGIN Connect TrackPassthrough to GlobalPlayback and AudioLevels via FX
                     logging.debug(f"# Channel{channelId+1} effects port connections :")
@@ -925,10 +838,8 @@ def audio_autoconnect(force=False):
                         if fxlayer is not None:
                             fx_in_ports = jclient.get_ports(fxlayer.get_jackname(), is_audio=True)
                             for fx_in_port in fx_in_ports:
-                                for connectedTo in jclient.get_all_connections(fx_in_port):
-                                    try:
-                                        jclient.disconnect(fx_in_port, connectedTo)
-                                    except: pass
+                                for connectedTo in zbjack.getAllConnections(get_jack_port_name(fx_in_port)):
+                                    zbjack.disconnectPorts(get_jack_port_name(fx_in_port), connectedTo)
 
                     for output_client_names in process_list:
                         # logging.info(f"## Processing list {output_client_names}")
@@ -987,22 +898,16 @@ def audio_autoconnect(force=False):
                                     # Connect dry ports to next to next client
                                     for ports in zip(dry_out_ports, next_next_in_ports):
                                         logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                                        try:
-                                            jclient.connect(ports[0], ports[1])
-                                        except: pass
+                                        zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     # Connect wet ports to FX client which is right next to this client in output_client_names
                                     for ports in zip(wet_out_ports, next_in_ports):
                                         logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                                        try:
-                                            jclient.connect(ports[0], ports[1])
-                                        except: pass
+                                        zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     # If next to next client is GlobalPlayback then connect the same port to AudioLevels too
                                     if output_client_names[index+2] == "GlobalPlayback":
                                         for ports in zip(dry_out_ports, channelAudioLevelsInputPorts):
                                             logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                                            try:
-                                                jclient.connect(ports[0], ports[1])
-                                            except: pass
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                 else:
                                     # This client is not a FXPassthrough, and not the last client in the list, which means it will be an FX. So connect it's output to the next client
 
@@ -1017,14 +922,10 @@ def audio_autoconnect(force=False):
                                         # Next client is GlobalPlayback then connect the same port to both GlobalPlayback and AudioLevels
                                         for ports in zip(out_ports, channelAudioLevelsInputPorts):
                                             logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                                            try:
-                                                jclient.connect(ports[0], ports[1])
-                                            except: pass
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                         for ports in zip(out_ports, globalPlaybackInputPorts):
                                             logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                                            try:
-                                                jclient.connect(ports[0], ports[1])
-                                            except: pass
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     else:
                                         # Next client is not GlobalPlayback. Connect the ports to next client
                                         next_in_ports = jclient.get_ports(next_client_name, is_audio=True, is_input=True)
@@ -1035,9 +936,7 @@ def audio_autoconnect(force=False):
 
                                         for ports in zip(out_ports, next_in_ports):
                                             logging.info(f"Connecting {ports[0]} to {ports[1]}")
-                                            try:
-                                                jclient.connect(ports[0], ports[1])
-                                            except: pass
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                     ### END Connect TrackPassthrough to GlobalPlayback and AudioLevels via FX
                     ### BEGIN FX Engine Audio Routing Overrides
                     for laneId in range(0, 5):
@@ -1060,7 +959,7 @@ def audio_autoconnect(force=False):
                                             # Lazily fill the slots input list here, in case it hasn't happened yet
                                             # Bit of a tricky trick - usually there will be two ports, sometimes there will be only one, so we'll have to deal with both those eventualities
                                             for port, leftOrRight in zip(slotRoutingData.audioInPorts, cycle("left", "right")):
-                                                for connectedTo in jclient.get_all_connections(port):
+                                                for connectedTo in zbjack.getAllConnections(get_jack_port_name(port)):
                                                     fxSlotInputs[leftOrRight].append(connectedTo)
                                             if len(slotRoutingData.audioInPorts) == 1:
                                                 fxSlotInputs["right"] = fxSlotInputs["left"]
@@ -1104,14 +1003,12 @@ def audio_autoconnect(force=False):
                                             capture_ports.append(f"{portRootName}{dryOrWet}Right")
                                 # First disconnect anything already hooked up
                                 try:
-                                    for connectedTo in jclient.get_all_connections(audioInPort.jackname):
-                                        jclient.disconnect(audioInPort.jackname, connectedTo)
+                                    for connectedTo in zbjack.getAllConnections(audioInPort.jackname):
+                                        zbjack.disconnectPorts(audioInPort.jackname, connectedTo)
                                 except: pass
                                 # Then hook up what we've been asked to
                                 for capture_port in capture_ports:
-                                    try:
-                                        jclient.connect(capture_port, audioInPort.jackname)
-                                    except: pass
+                                    zbjack.connectPorts(get_jack_port_name(capture_port), audioInPort.jackname)
                     ### END FX Engine Audio Routing Overrides
         else:
             logging.info("No song yet, clearly ungood - also how?")
@@ -1120,6 +1017,7 @@ def audio_autoconnect(force=False):
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True;
+        zbjack.clear()
         release_lock()
         return
     ### END Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on TrackPassthrough and FXPassthrough
@@ -1127,65 +1025,43 @@ def audio_autoconnect(force=False):
 
     ### BEGIN Connect Samplersynth uneffected ports to globalPlayback client
     for port in zip(jclient.get_ports("SamplerSynth:global-lane1", is_audio=True, is_output=True), globalPlaybackInputPorts):
-        try:
-            jclient.connect(port[0], port[1])
-        except: pass
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     ### END Connect Samplersynth uneffected ports to globalPlayback client
 
     ### Connect globalPlayback ports
     globalPlaybackDryOutputPorts = jclient.get_ports("GlobalPlayback:dryOut", is_audio=True, is_output=True)
     for port in zip(globalPlaybackDryOutputPorts, playback_ports):
-        try:
-            jclient.connect(port[0], port[1])
-        except:
-            #logging.debug("Error connecting ports")
-            pass
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
 
     for port in zip(globalPlaybackDryOutputPorts, jclient.get_ports("AudioLevels:SystemPlayback-", is_input=True, is_audio=True)):
-        try:
-            jclient.connect(port[0], port[1])
-        except:
-            # logging.debug("Error connecting ports")
-            pass
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     ### END Connect globalPlayback ports
 
     headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)
 
     if len(headphones_out)==2 or not zynthian_gui_config.show_cpu_status:
-        sysout_conports_1 = jclient.get_all_connections("system:playback_1")
-        sysout_conports_2 = jclient.get_all_connections("system:playback_2")
+        sysout_conports_1 = zbjack.getAllConnections("system:playback_1")
+        sysout_conports_2 = zbjack.getAllConnections("system:playback_2")
 
         #Setup headphones connections if enabled ...
         if len(headphones_out)==2:
             #Prepare for setup headphones connections
-            headphones_conports_1=jclient.get_all_connections("Headphones:playback_1")
-            headphones_conports_2=jclient.get_all_connections("Headphones:playback_2")
+            headphones_conports_1 = zbjack.getAllConnections("Headphones:playback_1")
+            headphones_conports_2 = zbjack.getAllConnections("Headphones:playback_2")
 
             #Disconnect ports from headphones (those that are not connected to System Out, if any ...)
             for cp in headphones_conports_1:
                 if cp not in sysout_conports_1:
-                    try:
-                        jclient.disconnect(cp,headphones_out[0])
-                    except:
-                        pass
+                    zbjack.disconnectPorts(cp, get_jack_port_name(headphones_out[0]))
             for cp in headphones_conports_2:
                 if cp not in sysout_conports_2:
-                    try:
-                        jclient.disconnect(cp,headphones_out[1])
-                    except:
-                        pass
+                    zbjack.disconnectPorts(cp, get_jack_port_name(headphones_out[1]))
 
             #Connect ports to headphones (those currently connected to System Out)
             for cp in sysout_conports_1:
-                try:
-                    jclient.connect(cp,headphones_out[0])
-                except:
-                    pass
+                zbjack.connectPorts(cp, get_jack_port_name(headphones_out[0]))
             for cp in sysout_conports_2:
-                try:
-                    jclient.connect(cp,headphones_out[1])
-                except:
-                    pass
+                zbjack.connectPorts(cp, get_jack_port_name(headphones_out[1]))
 
     #Get System Capture ports => jack output ports!!
     capture_ports = get_audio_capture_ports()
@@ -1211,25 +1087,16 @@ def audio_autoconnect(force=False):
         #                     for k, rlp_inp in enumerate(rlp_in):
         #                         if k%nsc==j%nsc:
         #                             #logger.debug("Connecting {} to {} ...".format(scp.name, layer.get_audio_jackname()))
-        #                             try:
-        #                                 jclient.connect(scp, rlp_inp)
-        #                             except:
-        #                                 pass
+        #                             zbjack.connectPorts(get_jack_port_name(scp), get_jack_port_name(rlp_inp))
         #                         else:
-        #                             try:
-        #                                 jclient.disconnect(scp, rlp_inp)
-        #                             except:
-        #                                 pass
+        #                             zbjack.disconnectPorts(get_jack_port_name(scp), get_jack_port_name(rlp_inp))
         #                         # Limit to 2 input ports
         #                         #if k>=1:
         #                         #    break
         #
         #                 else:
         #                     for rlp_inp in rlp_in:
-        #                         try:
-        #                             jclient.disconnect(scp, rlp_inp)
-        #                         except:
-        #                             pass
+        #                         zbjack.connectPorts(get_jack_port_name(scp), get_jack_port_name(rlp_inp))
 
         if zynthian_gui_config.midi_aubionotes_enabled:
             #Get Aubio Input ports ...
@@ -1239,11 +1106,11 @@ def audio_autoconnect(force=False):
                 #Connect System Capture to Aubio ports
                 j=0
                 for scp in capture_ports:
-                    try:
-                        jclient.connect(scp, aubio_in[j%nip])
-                    except:
-                        pass
+                    zbjack.connectPorts(get_jack_port_name(scp), get_jack_port_name(aubio_in[j%nip]))
                     j += 1
+
+    #Finally, commit all changes
+    zbjack.commit()
 
     #Release Mutex Lock
     release_lock()

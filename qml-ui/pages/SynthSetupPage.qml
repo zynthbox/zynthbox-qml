@@ -743,6 +743,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                 }
                 QQC2.Button {
+                    id: favToggleButton
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                     text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
                     onClicked: {

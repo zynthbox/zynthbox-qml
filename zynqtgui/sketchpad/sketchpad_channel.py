@@ -1584,7 +1584,7 @@ class sketchpad_channel(QObject):
     selectedFxSlotRowChanged = Signal()
 
     selectedFxSlotRow = Property(int, get_selectedFxSlotRow, set_selectedFxSlotRow, notify=selectedFxSlotRowChanged)
-    ### END Property selectedSlotRow
+    ### END Property selectedFxSlotRow
 
     ### Property occupiedSlots
     @Slot(None, result='QVariantList')
@@ -1658,19 +1658,68 @@ class sketchpad_channel(QObject):
     occupiedSampleSlotsCount = Property(int, get_occupiedSampleSlotsCount, notify=occupiedSlotsChanged)
     ### END Property occupiedSampleSlotsCount
 
+    # BEGIN Property selectedClip
+    # This is to decide which clip to show for this track (as opposed to which clip(s) are currently enabled for playback)
+    def get_selected_clip(self):
+        return self.__selected_clip__
+    def set_selected_clip(self, selected_clip, shouldEmitCurrentClipCUIAFeedback=True):
+        if self.__selected_clip__ == selected_clip:
+            self.__selected_clip__ = selected_clip
+            self.selectedClipChanged.emit()
+            if shouldEmitCurrentClipCUIAFeedback:
+                self.emitCurrentClipCUIAFeedback()
+    selectedClipChanged = Signal()
+    selectedClip = Property(int, get_selected_clip, set_selected_clip, notify=selectedClipChanged)
+    # END Property selectedClip
+
+    @Slot(None)
+    def emitCurrentClipCUIAFeedback(self):
+        pass
+
     ### Property selectedPart
     # TODO : selectedPart is a thing from way back and is analogous to selectedSlotRow or selectedFxSlotRow.
     #        Update all references of selectedPart to selectedSlotRow and selectedFxSlotRow as required
+    #        Or, when referring to clips, actually use selectedClip
     def get_selected_part(self):
         return self.__selected_part__
-    def set_selected_part(self, selected_part):
+    def set_selected_part(self, selected_part, shouldEmitCurrentSlotCUIAFeedback=True):
         if selected_part != self.__selected_part__:
             self.__selected_part__ = selected_part
             self.selectedSlotRow = selected_part
             self.selectedPartChanged.emit()
+            if shouldEmitCurrentSlotCUIAFeedback:
+                self.shouldEmitCurrentSlotCUIAFeedback()
     selectedPartChanged = Signal()
     selectedPart = Property(int, get_selected_part, set_selected_part, notify=selectedPartChanged)
     ### END Property selectedPart
+
+    @Slot(None)
+    def emitCurrentSlotCUIAFeedback(self):
+        knownGain = 0.0
+        knownPan = 0.0
+        if self.audioTypeKey() == "synth":
+            synthIndex = self.chainedSounds[self.selectedSlotRow]
+            if synthIndex > -1:
+                knownGain = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
+                knownPan = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
+        elif self.audioTypeKey() == "sample":
+            sample = self.samples[self.selectedSlotRow]
+            if sample.audioSource:
+                knownGain = sample.audioSource.gainAbsolute()
+                knownPan = sample.audioSource.pan()
+        elif self.audioTypeKey() == "sketch":
+            theClip = self.getClipsModelByPart(self.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            if theClip.audioSource:
+                knownGain = theClip.audioSource.gainAbsolute()
+                knownPan = theClip.audioSource.pan()
+        elif self.audioTypeKey() == "external":
+            pass
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownGain, (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownPan, (-1, 1), (0, 127)))
+        knownDryWetMixAmount = 0.0
+        if self.chainedFx[self.__selected_fx_slot_row]:
+            knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
     ### Property externalMidiChannel
     # Logic for this is, -1 is "just use the normal one", anything else is a specific channel
@@ -1904,10 +1953,14 @@ class sketchpad_channel(QObject):
             self.synthPassthroughMixingChanged.emit()
             if valueType == "dryAmount":
                 Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part(laneIndex), np.interp(newValue, (0, 1), (0, 127)))
+                if self.zynqtgui.sketchpad.selectedTrackId == self.__id__ and self.__selected_slot_row__ == laneIndex:
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(newValue, (0, 1), (0, 127)))
         elif passthroughKey == "fxPassthrough":
             self.fxPassthroughMixingChanged.emit()
             if valueType == "dryWetMixAmount":
                 Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part(laneIndex), np.interp(newValue, (0, 2), (0, 127)))
+                if self.zynqtgui.sketchpad.selectedTrackId == self.__id__ and self.__selected_fx_slot_row == laneIndex:
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(newValue, (0, 2), (0, 127)))
 
     ### BEGIN synthPassthrough properties
     @Slot(None)

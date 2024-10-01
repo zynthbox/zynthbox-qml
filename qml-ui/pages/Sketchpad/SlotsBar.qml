@@ -40,7 +40,7 @@ Rectangle {
     property alias bottomBarButton: bottomBarButton
     property alias channelButton: channelButton
     property alias mixerButton: mixerButton
-    property alias partButton: partButton
+    property alias clipsButton: clipsButton
     property alias synthsButton: synthsButton
     property alias samplesButton: samplesButton
     property alias fxButton: fxButton
@@ -262,7 +262,7 @@ Rectangle {
         } else if (type === "sample-loop") {
             console.log("handleItemClick : Audio")
 
-            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            var clip = root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
             if (zynqtgui.backButtonPressed) {
                 clip.clear()
@@ -381,7 +381,7 @@ Rectangle {
                     }
 
                     QQC2.Button {
-                        id: partButton
+                        id: clipsButton
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         checkable: true
@@ -852,7 +852,7 @@ Rectangle {
         objectName: "sketchPickerPopup"
         columns: 3
         rows: 3
-        property QtObject sketch: root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+        property QtObject sketch: root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         actions: [
             QQC2.Action {
                 text: qsTr("Save A Copy...")

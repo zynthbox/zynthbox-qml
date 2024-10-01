@@ -45,8 +45,8 @@ QQC2.AbstractButton {
     property color highlightColor: highlighted
                                        ? Kirigami.Theme.highlightColor
                                        : "transparent"
-    property bool isInScene: channel.selectedPartNames
-                                ? channel.selectedPartNames.join("").length > 0
+    property bool isInScene: channel.selectedClipNames
+                                ? channel.selectedClipNames.join("").length > 0
                                 : false
     property QtObject channel: null
 
@@ -86,8 +86,8 @@ QQC2.AbstractButton {
     contentItem: Item {
 //        Connections {
 //            target: channel
-//            onSelectedPartNamesChanged: {
-//                console.log("### Selected part names for channel " + channel.name + " : " + channel.selectedPartNames + ", length : " + channel.selectedPartNames.length + ", joined length : ", channel.selectedPartNames.join("").length)
+//            onSelectedClipNamesChanged: {
+//                console.log("### Selected clip names for channel " + channel.name + " : " + channel.selectedClipNames + ", length : " + channel.selectedClipNames.length + ", joined length : ", channel.selectedClipNames.join("").length)
 //            }
 //        }
 
@@ -165,16 +165,16 @@ QQC2.AbstractButton {
             anchors.leftMargin: 2
 
             Binding {
-                target: partNamesRepeater
+                target: clipNamesRepeater
                 delayed: true
                 property: "model"
-                value: channel.selectedPartNames
+                value: channel.selectedClipNames
             }
 
             Repeater {
-                id: partNamesRepeater
+                id: clipNamesRepeater
                 delegate: RowLayout {
-                    property QtObject partPattern: root.sequence && channel ? root.sequence.getByPart(channel.id, index) : null
+                    property QtObject clipPattern: root.sequence && channel ? root.sequence.getByPart(channel.id, index) : null
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -183,7 +183,7 @@ QQC2.AbstractButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: modelData.length > 0
-                                ? Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, partPattern.hasNotes ? 1 : 0.2)
+                                ? Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, clipPattern.hasNotes ? 1 : 0.2)
                                 : "transparent"
                     }
 

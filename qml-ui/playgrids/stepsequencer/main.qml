@@ -80,8 +80,8 @@ Zynthian.BasePlayGrid {
         var backButtonClearPatternHelper = function(channelIndex) {
             if (zynqtgui.backButtonPressed) {
                 component.ignoreNextBack = true;
-                for (var partIndex = 0; partIndex < _private.partCount; ++partIndex) {
-                    var pattern = _private.sequence.getByPart(channelIndex, partIndex);
+                for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                    var pattern = _private.sequence.getByPart(channelIndex, clipIndex);
                     if (pattern) {
                         pattern.clear();
                     }
@@ -149,7 +149,7 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "NAVIGATE_RIGHT":
-                    if (zynqtgui.sketchpad.selectedTrackId < _private.channelCount) {
+                    if (zynqtgui.sketchpad.selectedTrackId < Zynthbox.Plugin.sketchpadTrackCount) {
                         zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack + 1;
                     }
                     returnValue = true;
@@ -256,15 +256,12 @@ Zynthian.BasePlayGrid {
         if (patternObject.sketchpadTrack > -1 && patternObject.partIndex > -1) {
             zynqtgui.sketchpad.selectedTrackId = patternObject.sketchpadTrack;
             var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(patternObject.sketchpadTrack);
-            channel.selectedPart = patternObject.partIndex;
+            channel.selectedClip = patternObject.partIndex;
         }
     }
 
     QtObject {
         id:_private;
-        // Yes, this is a hack - if we don't do this, we'll forever be rebuilding the patterns popup etc when the sequence and pattern changes, which is all manner of expensive
-        readonly property int channelCount: 10
-        readonly property int partCount: 5
         readonly property int activeBarModelWidth: 16
 
         property QtObject sequence
@@ -999,7 +996,7 @@ Zynthian.BasePlayGrid {
                             delayed: true
                             restoreMode: Binding.RestoreBinding
                         }
-                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
+                        property QtObject sample: channel ? channel.getClipsModelById(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
                         Zynthian.SampleVisualiser {
                             anchors.fill: parent
                             sample: parent.visible ? drumpadLoopVisualiser.sample : null
@@ -1738,7 +1735,7 @@ Zynthian.BasePlayGrid {
                                 id: patternsMenuListView
                                 clip: true
                                 cacheBuffer: height * 2 // a little brutish, but it means all our delegates always exist, which is what we're actually after here
-                                model: _private.channelCount
+                                model: Zynthbox.Plugin.sketchpadTrackCount
                                 Connections {
                                     target: _private
                                     onActivePatternModelChanged: {
@@ -1765,7 +1762,7 @@ Zynthian.BasePlayGrid {
 
                                 delegate: Rectangle {
                                     id: patternsMenuItem
-                                    property QtObject thisPattern: _private.sequence && associatedChannel ? _private.sequence.getByPart(model.index, associatedChannel.selectedPart) : null
+                                    property QtObject thisPattern: _private.sequence && associatedChannel ? _private.sequence.getByPart(model.index, associatedChannel.selectedClip) : null
                                     property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
                                     property int activePattern: _private.activePattern
                                     property QtObject channelClipsModel: associatedChannel == null ? null : associatedChannel.clipsModel
@@ -1821,7 +1818,7 @@ Zynthian.BasePlayGrid {
                                                         icon.name: "player-volume"
                                                         onClicked: {
                                                             if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                                var associatedClip = patternsMenuItem.associatedChannel.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                                                let associatedClip = patternsMenuItem.associatedChannel.getClipsModelById(patternsMenuItem.thisPattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                                 associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                             }
@@ -1855,10 +1852,10 @@ Zynthian.BasePlayGrid {
                                                 Zynthian.PlayGridButton {
                                                     Layout.fillHeight: true
                                                     Layout.preferredHeight: patternsMenuItem.height / 2
-                                                    text: patternsMenuItem.thisPattern ? qsTr("Clip %1%2").arg(patternsMenuItem.associatedChannelIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
+                                                    text: patternsMenuItem.thisPattern ? qsTr("Clip %1%2").arg(patternsMenuItem.associatedChannelIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no clip)"
                                                     enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                                     onClicked: {
-                                                        partPicker.pickPart(patternsMenuItem.associatedChannelIndex);
+                                                        clipPicker.pickClip(patternsMenuItem.associatedChannelIndex);
                                                     }
                                                 }
                                             }
@@ -1990,7 +1987,7 @@ Zynthian.BasePlayGrid {
                                                             delayed: true
                                                             restoreMode: Binding.RestoreBinding
                                                         }
-                                                        property QtObject sample: channel ? channel.getClipsModelByPart(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
+                                                        property QtObject sample: channel ? channel.getClipsModelById(channel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
                                                         Zynthian.SampleVisualiser {
                                                             anchors.fill: parent
                                                             sample: parent.visible ?  patternPopupLoopVisualiser.sample : null
@@ -2213,62 +2210,62 @@ Zynthian.BasePlayGrid {
                 }
             }
             Zynthian.Popup {
-                id: partPicker
-                function pickPart(associatedChannelIndex) {
-                    partPicker.associatedChannelIndex = associatedChannelIndex;
+                id: clipPicker
+                function pickClip(associatedChannelIndex) {
+                    clipPicker.associatedChannelIndex = associatedChannelIndex;
                     open();
                 }
                 Connections {
                     target: component
                     onIsVisibleChanged: {
-                        if (partPicker.opened && component.isVisible === false) {
-                            partPicker.close();
+                        if (clipPicker.opened && component.isVisible === false) {
+                            clipPicker.close();
                         }
                     }
                 }
                 property var cuiaCallback: function(cuia) {
                     if (cuia === "SWITCH_BACK_SHORT" || cuia === "SWITCH_BACK_BOLD" || cuia === "SWITCH_BACK_LONG") {
-                        partPicker.close();
+                        clipPicker.close();
                     }
                     return true;
                 }
                 onOpened: {
-                    zynqtgui.pushDialog(partPicker);
+                    zynqtgui.pushDialog(clipPicker);
                 }
                 onClosed: {
-                    zynqtgui.popDialog(partPicker);
-                    partPicker.associatedChannelIndex = -1;
+                    zynqtgui.popDialog(clipPicker);
+                    clipPicker.associatedChannelIndex = -1;
                 }
                 parent: QQC2.Overlay.overlay
                 x: Math.round(parent.width/2 - width/2)
                 y: Math.round(parent.height/2 - height/2)
                 property int associatedChannelIndex: -1
-                property QtObject associatedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(partPicker.associatedChannelIndex)
+                property QtObject associatedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(clipPicker.associatedChannelIndex)
                 ColumnLayout {
                     anchors.fill: parent
                     implicitWidth: Kirigami.Units.gridUnit * 30
                     implicitHeight: Kirigami.Units.gridUnit * 40
                     Kirigami.Heading {
                         Layout.fillWidth: true
-                        text: qsTr("Select Active Parts For Channel %1").arg(partPicker.associatedChannel ? partPicker.associatedChannel.name : "")
+                        text: qsTr("Select Active Clips For Channel %1").arg(clipPicker.associatedChannel ? clipPicker.associatedChannel.name : "")
                     }
                     ColumnLayout {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         spacing: Kirigami.Units.largeSpacing
                         Repeater {
-                            model: partPicker.associatedChannel ? 5 : 0
+                            model: clipPicker.associatedChannel ? 5 : 0
                             delegate: RowLayout {
-                                id: partDelegate
+                                id: clipDelegate
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 spacing: Kirigami.Units.smallSpacing
-                                property QtObject pattern: _private.sequence.getByPart(partPicker.associatedChannelIndex, model.index)
+                                property QtObject pattern: _private.sequence.getByPart(clipPicker.associatedChannelIndex, model.index)
                                 Rectangle {
                                     Layout.fillHeight: true
                                     Layout.minimumWidth: Kirigami.Units.largeSpacing
                                     Layout.maximumWidth: Kirigami.Units.largeSpacing
-                                    color: partPicker.associatedChannel.selectedPart === model.index ? Kirigami.Theme.highlightColor : "transparent"
+                                    color: clipPicker.associatedChannel.selectedClip === model.index ? Kirigami.Theme.highlightColor : "transparent"
                                 }
                                 Item {
                                     Layout.fillWidth: true
@@ -2276,18 +2273,18 @@ Zynthian.BasePlayGrid {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                                     Zynthian.PlayGridButton {
                                         anchors.fill: parent
-                                        opacity: partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1 ? 1 : 0.5
+                                        opacity: clipDelegate.pattern.sequence && clipDelegate.pattern.sequence.soloPattern === -1 ? 1 : 0.5
                                         icon.name: "player-volume"
                                         onClicked: {
-                                            if (partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1) {
-                                                var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                            if (clipDelegate.pattern.sequence && clipDelegate.pattern.sequence.soloPattern === -1) {
+                                                var associatedClip = clipPicker.associatedChannel.getClipsModelById(clipDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
-                                                associatedClip.enabled = !partDelegate.pattern.enabled
+                                                associatedClip.enabled = !clipDelegate.pattern.enabled
                                             }
                                         }
                                     }
                                     Rectangle {
-                                        visible: partDelegate.pattern ? !partDelegate.pattern.enabled : false
+                                        visible: clipDelegate.pattern ? !clipDelegate.pattern.enabled : false
                                         anchors.centerIn: parent
                                         rotation: 45
                                         width: parent.height
@@ -2299,32 +2296,32 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                    text: qsTr("Pick Part %1%2").arg(partPicker.associatedChannelIndex + 1).arg(partDelegate.pattern.partName)
+                                    text: qsTr("Pick Clip %1%2").arg(clipPicker.associatedChannelIndex + 1).arg(clipDelegate.pattern.partName)
                                     onClicked: {
-                                        var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                        var associatedClip = clipPicker.associatedChannel.getClipsModelById(clipDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (associatedClip.enabled) {
-                                            partPicker.associatedChannel.selectedPart = model.index;
+                                            clipPicker.associatedChannel.selectedClip = model.index;
                                         } else {
                                             associatedClip.enabled = true;
                                         }
-                                        partPicker.close();
+                                        clipPicker.close();
                                     }
                                 }
                                 Image {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
-                                    source: partDelegate.pattern.thumbnailUrl
+                                    source: clipDelegate.pattern.thumbnailUrl
                                     Rectangle {
                                         anchors {
                                             top: parent.top
                                             bottom: parent.bottom
                                         }
-                                        visible: partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+                                        visible: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
                                         color: Kirigami.Theme.highlightColor
                                         width: Math.max(1, Math.floor(widthFactor))
-                                        property double widthFactor: partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
-                                        x: partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
+                                        property double widthFactor: clipDelegate.pattern ? parent.width / (clipDelegate.pattern.width * clipDelegate.pattern.bankLength) : 1
+                                        x: clipDelegate.pattern ? clipDelegate.pattern.bankPlaybackPosition * widthFactor : 0
                                     }
                                     Kirigami.Heading {
                                         anchors {
@@ -2334,7 +2331,7 @@ Zynthian.BasePlayGrid {
                                         horizontalAlignment: Text.AlignRight
                                         verticalAlignment: Text.AlignBottom
                                         level: 4
-                                        text: partDelegate.pattern.name
+                                        text: clipDelegate.pattern.name
                                     }
                                 }
                             }
@@ -2346,7 +2343,7 @@ Zynthian.BasePlayGrid {
                             property QtObject backAction: Kirigami.Action {
                                 text: "Back"
                                 onTriggered: {
-                                    partPicker.close();
+                                    clipPicker.close();
                                 }
                             }
                             property list<QtObject> contextualActions

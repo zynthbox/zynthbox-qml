@@ -54,7 +54,7 @@ Rectangle {
         Song,
         Clip,
         Channel,
-        Part,
+        Clips,
         Pattern,
         None
     }
@@ -66,8 +66,8 @@ Rectangle {
             zynqtgui.bottomBarControlType = "bottombar-controltype-clip"
         } else if (type === "channel") {
             zynqtgui.bottomBarControlType = "bottombar-controltype-channel"
-        } else if (type === "part") {
-            zynqtgui.bottomBarControlType = "bottombar-controltype-part"
+        } else if (type === "clips") {
+            zynqtgui.bottomBarControlType = "bottombar-controltype-clips"
         } else if (type === "pattern") {
             zynqtgui.bottomBarControlType = "bottombar-controltype-pattern"
         }
@@ -132,12 +132,8 @@ Rectangle {
                             return qsTr("CLIP: %1").arg(text);
                         case "bottombar-controltype-channel":
                             return qsTr("TRACK: %1").arg(text);
-                        case "bottombar-controltype-part":
-                            return qsTr("PART: %1").arg(text);
-    //                    case "bottombar-controltype-pattern":
-    //                        var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
-    //                        var pattern = sequence.getByPart(zynqtgui.bottomBarControlObj.clipChannel.connectedPattern, 0)
-    //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
+                        case "bottombar-controltype-clips":
+                            return qsTr("CLIPS: %1").arg(text);
                         default:
                             return text;
                         }
@@ -202,7 +198,7 @@ Rectangle {
                 SidebarButton {
                     icon.name: cppClipObject && cppClipObject.isPlaying ? "media-playback-stop" : "media-playback-start"
                     enabled: cppClipObject !== null
-                    active: zynqtgui.bottomBarControlType !== "bottombar-controltype-part" &&
+                    active: zynqtgui.bottomBarControlType !== "bottombar-controltype-clips" &&
                              (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable && zynqtgui.bottomBarControlObj.path
 
                     property QtObject cppClipObject: zynqtgui.bottomBarControlObj.cppObjId > -1 ? Zynthbox.PlayGridManager.getClipById(zynqtgui.bottomBarControlObj.cppObjId) : null
@@ -220,22 +216,22 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "media-playback-start"
-                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-part" &&
+                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-clips" &&
                              (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable
 
                     onClicked: {
-                        console.log("Starting Part")
+                        console.log("Starting Clip")
                         zynqtgui.bottomBarControlObj.play();
                     }
                 }
 
                 SidebarButton {
                     icon.name: "media-playback-stop"
-                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-part" &&
+                    active: zynqtgui.bottomBarControlType === "bottombar-controltype-clips" &&
                              (zynqtgui.bottomBarControlObj != null) && zynqtgui.bottomBarControlObj.playable
 
                     onClicked: {
-                        console.log("Stopping Part")
+                        console.log("Stopping Clip")
                         zynqtgui.bottomBarControlObj.stop();
                     }
                 }
@@ -270,8 +266,8 @@ Rectangle {
                                 return qsTr("CLIP: %1").arg(text);
                             case "bottombar-controltype-channel":
                                 return qsTr("TRACK: %1").arg(text);
-                            case "bottombar-controltype-part":
-                                return qsTr("PART: %1").arg(text);
+                            case "bottombar-controltype-clips":
+                                return qsTr("CLIPS: %1").arg(text);
     //                        case "bottombar-controltype-pattern":
     //                            return qsTr("PATTERN: %1").arg(zynqtgui.bottomBarControlObj.col+1);
                             default:
@@ -289,13 +285,13 @@ Rectangle {
                         return !zynqtgui.bottomBarControlObj.isEmpty ? clipSettingsAction : recordingAction;
                     case "bottombar-controltype-channel":
                         if (zynqtgui.bottomBarControlObj.trackType === "synth")
-                            return partAction; // as there's no channelSoundsAction any longer
+                            return clipsAction; // as there's no channelSoundsAction any longer
                         else {
                             return sampleSoundsAction;
                         }
 
-                    case "bottombar-controltype-part":
-                        return partAction;
+                    case "bottombar-controltype-clips":
+                        return clipsAction;
                     case "bottombar-controltype-pattern":
                         return !zynqtgui.bottomBarControlObj.isEmpty ? clipSettingsAction : patternAction;
                     default:
@@ -315,11 +311,11 @@ Rectangle {
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
-                        id: partAction
+                        id: clipsAction
                         text: qsTr("Clip")
-                        page: Qt.resolvedUrl("PartBar.qml")
+                        page: Qt.resolvedUrl("ClipsBar.qml")
                         preload: true
-                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-part"
+                        visible: zynqtgui.bottomBarControlType === "bottombar-controltype-clips"
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {

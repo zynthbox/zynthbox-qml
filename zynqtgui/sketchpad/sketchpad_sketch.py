@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Sketchpad Part: An object to store sketch
+# Sketchpad Sketch: An object to store sketch
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #

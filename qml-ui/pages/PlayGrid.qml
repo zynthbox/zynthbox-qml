@@ -684,60 +684,60 @@ don't want to have to dig too far...
         value: zynqtgui.sketchpad.song
     }
     // Our basic structure is logically scene contains channels which contain patterns, and accessing them is done through the song's inverted-structure channels model
-    // the channels contain clips models (each of which holds information for all channel/part combinations for that channel), and each clip in that model holds the data pertaining to one scene/part/channel
+    // the channels contain clips models (each of which holds information for all channel/clip combinations for that channel), and each clip in that model holds the data pertaining to one scene/clip/channel
     // there is further a set of sequence models which are partnered each to a scene, and inside each sequence is a pattern, which is paired with a channel
     // Which means that, logically, the structure is actually more:
     // The scene model contains scenes
     //   Each scene contains a sequence
-    //     Each sequence contains a number of patterns equal to the number of channels multiplied by the number of parts in each channel
+    //     Each sequence contains a number of patterns equal to the number of channels multiplied by the number of clips on each channel
     // The channels model contains channel objects
-    //   Each channel contains a clipsModel (holding information for the part/channel combination for all scenes), and holds clips
-    //   Each clip holds information specific to that scene/part/channel combination
-    //   Each scene/part/channel combination is corresponds to one specific pattern
-    // Synchronising the states means matching each pattern with the scene/part/channel leaf in the channel's tree of data
-    // The specific pattern for a leaf can be deduced through the name of the scene, the channel's index, and the part's index in that channel
+    //   Each channel contains a clipsModel (holding information for the clip/channel combination for all scenes), and holds clips
+    //   Each clip holds information specific to that scene/clip/channel combination
+    //   Each scene/clip/channel combination is corresponds to one specific pattern
+    // Synchronising the states means matching each pattern with the scene/clip/channel leaf in the channel's tree of data
+    // The specific pattern for a leaf can be deduced through the name of the scene, the channel's index, and the clip's index in that channel
     // and fetched from PlayGridManager by asking for the sequence by name ("T1" for example), and then
-    // calling getByPart(channelIndex, partIndex) to fetch the specific pattern
+    // calling getByPart(trackIndex, clipIndex) to fetch the specific pattern
     Repeater {
-        id: channelsRepeater
+        id: tracksRepeater
         delegate: Repeater {
-            id: baseChannelDelegate
-            property QtObject theChannel: channel
-            property int channelIndex: index
-            model: baseChannelDelegate.theChannel.parts
+            id: baseTrackDelegate
+            property QtObject theTrack: channel
+            property int trackIndex: index
+            model: baseTrackDelegate.theTrack.clips
             delegate: Repeater {
-                id: channelPartDelegate
-                property int partIndex: index
-                property QtObject part: modelData
-                model: channelPartDelegate.part
+                id: trackClipDelegate
+                property int clipIndex: index
+                property QtObject clip: modelData
+                model: trackClipDelegate.clip
                 delegate: Item {
-                    id: channelPartSceneDelegate
+                    id: trackClipSceneDelegate
                     property QtObject sceneClip: model.clip
                     property int sceneIndex: model.index
                     property string connectedSequenceName: model.index === 0 ? "global" : "global" + (model.index + 1)
                     property QtObject sequence: null
                     property int sequenceIndex: model.index;
-                    property QtObject pattern: sequence && sequence.count > 0 ? channelPartSceneDelegate.sequence.getByPart(baseChannelDelegate.channelIndex, channelPartDelegate.partIndex) : null;
+                    property QtObject pattern: sequence && sequence.count > 0 ? trackClipSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackClipDelegate.clipIndex) : null;
                     property int patternIndex: sequence ? sequence.indexOf(pattern) : -1;
                     onSequenceChanged: {
-                        if (channelPartSceneDelegate.sequence) {
-                            channelPartSceneDelegate.sequence.sceneIndex = channelPartSceneDelegate.sceneIndex;
+                        if (trackClipSceneDelegate.sequence) {
+                            trackClipSceneDelegate.sequence.sceneIndex = trackClipSceneDelegate.sceneIndex;
                             // This operation is potentially a bit pricy, as setting the song
                             // to something new will cause the global sequence to be reloaded
                             // to match what is in that song
-                            channelPartSceneDelegate.sequence.song = zynqtgui.sketchpad.song;
+                            trackClipSceneDelegate.sequence.song = zynqtgui.sketchpad.song;
                         }
                     }
                     onPatternChanged: {
-                        if (channelPartSceneDelegate.pattern) {
-                            channelPartSceneDelegate.pattern.zlChannel = baseChannelDelegate.theChannel;
-                            channelPartSceneDelegate.pattern.zlPart = channelPartDelegate.part;
-                            channelPartSceneDelegate.pattern.zlScene = channelPartSceneDelegate.sceneClip;
+                        if (trackClipSceneDelegate.pattern) {
+                            trackClipSceneDelegate.pattern.zlChannel = baseTrackDelegate.theTrack;
+                            trackClipSceneDelegate.pattern.zlPart = trackClipDelegate.clip;
+                            trackClipSceneDelegate.pattern.zlScene = trackClipSceneDelegate.sceneClip;
                         }
                     }
 
                     Binding {
-                        target: channelPartSceneDelegate
+                        target: trackClipSceneDelegate
                         property: "sequence"
                         value: Zynthbox.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
                         delayed: true
@@ -748,7 +748,7 @@ don't want to have to dig too far...
     }
 
     Binding {
-        target: channelsRepeater
+        target: tracksRepeater
         property: "model"
         value: zynqtgui.sketchpad.song.channelsModel
         delayed: true

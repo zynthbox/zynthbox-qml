@@ -56,7 +56,7 @@ Zynthian.Dialog {
                 }
             } else if (channel.trackType === "sample-loop") {
                 for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                    if (channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
+                    if (channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
@@ -87,9 +87,9 @@ Zynthian.Dialog {
             var longestPatternDuration = 0;
             // Assemble the duration of time we want to be recording for
             var syncTimerToPatternDurationMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
-            for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
-                for (var partIndex = 0; partIndex < 5; ++partIndex) {
-                    var pattern = sequence.getByPart(channelIndex, partIndex);
+            for (var trackIndex = 0; trackIndex < Zynthbox.Plugin.sketchpadTrackCount; ++trackIndex) {
+                for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                    var pattern = sequence.getByPart(trackIndex, clipIndex);
                     var patternDuration = pattern.width * pattern.availableBars * pattern.stepLength / syncTimerToPatternDurationMultiplier;
                     if (patternDuration > longestPatternDuration) {
                         longestPatternDuration = patternDuration;
@@ -167,7 +167,7 @@ Zynthian.Dialog {
                         }
                     } else if (channel.trackType === "sample-loop") {
                         for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                            var clip = channel.getClipsModelByPart(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                            var clip = channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             if (clip.cppObjId > -1) {
                                 // We pick the name of whatever the first loop is here, just so we've got one
                                 soundIndication = clip.path.split("/").pop();

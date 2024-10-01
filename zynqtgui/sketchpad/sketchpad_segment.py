@@ -65,14 +65,14 @@ class sketchpad_segment(QObject):
                 {
                     "row": clip.row,
                     "col": clip.col,
-                    "part": clip.part
+                    "part": clip.id
                 } for clip in self.__clips
             ],
             "restartClips": [
                 {
                     "row": clip.row,
                     "col": clip.col,
-                    "part": clip.part
+                    "part": clip.id
                 } for clip in self.__restartClips
             ]
         }
@@ -90,10 +90,10 @@ class sketchpad_segment(QObject):
             self.set_tickLength(0, True)
         if "clips" in obj:
             for clip in obj["clips"]:
-                self.__clips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
+                self.__clips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
         if "restartClips" in obj:
             for clip in obj["restartClips"]:
-                self.__restartClips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
+                self.__restartClips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
 
     def clear_clips(self):
         for clip in self.clips.copy():

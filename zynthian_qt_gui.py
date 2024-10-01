@@ -492,7 +492,7 @@ class zynthian_gui(QObject):
         self.channels_mod_active = False
 
         self.song_bar_active = False
-        self.slots_bar_part_active = False
+        self.slots_bar_clips_active = False
         self.sound_combinator_active = False
         self.channel_wave_editor_bar_active = False
         self.channel_samples_bar_active = False
@@ -679,31 +679,31 @@ class zynthian_gui(QObject):
     def handleCurrentScreenIDChanged(self):
         theScreenID = self.current_screen_id
         if theScreenID == "layer":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "layer_effects":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER_FX", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER_FX", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "main":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_MAIN", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_MAIN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         # elif theScreenID == "":
-            # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_EDIT_CONTEXTUAL", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_EDIT_CONTEXTUAL", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "admin":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_ADMIN", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_ADMIN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "bank":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_BANK", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_BANK", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "preset":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PRESET", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PRESET", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "control":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_CONTROL", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_CONTROL", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "sketchpad":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SKETCHPAD", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SKETCHPAD", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "song_manager":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SONG_MANAGER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SONG_MANAGER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "playgrid":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PLAYGRID", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PLAYGRID", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "audio_recorder":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_AUDIO_RECORDER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_AUDIO_RECORDER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
         elif theScreenID == "alsa_mixer":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
 
     @Slot()
     def channelsModTimerHandler(self):
@@ -923,17 +923,17 @@ class zynthian_gui(QObject):
     slotsBarMixerActive = Property(bool, get_slots_bar_mixer_active, set_slots_bar_mixer_active,
                                    notify=slotsBarMixerActiveChanged)
 
-    def get_slots_bar_part_active(self):
-        return self.slots_bar_part_active
+    def get_slots_bar_clips_active(self):
+        return self.slots_bar_clips_active
 
-    def set_slots_bar_part_active(self, isActive):
-        if self.slots_bar_part_active != isActive:
-            self.slots_bar_part_active = isActive
-            self.slotsBarPartActiveChanged.emit()
+    def set_slots_bar_clips_active(self, isActive):
+        if self.slots_bar_clips_active != isActive:
+            self.slots_bar_clips_active = isActive
+            self.slotsBarClipsActiveChanged.emit()
 
-    slotsBarPartActiveChanged = Signal()
+    slotsBarClipsActiveChanged = Signal()
 
-    slotsBarPartActive = Property(bool, get_slots_bar_part_active, set_slots_bar_part_active, notify=slotsBarPartActiveChanged)
+    slotsBarClipsActive = Property(bool, get_slots_bar_clips_active, set_slots_bar_clips_active, notify=slotsBarClipsActiveChanged)
 
     def get_slots_bar_synths_active(self):
         return self.slots_bar_synths_active
@@ -2152,12 +2152,12 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
         elif cuia == "SET_CLIP_ACTIVE_STATE":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             theClip.enabled = True if params[0] > 1 else False
             sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_CLIP":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             theClip.enabled = not theClip.enabled
         elif cuia == "SET_SLOT_GAIN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
@@ -2170,7 +2170,7 @@ class zynthian_gui(QObject):
                 if sample.audioSource:
                     sample.audioSource.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
             elif theTrack.audioTypeKey() == "sketch":
-                theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                 if theClip.audioSource:
                     theClip.audioSource.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
             elif theTrack.audioTypeKey() == "external":
@@ -2188,7 +2188,7 @@ class zynthian_gui(QObject):
                 if sample.audioSource:
                     sample.audioSource.setPan(np.interp(params[0], (0, 127), (-1, 1)))
             elif theTrack.audioTypeKey() == "sketch":
-                theClip = theTrack.getClipsModelByPart(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                 if theClip.audioSource:
                     theClip.audioSource.setPanAbsolute(np.interp(params[0], (0, 127), (-1, 1)))
             elif theTrack.audioTypeKey() == "external":
@@ -4237,7 +4237,7 @@ class zynthian_gui(QObject):
             self.__global_popup_opened__ = opened
             self.globalPopupOpenedChanged.emit()
             if self.__global_popup_opened__:
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_AUDIO_SETTINGS", -1, Zynthbox.ZynthboxBasics.Track(-2), Zynthbox.ZynthboxBasics.Part(-2), 0)
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_AUDIO_SETTINGS", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
             else:
                 self.handleCurrentScreenIDChanged() # Technically a bit odd, but logically this is what's happening
 
@@ -4323,7 +4323,7 @@ class zynthian_gui(QObject):
 
     ### Property bottomBarControlType
     ### This property will store the type of object that is being controlled by bottombar
-    ### Allowed values : "bottombar-controltype-song", "bottombar-controltype-clip", "bottombar-controltype-channel", "bottombar-controltype-part", "bottombar-controltype-pattern", "bottombar-controltype-none"
+    ### Allowed values : "bottombar-controltype-song", "bottombar-controltype-clip", "bottombar-controltype-channel", "bottombar-controltype-clips", "bottombar-controltype-pattern", "bottombar-controltype-none"
     def get_bottomBarControlType(self):
         return self.__bottombar_control_type
 

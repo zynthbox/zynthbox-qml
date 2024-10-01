@@ -117,7 +117,7 @@ Zynthian.DialogQuestion {
                             // Apply that newly loaded recording to the pattern
                             Zynthbox.MidiRecorder.applyToPattern(_private.pattern);
                         } else {
-                            console.log("Not adding in data for pattern, as no data exists for this part");
+                            console.log("Not adding in data for pattern, as no data exists for this clip");
                         }
                     }
                     if (replaceSamples.sketchHasData && replaceSamples.checked) {
@@ -134,11 +134,11 @@ Zynthian.DialogQuestion {
                     // In case we unbounced to a different sketchpad track, switch to that one
                     zynqtgui.sketchpad.selectedTrackId = _private.channel.id;
                     // Similarly, if we unbounced to another slot, update the current one there as well
-                    _private.channel.selectedPart = _private.slot;
+                    _private.channel.selectedClip = _private.slot;
                     // Since we unbounced the thing, we should disable that in favour of the newly unbounced thing
                     _private.clip.enabled = false;
                     // Always enable the newly created thing, to avoid that "eh?" experience
-                    let destinationClip = _private.channel.getClipsModelByPart(_private.slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                    let destinationClip = _private.channel.getClipsModelById(_private.slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                     destinationClip.enabled = true;
 
                     // Clear out ourselves

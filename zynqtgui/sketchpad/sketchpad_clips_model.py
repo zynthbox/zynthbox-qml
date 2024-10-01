@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to store parts of a song in Sketchpad
+# A model to store clips of a song in Sketchpad
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -34,15 +34,15 @@ class sketchpad_clips_model(QAbstractListModel):
     ClipRole = ClipIndexRole + 2
     __clips__: [sketchpad_clip] = []
 
-    def __init__(self, song, parentChannel=None, partIndex=-1):
+    def __init__(self, song, parentChannel=None, clipIndex=-1):
         super().__init__(parentChannel)
         self.__channel__ = parentChannel
         self.__song__ = song
         self.__clips__ = []
         self.__samples__ = []
-        self.__partIndex__ = partIndex
-        partNames = ['a', 'b', 'c', 'd', 'e']
-        self.__partName__ = "(?)" if (partIndex == -1) else partNames[partIndex]
+        self.__clipIndex__ = clipIndex
+        clipNames = ['a', 'b', 'c', 'd', 'e']
+        self.__clipName__ = "(?)" if (clipIndex == -1) else clipNames[clipIndex]
         if self.__channel__ is not None:
             self.__channel__.keyZoneModeChanged.connect(self.updateSamplesFromChannel)
             self.__channel__.track_type_changed.connect(self.updateSamplesFromChannel)
@@ -53,24 +53,24 @@ class sketchpad_clips_model(QAbstractListModel):
             data.append(c.serialize())
         return data
 
-    def deserialize(self, arr, part_index, load_autosave=True):
+    def deserialize(self, arr, clip_index, load_autosave=True):
         logging.debug(f"clips_model_deserialize : {load_autosave}")
+        self.__clips__ = []
         if not isinstance(arr, list):
             for i in range(2):
-                clip = sketchpad_clip(self.__channel__.id, i, part_index, self.__song__, self)
+                clip = sketchpad_clip(self.__channel__.id, i, clip_index, self.__song__, self)
                 self.add_clip(clip)
             raise Exception("Invalid json format for clips")
 
         if len(arr) == 0:
             for i in range(2):
-                clip = sketchpad_clip(self.__channel__.id, i, part_index, self.__song__, self)
+                clip = sketchpad_clip(self.__channel__.id, i, clip_index, self.__song__, self)
                 self.add_clip(clip)
             return
         for i, c in enumerate(arr):
-            clip = sketchpad_clip(self.__channel__.id, i, part_index, self.__song__, self)
+            clip = sketchpad_clip(self.__channel__.id, i, clip_index, self.__song__, self)
             clip.deserialize(c, load_autosave)
             self.add_clip(clip)
-            #self.__song__.add_clip_to_part(clip, i)
 
     def data(self, index, role=None):
         if not index.isValid():
@@ -108,8 +108,8 @@ class sketchpad_clips_model(QAbstractListModel):
         self.__clips__.append(clip)
         self.endInsertRows()
         self.countChanged.emit()
-        if self.__channel__ is not None and self.__partIndex__ > -1:
-            # The clips in a parts model contains the scene-related information for the channel/clip
+        if self.__channel__ is not None and self.__clipIndex__ > -1:
+            # The clips in a clips model contains the scene-related information for the channel/clip
             clip.enabled_changed.connect(self.__channel__.onClipEnabledChanged, Qt.QueuedConnection)
 
     @Slot(int, result=QObject)
@@ -133,18 +133,18 @@ class sketchpad_clips_model(QAbstractListModel):
         return len(self.__clips__)
     count = Property(int, count, notify=countChanged)
 
-    ### BEGIN Property partName
-    def get_partName(self):
-        return self.__partName__
-    def set_partName(self, partName):
-        if self.__partName__ != partName:
-            self.__partName__ = partName;
-            self.partName_changed.emit()
+    ### BEGIN Property clipName
+    def get_clipName(self):
+        return self.__clipName__
+    def set_clipName(self, clipName):
+        if self.__clipName__ != clipName:
+            self.__clipName__ = clipName;
+            self.clipName_changed.emit()
     @Signal
-    def partName_changed(self):
+    def clipName_changed(self):
         pass
-    partName = Property(str, get_partName, set_partName, notify=partName_changed)
-    ### END Property partName
+    clipName = Property(str, get_clipName, set_clipName, notify=clipName_changed)
+    ### END Property clipName
 
     ### BEGIN Property samples
     def get_samples(self):
@@ -174,7 +174,7 @@ class sketchpad_clips_model(QAbstractListModel):
     def updateSamplesFromChannel(self):
         if self.__channel__ is not None:
             if self.__channel__.trackType == "sample-trig" and self.__channel__.keyZoneMode == "all-full":
-                self.__samples__ = [self.__partIndex__] # A little odd seeming perhaps, but the indices line up (five parts, five samples, we want the sample for trig/full to match the part)
+                self.__samples__ = [self.__clipIndex__] # A little odd seeming perhaps, but the indices line up (five clips, five samples, we want the sample for trig/full to match the clip)
             else:
                 self.__samples__ = [0, 1, 2, 3, 4]
             self.samples_changed.emit()

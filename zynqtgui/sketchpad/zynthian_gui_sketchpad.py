@@ -471,8 +471,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         theTrack = self.__song__.channelsModel.getChannel(self.__selected_track_id)
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 1 if theTrack.muted else 0)
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.gainHandler.gainAbsolute(), (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part(theTrack.selectedPart), 0)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.selectedPart, (0, Zynthbox.Plugin.instance().sketchpadPartCount() - 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part(theTrack.selectedClip), 0)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.selectedClip, (0, Zynthbox.Plugin.instance().sketchpadPartCount() - 1), (0, 127)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.pan, (0, 1), (0, 127)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.wetFx1Amount, (0, 1), (0, 127)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND2_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.wetFx2Amount, (0, 1), (0, 127)))
@@ -848,13 +848,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def stopAllPlayback(self):
         if self.__song__ is not None and self.__song__.channelsModel is not None and self.__song__.scenesModel is not None:
-            for trackIndex in range(0, 10):
+            for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                 channel = self.__song__.channelsModel.getChannel(trackIndex)
                 if channel is not None:
-                    for partIndex in range(0, 5):
-                        clipsModel = channel.getClipsModelByPart(partIndex)
+                    for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                        clipsModel = channel.getClipsModelById(clipId)
                         if clipsModel is not None:
-                            clip = clipsModel.getClip(self.__song__.scenesModel.selectedSceneIndex)
+                            clip = clipsModel.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
                             if clip is not None:
                                 clip.stop()
 

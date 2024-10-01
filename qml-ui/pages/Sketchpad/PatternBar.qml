@@ -42,7 +42,7 @@ GridLayout {
 
     property QtObject controlObj: zynqtgui.bottomBarControlObj
     property QtObject sequence: controlObj.clipChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-    property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart) : null
+    property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedClip) : null
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -118,7 +118,7 @@ GridLayout {
                     zynqtgui.forced_screen_back = "sketchpad";
                     Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", Zynthbox.PlayGridManager.sequenceEditorIndex);
                     var sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
-                    sequence.setActiveChannel(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart);
+                    sequence.setActiveChannel(controlObj.clipChannel.id, controlObj.clipChannel.selectedClip);
                 }
             }
         }

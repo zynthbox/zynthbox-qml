@@ -225,9 +225,9 @@ Zynthian.Popup {
             QtObject {
                 id: _private
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
-                property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelByPart(root.selectedSlotRow).getClip(root.selectedChannel.id) : null
+                property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelById(root.selectedSlotRow).getClip(root.selectedChannel.id) : null
                 property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-                property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
+                property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
                 property bool midiSoloTrack: false
                 property int soloChannelOnOpen: -1
                 property bool armRecording: false

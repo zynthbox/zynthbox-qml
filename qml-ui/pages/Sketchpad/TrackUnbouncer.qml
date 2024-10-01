@@ -71,8 +71,8 @@ Zynthian.DialogQuestion {
                     _private.soundSourceSketch = -1;
                     if (_private.sketchpadTrack) {
                         let newSketches = [];
-                        for (let partIndex = 0; partIndex < 5; ++partIndex) {
-                            let clip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                        for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                            let clip = _private.sketchpadTrack.getClipsModelById(clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             newSketches.push(clip);
                         }
                         _private.sketches = newSketches;
@@ -200,7 +200,7 @@ Zynthian.DialogQuestion {
                     for (let detailIndex = 0; detailIndex < newDetails.length; ++detailIndex) {
                         let sketchList = [];
                         for (let sketchIndex = 0; sketchIndex < newDetails[detailIndex].sketches.length; ++sketchIndex) {
-                            sketchList.push(qsTr("Sketch %1").arg(newDetails[detailIndex].sketches[sketchIndex].part + 1));
+                            sketchList.push(qsTr("Sketch %1").arg(newDetails[detailIndex].sketches[sketchIndex].id + 1));
                         }
                         // This is absolutely an anglicism... but not really sure what to do, we're using qsTr, does that know how to do proper i18n list stuff?
                         if (newDetails[detailIndex].sketches.length > 2) {
@@ -248,40 +248,40 @@ Zynthian.DialogQuestion {
                     }
                     // - Run through the track's patterns
                     let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
-                    let enabledAPart = false;
-                    for (let partIndex = 0; partIndex < 5; ++partIndex) {
-                        let pattern = sequence.getByPart(_private.sketchpadTrack.id, partIndex);
+                    let enabledAClip = false;
+                    for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                        let pattern = sequence.getByPart(_private.sketchpadTrack.id, clipIndex);
                     //   - Clear the existing pattern and reset it to defaults
                         pattern.resetPattern(true);
-                        let partSketch = _private.sketches[partIndex];
+                        let clipSketch = _private.sketches[clipIndex];
                         // Disable the sketch we're unbouncing in favour of one of the destination slots
-                        if (partSketch) {
-                            partSketch.enabled = false;
+                        if (clipSketch) {
+                            clipSketch.enabled = false;
                         }
-                    //   - If there is a sketch at that position, and it has pattern data, fill up the part's pattern data from that sketch (ZYNTHBOX_PATTERN_JSON - setFromJson(clip.metadata.patternJson))
-                        if (partSketch.metadata.patternJson !== null && partSketch.metadata.patternJson.length > 5) {
+                    //   - If there is a sketch at that position, and it has pattern data, fill up the clip's pattern data from that sketch (ZYNTHBOX_PATTERN_JSON - setFromJson(clip.metadata.patternJson))
+                        if (clipSketch.metadata.patternJson !== null && clipSketch.metadata.patternJson.length > 5) {
                             console.log("Replace the slot's pattern content with the stored pattern");
-                            pattern.setFromJson(partSketch.metadata.patternJson)
-                            if (enabledAPart === false) {
+                            pattern.setFromJson(clipSketch.metadata.patternJson)
+                            if (enabledAClip === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
-                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                let destinationClip = _private.sketchpadTrack.getClipsModelById(clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 destinationClip.enabled = true;
-                                enabledAPart = true;
+                                enabledAClip = true;
                             }
-                        } else if (partSketch.metadata.midiRecording !== null && partSketch.metadata.midiRecording.length > 10) {
+                        } else if (clipSketch.metadata.midiRecording !== null && clipSketch.metadata.midiRecording.length > 10) {
                             console.log("Replace the slot's pattern content by reconstructing from recorded midi");
                             // Load the recording into the global recorder track
-                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(partSketch.metadata.midiRecording, -1);
+                            Zynthbox.MidiRecorder.loadTrackFromBase64Midi(clipSketch.metadata.midiRecording, -1);
                             // Apply that newly loaded recording to the pattern
                             Zynthbox.MidiRecorder.applyToPattern(pattern);
-                            if (enabledAPart === false) {
+                            if (enabledAClip === false) {
                                 // If we've not already enabled something, enable the first thing we encounter
-                                let destinationClip = _private.sketchpadTrack.getClipsModelByPart(partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                let destinationClip = _private.sketchpadTrack.getClipsModelById(clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 destinationClip.enabled = true;
-                                enabledAPart = true;
+                                enabledAClip = true;
                             }
                         } else {
-                            console.log("Not adding in data for pattern, as no data exists for this part");
+                            console.log("Not adding in data for pattern, as no data exists for this clip");
                         }
                     }
                     // - Clean up after ourselves

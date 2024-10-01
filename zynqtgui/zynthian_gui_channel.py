@@ -38,60 +38,12 @@ class zynthian_gui_channel(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):
         super(zynthian_gui_channel, self).__init__(parent)
         self.title = "Tracks"
-        self.__channel_id__ = 0
-        self.__part_id__ = 0
 
     def show(self):
         pass
 
-    @Signal
-    def __channel_id_changed__(self):
-        pass
-
-    @Property(int, notify=__channel_id_changed__)
-    def channelId(self):
-        return self.__channel_id__
-
-    @channelId.setter
-    def setChannelId(self, tId):
-        self.__channel_id__ = tId
-        self.__channel_id_changed__.emit()
-        self.__channel_changed__.emit()
-
-    @Signal
-    def __part_id_changed__(self):
-        pass
-
-    @Property(int, notify=__part_id_changed__)
-    def partId(self):
-        return self.__part_id__
-
-    @partId.setter
-    def setPartId(self, pId):
-        self.__part_id__ = pId
-        self.__part_id_changed__.emit()
-        self.__part_changed__.emit()
-
-    @Signal
-    def __channel_changed__(self):
-        pass
-
-    @Property(QObject, notify=__channel_changed__)
-    def channel(self):
-        return self.zynqtgui.screens['sketchpad'].song.channelsModel.getChannel(self.__channel_id__)
-
-
-    @Signal
-    def __part_changed__(self):
-        pass
-
-    @Property(QObject, notify=__part_changed__)
-    def part(self):
-        return self.zynqtgui.screens['sketchpad'].song.partsModel.getPart(self.__part_id__)
-
     def set_select_path(self):
         self.select_path = self.title
         self.select_path_element = self.title
-
 
 #------------------------------------------------------------------------------

@@ -88,7 +88,7 @@ class sketchpad_channel(QObject):
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
         self.__selected_fx_slot_row = 0
-        self.__selected_part__ = 0
+        self.__selected_clip__ = 0
         self.__externalMidiChannel__ = -1
         self.__externalCaptureVolume__ = 0
         self.__externalAudioSource__ = ""
@@ -180,7 +180,7 @@ class sketchpad_channel(QObject):
             self.__connected_pattern__ = self.__id__
 
         self.__song__.scenesModel.selected_sketchpad_song_index_changed.connect(self.track_index_changed_handler)
-        self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.selectedPartNamesChanged.emit())
+        self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.selectedClipNamesChanged.emit())
 
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
@@ -191,8 +191,8 @@ class sketchpad_channel(QObject):
         self.track_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
 
-        self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
-        self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
+        self.selectedClipChanged.connect(lambda: self.clipsModelChanged.emit())
+        self.selectedClipChanged.connect(lambda: self.scene_clip_changed.emit())
         self.zynqtgui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler_throttle.start)
 
         ### Proxy recordingPopupActive from zynthian_qt_gui
@@ -335,27 +335,27 @@ class sketchpad_channel(QObject):
         self.__sound_snapshot_changed = True
 
     @Slot(int, int)
-    def onClipEnabledChanged(self, trackIndex, partNum):
-        clip = self.getClipsModelByPart(partNum).getClip(trackIndex)
+    def onClipEnabledChanged(self, trackIndex, clipId):
+        clip = self.getClipsModelById(clipId).getClip(trackIndex)
 
         if clip is not None and clip.enabled is True:
-            self.set_selected_part(partNum)
-            # We will now allow playing multiple parts of a sample-loop channel
-            allowMultipart = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
-            # logging.error(f"Allowing multipart playback: {allowMultipart}")
-            if not allowMultipart:
-                for part in range(0, 5):
-                    if part != self.__selected_part__:
-                        clipForDisabling = self.getClipsModelByPart(part).getClip(trackIndex)
+            self.set_selected_clip(clipId)
+            # We will now allow playing multiple clips of a sample-loop channel
+            allowMulticlip = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
+            # logging.error(f"Allowing multiclip playback: {allowMulticlip}")
+            if not allowMulticlip:
+                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                    if clipId != self.__selected_clip__:
+                        clipForDisabling = self.getClipsModelById(clipId).getClip(trackIndex)
                         # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
                         if clipForDisabling is not None:
                             clipForDisabling.enabled = False
 
-        self.selectedPartNamesChanged.emit()
+        self.selectedClipNamesChanged.emit()
 
     def track_index_changed_handler(self):
         self.scene_clip_changed.emit()
-        self.selectedPartNamesChanged.emit()
+        self.selectedClipNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
         self.cache_bank_preset_lists()
@@ -449,9 +449,9 @@ class sketchpad_channel(QObject):
         self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
 
     def stopAllClips(self):
-        for part_index in range(0, 5):
-            for clip_index in range(0, self.getClipsModelByPart(part_index).count):
-                self.__song__.getClipByPart(self.__id__, clip_index, part_index).stop()
+        for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for song_index in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
+                self.__song__.getClipById(self.__id__, song_index, clip_index).stop()
 
     def serialize(self):
         samplesObj = []
@@ -476,7 +476,7 @@ class sketchpad_channel(QObject):
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
                 "externalAudioSource": self.__externalAudioSource__,
-                "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
+                "clips": [self.__clips_model__[clipId].serialize() for clipId in range(0, 5)],
                 "samples": samplesObj,
                 "layers_snapshot": self.__layers_snapshot,
                 "sample_picking_style": self.__sample_picking_style__,
@@ -575,13 +575,15 @@ class sketchpad_channel(QObject):
             if "samples" in obj:
                 bank_dir = Path(self.bankDir)
                 for i, clip in enumerate(obj["samples"]):
-                    if clip is not None:
+                    if clip is None:
+                        self.__samples__[i].clear()
+                    else:
                         if (bank_dir / clip["path"]).exists():
                             self.__samples__[i].set_path(str(bank_dir / clip["path"]), False, load_autosave) # Do not copy file when restoring
                 self.samples_changed.emit()
             if "clips" in obj:
-                for x in range(0, 5):
-                    self.__clips_model__[x].deserialize(obj["clips"][x], x, load_autosave)
+                for clipId in range(0, 5):
+                    self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId, load_autosave)
             if "layers_snapshot" in obj:
                 self.__layers_snapshot = obj["layers_snapshot"]
                 self.sound_data_changed.emit()
@@ -775,30 +777,24 @@ class sketchpad_channel(QObject):
         return self.__type__
     type = Property(str, type, constant=True)
 
+    # Get the clip model for the specified clip ID
     @Slot(int, result=QObject)
-    def getClipsModelByPart(self, part):
-        return self.__clips_model__[part]
+    def getClipsModelById(self, clipId):
+        return self.__clips_model__[clipId]
+    ### BEGIN Property clipsModel
+    # This is the clips model associated with the currently selected clip
     def clipsModel(self):
-        return self.__clips_model__[self.__selected_part__]
+        return self.__clips_model__[self.__selected_clip__]
     clipsModelChanged = Signal()
     clipsModel = Property(QObject, clipsModel, notify=clipsModelChanged)
+    ### END Property clipsModel
 
-    @Slot(result='QVariantList')
-    def getAllPartClips(self):
-        clips = []
-
-        for index in range(5):
-            clips_model = self.getClipsModelByPart(index)
-            clips.append(clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex))
-
-        return clips
-
-    ### BEGIN Property parts
-    def getParts(self):
+    ### BEGIN Property clips
+    def getClips(self):
         return self.__clips_model__
-    partsChanged = Signal()
-    parts = Property('QVariantList', getParts, notify=partsChanged)
-    ### END Property parts
+    clipsChanged = Signal()
+    clips = Property('QVariantList', getClips, notify=clipsChanged)
+    ### END Property clips
 
     @Slot(None)
     def delete(self):
@@ -826,8 +822,8 @@ class sketchpad_channel(QObject):
     def isEmpty(self):
         is_empty = True
 
-        for clip_index in range(0, self.clipsModel.count):
-            clip: sketchpad_clip = self.clipsModel.getClip(clip_index)
+        for songIndex in range(0, self.clipsModel.count):
+            clip: sketchpad_clip = self.clipsModel.getClip(songIndex)
             if clip.path is not None and len(clip.path) > 0:
                 is_empty = False
                 break
@@ -837,10 +833,10 @@ class sketchpad_channel(QObject):
     # source : Source sketchpad_channel object
     @Slot(QObject)
     def copyFrom(self, source):
-        for part in range(5):
+        for clipId in range(Zynthbox.Plugin.instance().sketchpadPartCount()):
             # Copy all clips from source channel to self
-            for clip_index in range(0, self.parts[part].count):
-                self.parts[part].getClip(clip_index).copyFrom(source.parts[part].getClip(clip_index))
+            for songIndex in range(0, self.clips[clipId].count):
+                self.clips[clipId].getClip(songIndex).copyFrom(source.clips[clipId].getClip(songIndex))
 
         for sample_id in range(5):
             self.samples[sample_id].copyFrom(source.samples[sample_id])
@@ -1299,11 +1295,11 @@ class sketchpad_channel(QObject):
             if type == "sample-trig":
                 self.keyZoneMode = "all-full"
 
-            for track in range(0, 10):
-                for part in range(0, 5):
-                    clip = self.__song__.getClipByPart(self.id, track, part)
+            for songId in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
+                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                    clip = self.__song__.getClipById(self.id, songId, clipId)
                     if clip is not None:
-                        clip.enabled_changed.emit(clip.col, clip.part)
+                        clip.enabled_changed.emit(clip.col, clip.id)
             if force_set == False:
                 self.__song__.schedule_save()
             self.update_jack_port()
@@ -1461,11 +1457,11 @@ class sketchpad_channel(QObject):
         if self.__keyzone_mode__ != keyZoneMode:
             self.__keyzone_mode__ = keyZoneMode
             self.keyZoneModeChanged.emit()
-            for track in range(0, 10):
-                for part in range(0, 5):
-                    clip = self.__song__.getClipByPart(self.id, track, part)
+            for songId in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
+                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                    clip = self.__song__.getClipById(self.id, songId, clipId)
                     if clip is not None:
-                        clip.enabled_changed.emit(clip.col, clip.part)
+                        clip.enabled_changed.emit(clip.col, clip.id)
             self.__song__.schedule_save()
 
     keyZoneModeChanged = Signal()
@@ -1562,15 +1558,45 @@ class sketchpad_channel(QObject):
     def get_selectedSlotRow(self):
         return self.__selected_slot_row__
 
-    def set_selectedSlotRow(self, row):
+    def set_selectedSlotRow(self, row, shouldEmitCurrentSlotCUIAFeedback=True):
         if self.__selected_slot_row__ != row:
             self.__selected_slot_row__ = row
             self.selectedSlotRowChanged.emit()
+            if shouldEmitCurrentSlotCUIAFeedback:
+                self.emitCurrentSlotCUIAFeedback()
 
     selectedSlotRowChanged = Signal()
 
     selectedSlotRow = Property(int, get_selectedSlotRow, set_selectedSlotRow, notify=selectedSlotRowChanged)
     ### END Property selectedSlotRow
+
+    @Slot(None)
+    def emitCurrentSlotCUIAFeedback(self):
+        knownGain = 0.0
+        knownPan = 0.0
+        if self.audioTypeKey() == "synth":
+            synthIndex = self.chainedSounds[self.selectedSlotRow]
+            if synthIndex > -1:
+                knownGain = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
+                knownPan = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
+        elif self.audioTypeKey() == "sample":
+            sample = self.samples[self.selectedSlotRow]
+            if sample.audioSource:
+                knownGain = sample.audioSource.gainAbsolute()
+                knownPan = sample.audioSource.pan()
+        elif self.audioTypeKey() == "sketch":
+            theClip = self.getClipsModelById(self.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            if theClip.audioSource:
+                knownGain = theClip.audioSource.gainAbsolute()
+                knownPan = theClip.audioSource.pan()
+        elif self.audioTypeKey() == "external":
+            pass
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownGain, (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownPan, (-1, 1), (0, 127)))
+        knownDryWetMixAmount = 0.0
+        if self.chainedFx[self.__selected_fx_slot_row]:
+            knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
     ### Property selectedFxSlotRow
     def get_selectedFxSlotRow(self):
@@ -1663,9 +1689,11 @@ class sketchpad_channel(QObject):
     def get_selected_clip(self):
         return self.__selected_clip__
     def set_selected_clip(self, selected_clip, shouldEmitCurrentClipCUIAFeedback=True):
-        if self.__selected_clip__ == selected_clip:
+        if self.__selected_clip__ != selected_clip:
             self.__selected_clip__ = selected_clip
             self.selectedClipChanged.emit()
+            if self.trackType == "sample-loop":
+                self.selectedSlotRow = selected_clip
             if shouldEmitCurrentClipCUIAFeedback:
                 self.emitCurrentClipCUIAFeedback()
     selectedClipChanged = Signal()
@@ -1675,51 +1703,6 @@ class sketchpad_channel(QObject):
     @Slot(None)
     def emitCurrentClipCUIAFeedback(self):
         pass
-
-    ### Property selectedPart
-    # TODO : selectedPart is a thing from way back and is analogous to selectedSlotRow or selectedFxSlotRow.
-    #        Update all references of selectedPart to selectedSlotRow and selectedFxSlotRow as required
-    #        Or, when referring to clips, actually use selectedClip
-    def get_selected_part(self):
-        return self.__selected_part__
-    def set_selected_part(self, selected_part, shouldEmitCurrentSlotCUIAFeedback=True):
-        if selected_part != self.__selected_part__:
-            self.__selected_part__ = selected_part
-            self.selectedSlotRow = selected_part
-            self.selectedPartChanged.emit()
-            if shouldEmitCurrentSlotCUIAFeedback:
-                self.shouldEmitCurrentSlotCUIAFeedback()
-    selectedPartChanged = Signal()
-    selectedPart = Property(int, get_selected_part, set_selected_part, notify=selectedPartChanged)
-    ### END Property selectedPart
-
-    @Slot(None)
-    def emitCurrentSlotCUIAFeedback(self):
-        knownGain = 0.0
-        knownPan = 0.0
-        if self.audioTypeKey() == "synth":
-            synthIndex = self.chainedSounds[self.selectedSlotRow]
-            if synthIndex > -1:
-                knownGain = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
-                knownPan = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
-        elif self.audioTypeKey() == "sample":
-            sample = self.samples[self.selectedSlotRow]
-            if sample.audioSource:
-                knownGain = sample.audioSource.gainAbsolute()
-                knownPan = sample.audioSource.pan()
-        elif self.audioTypeKey() == "sketch":
-            theClip = self.getClipsModelByPart(self.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-            if theClip.audioSource:
-                knownGain = theClip.audioSource.gainAbsolute()
-                knownPan = theClip.audioSource.pan()
-        elif self.audioTypeKey() == "external":
-            pass
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownGain, (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownPan, (-1, 1), (0, 127)))
-        knownDryWetMixAmount = 0.0
-        if self.chainedFx[self.__selected_fx_slot_row]:
-            knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
     ### Property externalMidiChannel
     # Logic for this is, -1 is "just use the normal one", anything else is a specific channel
@@ -1767,23 +1750,24 @@ class sketchpad_channel(QObject):
     externalAudioSource = Property(str, get_externalAudioSource, set_externalAudioSource, notify=externalAudioSourceChanged)
     ### END Property externalAudioSource
 
-    ### Property selectedPartNames
-    def get_selectedPartNames(self):
-        partNames = []
+    ### Property selectedClipNames
+    def get_selectedClipNames(self):
+        clipNames = []
         for i in range(5):
-            clip = self.getClipsModelByPart(i).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
+            clip = self.getClipsModelById(i).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
 
             if clip.enabled:
-                partNames.append(chr(i+65).lower())
+                clipNames.append(chr(i+65).lower())
             else:
-                partNames.append("")
+                clipNames.append("")
 
-        return partNames
+        return clipNames
 
-    selectedPartNamesChanged = Signal()
+    selectedClipNamesChanged = Signal()
 
-    selectedPartNames = Property('QVariantList', get_selectedPartNames, notify=selectedPartNamesChanged)
-    ### Property selectedPartNames
+    selectedPartNames = Property('QVariantList', get_selectedClipNames, notify=selectedClipNamesChanged)
+    selectedClipNames = Property('QVariantList', get_selectedClipNames, notify=selectedClipNamesChanged)
+    ### Property selectedClipNames
 
     ### Property recordingPopupActive
     ### Proxy recordingPopupActive from zynthian_qt_gui
@@ -2203,7 +2187,11 @@ class sketchpad_channel(QObject):
         elif self.trackType in ["sample-trig", "sample-slice"]:
             return self.samples
         elif self.trackType == "sample-loop":
-            return self.getAllPartClips()
+            clips = []
+            for clip_index in range(Zynthbox.Plugin.instance().sketchpadPartCount()):
+                clips_model = self.getClipsModelById(clip_index)
+                clips.append(clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex))
+            return clips
         elif self.trackType == "external":
             return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
                     f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
@@ -2299,7 +2287,7 @@ class sketchpad_channel(QObject):
         if self.trackType in ["sample-trig", "sample-slice"]:
             return self.samples[self.selectedSlotRow]
         else:
-            return self.getClipsModelByPart(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
+            return self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
 
     @Slot(str)
     def setChannelSamplesFromSnapshot(self, snapshot: str):
@@ -2396,11 +2384,11 @@ class sketchpad_channel(QObject):
             self.__routingData__["synth"] = newRoutingData
         elif _trackType == "sample-loop":
             # Reorder sketches
-            old_order_clips = [self.getClipsModelByPart(index).getClip(0) for index in range(5)]
+            old_order_clips = [self.getClipsModelById(index).getClip(0) for index in range(5)]
             for index, clip in enumerate(old_order_clips):
                 if index != newOrder[index]:
-                    self.getClipsModelByPart(newOrder[index]).__clips__[0] = clip
-                    clip.part = newOrder[index]
+                    self.getClipsModelById(newOrder[index]).__clips__[0] = clip
+                    clip.id = newOrder[index]
             self.__song__.schedule_save()
         elif _trackType in ["sample-trig", "sample-slice"]:
             # Reorder samples

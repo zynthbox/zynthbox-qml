@@ -65,7 +65,7 @@ Zynthian.ScreenPage {
     }
     property QtObject selectedClip: component.selectedChannel
                                     ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
-                                        ? component.selectedChannel.getClipsModelByPart(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                        ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                         : component.selectedChannel.samples[component.selectedChannel.selectedSlotRow]
                                     : null
     property QtObject cppClipObject: component.selectedClip && component.selectedClip.hasOwnProperty("cppObjId")
@@ -689,7 +689,7 @@ Zynthian.ScreenPage {
         }
 
         ColumnLayout {
-            id: partBar
+            id: clipBar
 
             spacing: 1
             Layout.fillWidth: false
@@ -699,15 +699,15 @@ Zynthian.ScreenPage {
             Repeater {
                 model: component.selectedChannel ? 5 : 0
                 delegate: Rectangle {
-                    id: partDelegate
+                    id: clipDelegate
 
                     property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
-                                                        ? component.selectedChannel.getClipsModelByPart(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                                        ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                                         : component.selectedChannel.samples[index]
-                    property QtObject cppClipObject: partDelegate.clip && partDelegate.clip.hasOwnProperty("cppObjId")
-                                                        ? Zynthbox.PlayGridManager.getClipById(partDelegate.clip.cppObjId)
+                    property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")
+                                                        ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
                                                         : null
-                    property bool clipHasWav: partDelegate.clip && !partDelegate.isEmpty
+                    property bool clipHasWav: clipDelegate.clip && !clipDelegate.isEmpty
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -719,11 +719,11 @@ Zynthian.ScreenPage {
                     Zynthbox.WaveFormItem {
                         anchors.fill: parent
                         color: Kirigami.Theme.textColor
-                        source: partDelegate.cppClipObject ? "clip:/%1".arg(partDelegate.cppClipObject.id) : ""
-                        start: partDelegate.cppClipObject ? partDelegate.cppClipObject.startPositionSeconds : 0
-                        end: partDelegate.cppClipObject ? partDelegate.cppClipObject.startPositionSeconds + partDelegate.cppClipObject.lengthSeconds : 0
+                        source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
+                        start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.startPositionSeconds : 0
+                        end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.startPositionSeconds + clipDelegate.cppClipObject.lengthSeconds : 0
 
-                        visible: partDelegate.clipHasWav
+                        visible: clipDelegate.clipHasWav
                     }
                     Rectangle {
                         height: 16
@@ -744,14 +744,17 @@ Zynthian.ScreenPage {
                             elide: "ElideRight"
                             horizontalAlignment: "AlignHCenter"
                             font.pointSize: 8
-                            text: partDelegate.clipHasWav ? partDelegate.clip.path.split("/").pop() : ""
+                            text: clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : ""
                         }
                     }
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            component.selectedChannel.selectedPart = index;
-                            component.selectedChannel.selectedSlotRow = index;
+                            if ("sample-loop" === component.selectedChannel.trackType) {
+                                component.selectedChannel.selectedClip = index;
+                            } else {
+                                component.selectedChannel.selectedSlotRow = index;
+                            }
                         }
                     }
                 }

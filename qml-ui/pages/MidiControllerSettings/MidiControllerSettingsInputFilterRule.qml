@@ -624,9 +624,23 @@ ColumnLayout {
             enabled: Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterRuleObject.cuiaEvent)
             text: component.filterRuleObject === null
                 ? "(no filter rule selected)"
-                : qsTr("Sketchpad Part:\n%1").arg(Zynthbox.ZynthboxBasics.partLabelText(component.filterRuleObject.cuiaPart))
+                : Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterRuleObject.cuiaEvent)
+                    ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaPart))
+                    : Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)
+                        ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaPart))
+                        : Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterRuleObject.cuiaEvent)
+                            ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaPart))
+                            : qsTr("Sketchpad Part:\n%1").arg(Zynthbox.ZynthboxBasics.partLabelText(component.filterRuleObject.cuiaPart))
             onClicked: {
-                partPicker.pickPart(component.filterRuleObject.cuiaPart, function(newPart) {
+                partType = -1;
+                if (Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterRuleObject.cuiaEvent)) {
+                    partType = 0;
+                } else if(Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)) {
+                    partType = 1;
+                } else if(Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterRuleObject.cuiaEvent)) {
+                    partType = 2;
+                }
+                partPicker.pickPart(component.filterRuleObject.cuiaPart, partType, function(newPart) {
                     component.filterRuleObject.cuiaPart = newPart;
                 });
             }

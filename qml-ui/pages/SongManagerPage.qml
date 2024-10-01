@@ -481,8 +481,7 @@ Zynthian.ScreenPage {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 5
                 Repeater {
                     model: 10
-                    Sketchpad.PartBarDelegate {
-                        id: partBarDelegate
+                    Sketchpad.ClipsBarDelegate {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: Kirigami.Units.gridUnit* 2

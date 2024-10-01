@@ -643,7 +643,7 @@ def audio_autoconnect(force=False):
                         # BEGIN Handle sample slots
                         samplerOutputPorts = jclient.get_ports(name_pattern=f"SamplerSynth:channel_{channelId + 1}-lane{laneId + 1}", is_audio=True, is_output=True, is_input=False)
                         sample = channel.samples[laneId]
-                        loopSample = channel.parts[laneId].getClip(0)
+                        loopSample = channel.clips[laneId].getClip(zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                         if sample.audioSource is not None or (loopSample and loopSample.audioSource is not None):
                             # Connect sampler ports if there's a sample or loop in the given slot
                             if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
@@ -794,7 +794,7 @@ def audio_autoconnect(force=False):
 
                     # Create a list of lists of ports to be connected in order, dependent on routing style
                     # For serial ("standard"): Single entry containing (Fx1, Fx2, Fx3, Fx4, Fx5, GlobalPlayback)
-                    # one-to-one: An entry per part, entries contain the FXPassthrough lane for the equivalent part, and GlobalPlayback. For example: (Fx1, GlobalPlayback), (Fx2, GlobalPlayback), (Fx3, GlobalPlayback)...
+                    # one-to-one: An entry per clip, entries contain the FXPassthrough lane for the equivalent clip, and GlobalPlayback. For example: (Fx1, GlobalPlayback), (Fx2, GlobalPlayback), (Fx3, GlobalPlayback)...
                     # Only add an fx entry to the list if the slot is occupied (an fx entry consists of two clients: the fx passthrough, and the fx jack client itself)
                     # Only add GlobalPlayback to the list if the list is not empty
                     # Only add the individual list to the processing list if it is not empty

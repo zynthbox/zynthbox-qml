@@ -132,7 +132,7 @@ Zynthian.DialogQuestion {
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_BOLD":
             case "MODE_SWITCH_LONG":
-                // when this dialog is open, switching tracks or parts would be... a problem in general, so let's not let that happen
+                // when this dialog is open, switching tracks or clips would be... a problem in general, so let's not let that happen
                 returnValue = true;
                 break;
         }

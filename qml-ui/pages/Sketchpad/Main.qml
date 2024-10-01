@@ -66,7 +66,7 @@ Zynthian.ScreenPage {
     Used to temporarily store last clicked object by user
     If the clicked object is a QObject the object is stored otherwise the index is stored
     Structure : {
-        "className": "sketch_track" | "sketch_part" | obj.className
+        "className": "sketchpad_track" | "sketchpad_clip" | obj.className
         "value": QObject or int depending on the type of selected object
         "component": QML Component which was clicked to determine co-ordinates of lastSelectedSketchOutline
     }
@@ -206,7 +206,7 @@ Zynthian.ScreenPage {
         if (slot === -1) {
             slot = root.selectedChannel.selectedSlotRow
         }
-        var clip = root.selectedChannel.getClipsModelByPart(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+        var clip = root.selectedChannel.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
@@ -481,8 +481,8 @@ Zynthian.ScreenPage {
                 if (zynqtgui.altButtonPressed) {
                     // Cycle between channel, mixer, synths, samples, fx when alt button is not pressed
                     if (bottomStack.slotsBar.channelButton.checked) {
-                        bottomStack.slotsBar.partButton.checked = true
-                    } else if (bottomStack.slotsBar.partButton.checked) {
+                        bottomStack.slotsBar.clipsButton.checked = true
+                    } else if (bottomStack.slotsBar.clipsButton.checked) {
                         bottomStack.slotsBar.synthsButton.checked = true
                     } else if (bottomStack.slotsBar.synthsButton.checked) {
                         bottomStack.slotsBar.samplesButton.checked = true
@@ -663,7 +663,7 @@ Zynthian.ScreenPage {
             if (bottomStack.slotsBar.channelButton.checked) {
                 console.log("LED : Slots Channel Bar active")
                 zynqtgui.slotsBarChannelActive = true;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
@@ -672,16 +672,16 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.mixerButton.checked) {
                 console.log("LED : Slots Mixer Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = true;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
                 zynqtgui.slotsBarFxActive = false;
                 // zynqtgui.soundCombinatorActive = false;
-            } else if (bottomStack.slotsBar.partButton.checked) {
-                console.log("LED : Slots Part Bar active")
+            } else if (bottomStack.slotsBar.clipsButton.checked) {
+                console.log("LED : Slots Clips Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = true;
+                zynqtgui.slotsBarClipsActive = true;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
@@ -690,7 +690,7 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.synthsButton.checked) {
                 console.log("LED : Slots Synths Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = true;
                 zynqtgui.slotsBarSamplesActive = false;
@@ -699,7 +699,7 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.samplesButton.checked) {
                 console.log("LED : Slots Samples Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = true;
@@ -708,7 +708,7 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.fxButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
@@ -717,7 +717,7 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.soundCombinatorButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
@@ -726,7 +726,7 @@ Zynthian.ScreenPage {
             } else {
                 console.log("LED : No Slots Bar active")
                 zynqtgui.slotsBarChannelActive = false;
-                zynqtgui.slotsBarPartActive = false;
+                zynqtgui.slotsBarClipsActive = false;
                 zynqtgui.slotsBarMixerActive = false;
                 zynqtgui.slotsBarSynthsActive = false;
                 zynqtgui.slotsBarSamplesActive = false;
@@ -851,7 +851,7 @@ Zynthian.ScreenPage {
     function resetBottomBar(toggleBottomBar) {
         if (toggleBottomBar) {
             if (bottomStack.slotsBar.channelButton.checked) {
-                bottomStack.slotsBar.partButton.checked = true
+                bottomStack.slotsBar.clipsButton.checked = true
             } else {
                 bottomStack.slotsBar.channelButton.checked = true
             }
@@ -866,8 +866,8 @@ Zynthian.ScreenPage {
         Rectangle {
             id: lastSelectedObjIndicator
 
-            visible: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_part"
-                        ? zynqtgui.slotsBarPartActive
+            visible: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
+                        ? zynqtgui.slotsBarClipsActive
                         : zynqtgui.sketchpad.lastSelectedObj != null
                             ? ["sketchpad_segment", "sketchpad_sketch"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
                                 ? false
@@ -916,8 +916,8 @@ Zynthian.ScreenPage {
         Rectangle {
             id: copySourceObjIndicator
 
-            visible: root.copySourceObj && root.copySourceObj.className === "sketchpad_part"
-                        ? zynqtgui.slotsBarPartActive
+            visible: root.copySourceObj && root.copySourceObj.className === "sketchpad_clips"
+                        ? zynqtgui.slotsBarClipsActive
                         : root.copySourceObj
 
             width: root.copySourceObj && root.copySourceObj.component ? root.copySourceObj.component.width : 0
@@ -982,7 +982,7 @@ Zynthian.ScreenPage {
                                 bottomStack.slotsBar.channelButton.checked = true
                             } else {
                                 zynqtgui.sketchpad.displaySceneButtons = true
-                                bottomStack.slotsBar.partButton.checked = true
+                                bottomStack.slotsBar.clipsButton.checked = true
                                 root.displayTrackButtons = false
                             }
                         }
@@ -1267,7 +1267,7 @@ Zynthian.ScreenPage {
                                     zynqtgui.bottomBarControlObj = clipCell.channel;
 
 //                                        zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = channel.sceneClip.col
-//                                        bottomStack.slotsBar.partButton.checked = true
+//                                        bottomStack.slotsBar.clipsButton.checked = true
 
 //                                        Qt.callLater(function() {
 //                                            if (channel.connectedPattern >= 0) {
@@ -1415,7 +1415,7 @@ Zynthian.ScreenPage {
 
                                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                     sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-                                    pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
+                                    pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedClip) : null
 
                                     onPressed: {
                                         clipsDelegate.switchToThisClip(true)
@@ -1516,7 +1516,7 @@ Zynthian.ScreenPage {
                                                         ? qsTr("Track")
                                                         : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
                                                             ? qsTr("Deprecated Track")
-                                                            : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_part"
+                                                            : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
                                                               ? qsTr("Clip")
                                                               : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment"
                                                                 ? qsTr("Segment")
@@ -1571,9 +1571,9 @@ Zynthian.ScreenPage {
                                            root.copySourceObj.value !== root.song.scenesModel.selectedSketchpadSongIndex &&
                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
                                     return true
-                                } else if (root.copySourceObj.className === "sketchpad_part" &&
+                                } else if (root.copySourceObj.className === "sketchpad_clips" &&
                                            root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                           zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_part") {
+                                           zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips") {
                                    return true
                                 } else if (root.copySourceObj.className === "sketchpad_segment" &&
                                            root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
@@ -1596,7 +1596,7 @@ Zynthian.ScreenPage {
                                                                ? qsTr("Track")
                                                                : root.copySourceObj.className === "sketchpad_track"
                                                                    ? qsTr("Deprecated Track")
-                                                                   : root.copySourceObj.className === "sketchpad_part"
+                                                                   : root.copySourceObj.className === "sketchpad_clips"
                                                                      ? qsTr("Clip")
                                                                      : root.copySourceObj.className === "sketchpad_segment"
                                                                        ? qsTr("Segment")
@@ -1612,8 +1612,8 @@ Zynthian.ScreenPage {
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
                                 // Copy pattern
-                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destChannel.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
+                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destChannel.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
                                 destPattern.cloneOther(sourcePattern)
 
                                 root.copySourceObj = null
@@ -1625,12 +1625,12 @@ Zynthian.ScreenPage {
                                 var destChannel = root.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
                                 destChannel.copyFrom(sourceChannel)
 
-                                for (var part=0; part<5; part++) {
+                                for (var clipId=0; clipId<5; clipId++) {
                                     for (var i=0; i<sourceChannel.clipsModel.count; i++) {
-                                        var sourceClip = sourceChannel.parts[part].getClip(i)
-                                        var destClip = destChannel.parts[part].getClip(i)
-                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, part)
-                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, part)
+                                        var sourceClip = sourceChannel.clips[clipId].getClip(i)
+                                        var destClip = destChannel.clips[clipId].getClip(i)
+                                        var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, clipId)
+                                        var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, clipId)
 
                                         destPattern.cloneOther(sourcePattern)
                                     }
@@ -1647,8 +1647,8 @@ Zynthian.ScreenPage {
 
                                 for (var i=0; i<root.song.channelsModel.count; i++) {
                                     var channel = root.song.channelsModel.getChannel(i)
-                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(root.copySourceObj.value === 0 ? "global" : ("global"+(root.copySourceObj.value + 1))).getByPart(channel.id, channel.selectedPart)
-                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByPart(channel.id, channel.selectedPart)
+                                    var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(root.copySourceObj.value === 0 ? "global" : ("global"+(root.copySourceObj.value + 1))).getByPart(channel.id, channel.selectedClip)
+                                    var destPattern = Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByPart(channel.id, channel.selectedClip)
 
                                     destPattern.cloneOther(sourcePattern)
                                 }
@@ -1656,15 +1656,15 @@ Zynthian.ScreenPage {
                                 root.copySourceObj = null
 
                                 zynqtgui.stop_loading()
-                            } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_part") {
+                            } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clips") {
                                 var sourceClip = root.copySourceObj.value
                                 var destClip = zynqtgui.sketchpad.lastSelectedObj.value
 
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
                                 // Copy pattern
-                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                var sourcePattern = Zynthbox.PlayGridManager.getSequenceModel(sourceClip.col === 0 ? "global" : ("global"+(sourceClip.col + 1))).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedClip)
+                                var destPattern = Zynthbox.PlayGridManager.getSequenceModel(destClip.col === 0 ? "global" : ("global"+(destClip.col + 1))).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedClip)
                                 destPattern.cloneOther(sourcePattern)
 
                                 root.copySourceObj = null
@@ -1698,7 +1698,7 @@ Zynthian.ScreenPage {
                                 // Try clearing pattern if exists.
                                 try {
                                     if (zynqtgui.sketchpad.lastSelectedObj.value.connectedPattern >= 0) {
-                                        Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByPart(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedPart).clear()
+                                        Zynthbox.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSequenceName).getByPart(zynqtgui.sketchpad.lastSelectedObj.value.id, zynqtgui.sketchpad.lastSelectedObj.value.selectedClip).clear()
                                     }
                                 } catch(e) {}
                             }
@@ -1741,14 +1741,14 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                 }
 
-                PartBar {
-                    id: partBar
+                ClipsBar {
+                    id: clipsBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     onClicked: {
-                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_part"
-                        zynqtgui.sketchpad.lastSelectedObj.value = partBar.selectedPartClip
-                        zynqtgui.sketchpad.lastSelectedObj.component = partBar.selectedComponent
+                        zynqtgui.sketchpad.lastSelectedObj.className = "sketchpad_clips"
+                        zynqtgui.sketchpad.lastSelectedObj.value = clipsBar.selectedClipObject
+                        zynqtgui.sketchpad.lastSelectedObj.component = clipsBar.selectedComponent
                     }
                 }
 

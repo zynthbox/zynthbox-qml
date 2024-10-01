@@ -23,6 +23,7 @@
 #
 # ******************************************************************************
 import logging
+import Zynthbox
 
 from PySide2.QtCore import QAbstractListModel, QObject, QTimer, Qt, Property, Signal, Slot
 
@@ -74,7 +75,7 @@ class sketchpad_scenes_model(QAbstractListModel):
                 "clips": [{
                     "row": clip.row,
                     "col": clip.col,
-                    "part": clip.part
+                    "part": clip.id
                 } for clip in val["clips"].copy() if clip is not None]
             }
         return {
@@ -90,7 +91,7 @@ class sketchpad_scenes_model(QAbstractListModel):
             for key, val in obj["scenesData"].items():
                 self.__scenes__[key] = val.copy()
                 for index, clip in enumerate(self.__scenes__[key]["clips"]):
-                    self.__scenes__[key]["clips"][index] = self.__song__.getClipByPart(clip["row"], clip["col"], clip["part"])
+                    self.__scenes__[key]["clips"][index] = self.__song__.getClipById(clip["row"], clip["col"], clip["part"])
             self.endResetModel()
 
         if "selectedSketchpadSongIndex" in obj:
@@ -194,9 +195,9 @@ class sketchpad_scenes_model(QAbstractListModel):
 
     def syncClipsEnabledFromCurrentScene(self):
         # Sync enabled attribute for clips in scene
-        for channel in range(10):
-            for part in range(5):
-                clip = self.__song__.getClipByPart(channel, self.selectedSketchpadSongIndex, part)
+        for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
+            for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                clip = self.__song__.getClipById(trackIndex, self.selectedSketchpadSongIndex, clipId)
 
                 if clip is not None and self.isClipInCurrentScene(clip):
                     clip.enabled = True
@@ -211,10 +212,7 @@ class sketchpad_scenes_model(QAbstractListModel):
             clip = scene["clips"][i]
 
             # Start all clips except clip to be recorded
-            if clip != self.zynqtgui.sketchpad.clipToRecord and \
-                    (trackIndex < 0 or (0 <= trackIndex == clip.col)):
-                # We will now allow playing multiple parts of a sample-loop channel and hence play all clips in part
-                # clip.part == clip.clipChannel.selectedPart and \
+            if clip != self.zynqtgui.sketchpad.clipToRecord and (trackIndex < 0 or (0 <= trackIndex == clip.col)):
                 clip.play()
 
     @Slot(int)
@@ -282,7 +280,7 @@ class sketchpad_scenes_model(QAbstractListModel):
     def copyTrack(self, from_track, to_track):
         for i in range(0, self.__song__.channelsModel.count):
             channel = self.__song__.channelsModel.getChannel(i)
-            for part in range(5):
-                channel.parts[part].getClip(to_track).copyFrom(channel.parts[part].getClip(from_track))
+            for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                channel.clips[clipId].getClip(to_track).copyFrom(channel.clips[clipId].getClip(from_track))
 
     clipCountChanged = Signal()

@@ -221,7 +221,7 @@ RowLayout {
     }
 
     QQC2.Button {
-        property var clip: applicationWindow().selectedChannel.getClipsModelByPart(applicationWindow().selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+        property var clip: applicationWindow().selectedChannel.getClipsModelById(applicationWindow().selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
         Layout.fillWidth: false
         Layout.fillHeight: false

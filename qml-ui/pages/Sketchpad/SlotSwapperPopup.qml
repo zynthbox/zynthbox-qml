@@ -75,7 +75,7 @@ Zynthian.DialogQuestion {
                 break;
             case "sketch":
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                    let slotData = root.selectedChannel.getClipsModelByPart(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                    let slotData = root.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                     if (slotData.path) {
                         newSlotTitles.push(slotData.path.split("/").pop());
                     } else {

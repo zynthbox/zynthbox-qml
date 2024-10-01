@@ -452,7 +452,7 @@ Item {
                         if (component.clip.isChannelSample) {
                             pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(channel, "sample", component.clip.lane);
                         } else {
-                            pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(channel, "sketch", component.clip.part);
+                            pageManager.getPage("sketchpad").bottomStack.slotsBar.requestSlotEqualizer(channel, "sketch", component.clip.id);
                         }
                     }
                 }

@@ -399,7 +399,7 @@ Item {
             // Only import a pattern object that is actually enabled
             if (theItem.importPattern) {
                 // As we're importing to the global sequence, operate on the pattern in the appropriate position
-                var importToPattern = globalSequence.getByPart(theItem.targetTrackIndex, theItem.targetPartIndex);
+                var importToPattern = globalSequence.getByPart(theItem.targetTrackIndex, theItem.targetClipIndex);
                 console.log("Importing", theItem.patternObject, "into", importToPattern);
 
                 // Now apply our loaded pattern onto the global one
@@ -418,11 +418,11 @@ Item {
             property bool importSound: false
             property int targetTrackIndex: -1
             property QtObject targetTrack: zynqtgui.sketchpad.song.channelsModel.getChannel(patternOptionsRoot.targetTrackIndex)
-            property int targetPartIndex: -1
+            property int targetClipIndex: -1
             property var soundInfo: []
             Component.onCompleted: {
                 targetTrackIndex = zynqtgui.sketchpad.selectedTrackId;
-                targetPartIndex = parent.singlePatternImport ? targetTrack.selectedPart : model.index;
+                targetClipIndex = parent.singlePatternImport ? targetTrack.selectedClip : model.index;
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -469,11 +469,11 @@ Item {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 1
                     enabled: patternOptionsRoot.importPattern
                     model: ["Slot a", "Slot b", "Slot c", "Slot d", "Slot e"]
-                    currentIndex: patternOptionsRoot.targetPartIndex
+                    currentIndex: patternOptionsRoot.targetClipIndex
                     onCurrentIndexChanged: {
-                        console.log(patternOptionsRoot.patternObject, patternOptionsRoot.targetPartIndex, currentIndex);
+                        console.log(patternOptionsRoot.patternObject, patternOptionsRoot.targetClipIndex, currentIndex);
                         if (currentIndex > -1) {
-                            patternOptionsRoot.targetPartIndex = currentIndex;
+                            patternOptionsRoot.targetClipIndex = currentIndex;
                         }
                     }
                     popup.z: 1999999999

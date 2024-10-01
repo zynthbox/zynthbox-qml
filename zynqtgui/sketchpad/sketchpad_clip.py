@@ -334,11 +334,11 @@ class sketchpad_clip_metadata(QObject):
 
     @Slot()
     def handleGainChanged(self):
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__part_index__), np.interp(self.clip.audioSource.gainAbsolute(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__id__), np.interp(self.clip.audioSource.gainAbsolute(), (0, 1), (0, 127)))
 
     @Slot()
     def handlePanChanged(self):
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__part_index__), np.interp(self.clip.audioSource.pan(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__id__), np.interp(self.clip.audioSource.pan(), (0, 1), (0, 127)))
 
     # This disconnects all our watcher signals from the clip's current ClipAudioSource instance, if there is one
     def unhook(self):
@@ -458,7 +458,7 @@ class sketchpad_clip_metadata(QObject):
                         # If there is no midi recording (that is, if this was not a live-recorded bit of audio), then save the clip's pattern data and ensure the midi recording meta is empty
                         self.set_midiRecording("", write=False, force=True)
                         sequenceObject = Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
-                        patternObject = sequenceObject.getByPart(self.clip.channel.id, self.clip.channel.selectedPart)
+                        patternObject = sequenceObject.getByPart(self.clip.channel.id, self.clip.id)
                         self.set_patternJson(patternObject.toJson(), write=False, force=True)
                     else:
                         # If there is a midi recording, store that, and ensure the pattern json is empty
@@ -573,14 +573,14 @@ class sketchpad_clip_metadata(QObject):
 
 
 class sketchpad_clip(QObject):
-    def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_channel_sample=False):
+    def __init__(self, row_index: int, col_index: int, id: int, song: QObject, parent=None, is_channel_sample=False):
         super(sketchpad_clip, self).__init__(parent)
         self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.is_channel_sample = is_channel_sample
         self.__row_index__ = row_index
         self.__col_index__ = col_index
-        self.__part_index__ = part_index
+        self.__id__ = id
         self.__path__ = None
         self.__filename__ = ""
         self.__song__ = song
@@ -597,7 +597,7 @@ class sketchpad_clip(QObject):
         self.__slices__ = 16
         self.__enabled__ = False
         self.channel = None
-        self.__lane__ = part_index
+        self.__lane__ = id
         self.__metadata = sketchpad_clip_metadata(self)
 
         # Just in case, fix up the lane so it's something sensible (we have five lanes, so...)
@@ -801,14 +801,14 @@ class sketchpad_clip(QObject):
     col = Property(int, col, set_col_index, notify=col_index_changed)
 
 
-    def part(self):
-        return self.__part_index__
-    def set_part(self, index):
-        if self.__part_index__ != index:
-            self.__part_index__ = index
-            self.part_index_changed.emit()
-    part_index_changed = Signal()
-    part = Property(int, part, set_part, notify=part_index_changed)
+    def id(self):
+        return self.__id__
+    def set_id(self, index):
+        if self.__id__ != index:
+            self.__id__ = index
+            self.id_changed.emit()
+    id_changed = Signal()
+    id = Property(int, id, set_id, notify=id_changed)
 
     def lane(self):
         return self.__lane__
@@ -827,19 +827,13 @@ class sketchpad_clip(QObject):
     lane = Property(int, lane, set_lane, notify=lane_changed)
 
     def name(self):
-        return f"{self.get_channel_name()}-{self.get_part_name()}"
+        return f"{self.get_channel_name()}-{self.get_clip_name()}"
     name = Property(str, name, constant=True)
 
 
-    def get_part_name(self):
+    def get_clip_name(self):
         return chr(self.__col_index__+65)
-        # if self.__col_index__ == 0:
-        #     return "I"
-        # elif self.__col_index__ == 1:
-        #     return "II"
-        # else:
-        #     return ""
-    partName = Property(str, get_part_name, constant=True)
+    clipName = Property(str, get_clip_name, constant=True)
 
     @Signal
     def duration_changed(self):
@@ -970,7 +964,7 @@ class sketchpad_clip(QObject):
     @Slot(None)
     def play(self):
         # if not self.isPlaying:
-            # We will now allow playing multiple parts of a sample-loop channel and hence do not stop other clips in part when playing
+            # We will now allow playing multiple clips on sample-loop channel and hence do not stop other clips on that track when playing
             # if self.channel is not None:
             #     clipsModel = self.channel.clipsModel
             #
@@ -985,10 +979,10 @@ class sketchpad_clip(QObject):
             # if channel is none, it means this clip is a sample rather than a clip and needs to be just... played
             self.play_audio(True)
         else:
-            # logging.info(f"Setting Clip To Play from the beginning at the top of the next bar {self} track {self.channel.id} part {self.part}")
+            # logging.info(f"Setting Clip To Play from the beginning at the top of the next bar {self} track {self.channel.id} clip {self.id}")
             # Until we work out what to actually do with the whole "more than one songs" thing, this will do
             songIndex = 0
-            Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.PlayingState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
+            Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.id, Zynthbox.PlayfieldManager.PlaybackState.PlayingState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
 
     @Slot(None)
     def stop(self):
@@ -1000,17 +994,11 @@ class sketchpad_clip(QObject):
             # Until we work out what to actually do with the whole "more than one songs" thing, this will do
             songIndex = 0
             if Zynthbox.SyncTimer.instance().timerRunning:
-                # logging.info(f"Setting Clip To Stop from the beginning at the top of the next bar {self} track {self.channel.id} part {self.part}")
-                Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
+                # logging.info(f"Setting Clip To Stop from the beginning at the top of the next bar {self} track {self.channel.id} clip {self.id}")
+                Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.id, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.NextBarPosition, 0)
             else:
-                # logging.info(f"Setting Clip To Stop immediately {self} track {self.channel.id} part {self.part}")
-                Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.part, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.CurrentPosition, 0)
-
-        if self.isPlaying:
-            if self.audioSource is not None:
-                partObject = self.__song__.partsModel.getPart(self.__col_index__)
-                if partObject is not None:
-                    partObject.isPlaying = False
+                # logging.info(f"Setting Clip To Stop immediately {self} track {self.channel.id} clip {self.id}")
+                Zynthbox.PlayfieldManager.instance().setClipPlaystate(songIndex, self.channel.id, self.id, Zynthbox.PlayfieldManager.PlaybackState.StoppedState, Zynthbox.PlayfieldManager.PlayfieldStatePosition.CurrentPosition, 0)
 
     def destroy(self):
         if self.audioSource is not None:
@@ -1161,10 +1149,10 @@ class sketchpad_clip(QObject):
                 else:
                     self.__song__.scenesModel.removeClipFromCurrentScene(self)
 
-            self.enabled_changed.emit(self.col, self.part)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_ACTIVE_STATE", -1, Zynthbox.ZynthboxBasics.Track(self.col), Zynthbox.ZynthboxBasics.Part(self.part), 1 if self.__enabled__ else 0)
+            self.enabled_changed.emit(self.col, self.id)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_ACTIVE_STATE", -1, Zynthbox.ZynthboxBasics.Track(self.col), Zynthbox.ZynthboxBasics.Part(self.__id__), 1 if self.__enabled__ else 0)
 
-    enabled_changed = Signal(int, int, arguments=["trackIndex", "partIndex"])
+    enabled_changed = Signal(int, int, arguments=["trackIndex", "clipIndex"])
 
     enabled = Property(bool, get_enabled, set_enabled, notify=enabled_changed)
     ### END Property enabled

@@ -43,15 +43,15 @@ Rectangle {
 
     property QtObject bottomBar: null
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
-    property QtObject selectedPartChannel
-    property QtObject selectedPartClip
-    property QtObject selectedPartPattern
+    property QtObject selectedClipChannel
+    property QtObject selectedClipObject
+    property QtObject selectedClipPattern
     property QtObject selectedComponent
 
     signal clicked()
 
     function cuiaCallback(cuia) {
-        console.log("### Part Bar CUIA Callback :", cuia)
+        console.log("### Clips Bar CUIA Callback :", cuia)
 
         var clip;
         var returnVal = false
@@ -73,7 +73,7 @@ Rectangle {
                 break
         }
 
-        console.log("### Part Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, cuia, clip)
+        console.log("### Clips Bar CUIA Callback :", selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, cuia, clip)
 
         return returnVal;
     }
@@ -115,11 +115,11 @@ Rectangle {
                         target: Zynthbox.PlayfieldManager
                         function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
                             // signalCounterThing.boop();
-                            let trackDelegate = partDelegateRepeater.itemAt(sketchpadTrack);
+                            let trackDelegate = clipDelegateRepeater.itemAt(sketchpadTrack);
                             if (trackDelegate && trackDelegate.channel && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
-                                let partDelegate = trackDelegate.repeater.itemAt(clip);
-                                if (partDelegate.nextBarState != newPlaystate) {
-                                    partDelegate.nextBarState = newPlaystate;
+                                let clipDelegate = trackDelegate.repeater.itemAt(clip);
+                                if (clipDelegate.nextBarState != newPlaystate) {
+                                    clipDelegate.nextBarState = newPlaystate;
                                 }
                             }
                         }
@@ -138,20 +138,20 @@ Rectangle {
                     //     }
                     // }
                     Repeater {
-                        id: partDelegateRepeater
+                        id: clipDelegateRepeater
                         model: 10
-                        delegate: PartBarDelegate {
-                            id: partBarDelegate
+                        delegate: ClipsBarDelegate {
+                            id: clipsBarDelegate
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             channel: zynqtgui.sketchpad.song.channelsModel.getChannel(model.index)
                             onClicked: {
                                 zynqtgui.sketchpad.selectedTrackId = model.index
-                                root.selectedPartChannel = partBarDelegate.channel
-                                root.selectedPartClip = partBarDelegate.selectedPartClip
-                                root.selectedPartPattern = partBarDelegate.selectedPartPattern
-                                root.selectedComponent = partBarDelegate.selectedComponent
+                                root.selectedClipChannel = clipsBarDelegate.channel
+                                root.selectedClipObject = clipsBarDelegate.selectedClipObject
+                                root.selectedClipPattern = clipsBarDelegate.selectedClipPattern
+                                root.selectedComponent = clipsBarDelegate.selectedComponent
                                 root.clicked()
                             }
                         }
@@ -163,7 +163,7 @@ Rectangle {
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-                    // Part details colume, visible when not in song mode
+                    // Clip details colume, visible when not in song mode
                     ColumnLayout {
                         anchors.fill: parent
 
@@ -171,16 +171,16 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartChannel && root.selectedPartChannel.trackType === "sample-loop"
-                            text: root.selectedPartClip ? root.selectedPartClip.path.split("/").pop() : ""
+                            visible: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
+                            text: root.selectedClipObject ? root.selectedClipObject.path.split("/").pop() : ""
                         }
 
                         QQC2.Label {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartChannel && root.selectedPartChannel.trackType !== "sample-loop"
-                            text: root.selectedPartPattern ? qsTr("Pattern %1%2").arg(root.selectedPartChannel.id + 1).arg(root.selectedPartPattern.partName) : ""
+                            visible: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
+                            text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.partName) : ""
                         }
 
                         Kirigami.Separator {
@@ -191,19 +191,19 @@ Rectangle {
 
                         QQC2.Button {
                             Layout.fillWidth: true
-                            visible: root.selectedPartChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedPartChannel.trackType) > -1
+                            visible: root.selectedClipChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedClipChannel.trackType) > -1
                             text: qsTr("Swap with...")
                             onClicked: {
-                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedPartChannel, "pattern", partBarDelegate.selectedPartPattern.partIndex);
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.partIndex);
                             }
                         }
 
                         QQC2.Button {
                             Layout.fillWidth: true
-                            visible: root.selectedPartChannel && root.selectedPartChannel.trackType === "sample-loop"
+                            visible: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
                             text: qsTr("Swap with...")
                             onClicked: {
-                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedPartChannel, "sketch", partBarDelegate.selectedPartPattern.partIndex);
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.partIndex);
                             }
                         }
 

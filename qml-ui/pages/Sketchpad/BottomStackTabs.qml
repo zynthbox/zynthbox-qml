@@ -47,11 +47,11 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.partButton.checked : false
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.clipsButton.checked : false
         enabled: !root.displaySceneButtons
         text: qsTr("Clips")
         onClicked: {
-            bottomStack.slotsBar.partButton.checked = true
+            bottomStack.slotsBar.clipsButton.checked = true
         }
     }
 

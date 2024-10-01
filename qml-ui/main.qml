@@ -236,14 +236,14 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "NAVIGATE_LEFT":
                     if (zynqtgui.modeButtonPressed) {
-                        root.selectedChannel.selectedPart = Math.max(0, root.selectedChannel.selectedPart - 1);
+                        root.selectedChannel.selectedClip = Math.max(0, root.selectedChannel.selectedClip - 1);
                         zynqtgui.ignoreNextModeButtonPress = true;
                         result = true;
                     }
                     break;
                 case "NAVIGATE_RIGHT":
                     if (zynqtgui.modeButtonPressed) {
-                        root.selectedChannel.selectedPart = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, root.selectedChannel.selectedPart + 1);
+                        root.selectedChannel.selectedClip = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, root.selectedChannel.selectedClip + 1);
                         zynqtgui.ignoreNextModeButtonPress = true;
                         result = true;
                     }
@@ -272,7 +272,7 @@ Kirigami.AbstractApplicationWindow {
                         if (root.selectedChannel.trackType.startsWith("sample-")) {
                             // If we are in any sample mode, switch whatever else is going on (as that page knows what to do about it)
                             if (root.selectedChannel.trackType === "sample-loop") {
-                                root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedPart;
+                                root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedClip;
                             } else {
                                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
                                     if (root.selectedChannel.samples[slotIndex].cppObjId > -1) {
@@ -1265,23 +1265,23 @@ Kirigami.AbstractApplicationWindow {
 
             switch (cuia) {
                 case "CHANNEL_1":
-                    partBar.handleItemClick(0);
+                    clipBar.handleItemClick(0);
                     returnVal = true;
                     break
                 case "CHANNEL_2":
-                    partBar.handleItemClick(1);
+                    clipBar.handleItemClick(1);
                     returnVal = true;
                     break
                 case "CHANNEL_3":
-                    partBar.handleItemClick(2);
+                    clipBar.handleItemClick(2);
                     returnVal = true;
                     break
                 case "CHANNEL_4":
-                    partBar.handleItemClick(3);
+                    clipBar.handleItemClick(3);
                     returnVal = true;
                     break
                 case "CHANNEL_5":
-                    partBar.handleItemClick(4);
+                    clipBar.handleItemClick(4);
                     returnVal = true;
                     break
                 case "SELECT_UP":
@@ -1528,20 +1528,20 @@ Kirigami.AbstractApplicationWindow {
                             text: qsTr("Clips")
                         }
 
-                        Sketchpad.PartBarDelegate {
-                            id: partBar
+                        Sketchpad.ClipsBarDelegate {
+                            id: clipBar
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             channel: slotSelectionDelegate.visible ? root.selectedChannel : null
                             Connections {
-                                target: partBar.repeater
+                                target: clipBar.repeater
                                 function onModelChanged() {
-                                    if (partBar.repeater.count > 0) {
-                                        for (let partIndex = 0; partIndex < 5; ++partIndex) {
-                                            let partDelegate = partBar.repeater.itemAt(partIndex);
-                                            let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(0, partBar.channel.id, partIndex, Zynthbox.PlayfieldManager.NextBarPosition);
-                                            if (partDelegate.nextBarState != newPlaystate) {
-                                                partDelegate.nextBarState = newPlaystate;
+                                    if (clipBar.repeater.count > 0) {
+                                        for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                                            let clipDelegate = clipBar.repeater.itemAt(clipIndex);
+                                            let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(0, clipBar.channel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                                            if (clipDelegate.nextBarState != newPlaystate) {
+                                                clipDelegate.nextBarState = newPlaystate;
                                             }
                                         }
                                     }
@@ -1549,12 +1549,12 @@ Kirigami.AbstractApplicationWindow {
                             }
                             Connections {
                                 target: Zynthbox.PlayfieldManager
-                                function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
-                                    if (partBar.channel) {
-                                        if (sketchpadTrack === partBar.channel.id && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
-                                            let partDelegate = partBar.repeater.itemAt(clip);
-                                            if (partDelegate.nextBarState != newPlaystate) {
-                                                partDelegate.nextBarState = newPlaystate;
+                                function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
+                                    if (clipBar.channel) {
+                                        if (sketchpadTrack === clipBar.channel.id && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                            let clipDelegate = clipBar.repeater.itemAt(clipIndex);
+                                            if (clipDelegate.nextBarState != newPlaystate) {
+                                                clipDelegate.nextBarState = newPlaystate;
                                             }
                                         }
                                     }

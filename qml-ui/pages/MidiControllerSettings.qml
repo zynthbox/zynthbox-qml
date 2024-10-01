@@ -272,7 +272,7 @@ Zynthian.ScreenPage {
         id: partPicker
         visible: false;
         property int partValue: -1
-        function pickPart(currentPart, callbackFunction) {
+        function pickPart(currentPart, partType, callbackFunction) {
             for (let testIndex = 0; testIndex < model.count; ++testIndex) {
                 let testElement = model.get(testIndex);
                 if (testElement.value === currentPart) {
@@ -280,19 +280,27 @@ Zynthian.ScreenPage {
                     break;
                 }
             }
+            partPicker.partType = partType;
             partPicker.callbackFunction = callbackFunction;
             partPicker.onClicked();
         }
         property var callbackFunction: null
+        property int partType: -1
         model: ListModel {
-            ListElement { text: "Current Part"; value: -1 }
-            ListElement { text: "Part 1"; value: 0 }
-            ListElement { text: "Part 2"; value: 1 }
-            ListElement { text: "Part 3"; value: 2 }
-            ListElement { text: "Part 4"; value: 3 }
-            ListElement { text: "Part 5"; value: 4 }
+            ListElement { text: "Current Part"; clipSlotText: "Current Clip"; soundSlotText: "Current Slot"; fxSlotText: "Current FX Slot"; value: -1 }
+            ListElement { text: "Part 1"; clipSlotText: "Clip 1"; soundSlotText: "Slot 1"; fxSlotText: "FX Slot 1"; value: 0 }
+            ListElement { text: "Part 2"; clipSlotText: "Clip 2"; soundSlotText: "Slot 2"; fxSlotText: "FX Slot 2"; value: 1 }
+            ListElement { text: "Part 3"; clipSlotText: "Clip 3"; soundSlotText: "Slot 3"; fxSlotText: "FX Slot 3"; value: 2 }
+            ListElement { text: "Part 4"; clipSlotText: "Clip 4"; soundSlotText: "Slot 4"; fxSlotText: "FX Slot 4"; value: 3 }
+            ListElement { text: "Part 5"; clipSlotText: "Clip 5"; soundSlotText: "Slot 5"; fxSlotText: "FX Slot 5"; value: 4 }
         }
-        textRole: "text"
+        textRole: partType === 0
+            ? "clipSlotText"
+            : partType === 1:
+                ? "soundSlotText"
+                : partType === 2
+                    ? "fxSlotText"
+                    : "text"
         onActivated: function(activatedIndex) {
             partPicker.partValue = partPicker.model.get(activatedIndex).value;
             if (partPicker.callbackFunction) {

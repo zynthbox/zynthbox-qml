@@ -192,7 +192,7 @@ QQC2.ScrollView {
                 visible: Zynthbox.CUIAHelper.cuiaEventWantsATrack(component.filterObject.cuiaEvent)
                 text: component.filterObject === null
                     ? ""
-                    : qsTr("Track:\n%1").arg(Zynthbox.ZynthboxBasics.trackLabelText(component.filterObject.originTrack))
+                    : qsTr("Sketchpad Track:\n%1").arg(Zynthbox.ZynthboxBasics.trackLabelText(component.filterObject.originTrack))
                 onClicked: {
                     trackPicker.pickTrack(component.filterObject.originTrack, function(newTrack) {
                         component.filterObject.originTrack = newTrack;
@@ -218,9 +218,23 @@ QQC2.ScrollView {
                 visible: Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterObject.cuiaEvent)
                 text: component.filterObject === null
                     ? ""
-                    : qsTr("Part:\n%1").arg(Zynthbox.ZynthboxBasics.partLabelText(component.filterObject.originPart))
+                    : Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterObject.cuiaEvent)
+                        ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaPart))
+                        : Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)
+                            ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaPart))
+                            : Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterObject.cuiaEvent)
+                                ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaPart))
+                                : qsTr("Sketchpad Part:\n%1").arg(Zynthbox.ZynthboxBasics.partLabelText(component.filterRuleObject.cuiaPart))
                 onClicked: {
-                    partPicker.pickPart(component.filterObject.originPart, function(newPart) {
+                    partType = -1;
+                    if (Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterObject.cuiaEvent)) {
+                        partType = 0;
+                    } else if(Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)) {
+                        partType = 1;
+                    } else if(Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterObject.cuiaEvent)) {
+                        partType = 2;
+                    }
+                    partPicker.pickPart(component.filterObject.originPart, partType, function(newPart) {
                         component.filterObject.originPart = newPart;
                     });
                 }

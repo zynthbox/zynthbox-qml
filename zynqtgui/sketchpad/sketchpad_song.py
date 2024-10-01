@@ -37,9 +37,7 @@ from .sketchpad_sketches_model import sketchpad_sketches_model
 from .sketchpad_scenes_model import sketchpad_scenes_model
 from .sketchpad_segment import sketchpad_segment
 from .sketchpad_channel import sketchpad_channel
-from .sketchpad_part import sketchpad_part
 from .sketchpad_clip import sketchpad_clip
-from .sketchpad_parts_model import sketchpad_parts_model
 from .sketchpad_channels_model import sketchpad_channels_model
 from zynqtgui import zynthian_gui_config
 
@@ -84,7 +82,6 @@ class sketchpad_song(QObject):
         self.__is_saving__ = False
         self.isLoadingChanged.emit()
         self.__channels_model__ = sketchpad_channels_model(self)
-        self.__parts_model__ = sketchpad_parts_model(self)
         self.__scenes_model__ = sketchpad_scenes_model(self)
         self.__sketches_model__ = sketchpad_sketches_model(self)
         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
@@ -103,7 +100,6 @@ class sketchpad_song(QObject):
         self.__hasUnsavedChanges__ = False
 
         self.__current_bar__ = 0
-        self.__current_part__ = self.__parts_model__.getPart(0)
         self.__name__ = name
         # self.__initial_name__ = name # To be used while storing cache details when name changes
         self.__to_be_deleted__ = False
@@ -140,36 +136,29 @@ class sketchpad_song(QObject):
             self.__is_loading__ = True
             self.isLoadingChanged.emit()
             # First, clear out any cruft that might have occurred during a failed load attempt
-            self.__parts_model__ = sketchpad_parts_model(self)
             self.__channels_model__ = sketchpad_channels_model(self)
             self.__scenes_model__ = sketchpad_scenes_model(self)
             self.__sketches_model__ = sketchpad_sketches_model(self)
 
-            # Add default parts
-            for i in range(0, 10):
-                self.__parts_model__.add_part(sketchpad_part(i, self))
-
-            for _ in range(0, 10):
+            for _ in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                 channel = sketchpad_channel(self.__channels_model__.count, self, self.__channels_model__)
                 self.__channels_model__.add_channel(channel)
                 # Set default audio type settings when creating new channel to reset passthroug clients to default values
                 channel.setAudioTypeSettings(channel.defaultAudioTypeSettings())
 
-                # Create 5 parts per channel
-                for i in range(0, 5):
-                    clipsModel = channel.getClipsModelByPart(i)
-                    # There is only 1 track now
-                    for j in range(1):
-                        clip = sketchpad_clip(channel.id, j, i, self, clipsModel)
+                # Create 5 clips per channel
+                for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                    clipsModel = channel.getClipsModelById(clip_index)
+                    for song_index in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
+                        clip = sketchpad_clip(channel.id, song_index, clip_index, self, clipsModel)
                         clipsModel.add_clip(clip)
 
-            for channel_index in range(10):
-                channel = self.__channels_model__.getChannel(channel_index)
+            for trackIndex in range(Zynthbox.Plugin.instance().sketchpadTrackCount()):
+                channel = self.__channels_model__.getChannel(trackIndex)
 
-                # Add first part of channel to current scene
-                # There is only 1 track now
-                for track_index in range(1):
-                    channel.getClipsModelByPart(0).getClip(track_index).enabled = True
+                # Add first clip of track to current scene
+                for songIndex in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
+                    channel.getClipsModelById(0).getClip(songIndex).enabled = True
 
             # Add default Sketches and Segments
             for sketch_index in range(10):
@@ -248,7 +237,6 @@ class sketchpad_song(QObject):
             "selectedScaleIndex": self.__selected_scale_index__,
             "octave": self.__octave__,
             "tracks": self.__channels_model__.serialize(),
-            "parts": self.__parts_model__.serialize(),
             "scenes": self.__scenes_model__.serialize(),
             "sketches": self.__sketches_model__.serialize(),
             "globalPlaybackClient": serializePassthroughData(Zynthbox.Plugin.instance().globalPlaybackClient()),
@@ -332,10 +320,10 @@ class sketchpad_song(QObject):
                 for sample in track.samples:
                     sample.metadata.write(isAutosave=autosave)
                 # Write clip metadata
-                for part_index in range(5):
-                    clips_model = track.getClipsModelByPart(part_index)
-                    for clip_index in range(clips_model.count):
-                        clip = clips_model.getClip(clip_index)
+                for clip_index in range(Zynthbox.Plugin.instance().sketchpadPartCount()):
+                    clips_model = track.getClipsModelById(clip_index)
+                    for song_index in range(clips_model.count):
+                        clip = clips_model.getClip(song_index)
                         clip.metadata.write(isAutosave=autosave)
 
     @Slot(None)
@@ -389,8 +377,6 @@ class sketchpad_song(QObject):
                         self.set_selected_scale_index(sketchpad["selectedScaleIndex"], True)
                     if "octave" in sketchpad:
                         self.set_octave(sketchpad["octave"], True)
-                    if "parts" in sketchpad:
-                        self.__parts_model__.deserialize(sketchpad["parts"])
 
                     # TODO : `channels` key is deprecated and has been renamed to `tracks`. Remove this fallback later
                     if "channels" in sketchpad:
@@ -456,35 +442,35 @@ class sketchpad_song(QObject):
             return False
 
     @Slot(int, int, result=QObject)
-    def getClip(self, channel: int, sketchpad: int):
-        # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
+    def getClip(self, channel: int, songIndex: int):
+        # logging.error("GETCLIP {} {} count {}".format(channel, songIndex, self.__channels_model__.count))
         if channel >= self.__channels_model__.count:
             return None
 
         channel = self.__channels_model__.getChannel(channel)
         # logging.error(channel.clipsModel.count)
 
-        if sketchpad >= channel.clipsModel.count:
+        if songIndex >= channel.clipsModel.count:
             return None
 
-        clip = channel.clipsModel.getClip(sketchpad)
+        clip = channel.clipsModel.getClip(songIndex)
         # logging.error(clip)
         return clip
 
     @Slot(int, int, int, result=QObject)
-    def getClipByPart(self, channel: int, sketchpad: int, part: int):
-        # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
+    def getClipById(self, channel: int, songId: int, clipId: int):
+        # logging.error("GETCLIP {} {} count {}".format(channel, clipId, self.__channels_model__.count))
         if channel >= self.__channels_model__.count:
             return None
 
         channel = self.__channels_model__.getChannel(channel)
         # logging.error(channel.clipsModel.count)
 
-        clipsModel = channel.getClipsModelByPart(part)
-        if sketchpad >= clipsModel.count:
+        clipsModel = channel.getClipsModelById(clipId)
+        if songId >= clipsModel.count:
             return None
 
-        clip = clipsModel.getClip(sketchpad)
+        clip = clipsModel.getClip(songId)
         # logging.error(clip)
         return clip
 
@@ -571,20 +557,12 @@ class sketchpad_song(QObject):
         pass
 
     @Signal
-    def __parts_model_changed__(self):
-        pass
-
-    @Signal
     def __scenes_model_changed__(self):
         pass
 
     def channelsModel(self):
         return self.__channels_model__
     channelsModel = Property(QObject, channelsModel, notify=channels_model_changed)
-
-    def partsModel(self):
-        return self.__parts_model__
-    partsModel = Property(QObject, partsModel, notify=__parts_model_changed__)
 
     def scenesModel(self):
         return self.__scenes_model__
@@ -602,16 +580,6 @@ class sketchpad_song(QObject):
     def isPlaying(self):
         return self.__is_playing__
     isPlaying = Property(bool, notify=__is_playing_changed__)
-
-    # @Slot(None)
-    # def addChannel(self):
-    #     channel = sketchpad_channel(self.__channels_model__.count, self, self.__channels_model__)
-    #     self.__channels_model__.add_channel(channel)
-    #     for i in range(0, 2): #TODO: keep numer of parts consistent
-    #         clip = sketchpad_clip(channel.id, i, self, channel.clipsModel)
-    #         channel.clipsModel.add_clip(clip)
-    #         #self.add_clip_to_part(clip, i)
-    #     self.schedule_save()
 
     def setBpmFromTrack(self):
         Zynthbox.SyncTimer.instance().setBpm(self.__bpm__[self.__scenes_model__.selectedSketchpadSongIndex])
@@ -772,8 +740,3 @@ class sketchpad_song(QObject):
 
     hasUnsavedChanges = Property(bool, get_hasUnsavedChanges, set_hasUnsavedChanges, notify=hasUnsavedChangesChanged)
     ### END Property hasUnsavedChanges
-
-    def stop(self):
-        for i in range(0, self.__parts_model__.count):
-            part = self.__parts_model__.getPart(i)
-            part.stop()

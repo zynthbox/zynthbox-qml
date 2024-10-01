@@ -308,8 +308,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     @Slot()
     def selected_track_id_changed_handler(self):
         self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        # Connect to part clips changed when channel changes
-        self.channel.selectedPartNamesChanged.connect(self.update_button_colors)
+        # Connect to clips changed when channel changes
+        self.channel.selectedClipNamesChanged.connect(self.update_button_colors)
 
         self.update_button_colors()
 
@@ -335,13 +335,13 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         library_page_active = self.zynqtgui.current_screen_id in ["layers_for_channel", "bank", "preset"]
         edit_page_active = self.zynqtgui.current_screen_id == "control" or self.zynqtgui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]
 
-        # Light up 1-5 buttons when respective part clip is enabled when leftSidebar is active
-        partClipEnabled = [
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 0).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 1).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 2).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 3).enabled,
-            self.zynqtgui.sketchpad.song.getClipByPart(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 4).enabled,
+        # Light up 1-5 buttons when respective clip is enabled when leftSidebar is active
+        clipEnabled = [
+            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 0).enabled,
+            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 1).enabled,
+            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 2).enabled,
+            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 3).enabled,
+            self.zynqtgui.sketchpad.song.getClipById(self.channel.id, self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, 4).enabled,
         ]
         # Light up 1-5 buttons when respective channel is selected when leftSidebar is not active
         channelDelta = 5 if self.zynqtgui.channelsModActive else 0
@@ -352,11 +352,11 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
                 self.set_button_color(button_id, led_color_inactive)
         else:
             self.set_button_color(self.button_menu, led_color_active if menu_page_active else led_color_inactive)
-            self.set_button_color(self.button_1, led_color_inactive, setChannelColor=partClipEnabled[0] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 0)
-            self.set_button_color(self.button_2, led_color_inactive, setChannelColor=partClipEnabled[1] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 1)
-            self.set_button_color(self.button_3, led_color_inactive, setChannelColor=partClipEnabled[2] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 2)
-            self.set_button_color(self.button_4, led_color_inactive, setChannelColor=partClipEnabled[3] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 3)
-            self.set_button_color(self.button_5, led_color_inactive, setChannelColor=partClipEnabled[4] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 4)
+            self.set_button_color(self.button_1, led_color_inactive, setChannelColor=clipEnabled[0] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 0)
+            self.set_button_color(self.button_2, led_color_inactive, setChannelColor=clipEnabled[1] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 1)
+            self.set_button_color(self.button_3, led_color_inactive, setChannelColor=clipEnabled[2] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 2)
+            self.set_button_color(self.button_4, led_color_inactive, setChannelColor=clipEnabled[3] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 3)
+            self.set_button_color(self.button_5, led_color_inactive, setChannelColor=clipEnabled[4] if self.zynqtgui.leftSidebarActive else selectedTrackIndex == 4)
             self.set_button_color(self.button_star, led_color_inactive, setChannelColor=not self.zynqtgui.leftSidebarActive and self.zynqtgui.channelsModActive)
             self.set_button_color(self.button_mode, led_color_inactive, setChannelColor=self.zynqtgui.leftSidebarActive)
             self.set_button_color(self.button_under_screen_1, led_color_active if sketchpad_page_active else led_color_inactive)

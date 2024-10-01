@@ -75,7 +75,7 @@ class sketchpad_scenes_model(QAbstractListModel):
                 "clips": [{
                     "row": clip.row,
                     "col": clip.col,
-                    "part": clip.id
+                    "id": clip.id
                 } for clip in val["clips"].copy() if clip is not None]
             }
         return {
@@ -91,7 +91,11 @@ class sketchpad_scenes_model(QAbstractListModel):
             for key, val in obj["scenesData"].items():
                 self.__scenes__[key] = val.copy()
                 for index, clip in enumerate(self.__scenes__[key]["clips"]):
-                    self.__scenes__[key]["clips"][index] = self.__song__.getClipById(clip["row"], clip["col"], clip["part"])
+                    if "part" in clip:
+                        # TODO Old stuff, remove before release
+                        self.__scenes__[key]["clips"][index] = self.__song__.getClipById(clip["row"], clip["col"], clip["part"])
+                    else:
+                        self.__scenes__[key]["clips"][index] = self.__song__.getClipById(clip["row"], clip["col"], clip["id"])
             self.endResetModel()
 
         if "selectedSketchpadSongIndex" in obj:
@@ -196,7 +200,7 @@ class sketchpad_scenes_model(QAbstractListModel):
     def syncClipsEnabledFromCurrentScene(self):
         # Sync enabled attribute for clips in scene
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-            for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 clip = self.__song__.getClipById(trackIndex, self.selectedSketchpadSongIndex, clipId)
 
                 if clip is not None and self.isClipInCurrentScene(clip):
@@ -280,7 +284,7 @@ class sketchpad_scenes_model(QAbstractListModel):
     def copyTrack(self, from_track, to_track):
         for i in range(0, self.__song__.channelsModel.count):
             channel = self.__song__.channelsModel.getChannel(i)
-            for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 channel.clips[clipId].getClip(to_track).copyFrom(channel.clips[clipId].getClip(from_track))
 
     clipCountChanged = Signal()

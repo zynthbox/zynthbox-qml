@@ -42,7 +42,7 @@ GridLayout {
 
     property QtObject controlObj: zynqtgui.bottomBarControlObj
     property QtObject sequence: controlObj.clipChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-    property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedClip) : null
+    property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByClipId(controlObj.clipChannel.id, controlObj.clipChannel.selectedClip) : null
 
     function cuiaCallback(cuia) {
         switch (cuia) {

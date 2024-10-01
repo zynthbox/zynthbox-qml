@@ -180,7 +180,7 @@ Rectangle {
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
                             visible: root.selectedClipChannel && root.selectedClipChannel.trackType !== "sample-loop"
-                            text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.partName) : ""
+                            text: root.selectedClipPattern ? qsTr("Pattern %1%2").arg(root.selectedClipChannel.id + 1).arg(root.selectedClipPattern.clipName) : ""
                         }
 
                         Kirigami.Separator {
@@ -194,7 +194,7 @@ Rectangle {
                             visible: root.selectedClipChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedClipChannel.trackType) > -1
                             text: qsTr("Swap with...")
                             onClicked: {
-                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.partIndex);
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.clipIndex);
                             }
                         }
 
@@ -203,7 +203,7 @@ Rectangle {
                             visible: root.selectedClipChannel && root.selectedClipChannel.trackType === "sample-loop"
                             text: qsTr("Swap with...")
                             onClicked: {
-                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.partIndex);
+                                bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "sketch", clipsBarDelegate.selectedClipPattern.clipIndex);
                             }
                         }
 

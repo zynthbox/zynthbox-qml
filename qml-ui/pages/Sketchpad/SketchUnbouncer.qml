@@ -67,7 +67,7 @@ Zynthian.DialogQuestion {
                 property int slot
                 property QtObject audioSource: clip ? Zynthbox.PlayGridManager.getClipById(clip.cppObjId) : null
                 property QtObject sequence: track !== "" ? Zynthbox.PlayGridManager.getSequenceModel(track) : null
-                property QtObject pattern: sequence && channel ? sequence.getByPart(channel.id, slot) : null
+                property QtObject pattern: sequence && channel ? sequence.getByClipId(channel.id, slot) : null
                 function switchDestination(track, channel, slot) {
                     _private.channel = null;
                     _private.track = track;

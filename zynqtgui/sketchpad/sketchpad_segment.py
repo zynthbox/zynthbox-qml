@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Sketchpad Part: An object to store segment
+# Sketchpad Segment: An object to store a segment (single element in a segments model), representing rules for individual clips at a point in time
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -65,14 +65,14 @@ class sketchpad_segment(QObject):
                 {
                     "row": clip.row,
                     "col": clip.col,
-                    "part": clip.id
+                    "id": clip.id
                 } for clip in self.__clips
             ],
             "restartClips": [
                 {
                     "row": clip.row,
                     "col": clip.col,
-                    "part": clip.id
+                    "id": clip.id
                 } for clip in self.__restartClips
             ]
         }
@@ -90,10 +90,17 @@ class sketchpad_segment(QObject):
             self.set_tickLength(0, True)
         if "clips" in obj:
             for clip in obj["clips"]:
-                self.__clips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
+                if "part" in clip:
+                    # TODO Old stuff, remove before release
+                    self.__clips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
+                else:
+                    self.__clips.append(self.__song.getClipById(clip["row"], clip["col"], clip["id"]))
         if "restartClips" in obj:
             for clip in obj["restartClips"]:
-                self.__restartClips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
+                if "part" in clip:
+                    self.__restartClips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
+                else:
+                    self.__restartClips.append(self.__song.getClipById(clip["row"], clip["col"], clip["id"]))
 
     def clear_clips(self):
         for clip in self.clips.copy():

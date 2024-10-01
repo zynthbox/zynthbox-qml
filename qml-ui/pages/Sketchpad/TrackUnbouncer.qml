@@ -71,7 +71,7 @@ Zynthian.DialogQuestion {
                     _private.soundSourceSketch = -1;
                     if (_private.sketchpadTrack) {
                         let newSketches = [];
-                        for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                        for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
                             let clip = _private.sketchpadTrack.getClipsModelById(clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             newSketches.push(clip);
                         }
@@ -249,8 +249,8 @@ Zynthian.DialogQuestion {
                     // - Run through the track's patterns
                     let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
                     let enabledAClip = false;
-                    for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
-                        let pattern = sequence.getByPart(_private.sketchpadTrack.id, clipIndex);
+                    for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                        let pattern = sequence.getByClipId(_private.sketchpadTrack.id, clipIndex);
                     //   - Clear the existing pattern and reset it to defaults
                         pattern.resetPattern(true);
                         let clipSketch = _private.sketches[clipIndex];

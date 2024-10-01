@@ -35,7 +35,7 @@ ColumnLayout {
         delegate: Rectangle {
             id: clipDelegate
             property int clipIndex: index
-            property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
+            property QtObject pattern: root.sequence.getByClipId(root.channel.id, model.index)
             property QtObject clip: root.channel.getClipsModelById(clipDelegate.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
             property QtObject cppClipObject: root.visible && root.channel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;

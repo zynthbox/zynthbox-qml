@@ -67,7 +67,7 @@ Rectangle {
     }
 
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-    property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
+    property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -1390,7 +1390,7 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
                                         Repeater {
-                                            model: Zynthbox.Plugin.sketchpadPartCount
+                                            model: Zynthbox.Plugin.sketchpadSlotCount
                                             QQC2.Label {
                                                 id: clipDelegate
                                                 font.pointSize: 9
@@ -1402,7 +1402,7 @@ Rectangle {
                                                 property QtObject clip: zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex);
                                                 property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
                                                 property QtObject cppClipObject: root.visible && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
-                                                property QtObject pattern: root.sequence.getByPart(root.selectedChannel.id, clipIndex)
+                                                property QtObject pattern: root.sequence.getByClipId(root.selectedChannel.id, clipIndex)
                                                 property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
                                                 MouseArea {
                                                     anchors.fill: parent

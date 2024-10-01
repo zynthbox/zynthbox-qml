@@ -697,7 +697,7 @@ don't want to have to dig too far...
     // Synchronising the states means matching each pattern with the scene/clip/channel leaf in the channel's tree of data
     // The specific pattern for a leaf can be deduced through the name of the scene, the channel's index, and the clip's index in that channel
     // and fetched from PlayGridManager by asking for the sequence by name ("T1" for example), and then
-    // calling getByPart(trackIndex, clipIndex) to fetch the specific pattern
+    // calling getByClipId(trackIndex, clipIndex) to fetch the specific pattern
     Repeater {
         id: tracksRepeater
         delegate: Repeater {
@@ -717,7 +717,7 @@ don't want to have to dig too far...
                     property string connectedSequenceName: model.index === 0 ? "global" : "global" + (model.index + 1)
                     property QtObject sequence: null
                     property int sequenceIndex: model.index;
-                    property QtObject pattern: sequence && sequence.count > 0 ? trackClipSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackClipDelegate.clipIndex) : null;
+                    property QtObject pattern: sequence && sequence.count > 0 ? trackClipSceneDelegate.sequence.getByClipId(baseTrackDelegate.trackIndex, trackClipDelegate.clipIndex) : null;
                     property int patternIndex: sequence ? sequence.indexOf(pattern) : -1;
                     onSequenceChanged: {
                         if (trackClipSceneDelegate.sequence) {
@@ -731,7 +731,7 @@ don't want to have to dig too far...
                     onPatternChanged: {
                         if (trackClipSceneDelegate.pattern) {
                             trackClipSceneDelegate.pattern.zlChannel = baseTrackDelegate.theTrack;
-                            trackClipSceneDelegate.pattern.zlPart = trackClipDelegate.clip;
+                            trackClipSceneDelegate.pattern.zlClip = trackClipDelegate.clip;
                             trackClipSceneDelegate.pattern.zlScene = trackClipSceneDelegate.sceneClip;
                         }
                     }

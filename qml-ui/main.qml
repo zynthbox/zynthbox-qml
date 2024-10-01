@@ -58,7 +58,7 @@ Kirigami.AbstractApplicationWindow {
     property QtObject selectedChannel: {
         return root.channels[0]
     }
-    property var cuiaCallback: function(cuia, originId, track, part, value) {
+    property var cuiaCallback: function(cuia, originId, track, slot, value) {
         var result = false;
 
         // Pass things along to the recording popup explicitly, if it's closed, to ensure things happen that are supposed to
@@ -243,7 +243,7 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "NAVIGATE_RIGHT":
                     if (zynqtgui.modeButtonPressed) {
-                        root.selectedChannel.selectedClip = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, root.selectedChannel.selectedClip + 1);
+                        root.selectedChannel.selectedClip = Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, root.selectedChannel.selectedClip + 1);
                         zynqtgui.ignoreNextModeButtonPress = true;
                         result = true;
                     }
@@ -1210,7 +1210,7 @@ Kirigami.AbstractApplicationWindow {
         id: confirmClearPatternDialog
         property QtObject channel
         property QtObject pattern
-        text: confirmClearPatternDialog.channel && confirmClearPatternDialog.pattern ? qsTr("Clear the notes in the pattern for Clip %1%2").arg(confirmClearPatternDialog.channel.name).arg(confirmClearPatternDialog.pattern.partName) : ""
+        text: confirmClearPatternDialog.channel && confirmClearPatternDialog.pattern ? qsTr("Clear the notes in the pattern for Clip %1%2").arg(confirmClearPatternDialog.channel.name).arg(confirmClearPatternDialog.pattern.clipName) : ""
         acceptText: qsTr("Clear Pattern")
         rejectText: qsTr("Don't Clear")
         onAccepted: {
@@ -1537,7 +1537,7 @@ Kirigami.AbstractApplicationWindow {
                                 target: clipBar.repeater
                                 function onModelChanged() {
                                     if (clipBar.repeater.count > 0) {
-                                        for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
+                                        for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
                                             let clipDelegate = clipBar.repeater.itemAt(clipIndex);
                                             let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(0, clipBar.channel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
                                             if (clipDelegate.nextBarState != newPlaystate) {

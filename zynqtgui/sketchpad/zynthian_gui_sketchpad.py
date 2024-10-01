@@ -456,7 +456,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.__update_channel_sounds_timer.timeout.connect(self.zynqtgui.layers_for_channel.update_channel_sounds, Qt.QueuedConnection)
             self.__fixed_layers_fill_list_timer.start()
             self.__update_channel_sounds_timer.start()
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("ACTIVATE_TRACK", -1, Zynthbox.ZynthboxBasics.Track(self.__selected_track_id), Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("ACTIVATE_TRACK", -1, Zynthbox.ZynthboxBasics.Track(self.__selected_track_id), Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
             if shouldEmitCurrentTrackClipCUIAFeedback:
                 self.emitCurrentTrackClipCUIAFeedback()
     selected_track_id_changed = Signal()
@@ -466,16 +466,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     @Slot(None)
     def emitCurrentTrackClipCUIAFeedback(self):
         trackDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadTrackCount())
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("ACTIVATE_TRACK_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, (trackDivisor * self.__selected_track_id))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 1 if self.__song__.playChannelSolo == self.__selected_track_id else 0)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("ACTIVATE_TRACK_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, (trackDivisor * self.__selected_track_id))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 1 if self.__song__.playChannelSolo == self.__selected_track_id else 0)
         theTrack = self.__song__.channelsModel.getChannel(self.__selected_track_id)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 1 if theTrack.muted else 0)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.gainHandler.gainAbsolute(), (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part(theTrack.selectedClip), 0)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.selectedClip, (0, Zynthbox.Plugin.instance().sketchpadPartCount() - 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.pan, (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.wetFx1Amount, (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND2_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(theTrack.wetFx2Amount, (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 1 if theTrack.muted else 0)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(theTrack.gainHandler.gainAbsolute(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot(theTrack.selectedClip), 0)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(theTrack.selectedClip, (0, Zynthbox.Plugin.instance().sketchpadSlotCount() - 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(theTrack.pan, (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(theTrack.wetFx1Amount, (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND2_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(theTrack.wetFx2Amount, (0, 1), (0, 127)))
         theTrack.emitCurrentClipCUIAFeedback()
 
     @Slot(None)
@@ -851,7 +851,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                 channel = self.__song__.channelsModel.getChannel(trackIndex)
                 if channel is not None:
-                    for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                    for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                         clipsModel = channel.getClipsModelById(clipId)
                         if clipsModel is not None:
                             clip = clipsModel.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)

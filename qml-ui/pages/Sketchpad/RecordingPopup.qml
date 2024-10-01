@@ -221,13 +221,13 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.leftMargin: root.spacing
             Layout.topMargin: root.spacing
-            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedPattern.partName).arg(root.selectedChannel.name) : ""
+            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedPattern.clipName).arg(root.selectedChannel.name) : ""
             QtObject {
                 id: _private
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
                 property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelById(root.selectedSlotRow).getClip(root.selectedChannel.id) : null
                 property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-                property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
+                property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
                 property bool midiSoloTrack: false
                 property int soloChannelOnOpen: -1
                 property bool armRecording: false

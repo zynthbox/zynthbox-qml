@@ -44,11 +44,11 @@ Zynthian.DialogQuestion {
             case "pattern":
                 let sequenceModel = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
                 for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
-                    let patternModel = sequenceModel.sequence.getByPart(_private.selectedChannel.id, slotIndex);
+                    let patternModel = sequenceModel.sequence.getByClipId(_private.selectedChannel.id, slotIndex);
                     if (patternModel.hasNotes) {
-                        newSlotTitles.push(qsTr("Pattern %1%2").arg(_private.selectedChannel.id + 1).arg(patternModel.partName));
+                        newSlotTitles.push(qsTr("Pattern %1%2").arg(_private.selectedChannel.id + 1).arg(patternModel.clipName));
                     } else {
-                        newSlotTitles.push(qsTr("Pattern %1%2 (empty)").arg(_private.selectedChannel.id + 1).arg(patternModel.partName));
+                        newSlotTitles.push(qsTr("Pattern %1%2 (empty)").arg(_private.selectedChannel.id + 1).arg(patternModel.clipName));
                     }
                 }
                 newSlotTitles = [qsTr("Pattern 1"), qsTr("Pattern 2"), qsTr("Pattern 3"), qsTr("Pattern 4"), qsTr("Pattern 5")];
@@ -105,9 +105,9 @@ Zynthian.DialogQuestion {
         switch(_private.slotType) {
             case "pattern":
                 let sequenceModel = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
-                let swapThisPattern = sequenceModel.getByPart(_private.selectedChannel.id, _private.slotIndex);
+                let swapThisPattern = sequenceModel.getByClipId(_private.selectedChannel.id, _private.slotIndex);
                 let swapThisData = swapThisPattern.toJson();
-                let withThisPattern = sequenceModel.getByPart(_private.selectedChannel.id, slotIndex);
+                let withThisPattern = sequenceModel.getByClipId(_private.selectedChannel.id, slotIndex);
                 let withThisData = withThisPattern.toJson();
                 swapThisPattern.setFromJson(withThisData);
                 withThisPattern.setFromJson(swapThisData);

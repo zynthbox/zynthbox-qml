@@ -399,7 +399,7 @@ Item {
             // Only import a pattern object that is actually enabled
             if (theItem.importPattern) {
                 // As we're importing to the global sequence, operate on the pattern in the appropriate position
-                var importToPattern = globalSequence.getByPart(theItem.targetTrackIndex, theItem.targetClipIndex);
+                var importToPattern = globalSequence.getByClipId(theItem.targetTrackIndex, theItem.targetClipIndex);
                 console.log("Importing", theItem.patternObject, "into", importToPattern);
 
                 // Now apply our loaded pattern onto the global one

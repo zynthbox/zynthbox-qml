@@ -104,7 +104,7 @@ Zynthian.Popup {
                     interval: 50; running: false; repeat: false;
                     onTriggered: {
                         if (_private.bounceLevel === 2) {
-                            let pattern = _private.sequence.getByPart(_private.selectedChannel.id, _private.selectedClipIndex);
+                            let pattern = _private.sequence.getByClipId(_private.selectedChannel.id, _private.selectedClipIndex);
                             if (pattern.hasNotes) {
                                 checkSketchpadTrackSounds(_private.selectedChannel);
                             } else {
@@ -113,8 +113,8 @@ Zynthian.Popup {
                             }
                         } else if (_private.bounceLevel === 1) {
                             let atLeastOnePatternHasNotes = false;
-                            for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
-                                let pattern = _private.sequence.getByPart(_private.selectedChannel.id, clipIndex);
+                            for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                                let pattern = _private.sequence.getByClipId(_private.selectedChannel.id, clipIndex);
                                 if (pattern.hasNotes) {
                                     atLeastOnePatternHasNotes = true;
                                     break;
@@ -131,8 +131,8 @@ Zynthian.Popup {
                             for (let trackIndex = 0; trackIndex < 10; ++trackIndex) {
                                 let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(trackIndex);
                                 let atLeastOnePatternHasNotes = false;
-                                for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
-                                    let pattern = _private.sequence.getByPart(trackIndex, clipIndex);
+                                for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                                    let pattern = _private.sequence.getByClipId(trackIndex, clipIndex);
                                     if (pattern.hasNotes) {
                                         atLeastOnePatternHasNotes = true;
                                         break;
@@ -246,7 +246,7 @@ Zynthian.Popup {
                                         }
                                     }
                                 } else if (sketchpadTrack.trackType === "sample-loop") {
-                                    for (var loopIndex = 0; loopIndex < Zynthbox.Plugin.sketchpadPartCount; ++loopIndex) {
+                                    for (var loopIndex = 0; loopIndex < Zynthbox.Plugin.sketchpadSlotCount; ++loopIndex) {
                                         var clip = sketchpadTrack.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (clip.cppObjId > -1) {
                                             // We pick the name of whatever the first loop is here, just so we've got one
@@ -280,7 +280,7 @@ Zynthian.Popup {
                                 }
                                 let previousStopRecordingPosition = 0;
                                 for (let clipIndex = 0; clipIndex < clipsToBounce.length; ++clipIndex) {
-                                    let pattern = _private.sequence.getByPart(sketchpadTrackId, clipsToBounce[clipIndex]);
+                                    let pattern = _private.sequence.getByClipId(sketchpadTrackId, clipsToBounce[clipIndex]);
                                     if (pattern.hasNotes) {
                                         let patternDurationInPatternSubbeats = (pattern.patternLength * pattern.stepLength) / patternSubbeatToTickMultiplier;
                                         let patternRepeatCount = _private.patternRepeatCount; // How long are the tails expected (we just start with 1 here, until we work out how to properly expose this)

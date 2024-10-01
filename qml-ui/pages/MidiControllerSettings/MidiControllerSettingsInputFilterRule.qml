@@ -573,13 +573,13 @@ ColumnLayout {
             }
         }
         function knob1up() {
-            if (Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterRuleObject.cuiaEvent)) {
-                component.filterRuleObject.cuiaPart = Math.min(4, component.filterRuleObject.cuiaPart + 1);
+            if (Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)) {
+                component.filterRuleObject.cuiaSlot = Math.min(4, component.filterRuleObject.cuiaSlot + 1);
             }
         }
         function knob1down() {
-            if (Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterRuleObject.cuiaEvent)) {
-                component.filterRuleObject.cuiaPart = Math.max(-1, component.filterRuleObject.cuiaPart - 1);
+            if (Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)) {
+                component.filterRuleObject.cuiaSlot = Math.max(-1, component.filterRuleObject.cuiaSlot - 1);
             }
         }
         function knob2up() {
@@ -593,7 +593,7 @@ ColumnLayout {
             }
         }
         Layout.fillWidth: true
-        visible: component.filterRuleObject.type === Zynthbox.MidiRouterFilterEntryRewriter.UIRule && (Zynthbox.CUIAHelper.cuiaEventWantsATrack(component.filterRuleObject.cuiaEvent) || Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterRuleObject.cuiaEvent) ||Zynthbox.CUIAHelper.cuiaEventWantsAValue(component.filterRuleObject.cuiaEvent))
+        visible: component.filterRuleObject.type === Zynthbox.MidiRouterFilterEntryRewriter.UIRule && (Zynthbox.CUIAHelper.cuiaEventWantsATrack(component.filterRuleObject.cuiaEvent) || Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent) ||Zynthbox.CUIAHelper.cuiaEventWantsAValue(component.filterRuleObject.cuiaEvent))
         QQC2.Button {
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit
@@ -621,27 +621,27 @@ ColumnLayout {
         QQC2.Button {
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit
-            enabled: Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterRuleObject.cuiaEvent)
+            enabled: Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)
             text: component.filterRuleObject === null
                 ? "(no filter rule selected)"
                 : Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterRuleObject.cuiaEvent)
-                    ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaPart))
+                    ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaSlot))
                     : Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)
-                        ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaPart))
+                        ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.soundSlotLabelText(component.filterRuleObject.cuiaSlot))
                         : Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterRuleObject.cuiaEvent)
-                            ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaPart))
-                            : qsTr("Sketchpad Part:\n%1").arg(Zynthbox.ZynthboxBasics.partLabelText(component.filterRuleObject.cuiaPart))
+                            ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaSlot))
+                            : qsTr("Sketchpad Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaSlot))
             onClicked: {
-                partType = -1;
+                slotType = -1;
                 if (Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterRuleObject.cuiaEvent)) {
-                    partType = 0;
-                } else if(Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterRuleObject.cuiaEvent)) {
-                    partType = 1;
+                    slotType = 0;
+                } else if(Zynthbox.CUIAHelper.cuiaEventWantsASoundSlot(component.filterRuleObject.cuiaEvent)) {
+                    slotType = 1;
                 } else if(Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterRuleObject.cuiaEvent)) {
-                    partType = 2;
+                    slotType = 2;
                 }
-                partPicker.pickPart(component.filterRuleObject.cuiaPart, partType, function(newPart) {
-                    component.filterRuleObject.cuiaPart = newPart;
+                slotPicker.pickSlot(component.filterRuleObject.cuiaSlot, slotType, function(newSlot) {
+                    component.filterRuleObject.cuiaSlot = newSlot;
                 });
             }
             Zynthian.KnobIndicator {

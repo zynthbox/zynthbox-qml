@@ -80,8 +80,8 @@ Zynthian.BasePlayGrid {
         var backButtonClearPatternHelper = function(channelIndex) {
             if (zynqtgui.backButtonPressed) {
                 component.ignoreNextBack = true;
-                for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
-                    var pattern = _private.sequence.getByPart(channelIndex, clipIndex);
+                for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                    var pattern = _private.sequence.getByClipId(channelIndex, clipIndex);
                     if (pattern) {
                         pattern.clear();
                     }
@@ -253,10 +253,10 @@ Zynthian.BasePlayGrid {
 
     function pickPattern(patternIndex) {
         var patternObject = _private.sequence.get(patternIndex);
-        if (patternObject.sketchpadTrack > -1 && patternObject.partIndex > -1) {
+        if (patternObject.sketchpadTrack > -1 && patternObject.clipIndex > -1) {
             zynqtgui.sketchpad.selectedTrackId = patternObject.sketchpadTrack;
             var channel = zynqtgui.sketchpad.song.channelsModel.getChannel(patternObject.sketchpadTrack);
-            channel.selectedClip = patternObject.partIndex;
+            channel.selectedClip = patternObject.clipIndex;
         }
     }
 
@@ -1643,14 +1643,14 @@ Zynthian.BasePlayGrid {
                                 //ColumnLayout {
                                     //Layout.fillHeight: true
                                     //Zynthian.PlayGridButton {
-                                        //text: "part I"
+                                        //text: "bank I"
                                         //checked: _private.bankOffset === 0
                                         //onClicked: {
                                             //_private.sequence.setPatternProperty(_private.activePattern, "bankOffset", 0)
                                         //}
                                     //}
                                     //Zynthian.PlayGridButton {
-                                        //text: "part II"
+                                        //text: "bank II"
                                         //checked: _private.bankOffset === 8
                                         //onClicked: {
                                             //_private.sequence.setPatternProperty(_private.activePattern, "bankOffset", 8)
@@ -1755,14 +1755,14 @@ Zynthian.BasePlayGrid {
                                     interval: 1; running: false; repeat: false;
                                     onTriggered: {
                                         if (_private.activePatternModel) {
-                                            patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.sketchpadTrack / Zynthbox.Plugin.sketchpadPartCount), ListView.Beginning);
+                                            patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.sketchpadTrack / Zynthbox.Plugin.sketchpadSlotCount), ListView.Beginning);
                                         }
                                     }
                                 }
 
                                 delegate: Rectangle {
                                     id: patternsMenuItem
-                                    property QtObject thisPattern: _private.sequence && associatedChannel ? _private.sequence.getByPart(model.index, associatedChannel.selectedClip) : null
+                                    property QtObject thisPattern: _private.sequence && associatedChannel ? _private.sequence.getByClipId(model.index, associatedChannel.selectedClip) : null
                                     property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
                                     property int activePattern: _private.activePattern
                                     property QtObject channelClipsModel: associatedChannel == null ? null : associatedChannel.clipsModel
@@ -1818,7 +1818,7 @@ Zynthian.BasePlayGrid {
                                                         icon.name: "player-volume"
                                                         onClicked: {
                                                             if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                                let associatedClip = patternsMenuItem.associatedChannel.getClipsModelById(patternsMenuItem.thisPattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                                                let associatedClip = patternsMenuItem.associatedChannel.getClipsModelById(patternsMenuItem.thisPattern.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                                 associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                             }
@@ -1852,7 +1852,7 @@ Zynthian.BasePlayGrid {
                                                 Zynthian.PlayGridButton {
                                                     Layout.fillHeight: true
                                                     Layout.preferredHeight: patternsMenuItem.height / 2
-                                                    text: patternsMenuItem.thisPattern ? qsTr("Clip %1%2").arg(patternsMenuItem.associatedChannelIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no clip)"
+                                                    text: patternsMenuItem.thisPattern ? qsTr("Clip %1%2").arg(patternsMenuItem.associatedChannelIndex + 1).arg(patternsMenuItem.thisPattern.clipName) : "(no clip)"
                                                     enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                                     onClicked: {
                                                         clipPicker.pickClip(patternsMenuItem.associatedChannelIndex);
@@ -1889,7 +1889,7 @@ Zynthian.BasePlayGrid {
                                                             delayed: true
                                                             restoreMode: Binding.RestoreBindingOrValue
                                                         }
-                                                        property QtObject sample: channel && channel.samples ? channel.samples[patternsMenuItem.thisPattern.partIndex] : null
+                                                        property QtObject sample: channel && channel.samples ? channel.samples[patternsMenuItem.thisPattern.clipIndex] : null
                                                         Zynthian.SampleVisualiser {
                                                             anchors.fill: parent
                                                             opacity: 0.2
@@ -2027,7 +2027,7 @@ Zynthian.BasePlayGrid {
                                             //ColumnLayout {
                                                 //Layout.fillHeight: true
                                                 //Zynthian.PlayGridButton {
-                                                    //text: "part I"
+                                                    //text: "bank I"
                                                     //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                                     //checked: patternsMenuItem.thisPattern.bankOffset === 0
                                                     //onClicked: {
@@ -2035,7 +2035,7 @@ Zynthian.BasePlayGrid {
                                                     //}
                                                 //}
                                                 //Zynthian.PlayGridButton {
-                                                    //text: "part II"
+                                                    //text: "bank II"
                                                     //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                                     //checked: patternsMenuItem.thisPattern.bankOffset === 8
                                                     //onClicked: {
@@ -2260,7 +2260,7 @@ Zynthian.BasePlayGrid {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 spacing: Kirigami.Units.smallSpacing
-                                property QtObject pattern: _private.sequence.getByPart(clipPicker.associatedChannelIndex, model.index)
+                                property QtObject pattern: _private.sequence.getByClipId(clipPicker.associatedChannelIndex, model.index)
                                 Rectangle {
                                     Layout.fillHeight: true
                                     Layout.minimumWidth: Kirigami.Units.largeSpacing
@@ -2277,7 +2277,7 @@ Zynthian.BasePlayGrid {
                                         icon.name: "player-volume"
                                         onClicked: {
                                             if (clipDelegate.pattern.sequence && clipDelegate.pattern.sequence.soloPattern === -1) {
-                                                var associatedClip = clipPicker.associatedChannel.getClipsModelById(clipDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                                var associatedClip = clipPicker.associatedChannel.getClipsModelById(clipDelegate.pattern.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                 associatedClip.enabled = !clipDelegate.pattern.enabled
                                             }
@@ -2296,9 +2296,9 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                    text: qsTr("Pick Clip %1%2").arg(clipPicker.associatedChannelIndex + 1).arg(clipDelegate.pattern.partName)
+                                    text: qsTr("Pick Clip %1%2").arg(clipPicker.associatedChannelIndex + 1).arg(clipDelegate.pattern.clipName)
                                     onClicked: {
-                                        var associatedClip = clipPicker.associatedChannel.getClipsModelById(clipDelegate.pattern.partIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                        var associatedClip = clipPicker.associatedChannel.getClipsModelById(clipDelegate.pattern.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (associatedClip.enabled) {
                                             clipPicker.associatedChannel.selectedClip = model.index;
                                         } else {
@@ -2369,11 +2369,11 @@ Zynthian.BasePlayGrid {
                         ? _private.sequence.soloPatternObject
                             ? "Track" + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + "\n"
                                 + "SOLO\n"
-                                + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + _private.sequence.soloPatternObject.partName
+                                + (_private.sequence.soloPatternObject.sketchpadTrack + 1) + _private.sequence.soloPatternObject.clipName
                             : _private.activePatternModel
                                 ? "Track" + (_private.activePatternModel.sketchpadTrack + 1) + "\n"
                                     + "Clip"
-                                    + (_private.activePatternModel.sketchpadTrack + 1) + _private.activePatternModel.partName
+                                    + (_private.activePatternModel.sketchpadTrack + 1) + _private.activePatternModel.clipName
                                 : "(no\npat\ntern)"
                         : "(no\nsequ\nence)"
                     onClicked: {

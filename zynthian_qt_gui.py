@@ -679,31 +679,31 @@ class zynthian_gui(QObject):
     def handleCurrentScreenIDChanged(self):
         theScreenID = self.current_screen_id
         if theScreenID == "layer":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "layer_effects":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER_FX", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_LAYER_FX", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "main":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_MAIN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_MAIN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         # elif theScreenID == "":
-            # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_EDIT_CONTEXTUAL", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_EDIT_CONTEXTUAL", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "admin":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_ADMIN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_ADMIN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "bank":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_BANK", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_BANK", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "preset":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PRESET", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PRESET", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "control":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_CONTROL", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_CONTROL", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "sketchpad":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SKETCHPAD", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SKETCHPAD", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "song_manager":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SONG_MANAGER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SONG_MANAGER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "playgrid":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PLAYGRID", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PLAYGRID", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "audio_recorder":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_AUDIO_RECORDER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_AUDIO_RECORDER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "alsa_mixer":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
 
     @Slot()
     def channelsModTimerHandler(self):
@@ -1659,18 +1659,18 @@ class zynthian_gui(QObject):
     # -------------------------------------------------------------------
 
     @Slot(str,int,int,int,int)
-    def handleMidiRouterCuiaEvent(self, cuia, originId, track, part, value):
-        # logging.error(f"midi router cuia event: {cuia}, origin ID: {originId}, track: {track} aka {int(track)}, part: {part} aka {int(part)}, value: {value}")
+    def handleMidiRouterCuiaEvent(self, cuia, originId, track, slot, value):
+        # logging.error(f"midi router cuia event: {cuia}, origin ID: {originId}, track: {track} aka {int(track)}, slot: {slot} aka {int(slot)}, value: {value}")
         if int(track) < 0:
             track = self.sketchpad.selectedTrackId
-        if int(part) < 0:
-            part = 0 # FIXME This needs to also sniff the currently selected part/fx slot when valid
+        if int(slot) < 0:
+            slot = 0 # FIXME This needs to also sniff the currently selected clip/sound/fx slot when valid
             # theTrack.selectedFxSlotRow - the property holding that information...
-        self.callable_ui_action(cuia, [value], originId, int(track), int(part))
+        self.callable_ui_action(cuia, [value], originId, int(track), int(slot))
 
     @Slot(str, 'QVariantList', int, int, int)
-    def callable_ui_action(self, cuia, params=[-1], originId=-1, track=-1, part=-1):
-        # logging.error(f"CUIA : {cuia} {params} {originId} {track} {part}")
+    def callable_ui_action(self, cuia, params=[-1], originId=-1, track=-1, slot=-1):
+        # logging.error(f"CUIA : {cuia} {params} {originId} {track} {slot}")
 
         channelDelta = 5 if self.channelsModActive else 0
 
@@ -1678,9 +1678,9 @@ class zynthian_gui(QObject):
         try:
             cuia_callback = zynthian_gui_config.top.property("cuiaCallback")
             if cuia_callback is not None and cuia_callback.isCallable():
-                _result = cuia_callback.call([cuia, originId, track, part, params[0]])
+                _result = cuia_callback.call([cuia, originId, track, slot, params[0]])
                 if _result is not None and _result.toBool():
-                    Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                     return
         except Exception as e:
             logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
@@ -1692,11 +1692,11 @@ class zynthian_gui(QObject):
                 visible = self.opened_dialog.property("visible")
 
                 if cuia_callback is not None and cuia_callback.isCallable() and visible:
-                    _result = cuia_callback.call([cuia, originId, track, part, params[0]])
+                    _result = cuia_callback.call([cuia, originId, track, slot, params[0]])
 
                     if _result is not None and _result.toBool():
                         # If cuiaCallback returned true, then CUIA event has been handled by qml. Return
-                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
+                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                         return
 
                 if visible:
@@ -1706,7 +1706,7 @@ class zynthian_gui(QObject):
                         if cuia.startswith("SWITCH_BACK"):
                             logging.debug(f"SWITCH_BACK pressed. Dialog does not have a cuiaCallback property. Try closing.")
                             QMetaObject.invokeMethod(self.opened_dialog, "close", Qt.QueuedConnection)
-                            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
+                            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                             return
                     except Exception as e:
                         logging.debug(f"Attempted to close openedDialog, got error: {e}")
@@ -1718,9 +1718,9 @@ class zynthian_gui(QObject):
             try:
                 js_value = self.current_qml_page_prop.property("cuiaCallback")
                 if js_value is not None and js_value.isCallable():
-                    _result = js_value.call([cuia, originId, track, part, params[0]])
+                    _result = js_value.call([cuia, originId, track, slot, params[0]])
                     if _result is not None and _result.toBool():
-                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
+                        Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
                         return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
@@ -2123,7 +2123,7 @@ class zynthian_gui(QObject):
                 self.sketchpad.set_selected_track_id(max(0, min(track, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1)), shouldEmitCurrentTrackClipCUIAFeedback=False)
                 shouldEmitClipOnly = False
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.theTrack.set_selected_clip(max(0, min(part, Zynthbox.Plugin.instance().sketchpadPartCount() - 1)), shouldEmitCurrentClipCUIAFeedback=shouldEmitClipOnly)
+            theTrack.theTrack.set_selected_clip(max(0, min(slot, Zynthbox.Plugin.instance().sketchpadSlotCount() - 1)), shouldEmitCurrentClipCUIAFeedback=shouldEmitClipOnly)
             if shouldEmitClipOnly == False:
                 self.sketchpad.emitCurrentTrackClipCUIAFeedback()
             sendCuiaEventFeedback = False
@@ -2132,9 +2132,9 @@ class zynthian_gui(QObject):
             if -1 < track and track < Zynthbox.Plugin.instance().sketchpadTrackCount():
                 self.sketchpad.set_selected_track_id(max(0, min(track, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1)), shouldEmitCurrentTrackClipCUIAFeedback=False)
                 shouldEmitClipOnly = False
-            partDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadPartCount())
+            slotDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadSlotCount())
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.set_selected_clip(max(0, min((value / partDivisor), Zynthbox.Plugin.instance().sketchpadPartCount() - 1)), shouldEmitCurrentClipCUIAFeedback=shouldEmitClipOnly)
+            theTrack.set_selected_clip(max(0, min((value / slotDivisor), Zynthbox.Plugin.instance().sketchpadSlotCount() - 1)), shouldEmitCurrentClipCUIAFeedback=shouldEmitClipOnly)
             if shouldEmitClipOnly == False:
                 self.sketchpad.emitCurrentTrackClipCUIAFeedback()
             sendCuiaEventFeedback = False
@@ -2152,25 +2152,25 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
         elif cuia == "SET_CLIP_ACTIVE_STATE":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip = theTrack.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             theClip.enabled = True if params[0] > 1 else False
             sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_CLIP":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip = theTrack.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             theClip.enabled = not theClip.enabled
         elif cuia == "SET_SLOT_GAIN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.audioTypeKey() == "synth":
-                synthIndex = theTrack.chainedSounds[part]
+                synthIndex = theTrack.chainedSounds[slot]
                 if synthIndex > -1:
-                    theTrack.set_passthroughValue("synthPassthrough", part, "dryAmount", np.interp(params[0], (0, 127), (0, 1)))
+                    theTrack.set_passthroughValue("synthPassthrough", slot, "dryAmount", np.interp(params[0], (0, 127), (0, 1)))
             elif theTrack.audioTypeKey() == "sample":
-                sample = theTrack.samples[part]
+                sample = theTrack.samples[slot]
                 if sample.audioSource:
                     sample.audioSource.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
             elif theTrack.audioTypeKey() == "sketch":
-                theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                theClip = theTrack.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                 if theClip.audioSource:
                     theClip.audioSource.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
             elif theTrack.audioTypeKey() == "external":
@@ -2180,15 +2180,15 @@ class zynthian_gui(QObject):
         elif cuia == "SET_SLOT_PAN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.audioTypeKey() == "synth":
-                synthIndex = theTrack.chainedSounds[part]
+                synthIndex = theTrack.chainedSounds[slot]
                 if synthIndex > -1:
-                    theTrack.set_passthroughValue("synthPassthrough", part, "panAmount", np.interp(params[0], (0, 127), (-1, 1)))
+                    theTrack.set_passthroughValue("synthPassthrough", slot, "panAmount", np.interp(params[0], (0, 127), (-1, 1)))
             elif theTrack.audioTypeKey() == "sample":
-                sample = theTrack.samples[part]
+                sample = theTrack.samples[slot]
                 if sample.audioSource:
                     sample.audioSource.setPan(np.interp(params[0], (0, 127), (-1, 1)))
             elif theTrack.audioTypeKey() == "sketch":
-                theClip = theTrack.getClipsModelById(part).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                theClip = theTrack.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                 if theClip.audioSource:
                     theClip.audioSource.setPanAbsolute(np.interp(params[0], (0, 127), (-1, 1)))
             elif theTrack.audioTypeKey() == "external":
@@ -2198,22 +2198,22 @@ class zynthian_gui(QObject):
         elif cuia == "SET_FX_AMOUNT":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.chainedFx[slot]:
-                theTrack.set_passthroughValue("fxPassthrough", part, "dryWetMixAmount", np.interp(params[0], (0, 127), (0, 2)))
+                theTrack.set_passthroughValue("fxPassthrough", slot, "dryWetMixAmount", np.interp(params[0], (0, 127), (0, 2)))
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_AND_CLIP_CURRRENT_RELATIVE":
-            trackPartDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadPartCount() * Zynthbox.Plugin.instance().sketchpadTrackCount())
-            cumulativePart = value / trackPartDivisor
-            theTrackIndex = floor(cumulativePart / Zynthbox.Plugin.instance().sketchpadPartCount())
-            thePartIndex = cumulativePart - (theTrackIndex * Zynthbox.Plugin.instance().sketchpadPartCount())
+            trackSlotDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadSlotCount() * Zynthbox.Plugin.instance().sketchpadTrackCount())
+            cumulativeSlot = value / trackSlotDivisor
+            theTrackIndex = floor(cumulativeSlot / Zynthbox.Plugin.instance().sketchpadSlotCount())
+            theSlotIndex = cumulativeSlot - (theTrackIndex * Zynthbox.Plugin.instance().sketchpadSlotCount())
             self.sketchpad.set_selected_track_id( max(0, min(theTrackIndex, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1)), shouldEmitCurrentTrackClipCUIAFeedback=False)
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.set_selected_clip(max(0, min(thePartIndex, Zynthbox.Plugin.instance().sketchpadPartCount() - 1)), shouldEmitCurrentClipCUIAFeedback=False)
+            theTrack.set_selected_clip(max(0, min(theSlotIndex, Zynthbox.Plugin.instance().sketchpadSlotCount() - 1)), shouldEmitCurrentClipCUIAFeedback=False)
             self.sketchpad.emitCurrentTrackClipCUIAFeedback()
             sendCuiaEventFeedback = False
 
         # Finally, report back to MidiRouter that we've handled the action
         if sendCuiaEventFeedback == True:
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Part(part), params[0])
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -4237,7 +4237,7 @@ class zynthian_gui(QObject):
             self.__global_popup_opened__ = opened
             self.globalPopupOpenedChanged.emit()
             if self.__global_popup_opened__:
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_AUDIO_SETTINGS", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_AUDIO_SETTINGS", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
             else:
                 self.handleCurrentScreenIDChanged() # Technically a bit odd, but logically this is what's happening
 

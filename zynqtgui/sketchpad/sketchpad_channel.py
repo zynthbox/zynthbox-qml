@@ -163,7 +163,7 @@ class sketchpad_channel(QObject):
             "synth": []
             }
         for routingDataCategory in ["fx", "synth"]:
-            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 newRoutingData = sketchpad_engineRoutingData(self)
                 newRoutingData.routingDataChanged.connect(self.__song__.schedule_save)
                 self.__routingData__[routingDataCategory].append(newRoutingData)
@@ -223,7 +223,7 @@ class sketchpad_channel(QObject):
             synthPassthrough.dryAmountChanged.connect(lambda theClient=synthPassthrough:handlePassthroughClientDryAmountChanged(theClient))
         self.__trackPassthroughClients = []
         self.__fxPassthroughClients = []
-        for laneId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+        for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
             channelClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.__id__ * 5 + laneId]
             self.__trackPassthroughClients.insert(laneId, channelClient)
             # Make the muted change handler a direct connection so playChannelSolo do not get updated while handling the muted state change
@@ -344,7 +344,7 @@ class sketchpad_channel(QObject):
             allowMulticlip = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
             # logging.error(f"Allowing multiclip playback: {allowMulticlip}")
             if not allowMulticlip:
-                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     if clipId != self.__selected_clip__:
                         clipForDisabling = self.getClipsModelById(clipId).getClip(trackIndex)
                         # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
@@ -449,7 +449,7 @@ class sketchpad_channel(QObject):
         self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
 
     def stopAllClips(self):
-        for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+        for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
             for song_index in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
                 self.__song__.getClipById(self.__id__, song_index, clip_index).stop()
 
@@ -753,9 +753,9 @@ class sketchpad_channel(QObject):
     def handleGainChanged(self):
         self.volume_changed.emit()
         self.__song__.schedule_save()
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
         if self.zynqtgui.sketchpad.selectedTrackId == self.__id__:
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_VOLUME", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__volume__.gainAbsolute(), (0, 1), (0, 127)))
     def get_gainHandler(self):
         return self.__volume__
     gainHandler = Property(QObject, get_gainHandler, constant=True)
@@ -833,7 +833,7 @@ class sketchpad_channel(QObject):
     # source : Source sketchpad_channel object
     @Slot(QObject)
     def copyFrom(self, source):
-        for clipId in range(Zynthbox.Plugin.instance().sketchpadPartCount()):
+        for clipId in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
             # Copy all clips from source channel to self
             for songIndex in range(0, self.clips[clipId].count):
                 self.clips[clipId].getClip(songIndex).copyFrom(source.clips[clipId].getClip(songIndex))
@@ -1239,7 +1239,7 @@ class sketchpad_channel(QObject):
             for laneId in range(0, 5):
                 Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId].setMuted(muted)
             self.mutedChanged.emit()
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, (1 if self.__muted__ == True else 0))
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, (1 if self.__muted__ == True else 0))
 
     mutedChanged = Signal()
 
@@ -1296,7 +1296,7 @@ class sketchpad_channel(QObject):
                 self.keyZoneMode = "all-full"
 
             for songId in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
-                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     clip = self.__song__.getClipById(self.id, songId, clipId)
                     if clip is not None:
                         clip.enabled_changed.emit(clip.col, clip.id)
@@ -1458,7 +1458,7 @@ class sketchpad_channel(QObject):
             self.__keyzone_mode__ = keyZoneMode
             self.keyZoneModeChanged.emit()
             for songId in range(0, Zynthbox.Plugin.instance().sketchpadSongCount()):
-                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     clip = self.__song__.getClipById(self.id, songId, clipId)
                     if clip is not None:
                         clip.enabled_changed.emit(clip.col, clip.id)
@@ -1591,12 +1591,12 @@ class sketchpad_channel(QObject):
                 knownPan = theClip.audioSource.pan()
         elif self.audioTypeKey() == "external":
             pass
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownGain, (0, 1), (0, 127)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownPan, (-1, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownGain, (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownPan, (-1, 1), (0, 127)))
         knownDryWetMixAmount = 0.0
         if self.chainedFx[self.__selected_fx_slot_row]:
             knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
     ### Property selectedFxSlotRow
     def get_selectedFxSlotRow(self):
@@ -1765,7 +1765,6 @@ class sketchpad_channel(QObject):
 
     selectedClipNamesChanged = Signal()
 
-    selectedPartNames = Property('QVariantList', get_selectedClipNames, notify=selectedClipNamesChanged)
     selectedClipNames = Property('QVariantList', get_selectedClipNames, notify=selectedClipNamesChanged)
     ### Property selectedClipNames
 
@@ -1836,7 +1835,7 @@ class sketchpad_channel(QObject):
             # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             passthroughClient.setPanAmount(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"])
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"], (-1, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"], (-1, 1), (0, 127)))
 
     panChanged = Signal()
 
@@ -1893,7 +1892,7 @@ class sketchpad_channel(QObject):
         for laneId in range(5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             passthroughClient.setWetFx1Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
     ### END Property wetFx1Amount
@@ -1921,7 +1920,7 @@ class sketchpad_channel(QObject):
         for laneId in range(0, 5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             passthroughClient.setWetFx2Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part.AnyPart, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
     """
     Store wetFx1Amount for current channel as a property and set it to JackPassthrough when value changes
     Stored value ranges from 0-100 and accepted range by setWetFx1Amount is 0-1
@@ -1936,15 +1935,15 @@ class sketchpad_channel(QObject):
         if passthroughKey == "synthPassthrough":
             self.synthPassthroughMixingChanged.emit()
             if valueType == "dryAmount":
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part(laneIndex), np.interp(newValue, (0, 1), (0, 127)))
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(laneIndex), np.interp(newValue, (0, 1), (0, 127)))
                 if self.zynqtgui.sketchpad.selectedTrackId == self.__id__ and self.__selected_slot_row__ == laneIndex:
-                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_PART_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(newValue, (0, 1), (0, 127)))
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(newValue, (0, 1), (0, 127)))
         elif passthroughKey == "fxPassthrough":
             self.fxPassthroughMixingChanged.emit()
             if valueType == "dryWetMixAmount":
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Part(laneIndex), np.interp(newValue, (0, 2), (0, 127)))
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(laneIndex), np.interp(newValue, (0, 2), (0, 127)))
                 if self.zynqtgui.sketchpad.selectedTrackId == self.__id__ and self.__selected_fx_slot_row == laneIndex:
-                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Part.CurrentPart, np.interp(newValue, (0, 2), (0, 127)))
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(newValue, (0, 2), (0, 127)))
 
     ### BEGIN synthPassthrough properties
     @Slot(None)
@@ -2188,7 +2187,7 @@ class sketchpad_channel(QObject):
             return self.samples
         elif self.trackType == "sample-loop":
             clips = []
-            for clip_index in range(Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for clip_index in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 clips_model = self.getClipsModelById(clip_index)
                 clips.append(clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex))
             return clips

@@ -132,8 +132,8 @@ QQC2.ScrollView {
         RowLayout {
             id: outputFilterCUIAEventRow
             function goNext() {
-                if (outputFilterTrackPart.visible) {
-                    component.currentRow = outputFilterTrackPart;
+                if (outputFilterTrackSlot.visible) {
+                    component.currentRow = outputFilterTrackSlot;
                 } else if (outputFilterValuesRow.visible) {
                     component.currentRow = outputFilterValuesRow;
                 } else {
@@ -158,7 +158,7 @@ QQC2.ScrollView {
             }
         }
         RowLayout {
-            id: outputFilterTrackPart
+            id: outputFilterTrackSlot
             function goNext() {
                 if (outputFilterValuesRow.visible) {
                     component.currentRow = outputFilterValuesRow;
@@ -174,16 +174,16 @@ QQC2.ScrollView {
                 component.filterObject.originTrack = Math.max(-2, component.filterObject.originTrack - 1);
             }
             function knob1up() {
-                component.filterObject.originPart = Math.min(Zynthbox.Plugin.sketchpadPartCount - 1, component.filterObject.originPart + 1);
+                component.filterObject.originSlot = Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, component.filterObject.originSlot + 1);
             }
             function knob1down() {
-                component.filterObject.originPart = Math.max(-2, component.filterObject.originPart - 1);
+                component.filterObject.originSlot = Math.max(-2, component.filterObject.originSlot - 1);
             }
             function selectPressed() {
                 outputFilterListenForEvent.onClicked();
             }
             Layout.fillWidth: true
-            visible: Zynthbox.CUIAHelper.cuiaEventWantsATrack(component.filterObject.cuiaEvent) || Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterObject.cuiaEvent)
+            visible: Zynthbox.CUIAHelper.cuiaEventWantsATrack(component.filterObject.cuiaEvent) || Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)
             QQC2.Button {
                 id: outputFilterOriginTrack
                 function selectPressed() { onClicked(); }
@@ -207,35 +207,35 @@ QQC2.ScrollView {
                     height: Kirigami.Units.iconSizes.smallMedium
                     width: Kirigami.Units.iconSizes.smallMedium
                     knobId: 0
-                    visible: component.currentRow === outputFilterTrackPart
+                    visible: component.currentRow === outputFilterTrackSlot
                 }
             }
             QQC2.Button {
-                id: outputFilterOriginPart
+                id: outputFilterOriginSlot
                 function selectPressed() { onClicked(); }
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 Layout.fillWidth: true
-                visible: Zynthbox.CUIAHelper.cuiaEventWantsAPart(component.filterObject.cuiaEvent)
+                visible: Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)
                 text: component.filterObject === null
                     ? ""
                     : Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterObject.cuiaEvent)
-                        ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaPart))
+                        ? qsTr("Sketchpad Clip:\n%1").arg(Zynthbox.ZynthboxBasics.clipLabelText(component.filterRuleObject.cuiaSlot))
                         : Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)
-                            ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaPart))
+                            ? qsTr("Sketchpad Sound Slot:\n%1").arg(Zynthbox.ZynthboxBasics.soundSlotLabelText(component.filterRuleObject.cuiaSlot))
                             : Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterObject.cuiaEvent)
-                                ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaPart))
-                                : qsTr("Sketchpad Part:\n%1").arg(Zynthbox.ZynthboxBasics.partLabelText(component.filterRuleObject.cuiaPart))
+                                ? qsTr("Sketchpad Fx Slot:\n%1").arg(Zynthbox.ZynthboxBasics.fxLabelText(component.filterRuleObject.cuiaSlot))
+                                : qsTr("Sketchpad Slot:\n%1").arg(Zynthbox.ZynthboxBasics.slotLabelText(component.filterRuleObject.cuiaSlot))
                 onClicked: {
-                    partType = -1;
+                    slotType = -1;
                     if (Zynthbox.CUIAHelper.cuiaEventWantsAClip(component.filterObject.cuiaEvent)) {
-                        partType = 0;
-                    } else if(Zynthbox.CUIAHelper.cuiaEventWantsASlot(component.filterObject.cuiaEvent)) {
-                        partType = 1;
+                        slotType = 0;
+                    } else if(Zynthbox.CUIAHelper.cuiaEventWantsASoundSlot(component.filterObject.cuiaEvent)) {
+                        slotType = 1;
                     } else if(Zynthbox.CUIAHelper.cuiaEventWantsAnFxSlot(component.filterObject.cuiaEvent)) {
-                        partType = 2;
+                        slotType = 2;
                     }
-                    partPicker.pickPart(component.filterObject.originPart, partType, function(newPart) {
-                        component.filterObject.originPart = newPart;
+                    slotPicker.pickSlot(component.filterObject.originSlot, slotType, function(newSlot) {
+                        component.filterObject.originSlot = newSlot;
                     });
                 }
                 Zynthian.KnobIndicator {
@@ -247,7 +247,7 @@ QQC2.ScrollView {
                     height: Kirigami.Units.iconSizes.smallMedium
                     width: Kirigami.Units.iconSizes.smallMedium
                     knobId: 1
-                    visible: component.currentRow === outputFilterTrackPart
+                    visible: component.currentRow === outputFilterTrackSlot
                 }
             }
         }
@@ -255,8 +255,8 @@ QQC2.ScrollView {
             id: outputFilterValuesRow
             function goNext() { component.currentRow = addOutputFilterRuleButton; }
             function goPrevious() {
-                if (outputFilterTrackPart.visible) {
-                    component.currentRow = outputFilterTrackPart;
+                if (outputFilterTrackSlot.visible) {
+                    component.currentRow = outputFilterTrackSlot;
                 } else {
                     component.currentRow = outputFilterCUIAEventRow;
                 }
@@ -341,8 +341,8 @@ QQC2.ScrollView {
                 function goPrevious() { 
                     if (outputFilterValuesRow.visible) {
                         component.currentRow = outputFilterValuesRow;
-                    } else if (outputFilterTrackPart.visible) {
-                        component.currentRow = outputFilterTrackPart;
+                    } else if (outputFilterTrackSlot.visible) {
+                        component.currentRow = outputFilterTrackSlot;
                     } else {
                         component.currentRow = outputFilterCUIAEventRow;
                     }

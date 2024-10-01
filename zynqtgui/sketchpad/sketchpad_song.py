@@ -127,7 +127,7 @@ class sketchpad_song(QObject):
             connectPassthroughClientForSaving(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
             connectPassthroughClientForSaving(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex])
-            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 connectPassthroughClientForSaving(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
 
         if not self.restore(load_autosave):
@@ -147,7 +147,7 @@ class sketchpad_song(QObject):
                 channel.setAudioTypeSettings(channel.defaultAudioTypeSettings())
 
                 # Create 5 clips per channel
-                for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     clipsModel = channel.getClipsModelById(clip_index)
                     for song_index in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
                         clip = sketchpad_clip(channel.id, song_index, clip_index, self, clipsModel)
@@ -172,7 +172,7 @@ class sketchpad_song(QObject):
             setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
             for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                 setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex])
-                for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
             for midiChannel in range(0, 16):
                 setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
@@ -224,7 +224,7 @@ class sketchpad_song(QObject):
         trackPassthroughClientsData = []
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
             slotData = []
-            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 slotData.append(serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex]))
             trackPassthroughClientsData.append({
                     "trackPassthroughClient": serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex]),
@@ -320,7 +320,7 @@ class sketchpad_song(QObject):
                 for sample in track.samples:
                     sample.metadata.write(isAutosave=autosave)
                 # Write clip metadata
-                for clip_index in range(Zynthbox.Plugin.instance().sketchpadPartCount()):
+                for clip_index in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     clips_model = track.getClipsModelById(clip_index)
                     for song_index in range(clips_model.count):
                         clip = clips_model.getClip(song_index)
@@ -407,12 +407,12 @@ class sketchpad_song(QObject):
                     if "trackPassthroughClients" in sketchpad:
                         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                             restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex], sketchpad["trackPassthroughClients"][trackIndex]["trackPassthroughClient"])
-                            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                 restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], sketchpad["trackPassthroughClients"][trackIndex]["fxPassthroughClients"][slotIndex])
                     else:
                         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                             setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex])
-                            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadPartCount()):
+                            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                 setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
                     if "synthPassthroughClients" in sketchpad:
                         for midiChannel in range(0, 16):
@@ -675,11 +675,11 @@ class sketchpad_song(QObject):
             valueUpdated = False
             if self.__play_channel_solo > -1:
                 # We're switching soloed track, so inform others the current one is no longer soloed
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Part.AnyPart, 0)
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
             if value > -1:
                 self.__play_channel_solo = value
                 self.playChannelSoloChanged.emit()
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Part.AnyPart, 1)
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Slot.AnySlot, 1)
                 valueUpdated = True
 
             for channel_index in range(self.channelsModel.count):
@@ -697,7 +697,7 @@ class sketchpad_song(QObject):
             if not valueUpdated:
                 self.__play_channel_solo = value
                 self.playChannelSoloChanged.emit()
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Part.AnyPart, 1)
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SOLOED", -1, Zynthbox.ZynthboxBasics.Track(self.__play_channel_solo), Zynthbox.ZynthboxBasics.Slot.AnySlot, 1)
 
     playChannelSoloChanged = Signal()
 

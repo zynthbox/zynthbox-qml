@@ -88,8 +88,8 @@ Zynthian.Dialog {
             // Assemble the duration of time we want to be recording for
             var syncTimerToPatternDurationMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
             for (var trackIndex = 0; trackIndex < Zynthbox.Plugin.sketchpadTrackCount; ++trackIndex) {
-                for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadPartCount; ++clipIndex) {
-                    var pattern = sequence.getByPart(trackIndex, clipIndex);
+                for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                    var pattern = sequence.getByClipId(trackIndex, clipIndex);
                     var patternDuration = pattern.width * pattern.availableBars * pattern.stepLength / syncTimerToPatternDurationMultiplier;
                     if (patternDuration > longestPatternDuration) {
                         longestPatternDuration = patternDuration;

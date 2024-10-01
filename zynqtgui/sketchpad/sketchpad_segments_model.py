@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to store sketches of a song in Sketchpad
+# A model to store an arrangement of a song in Sketchpad, made from individual segments
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #

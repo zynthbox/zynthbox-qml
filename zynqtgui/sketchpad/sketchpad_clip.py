@@ -334,11 +334,11 @@ class sketchpad_clip_metadata(QObject):
 
     @Slot()
     def handleGainChanged(self):
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__id__), np.interp(self.clip.audioSource.gainAbsolute(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Slot(self.clip.__id__), np.interp(self.clip.audioSource.gainAbsolute(), (0, 1), (0, 127)))
 
     @Slot()
     def handlePanChanged(self):
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Part(self.clip.__id__), np.interp(self.clip.audioSource.pan(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Slot(self.clip.__id__), np.interp(self.clip.audioSource.pan(), (0, 1), (0, 127)))
 
     # This disconnects all our watcher signals from the clip's current ClipAudioSource instance, if there is one
     def unhook(self):
@@ -458,7 +458,7 @@ class sketchpad_clip_metadata(QObject):
                         # If there is no midi recording (that is, if this was not a live-recorded bit of audio), then save the clip's pattern data and ensure the midi recording meta is empty
                         self.set_midiRecording("", write=False, force=True)
                         sequenceObject = Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
-                        patternObject = sequenceObject.getByPart(self.clip.channel.id, self.clip.id)
+                        patternObject = sequenceObject.getByClipId(self.clip.channel.id, self.clip.id)
                         self.set_patternJson(patternObject.toJson(), write=False, force=True)
                     else:
                         # If there is a midi recording, store that, and ensure the pattern json is empty
@@ -1150,7 +1150,7 @@ class sketchpad_clip(QObject):
                     self.__song__.scenesModel.removeClipFromCurrentScene(self)
 
             self.enabled_changed.emit(self.col, self.id)
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_ACTIVE_STATE", -1, Zynthbox.ZynthboxBasics.Track(self.col), Zynthbox.ZynthboxBasics.Part(self.__id__), 1 if self.__enabled__ else 0)
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_ACTIVE_STATE", -1, Zynthbox.ZynthboxBasics.Track(self.col), Zynthbox.ZynthboxBasics.Slot(self.__id__), 1 if self.__enabled__ else 0)
 
     enabled_changed = Signal(int, int, arguments=["trackIndex", "clipIndex"])
 

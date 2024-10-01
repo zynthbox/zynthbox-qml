@@ -174,7 +174,7 @@ QQC2.AbstractButton {
             Repeater {
                 id: clipNamesRepeater
                 delegate: RowLayout {
-                    property QtObject clipPattern: root.sequence && channel ? root.sequence.getByPart(channel.id, index) : null
+                    property QtObject clipPattern: root.sequence && channel ? root.sequence.getByClipId(channel.id, index) : null
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true

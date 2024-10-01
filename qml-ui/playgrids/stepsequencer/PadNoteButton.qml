@@ -144,7 +144,6 @@ QQC2.Button {
                 bottomMargin: 10
             }
             property int maxHalfSubnoteHeight: (height / 2) - 5
-            property real dividedSubNoteHeight: maxHalfSubnoteHeight / 100
             spacing: 1
             Repeater {
                 id:padSubNoteRepeater
@@ -208,7 +207,7 @@ QQC2.Button {
                             right: parent.right
                             bottom: parent.bottom
                         }
-                        height: subnoteLayout.maxHalfSubnoteHeight + (subnoteLayout.dividedSubNoteHeight * (subNoteVelocity / 127) * 100)
+                        height: padSubNoteRect.height * (subNoteVelocity / 127)
                         color: zynqtgui.theme_chooser.noteColors[subNote.midiNote]
                     }
                     Rectangle {

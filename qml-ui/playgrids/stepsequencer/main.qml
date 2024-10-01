@@ -2160,6 +2160,8 @@ Zynthian.BasePlayGrid {
                 parent: QQC2.Overlay.overlay
                 y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
                 x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+                height: applicationWindow().height
+                width: applicationWindow().width
                 closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
                 function showSettings(patternModel, firstBar, lastBar, midiNoteFilter, firstStep = -1, lastStep = -1) {
                     let currentlySelectedBar = -1;
@@ -2204,7 +2206,6 @@ Zynthian.BasePlayGrid {
                 NoteSettings {
                     id: noteSettings
                     anchors.fill: parent
-                    implicitWidth: applicationWindow().width - Kirigami.Units.largeSpacing * 2
                     onClose: noteSettingsPopup.close();
                     showCloseButton: true
                 }

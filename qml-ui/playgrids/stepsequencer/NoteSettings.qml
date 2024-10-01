@@ -244,8 +244,10 @@ ColumnLayout {
                 component.changeStepAndSubnote(-1, -1);
             }
         } else {
-            let subnoteData = listData[component.currentIndex];
-            component.changeStepAndSubnote((subnoteData["barIndex"] * component.patternModel.width) + subnoteData["stepIndex"], subnoteData["subnoteIndex"]);
+            if (-1 < component.currentIndex && component.currentIndex < listData.length) {
+                let subnoteData = listData[component.currentIndex];
+                component.changeStepAndSubnote((subnoteData["barIndex"] * component.patternModel.width) + subnoteData["stepIndex"], subnoteData["subnoteIndex"]);
+            }
             if (component.listData.length > 7) {
                 if (component.currentIndex < 3) {
                     component.firstDisplayedIndex = 0;
@@ -263,17 +265,47 @@ ColumnLayout {
         listDataUpdater.barStepAndSubnoteToSelect = { "barIndex": barIndex, "stepIndex": stepIndex, "subnoteIndex": subnoteIndex }
     }
 
-    Kirigami.Heading {
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-        level: 2
-        text: component.midiNoteFilter.length > 0
-            ? "Note Settings: Notes %1".arg(Zynthbox.Chords.symbol(component.midiNoteFilter, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey, " | "))
-            : component.firstBar === component.lastBar
-                ? component.firstStep > -1 && component.patternModel && component.firstStep === component.lastStep
-                    ? "Note Settings: Step %1".arg((component.firstBar * component.patternModel.width) + component.firstStep + 1)
-                    : "Note Settings: Bar %1".arg(component.firstBar + 1)
-                : "Note Settings"
-        Layout.fillWidth: true
+    RowLayout {
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+        Kirigami.Heading {
+            level: 2
+            text: component.midiNoteFilter.length > 0
+                ? "Note Settings: Notes %1".arg(Zynthbox.Chords.symbol(component.midiNoteFilter, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey, " | "))
+                : component.firstBar === component.lastBar
+                    ? component.firstStep > -1 && component.patternModel && component.firstStep === component.lastStep
+                        ? "Note Settings: Step %1".arg((component.firstBar * component.patternModel.width) + component.firstStep + 1)
+                        : "Note Settings: Bar %1".arg(component.firstBar + 1)
+                    : "Note Settings"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            text: qsTr("General")
+            checked: component.currenParameterPageIndex === 0
+            onClicked: {
+                component.currenParameterPageIndex = 0;
+            }
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            text: qsTr("Probability")
+            checked: component.currenParameterPageIndex === 1
+            onClicked: {
+                component.currenParameterPageIndex = 1;
+            }
+        }
+        Zynthian.PlayGridButton {
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            text: qsTr("Ratchet")
+            checked: component.currenParameterPageIndex === 2
+            onClicked: {
+                component.currenParameterPageIndex = 2;
+            }
+        }
     }
     RowLayout {
         visible: component.listData.length === 0
@@ -437,22 +469,6 @@ ColumnLayout {
                 visible: component.currentSubNote === -1
                 knobId: 2
             }
-            Zynthian.PlayGridButton {
-                anchors {
-                    top: parent.top
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-                width: height
-                text: qsTr("%1/%2").arg(component.currenParameterPageIndex + 1).arg(component.parameterPageCount)
-                onClicked: {
-                    if (component.currenParameterPageIndex + 1 < component.parameterPageCount) {
-                        component.currenParameterPageIndex = component.currenParameterPageIndex + 1;
-                    } else {
-                        component.currenParameterPageIndex = 0;
-                    }
-                }
-            }
         }
     }
     Repeater {
@@ -544,9 +560,9 @@ ColumnLayout {
                                 }
                                 rootComponent.patternModel.removeSubnote(subnoteDelegate.barIndex, subnoteDelegate.stepIndex, subnoteDelegate.subnoteIndex);
                                 // Now refetch the note we're displaying
-                                var theColumn = rootComponent.column;
-                                rootComponent.column = -1;
-                                rootComponent.column = theColumn;
+                                var theModel = rootComponent.patternModel;
+                                rootComponent.patternModel = null;
+                                rootComponent.patternModel = theModel;
                                 //if (rootComponent.note.subnotes.count === 0) {
                                     //rootComponent.close();
                                 //}
@@ -1104,7 +1120,7 @@ ColumnLayout {
         }
     }
     Zynthian.PlayGridButton {
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2.5
         Layout.fillWidth: true
         text: "Back"
         visible: component.showCloseButton

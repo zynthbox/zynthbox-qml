@@ -1200,10 +1200,10 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function velocityUp() {
-                                changeValue("velocity", 1, 0, 127, 64);
+                                changeValue("velocity", 1, -1, 127, 0);
                             }
                             function velocityDown() {
-                                changeValue("velocity", -1, 0, 127, 64);
+                                changeValue("velocity", -1, -1, 127, 0);
                             }
                             // TODO Default value should probably be the current note duration... get that from PatternModel (which need it exposed)
                             function durationUp() {

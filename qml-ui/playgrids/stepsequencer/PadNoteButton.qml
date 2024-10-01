@@ -152,6 +152,11 @@ QQC2.Button {
                     id:padSubNoteRect
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.workingModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
+                    property double actualSubnoteVelocity: subNoteVelocity == -1
+                        ? 0
+                        : subNoteVelocity == 0
+                            ? 64
+                            : subNoteVelocity
 
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
@@ -207,8 +212,16 @@ QQC2.Button {
                             right: parent.right
                             bottom: parent.bottom
                         }
-                        height: padSubNoteRect.height * (subNoteVelocity / 127)
+                        height: padSubNoteRect.height * (actualSubnoteVelocity / 127)
                         color: zynqtgui.theme_chooser.noteColors[subNote.midiNote]
+                    }
+                    QQC2.Label {
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignBottom
+                        text: "⏼"
+                        font.pixelSize: 10
+                        visible: subNoteVelocity === -1
                     }
                     Rectangle {
                         anchors.fill: parent;

@@ -637,12 +637,17 @@ ColumnLayout {
                     model: component.patternModel; row: subnoteDelegate.barIndex; column: subnoteDelegate.stepIndex;
                     paramIndex: subnoteDelegate.subnoteIndex
                     paramName: "velocity"
-                    paramDefaultString: "64"
+                    paramDefaultString: "64 (default)"
                     paramValueSuffix: ""
-                    paramDefault: 64
-                    paramMin: 0
+                    paramDefault: 0
+                    paramMin: -1
                     paramMax: 127
                     scrollWidth: 128
+                    paramList: [-1, 0]
+                    paramNames: {
+                        "-1": "Untriggered",
+                        "0": "64 (default)"
+                    }
                     knobId: 0
                     currentlySelected: subnoteDelegate.isCurrent
                 }

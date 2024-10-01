@@ -67,7 +67,7 @@ Rectangle {
     }
 
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-    property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
+    property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -757,10 +757,9 @@ Rectangle {
                                                 zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
                                                 zynqtgui.sketchpad.lastSelectedObj.value = index
                                                 zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
-                                                root.selectedChannel.selectedPart = index
                                                 root.selectedChannel.selectedSlotRow = index
-                                                zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                                zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                                // zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+                                                // zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                             } else {
                                                 if (root.selectedChannel.trackType === "external") {
                                                     // If channel type is external, then it has 2 slots visible
@@ -1121,7 +1120,7 @@ Rectangle {
                                     interval: 1; repeat: false; running: false;
                                     onTriggered: {
                                         waveformContainer.clip = root.selectedChannel.trackType === "sample-loop"
-                                            ? root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                            ? root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                             : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
                                         waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-trig" ||
                                                                          root.selectedChannel.trackType === "sample-slice" ||
@@ -1387,11 +1386,61 @@ Rectangle {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                                     opacity: patternContainer.showPattern ? 1 : 0
 
-                                    QQC2.Label {
-                                        Layout.fillWidth: false
+                                    RowLayout {
+                                        Layout.fillWidth: true
                                         Layout.fillHeight: false
-                                        font.pointSize: 9
-                                        text: qsTr("Clip : %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(root.selectedChannel.selectedPart + 97))
+                                        Repeater {
+                                            model: Zynthbox.Plugin.sketchpadPartCount
+                                            QQC2.Label {
+                                                id: clipDelegate
+                                                font.pointSize: 9
+                                                Layout.fillWidth: true
+                                                Layout.preferredWidth: Kirigami.Units.gridUnit
+                                                text: qsTr("Clip %1%2").arg(root.selectedChannel.id + 1).arg(String.fromCharCode(clipIndex + 97))
+                                                font.underline: root.selectedChannel.selectedClip === clipIndex
+                                                property int clipIndex: model.index
+                                                property QtObject clip: zynqtgui.sketchpad.song.getClipById(root.selectedChannel.id, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipDelegate.clipIndex);
+                                                property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
+                                                property QtObject cppClipObject: root.visible && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
+                                                property QtObject pattern: root.sequence.getByPart(root.selectedChannel.id, clipIndex)
+                                                property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: {
+                                                        if (root.selectedChannel.selectedClip === clipDelegate.clipIndex) {
+                                                            clipDelegate.clip.enabled = !clipDelegate.clip.enabled;
+                                                        } else {
+                                                            root.selectedChannel.selectedClip = clipDelegate.clipIndex;
+                                                            clipDelegate.clip.enabled = true;
+                                                        }
+                                                    }
+                                                }
+                                                Kirigami.Icon {
+                                                    anchors {
+                                                        left: parent.left
+                                                        verticalCenter: parent.verticalCenter
+                                                        leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                    }
+                                                    height: parent.height - Kirigami.Units.smallSpacing
+                                                    width: height
+                                                    // Visible if we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
+                                                    visible: Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                                                    source: "media-playback-start-symbolic"
+                                                }
+                                                Kirigami.Icon {
+                                                    anchors {
+                                                        left: parent.left
+                                                        verticalCenter: parent.verticalCenter
+                                                        leftMargin: parent.paintedWidth + Kirigami.Units.smallSpacing
+                                                    }
+                                                    height: parent.height - Kirigami.Units.smallSpacing
+                                                    width: height
+                                                    // Visible if we are running playback, the clip is playing, and we are going to stop the clip at the top of the next bar
+                                                    visible: Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.StoppedState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                                                    source: "media-playback-stop-symbolic"
+                                                }
+                                            }
+                                        }
                                     }
 
                                     Rectangle {

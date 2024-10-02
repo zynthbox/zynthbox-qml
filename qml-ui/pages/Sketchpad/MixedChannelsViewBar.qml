@@ -72,6 +72,129 @@ Rectangle {
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
+    function pickNextSlot() {
+        let slotMax = 4;
+        let fxSlotMax = 4;
+        if (root.selectedChannel.trackType === "external") {
+            slotMax = 1;
+        } else if (root.selectedChannel.trackType === "sample-slice") {
+            slotMax = 0;
+        } else if (root.selectedChannel.trackType === "sample-loop") {
+            fxSlotMax = -1;
+        }
+        if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+            if (zynqtgui.sketchpad.lastSelectedObj.value === slotMax) {
+                if (fxSlotMax > -1) {
+                    // if we're on the last slot, select the first fx slot
+                    fxRepeater.itemAt(0).switchToThisSlot(true);
+                } else {
+                    // If we're not showing the fx row, select the first synth slot
+                    synthRepeater.itemAt(0).switchToThisSlot(true);
+                }
+            } else {
+                // otherwise select the next slot
+                synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
+            }
+        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+            if (zynqtgui.sketchpad.lastSelectedObj.value === fxSlotMax) {
+                // if we're on the last fx slot, select the first slot
+                synthRepeater.itemAt(0).switchToThisSlot(true);
+            } else {
+                // otherwise select the next slot
+                fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
+            }
+        } else {
+            // select the first slot
+            synthRepeater.itemAt(0).switchToThisSlot(true);
+        }
+    }
+    function pickPreviousSlot() {
+        let slotMax = 4;
+        let fxSlotMax = 4;
+        if (root.selectedChannel.trackType === "external") {
+            slotMax = 1;
+        } else if (root.selectedChannel.trackType === "sample-slice") {
+            slotMax = 0;
+        } else if (root.selectedChannel.trackType === "sample-loop") {
+            fxSlotMax = -1;
+        }
+        if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+            if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                if (fxSlotMax > -1) {
+                    // if we're on the first slot, select the last fx slot
+                    fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
+                } else {
+                    synthRepeater.itemAt(slotMax).switchToThisSlot(true);
+                }
+            } else {
+                // otherwise select the previous slot
+                synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
+            }
+        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+            if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                // if we're on the first fx slot, select the last slot
+                synthRepeater.itemAt(slotMax).switchToThisSlot(true);
+            } else {
+                // otherwise select the previous fx slot
+                fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
+            }
+        } else {
+            if (fxSlotMax > -1) {
+                // select the last fx
+                fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
+            } else {
+                // if we're not using the fx row, select the last synth slot
+                synthRepeater.itemAt(slotMax).switchToThisSlot(true);
+            }
+        }
+    }
+    // Depending on track type, select the first and best (occupied) slot
+    // If there is already a slot selected, we will start from there, and simply rotate through until we
+    // either have a slot selected with something in it, or we have gone through all the slots and found
+    // nothing of use. If the existing selected slot has stuff in it, that is the one we will use.
+    function pickFirstAndBestSlot() {
+        let initialSlotIndex = 0;
+        let initialSlotType = 0;
+        if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+            initialSlotType = 1;
+            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+        }
+        let slotHasContents = false;
+        for (let slotIndex = 0; slotIndex < (Zynthbox.Plugin.sketchpadSlotCount * 2); ++slotIndex) {
+            if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                switch(root.selectedChannel.trackTypeKey) {
+                    case "synth":
+                        slotHasContents = root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value]);
+                        break;
+                    case "sample":
+                    case "sketch":
+                        slotHasContents = root.selectedChannel.slotsData[zynqtgui.sketchpad.lastSelectedObj.value].cppObjId > -1;
+                        break;
+                    case "external":
+                        slotHasContents = (root.selectedChannel.slotsData[zynqtgui.sketchpad.lastSelectedObj.value] !== undefined);
+                        break;
+                }
+            } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                if (root.selectedChannel.chainedFx[zynqtgui.sketchpad.lastSelectedObj.value] != null) {
+                    slotHasContents = true;
+                }
+            }
+            if (slotHasContents) {
+                break;
+            }
+            root.pickNextSlot();
+        }
+        // If we have reached this point and still have nothing selected, make sure we select the whatever was previously selected (or default to the first sound slot)
+        if (slotHasContents === false) {
+            if (initialSlotType === 0) {
+                synthRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+            } else if (initialSlotType === 1) {
+                fxRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+            }
+        }
+    }
     function cuiaCallback(cuia) {
         var returnValue = false;
         console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
@@ -87,6 +210,7 @@ Rectangle {
                 break;
 
             case "SELECT_UP":
+                root.pickFirstAndBestSlot();
                 if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
@@ -96,6 +220,7 @@ Rectangle {
                 break;
 
             case "SELECT_DOWN":
+                root.pickFirstAndBestSlot();
                 if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                 } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
@@ -105,6 +230,7 @@ Rectangle {
                 break;
             case "KNOB0_TOUCHED":
                 if (!applicationWindow().osd.opened) {
+                    root.pickFirstAndBestSlot();
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (root.selectedChannel.trackType == "synth") {
                             pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
@@ -130,6 +256,7 @@ Rectangle {
                 }
                 break;
             case "KNOB0_UP":
+                root.pickFirstAndBestSlot();
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 1)
@@ -145,6 +272,7 @@ Rectangle {
                 }
                 break;
             case "KNOB0_DOWN":
+                root.pickFirstAndBestSlot();
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], -1)
@@ -161,6 +289,7 @@ Rectangle {
                 break;
             case "KNOB1_TOUCHED":
                 if (!applicationWindow().osd.opened) {
+                    root.pickFirstAndBestSlot();
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (root.selectedChannel.trackType == "synth") {
                             pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
@@ -182,6 +311,7 @@ Rectangle {
                 }
                 break;
             case "KNOB1_UP":
+                root.pickFirstAndBestSlot();
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
@@ -193,6 +323,7 @@ Rectangle {
                 }
                 break;
             case "KNOB1_DOWN":
+                root.pickFirstAndBestSlot();
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
@@ -205,6 +336,7 @@ Rectangle {
                 break;
             case "KNOB2_TOUCHED":
                 if (!applicationWindow().osd.opened) {
+                    root.pickFirstAndBestSlot();
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                         if (root.selectedChannel.trackType == "synth") {
                             pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
@@ -226,6 +358,7 @@ Rectangle {
                 }
                 break;
             case "KNOB2_UP":
+                root.pickFirstAndBestSlot();
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
@@ -237,6 +370,7 @@ Rectangle {
                 }
                 break;
             case "KNOB2_DOWN":
+                root.pickFirstAndBestSlot();
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     if (root.selectedChannel.trackType == "synth") {
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
@@ -262,84 +396,14 @@ Rectangle {
             case "KNOB3_UP":
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
-                    let slotMax = 4;
-                    let fxSlotMax = 4;
-                    if (root.selectedChannel.trackType === "external") {
-                        slotMax = 1;
-                    } else if (root.selectedChannel.trackType === "sample-slice") {
-                        slotMax = 0;
-                    } else if (root.selectedChannel.trackType === "sample-loop") {
-                        fxSlotMax = -1;
-                    }
-                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                        if (zynqtgui.sketchpad.lastSelectedObj.value === slotMax) {
-                            if (fxSlotMax > -1) {
-                                // if we're on the last slot, select the first fx slot
-                                fxRepeater.itemAt(0).switchToThisSlot(true);
-                            } else {
-                                // If we're not showing the fx row, select the first synth slot
-                                synthRepeater.itemAt(0).switchToThisSlot(true);
-                            }
-                        } else {
-                            // otherwise select the next slot
-                            synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
-                        }
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                        if (zynqtgui.sketchpad.lastSelectedObj.value === fxSlotMax) {
-                            // if we're on the last fx slot, select the first slot
-                            synthRepeater.itemAt(0).switchToThisSlot(true);
-                        } else {
-                            // otherwise select the next slot
-                            fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true)
-                        }
-                    } else {
-                        // select the first slot
-                        synthRepeater.itemAt(0).switchToThisSlot(true);
-                    }
+                    root.pickNextSlot();
                     returnValue = true;
                 }
                 break;
             case "KNOB3_DOWN":
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
-                    let slotMax = 4;
-                    let fxSlotMax = 4;
-                    if (root.selectedChannel.trackType === "external") {
-                        slotMax = 1;
-                    } else if (root.selectedChannel.trackType === "sample-slice") {
-                        slotMax = 0;
-                    } else if (root.selectedChannel.trackType === "sample-loop") {
-                        fxSlotMax = -1;
-                    }
-                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                        if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
-                            if (fxSlotMax > -1) {
-                                // if we're on the first slot, select the last fx slot
-                                fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
-                            } else {
-                                synthRepeater.itemAt(slotMax).switchToThisSlot(true);
-                            }
-                        } else {
-                            // otherwise select the previous slot
-                            synthRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
-                        }
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                        if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
-                            // if we're on the first fx slot, select the last slot
-                            synthRepeater.itemAt(slotMax).switchToThisSlot(true);
-                        } else {
-                            // otherwise select the previous fx slot
-                            fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true)
-                        }
-                    } else {
-                        if (fxSlotMax > -1) {
-                            // select the last fx
-                            fxRepeater.itemAt(fxSlotMax).switchToThisSlot(true);
-                        } else {
-                            // if we're not using the fx row, select the last synth slot
-                            synthRepeater.itemAt(slotMax).switchToThisSlot(true);
-                        }
-                    }
+                    root.pickPreviousSlot();
                     returnValue = true;
                 }
                 break;
@@ -733,7 +797,7 @@ Rectangle {
                                 Repeater {
                                     id: synthRepeater
 
-                                    model: 5
+                                    model: Zynthbox.Plugin.sketchpadSlotCount
                                     property var synthData: root.selectedChannel.slotsData
                                     delegate: Rectangle {
                                         id: slotDelegate

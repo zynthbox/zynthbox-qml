@@ -149,7 +149,7 @@ class sketchpad_channel(QObject):
             self.__engine_config = {}
 
         # Create 5 clip objects for 5 samples per channel
-        for i in range(0, 5):
+        for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
             newSample = sketchpad_clip(self.id, -1, -1, self.__song__, self, True)
             newSample.set_lane(i)
             # Explicitly set channel as it is a channelSample
@@ -1333,6 +1333,7 @@ class sketchpad_channel(QObject):
         self.synthPassthroughMixingChanged.emit()
         self.fxPassthroughMixingChanged.emit()
 
+    trackTypeKey = Property(str, audioTypeKey, notify=track_type_changed)
     trackType = Property(str, get_track_type, set_track_type, notify=track_type_changed)
     ### END Property trackType
 

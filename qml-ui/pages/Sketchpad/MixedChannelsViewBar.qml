@@ -149,20 +149,14 @@ Rectangle {
         }
     }
     // Depending on track type, select the first and best (occupied) slot
-    // If there is already a slot selected, we will start from there, and simply rotate through until we
-    // either have a slot selected with something in it, or we have gone through all the slots and found
-    // nothing of use. If the existing selected slot has stuff in it, that is the one we will use.
+    // If there is a selected slot which has stuff in it, that is the one we will use.
+    // If there is is a selected slot, but there is nothing in that slot, we will reset the selection to
+    // the first slot in the given type (either sound or fx slot).
+    // We will then start from that position, and simply rotate through until we either have a slot
+    // selected with something in it, or we have gone through all the slots and found nothing of use.
     function pickFirstAndBestSlot() {
-        let initialSlotIndex = 0;
-        let initialSlotType = 0;
-        if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
-        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-            initialSlotType = 1;
-            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
-        }
-        let slotHasContents = false;
-        for (let slotIndex = 0; slotIndex < (Zynthbox.Plugin.sketchpadSlotCount * 2); ++slotIndex) {
+        function checkCurrent(switchIfEmpty) {
+            let slotHasContents = false;
             if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                 switch(root.selectedChannel.trackTypeKey) {
                     case "synth":
@@ -176,22 +170,43 @@ Rectangle {
                         slotHasContents = (root.selectedChannel.slotsData[zynqtgui.sketchpad.lastSelectedObj.value] !== undefined);
                         break;
                 }
+                if (switchIfEmpty && slotHasContents === false) {
+                    synthRepeater.itemAt(0).switchToThisSlot(true);
+                }
             } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
                 if (root.selectedChannel.chainedFx[zynqtgui.sketchpad.lastSelectedObj.value] != null) {
                     slotHasContents = true;
                 }
+                if (switchIfEmpty && (slotHasContents === false)) {
+                    fxRepeater.itemAt(0).switchToThisSlot(true);
+                }
             }
-            if (slotHasContents) {
-                break;
-            }
-            root.pickNextSlot();
+            return slotHasContents;
         }
-        // If we have reached this point and still have nothing selected, make sure we select the whatever was previously selected (or default to the first sound slot)
+        let initialSlotIndex = 0;
+        let initialSlotType = 0;
+        if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+            initialSlotType = 1;
+            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+        }
+        let slotHasContents = checkCurrent(true);
         if (slotHasContents === false) {
-            if (initialSlotType === 0) {
-                synthRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
-            } else if (initialSlotType === 1) {
-                fxRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+            for (let slotIndex = 0; slotIndex < (Zynthbox.Plugin.sketchpadSlotCount * 2); ++slotIndex) {
+                slotHasContents = checkCurrent(false);
+                if (slotHasContents) {
+                    break;
+                }
+                root.pickNextSlot();
+            }
+            // If we have reached this point and still have nothing selected, make sure we select the whatever was previously selected (or default to the first sound slot)
+            if (slotHasContents === false) {
+                if (initialSlotType === 0) {
+                    synthRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+                } else if (initialSlotType === 1) {
+                    fxRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+                }
             }
         }
     }

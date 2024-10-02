@@ -54,26 +54,42 @@ Zynthian.ScreenPage {
     ]
 
     cuiaCallback: function(cuia) {
+        let result = false;
         switch (cuia) {
         case "SELECT_UP":
             view.moveCurrentIndexUp();
-            return true;
+            result = true;
+            break;
         case "SELECT_DOWN":
             if (view.currentIndex === -1) {
                 view.currentIndex = 0;
             } else {
                 view.moveCurrentIndexDown();
             }
-            return true;
+            result = true;
+            break;
         case "NAVIGATE_LEFT":
-            view.moveCurrentIndexLeft();
-            return true
+            zynqtgui.engine.shown_category = "Instrument";
+            break;
         case "NAVIGATE_RIGHT":
+            zynqtgui.engine.shown_category = "None";
+            break;
+        case "KNOB3_TOUCHED":
+        case "KNOB3_RELEASED":
+            result = true;
+            break;
+        case "KNOB3_DOWN":
+            view.moveCurrentIndexLeft();
+            result = true;
+            break;
+        case "KNOB3_UP":
             view.moveCurrentIndexRight();
-            return true;
+            result = true;
+            break;
         default:
-            return false;
+            break;
         }
+        return result;
     }
 
     function stringToColor(string) {

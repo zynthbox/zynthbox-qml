@@ -111,8 +111,8 @@ RowLayout {
             width: ListView.view.width
             height: ListView.view.height / 8
             color: "transparent"
-            border.color: "#88ffffff"
-            border.width: zynqtgui.control.selectedPage === index ? 2 : 0
+            border.color: zynqtgui.control.selectedPage === index ? "#88ffffff" : "transparent"
+            border.width: 2
             radius: 2
 
             QQC2.Label {
@@ -135,6 +135,18 @@ RowLayout {
                     zynqtgui.control.selectedPage = index
                 }
             }
+
+            Zynthian.KnobIndicator {
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                    margins: Kirigami.Units.smallSpacing
+                }
+                height: Kirigami.Units.iconSizes.small
+                width: Kirigami.Units.iconSizes.small
+                visible: zynqtgui.control.selectedPage === index
+                knobId: 3
+            }
         }
     }
 
@@ -145,15 +157,18 @@ RowLayout {
         delegate: Rectangle {
             id: columnDelegate
 
-            property int columnIndex: index
-            property alias rowsRepeater: rowsRepeater
+            readonly property int columnIndex: index
+            readonly property alias rowsRepeater: rowsRepeater
+            readonly property bool isCurrentColumn: root.selectedChannel.channelHasSynth && (zynqtgui.control.selectedColumn % 4) === index
 
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             color: "transparent"
-            border.color: "#88ffffff"
-            border.width: root.selectedChannel.channelHasSynth && (zynqtgui.control.selectedColumn % 4) === index ? 2 : 0
+            border {
+                color: isCurrentColumn ? "#88ffffff" : "transparent"
+                width: 2
+            }
 
             ColumnLayout {
                 anchors.fill: parent
@@ -166,9 +181,10 @@ RowLayout {
                     delegate: Item {
                         id: controlDelegate
 
-                        property int allControlsIndex: zynqtgui.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
+                        readonly property int allControlsIndex: zynqtgui.control.selectedPage * 12 + columnDelegate.columnIndex * 3 + index
+                        readonly property alias controllerLoader: controllerLoader
+                        readonly property int rowIndex: model.index
                         property var control: null
-                        property alias controllerLoader: controllerLoader
 
                         Timer {
                             id: controlUpdater
@@ -197,6 +213,7 @@ RowLayout {
                         Zynthian.ControllerLoader {
                             id: controllerLoader
                             visible: controlDelegate.control != null
+                            knobId: columnDelegate.isCurrentColumn ? controlDelegate.rowIndex : -1
                             anchors.fill: parent
                             controller {
                                 ctrl: controlDelegate.control

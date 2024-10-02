@@ -36,7 +36,8 @@ Item {
     signal pressedChanged(bool pressed)
     signal interacted()
     readonly property ControllerGroup controller: ControllerGroup {}
-    property bool highlighted: false    
+    property bool highlighted: false
+    property int knobId: -1
     readonly property string valueType: {
         //FIXME: Ugly heuristics
         if (!root.controller.ctrl) {
@@ -115,6 +116,21 @@ Item {
         }
         onPressed: {
             root.interacted()
+        }
+    }
+    Item {
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+        }
+        height: Kirigami.Units.iconSizes.medium
+        width: Kirigami.Units.iconSizes.medium
+        KnobIndicator {
+            anchors.centerIn: parent
+            height: Kirigami.Units.iconSizes.small
+            width: Kirigami.Units.iconSizes.small
+            visible: root.knobId > -1
+            knobId: Math.max(0, Math.min(root.knobId, 3))
         }
     }
 }

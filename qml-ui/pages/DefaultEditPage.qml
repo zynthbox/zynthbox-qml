@@ -140,7 +140,8 @@ RowLayout {
 
     Repeater {
         id: columnsRepeater
-        model: 4
+        readonly property int columnCount: 4
+        model: columnCount
         delegate: Rectangle {
             id: columnDelegate
 
@@ -199,6 +200,9 @@ RowLayout {
                             anchors.fill: parent
                             controller {
                                 ctrl: controlDelegate.control
+                            }
+                            onInteracted: {
+                                zynqtgui.control.selectedColumn = (zynqtgui.control.selectedPage * columnsRepeater.columnCount) + columnDelegate.columnIndex;
                             }
                         }
                     }

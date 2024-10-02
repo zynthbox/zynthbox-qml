@@ -34,6 +34,7 @@ Item {
     id: root
 
     signal pressedChanged(bool pressed)
+    signal interacted()
     readonly property ControllerGroup controller: ControllerGroup {}
     property bool highlighted: false    
     readonly property string valueType: {
@@ -86,6 +87,7 @@ Item {
         highlighted: root.highlighted
         onPressedChanged: {
             root.pressedChanged(pressed)
+            root.interacted()
         }
     }
     DialController {
@@ -96,6 +98,7 @@ Item {
         highlighted: root.highlighted
         onPressedChanged: {
             root.pressedChanged(pressed)
+            root.interacted()
         }
     }
     QQC2.ToolButton {
@@ -109,6 +112,9 @@ Item {
         icon.name: "overflow-menu"
         onClicked: {
             applicationWindow().pageStack.getPage("control").showControlActions(root.controller.ctrl.zctrl);
+        }
+        onPressed: {
+            root.interacted()
         }
     }
 }

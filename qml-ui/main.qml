@@ -274,7 +274,7 @@ Kirigami.AbstractApplicationWindow {
                             if (root.selectedChannel.trackType === "sample-loop") {
                                 root.selectedChannel.selectedSlotRow = root.selectedChannel.selectedClip;
                             } else {
-                                for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                                for (let slotIndex = 0; slotIndex < Zynthbox.Plugin.sketchpadSlotCount; ++slotIndex) {
                                     if (root.selectedChannel.samples[slotIndex].cppObjId > -1) {
                                         // Let's at least make sure there's some sample selected
                                         root.selectedChannel.selectedSlotRow = slotIndex;
@@ -286,7 +286,7 @@ Kirigami.AbstractApplicationWindow {
                         } else if (root.selectedChannel.trackType === "synth") {
                             // If we are in synth mode, select the first slot explicitly and then switch to the control page, and if there isn't one... throw up the warning
                             let foundASound = false;
-                            for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                            for (let slotIndex = 0; slotIndex < Zynthbox.Plugin.sketchpadSlotCount; ++slotIndex) {
                                 let sound = root.selectedChannel.chainedSounds[slotIndex];
                                 if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
                                     root.selectedChannel.selectedSlotRow = sound;

@@ -152,11 +152,13 @@ QQC2.Button {
                     id:padSubNoteRect
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.workingModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
-                    property double actualSubnoteVelocity: subNoteVelocity == -1
+                    property double actualSubnoteVelocity: subNoteVelocity == undefined
                         ? 0
-                        : subNoteVelocity == 0
-                            ? 64
-                            : subNoteVelocity
+                        : subNoteVelocity == -1
+                            ? 0
+                            : subNoteVelocity == 0
+                                ? 64
+                                : subNoteVelocity
 
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2

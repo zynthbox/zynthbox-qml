@@ -35,7 +35,13 @@ function startMetronomeAndPlayback() {
 
 function stopMetronomeAndPlayback() {
     if (Zynthbox.SyncTimer.timerRunning) {
-        Zynthbox.SyncTimer.scheduleStopPlayback(0);
+        if (zynqtgui.metronomeButtonPressed) {
+            // Schedule a stop at the end of the current bar
+            Zynthbox.SyncTimer.scheduleStopPlayback(Zynthbox.SyncTimer.delayFor(Zynthbox.SyncTimer.CurrentBarEndPosition));
+            // console.log("Stopping playback after", Zynthbox.SyncTimer.delayFor(Zynthbox.SyncTimer.CurrentBarEndPosition), "ticks, based on position", Zynthbox.SyncTimer.CurrentBarEndPosition, "meaning the next bar is at", Zynthbox.SyncTimer.cumulativeBeat() + Zynthbox.SyncTimer.delayFor(Zynthbox.SyncTimer.CurrentBarEndPosition) + 1);
+        } else {
+            Zynthbox.SyncTimer.scheduleStopPlayback(0);
+        }
     } else {
         console.log("Stop was requested while already stopped, not scheduling a stop");
     }

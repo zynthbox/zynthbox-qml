@@ -230,7 +230,7 @@ RowLayout {
             Layout.preferredHeight: width
             Layout.maximumHeight: width
             onClicked: {
-                zynqtgui.callable_ui_action("KEYBOARD")
+                zynqtgui.callable_ui_action_simple("KEYBOARD")
             }
         }
     }

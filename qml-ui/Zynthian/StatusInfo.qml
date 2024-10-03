@@ -648,7 +648,7 @@ MouseArea {
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit
                     text: qsTr("Stop All Notes")
-                    onClicked: zynqtgui.callable_ui_action("ALL_NOTES_OFF")
+                    onClicked: zynqtgui.callable_ui_action_simple("ALL_NOTES_OFF")
                 }
                 QQC2.Button {
                     Layout.fillWidth: true

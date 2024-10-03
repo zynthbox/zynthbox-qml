@@ -1668,6 +1668,11 @@ class zynthian_gui(QObject):
             # theTrack.selectedFxSlotRow - the property holding that information...
         self.callable_ui_action(cuia, [value], originId, int(track), int(slot))
 
+    # This exists to allow us to call just a cuia (without parameters) from QML, as we can't easily overload slots
+    @Slot(str)
+    def callable_ui_action_simple(self, cuia):
+        self.callable_ui_action(cuia)
+
     @Slot(str, 'QVariantList', int, int, int)
     def callable_ui_action(self, cuia, params=[-1], originId=-1, track=-1, slot=-1):
         # logging.error(f"CUIA : {cuia} {params} {originId} {track} {slot}")

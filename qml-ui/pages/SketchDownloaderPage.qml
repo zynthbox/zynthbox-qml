@@ -61,6 +61,6 @@ Zynthian.NewStuffPage {
                 // maybe a warning that there's an unexpected amount of files and we can't really work out what to do with that other than "just use the first" or "use the first five"?
             }
         }
-        zynqtgui.callable_ui_action("SWITCH_BACK_SHORT")
+        zynqtgui.callable_ui_action_simple("SWITCH_BACK_SHORT")
     }
 }

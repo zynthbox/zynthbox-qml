@@ -62,7 +62,7 @@ Item {
      * The parameter installedFiles forwards the list of files for a newstuff entry,
      * and contains all the installed files from that entry.
      * You likely also want to go back from the page upon performing the action,
-     * which can be done by calling zynqtgui.callable_ui_action("SWITCH_BACK_SHORT")
+     * which can be done by calling zynqtgui.callable_ui_action_simple("SWITCH_BACK_SHORT")
      */
     signal useThis(var installedFiles);
 

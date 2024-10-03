@@ -1104,7 +1104,7 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 18
                     icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                     onClicked: {
-                        zynqtgui.callable_ui_action("START_RECORD");
+                        zynqtgui.callable_ui_action_simple("START_RECORD");
                     }
                 }
                 QQC2.Button {
@@ -1114,7 +1114,7 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     icon.name: "view-grid-symbolic"
                     onClicked: {
-                        zynqtgui.callable_ui_action("KEYBOARD");
+                        zynqtgui.callable_ui_action_simple("KEYBOARD");
                     }
                 }
             }

@@ -248,7 +248,7 @@ Zynthian.BasePlayGrid {
     property var currentBankNotes: []
 
     function setActiveBar(activeBar) {
-        _private.sequence.activePatternObject.activeBar = activeBar;
+        _private.activePatternModel.activeBar = activeBar;
     }
 
     function pickPattern(patternIndex) {
@@ -1660,24 +1660,79 @@ Zynthian.BasePlayGrid {
                             }
                         }
 
-                        RowLayout {
-                            id: patternBarsLayout
+                        Item {
                             Layout.preferredWidth: parent.width / 2
                             Layout.fillHeight: true
-                            property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
-                            Item {
-                                visible: padSettings.visible && patternBarsLayout.channelIsLoopType
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                            }
-                            Repeater {
-                                model: patternBarsLayout.channelIsLoopType ? 0 : _private.bars
-                                delegate: BarStep {
-                                    availableBars: _private.availableBars
-                                    activeBar: _private.activeBar
-                                    playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.workingPatternModel.bankOffset : 0
-                                    playgrid: component
+                            Image {
+                                id: patternBarsVisualiser
+                                visible: !patternBarsLayout.channelIsLoopType
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                    right: parent.right
+                                    bottom: parent.verticalCenter
+                                    bottomMargin: Kirigami.Units.largeSpacing
                                 }
+                                source: _private.activePatternModel ? _private.activePatternModel.thumbnailUrl : ""
+                                asynchronous: true
+                                Rectangle {
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    visible: parent.visible && _private.activePatternModel ? _private.activePatternModel.isPlaying : false
+                                    color: Kirigami.Theme.highlightColor
+                                    width: Math.max(1, Math.floor(widthFactor))
+                                    property double widthFactor: visible && _private.activePatternModel ? parent.width / (_private.activePatternModel.width * _private.activePatternModel.bankLength) : 1
+                                    x: visible && _private.activePatternModel ? _private.activePatternModel.bankPlaybackPosition * widthFactor : 0
+                                }
+                            }
+                            RowLayout {
+                                id: patternBarsLayout
+                                anchors {
+                                    top: parent.verticalCenter
+                                    topMargin: -Kirigami.Units.largeSpacing
+                                    left: parent.left
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
+                                property bool channelIsLoopType: _private.activePatternModel && _private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination
+                                Item {
+                                    visible: padSettings.visible && patternBarsLayout.channelIsLoopType
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                }
+                                Repeater {
+                                    model: patternBarsLayout.channelIsLoopType ? 0 : _private.bars
+                                    delegate: BarStep {
+                                        availableBars: _private.availableBars
+                                        activeBar: _private.activeBar
+                                        playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.workingPatternModel.bankOffset : 0
+                                        playgrid: component
+                                    }
+                                }
+                            }
+                            MultiPointTouchArea {
+                                anchors.fill: parent
+                                touchPoints: [
+                                    TouchPoint {
+                                        id: patternsBarTouchPoint
+                                        onPressedChanged: {
+                                            if (patternsBarTouchPoint.pressed) {
+                                                let barStepIndex = _private.activePatternModel.bankLength * (startX / patternBarsVisualiser.width);
+                                                if (barStepIndex < _private.availableBars) {
+                                                    _private.activePatternModel.activeBar = barStepIndex;
+                                                }
+                                            }
+                                        }
+                                        onXChanged: {
+                                            let barStepIndex = _private.activePatternModel.bankLength * (x / patternBarsVisualiser.width);
+                                            if (barStepIndex < _private.availableBars) {
+                                                _private.activePatternModel.activeBar = barStepIndex;
+                                            }
+                                        }
+                                    }
+                                ]
                             }
                         }
                     }

@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-QQC2.Button {
+Item {
     id:component
     Layout.fillHeight: true
     Layout.fillWidth: true
@@ -44,45 +44,35 @@ QQC2.Button {
     property color foregroundColor: Kirigami.Theme.backgroundColor
     property color backgroundColor: Kirigami.Theme.textColor
     property color borderColor: foregroundColor
-    background: Rectangle {
-        id:barStepRect
-        anchors.fill:parent
-        visible: component.barStepIndex < component.availableBars
+
+    opacity: component.barStepIndex < component.availableBars ? 1 : 0
+
+    Rectangle {
+        anchors.fill: parent
         color: barStepIndex === component.activeBar ? Kirigami.Theme.focusColor: component.backgroundColor
         border {
             color: component.barStepIndex < component.availableBars ? component.borderColor : "transparent"
             width: 1
         }
-
-        QQC2.Label {
-            width:parent.width
-            height:parent.height
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            text: component.barStepIndex + 1
-            Kirigami.Theme.inherit: false
-            color: component.foregroundColor
-        }
-
-        Rectangle {
-            id:barStepIndicatorRect
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.bottom
-                margins: 1
-            }
-            height:9
-            color: visible && component.barStepIndex === component.playedBar ? "yellow" : "transparent"
-        }
     }
 
-    MultiPointTouchArea {
+    QQC2.Label {
         anchors.fill: parent
-        onPressed: {
-            if (barStepIndex < component.availableBars){
-                component.playgrid.setActiveBar(barStepIndex)
-            }
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: component.barStepIndex + 1
+        Kirigami.Theme.inherit: false
+        color: component.foregroundColor
+    }
+
+    Rectangle {
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.bottom
+            margins: 1
         }
+        height:9
+        color: visible && component.barStepIndex === component.playedBar ? "yellow" : "transparent"
     }
 }

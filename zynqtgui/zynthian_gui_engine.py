@@ -37,6 +37,7 @@ import zynautoconnect
 from zyngine import *
 from zyngine.zynthian_engine_pianoteq import *
 from zyngine.zynthian_engine_jalv import *
+from zyngine.zynthian_engine_jucy import *
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
@@ -91,6 +92,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
         for plugin_name, plugin_info in get_jalv_plugins().items():
             eng = 'JV/{}'.format(plugin_name)
             cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jalv, plugin_info['ENABLED'])
+
+        for plugin_name, plugin_info in zynthian_engine_jucy.plugins_dict.items():
+            eng = 'JY/{}'.format(plugin_name)
+            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, True)
 
 
     def __init__(self, parent = None):
@@ -272,6 +277,9 @@ class zynthian_gui_engine(zynthian_gui_selector):
             zynthian_engine_class=info[4]
             if eng[0:3]=="JV/":
                 eng="JV/{}".format(self.zyngine_counter)
+                self.zyngines[eng]=zynthian_engine_class(info[0], info[2], self.zynqtgui)
+            elif eng[0:3]=="JY/":
+                eng="JY/{}".format(self.zyngine_counter)
                 self.zyngines[eng]=zynthian_engine_class(info[0], info[2], self.zynqtgui)
             else:
                 if eng=="SF":

@@ -151,6 +151,20 @@ Zynthian.ScreenPage {
                 }
             }
             QQC2.Button {
+                id: vst3Switch
+                Layout.fillWidth: true
+                implicitWidth: 1
+                checkable: true
+                checked: zynqtgui.engine.shown_category == "VST3 Instruments"
+                autoExclusive: true
+                text: qsTr("VST3 Instruments")
+                onToggled: {
+                    if (checked) {
+                        zynqtgui.engine.shown_category = "VST3 Instrument";
+                    }
+                }
+            }
+            QQC2.Button {
                 id: othersSwitch
                 Layout.fillWidth: true
                 implicitWidth: 1

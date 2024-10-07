@@ -123,6 +123,8 @@ class zynthian_engine_jucy(zynthian_engine):
             return False
         logging.debug(f"Setting preset {preset[0]}")
         self.jucy_pluginhost.setCurrentPreset(preset[0])
+        self.vst3_zctrl_dict = self.get_vst3_controllers_dict()
+        self.generate_ctrl_screens(self.vst3_zctrl_dict)
 
         return True
 
@@ -141,173 +143,114 @@ class zynthian_engine_jucy(zynthian_engine):
     #----------------------------------------------------------------------------
 
     def get_vst3_controllers_dict(self):
-        # TODO
         zctrls = OrderedDict()
-        # for i, info in zynthian_lv2.get_plugin_ports(self.plugin_url).items():
-        #     symbol = info['symbol']
-        #     #logging.debug("Controller {} info =>\n{}!".format(symbol, info))
-        #     try:
-        #         #If there is points info ...
-        #         if len(info['scale_points'])>1:
-        #             labels = []
-        #             values = []
-        #             for p in info['scale_points']:
-        #                 labels.append(p['label'])
-        #                 values.append(p['value'])
+        for index, parameter in enumerate(self.jucy_pluginhost.getAllParameters()):
+            if type(parameter) == Jucy.StringParameter:
+                # Controller value is a set of string
+                zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
+                    'group_symbol': "ctrl",
+                    'group_name': "Ctrl",
+                    'graph_path': index,
+                    'value': parameter.getValue(),
+                    'labels': parameter.getAllValueStrings(),
+                    'ticks': parameter.getAllValues(),
+                    'value_min': 0.0,
+                    'value_max': 1.0,
+                    'is_toggle': False,
+                    'is_integer': False
+                })
 
-        #             zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
-        #                 'group_symbol': info['group_symbol'],
-        #                 'group_name': info['group_name'],
-        #                 'graph_path': info['index'],
-        #                 'value': info['value'],
-        #                 'labels': labels,
-        #                 'ticks': values,
-        #                 'value_min': values[0],
-        #                 'value_max': values[-1],
-        #                 'is_toggle': info['is_toggled'],
-        #                 'is_integer': info['is_integer']
-        #             })
-
-        #         #If it's a numeric controller ...
-        #         else:
-        #             r = info['range']['max'] - info['range']['min']
-        #             if info['is_integer']:
-        #                 if info['is_toggled']:
-        #                     if info['value']==0:
-        #                         val = 'off'
-        #                     else:
-        #                         val = 'on'
-
-        #                     zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
-        #                         'group_symbol': info['group_symbol'],
-        #                         'group_name': info['group_name'],
-        #                         'graph_path': info['index'],
-        #                         'value': val,
-        #                         'labels': ['off','on'],
-        #                         'ticks': [int(info['range']['min']), int(info['range']['max'])],
-        #                         'value_min': int(info['range']['min']),
-        #                         'value_max': int(info['range']['max']),
-        #                         'is_toggle': True,
-        #                         'is_integer': True
-        #                     })
-        #                 else:
-        #                     zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
-        #                         'group_symbol': info['group_symbol'],
-        #                         'group_name': info['group_name'],
-        #                         'graph_path': info['index'],
-        #                         'value': int(info['value']),
-        #                         'value_default': int(info['range']['default']),
-        #                         'value_min': int(info['range']['min']),
-        #                         'value_max': int(info['range']['max']),
-        #                         'is_toggle': False,
-        #                         'is_integer': True,
-        #                         'is_logarithmic': info['is_logarithmic']
-        #                     })
-        #             else:
-        #                 if info['is_toggled']:
-        #                     if info['value']==0:
-        #                         val = 'off'
-        #                     else:
-        #                         val = 'on'
-
-        #                     zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
-        #                         'group_symbol': info['group_symbol'],
-        #                         'group_name': info['group_name'],
-        #                         'graph_path': info['index'],
-        #                         'value': val,
-        #                         'labels': ['off','on'],
-        #                         'ticks': [info['range']['min'], info['range']['max']],
-        #                         'value_min': info['range']['min'],
-        #                         'value_max': info['range']['max'],
-        #                         'is_toggle': True,
-        #                         'is_integer': False
-        #                     })
-        #                 else:
-        #                     zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
-        #                         'group_symbol': info['group_symbol'],
-        #                         'group_name': info['group_name'],
-        #                         'graph_path': info['index'],
-        #                         'value': info['value'],
-        #                         'value_default': info['range']['default'],
-        #                         'value_min': info['range']['min'],
-        #                         'value_max': info['range']['max'],
-        #                         'is_toggle': False,
-        #                         'is_integer': False,
-        #                         'is_logarithmic': info['is_logarithmic']
-        #                     })
-
-        #     #If control info is not OK
-        #     except Exception as e:
-        #         logging.error(e)
+            elif type(parameter) == Jucy.BooleanParameter:
+                # Controller value is a boolean
+                zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
+                    'group_symbol': "ctrl",
+                    'group_name': "Ctrl",
+                    'graph_path': index,
+                    'value': parameter.getValue(),
+                    'labels': ["Off", "On"],
+                    'ticks': [0.0, 1.0],
+                    'value_min': 0.0,
+                    'value_max': 1.0,
+                    'is_toggle': True,
+                    'is_integer': False
+                })
+            elif type(parameter) == Jucy.Parameter:
+                # Controller value is normalized float from 0.0 to 1.0
+                zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
+                    'group_symbol': "ctrl",
+                    'group_name': "Ctrl",
+                    'graph_path': index,
+                    'value': parameter.getValue(),
+                    'value_min': 0.0,
+                    'value_max': 1.0,
+                    'is_toggle': False,
+                    'is_integer': False
+                })
+            else:
+                # Controller type is unknown. Handle accordingly
+                logging.debug("Unknown controller type. Handle accordingly")
         return zctrls
 
 
     def get_ctrl_screen_name(self, gname, i):
-        # TODO
-        # if i>0:
-        #     gname = "{}#{}".format(gname, i)
-        # return gname
-        return ""
+        if i>0:
+            gname = "{}#{}".format(gname, i)
+        return gname
 
     def generate_ctrl_screens(self, zctrl_dict=None):
-        # TODO
-        # if zctrl_dict is None:
-        #     zctrl_dict=self.zctrl_dict
+        if zctrl_dict is None:
+            zctrl_dict=self.zctrl_dict
 
-        # # Get zctrls by group
-        # zctrl_group = OrderedDict()
-        # for symbol, zctrl in zctrl_dict.items():
-        #     gsymbol = zctrl.group_symbol
-        #     if gsymbol is None:
-        #         gsymbol = "_"
-        #     if gsymbol not in zctrl_group:
-        #         zctrl_group[gsymbol] = [zctrl.group_name, OrderedDict()]
-        #     zctrl_group[gsymbol][1][symbol] = zctrl
-        # if "_" in zctrl_group:
-        #     last_group = zctrl_group["_"]
-        #     del zctrl_group["_"]
-        #     if len(zctrl_group)==0:
-        #         last_group[0] = "Ctrls"
-        #     else:
-        #         last_group[0] = "Ungroup"
-        #     zctrl_group["_"] = last_group
+        # Get zctrls by group
+        zctrl_group = OrderedDict()
+        for symbol, zctrl in zctrl_dict.items():
+            gsymbol = zctrl.group_symbol
+            if gsymbol is None:
+                gsymbol = "_"
+            if gsymbol not in zctrl_group:
+                zctrl_group[gsymbol] = [zctrl.group_name, OrderedDict()]
+            zctrl_group[gsymbol][1][symbol] = zctrl
+        if "_" in zctrl_group:
+            last_group = zctrl_group["_"]
+            del zctrl_group["_"]
+            if len(zctrl_group)==0:
+                last_group[0] = "Ctrls"
+            else:
+                last_group[0] = "Ungroup"
+            zctrl_group["_"] = last_group
 
-        # for gsymbol, gdata in zctrl_group.items():
-        #     ctrl_set=[]
-        #     gname = gdata[0]
-        #     if len(gdata[1])<=4:
-        #         c=0
-        #     else:
-        #         c=1
-        #     for symbol, zctrl in gdata[1].items():
-        #         try:
-        #             #logging.debug("CTRL {}".format(symbol))
-        #             ctrl_set.append(symbol)
-        #             if len(ctrl_set)>=4:
-        #                 #logging.debug("ADDING CONTROLLER SCREEN {}".format(self.get_ctrl_screen_name(gname,c)))
-        #                 self._ctrl_screens.append([self.get_ctrl_screen_name(gname,c),ctrl_set])
-        #                 ctrl_set=[]
-        #                 c=c+1
-        #         except Exception as err:
-        #             logging.error("Generating Controller Screens => {}".format(err))
+        for gsymbol, gdata in zctrl_group.items():
+            ctrl_set=[]
+            gname = gdata[0]
+            if len(gdata[1])<=4:
+                c=0
+            else:
+                c=1
+            for symbol, zctrl in gdata[1].items():
+                try:
+                    #logging.debug("CTRL {}".format(symbol))
+                    ctrl_set.append(symbol)
+                    if len(ctrl_set)>=4:
+                        #logging.debug("ADDING CONTROLLER SCREEN {}".format(self.get_ctrl_screen_name(gname,c)))
+                        self._ctrl_screens.append([self.get_ctrl_screen_name(gname,c),ctrl_set])
+                        ctrl_set=[]
+                        c=c+1
+                except Exception as err:
+                    logging.error("Generating Controller Screens => {}".format(err))
 
-        #     if len(ctrl_set)>=1:
-        #         #logging.debug("ADDING CONTROLLER SCREEN {}",format(self.get_ctrl_screen_name(gname,c)))
-        #         self._ctrl_screens.append([self.get_ctrl_screen_name(gname,c),ctrl_set])
-        pass
+            if len(ctrl_set)>=1:
+                #logging.debug("ADDING CONTROLLER SCREEN {}",format(self.get_ctrl_screen_name(gname,c)))
+                self._ctrl_screens.append([self.get_ctrl_screen_name(gname,c),ctrl_set])
 
     def get_controllers_dict(self, layer):
-        # TODO
         # Get plugin static controllers
         zctrls=super().get_controllers_dict(layer)
         # # Add plugin native controllers
-        # zctrls.update(self.lv2_zctrl_dict)
+        zctrls.update(self.vst3_zctrl_dict)
         return zctrls
 
     def send_controller_value(self, zctrl):
-        # TODO
-        # self.proc_cmd("set %d %.6f" % (zctrl.graph_path, zctrl.value))
-        pass
+        self.jucy_pluginhost.getParameter(zctrl.name).setValue(zctrl.value)
 
 
 #******************************************************************************

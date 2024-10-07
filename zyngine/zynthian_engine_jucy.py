@@ -22,6 +22,7 @@
 #
 #******************************************************************************
 
+import logging
 import re
 import Jucy
 from collections import OrderedDict
@@ -89,11 +90,9 @@ class zynthian_engine_jucy(zynthian_engine):
     #----------------------------------------------------------------------------
 
     def get_bank_list(self, layer=None):
-        # TODO
         return self.bank_list
 
     def set_bank(self, layer, bank):
-        # TODO
         return True
 
     #----------------------------------------------------------------------------
@@ -101,51 +100,41 @@ class zynthian_engine_jucy(zynthian_engine):
     #----------------------------------------------------------------------------
 
     def get_plugin_presets(self):
-        # TODO
-        pass
+        return {
+            "": {
+                "bank_url" : None,
+                "presets": self.jucy_pluginhost.getAllPresets()
+            }
+        }
 
     def get_preset_list(self, bank):
-        # TODO
         preset_list = []
-        # try:
-        #     for info in  self.preset_info[bank[2]]['presets']:
-        #         preset_list.append([info['url'], None, info['label'], bank[0]])
-        # except:
-        #     preset_list.append(("", None, "", None))
+        try:
+            for info in  self.preset_info[bank[2]]['presets']:
+                preset_list.append([info, None, info, bank[0]])
+        except:
+            preset_list.append(("", None, "", None))
 
         return preset_list
 
 
     def set_preset(self, layer, preset, preload=False):
-        # TODO
-        # if not preset[0]:
-        #     return
-        # output=self.proc_cmd("preset {}".format(preset[0]), wait_for_output=True)
+        if not preset[0]:
+            return False
+        logging.debug(f"Setting preset {preset[0]}")
+        self.jucy_pluginhost.setCurrentPreset(preset[0])
 
-        # #Parse new controller values
-        # for line in output.split("\n"):
-        #     try:
-        #         parts=line.split(" = ")
-        #         if len(parts)==2:
-        #             self.lv2_zctrl_dict[parts[0]]._set_value(float(parts[1]))
-        #     except Exception as e:
-        #         # logging.debug(e)
-        #         pass
-
-        # return True
-        pass
+        return True
 
 
     def cmp_presets(self, preset1, preset2):
-        # TODO
-        # try:
-        #     if preset1[0]==preset2[0]:
-        #         return True
-        #     else:
-        #         return False
-        # except:
-        #     return False
-        pass
+        try:
+            if preset1[0] == preset2[0]:
+                return True
+            else:
+                return False
+        except:
+            return False
 
     #----------------------------------------------------------------------------
     # Controllers Managament

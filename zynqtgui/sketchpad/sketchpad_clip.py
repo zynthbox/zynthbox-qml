@@ -219,6 +219,24 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
             else:
                 self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
+    def set_loopStartCrossfadeDirection(self, value):
+        if self.clip.audioSource is not None:
+            loopStartCrossfadeDirection = value
+            if loopStartCrossfadeDirection.startswith("Zynthbox.ClipAudioSource.CrossfadingDirection."):
+                loopStartCrossfadeDirection = loopStartCrossfadeDirection.split(".")[-1]
+            if loopStartCrossfadeDirection in Zynthbox.ClipAudioSource.CrossfadingDirection.values:
+                self.clip.audioSource.setLoopStartCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.values[loopStartCrossfadeDirection])
+            else:
+                self.clip.audioSource.loopStartCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.CrossfadeOutie)
+    def set_stopCrossfadeDirection(self, value):
+        if self.clip.audioSource is not None:
+            stopCrossfadeDirection = value
+            if stopCrossfadeDirection.startswith("Zynthbox.ClipAudioSource.CrossfadingDirection."):
+                stopCrossfadeDirection = stopCrossfadeDirection.split(".")[-1]
+            if stopCrossfadeDirection in Zynthbox.ClipAudioSource.CrossfadingDirection.values:
+                self.clip.audioSource.setStopCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.values[stopCrossfadeDirection])
+            else:
+                self.clip.audioSource.setStopCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.CrossfadeInnie)
     def set_equaliserSettings(self, value):
         if self.clip.audioSource is not None:
             if value is None or value == "":
@@ -302,6 +320,9 @@ class sketchpad_clip_metadata(QObject):
             self.clip.audioSource.lengthChanged.connect(self.scheduleWrite)
             self.clip.audioSource.loopDeltaChanged.connect(self.scheduleWrite)
             self.clip.audioSource.loopDelta2Changed.connect(self.scheduleWrite)
+            self.clip.audioSource.loopCrossfadeAmountChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.loopStartCrossfadeDirectionChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.stopCrossfadeDirectionChanged.connect(self.scheduleWrite)
             self.clip.audioSource.gainChanged.connect(self.scheduleWrite)
             self.clip.audioSource.keyZoneStartChanged.connect(self.scheduleWrite)
             self.clip.audioSource.keyZoneEndChanged.connect(self.scheduleWrite)
@@ -414,6 +435,9 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
                 self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
                 self.set_subvoiceSettings(str(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_SETTINGS", "")))
+                self.clip.audioSource.setLoopCrossfadeAmount(float(self.getMetadataProperty("ZYNTHBOX_LOOP_CROSSFADE_AMOUNT", 0)))
+                self.set_loopStartCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION", "CrossfadeOutie"))
+                self.set_stopCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_STOP_CROSSFADE_DIRECTION", "CrossfadeOutie"))
                 # Some fallbackery that we can likely remove at some point (or also perhaps get rid of entirely when we switch to using the industry version of slice and loop definitions...)
                 startPositionSamples = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION_SAMPLES", -1))
                 if startPositionSamples == -1:
@@ -508,6 +532,9 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_LENGTH_SAMPLES"] = [str(self.clip.audioSource.getLengthSamples())]
                     tags["ZYNTHBOX_LOOPDELTA_SAMPLES"] = [str(self.clip.audioSource.loopDeltaSamples())]
                     tags["ZYNTHBOX_LOOPDELTA2_SAMPLES"] = [str(self.clip.audioSource.loopDelta2Samples())]
+                    tags["ZYNTHBOX_LOOP_CROSSFADE_AMOUNT"] = [str(self.clip.audioSource.loopCrossfadeAmount())]
+                    tags["ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.loopStartCrossfadeDirection()).split(".")[-1]]
+                    tags["ZYNTHBOX_STOP_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.stopCrossfadeDirection()).split(".")[-1]]
                     tags["ZYNTHBOX_PITCH"] = [str(self.clip.audioSource.pitch())]
                     tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.clip.audioSource.playbackStyle()).split(".")[-1]]
                     tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.clip.audioSource.snapLengthToBeat())]

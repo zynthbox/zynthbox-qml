@@ -23,10 +23,10 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Window 2.1
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import io.zynthbox.components 1.0 as Zynthbox
@@ -39,7 +39,7 @@ Item {
                                         : null
     property int currentADSRElement: 0
     function nextADSRElement() {
-        if (currentADSRElement === 3) {
+        if (currentADSRElement === _private.lastElement) {
             currentADSRElement = 0;
         } else {
             currentADSRElement = currentADSRElement + 1;
@@ -47,13 +47,25 @@ Item {
     }
     function previousADSRElement() {
         if (currentADSRElement === 0) {
-            currentADSRElement = 3;
+            currentADSRElement = _private.lastElement;
         } else {
             currentADSRElement = currentADSRElement - 1;
         }
     }
     function increaseCurrentValue() {
-        if (showGranularSettings) {
+        if (showCrossfadeSettings) {
+            switch(currentADSRElement) {
+                case 0:
+                    component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie;
+                    break;
+                case 1:
+                    component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie;
+                    break;
+                case 2:
+                    cppClipObject.loopCrossfadeAmount = cppClipObject.loopCrossfadeAmount + 0.01;
+                    break;
+            }
+        } else if (showGranularSettings) {
             switch(currentADSRElement) {
                 case 0:
                 case 2:
@@ -82,7 +94,19 @@ Item {
         }
     }
     function decreaseCurrentValue() {
-        if (showGranularSettings) {
+        if (showCrossfadeSettings) {
+            switch(currentADSRElement) {
+                case 0:
+                    component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie;
+                    break;
+                case 1:
+                    component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie;
+                    break;
+                case 2:
+                    cppClipObject.loopCrossfadeAmount = cppClipObject.loopCrossfadeAmount - 0.01;
+                    break;
+            }
+        } else if (showGranularSettings) {
             switch(currentADSRElement) {
                 case 0:
                 case 2:
@@ -113,34 +137,62 @@ Item {
     QtObject {
         id: _private
         property int settingsCategory: 0
+        property int lastElement: settingsCategory === 2 ? 2 : 3
     }
     property QtObject cppObj: clip && clip.hasOwnProperty("cppObjId") ? Zynthbox.PlayGridManager.getClipById(clip.cppObjId) : null
+    property bool showNotesSettings: showGranularSettings === false && showCrossfadeSettings === false
     property bool showGranularSettings: cppObj && cppObj.granular ? _private.settingsCategory === 1 : false
+    // Wavetable style ignores the crossfade setting anyway, so don't show it
+    property bool showCrossfadeSettings: cppObj && cppObj.looping && cppObj.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle ? _private.settingsCategory === 2 : false
     RowLayout {
         anchors.fill: parent
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.cppObj ? component.cppObj.granular : false
+            visible: component.cppObj ? (component.cppObj.granular || (component.cppObj.looping && component.cppObj.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle)) : false
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit
                 text: qsTr("Notes")
                 checked: _private.settingsCategory === 0
                 MouseArea {
                     anchors.fill: parent;
-                    onClicked: _private.settingsCategory = 0
+                    onClicked: {
+                        _private.settingsCategory = 0;
+                        component.currentADSRElement = 0;
+                    }
                 }
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit
+                visible: component.cppObj ? component.cppObj.granular : false
                 text: qsTr("Grains")
                 checked: _private.settingsCategory === 1
                 MouseArea {
                     anchors.fill: parent;
-                    onClicked: _private.settingsCategory = 1
+                    onClicked: {
+                        _private.settingsCategory = 1;
+                        component.currentADSRElement = 0;
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit
+                visible: component.cppObj ? (component.cppObj.looping && component.cppObj.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle) : false
+                text: qsTr("Loop\nX-Fade")
+                checked: _private.settingsCategory === 2
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        _private.settingsCategory = 2;
+                        component.currentADSRElement = 0;
+                    }
                 }
             }
         }
@@ -168,7 +220,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.showGranularSettings === false
+            visible: component.showNotesSettings
             unitLabel: "\n" + qsTr("seconds")
             value: component.cppClipObject ? component.cppClipObject.adsrAttack : 0
             decimals: 2
@@ -191,7 +243,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.showGranularSettings === false
+            visible: component.showNotesSettings
             unitLabel: "\n" + qsTr("seconds")
             value: component.cppClipObject ? component.cppClipObject.adsrDecay : 0
             decimals: 2
@@ -214,7 +266,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.showGranularSettings === false
+            visible: component.showNotesSettings
             unitLabel: "%"
             value: component.cppClipObject ? component.cppClipObject.adsrSustain : 0
             decimals: 2
@@ -239,7 +291,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.showGranularSettings === false
+            visible: component.showNotesSettings
             unitLabel: "\n" + qsTr("seconds")
             value: component.cppClipObject ? component.cppClipObject.adsrRelease : 0
             decimals: 2
@@ -328,22 +380,216 @@ Item {
                 color: component.currentADSRElement === 1 || component.currentADSRElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
             }
         }
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            visible: component.showCrossfadeSettings
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Loop Point")
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            QQC2.Button {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checked: component.cppClipObject ? component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie : false
+                text: qsTr("Innie")
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie
+                }
+            }
+            QQC2.Button {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checked: component.cppClipObject ? component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie : false
+                text: qsTr("Outie")
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie
+                }
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 2
+                Layout.maximumHeight: 2
+                color: component.currentADSRElement === 0 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            }
+        }
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            visible: component.showCrossfadeSettings
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Stop Point")
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            QQC2.Button {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checked: component.cppClipObject ? component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie : false
+                text: qsTr("Innie")
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie
+                }
+            }
+            QQC2.Button {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checked: component.cppClipObject ? component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie : false
+                text: qsTr("Outie")
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie
+                }
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 2
+                Layout.maximumHeight: 2
+                color: component.currentADSRElement === 1 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            }
+        }
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            visible: component.showCrossfadeSettings
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Amount")
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            QQC2.Slider {
+                implicitWidth: 1
+                implicitHeight: 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                orientation: Qt.Vertical
+                stepSize: 0.01
+                value: component.cppClipObject ? component.cppClipObject.loopCrossfadeAmount : 0
+                from: 0
+                to: 0.5
+                onMoved: component.cppClipObject.loopCrossfadeAmount = value
+            }
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("%1% of\nloop").arg((component.cppClipObject ? component.cppClipObject.loopCrossfadeAmount : 0).toFixed(2) * 100)
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+            }
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.minimumHeight: 2
+                Layout.maximumHeight: 2
+                color: component.currentADSRElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
+            }
+        }
         AbstractADSRView {
             id: adsrView
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
             property double grainRemaining: component.cppClipObject ? (1 - component.cppClipObject.grainSustain) : 1;
-            attackValue: component.cppClipObject ? (component.showGranularSettings ? grainRemaining * component.cppClipObject.grainTilt : component.cppClipObject.adsrAttack) : 0
-            attackMax: component.showGranularSettings ? 1 : Math.max(1, component.cppClipObject ? component.cppClipObject.adsrAttack : 1)
-            decayValue: component.cppClipObject ? (component.showGranularSettings ? 0 : component.cppClipObject.adsrDecay) : 0
-            decayMax: component.showGranularSettings ? 2 : Math.max(1, component.cppClipObject ? component.cppClipObject.adsrDecay : 2)
-            decayWidth: component.showGranularSettings ? 0 : decayMax;
-            sustainValue: component.cppClipObject ? (component.showGranularSettings ? 1 : component.cppClipObject.adsrSustain) : 0
+
+            property double crossfadeSustainDuration: component.cppClipObject
+                ? component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie && component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie
+                    ? 1 - (component.cppClipObject.loopCrossfadeAmount * 2) // Both are innies
+                    : component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie || component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie
+                        ? 1 - component.cppClipObject.loopCrossfadeAmount // One of the two is an outie
+                        : 1
+                : 1
+            attackLine: component.showCrossfadeSettings && component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie // vertical line at attack start point
+            attackLabel: qsTr("Loop Area")
+            // decayLine: false // vertical line at decay start point - don't need this for this thing (it's functionally similar to the grain envelope, minus tilt, and with slightly different sustain length logic)
+            // decayLabel: ""
+            sustainLine: component.showCrossfadeSettings && component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie // vertical line at sustain start point
+            sustainLabel: adsrView.crossfadeSustainDuration > 0 ? qsTr("Loop Area") : ""
+            releaseLine: component.showCrossfadeSettings && component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie // vertical line at release start point
+            // releaseLabel: ""
+            endLine: component.showCrossfadeSettings && component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie // vertical line at envelope end point
+            // endLabel: ""
+            attackValue: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? component.cppClipObject.loopCrossfadeAmount
+                    : component.showGranularSettings
+                        ? grainRemaining * component.cppClipObject.grainTilt
+                        : component.showCrossfadeSettings
+                            ? 0
+                            : component.cppClipObject.adsrAttack
+                : 0
+            attackMax: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? 1
+                    : component.showGranularSettings
+                        ? 1
+                        : Math.max(1, component.cppClipObject.adsrAttack)
+                : 1
+            decayValue: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? 0
+                    : component.showGranularSettings
+                        ? 0
+                        : component.cppClipObject.adsrDecay
+                : 0
+            decayMax: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? 2
+                    : component.showGranularSettings
+                        ? 2
+                        : Math.max(1, component.cppClipObject.adsrDecay)
+                : 2
+            decayWidth: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? 0
+                    : component.showGranularSettings
+                        ? 0
+                        : decayMax
+                : 0
+            sustainValue: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? 1
+                    : component.showGranularSettings
+                        ? 1
+                        : component.cppClipObject.adsrSustain
+                : 0
             sustainMax: 1
-            sustainWidth: component.cppClipObject ? (component.showGranularSettings ? component.cppClipObject.grainSustain : 1) : 1
-            releaseValue: component.cppClipObject ? (component.showGranularSettings ? grainRemaining * (1.0 - component.cppClipObject.grainTilt) : component.cppClipObject.adsrRelease) : 0
-            releaseMax: component.showGranularSettings ? 1 : Math.max(1, component.cppClipObject ? component.cppClipObject.adsrRelease : 1)
+            sustainWidth: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? adsrView.crossfadeSustainDuration
+                    : component.showGranularSettings
+                        ? component.cppClipObject.grainSustain
+                        : 1
+                : 1
+            releaseValue: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? component.cppClipObject.loopCrossfadeAmount
+                    : component.showGranularSettings
+                        ? grainRemaining * (1.0 - component.cppClipObject.grainTilt)
+                        : component.cppClipObject.adsrRelease
+                : 0
+            releaseMax: component.cppClipObject
+                ? component.showCrossfadeSettings
+                    ? 1
+                    : component.showGranularSettings
+                        ? 1
+                        : Math.max(1, component.cppClipObject.adsrRelease)
+                : 1
             Connections {
                 target: component
                 onClipChanged: {
@@ -370,6 +616,9 @@ Item {
                 onAdsrDecayChanged: update()
                 onAdsrReleaseChanged: update()
                 onAdsrSustainChanged: update()
+                onLoopStartCrossfadeDirectionChanged: update()
+                onStopCrossfadeDirectionChanged: update()
+                onLoopCrossfadeAmountChanged: update()
             }
         }
     }

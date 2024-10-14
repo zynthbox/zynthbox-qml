@@ -20,6 +20,8 @@ ColumnLayout {
 
     property bool selected: false
 
+    property alias knobId: knobIndicator.knobId
+
     signal pressed(var mouse)
     signal clicked()
     signal doubleClicked()
@@ -155,6 +157,19 @@ ColumnLayout {
             }
             height: 2
             color: root.selected ? Kirigami.Theme.highlightedTextColor : "transparent"
+        }
+        KnobIndicator {
+            id: knobIndicator
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                topMargin: -Kirigami.Units.smallSpacing
+                bottomMargin: -Kirigami.Units.smallSpacing
+                right: parent.horizontalCenter
+                rightMargin: parent.paintedWidth / 2
+            }
+            width: Kirigami.Units.iconSizes.small
+            knobId: -1
         }
     }
 }

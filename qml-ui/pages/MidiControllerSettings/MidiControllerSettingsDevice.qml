@@ -502,7 +502,15 @@ QQC2.ScrollView {
                 function selectPressed() { onClicked(); }
                 text: qsTr("Pick track for all channels...")
                 onClicked: {
-                    trackPicker.pickTrack(Zynthbox.ZynthboxBasics.CurrentTrack, function(newTrack){
+                    let currentBestGuess = _private.selectedDeviceObject.midiChannelTargetTracks[0];
+                    for (let midiChannel = 0; midiChannel < 16; ++midiChannel) {
+                        if (currentBestGuess != _private.selectedDeviceObject.midiChannelTargetTracks[midiChannel]) {
+                            // If we come across anything that doesn't match the rest, default to current track and bail out
+                            currentBestGuess = Zynthbox.ZynthboxBasics.CurrentTrack;
+                            break;
+                        }
+                    }
+                    trackPicker.pickTrack(currentBestGuess, function(newTrack){
                         _private.selectedDeviceObject.setMidiChannelTargetTrack(-1, newTrack);
                     });
                 }

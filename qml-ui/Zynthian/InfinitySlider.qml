@@ -45,6 +45,7 @@ Item {
     property int decimals: 2
     property bool resetOnTap: false
     property double resetValue: 0
+    property alias knobId: knobIndicator.knobId
     Component.onCompleted: {
         valueLabelThrottle.restart();
     }
@@ -99,6 +100,18 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignTop
         level: 2
+        KnobIndicator {
+            id: knobIndicator
+            anchors {
+                top: parent.top
+                bottom: parent.bottom
+                right: parent.horizontalCenter
+                rightMargin: parent.paintedWidth / 2
+            }
+            width: Kirigami.Units.iconSizes.small
+            visible: component.selected
+            knobId: -1
+        }
     }
     Item {
         anchors {

@@ -246,6 +246,7 @@ Zynthian.ScreenPage {
         }
         property var callbackFunction: null
         model: ListModel {
+            ListElement { text: "No Track"; value: -3 }
             ListElement { text: "Any Track"; value: -2 }
             ListElement { text: "Current Track"; value: -1 }
             ListElement { text: "Track 1"; value: 0 }

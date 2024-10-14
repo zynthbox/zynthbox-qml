@@ -275,6 +275,7 @@ Item {
             applyUpperBound: true
             upperBound: 16
             selected: _private.currentElement === 0
+            knobId: 0
             onValueChanged: if (component.cppClipObject) { component.cppClipObject.subvoiceCount = value; }
             Connections {
                 target: component.cppClipObject
@@ -287,6 +288,16 @@ Item {
                         _private.currentElement = 0;
                     }
                 }
+            }
+            KnobIndicator {
+                anchors {
+                    top: parent.bottom
+                    horizontalCenter: parent.right
+                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+                visible: parent.selected
+                knobId: 3
             }
         }
         Zynthian.InfinitySlider {
@@ -307,6 +318,7 @@ Item {
             resetOnTap: true
             resetValue: 0
             selected: _private.currentElement === 0
+            knobId: 1
             onValueChanged: _private.editVoice = value
             Connections {
                 target: _private
@@ -320,86 +332,107 @@ Item {
             Layout.maximumWidth: Kirigami.Units.largeSpacing * 2
         }
 
-        ColumnLayout {
+        Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-            enabled: component.cppClipObject && component.cppClipObject.subvoiceCount > 0
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Sub-voice %1 Changes").arg(_private.editVoice + 1)
-                Layout.fillWidth: true
-                Layout.margins: Kirigami.Units.smallSpacing
-                horizontalAlignment: Text.AlignHCenter
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            ColumnLayout {
+                anchors.fill: parent
+                enabled: component.cppClipObject && component.cppClipObject.subvoiceCount > 0
+                Kirigami.Heading {
+                    level: 2
+                    text: qsTr("Sub-voice %1 Changes").arg(_private.editVoice + 1)
+                    Layout.fillWidth: true
+                    Layout.margins: Kirigami.Units.smallSpacing
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                RowLayout {
+                    spacing: 0
+                    Layout.bottomMargin: 2 // To give even space for the selected indicator that sits two pixels below the thing
+                    Zynthian.SketchpadDial {
+                        id: panDial
+                        text: qsTr("Pan")
+                        controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                        controlProperty: "pan"
+                        valueString: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice].pan.toFixed(2) : 0
+                        selected: _private.currentElement === 1
+                        showKnobIndicator: selected
+                        knobId: 0
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
+                        dial {
+                            stepSize: 0.01
+                            from: -1
+                            to: 1
+                        }
+                        onDoubleClicked: {
+                            if (component.cppClipObject) {
+                                component.cppClipObject.subvoiceSettings[_private.editVoice].pan = 0;
+                            }
+                        }
+                    }
+
+                    Zynthian.SketchpadDial {
+                        id: pitchDial
+                        text: qsTr("Pitch")
+                        controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                        controlProperty: "pitch"
+                        fixedPointTrail: 2
+                        selected: _private.currentElement === 1
+                        showKnobIndicator: selected
+                        knobId: 1
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
+                        dial {
+                            stepSize: 0.1
+                            from: -48
+                            to: 48
+                        }
+                        onDoubleClicked: {
+                            if (component.cppClipObject) {
+                                component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = 0;
+                            }
+                        }
+                    }
+
+                    Zynthian.SketchpadDial {
+                        id: gainDial
+                        text: qsTr("Gain (dB)")
+                        controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                        controlProperty: "gainAbsolute"
+                        valueString: component.cppClipObject ? qsTr("%1 dB").arg(component.cppClipObject.subvoiceSettings[_private.editVoice].gainDb.toFixed(2)) : 0
+                        selected: _private.currentElement === 1
+                        showKnobIndicator: selected
+                        knobId: 2
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit
+
+                        dial {
+                            stepSize: 0.01
+                            from: 0
+                            to: 1
+                        }
+
+                        onDoubleClicked: {
+                            if (component.cppClipObject) {
+                                component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
+                            }
+                        }
+                    }
+                }
             }
-            RowLayout {
-                spacing: 0
-                Layout.bottomMargin: 2 // To give even space for the selected indicator that sits two pixels below the thing
-                Zynthian.SketchpadDial {
-                    id: panDial
-                    text: qsTr("Pan")
-                    controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
-                    controlProperty: "pan"
-                    valueString: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice].pan.toFixed(2) : 0
-                    selected: _private.currentElement === 1
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit
-                    dial {
-                        stepSize: 0.01
-                        from: -1
-                        to: 1
-                    }
-                    onDoubleClicked: {
-                        if (component.cppClipObject) {
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].pan = 0;
-                        }
-                    }
+            KnobIndicator {
+                anchors {
+                    top: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
                 }
-
-                Zynthian.SketchpadDial {
-                    id: pitchDial
-                    text: qsTr("Pitch")
-                    controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
-                    controlProperty: "pitch"
-                    fixedPointTrail: 2
-                    selected: _private.currentElement === 1
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit
-                    dial {
-                        stepSize: 0.1
-                        from: -48
-                        to: 48
-                    }
-                    onDoubleClicked: {
-                        if (component.cppClipObject) {
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = 0;
-                        }
-                    }
-                }
-
-                Zynthian.SketchpadDial {
-                    id: gainDial
-                    text: qsTr("Gain (dB)")
-                    controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
-                    controlProperty: "gainAbsolute"
-                    valueString: component.cppClipObject ? qsTr("%1 dB").arg(component.cppClipObject.subvoiceSettings[_private.editVoice].gainDb.toFixed(2)) : 0
-                    selected: _private.currentElement === 1
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit
-
-                    dial {
-                        stepSize: 0.01
-                        from: 0
-                        to: 1
-                    }
-
-                    onDoubleClicked: {
-                        if (component.cppClipObject) {
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
-                        }
-                    }
-                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+                visible: pitchDial.selected
+                knobId: 3
             }
         }
 

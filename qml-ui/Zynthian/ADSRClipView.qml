@@ -231,10 +231,21 @@ Item {
             resetOnTap: true
             resetValue: 0
             selected: component.currentADSRElement === 0
+            knobId: 1
             onValueChanged: {
                 if (component.cppClipObject && component.cppClipObject.adsrAttack != attackSlider.value) {
                     component.cppClipObject.adsrAttack = attackSlider.value
                 }
+            }
+            KnobIndicator {
+                anchors {
+                    top: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+                visible: parent.selected
+                knobId: 3
             }
         }
         InfinitySlider {
@@ -254,10 +265,21 @@ Item {
             resetOnTap: true
             resetValue: 0
             selected: component.currentADSRElement === 1
+            knobId: 1
             onValueChanged: {
                 if (component.cppClipObject && component.cppClipObject.adsrDecay != decaySlider.value) {
                     component.cppClipObject.adsrDecay = decaySlider.value
                 }
+            }
+            KnobIndicator {
+                anchors {
+                    top: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+                visible: parent.selected
+                knobId: 3
             }
         }
         InfinitySlider {
@@ -279,10 +301,21 @@ Item {
             resetOnTap: true
             resetValue: 1
             selected: component.currentADSRElement === 2
+            knobId: 1
             onValueChanged: {
                 if (component.cppClipObject && component.cppClipObject.adsrSustain != sustainSlider.value) {
                     component.cppClipObject.adsrSustain = sustainSlider.value
                 }
+            }
+            KnobIndicator {
+                anchors {
+                    top: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+                visible: parent.selected
+                knobId: 3
             }
         }
         InfinitySlider {
@@ -302,10 +335,21 @@ Item {
             resetOnTap: true
             resetValue: 0
             selected: component.currentADSRElement === 3
+            knobId: 1
             onValueChanged: {
                 if (component.cppClipObject && component.cppClipObject.adsrRelease != releaseSlider.value) {
                     component.cppClipObject.adsrRelease = releaseSlider.value
                 }
+            }
+            KnobIndicator {
+                anchors {
+                    top: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+                visible: parent.selected
+                knobId: 3
             }
         }
         ColumnLayout {
@@ -318,6 +362,17 @@ Item {
                 text: qsTr("Sustain")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.horizontalCenter
+                        rightMargin: parent.paintedWidth / 2
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    visible: component.currentADSRElement === 0 || component.currentADSRElement === 2
+                    knobId: 1
+                }
             }
             QQC2.Slider {
                 implicitWidth: 1
@@ -342,6 +397,16 @@ Item {
                 Layout.minimumHeight: 2
                 Layout.maximumHeight: 2
                 color: component.currentADSRElement === 0 || component.currentADSRElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                KnobIndicator {
+                    anchors {
+                        top: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: component.currentADSRElement === 0 || component.currentADSRElement === 2
+                    knobId: 3
+                }
             }
         }
         ColumnLayout {
@@ -354,6 +419,17 @@ Item {
                 text: qsTr("Tilt")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.horizontalCenter
+                        rightMargin: parent.paintedWidth / 2
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    visible: component.currentADSRElement === 1 || component.currentADSRElement === 3
+                    knobId: 1
+                }
             }
             QQC2.Slider {
                 implicitWidth: 1
@@ -378,6 +454,16 @@ Item {
                 Layout.minimumHeight: 2
                 Layout.maximumHeight: 2
                 color: component.currentADSRElement === 1 || component.currentADSRElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                KnobIndicator {
+                    anchors {
+                        top: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: component.currentADSRElement === 1 || component.currentADSRElement === 3
+                    knobId: 3
+                }
             }
         }
         ColumnLayout {
@@ -390,6 +476,17 @@ Item {
                 text: qsTr("Loop Point")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.horizontalCenter
+                        rightMargin: parent.paintedWidth / 2
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    visible: component.currentADSRElement === 0
+                    knobId: 1
+                }
             }
             QQC2.Button {
                 implicitWidth: 1
@@ -420,6 +517,16 @@ Item {
                 Layout.minimumHeight: 2
                 Layout.maximumHeight: 2
                 color: component.currentADSRElement === 0 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                KnobIndicator {
+                    anchors {
+                        top: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: component.currentADSRElement === 0
+                    knobId: 3
+                }
             }
         }
         ColumnLayout {
@@ -432,6 +539,17 @@ Item {
                 text: qsTr("Stop Point")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.horizontalCenter
+                        rightMargin: parent.paintedWidth / 2
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    visible: component.currentADSRElement === 1
+                    knobId: 1
+                }
             }
             QQC2.Button {
                 implicitWidth: 1
@@ -462,6 +580,16 @@ Item {
                 Layout.minimumHeight: 2
                 Layout.maximumHeight: 2
                 color: component.currentADSRElement === 1 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                KnobIndicator {
+                    anchors {
+                        top: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: component.currentADSRElement === 1
+                    knobId: 3
+                }
             }
         }
         ColumnLayout {
@@ -474,6 +602,17 @@ Item {
                 text: qsTr("Amount")
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.horizontalCenter
+                        rightMargin: parent.paintedWidth / 2
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    visible: component.currentADSRElement === 2
+                    knobId: 1
+                }
             }
             QQC2.Slider {
                 implicitWidth: 1
@@ -498,6 +637,16 @@ Item {
                 Layout.minimumHeight: 2
                 Layout.maximumHeight: 2
                 color: component.currentADSRElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                KnobIndicator {
+                    anchors {
+                        top: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: component.currentADSRElement === 2
+                    knobId: 3
+                }
             }
         }
         AbstractADSRView {

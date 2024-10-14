@@ -109,7 +109,7 @@ Item {
                 rightMargin: parent.paintedWidth / 2
             }
             width: Kirigami.Units.iconSizes.small
-            visible: component.selected
+            visible: component.selected && -1 < knobId  && knobId < 4
             knobId: -1
         }
     }

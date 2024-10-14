@@ -296,7 +296,7 @@ Zynthian.ScreenPage {
         }
         textRole: slotType === 0
             ? "clipSlotText"
-            : slotType === 1:
+            : slotType === 1
                 ? "soundSlotText"
                 : slotType === 2
                     ? "fxSlotText"

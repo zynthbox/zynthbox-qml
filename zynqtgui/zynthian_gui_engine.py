@@ -91,11 +91,17 @@ class zynthian_gui_engine(zynthian_gui_selector):
         
         for plugin_name, plugin_info in get_jalv_plugins().items():
             eng = 'JV/{}'.format(plugin_name)
-            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jalv, plugin_info['ENABLED'])
+            plugin_class = plugin_info.get('CLASS', None)
+            if plugin_class is not None:
+                plugin_class = "LV2 " + plugin_class
+            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_class, zynthian_engine_jalv, plugin_info['ENABLED'])
 
-        for plugin_name, plugin_info in zynthian_engine_jucy.plugins_dict.items():
+        for plugin_name, plugin_info in get_jucy_plugins().items():
             eng = 'JY/{}'.format(plugin_name)
-            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, True)
+            plugin_class = plugin_info.get('CLASS', None)
+            if plugin_class is not None:
+                plugin_class = "VST3 " + plugin_class
+            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_class, zynthian_engine_jucy, True)
 
 
     def __init__(self, parent = None):

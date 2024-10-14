@@ -385,12 +385,6 @@ MouseArea {
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: Item {
-                        Zynthian.KnobIndicator {
-                            width: Kirigami.Units.gridUnit * 1.5
-                            height: width
-                            knobId: 3
-                            rotationFactor: 4
-                        }
                         ColumnLayout {
                             anchors.fill: parent
                             SketchpadDial {
@@ -402,6 +396,7 @@ MouseArea {
                                 controlObj: zynqtgui
                                 controlProperty: "masterVolume"
                                 valueString: qsTr("%1%").arg(dial.value)
+                                knobId: 3
 
                                 dial {
                                     stepSize: 1
@@ -441,12 +436,6 @@ MouseArea {
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: Item {
-                        Zynthian.KnobIndicator {
-                            width: Kirigami.Units.gridUnit * 1.5
-                            height: width
-                            knobId: 0
-                            rotationFactor: 4
-                        }
                         ColumnLayout {
                             anchors.fill: parent
                             SketchpadDial {
@@ -457,6 +446,7 @@ MouseArea {
                                 text: qsTr("BPM")
                                 controlObj: Zynthbox.SyncTimer
                                 controlProperty: "bpm"
+                                knobId: 0
 
                                 dial {
                                     stepSize: 1
@@ -500,12 +490,6 @@ MouseArea {
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: Item {
-                        Zynthian.KnobIndicator {
-                            width: Kirigami.Units.gridUnit * 1.5
-                            height: width
-                            knobId: 1
-                            rotationFactor: 4
-                        }
                         ColumnLayout {
                             anchors.fill: parent
                             SketchpadDial {
@@ -516,6 +500,7 @@ MouseArea {
                                 controlObj: zynqtgui.delayController
                                 controlProperty: "value"
                                 valueString: qsTr("%1%").arg(dial.value)
+                                knobId: 1
 
                                 dial {
                                     stepSize: zynqtgui.delayController.step_size
@@ -577,12 +562,6 @@ MouseArea {
                     Layout.preferredWidth: 1
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
                     contentItem: Item {
-                        Zynthian.KnobIndicator {
-                            width: Kirigami.Units.gridUnit * 1.5
-                            height: width
-                            knobId: 2
-                            rotationFactor: 4
-                        }
                         ColumnLayout {
                             anchors.fill: parent
                             SketchpadDial {
@@ -593,6 +572,7 @@ MouseArea {
                                 controlObj: zynqtgui.reverbController
                                 controlProperty: "value"
                                 valueString: qsTr("%1%").arg(dial.value)
+                                knobId: 2
 
                                 dial {
                                     stepSize: zynqtgui.reverbController.step_size

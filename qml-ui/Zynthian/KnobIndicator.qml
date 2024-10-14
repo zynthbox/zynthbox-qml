@@ -54,9 +54,12 @@ Item {
      * @default No knob is inspected
      */
     property int knobId: -1
-    property int rotationFactor: 1
+    property int rotationFactor: 10
     signal knobUp()
     signal knobDown()
+
+    // By default, the knob indicator's visibility is managed by what ID is set on it
+    visible: -1 < knobId && knobId < 4
 
     onKnobUp: {
         //indicatorRect.movingDirection = 1;
@@ -70,27 +73,32 @@ Item {
         id: indicatorRect
         anchors.centerIn: parent
         // This allows for the component to be positioned in all manner of fun places
-        width: Math.min(component.width, component.height);
+        width: Math.min(component.width, component.height) - Kirigami.Units.smallSpacing;
         height: width
         radius: width / 2
         color: Kirigami.Theme.buttonFocusColor
-        border {
-            width: 1
-            color: Kirigami.Theme.buttonTextColor
+        Item {
+            id: ridges
+            property real currentPointRotation
+            anchors {
+                fill: parent
+                margins: parent.radius / 5
+            }
+            rotation: ridges.currentPointRotation
+            Rectangle {
+                anchors {
+                    fill: parent
+                }
+                color: Kirigami.Theme.buttonFocusColor
+            }
+            Rectangle {
+                anchors {
+                    fill: parent
+                }
+                rotation: 45
+                color: Kirigami.Theme.buttonFocusColor
+            }
         }
-        //property int movingDirection: 0
-        //onMovingDirectionChanged: {
-            //if (indicatorRect.movingDirection !== 0) {
-                //indicatorTimer.restart();
-            //}
-        //}
-        //Timer {
-            //id: indicatorTimer
-            //interval: 333; running: false; repeat: false;
-            //onTriggered: {
-                //indicatorRect.movingDirection = 0;
-            //}
-        //}
         QQC2.Label {
             anchors.fill: parent
             font.pixelSize: height/2
@@ -106,44 +114,11 @@ Item {
                         return "K3";
                     case 3:
                         return "BK";
+                    case -1:
+                        return "";
                 }
             }
             color: Kirigami.Theme.buttonTextColor
-        }
-        Item {
-            id: ridges
-            property real currentPointRotation
-            anchors.fill: parent
-            rotation: ridges.currentPointRotation
-            Repeater {
-                model: 4
-                Item {
-                    anchors.centerIn: parent
-                    width: ridges.width
-                    height: 5
-                    rotation: 45 * index
-                    Rectangle {
-                        anchors {
-                            left: parent.left
-                            leftMargin: -1
-                        }
-                        height: parent.height
-                        width: 3
-                        color: Kirigami.Theme.buttonTextColor
-                        radius: height
-                    }
-                    Rectangle {
-                        anchors {
-                            right: parent.right
-                            rightMargin: -1
-                        }
-                        height: parent.height
-                        width: 3
-                        color: Kirigami.Theme.buttonTextColor
-                        radius: height
-                    }
-                }
-            }
         }
     }
     Connections {

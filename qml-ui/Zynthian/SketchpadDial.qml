@@ -20,6 +20,8 @@ ColumnLayout {
 
     property bool selected: false
 
+    // Set this explicitly to false if you want to hide the indicator
+    property bool showKnobIndicator: true
     property alias knobId: knobIndicator.knobId
 
     signal pressed(var mouse)
@@ -52,12 +54,9 @@ ColumnLayout {
         Layout.fillHeight: true
         QQC2.Dial {
             id: dial
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-                horizontalCenter: parent.horizontalCenter
-            }
-            width: height
+            anchors.centerIn: parent
+            width: Math.min(parent.height, parent.width)
+            height: Math.min(parent.height, parent.width)
 
             value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
 
@@ -169,6 +168,7 @@ ColumnLayout {
                 rightMargin: parent.paintedWidth / 2
             }
             width: Kirigami.Units.iconSizes.small
+            visible: root.showKnobIndicator && -1 < knobId && knobId < 4
             knobId: -1
         }
     }

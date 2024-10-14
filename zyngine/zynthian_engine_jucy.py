@@ -30,11 +30,49 @@ from collections import OrderedDict
 from . import zynthian_engine
 from . import zynthian_controller
 
+
+def get_jucy_plugins():
+    def get_plugin_type(plugin: Jucy.PluginDescription):
+        result = "Unknown"
+        # Plugin category string from Juce is a string seperated by `|`
+        # where the first element is the plugin type and if applicable the 2nd string is the subtype
+        # For example, the category could be `Instrument` or `FX|Reverb`
+        plugin_category = plugin.category.split("|")
+        if len(plugin_category) > 0:
+            if plugin_category[0] == "Instrument":
+                result = "MIDI Synth"
+            elif plugin_category[0] == "Fx":
+                result = "Audio Effect"
+        return result
+
+    def get_plugin_class(plugin: Jucy.PluginDescription):
+        result = "Uncategorized"
+        # Plugin category string from Juce is a string seperated by `|`
+        # where the first element is the plugin type and if applicable the 2nd string is the subtype
+        # For example, the category could be `Instrument` or `FX|Reverb`
+        plugin_category = plugin.category.split("|")
+        if len(plugin_category) > 0:
+            if plugin_category[0] == "Fx" and plugin.name == "Airwindows Consolidated":
+                # Special case for Airwindows. Put airwindows in its own category.
+                result = "Airwindows"
+            elif plugin_category[0] == "Fx" and len(plugin_category) > 1:
+                result = plugin_category[1]
+        return result
+
+    if zynthian_engine_jucy.plugins_dict is None:
+        zynthian_engine_jucy.plugins_dict = OrderedDict()
+        jucy_pluginhost = Jucy.VST3PluginHost("", "", None)
+        for plugin in jucy_pluginhost.getAllPlugins():
+            zynthian_engine_jucy.plugins_dict[plugin.name] = {
+                'TYPE': get_plugin_type(plugin),
+                'CLASS': get_plugin_class(plugin),
+                'URL': plugin.fileOrIdentifier
+            }
+    return zynthian_engine_jucy.plugins_dict
+
+
 class zynthian_engine_jucy(zynthian_engine):
-    plugins_dict = OrderedDict([
-        ("AirWindows", {'TYPE': "Audio Effect", 'CLASS': "VST3 FX", 'URL': "/zynthian/airwin2rack/build/awcons-products/Airwindows Consolidated.vst3"}),
-        ("Nekobi", {'TYPE': "MIDI Synth", 'CLASS': "VST3 Instrument", 'URL': "/usr/lib/vst3/Nekobi.vst3"}),
-    ])
+    plugins_dict = None
 
     def __init__(self, plugin_name, plugin_type, zynqtgui=None):
         super().__init__(zynqtgui)

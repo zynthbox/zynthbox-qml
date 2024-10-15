@@ -69,16 +69,17 @@ class zynthian_gui_engine(zynthian_gui_selector):
     def init_engine_info(cls):
 
         cls.engine_info=OrderedDict([
-            # ['PD', ("PureData", "PureData - Visual Programming", "Special", None, zynthian_engine_puredata, True)],
-            # ['CS', ("CSound", "CSound Audio Language", "Special", None, zynthian_engine_csound, False)],
-            # ['MD', ("MOD-UI", "MOD-UI - Plugin Host", "Special", None, zynthian_engine_modui, True)]
-            # ["LS", ("LinuxSampler", "LinuxSampler - SFZ/GIG Player", "Other MIDI Synth", None, zynthian_engine_linuxsampler, True)],
-            ["MX", ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, True)],
-            ["ZY", ("ZynAddSubFX", "ZynAddSubFX - Synthesizer", "Other MIDI Synth", "Instrument", zynthian_engine_zynaddsubfx, True)],
-            ["FS", ("FluidSynth", "FluidSynth - SF2 Player", "Other MIDI Synth", "Instrument", zynthian_engine_fluidsynth, True)],
-            ["SF", ("Sfizz", "Sfizz - SFZ Player", "Other MIDI Synth", "Instrument", zynthian_engine_sfizz, True)],
-            ["BF", ("setBfree", "setBfree - Hammond Emulator", "Other MIDI Synth", "Instrument", zynthian_engine_setbfree, True)],
-            ["AE", ("Aeolus", "Aeolus - Pipe Organ Emulator", "Other MIDI Synth", "Instrument", zynthian_engine_aeolus, True)],
+            # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>)],
+            # ['PD', ("PureData", "PureData - Visual Programming", "Special", None, zynthian_engine_puredata, True, "")],
+            # ['CS', ("CSound", "CSound Audio Language", "Special", None, zynthian_engine_csound, False, "")],
+            # ['MD', ("MOD-UI", "MOD-UI - Plugin Host", "Special", None, zynthian_engine_modui, True, "")]
+            # ["LS", ("LinuxSampler", "LinuxSampler - SFZ/GIG Player", "MIDI Synth", None, zynthian_engine_linuxsampler, True, "")],
+            ["MX", ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, True, "")],
+            ["ZY", ("ZynAddSubFX", "ZynAddSubFX - Synthesizer", "MIDI Synth", "Instrument", zynthian_engine_zynaddsubfx, True, "")],
+            ["FS", ("FluidSynth", "FluidSynth - SF2 Player", "MIDI Synth", "Instrument", zynthian_engine_fluidsynth, True, "")],
+            ["SF", ("Sfizz", "Sfizz - SFZ Player", "MIDI Synth", "Instrument", zynthian_engine_sfizz, True, "")],
+            ["BF", ("setBfree", "setBfree - Hammond Emulator", "MIDI Synth", "Instrument", zynthian_engine_setbfree, True, "")],
+            ["AE", ("Aeolus", "Aeolus - Pipe Organ Emulator", "MIDI Synth", "Instrument", zynthian_engine_aeolus, True, "")],
         ])
 
         if check_pianoteq_binary():
@@ -87,15 +88,15 @@ class zynthian_gui_engine(zynthian_gui_selector):
                 PIANOTEQ_VERSION[1],
                 PIANOTEQ_PRODUCT,
                 " (Demo)" if PIANOTEQ_TRIAL else "")
-            cls.engine_info['PT'] = (PIANOTEQ_NAME, pianoteq_title, "Other MIDI Synth", None, zynthian_engine_pianoteq, True)
+            cls.engine_info['PT'] = (PIANOTEQ_NAME, pianoteq_title, "MIDI Synth", None, zynthian_engine_pianoteq, True, "")
         
         for plugin_name, plugin_info in get_jalv_plugins().items():
             eng = 'JV/{}'.format(plugin_name)
-            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jalv, plugin_info['ENABLED'])
+            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jalv, plugin_info['ENABLED'], "LV2")
 
         for plugin_name, plugin_info in get_jucy_plugins().items():
             eng = 'JY/{}'.format(plugin_name)
-            cls.engine_info[eng] = (plugin_name, plugin_name, "VST3 " + plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, True)
+            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, True, "VST3")
 
 
     def __init__(self, parent = None):
@@ -105,6 +106,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
         self.zyngines = OrderedDict()
         self.only_categories = False
         self.single_category = None
+        # A variable to filter which type of plugin to list
+        self.plugin_format = "LV2"
 
         # Load engine config
         try:
@@ -115,8 +118,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
             self.__engine_config__ = {}
 
         self.set_engine_type("MIDI Synth")
-        self.set_shown_category("Instrument")
-
 
     def set_midi_channel(self, chan):
         self.midi_chan = chan
@@ -163,7 +164,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
             eng_type = info[2]
             cat = info[3]
             enabled = info[5]
-            if enabled and (eng_type==self.engine_type or self.engine_type is None) and (eng not in self.single_layer_engines or eng not in self.zyngines):
+            if enabled and (eng_type==self.engine_type or self.engine_type is None) and (eng not in self.single_layer_engines or eng not in self.zyngines) and (self.plugin_format == info[6]):
                 if cat not in result:
                     result[cat] = OrderedDict()
                 result[cat][eng] = info
@@ -347,6 +348,15 @@ class zynthian_gui_engine(zynthian_gui_selector):
         self.select_path_element = "Engine"
         super().set_select_path()
 
+    def get_pluginFormat(self):
+        return self.plugin_format
+    def set_pluginFormat(self, format):
+        if not self.plugin_format == format:
+            self.plugin_format = format
+            self.fill_list()
+            self.pluginFormatChanged.emit()
+    pluginFormatChanged = Signal()
+    pluginFormat = Property(str, get_pluginFormat, set_pluginFormat, notify=pluginFormatChanged)
 
     midi_channel_changed = Signal()
     shown_category_changed = Signal()

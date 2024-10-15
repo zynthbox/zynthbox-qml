@@ -108,7 +108,8 @@ Zynthian.ScreenPage {
     }
     Component.onCompleted: {
         zynqtgui.engine.synth_engine_type = "MIDI Synth"
-        zynqtgui.engine.shown_category = "Instrument";
+        zynqtgui.engine.shown_category = "Instrument";        
+        zynqtgui.engine.plugin_format = "LV2"
         zynqtgui.engine.current_index = -1;
         view.contentY = 0;
     }
@@ -125,33 +126,33 @@ Zynthian.ScreenPage {
                 id: lv2Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
-                checked: zynqtgui.engine.synth_engine_type == "MIDI Synth"
+                checked: zynqtgui.engine.pluginFormat == "LV2"
                 autoExclusive: true
                 text: qsTr("LV2 Instruments")
                 onClicked: {
-                    zynqtgui.engine.synth_engine_type = "MIDI Synth"
+                    zynqtgui.engine.pluginFormat = "LV2"
                 }
             }
             QQC2.Button {
                 id: vst3Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
-                checked: zynqtgui.engine.synth_engine_type == "VST3 MIDI Synth"
+                checked: zynqtgui.engine.pluginFormat == "VST3"
                 autoExclusive: true
                 text: qsTr("VST3 Instruments")
                 onClicked: {
-                    zynqtgui.engine.synth_engine_type = "VST3 MIDI Synth"
+                    zynqtgui.engine.pluginFormat = "VST3"
                 }
             }
             QQC2.Button {
                 id: othersSwitch
                 Layout.fillWidth: true
                 implicitWidth: 1
-                checked: zynqtgui.engine.synth_engine_type == "Other MIDI Synth"
+                checked: zynqtgui.engine.pluginFormat == ""
                 autoExclusive: true
                 text: qsTr("Other Synths")
                 onClicked: {
-                    zynqtgui.engine.synth_engine_type = "Other MIDI Synth"
+                    zynqtgui.engine.pluginFormat = ""
                 }
             }
         }

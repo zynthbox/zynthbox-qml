@@ -106,6 +106,12 @@ Zynthian.ScreenPage {
         }
         return Qt.rgba(rgb[0]/255, rgb[1]/255, rgb[2]/255, 1);
     }
+    Component.onCompleted: {
+        zynqtgui.engine.synth_engine_type = "MIDI Synth"
+        zynqtgui.engine.shown_category = "Instrument";
+        zynqtgui.engine.current_index = -1;
+        view.contentY = 0;
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -119,63 +125,33 @@ Zynthian.ScreenPage {
                 id: lv2Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
-                checkable: true
-                checked: zynqtgui.engine.shown_category == "Instrument"
+                checked: zynqtgui.engine.synth_engine_type == "MIDI Synth"
                 autoExclusive: true
                 text: qsTr("LV2 Instruments")
-                onToggled: {
-                    if (checked) {
-                        zynqtgui.engine.shown_category = "Instrument";
-                    }
-                }
-                Component.onCompleted: {
-                    if (zynqtgui.engine.synth_engine_type !== "Audio Effect" &&
-                        zynqtgui.engine.synth_engine_type !== "MIDI Tool") {
-                        zynqtgui.engine.shown_category = "Instrument";
-                    } else {
-                        zynqtgui.engine.shown_category = null;
-                    }
-                    zynqtgui.engine.current_index = -1;
-                    view.contentY = 0;
-                }
-                Connections {
-                    target: zynqtgui.engine
-                    onSynth_engine_typeChanged: {
-                        if (zynqtgui.engine.synth_engine_type !== "Audio Effect" &&
-                            zynqtgui.engine.synth_engine_type !== "MIDI Tool") {
-                            zynqtgui.engine.shown_category = "Instrument";
-                        } else {
-                            zynqtgui.engine.shown_category = null;
-                        }
-                    }
+                onClicked: {
+                    zynqtgui.engine.synth_engine_type = "MIDI Synth"
                 }
             }
             QQC2.Button {
                 id: vst3Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
-                checkable: true
-                checked: zynqtgui.engine.shown_category == "VST3 Instruments"
+                checked: zynqtgui.engine.synth_engine_type == "VST3 MIDI Synth"
                 autoExclusive: true
                 text: qsTr("VST3 Instruments")
-                onToggled: {
-                    if (checked) {
-                        zynqtgui.engine.shown_category = "VST3 Instrument";
-                    }
+                onClicked: {
+                    zynqtgui.engine.synth_engine_type = "VST3 MIDI Synth"
                 }
             }
             QQC2.Button {
                 id: othersSwitch
                 Layout.fillWidth: true
                 implicitWidth: 1
-                checkable: true
-                checked: zynqtgui.engine.shown_category == "None"
+                checked: zynqtgui.engine.synth_engine_type == "Other MIDI Synth"
                 autoExclusive: true
                 text: qsTr("Other Synths")
-                onToggled: {
-                    if (checked) {
-                        zynqtgui.engine.shown_category = "None";
-                    }
+                onClicked: {
+                    zynqtgui.engine.synth_engine_type = "Other MIDI Synth"
                 }
             }
         }

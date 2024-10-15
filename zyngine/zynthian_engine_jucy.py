@@ -52,7 +52,9 @@ def get_jucy_plugins():
         # For example, the category could be `Instrument` or `FX|Reverb`
         plugin_category = plugin.category.split("|")
         if len(plugin_category) > 0:
-            if plugin_category[0] == "Fx" and plugin.name == "Airwindows Consolidated":
+            if plugin_category[0] == "Instrument":
+                result = "Instrument"
+            elif plugin_category[0] == "Fx" and plugin.name == "Airwindows Consolidated":
                 # Special case for Airwindows. Put airwindows in its own category.
                 result = "Airwindows"
             elif plugin_category[0] == "Fx" and len(plugin_category) > 1:

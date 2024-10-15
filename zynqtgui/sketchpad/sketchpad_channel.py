@@ -477,6 +477,7 @@ class sketchpad_channel(QObject):
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
                 "externalAudioSource": self.__externalAudioSource__,
                 "clips": [self.__clips_model__[clipId].serialize() for clipId in range(0, 5)],
+                "selectedClip": self.__selected_clip__,
                 "samples": samplesObj,
                 "layers_snapshot": self.__layers_snapshot,
                 "sample_picking_style": self.__sample_picking_style__,
@@ -584,6 +585,10 @@ class sketchpad_channel(QObject):
             if "clips" in obj:
                 for clipId in range(0, 5):
                     self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId, load_autosave)
+            if "selectedClip" in obj:
+                self.set_selected_clip(obj["selectedClip"])
+            else:
+                self.set_selected_clip(0)
             if "layers_snapshot" in obj:
                 self.__layers_snapshot = obj["layers_snapshot"]
                 self.sound_data_changed.emit()

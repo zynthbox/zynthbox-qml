@@ -1465,10 +1465,38 @@ Rectangle {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                                     opacity: patternContainer.showPattern ? 1 : 0
 
+                                    Connections {
+                                        target: root
+                                        function onSelectedChannelChanged() {
+                                            if (clipBar.count > 0) {
+                                                for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                                                    let clipDelegate = clipBar.itemAt(clipIndex);
+                                                    let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                                                    if (clipDelegate.nextBarState != newPlaystate) {
+                                                        clipDelegate.nextBarState = newPlaystate;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Connections {
+                                        target: Zynthbox.PlayfieldManager
+                                        function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
+                                            if (root.selectedChannel) {
+                                                if (sketchpadTrack === root.selectedChannel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                                    let clipDelegate = clipBar.itemAt(clipIndex);
+                                                    if (clipDelegate.nextBarState != newPlaystate) {
+                                                        clipDelegate.nextBarState = newPlaystate;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
                                         Repeater {
+                                            id: clipBar
                                             model: Zynthbox.Plugin.sketchpadSlotCount
                                             QQC2.Label {
                                                 id: clipDelegate
@@ -1483,6 +1511,7 @@ Rectangle {
                                                 property QtObject cppClipObject: root.visible && root.selectedChannel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
                                                 property QtObject pattern: root.sequence.getByClipId(root.selectedChannel.id, clipIndex)
                                                 property bool clipPlaying: clipDelegate.pattern ? clipDelegate.pattern.isPlaying : false
+                                                property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     onClicked: {
@@ -1503,7 +1532,9 @@ Rectangle {
                                                     height: parent.height - Kirigami.Units.smallSpacing
                                                     width: height
                                                     // Visible if we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
-                                                    visible: Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                                                    // Also visible (non-blinking) if the timer is running, the clip is playing, and it is going to keep playing on the next bar
+                                                    visible: (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0)
+                                                        || (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState)
                                                     source: "media-playback-start-symbolic"
                                                 }
                                                 Kirigami.Icon {

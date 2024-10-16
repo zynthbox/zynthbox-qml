@@ -1178,10 +1178,12 @@ class sketchpad_channel(QObject):
         names = []
         for fx in self.chainedFx:
             try:
+                # Strip Jalv/Jucy prefix from name (if any)
+                engine_name = fx.engine.name.lstrip("Jalv/").lstrip("Jucy/")
                 if fx.preset_name is not None and fx.preset_name != "None" and fx.preset_name != "":
-                    names.append(f"{fx.engine.name.replace('Jalv/', '')} > {fx.preset_name}")
+                    names.append(f"{engine_name} > {fx.preset_name}")
                 else:
-                    names.append(fx.engine.name.replace('Jalv/', ''))
+                    names.append(engine_name)
             except:
                 names.append("")
         return names

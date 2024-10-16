@@ -50,6 +50,7 @@ class zynthian_gui_fixed_effects(zynthian_gui_selector):
     """
     def __init__(self, parent = None):
         super(zynthian_gui_fixed_effects, self).__init__('FX', parent)
+        self.selected_track = None
         self.connect_timer = QTimer(self)
         self.connect_timer.setSingleShot(True)
         self.connect_timer.setInterval(500)
@@ -59,8 +60,8 @@ class zynthian_gui_fixed_effects(zynthian_gui_selector):
 
     def connect_signals(self):
         try:
-            selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            selected_track.chainedFxNamesChanged.connect(self.fill_list)
+            self.selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+            self.selected_track.chainedFxNamesChanged.connect(self.fill_list)
             self.zynqtgui.sketchpad.selected_track_id_changed.connect(self.fill_list)
             self.zynqtgui.sketchpad.song_changed.connect(self.fill_list)
         except Exception as e:
@@ -70,19 +71,21 @@ class zynthian_gui_fixed_effects(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
         try:
-            selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            for index, fx in enumerate(selected_track.chainedFxNames):
-                self.list_data.append((str(index+1), index, f"{index+1} - {fx}"))
+            for index in range(5):
+                self.list_data.append((str(index+1), index, f"{index+1} - {self.selected_track.chainedFxNames[index]}", self.selected_track.chainedFx[index]))
         except: pass
         super().fill_list()
 
     def select(self, index=None):
-        super().select(index)        
+        super().select(index)
         self.set_select_path()
 
     def select_action(self, i, t='S'):
         if i < 0 or i >= len(self.list_data):
             return
+        # self.selected_track.selectedFxSlotRow = i
+        # if self.list_data[i][3] is not None:
+        #     self.zynqtgui.set_curlayer(self.list_data[i][3])
         self.select(i)
         self.fill_list()
 

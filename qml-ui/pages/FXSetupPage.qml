@@ -32,8 +32,22 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    property var screenIds: ["effect_types", "layer_effect_chooser", "effect_preset"]
-    property var screenTitles: [qsTr("FX Type (%1)").arg(zynqtgui.effect_types.effective_count), qsTr("FX (%1)").arg(zynqtgui.layer_effect_chooser.effective_count), qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)]
+    property var screenIds: ["fixed_effects", "effect_preset"]
+    property QtObject selectedChannel: null
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            root.selectedChannel = applicationWindow().selectedChannel;
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
+    Component.onCompleted: {
+        selectedChannelThrottle.restart()
+    }
 
     contextualActions: [
         Kirigami.Action {
@@ -58,12 +72,6 @@ Zynthian.ScreenPage {
         // Call cuiaCallback of current selectorView
         var selectorCuiaReturnVal = false
         switch(zynqtgui.current_screen_id) {
-            case "effect_types":
-                selectorCuiaReturnVal = effectTypesView.cuiaCallback(cuia)
-                break
-            case "layer_effect_chooser":
-                selectorCuiaReturnVal = effectChooserView.cuiaCallback(cuia)
-                break
             case "effect_preset":
                 selectorCuiaReturnVal = effectPresetView.cuiaCallback(cuia)
                 break
@@ -107,13 +115,14 @@ Zynthian.ScreenPage {
 
             Kirigami.Heading {
                 level: 2
-                text: root.screenTitles[0]
+                text: qsTr("Track %1 FX").arg(zynqtgui.sketchpad.selectedTrackId+1)
                 Kirigami.Theme.inherit: false
                 // TODO: this should eventually go to Window and the panels to View
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
             }
+
             Zynthian.SelectorView {
-                id: effectTypesView
+                id: fixedEffectsView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: root.screenIds[0]
@@ -121,8 +130,47 @@ Zynthian.ScreenPage {
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                 autoActivateIndexOnChange: true
+                onIconClicked: {
+                    if (fixedEffectsView.selector.current_index != index) {
+                        fixedEffectsView.selector.current_index = index;
+                        fixedEffectsView.selector.activate_index(index);
+                    }
+                    zynqtgui.current_screen_id = "fixed_effects";
+                }
                 Component.onCompleted: {
-                    effectTypesView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                    fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                }
+                delegate: Zynthian.SelectorDelegate {
+                    id: delegate
+                    screenId: fixedEffectsView.screenId
+                    selector: fixedEffectsView.selector
+                    highlighted: zynqtgui.current_screen_id === fixedEffectsView.screenId
+                    onCurrentScreenIdRequested: fixedEffectsView.currentScreenIdRequested(screenId)
+                    onItemActivated: fixedEffectsView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: fixedEffectsView.itemActivatedSecondary(screenId, index)
+                    height: fixedEffectsView.view.height/5
+                    onClicked: {
+                        if (!zynqtgui.fixed_effects.current_index_valid) {
+                            delegate.selector.activate_index(index);
+                        }
+                    }
+                    contentItem: ColumnLayout {
+                        RowLayout {
+                            QQC2.Label {
+                                id: mainLabel
+                                Layout.fillWidth: true
+                                Binding { // Optimization
+                                    target: mainLabel
+                                    property: "text"
+                                    delayed: true
+                                    value: mainLabel.visible
+                                        ? model.display
+                                        : ""
+                                }
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -134,22 +182,16 @@ Zynthian.ScreenPage {
 
             Kirigami.Heading {
                 level: 2
-                text: root.screenTitles[1]
+                text: ""
                 Kirigami.Theme.inherit: false
                 // TODO: this should eventually go to Window and the panels to View
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
             }
+
             Zynthian.SelectorView {
-                id: effectChooserView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: root.screenIds[1]
-                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: root.itemActivated(screenId, index)
-                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                Component.onCompleted: {
-                    effectChooserView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
-                }
+                model: []
             }
         }
 
@@ -162,7 +204,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Kirigami.Heading {
                     level: 2
-                    text: root.screenTitles[2]
+                    text: qsTr("Presets (%1)").arg(zynqtgui.preset.effective_count)
                     Kirigami.Theme.inherit: false
                     // TODO: this should eventually go to Window and the panels to View
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
@@ -182,7 +224,7 @@ Zynthian.ScreenPage {
                 id: effectPresetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: root.screenIds[2]
+                screenId: root.screenIds[1]
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)

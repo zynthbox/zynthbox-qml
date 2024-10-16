@@ -102,6 +102,7 @@ from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
 from zynqtgui.zynthian_gui_fixed_layers import zynthian_gui_fixed_layers
+from zynqtgui.zynthian_gui_fixed_effects import zynthian_gui_fixed_effects
 from zynqtgui.zynthian_gui_layers_for_channel import zynthian_gui_layers_for_channel
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
@@ -340,6 +341,7 @@ class zynthian_gui(QObject):
         "main",
         "layer",
         "fixed_layers",
+        "fixed_effects",
         "layers_for_channel",
         "main_layers_view",
         "bank",
@@ -1245,6 +1247,8 @@ class zynthian_gui(QObject):
         self.screens["layers_for_channel"] = zynthian_gui_layers_for_channel(self)
         self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
         self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
+
+        self.screens["fixed_effects"] = zynthian_gui_fixed_effects(self)
 
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -3687,6 +3691,9 @@ class zynthian_gui(QObject):
     def get_fixed_layers(self):
         return self.screens["fixed_layers"]
 
+    def get_fixed_effects(self):
+        return self.screens["fixed_effects"]
+
     def get_layers_for_channel(self):
         return self.screens["layers_for_channel"]
 
@@ -4542,6 +4549,7 @@ class zynthian_gui(QObject):
     engine = Property(QObject, get_engine, constant=True)
     layer = Property(QObject, get_layer, constant=True)
     fixed_layers = Property(QObject, get_fixed_layers, constant=True)
+    fixed_effects = Property(QObject, get_fixed_effects, constant=True)
     layers_for_channel = Property(QObject, get_layers_for_channel, constant=True)
     main_layers_view = Property(QObject, get_main_layers_view, constant=True)
     layer_options = Property(QObject, get_layer_options, constant=True)

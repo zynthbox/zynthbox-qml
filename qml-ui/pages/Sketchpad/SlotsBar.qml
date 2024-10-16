@@ -1027,7 +1027,7 @@ Rectangle {
                         : qsTr("Change FX")
                 onTriggered: {
                     zynqtgui.forced_screen_back = "sketchpad"
-                    zynqtgui.current_screen_id = "effect_types"
+                    zynqtgui.current_screen_id = "layer_effects"
                     zynqtgui.layer.page_after_layer_creation = "sketchpad"
                 }
             },

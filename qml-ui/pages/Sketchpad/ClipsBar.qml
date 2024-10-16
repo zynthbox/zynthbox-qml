@@ -116,7 +116,7 @@ Rectangle {
                         function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clip, position, newPlaystate) {
                             // signalCounterThing.boop();
                             let trackDelegate = clipDelegateRepeater.itemAt(sketchpadTrack);
-                            if (trackDelegate && trackDelegate.channel && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                            if (trackDelegate && trackDelegate.channel && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
                                 let clipDelegate = trackDelegate.repeater.itemAt(clip);
                                 if (clipDelegate.nextBarState != newPlaystate) {
                                     clipDelegate.nextBarState = newPlaystate;

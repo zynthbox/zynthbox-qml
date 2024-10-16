@@ -1539,7 +1539,7 @@ Kirigami.AbstractApplicationWindow {
                                     if (clipBar.repeater.count > 0) {
                                         for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
                                             let clipDelegate = clipBar.repeater.itemAt(clipIndex);
-                                            let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(0, clipBar.channel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                                            let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, clipBar.channel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
                                             if (clipDelegate.nextBarState != newPlaystate) {
                                                 clipDelegate.nextBarState = newPlaystate;
                                             }
@@ -1551,7 +1551,7 @@ Kirigami.AbstractApplicationWindow {
                                 target: Zynthbox.PlayfieldManager
                                 function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
                                     if (clipBar.channel) {
-                                        if (sketchpadTrack === clipBar.channel.id && sketchpadSong === 0 && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                                        if (sketchpadTrack === clipBar.channel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
                                             let clipDelegate = clipBar.repeater.itemAt(clipIndex);
                                             if (clipDelegate.nextBarState != newPlaystate) {
                                                 clipDelegate.nextBarState = newPlaystate;

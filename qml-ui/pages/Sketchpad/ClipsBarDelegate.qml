@@ -64,6 +64,7 @@ ColumnLayout {
             property bool clipPlaying: root.channel.trackType === "sample-loop"
                 ? clipDelegate.cppClipObject ? clipDelegate.cppClipObject.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
                 : clipDelegate.pattern ? clipDelegate.pattern.isPlaying : nextBarState == Zynthbox.PlayfieldManager.PlayingState
+            // nextBarState is updated from the container (i.e. ClipsBar and slotSelectionDrawer in the main window - SongMode doesn't update this state, as it handles the playfield state explicitly during playback)
             property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
 
             Layout.fillWidth: true
@@ -172,8 +173,10 @@ ColumnLayout {
                 }
                 height: Kirigami.Units.largeSpacing
                 width: Kirigami.Units.largeSpacing
-                // Visible if we are not in song mode, we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
-                visible: root.songMode === false && Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0
+                // Visible (blinking) if we are not in song mode, we are running playback, the clip is not playing, and we are going to start the clip at the top of the next bar
+                // Also visible (non-blinking) regardless of song mode state, if the timer is running, the clip is playing, and it is going to keep playing on the next bar
+                visible: (root.songMode === false && Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === false && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState && Zynthbox.PlayGridManager.metronomeBeat16th % 4 === 0)
+                    || (Zynthbox.SyncTimer.timerRunning && clipDelegate.clipPlaying === true && clipDelegate.nextBarState == Zynthbox.PlayfieldManager.PlayingState)
                 source: "media-playback-start-symbolic"
             }
             Kirigami.Icon {

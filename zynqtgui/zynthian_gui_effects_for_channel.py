@@ -44,12 +44,12 @@ from .zynthian_gui_multi_controller import MultiController
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_fixed_effects(zynthian_gui_selector):
+class zynthian_gui_effects_for_channel(zynthian_gui_selector):
     """
     A Selector class to display FX List on FXSetupPage
     """
     def __init__(self, parent = None):
-        super(zynthian_gui_fixed_effects, self).__init__('FX', parent)
+        super(zynthian_gui_effects_for_channel, self).__init__('FX', parent)
         self.selected_track = None
         self.connect_timer = QTimer(self)
         self.connect_timer.setSingleShot(True)

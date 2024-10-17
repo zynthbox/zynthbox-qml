@@ -20,7 +20,7 @@ Zynthian.Stack {
         "preset": "SynthSetupPage.qml",
         "control": "ControlPage.qml",
         "layer_effects": "FXEnginePage.qml",
-        "fixed_effects": "FXSetupPage.qml",
+        "effects_for_channel": "FXSetupPage.qml",
         "effect_types": "FXSetupPage.qml",
         "layer_effect_chooser": "FXSetupPage.qml",
         "effect_preset": "FXSetupPage.qml",
@@ -209,9 +209,9 @@ Zynthian.Stack {
         if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(page) >= 0) {
             console.log("Page", page, "is a library page. Using layers_for_channel cache")
             page = "layers_for_channel"
-        } else if (["fixed_effects", "effect_types", "layer_effect_chooser", "effect_preset"].indexOf(page) >= 0) {
-            console.log("Page", page, "is an FX Setup page. Using fixed_effects cache")
-            page = "fixed_effects"
+        } else if (["effects_for_channel", "effect_types", "layer_effect_chooser", "effect_preset"].indexOf(page) >= 0) {
+            console.log("Page", page, "is an FX Setup page. Using effects_for_channel cache")
+            page = "effects_for_channel"
         } else if (["layer_midi_effects", "midi_effect_types", "layer_midi_effect_chooser"].indexOf(page) >= 0) {
             console.log("Page", page, "is an Midi FX page. Using layer_midi_effects cache")
             page = "layer_midi_effects"

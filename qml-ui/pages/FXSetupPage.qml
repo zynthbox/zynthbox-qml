@@ -32,7 +32,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    property var screenIds: ["fixed_effects", "effect_preset"]
+    property var screenIds: ["effects_for_channel", "effect_preset"]
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -135,7 +135,7 @@ Zynthian.ScreenPage {
                         fixedEffectsView.selector.current_index = index;
                         fixedEffectsView.selector.activate_index(index);
                     }
-                    zynqtgui.current_screen_id = "fixed_effects";
+                    zynqtgui.current_screen_id = "effects_for_channel";
                 }
                 Component.onCompleted: {
                     fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
@@ -150,7 +150,7 @@ Zynthian.ScreenPage {
                     onItemActivatedSecondary: fixedEffectsView.itemActivatedSecondary(screenId, index)
                     height: fixedEffectsView.view.height/5
                     onClicked: {
-                        if (!zynqtgui.fixed_effects.current_index_valid) {
+                        if (!zynqtgui.effects_for_channel.current_index_valid) {
                             delegate.selector.activate_index(index);
                         }
                     }

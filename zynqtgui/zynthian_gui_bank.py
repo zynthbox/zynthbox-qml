@@ -120,7 +120,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
             logging.debug("Can't show bank list for None layer!")
             super().show()
             return
-        if not self.zynqtgui.curlayer.get_bank_name():
+        if self.zynqtgui.curlayer.get_bank_name() is None:
             self.zynqtgui.curlayer.set_bank(0)
         if self.zynqtgui.screens['preset'].get_show_only_favorites():
             self.select(0)

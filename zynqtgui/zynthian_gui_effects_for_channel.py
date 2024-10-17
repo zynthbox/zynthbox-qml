@@ -50,30 +50,18 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
     """
     def __init__(self, parent = None):
         super(zynthian_gui_effects_for_channel, self).__init__('FX', parent)
-        self.selected_track = None
-        self.connect_timer = QTimer(self)
-        self.connect_timer.setSingleShot(True)
-        self.connect_timer.setInterval(500)
-        self.connect_timer.timeout.connect(self.connect_signals)
-        self.connect_timer.start()
-        self.show()
-
-    def connect_signals(self):
-        try:
-            self.selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            self.selected_track.chainedFxNamesChanged.connect(self.fill_list)
-            self.zynqtgui.sketchpad.selected_track_id_changed.connect(self.fill_list)
-            self.zynqtgui.sketchpad.song_changed.connect(self.fill_list)
-        except Exception as e:
-            self.connect_timer.start()
 
     @Slot()
     def fill_list(self):
         self.list_data = []
         try:
+            selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             for index in range(5):
-                self.list_data.append((str(index+1), index, f"{index+1} - {self.selected_track.chainedFxNames[index]}", self.selected_track.chainedFx[index]))
-        except: pass
+                self.list_data.append((str(index+1), index, f"{index+1} - {selected_track.chainedFxNames[index]}", selected_track.chainedFx[index]))
+            self.select(selected_track.selectedFxSlotRow)
+        except:
+            # fill_list might fail when sketchpad is yet to be loaded. Do nothing as it will fill list again when curlayer changes
+            pass
         super().fill_list()
 
     def select(self, index=None):
@@ -83,9 +71,9 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
     def select_action(self, i, t='S'):
         if i < 0 or i >= len(self.list_data):
             return
-        # self.selected_track.selectedFxSlotRow = i
-        # if self.list_data[i][3] is not None:
-        #     self.zynqtgui.set_curlayer(self.list_data[i][3])
+        selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+        selected_track.selectedFxSlotRow = i
+        selected_track.setCurlayerByType("fx")
         self.select(i)
         self.fill_list()
 

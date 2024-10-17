@@ -96,7 +96,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
         for plugin_name, plugin_info in get_jucy_plugins().items():
             eng = 'JY/{}'.format(plugin_name)
-            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, True, "VST3")
+            cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, plugin_info['ENABLED'], "VST3")
 
 
     def __init__(self, parent = None):

@@ -1591,6 +1591,8 @@ class zynthian_gui(QObject):
             self.add_screen_to_show_queue(self.screens["bank"], False, True)
             self.add_screen_to_show_queue(self.screens["preset"], False, True)
             self.add_screen_to_show_queue(self.screens["control"], False, True)
+            if self.curlayer is not None and self.curlayer.engine.type == "Audio Effect":
+                self.add_screen_to_show_queue(self.screens["effects_for_channel"], False, True)
         else:
             self.curlayer.refresh_controllers()
             self.screens["bank"].fill_list()
@@ -1599,6 +1601,9 @@ class zynthian_gui(QObject):
             self.screens["bank"].show()
             self.screens["preset"].show()
             self.screens["control"].show()
+            if self.curlayer is not None and self.curlayer.engine.type == "Audio Effect":
+                self.screens["effects_for_channel"].fill_list()
+                self.screens["effects_for_channel"].show()
         self.control.selectedColumn = 0
         if self.curlayer:
             self.screens["midi_key_range"].config(self.curlayer.midi_chan)

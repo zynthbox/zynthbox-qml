@@ -33,72 +33,14 @@ from PySide2.QtCore import QTimer
 
 from . import zynthian_engine
 from . import zynthian_controller
-
-
-plugins_json_file = Path(f"{os.environ.get('ZYNTHIAN_CONFIG_DIR')}/jucy/plugins.json")
-
-
-def generate_jucy_plugins_json_cache():
-    global plugins_json_file
-    def get_plugin_type(plugin: Jucy.PluginDescription):
-        result = "Unknown"
-        # Plugin category string from Juce is a string seperated by `|`
-        # where the first element is the plugin type and if applicable the 2nd string is the subtype
-        # For example, the category could be `Instrument` or `FX|Reverb`
-        plugin_category = plugin.category.split("|")
-        if len(plugin_category) > 0:
-            if plugin_category[0] == "Instrument":
-                result = "MIDI Synth"
-            elif plugin_category[0] == "Fx":
-                result = "Audio Effect"
-        return result
-
-    def get_plugin_class(plugin: Jucy.PluginDescription):
-        result = "Uncategorized"
-        # Plugin category string from Juce is a string seperated by `|`
-        # where the first element is the plugin type and if applicable the 2nd string is the subtype
-        # For example, the category could be `Instrument` or `FX|Reverb`
-        plugin_category = plugin.category.split("|")
-        if len(plugin_category) > 0:
-            if plugin_category[0] == "Instrument":
-                result = "Instrument"
-            elif plugin_category[0] == "Fx" and plugin.name == "Airwindows Consolidated":
-                # Special case for Airwindows. Put airwindows in its own category.
-                result = "Airwindows"
-            elif plugin_category[0] == "Fx" and len(plugin_category) > 1:
-                result = plugin_category[1]
-        return result
-
-    plugins_dict = OrderedDict()
-    jucy_pluginhost = Jucy.VST3PluginHost("", "", None)
-    plugins_json_file.parent.mkdir(parents=True, exist_ok=True)
-    # First read the existing plugins json if available
-    if plugins_json_file.exists():
-        with open(plugins_json_file, "r") as f:
-            plugins_dict = json.load(f)
-
-    for plugin in jucy_pluginhost.getAllPlugins():
-        enabled = False
-        # If plugin already exists in cache, use the previous value for enabled
-        if plugin.name in plugins_dict:
-            enabled = plugins_dict[plugin.name]["ENABLED"]
-        plugins_dict[plugin.name] = {
-            'TYPE': get_plugin_type(plugin),
-            'CLASS': get_plugin_class(plugin),
-            'URL': plugin.fileOrIdentifier,
-            'ENABLED': enabled
-        }
-
-    # Sort and store plugins cache
-    with open(plugins_json_file, "w") as f:
-        json.dump(OrderedDict(sorted(plugins_dict.items())), f)
+from . import zynthian_vst3
 
 
 def get_jucy_plugins():
-    global plugins_json_file
+    plugins_json_file = Path(f"{os.environ.get('ZYNTHIAN_CONFIG_DIR')}/jucy/plugins.json")
     if zynthian_engine_jucy.plugins_dict is None:
         if not plugins_json_file.exists():
-            generate_jucy_plugins_json_cache()
+            zynthian_vst3.generate_jucy_plugins_json_cache()
         with open(plugins_json_file, "r") as f:
             zynthian_engine_jucy.plugins_dict = json.load(f)
     return zynthian_engine_jucy.plugins_dict
@@ -335,3 +277,4 @@ class zynthian_engine_jucy(zynthian_engine):
 
 
 #******************************************************************************
+

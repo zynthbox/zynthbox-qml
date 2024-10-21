@@ -4393,8 +4393,8 @@
   },
   "ZBP_00732": {
     "name": "Airwindows Consolidated",
-    "path": "/zynthian/zynthian-plugins/lv2/Airwindows Consolidated.lv2",
-    "type": "lv2",
+    "path": "/usr/lib/vst3/Airwindows Consolidated.vst3",
+    "type": "vst3",
     "version_added": 1
   }
 }

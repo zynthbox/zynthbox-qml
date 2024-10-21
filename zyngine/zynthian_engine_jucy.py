@@ -29,6 +29,7 @@ import os
 import json
 from collections import OrderedDict
 from pathlib import Path
+from PySide2.QtCore import QTimer
 
 from . import zynthian_engine
 from . import zynthian_controller
@@ -125,9 +126,12 @@ class zynthian_engine_jucy(zynthian_engine):
         self.bank_list.append(("", None, "", None))
         self.preset_info = self.get_plugin_presets()
 
-        # # Generate LV2-Plugin Controllers
-        self.vst3_zctrl_dict = self.get_vst3_controllers_dict()
-        self.generate_ctrl_screens(self.vst3_zctrl_dict)
+        # Generate Plugin Controllers
+        self.update_controllers_timer = QTimer()
+        self.update_controllers_timer.setInterval(100)
+        self.update_controllers_timer.setSingleShot(True)
+        self.update_controllers_timer.timeout.connect(self.update_controllers)
+        self.update_controllers()
 
         self.reset()
 
@@ -147,6 +151,11 @@ class zynthian_engine_jucy(zynthian_engine):
             jname_count = 0
 
         return "{}-{:02d}".format(jname, jname_count)
+
+    def update_controllers(self):
+        self.pluginhost_parameters_dict = {}
+        self.generate_vst3_controllers_dict()
+        self.generate_ctrl_screens(self.vst3_zctrl_dict)
 
     # ---------------------------------------------------------------------------
     # Layer Management
@@ -193,9 +202,7 @@ class zynthian_engine_jucy(zynthian_engine):
             return False
         logging.debug(f"Setting preset {preset[0]}")
         self.jucy_pluginhost.setCurrentPreset(preset[0])
-        self.vst3_zctrl_dict = self.get_vst3_controllers_dict()
-        self.generate_ctrl_screens(self.vst3_zctrl_dict)
-
+        self.update_controllers_timer.start()
         return True
 
 
@@ -212,9 +219,11 @@ class zynthian_engine_jucy(zynthian_engine):
     # Controllers Managament
     #----------------------------------------------------------------------------
 
-    def get_vst3_controllers_dict(self):
+    def generate_vst3_controllers_dict(self):
         zctrls = OrderedDict()
         for index, parameter in enumerate(self.jucy_pluginhost.getAllParameters()):
+            self.pluginhost_parameters_dict[parameter.getName()] = parameter
+
             if type(parameter) == Jucy.StringParameter:
                 # Controller value is a set of string
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
@@ -259,7 +268,7 @@ class zynthian_engine_jucy(zynthian_engine):
             else:
                 # Controller type is unknown. Handle accordingly
                 logging.debug("Unknown controller type. Handle accordingly")
-        return zctrls
+        self.vst3_zctrl_dict = zctrls
 
 
     def get_ctrl_screen_name(self, gname, i):
@@ -269,7 +278,7 @@ class zynthian_engine_jucy(zynthian_engine):
 
     def generate_ctrl_screens(self, zctrl_dict=None):
         if zctrl_dict is None:
-            zctrl_dict=self.zctrl_dict
+            zctrl_dict=self.vst3_zctrl_dict
 
         # Get zctrls by group
         zctrl_group = OrderedDict()
@@ -320,7 +329,7 @@ class zynthian_engine_jucy(zynthian_engine):
         return zctrls
 
     def send_controller_value(self, zctrl):
-        self.jucy_pluginhost.getParameter(zctrl.name).setValue(zctrl.value)
+        self.pluginhost_parameters_dict[zctrl.name].setValue(zctrl.value)
 
 
 #******************************************************************************

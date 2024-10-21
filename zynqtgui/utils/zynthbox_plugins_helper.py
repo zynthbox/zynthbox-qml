@@ -75,7 +75,7 @@ class zynthbox_plugins_helper(QObject):
         Translate plugin name to plugin id in the layer snapshot
         """
         snapshot = copy.deepcopy(source_snapshot)
-        # Handle Plugin ID substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
+        # Handle Plugin ID substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2, Jucy: vst3)
         if snapshot["engine_nick"].startswith("JV/"):
             # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
             plugin_name = snapshot["engine_nick"].split("/")[1]
@@ -87,6 +87,17 @@ class zynthbox_plugins_helper(QObject):
                 snapshot["engine_nick"] = "{0}/${{{1}_name}}".format(snapshot['engine_nick'].split('/')[0], plugin_id)
             else:
                 logging.info(f"Plugin name JV/{plugin_name} not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
+        elif snapshot["engine_nick"].startswith("JY/"):
+            # Jucy stores the plugin name in its nickname and name like `JY/<plugin name>` and `Jucy/<plugin name>`
+            plugin_name = snapshot["engine_nick"].split("/")[1]
+            if f"vst3/{plugin_name}" in self.plugins_by_name:
+                plugin_id = self.plugins_by_name[f"vst3/{plugin_name}"].id
+                logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin_id}")
+                snapshot["plugin_id"] = plugin_id
+                snapshot["engine_name"] = "{0}/${{{1}_name}}".format(snapshot['engine_name'].split('/')[0], plugin_id)
+                snapshot["engine_nick"] = "{0}/${{{1}_name}}".format(snapshot['engine_nick'].split('/')[0], plugin_id)
+            else:
+                logging.info(f"Plugin name JY/{plugin_name} not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
         elif snapshot["engine_nick"] == "SF":
             # SFizz stores the plugin name in a few places
             # 1. bank_name: `SFZ/<plugin name>` or `MySFZ/<plugin name>`
@@ -135,12 +146,23 @@ class zynthbox_plugins_helper(QObject):
         Translate plugin id to plugin name in the layer snapshot
         """
         snapshot = copy.deepcopy(source_snapshot)
-        # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2)
+        # Handle Plugin Name substitution for engines having plugin support like (Jalv: lv2, SFizz: sfz, FluidSynth: sf2, Jucy: vst3)
         if snapshot["engine_nick"].startswith("JV/"):
             if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
                 plugin_id = snapshot["plugin_id"]
                 if plugin_id in self.plugins_by_id:
                     # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
+                    plugin = self.plugins_by_id[plugin_id]
+                    logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.name}")
+                    snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin.substitution_map)
+                    snapshot["engine_nick"] = Template(snapshot["engine_nick"]).substitute(plugin.substitution_map)
+                else:
+                    logging.error(f"FATAL ERROR : Stored plugin id {plugin_id} is not found and cannot be translated to plugin name. This should not happen unless the files are tampered with.")
+        elif snapshot["engine_nick"].startswith("JY/"):
+            if "plugin_id" in snapshot and snapshot["plugin_id"].startswith("ZBP_"):
+                plugin_id = snapshot["plugin_id"]
+                if plugin_id in self.plugins_by_id:
+                    # Jucy stores the plugin name in its nickname and name like `JY/<plugin name>` and `Jucy/<plugin name>`
                     plugin = self.plugins_by_id[plugin_id]
                     logging.info(f"Found ZBP plugin id when restoring snapshot. Translating plugin id {plugin_id} to {plugin.name}")
                     snapshot["engine_name"] = Template(snapshot["engine_name"]).substitute(plugin.substitution_map)

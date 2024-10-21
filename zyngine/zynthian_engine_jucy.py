@@ -156,6 +156,8 @@ class zynthian_engine_jucy(zynthian_engine):
         self.pluginhost_parameters_dict = {}
         self.generate_vst3_controllers_dict()
         self.generate_ctrl_screens(self.vst3_zctrl_dict)
+        if len(self.layers) > 0:
+            self.layers[0].refresh_controllers()
 
     # ---------------------------------------------------------------------------
     # Layer Management

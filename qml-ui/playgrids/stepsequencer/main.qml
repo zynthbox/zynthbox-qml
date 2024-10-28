@@ -732,7 +732,7 @@ Zynthian.BasePlayGrid {
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
                         onKnob0Up: {
-                            if (component.showPatternSettings) {
+                            if (component.showPatternSettings && noteSettingsPopup.visible === false) {
                                 _private.stepLengthUp();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
@@ -750,7 +750,7 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         onKnob0Down: {
-                            if (component.showPatternSettings) {
+                            if (component.showPatternSettings && noteSettingsPopup.visible === false) {
                                 _private.stepLengthDown();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
@@ -768,7 +768,7 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         onKnob1Up: {
-                            if (component.showPatternSettings) {
+                            if (component.showPatternSettings && noteSettingsPopup.visible === false) {
                                 _private.swingUp();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
@@ -786,7 +786,7 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         onKnob1Down: {
-                            if (component.showPatternSettings) {
+                            if (component.showPatternSettings && noteSettingsPopup.visible === false) {
                                 _private.swingDown();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
@@ -804,7 +804,7 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         onKnob2Up: {
-                            if (component.showPatternSettings) {
+                            if (component.showPatternSettings && noteSettingsPopup.visible === false) {
                                 _private.patternLengthUp();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
@@ -822,7 +822,7 @@ Zynthian.BasePlayGrid {
                             }
                         }
                         onKnob2Down: {
-                            if (component.showPatternSettings) {
+                            if (component.showPatternSettings && noteSettingsPopup.visible === false) {
                                 _private.patternLengthDown();
                             } else {
                                 switch (drumPad.parameterPageIndex) {
@@ -879,10 +879,10 @@ Zynthian.BasePlayGrid {
                             noteLengthVisualiser.lastLoopIndex = -1;
                         }
                         function visualiseNote(note, noteDuration, noteDelay, noteOffset) {
-                            noteLengthVisualiser.singleStepLength = noteLengthVisualiser.noteLengths[_private.workingPatternModel.stepLength]
+                            noteLengthVisualiser.singleStepLength =_private.workingPatternModel.stepLength;
                             noteLengthVisualiser.totalStepLength = noteDuration / noteLengthVisualiser.singleStepLength;
                             noteLengthVisualiser.lastLoopIndex = (noteLengthVisualiser.totalStepLength + noteOffset) / 16;
-                            noteLengthVisualiser.noteDuration = noteDuration;
+                            noteLengthVisualiser.noteDuration = noteDuration === 0 ? _private.workingPatternModel.stepLength : noteDuration;
                             noteLengthVisualiser.noteOffset = noteOffset;
                             noteLengthVisualiser.noteDelay = noteDelay;
                             if (noteDelay !== 0 && noteDuration === 0) {
@@ -894,14 +894,6 @@ Zynthian.BasePlayGrid {
                             } else {
                                 noteLengthVisualiser.note = null;
                             }
-                        }
-                        property var noteLengths: {
-                            96: 32,
-                            48: 16,
-                            24: 8,
-                            12: 4,
-                            6: 2,
-                            3: 1
                         }
                         property QtObject note: null
                         property int noteOffset: 0
@@ -1052,6 +1044,7 @@ Zynthian.BasePlayGrid {
                                         noteLengthVisualiser.clearVisualisation();
                                     }
                                 } else {
+                                    noteLengthVisualiser.clearVisualisation();
                                     Qt.callLater(updateMostRecentFromSelection);
                                 }
                             }
@@ -1115,7 +1108,7 @@ Zynthian.BasePlayGrid {
                             }
                             function deselectSelectedItem() {
                                 if (noteSettingsPopup.visible) {
-                                    noteSettingsPopup.close();;
+                                    noteSettingsPopup.close();
                                 } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad.currentSubNote > -1) {
@@ -1124,6 +1117,7 @@ Zynthian.BasePlayGrid {
                                         drumPadRepeater.selectedIndex = -1;
                                     }
                                 }
+                                Qt.callLater(updateMostRecentFromSelection);
                             }
                             function activateSelectedItem() {
                                 if (noteSettingsPopup.visible) {
@@ -1218,7 +1212,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.workingPatternModel.stepLength]
+                                        var stepDuration = _private.workingPatternModel.stepLength;
                                         changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }
@@ -1229,7 +1223,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                     if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
-                                        var stepDuration = noteLengthVisualiser.stepLengths[_private.workingPatternModel.stepLength]
+                                        var stepDuration = _private.workingPatternModel.stepLength;
                                         changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
                                     }
                                 }

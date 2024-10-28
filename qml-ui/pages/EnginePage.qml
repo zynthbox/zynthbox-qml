@@ -69,10 +69,18 @@ Zynthian.ScreenPage {
             result = true;
             break;
         case "NAVIGATE_LEFT":
-            zynqtgui.engine.shown_category = "Instrument";
+            if (zynqtgui.engine.pluginFormat === "") { // "" === Other
+                zynqtgui.engine.pluginFormat = "VST3";
+            } else {
+                zynqtgui.engine.pluginFormat = "LV2";
+            }
             break;
         case "NAVIGATE_RIGHT":
-            zynqtgui.engine.shown_category = "None";
+            if (zynqtgui.engine.pluginFormat === "LV2") {
+                zynqtgui.engine.pluginFormat = "VST3";
+            } else {
+                zynqtgui.engine.pluginFormat = ""; // "" === Other
+            }
             break;
         case "KNOB3_TOUCHED":
         case "KNOB3_RELEASED":
@@ -108,8 +116,8 @@ Zynthian.ScreenPage {
     }
     Component.onCompleted: {
         zynqtgui.engine.synth_engine_type = "MIDI Synth"
-        zynqtgui.engine.shown_category = "Instrument";        
-        zynqtgui.engine.plugin_format = "LV2"
+        zynqtgui.engine.shown_category = "Instrument";
+        zynqtgui.engine.pluginFormat = "LV2"
         zynqtgui.engine.current_index = -1;
         view.contentY = 0;
     }
@@ -123,7 +131,6 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
 
             QQC2.Button {
-                id: lv2Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checked: zynqtgui.engine.pluginFormat == "LV2"
@@ -134,7 +141,6 @@ Zynthian.ScreenPage {
                 }
             }
             QQC2.Button {
-                id: vst3Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checked: zynqtgui.engine.pluginFormat == "VST3"
@@ -145,7 +151,6 @@ Zynthian.ScreenPage {
                 }
             }
             QQC2.Button {
-                id: othersSwitch
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checked: zynqtgui.engine.pluginFormat == ""
@@ -281,7 +286,7 @@ Zynthian.ScreenPage {
                                         bottomMargin: Kirigami.Units.gridUnit
                                     }
 
-                                    text: model.metadata.description ? model.metadata.description : ""
+                                    text: model.metadata && model.metadata.description ? model.metadata.description : ""
                                     elide: "ElideRight"
                                     font.pointSize: 8
                                     visible: view.currentIndex === index

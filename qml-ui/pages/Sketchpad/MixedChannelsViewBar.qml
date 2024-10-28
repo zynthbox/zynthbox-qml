@@ -1471,9 +1471,11 @@ Rectangle {
                                             if (clipBar.count > 0) {
                                                 for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
                                                     let clipDelegate = clipBar.itemAt(clipIndex);
-                                                    let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
-                                                    if (clipDelegate.nextBarState != newPlaystate) {
-                                                        clipDelegate.nextBarState = newPlaystate;
+                                                    if (clipDelegate) {
+                                                        let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                                                        if (clipDelegate.nextBarState != newPlaystate) {
+                                                            clipDelegate.nextBarState = newPlaystate;
+                                                        }
                                                     }
                                                 }
                                             }

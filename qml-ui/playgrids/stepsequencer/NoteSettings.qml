@@ -270,7 +270,9 @@ ColumnLayout {
         Kirigami.Heading {
             level: 2
             text: component.midiNoteFilter.length > 0
-                ? "Note Settings: Notes %1".arg(Zynthbox.Chords.symbol(component.midiNoteFilter, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey, " | "))
+                ? component.patternModel
+                    ? "Note Settings: Notes %1".arg(Zynthbox.Chords.symbol(component.midiNoteFilter, component.patternModel.scaleKey, component.patternModel.pitchKey, component.patternModel.octaveKey, " | "))
+                    : ""
                 : component.firstBar === component.lastBar
                     ? component.firstStep > -1 && component.patternModel && component.firstStep === component.lastStep
                         ? "Note Settings: Step %1".arg((component.firstBar * component.patternModel.width) + component.firstStep + 1)

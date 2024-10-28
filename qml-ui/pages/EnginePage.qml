@@ -133,17 +133,17 @@ Zynthian.ScreenPage {
                     zynqtgui.engine.pluginFormat = "LV2"
                 }
             }
-            // QQC2.Button {
-            //     id: vst3Switch
-            //     Layout.fillWidth: true
-            //     implicitWidth: 1
-            //     checked: zynqtgui.engine.pluginFormat == "VST3"
-            //     autoExclusive: true
-            //     text: qsTr("VST3 Instruments")
-            //     onClicked: {
-            //         zynqtgui.engine.pluginFormat = "VST3"
-            //     }
-            // }
+            QQC2.Button {
+                id: vst3Switch
+                Layout.fillWidth: true
+                implicitWidth: 1
+                checked: zynqtgui.engine.pluginFormat == "VST3"
+                autoExclusive: true
+                text: qsTr("VST3 Instruments")
+                onClicked: {
+                    zynqtgui.engine.pluginFormat = "VST3"
+                }
+            }
             QQC2.Button {
                 id: othersSwitch
                 Layout.fillWidth: true

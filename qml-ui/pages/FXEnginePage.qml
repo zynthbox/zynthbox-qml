@@ -75,10 +75,10 @@ Zynthian.ScreenPage {
             result = true;
             break;
         case "NAVIGATE_LEFT":
-            zynqtgui.engine.shown_category = "Instrument";
+            root.pluginFormat = "LV2";
             break;
         case "NAVIGATE_RIGHT":
-            zynqtgui.engine.shown_category = "None";
+            root.pluginFormat = "VST3";
             break;
         case "KNOB3_TOUCHED":
         case "KNOB3_RELEASED":
@@ -90,6 +90,27 @@ Zynthian.ScreenPage {
             break;
         case "KNOB3_UP":
             view.moveCurrentIndexRight();
+            result = true;
+            break;
+        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_BOLD":
+        case "SWITCH_BACK_LONG":
+            if (root.isCategorySelected) {
+                root.isCategorySelected = false
+            } else {
+                zynqtgui.go_back()
+            }
+            result = true;
+            break;
+        case "SWITCH_SELECT_SHORT":
+        case "SWITCH_SELECT_BOLD":
+        case "SWITCH_SELECT_LONG":
+            if (root.isCategorySelected) {
+                zynqtgui.layer_effect_chooser.activate_index(zynqtgui.layer_effect_chooser.current_index);
+            } else {
+                zynqtgui.effect_types.activate_index(zynqtgui.effect_types.current_index);
+                root.isCategorySelected = true;
+            }
             result = true;
             break;
         default:
@@ -143,7 +164,6 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
 
             QQC2.Button {
-                id: lv2Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checked: root.pluginFormat == "LV2"
@@ -154,7 +174,6 @@ Zynthian.ScreenPage {
                 }
             }
             QQC2.Button {
-                id: vst3Switch
                 Layout.fillWidth: true
                 implicitWidth: 1
                 checked: root.pluginFormat == "VST3"
@@ -282,7 +301,7 @@ Zynthian.ScreenPage {
                                         bottomMargin: Kirigami.Units.gridUnit
                                     }
 
-                                    text: model.metadata.description ? model.metadata.description : ""
+                                    text: model.metadata && model.metadata.description ? model.metadata.description : ""
                                     elide: "ElideRight"
                                     font.pointSize: 8
                                     visible: view.currentIndex === index

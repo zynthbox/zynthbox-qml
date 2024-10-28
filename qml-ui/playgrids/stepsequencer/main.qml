@@ -156,7 +156,7 @@ Zynthian.BasePlayGrid {
                     break;
                 case "SWITCH_SELECT_SHORT":
                 case "SWITCH_SELECT_BOLD":
-                case "SWITCH_SELECT_LONGT":
+                case "SWITCH_SELECT_LONG":
                     _private.activateSelectedItem();
                     returnValue = true;
                     break;

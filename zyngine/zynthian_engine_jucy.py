@@ -37,12 +37,8 @@ from . import zynthian_vst3
 
 
 def get_jucy_plugins():
-    plugins_json_file = Path(f"{os.environ.get('ZYNTHIAN_CONFIG_DIR')}/jucy/plugins.json")
     if zynthian_engine_jucy.plugins_dict is None:
-        if not plugins_json_file.exists():
-            zynthian_vst3.generate_jucy_plugins_json_cache()
-        with open(plugins_json_file, "r") as f:
-            zynthian_engine_jucy.plugins_dict = json.load(f)
+        zynthian_engine_jucy.plugins_dict = zynthian_vst3.get_plugins()
     return zynthian_engine_jucy.plugins_dict
 
 

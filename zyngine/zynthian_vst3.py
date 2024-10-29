@@ -32,10 +32,46 @@ import sys
 
 from pathlib import Path
 from collections import OrderedDict
+from enum import Enum
+
+
+plugins = None
+plugins_by_type = None
+plugins_json_file = Path(f"{os.environ.get('ZYNTHIAN_CONFIG_DIR')}/jucy/plugins.json")
+
+
+class PluginType(Enum):
+    MIDI_SYNTH = "MIDI Synth"
+    MIDI_TOOL = "MIDI Tool"
+    AUDIO_EFFECT = "Audio Effect"
+    AUDIO_GENERATOR = "Audio Generator"
+    #UNKNOWN = "Unknown"
+
+
+def get_plugins():
+    global plugins, plugins_json_file
+    if plugins is None:
+        if not plugins_json_file.exists():
+            generate_jucy_plugins_json_cache()
+        with open(plugins_json_file, "r") as f:
+            plugins = json.load(f, object_pairs_hook=OrderedDict)
+    return plugins
+
+
+def get_plugins_by_type():
+    global plugins_by_type
+    if plugins_by_type is None:
+        plugins_by_type = OrderedDict()
+        for t in PluginType:
+            plugins_by_type[t.value] = OrderedDict()
+
+        for name, properties in get_plugins().items():
+            plugins_by_type[properties['TYPE']][name] = properties
+    return plugins_by_type
 
 
 def generate_jucy_plugins_json_cache():
-    plugins_json_file = Path(f"{os.environ.get('ZYNTHIAN_CONFIG_DIR')}/jucy/plugins.json")
+    global plugins, plugins_by_type, plugins_json_file
 
     def get_plugin_type(plugin: Jucy.PluginDescription):
         result = "Unknown"
@@ -69,6 +105,9 @@ def generate_jucy_plugins_json_cache():
     plugins_dict = OrderedDict()
     jucy_pluginhost = Jucy.VST3PluginHost("", "", None)
     plugins_json_file.parent.mkdir(parents=True, exist_ok=True)
+    # Invalidate existing plugins and plugins_by_type lists when cache is generated
+    plugins = None
+    plugins_by_type = None
     # First read the existing plugins json if available
     if plugins_json_file.exists():
         with open(plugins_json_file, "r") as f:
@@ -86,9 +125,18 @@ def generate_jucy_plugins_json_cache():
             'ENABLED': enabled
         }
 
+    save_plugins(plugins_dict)
+
+
+def save_plugins(_plugins=None):
+    global plugins_json_file
+    # If plugins dict is passed, save it to file.
+    # Otherwise save the global plugins dict
+    if _plugins is None:
+        _plugins = get_plugins()
     # Sort and store plugins cache
     with open(plugins_json_file, "w") as f:
-        json.dump(OrderedDict(sorted(plugins_dict.items())), f)
+        json.dump(OrderedDict(sorted(_plugins.items())), f)
 
 
 if __name__ == '__main__':

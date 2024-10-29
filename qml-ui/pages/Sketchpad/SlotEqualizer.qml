@@ -521,6 +521,7 @@ Zynthian.DialogQuestion {
                                                 horizontalCenter: parent.horizontalCenter
                                             }
                                             width: height
+                                            inputMode: QQC2.Dial.Vertical
                                             handle: null
                                             value: bandDelegate.filterSettings ? bandDelegate.filterSettings.quality : 0
                                             from: 0
@@ -581,6 +582,7 @@ Zynthian.DialogQuestion {
                                                 horizontalCenter: parent.horizontalCenter
                                             }
                                             width: height
+                                            inputMode: QQC2.Dial.Vertical
                                             handle: null
                                             value: bandDelegate.filterSettings ? bandDelegate.filterSettings.gainAbsolute : 0
                                             from: 0
@@ -629,6 +631,7 @@ Zynthian.DialogQuestion {
                                         horizontalCenter: parent.horizontalCenter
                                     }
                                     width: height
+                                    inputMode: QQC2.Dial.Vertical
                                     handle: null
                                     value: bandDelegate.filterSettings ? bandDelegate.filterSettings.frequency : 0
                                     stepSize: 1
@@ -828,6 +831,7 @@ Zynthian.DialogQuestion {
                                     horizontalCenter: parent.horizontalCenter
                                 }
                                 width: height
+                                inputMode: QQC2.Dial.Vertical
                                 handle: null
                                 value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.threshold : 0
                                 from: 0
@@ -887,6 +891,7 @@ Zynthian.DialogQuestion {
                                     horizontalCenter: parent.horizontalCenter
                                 }
                                 width: height
+                                inputMode: QQC2.Dial.Vertical
                                 handle: null
                                 value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.kneeWidth : 0
                                 from: 0
@@ -950,6 +955,7 @@ Zynthian.DialogQuestion {
                                     horizontalCenter: parent.horizontalCenter
                                 }
                                 width: height
+                                inputMode: QQC2.Dial.Vertical
                                 handle: null
                                 value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.attack : 0
                                 from: 0
@@ -1009,6 +1015,7 @@ Zynthian.DialogQuestion {
                                     horizontalCenter: parent.horizontalCenter
                                 }
                                 width: height
+                                inputMode: QQC2.Dial.Vertical
                                 handle: null
                                 value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.makeUpGain : 0
                                 from: 0
@@ -1072,6 +1079,7 @@ Zynthian.DialogQuestion {
                                     horizontalCenter: parent.horizontalCenter
                                 }
                                 width: height
+                                inputMode: QQC2.Dial.Vertical
                                 handle: null
                                 value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.release : 0
                                 from: 0
@@ -1131,6 +1139,7 @@ Zynthian.DialogQuestion {
                                     horizontalCenter: parent.horizontalCenter
                                 }
                                 width: height
+                                inputMode: QQC2.Dial.Vertical
                                 handle: null
                                 value: _private.slotPassthroughClient ? _private.slotPassthroughClient.compressorSettings.ratio : 0
                                 from: 1

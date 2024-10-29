@@ -1,6 +1,6 @@
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 //TODO: Use Zynthian.DialController?
@@ -55,6 +55,7 @@ ColumnLayout {
         QQC2.Dial {
             id: dial
             anchors.centerIn: parent
+            inputMode: QQC2.Dial.Vertical
             width: Math.min(parent.height, parent.width)
             height: Math.min(parent.height, parent.width)
 
@@ -75,42 +76,6 @@ ColumnLayout {
                     : Math.floor(dial.value) == dial.value
                         ? Math.floor(dial.value)
                         : dial.value.toFixed(root.fixedPointTrail)
-            }
-
-            //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
-            MouseArea {
-                id: dialMouse
-                anchors.fill: parent
-                preventStealing: true
-                property real startY
-                property real startX
-                property real startValue
-                property real startDiff
-                onPressed: {
-                    root.pressed(mouse);
-                    startY = mouse.y;
-                    startX = mouse.x;
-                    startValue = dial.value
-                    // Calculate difference from floored value to apply when writing final value
-                    startDiff = startValue - (Math.floor(startValue/dial.stepSize)*dial.stepSize)
-                    dial.forceActiveFocus()
-                }
-                onPositionChanged: {
-                    let delta = mouse.y - startY;
-                    let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
-
-                    let floored = Math.floor(value/dial.stepSize) * dial.stepSize;
-                    dial.value = floored+startDiff
-                    dial.moved()
-                }
-                onReleased: {
-                    if (Math.abs(startY - mouse.y) < 5 && Math.abs(startX - mouse.x) < 5 && mouse.x > -1 && mouse.y > -1 && mouse.x < dialMouse.width && mouse.y < dialMouse.height) {
-                        root.clicked();
-                    }
-                }
-                onDoubleClicked: {
-                    root.doubleClicked();
-                }
             }
         }
     }

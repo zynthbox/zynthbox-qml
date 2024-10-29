@@ -1450,6 +1450,7 @@ Zynthian.ScreenPage {
                                             Layout.fillHeight: true
                                             Layout.leftMargin: Kirigami.Units.smallSpacing
                                             Layout.rightMargin: Kirigami.Units.smallSpacing
+                                            inputMode: QQC2.Dial.Vertical
                                             handle: null
                                             value: applicationWindow().channels[index].wetFx1Amount
                                             stepSize: 1
@@ -1478,6 +1479,7 @@ Zynthian.ScreenPage {
                                                 Layout.fillHeight: true
                                                 Layout.leftMargin: Kirigami.Units.smallSpacing
                                                 Layout.rightMargin: Kirigami.Units.smallSpacing
+                                                inputMode: QQC2.Dial.Vertical
                                                 handle: null
                                                 value: applicationWindow().channels[index].wetFx2Amount
                                                 stepSize: 1

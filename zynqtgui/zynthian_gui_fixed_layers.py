@@ -121,14 +121,18 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                 for j in range(15):
                     if i != j and self.zynqtgui.screens['layer'].is_midi_cloned(i, j):
                         metadata["midi_cloned_to"].append(j)
+                metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
+                metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
+                metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
+                metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
             else:
                 metadata["midi_cloned"] = False
                 metadata["midi_cloned_to"] = []
+                metadata["octave_transpose"] = 0
+                metadata["halftone_transpose"] = 0
+                metadata["note_low"] = 0
+                metadata["note_high"] = 127
             metadata["midi_channel"] = i
-            metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
-            metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
-            metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
-            metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
 
             self.list_metadata.append(metadata)
 

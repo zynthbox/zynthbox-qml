@@ -82,9 +82,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             if i in self.zynqtgui.screens['layer'].layer_midi_map:
                 layer = self.zynqtgui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
-                    self.list_data.append((str(i+1),i,"{}".format(layer.engine.name.replace("Jalv/", ""))))
+                    self.list_data.append((str(i+1),i,"{}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""))))
                 else:
-                    self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+                    self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""), layer.preset_name)))
                 effects_label = ""
                 first = True
                 for sl in self.zynqtgui.screens['layer'].get_fxchain_layers(layer):

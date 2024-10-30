@@ -61,11 +61,22 @@ ColumnLayout {
 
             value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
 
+            property bool shouldClick: false
             onMoved: {
+                shouldClick = false;
                 if (!root.controlObj || !root.controlObj.hasOwnProperty(root.controlProperty)) {
                     return;
                 }
                 root.controlObj[root.controlProperty] = value
+            }
+            onPressedChanged: {
+                if (pressed) {
+                    shouldClick = true;
+                    root.pressed(null);
+                } else {
+                    shouldClick = false;
+                    root.clicked();
+                }
             }
 
             QQC2.Label {

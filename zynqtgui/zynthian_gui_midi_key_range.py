@@ -84,10 +84,11 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.zynqtgui):
 
     def config(self, chan):
         self.chan = chan
-        self.note_low = zyncoder.lib_zyncoder.get_midi_filter_note_low(chan)
-        self.note_high = zyncoder.lib_zyncoder.get_midi_filter_note_high(chan)
-        self.octave_trans = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(chan)
-        self.halftone_trans = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(chan)
+        if -1 < chan and chan < 16:
+            self.note_low = zyncoder.lib_zyncoder.get_midi_filter_note_low(chan)
+            self.note_high = zyncoder.lib_zyncoder.get_midi_filter_note_high(chan)
+            self.octave_trans = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(chan)
+            self.halftone_trans = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(chan)
         self.set_select_path()
 
     @Slot(int, result=str)

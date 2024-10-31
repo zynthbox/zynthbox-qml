@@ -619,7 +619,7 @@ class zynthian_layer:
                 logging.debug("Saving {}".format(k))
                 zs3['controllers_dict'][k] = self.controllers_dict[k].get_snapshot()
 
-            if self.midi_chan>=0:
+            if self.midi_chan>=0 and self.midi_chan<16:
                 zs3['note_range'] = {
                     'note_low': zyncoder.lib_zyncoder.get_midi_filter_note_low(self.midi_chan),
                     'note_high': zyncoder.lib_zyncoder.get_midi_filter_note_high(self.midi_chan),
@@ -668,7 +668,7 @@ class zynthian_layer:
                 self.controllers_dict[k].restore_snapshot(zs3['controllers_dict'][k])
 
             # Set Note Range
-            if self.midi_chan>=0 and 'note_range' in zs3:
+            if self.midi_chan>=0 and self.midi_chan<16 and 'note_range' in zs3:
                 nr = zs3['note_range']
                 zyncoder.lib_zyncoder.set_midi_filter_note_range(self.midi_chan, nr['note_low'], nr['note_high'], nr['octave_trans'], nr['halftone_trans'])
 

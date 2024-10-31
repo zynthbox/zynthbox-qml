@@ -115,7 +115,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""
 
-            if i < 15:
+            if -1 < i and i < 15:
                 metadata["midi_cloned"] = self.zynqtgui.screens['layer'].is_midi_cloned(i, i+1)
                 metadata["midi_cloned_to"] = []
                 for j in range(15):

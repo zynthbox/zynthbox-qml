@@ -1849,13 +1849,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
     @Slot(int, int, result=bool)
     def is_midi_cloned(self, from_chan: int, to_chan: int):
-        return zyncoder.lib_zyncoder.get_midi_filter_clone(from_chan, to_chan)
+        if -1 < from_chan and from_chan < 16 and -1 < to_chan and to_chan < 16:
+            return zyncoder.lib_zyncoder.get_midi_filter_clone(from_chan, to_chan)
+        return False
 
     @Slot(int, int)
     def clone_midi(self, from_chan: int, to_chan: int):
         if from_chan == to_chan:
             return
-        zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
+        if -1 < from_chan and from_chan < 16 and -1 < to_chan and to_chan < 16:
+            zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
         try:
             self.zynqtgui.screens['main_layers_view'].fill_list()
             self.zynqtgui.screens['fixed_layers'].fill_list()
@@ -1866,7 +1869,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
     def remove_clone_midi(self, from_chan: int, to_chan: int):
         if from_chan == to_chan:
             return
-        zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
+        if -1 < from_chan and from_chan < 16 and -1 < to_chan and to_chan < 16:
+            zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
         if 'main_layers_view' in self.zynqtgui.screens:
             self.zynqtgui.screens['main_layers_view'].fill_list()
         if 'fixed_layers' in self.zynqtgui.screens:

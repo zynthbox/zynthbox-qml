@@ -570,9 +570,9 @@ def audio_autoconnect(force=False):
 
     # BEGIN Connect global FX ports to system playback
     for port in zip(globalFx1OutputPorts, globalPlaybackInputPorts):
-        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     for port in zip(globalFx2OutputPorts, globalPlaybackInputPorts):
-        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     # END Connect global FX ports to system playback
 
     # TODO We are only connecting the first pair of ports here (since the global channels don't really have advanced routing anyway).
@@ -580,11 +580,11 @@ def audio_autoconnect(force=False):
     # BEGIN Connect SamplerSynth's global effected to the global effects passthrough
     samplerSynthEffectedPorts =jclient.get_ports("SamplerSynth:global-lane2", is_audio=True, is_output=True)
     for port in zip(samplerSynthEffectedPorts, globalFx1InputPorts):
-        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     for port in zip(samplerSynthEffectedPorts, globalFx2InputPorts):
-        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     for port in zip(samplerSynthEffectedPorts, globalPlaybackInputPorts):
-        zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+        zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     # END Connect SamplerSynth's global effected to the global effects passthrough
 
     # logging.info("Clear out any connections TrackPassthrough and FXPassthrough might already have")

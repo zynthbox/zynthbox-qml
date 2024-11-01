@@ -291,7 +291,7 @@ class zynthian_engine_linuxsampler(zynthian_engine):
         return self._get_preset_list(bank)
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         if self.ls_set_preset(layer, preset[3], preset[0]):
             layer.send_ctrl_midi_cc()
             return True

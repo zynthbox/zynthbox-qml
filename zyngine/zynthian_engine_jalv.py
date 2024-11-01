@@ -285,7 +285,7 @@ class zynthian_engine_jalv(zynthian_engine):
         return preset_list
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         if not preset[0]:
             return
         output=self.proc_cmd("preset {}".format(preset[0]), wait_for_output=True)

@@ -332,7 +332,7 @@ class zynthian_engine_setbfree(zynthian_engine):
         return self.load_program_list(bank[0])
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         if super().set_preset(layer,preset):
             self.update_controller_values(layer, preset)
             return True

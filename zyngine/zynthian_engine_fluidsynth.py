@@ -189,7 +189,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         return preset_list
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         try:
             sfi = self.soundfont_index[preset[3]]
         except:

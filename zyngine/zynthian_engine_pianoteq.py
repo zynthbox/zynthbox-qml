@@ -637,7 +637,7 @@ class zynthian_engine_pianoteq(zynthian_engine):
         return res
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         mm = "Zynthian-{}".format(preset[3])
         if mm == self.midimapping:
             super().set_preset(layer,preset,preload)

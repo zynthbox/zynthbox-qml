@@ -365,7 +365,7 @@ class zynthian_engine_aeolus(zynthian_engine):
         return res
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         #Send Program Change
         self.zynqtgui.zynmidi.set_midi_preset(layer.get_midi_chan(), preset[1][0], preset[1][1], preset[1][2])
 

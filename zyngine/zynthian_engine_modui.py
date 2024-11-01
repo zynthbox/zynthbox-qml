@@ -204,7 +204,7 @@ class zynthian_engine_modui(zynthian_engine):
         return preset_list
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         if preset[3]:
             self.load_effect_preset(preset[3],preset[0])
         else:

@@ -210,7 +210,7 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
         return self._get_preset_list(bank)
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         self.start_loading()
         if preset[3]=='xiz':
             self.enable_part(layer)

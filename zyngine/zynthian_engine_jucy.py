@@ -137,12 +137,15 @@ class zynthian_engine_jucy(zynthian_engine):
         return preset_list
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         if not preset[0]:
             return False
         logging.debug(f"Setting preset {preset[0]}")
         self.jucy_pluginhost.setCurrentPreset(preset[0])
-        self.update_controllers_timer.start()
+        if force_immediate:
+            self.update_controllers()
+        else:
+            self.update_controllers_timer.start()
         return True
 
 
@@ -164,7 +167,14 @@ class zynthian_engine_jucy(zynthian_engine):
         for index, parameter in enumerate(self.jucy_pluginhost.getAllParameters()):
             self.pluginhost_parameters_dict[parameter.getName()] = parameter
 
-            if type(parameter) == Jucy.StringParameter:
+            if parameter.isProgramParameter():
+                # This is the Program parameter, and we want to not be displaying that (juce does not always have it (only if there are actually a programs list), but if it is there, it always has the id "juceProgramParameter")
+                pass
+            # TODO This goes back in when we've got bypass exposed in general as a property on engine
+            # elif parameter.isBypassParameter():
+                # This is the bypass parameter, and we want to be exposing that in a more clever way than just in the raw parameter list
+                # pass
+            elif type(parameter) == Jucy.StringParameter:
                 # Controller value is a set of string
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
                     'group_symbol': "ctrl",

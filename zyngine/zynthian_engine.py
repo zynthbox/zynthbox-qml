@@ -419,7 +419,7 @@ class zynthian_engine(zynthian_basic_engine):
         logging.info('Getting Preset List for %s: NOT IMPLEMENTED!' % self.name),'PD'
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         if isinstance(preset[1],int):
             self.zynqtgui.zynmidi.set_midi_prg(layer.get_midi_chan(), preset[1])
         else:

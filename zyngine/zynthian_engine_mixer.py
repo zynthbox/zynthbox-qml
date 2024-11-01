@@ -124,7 +124,7 @@ class zynthian_engine_mixer(zynthian_engine):
         return [("", None, "", None)]
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         return True
 
 

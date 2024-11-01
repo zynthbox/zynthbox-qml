@@ -119,7 +119,7 @@ class zynthian_engine_puredata(zynthian_engine):
         return self.get_dirlist(bank[0])
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         self.load_preset_config(preset)
         self.command=self.base_command+ " " + self.get_preset_filepath(preset)
         self.preset=preset[0]

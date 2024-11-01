@@ -147,7 +147,7 @@ class zynthian_engine_sfizz(zynthian_engine):
         return self._get_preset_list(bank)
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         try:
             self.sfzpath = preset[0]
             return self.proc_cmd("load_instrument \"{}\"".format(self.sfzpath), wait_for_output=True)

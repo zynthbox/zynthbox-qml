@@ -118,7 +118,7 @@ class zynthian_engine_csound(zynthian_engine):
         return self.get_dirlist(bank[0])
 
 
-    def set_preset(self, layer, preset, preload=False):
+    def set_preset(self, layer, preset, preload=False, force_immediate=False):
         self.load_preset_config(preset[0])
         self.command=self.base_command+ " " + self.get_fixed_preset_filepath(preset[0], layer.midi_chan)
         self.preset=preset[0]

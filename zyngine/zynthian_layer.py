@@ -259,7 +259,7 @@ class zynthian_layer:
         self.preset_info=None
 
 
-    def set_preset(self, i, set_engine=True):
+    def set_preset(self, i, set_engine=True, force_immediate=False):
         if i < len(self.preset_list):
             last_preset_index=self.preset_index
             last_preset_name=self.preset_name
@@ -298,21 +298,21 @@ class zynthian_layer:
             if set_engine and set_engine_needed:
                 #TODO => Review this!!
                 #self.load_ctrl_config()
-                return self.engine.set_preset(self, self.preset_info)
+                return self.engine.set_preset(self, self.preset_info,force_immediate=force_immediate)
 
             return True
         return False
 
 
     #TODO Optimize search!!
-    def set_preset_by_name(self, preset_name, set_engine=True):
+    def set_preset_by_name(self, preset_name, set_engine=True, force_immediate=False):
         for i in range(len(self.preset_list)):
             name_i=self.preset_list[i][2]
             try:
                 if name_i[0]=='*':
                     name_i=name_i[1:]
                 if preset_name==name_i:
-                    return self.set_preset(i,set_engine)
+                    return self.set_preset(i,set_engine,force_immediate)
             except:
                 pass
 
@@ -320,10 +320,10 @@ class zynthian_layer:
 
 
     #TODO Optimize search!!
-    def set_preset_by_id(self, preset_id, set_engine=True):
+    def set_preset_by_id(self, preset_id, set_engine=True, force_immediate=False):
         for i in range(len(self.preset_list)):
             if preset_id==self.preset_list[i][0]:
-                return self.set_preset(i,set_engine)
+                return self.set_preset(i,set_engine,force_immediate)
         return False
 
 
@@ -334,7 +334,7 @@ class zynthian_layer:
                 self.preload_name = self.preset_list[i][2]
                 self.preload_info = copy.deepcopy(self.preset_list[i])
                 logging.info("Preset Preloaded: %s (%d)" % (self.preload_name,i))
-                self.engine.set_preset(self,self.preload_info,True)
+                self.engine.set_preset(self,self.preload_info,True,force_immediate=True)
                 return True
         return False
 
@@ -347,7 +347,7 @@ class zynthian_layer:
             self.preload_name=None
             self.preload_info=None
             logging.info("Restore Preset: %s (%d)" % (self.preset_name,self.preset_index))
-            self.engine.set_preset(self,self.preset_info)
+            self.engine.set_preset(self,self.preset_info,force_immediate=True)
             return True
         return False
 
@@ -541,7 +541,7 @@ class zynthian_layer:
         #Load preset list and set preset
         #try:
         self.load_preset_list()
-        self.preset_loaded=self.set_preset_by_name(snapshot['preset_name'])
+        self.preset_loaded=self.set_preset_by_name(snapshot['preset_name'],force_immediate=True)
 
         #except Exception as e:
             #logging.warning("Invalid Preset on layer {}: {}".format(self.get_basepath(), e))
@@ -645,7 +645,7 @@ class zynthian_layer:
 
             # Set preset if needed
             if zs3['preset_name'] and zs3['preset_name']!=self.preset_name:
-                self.set_preset_by_name(zs3['preset_name'])
+                self.set_preset_by_name(zs3['preset_name'],force_immediate=True)
                 self.wait_stop_loading()
 
             # Refresh controller config

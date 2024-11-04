@@ -539,7 +539,7 @@ def audio_autoconnect(force=False):
     #     # Connect GlobalFXPassthrough dry ports to bluealsa (if available)
     #     try:
     #         for port in zip(jclient.get_ports("GlobalFXPassthrough:dryOut", is_audio=True, is_output=True), bluealsa_ports):
-    #             zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+    #             zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     #     except Exception as e:
     #         logging.error(f"Failed to connect global fx passthrough to bluealsa playback. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
     #         # Logic below the return statement will be eventually evaluated when called again after the timeout
@@ -557,7 +557,7 @@ def audio_autoconnect(force=False):
     #                 if len(engineOutPorts) == 1:
     #                     engineOutPorts[1] = engineOutPorts[0]
     #                 for port in zip(engineOutPorts, bluealsa_ports):
-    #                     zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
+    #                     zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
     #             except Exception as e:
     #                 logging.error(f"Failed to connect effect engines to bluealsa ports. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
     #                 # Logic below the return statement will be eventually evaluated when called again after the timeout
@@ -1096,7 +1096,7 @@ def audio_autoconnect(force=False):
         #
         #                 else:
         #                     for rlp_inp in rlp_in:
-        #                         zbjack.connectPorts(get_jack_port_name(scp), get_jack_port_name(rlp_inp))
+        #                         zbjack.disconnectPorts(get_jack_port_name(scp), get_jack_port_name(rlp_inp))
 
         if zynthian_gui_config.midi_aubionotes_enabled:
             #Get Aubio Input ports ...

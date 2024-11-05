@@ -607,7 +607,8 @@ class zynthian_engine_modui(zynthian_engine):
                 'is_integer': True
             })
 
-            self.plugin_zctrls[pgraph][':bypass']=bypass_zctrl
+            # self.plugin_zctrls[pgraph][':bypass']=bypass_zctrl
+            self.setBypassController(bypass_zctrl)
             pinfo['ports']['control']['input'].insert(0,{'symbol':':bypass', 'ctrl':bypass_zctrl})
             #Add position info
             pinfo['posx']=int(round(float(posx)))

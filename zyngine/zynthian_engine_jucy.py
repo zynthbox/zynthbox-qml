@@ -170,10 +170,21 @@ class zynthian_engine_jucy(zynthian_engine):
             if parameter.isProgramParameter():
                 # This is the Program parameter, and we want to not be displaying that (juce does not always have it (only if there are actually a programs list), but if it is there, it always has the id "juceProgramParameter")
                 pass
-            # TODO This goes back in when we've got bypass exposed in general as a property on engine
-            # elif parameter.isBypassParameter():
+            elif parameter.isBypassParameter():
                 # This is the bypass parameter, and we want to be exposing that in a more clever way than just in the raw parameter list
-                # pass
+                self.__bypassController = zynthian_controller(self, parameter.getName(), parameter.getName(), {
+                    'group_symbol': "ctrl",
+                    'group_name': "Ctrl",
+                    'graph_path': index,
+                    'value': parameter.getValue(),
+                    'labels': ["Off", "On"],
+                    'ticks': [0.0, 1.0],
+                    'value_min': 0.0,
+                    'value_max': 1.0,
+                    'is_toggle': True,
+                    'is_integer': False
+                })
+                self.setBypassController(self.__bypassController)
             elif type(parameter) == Jucy.StringListParameter:
                 # Controller value is a set of string
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {

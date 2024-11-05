@@ -138,6 +138,8 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__custom_controller_mode = False
         self._active_custom_controller = None
         self.__all_controls = []
+        self.__selected_engine = None
+        self.__selected_engine_bypass_controller = None
         self.__selected_column = 0
         self.bigknob_multiplier = 1 if self.isZ2V3 else 100
         self.controller0 = None
@@ -307,6 +309,7 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__all_controls = []
 
         if self.zynqtgui.curlayer:
+            self.__selected_engine = self.zynqtgui.curlayer.engine
             self.layers = self.zynqtgui.screens['layer'].get_fxchain_layers()
             # If no FXChain layers, then use the curlayer itself
             if self.layers is None or len(self.layers)==0:
@@ -350,6 +353,12 @@ class zynthian_gui_control(zynthian_gui_selector):
             logging.info("Current layer is empty - updating controls to match")
             self.layers = []
             self.index = 0
+            self.__selected_engine = None
+
+        if self.__selected_engine and self.__selected_engine.bypassController:
+            self.__selected_engine_bypass_controller = zynthian_gui_controller(-1, self.__selected_engine.bypassController, self)
+        else:
+            self.__selected_engine_bypass_controller = None
 
         super().fill_list()
         self.all_controls_changed.emit()
@@ -945,6 +954,12 @@ class zynthian_gui_control(zynthian_gui_selector):
     def get_all_controls(self):
         return self.__all_controls
 
+    def get_selected_engine(self):
+        return self.__selected_engine
+
+    def get_selected_engine_bypass_controller(self):
+        return self.__selected_engine_bypass_controller
+
     def get_selectedPage(self):
         return math.floor((self.selectedColumn * 3) / 12)
 
@@ -993,6 +1008,8 @@ class zynthian_gui_control(zynthian_gui_selector):
     single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
 #    active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
     all_controls = Property('QVariantList', get_all_controls, notify=all_controls_changed)
+    selectedEngine = Property(QObject, get_selected_engine, notify=all_controls_changed)
+    selectedEngineBypassController = Property(QObject, get_selected_engine_bypass_controller, notify=all_controls_changed)
 
     selectedPage = Property(int, get_selectedPage, set_selectedPage, notify=selectedColumnChanged)
     selectedColumn = Property(int, get_selectedColumn, set_selectedColumn, notify=selectedColumnChanged)

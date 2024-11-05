@@ -23,11 +23,11 @@
  ******************************************************************************
  */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Window 2.10
-import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.7 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
@@ -40,10 +40,21 @@ RowLayout {
         var columnIndex = zynqtgui.control.selectedColumn - zynqtgui.control.selectedPage * 4
 
         switch (cuia) {
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                if (zynqtgui.control.selectedEngineBypassController) {
+                    if (zynqtgui.control.selectedEngineBypassController.value === 0) {
+                        zynqtgui.control.selectedEngineBypassController.value = 1;
+                    } else {
+                        zynqtgui.control.selectedEngineBypassController.value = 0;
+                    }
+                }
+                return true;
+                break;
             case "SELECT_UP":
                 zynqtgui.control.selectPrevPage()
                 return true
-
             case "SELECT_DOWN":
                 zynqtgui.control.selectNextPage()
                 return true
@@ -86,66 +97,93 @@ RowLayout {
 
     spacing: 4
 
-    ListView {
-        id: pageSelectorListview
+    ColumnLayout {
         Layout.fillHeight: true
+        Layout.fillWidth: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-        model: zynqtgui.current_screen_id === "control"
-               && root.selectedChannel.channelHasSynth
-                ? zynqtgui.control.totalPages
-                : 0
-        clip: true
-        currentIndex: zynqtgui.control.selectedPage
-        highlightFollowsCurrentItem: true
-        QQC2.ScrollBar.vertical: QQC2.ScrollBar {
-            width: Kirigami.Units.gridUnit * 0.3
-            policy: QQC2.ScrollBar.AlwaysOn
-            active: true
-            contentItem: Rectangle {
-                radius: width/2
-                color: Kirigami.Theme.textColor
-                opacity: 0.3
-            }
-        }
-        delegate: Rectangle {
-            width: ListView.view.width
-            height: ListView.view.height / 8
-            color: "transparent"
-            border.color: zynqtgui.control.selectedPage === index ? "#88ffffff" : "transparent"
-            border.width: 2
-            radius: 2
-
-            QQC2.Label {
-                anchors.centerIn: parent
-                text: qsTr("Page %1").arg(index+1)
-            }
-
-            Kirigami.Separator {
-                height: 1
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    bottom: parent.bottom
+        ListView {
+            id: pageSelectorListview
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            model: zynqtgui.current_screen_id === "control"
+                    ? zynqtgui.control.totalPages
+                    : 0
+            clip: true
+            currentIndex: zynqtgui.control.selectedPage
+            highlightFollowsCurrentItem: true
+            QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                width: Kirigami.Units.gridUnit * 0.3
+                policy: QQC2.ScrollBar.AlwaysOn
+                active: true
+                contentItem: Rectangle {
+                    radius: width/2
+                    color: Kirigami.Theme.textColor
+                    opacity: 0.3
                 }
             }
+            delegate: Rectangle {
+                width: ListView.view.width
+                height: ListView.view.height / 8
+                color: "transparent"
+                border.color: zynqtgui.control.selectedPage === index ? "#88ffffff" : "transparent"
+                border.width: 2
+                radius: 2
 
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: qsTr("Page %1").arg(index+1)
+                }
+
+                Kirigami.Separator {
+                    height: 1
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        zynqtgui.control.selectedPage = index
+                    }
+                }
+
+                Zynthian.KnobIndicator {
+                    anchors {
+                        bottom: parent.bottom
+                        left: parent.left
+                        margins: Kirigami.Units.smallSpacing
+                    }
+                    height: Kirigami.Units.iconSizes.small
+                    width: Kirigami.Units.iconSizes.small
+                    visible: zynqtgui.control.selectedPage === index
+                    knobId: 3
+                }
+            }
+        }
+        QQC2.Button {
+            Layout.fillWidth: true
+            visible: zynqtgui.control.selectedEngineBypassController !== null
+            QQC2.Switch {
+                anchors {
+                    fill: parent
+                    leftMargin: Kirigami.Units.largeSpacing
+                    rightMargin: Kirigami.Units.largeSpacing
+                }
+                text: qsTr("Bypass")
+                checked: zynqtgui.control.selectedEngineBypassController ? zynqtgui.control.selectedEngineBypassController.value > 0 : false
+            }
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    zynqtgui.control.selectedPage = index
+                    if (zynqtgui.control.selectedEngineBypassController.value === 0) {
+                        zynqtgui.control.selectedEngineBypassController.value = 1;
+                    } else {
+                        zynqtgui.control.selectedEngineBypassController.value = 0;
+                    }
                 }
-            }
-
-            Zynthian.KnobIndicator {
-                anchors {
-                    bottom: parent.bottom
-                    left: parent.left
-                    margins: Kirigami.Units.smallSpacing
-                }
-                height: Kirigami.Units.iconSizes.small
-                width: Kirigami.Units.iconSizes.small
-                visible: zynqtgui.control.selectedPage === index
-                knobId: 3
             }
         }
     }
@@ -159,10 +197,11 @@ RowLayout {
 
             readonly property int columnIndex: index
             readonly property alias rowsRepeater: rowsRepeater
-            readonly property bool isCurrentColumn: root.selectedChannel.channelHasSynth && (zynqtgui.control.selectedColumn % 4) === index
+            readonly property bool isCurrentColumn: (zynqtgui.control.selectedColumn % 4) === index
 
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
 
             color: "transparent"
             border {
@@ -194,9 +233,8 @@ RowLayout {
                                     // Do not use all_controls property here in js as it will slow things down if array is large enough
                                     // Instead fetch the required controls as required
                                     return zynqtgui.current_screen_id === "control"
-                                        && root.selectedChannel.channelHasSynth
-                                            ? zynqtgui.control.getAllControlAt(controlDelegate.allControlsIndex)
-                                            : null
+                                        ? zynqtgui.control.getAllControlAt(controlDelegate.allControlsIndex)
+                                        : null
                                 })
                             }
                         }

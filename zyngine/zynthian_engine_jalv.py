@@ -322,8 +322,9 @@ class zynthian_engine_jalv(zynthian_engine):
         zctrls = OrderedDict()
         for i, info in zynthian_lv2.get_plugin_ports(self.plugin_url).items():
             symbol = info['symbol']
-            #logging.debug("Controller {} info =>\n{}!".format(symbol, info))
+            # logging.error("Controller {} info =>\n{}!".format(symbol, info))
             try:
+                zctrl = None
                 #If there is points info ...
                 if len(info['scale_points'])>1:
                     labels = []
@@ -332,7 +333,7 @@ class zynthian_engine_jalv(zynthian_engine):
                         labels.append(p['label'])
                         values.append(p['value'])
 
-                    zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
+                    zctrl = zynthian_controller(self, symbol, info['name'], {
                         'group_symbol': info['group_symbol'],
                         'group_name': info['group_name'],
                         'graph_path': info['index'],
@@ -355,7 +356,7 @@ class zynthian_engine_jalv(zynthian_engine):
                             else:
                                 val = 'on'
 
-                            zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
+                            zctrl = zynthian_controller(self, symbol, info['name'], {
                                 'group_symbol': info['group_symbol'],
                                 'group_name': info['group_name'],
                                 'graph_path': info['index'],
@@ -368,7 +369,7 @@ class zynthian_engine_jalv(zynthian_engine):
                                 'is_integer': True
                             })
                         else:
-                            zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
+                            zctrl = zynthian_controller(self, symbol, info['name'], {
                                 'group_symbol': info['group_symbol'],
                                 'group_name': info['group_name'],
                                 'graph_path': info['index'],
@@ -387,7 +388,7 @@ class zynthian_engine_jalv(zynthian_engine):
                             else:
                                 val = 'on'
 
-                            zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
+                            zctrl = zynthian_controller(self, symbol, info['name'], {
                                 'group_symbol': info['group_symbol'],
                                 'group_name': info['group_name'],
                                 'graph_path': info['index'],
@@ -400,7 +401,7 @@ class zynthian_engine_jalv(zynthian_engine):
                                 'is_integer': False
                             })
                         else:
-                            zctrls[symbol] = zynthian_controller(self, symbol, info['name'], {
+                            zctrl = zynthian_controller(self, symbol, info['name'], {
                                 'group_symbol': info['group_symbol'],
                                 'group_name': info['group_name'],
                                 'graph_path': info['index'],
@@ -412,6 +413,10 @@ class zynthian_engine_jalv(zynthian_engine):
                                 'is_integer': False,
                                 'is_logarithmic': info['is_logarithmic']
                             })
+                if symbol.casefold() == "bypass":
+                    self.setBypassController(zctrl)
+                else:
+                    zctrls[symbol] = zctrl
 
             #If control info is not OK
             except Exception as e:

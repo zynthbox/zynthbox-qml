@@ -32,7 +32,7 @@ import Zynthbox
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
-from PySide2.QtCore import QObject, Slot
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from . import zynthian_controller
 
@@ -188,6 +188,8 @@ class zynthian_engine(zynthian_basic_engine):
 
         self.learned_cc = [[None for c in range(128)] for chan in range(16)]
         self.learned_zctrls = {}
+
+        self.__bypassController = None
 
 
     def __del__(self):
@@ -589,6 +591,19 @@ class zynthian_engine(zynthian_basic_engine):
     def send_controller_value(self, zctrl):
         raise Exception("NOT IMPLEMENTED!")
 
+    # BEGIN Property bypassController
+    def setBypassController(self, newBypassController):
+        if self.__bypassController != newBypassController:
+            self.__bypassController = newBypassController
+            self.bypassControllerChanged.emit()
+
+    def getBypassController(self):
+        return self.__bypassController
+
+    bypassControllerChanged = Signal()
+
+    bypassController = Property(QObject, getBypassController, notify=bypassControllerChanged)
+    # END Property bypassController
 
     #----------------------------------------------------------------------------
     # MIDI learning

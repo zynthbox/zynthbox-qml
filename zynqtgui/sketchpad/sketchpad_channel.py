@@ -1824,7 +1824,7 @@ class sketchpad_channel(QObject):
         return False
 
     channelHasSynth = Property(bool, get_channelHasSynth, notify=chained_sounds_changed)
-    ### END Property channelSynthPorts
+    ### END Property channelHasSynth
 
     ### BEGIN Property pan
     def get_pan(self):

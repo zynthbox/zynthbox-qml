@@ -174,7 +174,7 @@ class zynthian_engine_jucy(zynthian_engine):
             # elif parameter.isBypassParameter():
                 # This is the bypass parameter, and we want to be exposing that in a more clever way than just in the raw parameter list
                 # pass
-            elif type(parameter) == Jucy.StringParameter:
+            elif type(parameter) == Jucy.StringListParameter:
                 # Controller value is a set of string
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
                     'group_symbol': "ctrl",

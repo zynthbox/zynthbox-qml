@@ -580,7 +580,7 @@ class zynthian_gui_controller(QObject):
     def get_value_default(self):
         if self.zctrl == None:
             return 0
-        return self.zctrl.value_default
+        return self.zctrl.value_default/self.scale_value
 
     index_changed = Signal()
     title_changed = Signal()

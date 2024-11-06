@@ -52,8 +52,33 @@ AbstractController {
         stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 1 : root.controller.ctrl.step_size) : 0
         from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
         to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
-        onMoved: root.controller.ctrl.value = value
-        onPressedChanged: root.pressedChanged(pressed)
+
+        property bool shouldClick: false
+        property var mostRecentClickTime: 0
+        onMoved: {
+            shouldClick = false;
+            if (root.controller && root.controller.ctrl) {
+                root.controller.ctrl.value = value;
+            }
+        }
+        onPressedChanged: {
+            if (pressed) {
+                shouldClick = true;
+            } else {
+                shouldClick = false;
+                let thisClickTime = Date.now();
+                if (thisClickTime - mostRecentClickTime < 300) {
+                    if (root.controller && root.controller.ctrl) {
+                        root.controller.ctrl.value = root.controller.ctrl.value_default;
+                    }
+                    root.doubleClicked();
+                } else {
+                    root.clicked();
+                }
+                mostRecentClickTime = thisClickTime;
+            }
+            root.pressedChanged(pressed);
+        }
 
         Kirigami.Heading {
             id: valueLabel
@@ -69,7 +94,7 @@ AbstractController {
                 return root.controller.ctrl.value_print;
             }
         }
-    }    
+    }
 
     Binding {
         target: dial

@@ -202,10 +202,10 @@ class zynthian_gui_controller(QObject):
         if self.ctrl_value_print != newValuePrint:
             self.ctrl_value_print = newValuePrint
             emitValuePrintChanged = True
-        if emitValuePrintChanged:
-            self.value_print_changed.emit()
         if update_zctrl:
             self.zctrl.set_value(val)
+        if emitValuePrintChanged:
+            self.value_print_changed.emit()
 
         self.zynqtgui.zynread_wait_flag = False
         #print("VALUE: %s" % self.ctrl_value)
@@ -255,6 +255,8 @@ class zynthian_gui_controller(QObject):
         return self.ctrl_value
 
     def get_value_print(self):
+        if self.zctrl and self.zctrl.hasValueLabel:
+            return self.zctrl.get_valueLabel()
         return self.ctrl_value_print
 
     def get_max_value(self):

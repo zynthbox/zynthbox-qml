@@ -173,15 +173,15 @@ RowLayout {
                     rightMargin: Kirigami.Units.largeSpacing
                 }
                 text: qsTr("Bypass")
-                checked: zynqtgui.control.selectedEngineBypassController ? zynqtgui.control.selectedEngineBypassController.value > 0 : false
+                checked: zynqtgui.control.selectedEngineBypassController ? zynqtgui.control.selectedEngineBypassController.value === zynqtgui.control.selectedEngineBypassController.value_default : false
             }
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (zynqtgui.control.selectedEngineBypassController.value === 0) {
-                        zynqtgui.control.selectedEngineBypassController.value = 1;
+                    if (zynqtgui.control.selectedEngineBypassController.value === zynqtgui.control.selectedEngineBypassController.value0) {
+                        zynqtgui.control.selectedEngineBypassController.value = zynqtgui.control.selectedEngineBypassController.max_value;
                     } else {
-                        zynqtgui.control.selectedEngineBypassController.value = 0;
+                        zynqtgui.control.selectedEngineBypassController.value = zynqtgui.control.selectedEngineBypassController.value0;
                     }
                 }
             }

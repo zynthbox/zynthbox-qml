@@ -72,6 +72,8 @@ class zynthian_controller(QObject):
         self.label2value=None
         self.value2label=None
 
+        self.hasValueLabel=False
+
         if options:
             self.set_options(options)
 
@@ -262,6 +264,11 @@ class zynthian_controller(QObject):
     def get_value(self):
         return self.value
 
+    def get_valueLabel(self):
+        if self.hasValueLabel == True and self.engine:
+            return self.engine.get_controller_value_label(self)
+        else:
+            return self.value
 
     def _set_value(self, val):
         valueChanged = False

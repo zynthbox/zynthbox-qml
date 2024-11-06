@@ -62,6 +62,7 @@ ColumnLayout {
             value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
 
             property bool shouldClick: false
+            property var mostRecentClickTime: 0
             onMoved: {
                 shouldClick = false;
                 if (!root.controlObj || !root.controlObj.hasOwnProperty(root.controlProperty)) {
@@ -75,7 +76,13 @@ ColumnLayout {
                     root.pressed(null);
                 } else {
                     shouldClick = false;
-                    root.clicked();
+                    let thisClickTime = Date.now();
+                    if (thisClickTime - mostRecentClickTime < 300) {
+                        root.doubleClicked();
+                    } else {
+                        root.clicked();
+                    }
+                    mostRecentClickTime = thisClickTime;
                 }
             }
 

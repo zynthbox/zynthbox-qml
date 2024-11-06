@@ -35,6 +35,8 @@ Card {
     id: root
 
     signal pressedChanged(bool pressed)
+    signal clicked()
+    signal doubleClicked()
 
     // instance of zynthian_gui_controller.py, TODO: should be registered in qml?
     property ControllerGroup controller: ControllerGroup {}

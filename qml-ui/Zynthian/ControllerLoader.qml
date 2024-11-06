@@ -34,6 +34,8 @@ Item {
     id: root
 
     signal pressedChanged(bool pressed)
+    signal clicked()
+    signal doubleClicked()
     signal interacted()
     readonly property ControllerGroup controller: ControllerGroup {}
     property bool highlighted: false
@@ -87,8 +89,8 @@ Item {
         controller: visible ? root.controller : root.noController;
         highlighted: root.highlighted
         onPressedChanged: {
-            root.pressedChanged(pressed)
-            root.interacted()
+            root.pressedChanged(pressed);
+            root.interacted();
         }
     }
     DialController {
@@ -98,8 +100,14 @@ Item {
         controller: visible ? root.controller : root.noController;
         highlighted: root.highlighted
         onPressedChanged: {
-            root.pressedChanged(pressed)
-            root.interacted()
+            root.pressedChanged(pressed);
+            root.interacted();
+        }
+        onClicked: {
+            root.clicked();
+        }
+        onDoubleClicked: {
+            root.doubleClicked();
         }
     }
     QQC2.ToolButton {
@@ -115,7 +123,10 @@ Item {
             applicationWindow().pageStack.getPage("control").showControlActions(root.controller.ctrl.zctrl);
         }
         onPressed: {
-            root.interacted()
+            root.interacted();
+        }
+        onDoubleClicked: {
+            root.doubleClicked();
         }
     }
     Item {

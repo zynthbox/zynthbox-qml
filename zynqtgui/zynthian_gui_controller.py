@@ -575,6 +575,11 @@ class zynthian_gui_controller(QObject):
     zctrlChanged = Signal()
     zctrl = Property(QObject,getZctrl,setZctrl,notify=zctrlChanged)
 
+    def get_value_default(self):
+        if self.zctrl == None:
+            return 0
+        return self.zctrl.value_default
+
     index_changed = Signal()
     title_changed = Signal()
     midi_bind_changed = Signal()
@@ -591,6 +596,7 @@ class zynthian_gui_controller(QObject):
     visible = Property(bool, get_visible, set_visible, notify = visible_changed)
     midi_bind = Property(str, get_midi_bind, notify = midi_bind_changed)
     value = Property(float, get_value, write_value, notify = value_changed)
+    value_default = Property(float, get_value_default, notify = zctrlChanged)
     value_print = Property(str, get_value_print, notify = value_print_changed)
     value0 = Property(float, get_value0, notify = value0_changed)
     max_value = Property(float, get_max_value, notify = max_value_changed)

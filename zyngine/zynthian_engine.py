@@ -591,6 +591,9 @@ class zynthian_engine(zynthian_basic_engine):
     def send_controller_value(self, zctrl):
         raise Exception("NOT IMPLEMENTED!")
 
+    def get_controller_value_label(self, zctrl):
+        raise Exception("NOT IMPLEMENTED!")
+
     # BEGIN Property bypassController
     def setBypassController(self, newBypassController):
         if self.__bypassController != newBypassController:

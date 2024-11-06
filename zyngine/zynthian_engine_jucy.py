@@ -185,6 +185,7 @@ class zynthian_engine_jucy(zynthian_engine):
                     'is_toggle': True,
                     'is_integer': False
                 })
+                self.__bypassController.hasValueLabel = True
                 self.setBypassController(self.__bypassController)
             elif type(parameter) == Jucy.StringListParameter:
                 # Controller value is a set of string
@@ -201,6 +202,7 @@ class zynthian_engine_jucy(zynthian_engine):
                     'is_toggle': False,
                     'is_integer': False
                 })
+                zctrls[parameter.getName()].hasValueLabel = True
 
             elif type(parameter) == Jucy.BooleanParameter:
                 # Controller value is a boolean
@@ -217,6 +219,7 @@ class zynthian_engine_jucy(zynthian_engine):
                     'is_toggle': True,
                     'is_integer': False
                 })
+                zctrls[parameter.getName()].hasValueLabel = True
             elif type(parameter) == Jucy.Parameter:
                 # Controller value is normalized float from 0.0 to 1.0
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
@@ -230,6 +233,7 @@ class zynthian_engine_jucy(zynthian_engine):
                     'is_toggle': False,
                     'is_integer': False
                 })
+                zctrls[parameter.getName()].hasValueLabel = True
             else:
                 # Controller type is unknown. Handle accordingly
                 logging.debug("Unknown controller type. Handle accordingly")
@@ -295,6 +299,9 @@ class zynthian_engine_jucy(zynthian_engine):
 
     def send_controller_value(self, zctrl):
         self.pluginhost_parameters_dict[zctrl.name].setValue(zctrl.value)
+
+    def get_controller_value_label(self, zctrl):
+        return self.pluginhost_parameters_dict[zctrl.name].getValueLabel()
 
 
 #******************************************************************************

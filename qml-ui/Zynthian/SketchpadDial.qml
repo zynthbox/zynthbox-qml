@@ -88,7 +88,15 @@ ColumnLayout {
 
             QQC2.Label {
                 id: valueLabel
-                anchors.centerIn: parent
+                anchors {
+                    fill: parent
+                    margins: dial.handle.width / 2
+                }
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                fontSizeMode: Text.Fit
+                minimumPointSize: 8
+                font.pointSize: 18
                 text: root.showDecimalsAtInteger
                     ? dial.value.toFixed(root.fixedPointTrail)
                     : Math.floor(dial.value) == dial.value

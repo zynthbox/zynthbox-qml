@@ -301,7 +301,16 @@ class zynthian_engine_jucy(zynthian_engine):
         self.pluginhost_parameters_dict[zctrl.name].setValue(zctrl.value)
 
     def get_controller_value_label(self, zctrl):
-        return self.pluginhost_parameters_dict[zctrl.name].getValueLabel()
+        label = self.pluginhost_parameters_dict[zctrl.name].getValueLabel().strip()
+        try:
+            # Filter out the float value with precision 2 from the label
+            updated_value = re.search(r'[0-9]*[.][0-9]{2}', label).group(0)
+            # Return label with float value of precision 2 to make it look prettier
+            label = re.sub(r'[0-9]*[.][0-9]*', updated_value, label)
+        except:
+            # logging.exception(e)
+            pass
+        return label
 
 
 #******************************************************************************

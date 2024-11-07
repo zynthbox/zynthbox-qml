@@ -700,8 +700,9 @@ class zynthian_layer:
         if "system" in ao:
             ao.remove("system")
             ao += ["system:playback_1", "system:playback_2"]
-            
-        self.audio_out=ao
+
+        # pushing through a dictionary to both ensure order, and get rid of any duplicate entries
+        self.audio_out=list(OrderedDict.fromkeys(ao))
         self.zynqtgui.zynautoconnect_audio()
 
 

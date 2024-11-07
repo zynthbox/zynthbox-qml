@@ -80,9 +80,17 @@ AbstractController {
             root.pressedChanged(pressed);
         }
 
-        Kirigami.Heading {
+        QQC2.Label {
             id: valueLabel
-            anchors.centerIn: parent
+            anchors {
+                fill: parent
+                margins: dial.handle.width / 2
+            }
+            horizontalAlignment: Text.AlighHCenter
+            verticalAlignment: Text.AlignVCenter
+            fontSizeMode: Text.Fit
+            minimumPointSize: 8
+            font.pointSize: 24
             text: {
                 if (!root.controller.ctrl) {
                     return "";

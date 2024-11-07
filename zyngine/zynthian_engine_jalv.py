@@ -355,6 +355,10 @@ class zynthian_engine_jalv(zynthian_engine):
                                 val = 'off'
                             else:
                                 val = 'on'
+                            if info['range']['default']==0:
+                                val_default = 'off'
+                            else:
+                                val_default = 'on'
 
                             zctrl = zynthian_controller(self, symbol, info['name'], {
                                 'group_symbol': info['group_symbol'],
@@ -363,6 +367,7 @@ class zynthian_engine_jalv(zynthian_engine):
                                 'value': val,
                                 'labels': ['off','on'],
                                 'ticks': [int(info['range']['min']), int(info['range']['max'])],
+                                'value_default': val_default,
                                 'value_min': int(info['range']['min']),
                                 'value_max': int(info['range']['max']),
                                 'is_toggle': True,
@@ -387,6 +392,10 @@ class zynthian_engine_jalv(zynthian_engine):
                                 val = 'off'
                             else:
                                 val = 'on'
+                            if info['range']['default']==0:
+                                val_default = 'off'
+                            else:
+                                val_default = 'on'
 
                             zctrl = zynthian_controller(self, symbol, info['name'], {
                                 'group_symbol': info['group_symbol'],
@@ -395,6 +404,7 @@ class zynthian_engine_jalv(zynthian_engine):
                                 'value': val,
                                 'labels': ['off','on'],
                                 'ticks': [info['range']['min'], info['range']['max']],
+                                'value_default': val_default,
                                 'value_min': info['range']['min'],
                                 'value_max': info['range']['max'],
                                 'is_toggle': True,

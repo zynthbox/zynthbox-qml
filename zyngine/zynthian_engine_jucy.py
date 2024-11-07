@@ -177,7 +177,7 @@ class zynthian_engine_jucy(zynthian_engine):
                     'group_name': "Ctrl",
                     'graph_path': index,
                     'value': parameter.getValue(),
-                    'value_default': parameter.getDefaultValue(),
+                    'value_default': 1.0,
                     'labels': ["Off", "On"],
                     'ticks': [0.0, 1.0],
                     'value_min': 0.0,

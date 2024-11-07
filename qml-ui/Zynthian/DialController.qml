@@ -86,11 +86,11 @@ AbstractController {
                 fill: parent
                 margins: dial.handle.width / 2
             }
-            horizontalAlignment: Text.AlighHCenter
+            horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             fontSizeMode: Text.Fit
             minimumPointSize: 8
-            font.pointSize: 24
+            font.pointSize: 18
             text: {
                 if (!root.controller.ctrl) {
                     return "";
@@ -99,7 +99,7 @@ AbstractController {
                 if (root.controller.ctrl.value0 === 0 && root.controller.ctrl.max_value === 127) {
                     return Math.round(100 * (value / 127));
                 }
-                return root.controller.ctrl.value_print;
+                return root.controller.ctrl.value_print.trim();
             }
         }
     }

@@ -203,7 +203,6 @@ class zynthian_engine_jucy(zynthian_engine):
                     'is_integer': False
                 })
                 zctrls[parameter.getName()].hasValueLabel = True
-
             elif type(parameter) == Jucy.BooleanParameter:
                 # Controller value is a boolean
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
@@ -220,7 +219,7 @@ class zynthian_engine_jucy(zynthian_engine):
                     'is_integer': False
                 })
                 zctrls[parameter.getName()].hasValueLabel = True
-            elif type(parameter) == Jucy.Parameter:
+            elif type(parameter) in [Jucy.Parameter, Jucy.IntegerParameter]:
                 # Controller value is normalized float from 0.0 to 1.0
                 zctrls[parameter.getName()] = zynthian_controller(self, parameter.getName(), parameter.getName(), {
                     'group_symbol': "ctrl",

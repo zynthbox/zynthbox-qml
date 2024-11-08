@@ -66,7 +66,10 @@ class zynthian_basic_engine(QObject):
         self.is_running = False
 
     def __del__(self):
-        self.stop()
+        # If this fails, it is likely that the engine was already stopped and the process object deleted, so let's just not worry too much
+        try:
+            self.stop()
+        except: pass
 
     # ---------------------------------------------------------------------------
     # Subproccess Management & IPC

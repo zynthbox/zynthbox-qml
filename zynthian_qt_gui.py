@@ -1688,6 +1688,10 @@ class zynthian_gui(QObject):
 
         channelDelta = 5 if self.channelsModActive else 0
 
+        # This will happen if fed an empty parameter list (such as from osc)
+        if len(params) == 0:
+            params = [-1]
+
         # Before anything else, try and ask the main window whether there's anything to be done
         try:
             cuia_callback = zynthian_gui_config.top.property("cuiaCallback")

@@ -1518,9 +1518,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
                                             base1 = othersublayer.jackname.split("-")[0]
                                         base2 = jackname.split("-")[0]
                                         if othersublayer.jackname != jackname and base1 == base2:
-                                            new_audio_out.append(othersublayer.jackname)
+                                            if othersublayer.jackname in new_audio_out:
+                                                # logging.error(f"Port from other sublayer {othersublayer.jackname} already exists, don't add again")
+                                                pass
+                                            else:
+                                                new_audio_out.append(othersublayer.jackname)
                                         else:
-                                            new_audio_out.append(jackname)
+                                            if jackname in new_audio_out:
+                                                # logging.error(f"Port {jackname} already exists, don't add again")
+                                                pass
+                                            else:
+                                                new_audio_out.append(jackname)
                         if needs_change:
                             sublayer.set_audio_out(new_audio_out);
 

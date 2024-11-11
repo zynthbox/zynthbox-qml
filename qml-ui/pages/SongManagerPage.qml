@@ -281,11 +281,12 @@ Zynthian.ScreenPage {
                                         : ""
                         subText: {
                             if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > segmentsLayout.lastVisibleSegmentCellIndex + 1 && (index === 0 || index === segmentsLayout.lastVisibleSegmentCellIndex)) {
-                                return " "
+                                return " \n "
                             } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
-                                return " "
+                                return " \n "
                             } else {
-                                return segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
+                                let timeInSeconds = Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * ((segmentHeader.segment.barLength * 4) + segmentHeader.segment.beatLength)).toFixed(2));
+                                return timeInSeconds + "\n" + segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
                             }
                         }
 
@@ -379,7 +380,10 @@ Zynthian.ScreenPage {
                         property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.SyncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
                         model: component.isVisible && totalDuration > 0 ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel : 0
                         delegate: Item {
+                            id: segmentDelegate
                             property QtObject segment: model.segment
+                            property QtObject nextSegment: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.get_segment(model.index + 1)
+                            property bool isCurrentSegment: component.isVisible ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex === model.index : false
                             property int duration: Zynthbox.SyncTimer.getMultiplier() * (segment.barLength * 4 + segment.beatLength)
                             Layout.fillWidth: true
                             Layout.preferredWidth: component.width * (duration / segmentsRepeater.totalDuration)
@@ -400,7 +404,25 @@ Zynthian.ScreenPage {
                                         margins: 2
                                     }
                                     color: Kirigami.Theme.focusColor
-                                    visible: component.isVisible ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex === model.index : false
+                                    visible: segmentDelegate.isCurrentSegment
+                                }
+                                QQC2.Label {
+                                    anchors {
+                                        top: parent.bottom
+                                        right: parent.left
+                                    }
+                                    font.pixelSize: Kirigami.Units.gridUnit / 2
+                                    visible: segmentDelegate.isCurrentSegment && model.index > 0
+                                    text: Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.segment.beatStartPosition).toFixed(2))
+                                }
+                                QQC2.Label {
+                                    anchors {
+                                        top: parent.bottom
+                                        left: parent.right
+                                    }
+                                    font.pixelSize: Kirigami.Units.gridUnit / 2
+                                    visible: segmentDelegate.isCurrentSegment && segmentDelegate.nextSegment !== null
+                                    text: segmentDelegate.nextSegment ? Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, Zynthbox.SyncTimer.getMultiplier() * segmentDelegate.nextSegment.beatStartPosition).toFixed(2)) : ""
                                 }
                             }
                         }
@@ -441,19 +463,7 @@ Zynthian.ScreenPage {
                         }
                         font.pixelSize: Kirigami.Units.gridUnit / 2
                         horizontalAlignment: Text.AlignRight
-                        text: segmentsRepeater.totalDuration > 0 ? formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
-                        function formatTime(seconds) {
-                            const hours = Math.floor(seconds / 3600);
-                            const minutes = Math.floor((seconds % 3600) / 60);
-                            const remainingSeconds = seconds % 60;
-
-                            if (hours > 0) {
-                                return `${hours}h${minutes}m${remainingSeconds}s`;
-                            } else if (minutes > 0) {
-                                return `${minutes}m${remainingSeconds}s`;
-                            }
-                            return `${seconds}s`;
-                        }
+                        text: segmentsRepeater.totalDuration > 0 ? Zynthian.CommonUtils.formatTime(Zynthbox.SyncTimer.subbeatCountToSeconds(Zynthbox.SyncTimer.bpm, segmentsRepeater.totalDuration).toFixed(2)) : ""
                     }
                 }
             }

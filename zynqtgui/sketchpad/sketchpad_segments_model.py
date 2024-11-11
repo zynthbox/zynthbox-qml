@@ -245,6 +245,16 @@ class sketchpad_segments_model(QAbstractListModel):
     count = Property(int, get_count, notify=countChanged)
     ### END Property count
 
+    @Slot(int, result=int)
+    def beatDurationAtIndex(self, index):
+        beatDuration = 0
+        currentIndex = 0
+        while currentIndex < len(self.__segments) and currentIndex < index:
+            currentSegment = self.__segments[currentIndex]
+            beatDuration += currentSegment.barLength * 4 + currentSegment.beatLength
+            currentIndex += 1
+        return beatDuration
+
     ### Property totalBeatDuration
     def get_totalBeatDuration(self):
         totalDuration = 0

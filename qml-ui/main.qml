@@ -1094,8 +1094,12 @@ Kirigami.AbstractApplicationWindow {
         delegate: Shortcut {
             sequence: model.display
             context: Qt.ApplicationShortcut
-            onActivated: zynqtgui.process_keybinding_shortcut(model.display)
-            onActivatedAmbiguously: zynqtgui.process_keybinding_shortcut(model.display)
+            enabled: Qt.inputMethod.visible === false
+            function activateThing() {
+                zynqtgui.process_keybinding_shortcut(model.display);
+            }
+            onActivated: activateThing()
+            onActivatedAmbiguously: activateThing()
         }
     }
 

@@ -43,6 +43,7 @@ class sketchpad_segment(QObject):
 
         self.__segment_model = segment_model
         self.__segment_model.countChanged.connect(self.segmentIdChanged.emit)
+        self.__segment_model.totalBeatDurationChanged.connect(self.beatStartPositionChanged)
 
         # Update isEmpty when bar/beat length changes
         self.barLengthChanged.connect(self.isEmptyChanged.emit)
@@ -205,6 +206,13 @@ class sketchpad_segment(QObject):
 
     tickLength = Property(int, get_tickLength, set_tickLength, notify=tickLengthChanged)
     ### END Property tickLength
+
+    ### BEGIN Property beatStartPosition
+    def get_beatStartPosition(self):
+        return self.__segment_model.beatDurationAtIndex(self.__segment_model.segment_index(self))
+    beatStartPositionChanged = Signal()
+    beatStartPosition = Property(int, get_beatStartPosition, notify=beatStartPositionChanged)
+    ### END Property beatStartPosition
 
     ### Property clips
     def get_clips(self):

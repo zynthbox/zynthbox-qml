@@ -4396,5 +4396,23 @@
     "path": "/usr/lib/vst3/Airwindows Consolidated.vst3",
     "type": "vst3",
     "version_added": 1
+  },
+  "ZBP_00733": {
+    "name": "Kars",
+    "path": "/usr/lib/vst3/Kars.vst3",
+    "type": "vst3",
+    "version_added": 1
+  },
+  "ZBP_00734": {
+    "name": "Nekobi",
+    "path": "/usr/lib/vst3/Nekobi.vst3",
+    "type": "vst3",
+    "version_added": 1
+  },
+  "ZBP_00735": {
+    "name": "Surge",
+    "path": "/usr/lib/vst3/Surge.vst3",
+    "type": "vst3",
+    "version_added": 1
   }
 }

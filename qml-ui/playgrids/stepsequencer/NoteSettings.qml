@@ -981,6 +981,53 @@ ColumnLayout {
             Layout.maximumWidth: Layout.minimumWidth
             horizontalAlignment: Text.AlignHCenter
             text: "Key and Scale:"
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                }
+                width: height
+                icon.name: component.patternModel
+                    ? component.patternModel.lockToKeyAndScale == Zynthbox.PatternModel.KeyScaleLockRewrite
+                        ? "exchange-positions"
+                        : component.patternModel.lockToKeyAndScale == Zynthbox.PatternModel.KeyScaleLockBlock
+                            ? "object-locked"
+                            : "object-unlocked"
+                    : "object-unlocked"
+                onClicked: {
+                    keyScaleLockStylePopup.open();
+                }
+                Zynthian.ActionPickerPopup {
+                    id: keyScaleLockStylePopup
+                    actions: [
+                        Kirigami.Action {
+                            text: component.patternModel && component.patternModel.lockToKeyAndScale == Zynthbox.PatternModel.KeyScaleLockOff
+                                ? qsTr("<b>Unlocked</b><br />(leaves incoming<br/>notes alone)")
+                                : qsTr("Unlocked\n(leaves incoming\nnotes alone)")
+                            onTriggered: {
+                                component.patternModel.lockToKeyAndScale = Zynthbox.PatternModel.KeyScaleLockOff;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: component.patternModel && component.patternModel.lockToKeyAndScale == Zynthbox.PatternModel.KeyScaleLockBlock
+                                ? qsTr("<b>Block Off-key</b><br />(blocks incoming notes that<br/>are not on scale)")
+                                : qsTr("Block Off-key\n(blocks incoming notes that\nare not on scale)")
+                            onTriggered: {
+                                component.patternModel.lockToKeyAndScale = Zynthbox.PatternModel.KeyScaleLockBlock;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: component.patternModel && component.patternModel.lockToKeyAndScale == Zynthbox.PatternModel.KeyScaleLockRewrite
+                                ? qsTr("<b>Rewrite To Fit</b><br />(changes off-scale incoming<br/>notes to be on scale)")
+                                : qsTr("Rewrite To Fit\n(changes off-scale incoming\nnotes to be on scale)")
+                            onTriggered: {
+                                component.patternModel.lockToKeyAndScale = Zynthbox.PatternModel.KeyScaleLockRewrite;
+                            }
+                        }
+                    ]
+                }
+            }
         }
         Zynthian.PlayGridButton {
             Layout.fillWidth: true

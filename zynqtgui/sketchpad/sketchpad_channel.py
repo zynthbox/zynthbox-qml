@@ -586,9 +586,9 @@ class sketchpad_channel(QObject):
                 for clipId in range(0, 5):
                     self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId, load_autosave)
             if "selectedClip" in obj:
-                self.set_selected_clip(obj["selectedClip"])
+                self.set_selected_clip(obj["selectedClip"], force_set=True)
             else:
-                self.set_selected_clip(0)
+                self.set_selected_clip(0, force_set=True)
             if "layers_snapshot" in obj:
                 self.__layers_snapshot = obj["layers_snapshot"]
                 self.sound_data_changed.emit()
@@ -1696,8 +1696,8 @@ class sketchpad_channel(QObject):
     # This is to decide which clip to show for this track (as opposed to which clip(s) are currently enabled for playback)
     def get_selected_clip(self):
         return self.__selected_clip__
-    def set_selected_clip(self, selected_clip, shouldEmitCurrentClipCUIAFeedback=True):
-        if self.__selected_clip__ != selected_clip:
+    def set_selected_clip(self, selected_clip, force_set=False, shouldEmitCurrentClipCUIAFeedback=True):
+        if self.__selected_clip__ != selected_clip or force_set == True:
             self.__selected_clip__ = selected_clip
             self.selectedClipChanged.emit()
             if self.trackType == "sample-loop":
@@ -1710,7 +1710,8 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def emitCurrentClipCUIAFeedback(self):
-        pass
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
+        # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
 
     ### Property externalMidiChannel
     # Logic for this is, -1 is "just use the normal one", anything else is a specific channel

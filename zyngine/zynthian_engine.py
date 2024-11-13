@@ -58,7 +58,7 @@ class zynthian_basic_engine(QObject):
     def __init__(self, name=None, command=None, prompt=None, zynqtgui=None):
         super(zynthian_basic_engine, self).__init__(zynqtgui)
         self.name = name
-        self.proc = Zynthbox.ProcessWrapper(zynqtgui)
+        self.proc = Zynthbox.ProcessWrapper(self)
         self.proc.stateChanged.connect(self.handleStateChanged)
         self.command = command
         self.command_env = os.environ.copy()

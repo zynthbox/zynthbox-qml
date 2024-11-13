@@ -490,7 +490,13 @@ QQC2.ScrollView {
             }
             QQC2.Button {
                 id: pickTrackForAllChannelsButton
-                function goNext() { component.currentRow = midiChannelTargetTrackRepeater.itemAt(0); }
+                function goNext() {
+                    if (_private.selectedDeviceObject.noteSplitPoint === 127) {
+                        component.currentRow = midiChannelTargetTrackRepeater.itemAt(0);
+                    } else {
+                        component.currentRow = pickTrackForUpperZoneButton;
+                    }
+                }
                 function goPrevious() {
                     if (inputFiltersRepeater.count === 0) {
                         component.currentRow = addNewInputFilterButton;
@@ -500,10 +506,11 @@ QQC2.ScrollView {
                     }
                 }
                 function selectPressed() { onClicked(); }
-                text: qsTr("Pick track for all channels...")
+                text: _private.selectedDeviceObject.noteSplitPoint === 127 ? qsTr("Pick track for all channels...") : qsTr("Pick track for lower zone...")
                 onClicked: {
                     let currentBestGuess = _private.selectedDeviceObject.midiChannelTargetTracks[0];
-                    for (let midiChannel = 0; midiChannel < 16; ++midiChannel) {
+                    let lastLowerZoneMemberChannel = _private.selectedDeviceObject.noteSplitPoint === 127 ? 16 : _private.selectedDeviceObject.lastLowerZoneMemberChannel + 1;
+                    for (let midiChannel = 0; midiChannel < lastLowerZoneMemberChannel; ++midiChannel) {
                         if (currentBestGuess != _private.selectedDeviceObject.midiChannelTargetTracks[midiChannel]) {
                             // If we come across anything that doesn't match the rest, default to current track and bail out
                             currentBestGuess = Zynthbox.ZynthboxBasics.CurrentTrack;
@@ -511,10 +518,39 @@ QQC2.ScrollView {
                         }
                     }
                     trackPicker.pickTrack(currentBestGuess, function(newTrack){
-                        _private.selectedDeviceObject.setMidiChannelTargetTrack(-1, newTrack);
+                        let lastLowerZoneMemberChannel = _private.selectedDeviceObject.noteSplitPoint === 127 ? 16 : _private.selectedDeviceObject.lastLowerZoneMemberChannel + 1;
+                        for (let midiChannel = 0; midiChannel < lastLowerZoneMemberChannel; ++midiChannel) {
+                            _private.selectedDeviceObject.setMidiChannelTargetTrack(midiChannel, newTrack);
+                        }
                     });
                 }
                 checked: component.currentRow === pickTrackForAllChannelsButton
+            }
+            QQC2.Button {
+                id: pickTrackForUpperZoneButton
+                function goNext() { component.currentRow = midiChannelTargetTrackRepeater.itemAt(0); }
+                function goPrevious() { component.currentRow = pickTrackForAllChannelsButton; }
+                function selectPressed() { onClicked(); }
+                visible: _private.selectedDeviceObject.noteSplitPoint < 127
+                text: qsTr("Pick track for upper zone...")
+                onClicked: {
+                    if (_private.selectedDeviceObject.noteSplitPoint < 127) {
+                        let currentBestGuess = _private.selectedDeviceObject.midiChannelTargetTracks[15];
+                        for (let midiChannel = _private.selectedDeviceObject.lastLowerZoneMemberChannel + 1; midiChannel < 16; ++midiChannel) {
+                            if (currentBestGuess != _private.selectedDeviceObject.midiChannelTargetTracks[midiChannel]) {
+                                // If we come across anything that doesn't match the rest, default to current track and bail out
+                                currentBestGuess = Zynthbox.ZynthboxBasics.CurrentTrack;
+                                break;
+                            }
+                        }
+                        trackPicker.pickTrack(currentBestGuess, function(newTrack){
+                            for (let midiChannel = _private.selectedDeviceObject.lastLowerZoneMemberChannel + 1; midiChannel < 16; ++midiChannel) {
+                                _private.selectedDeviceObject.setMidiChannelTargetTrack(midiChannel, newTrack);
+                            }
+                        });
+                    }
+                }
+                checked: component.currentRow === pickTrackForUpperZoneButton
             }
         }
         GridLayout {
@@ -802,6 +838,12 @@ QQC2.ScrollView {
                 text: qsTr("Save Device Settings...")
                 onTriggered: {
                     deviceFilePickerDialog.pick(true);
+                }
+            },
+            Kirigami.Action {
+                text: qsTr("Send MPE Settings\nTo Device")
+                onTriggered: {
+                    component._private.selectedDeviceObject.sendMPESettingsToDevice();
                 }
             }
         ]

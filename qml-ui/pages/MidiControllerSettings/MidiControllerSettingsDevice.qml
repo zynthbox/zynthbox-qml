@@ -570,7 +570,11 @@ QQC2.ScrollView {
                     }
                     function goPrevious() {
                         if (model.index === 0) {
-                            component.currentRow = pickTrackForAllChannelsButton;
+                            if (_private.selectedDeviceObject.noteSplitPoint === 127) {
+                                component.currentRow = pickTrackForAllChannelsButton;
+                            } else {
+                                component.currentRow = pickTrackForUpperZoneButton;
+                            }
                         } else {
                             component.currentRow = midiChannelTargetTrackRepeater.itemAt(model.index - 1);
                         }

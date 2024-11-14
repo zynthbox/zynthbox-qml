@@ -1300,14 +1300,12 @@ class zynthian_gui(QObject):
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
-
-        # Turn off leds
-        Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "off"))
-
         self.stop_polling()
         self.osc_end()
         zynautoconnect.stop()
         self.screens["layer"].reset()
+        # Turn off leds
+        Popen(("python3", "zynqtgui/zynthian_gui_led_config.py", "off"))
         # self.zyntransport.stop()
 
     def hide_screens(self, exclude=None):

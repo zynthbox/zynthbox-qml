@@ -1062,6 +1062,14 @@ Kirigami.AbstractApplicationWindow {
             messageDialog.closeAfter(hideDelay)
         }
     }
+    onActiveChanged: {
+        if (active) {
+            // Run set_selector when main window is active to avoid probles with knobs
+            // not getting initialized when set_selector is called before the main window is active
+            // FIXME : Find the root cause of this problem and fix that instead of this workaround
+            zynqtgui.set_selector()
+        }
+    }
 
     // Listen to selected_track_id_changed signal to
     Connections {

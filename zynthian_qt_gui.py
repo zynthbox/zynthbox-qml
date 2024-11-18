@@ -805,6 +805,7 @@ class zynthian_gui(QObject):
         else:
             self.callable_ui_action(f"KNOB3_RELEASED")
 
+    @Slot(None)
     def set_selector(self):
         if not self.isBootingComplete:
             return

@@ -1710,6 +1710,8 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def emitCurrentClipCUIAFeedback(self):
+        if self.__id__ == self.zynqtgui.sketchpad.selectedTrackId:
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
         # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
 

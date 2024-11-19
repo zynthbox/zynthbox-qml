@@ -64,12 +64,11 @@ Zynthian.MultiSelectorPage {
         }
     }
     Connections {
-        id: currentConnection
         target: zynqtgui
         onCurrent_screen_idChanged: {
-            print(zynqtgui.current_screen_id +" "+ applicationWindow().pageStack.lastItem +" "+ root)
+            // console.log("Current screen id changed to", zynqtgui.current_screen_id, "last item on page stack is", applicationWindow().pageStack.lastItem)
             if (zynqtgui.current_screen_id !== "layer_midi_effects" && zynqtgui.current_screen_id !== "midi_effect_types" && zynqtgui.current_screen_id !== "layer_midi_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
-                pageRemoveTimer.restart()
+                pageRemoveTimer.restart();
             }
         }
     }

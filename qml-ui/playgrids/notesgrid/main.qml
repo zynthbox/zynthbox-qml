@@ -222,10 +222,10 @@ Zynthian.BasePlayGrid {
         target: Zynthbox.PlayGridManager
         onCurrentSketchpadTrackChanged: {
             if (_private.model) {
-                Qt.callLater(_private.model.changeMidiChannel, Zynthbox.PlayGridManager.currentSketchpadTrack);
+                Qt.callLater(_private.model.changeSketchpadTrack, Zynthbox.PlayGridManager.currentSketchpadTrack);
             }
             if (_private.miniGridModel) {
-                Qt.callLater(_private.miniGridModel.changeMidiChannel, Zynthbox.PlayGridManager.currentSketchpadTrack);
+                Qt.callLater(_private.miniGridModel.changeSketchpadTrack, Zynthbox.PlayGridManager.currentSketchpadTrack);
             }
         }
     }

@@ -1938,7 +1938,14 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_SKETCHPAD":
-            self.show_modal("sketchpad")
+            if self.current_screen_id == "sketchpad":
+                if self.altButtonPressed:
+                    self.toggleSketchpadMixer()
+            else:
+                if self.altButtonPressed:
+                    self.showSketchpadMixer()
+                else:
+                    self.show_modal("sketchpad")
             sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_SONG_MANAGER":
@@ -4399,6 +4406,29 @@ class zynthian_gui(QObject):
 
     bottomBarControlType = Property(str, get_bottomBarControlType, set_bottomBarControlType, notify=bottomBarControlTypeChanged)
     ### END Property bottomBarControlType
+
+    ### BEGIN Mixer display control
+    @Slot(None)
+    def showSketchpadMixer(self):
+        if self.current_screen_id != "sketchpad":
+            self.show_modal("sketchpad")
+        self.showMixer.emit()
+
+    @Slot(None)
+    def hideSketchpadMixer(self):
+        self.hideMixer.emit()
+
+    @Slot(None)
+    def toggleSketchpadMixer(self):
+        if self.current_screen_id != "sketchpad":
+            self.showSketchpadMixer()
+        else:
+            self.toggleMixer.emit()
+
+    showMixer = Signal()
+    hideMixer = Signal()
+    toggleMixer = Signal()
+    ### END Mixer display control
 
     ### Property isExternalAppActive
     def get_isExternalAppActive(self):

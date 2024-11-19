@@ -441,164 +441,177 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Mixer")
             checked: bottomStack.slotsBar.mixerButton.checked
-            onTriggered: {
-                if (bottomStack.slotsBar.mixerButton.checked) {
-                    bottomStack.slotsBar.channelButton.checked = true
-                } else {
-                    bottomStack.slotsBar.mixerButton.checked = true
-                    zynqtgui.sketchpad.displaySceneButtons = false
+            onTriggered: zynqtgui.toggleSketchpadMixer()
+            Connections {
+                target: zynqtgui
+                onToggleMixer: {
+                    if (bottomStack.slotsBar.mixerButton.checked) {
+                        bottomStack.slotsBar.channelButton.checked = true;
+                    } else {
+                        bottomStack.slotsBar.mixerButton.checked = true;
+                        zynqtgui.sketchpad.displaySceneButtons = false;
+                    }
+                }
+                onShowMixer: {
+                    bottomStack.slotsBar.mixerButton.checked = true;
+                    zynqtgui.sketchpad.displaySceneButtons = false;
+                }
+                onHideMixer: {
+                    bottomStack.slotsBar.channelButton.checked = true;
                 }
             }
         }
     ]
 
     cuiaCallback: function(cuia) {
+        let returnValue = false;
         if (sketchpadPickerDialog.opened) {
-            return sketchpadPickerDialog.cuiaCallback(cuia);
-        }
-
-        // Forward CUIA actions to bottomBar only when bottomBar is open
-        if (bottomStack.currentIndex === 0) {
-            if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
-                if (bottomBar.tabbedView.activeItem.cuiaCallback(cuia)) {
-                    return true;
-                }
-            }
+            returnValue = sketchpadPickerDialog.cuiaCallback(cuia);
         } else {
-            if (bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback != null) {
-                var returnVal = bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback(cuia)
-                if (returnVal) {
-                    // Return true only if bottomStack handled the cuia events. Otherwise handle it here
-                    return true;
+            // Forward CUIA actions to bottomBar only when bottomBar is open
+            if (bottomStack.currentIndex === 0) {
+                if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
+                    returnValue = bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
+                }
+            } else {
+                if (bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback != null) {
+                    returnValue = bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback(cuia);
+                }
+            }
+
+            if (returnValue == false) {
+                switch (cuia) {
+                    case "SWITCH_MODE_RELEASED":
+                        if (zynqtgui.altButtonPressed) {
+                            // Cycle between channel, mixer, synths, samples, fx when alt button is pressed
+                            if (bottomStack.slotsBar.mixerButton.checked) {
+                                bottomStack.slotsBar.channelButton.checked = true;
+                            } else if (bottomStack.slotsBar.channelButton.checked) {
+                                bottomStack.slotsBar.clipsButton.checked = true;
+                            } else if (bottomStack.slotsBar.clipsButton.checked) {
+                                bottomStack.slotsBar.synthsButton.checked = true;
+                            } else if (bottomStack.slotsBar.synthsButton.checked) {
+                                bottomStack.slotsBar.samplesButton.checked = true;
+                            } else if (bottomStack.slotsBar.samplesButton.checked) {
+                                bottomStack.slotsBar.fxButton.checked = true;
+                            } else if (bottomStack.slotsBar.fxButton.checked) {
+                                bottomStack.slotsBar.channelButton.checked = true;
+                            } else {
+                                bottomStack.slotsBar.channelButton.checked = true;
+                            }
+                            returnValue = true;
+                        }
+                        break;
+                    case "SCREEN_ADMIN":
+                        if (root.selectedChannel && root.selectedChannel.trackType === "synth") {
+                            let sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+                            // when synth and slot is active, edit that sound or show popup when empty
+                            if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                                zynqtgui.fixed_layers.activate_index(sound);
+                                zynqtgui.control.single_effect_engine = null;
+                                zynqtgui.current_screen_id = "control";
+                                zynqtgui.forced_screen_back = "sketchpad"
+                            } else {
+                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
+                            }
+                            returnValue = true;
+                        } else if (root.selectedChannel && ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
+                            let sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow];
+                            // when sample and slot is active, goto wave editor or show popup when empty
+                            if (sample && !sample.isEmpty) {
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                zynqtgui.bottomBarControlObj = root.selectedChannel;
+                                bottomStack.slotsBar.bottomBarButton.checked = true;
+                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                            } else {
+                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
+                            }
+                            returnValue = true;
+                        } else if (root.selectedChannel && root.selectedChannel.trackType === "sample-loop") {
+                            let clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                            // when loop and slot is active, goto wave editor or show popup when empty
+                            if (clip && !clip.isEmpty) {
+                                zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
+                                zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                bottomStack.slotsBar.bottomBarButton.checked = true;
+                                bottomStack.bottomBar.waveEditorAction.trigger();
+                            } else {
+                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
+                            }
+                            returnValue = true;
+                        } else {
+                            // do nothing for other cases
+                            returnValue = false;
+                        }
+                        break;
+                    case "KNOB0_TOUCHED":
+                        if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                            applicationWindow().updateSelectedChannelVolume(0);
+                        }
+                        returnValue = true;
+                        break;
+                    case "KNOB0_RELEASED":
+                        returnValue = true;
+                        break;
+                    case "KNOB0_UP":
+                        if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                            applicationWindow().updateSelectedChannelVolume(1);
+                        }
+                        returnValue = true;
+                        break;
+                    case "KNOB0_DOWN":
+                        if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
+                            applicationWindow().updateSelectedChannelVolume(-1);
+                        }
+                        returnValue = true;
+                        break;
+                    case "KNOB1_TOUCHED":
+                        returnValue = true;
+                        break;
+                    case "KNOB1_RELEASED":
+                        returnValue = true;
+                        break;
+                    case "KNOB1_UP":
+                        // Do nothing
+                        returnValue = true;
+                        break;
+                    case "KNOB1_DOWN":
+                        // Do nothing
+                        returnValue = true;
+                        break;
+                    case "KNOB2_TOUCHED":
+                        returnValue = true;
+                        break;
+                    case "KNOB2_RELEASED":
+                        returnValue = true;
+                        break;
+                    case "KNOB2_UP":
+                        // Do nothing
+                        returnValue = true;
+                        break;
+                    case "KNOB2_DOWN":
+                        // Do nothing
+                        returnValue = true;
+                        break;
+                    case "KNOB3_TOUCHED":
+                        returnValue = true;
+                        break;
+                    case "KNOB3_RELEASED":
+                        returnValue = true;
+                        break;
+                    case "KNOB3_UP":
+                        zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+                        returnValue = true;
+                        break;
+                    case "KNOB3_DOWN":
+                        zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1);
+                        returnValue = true;
+                        break;
                 }
             }
         }
 
-        switch (cuia) {
-            case "SWITCH_MODE_RELEASED":
-                if (zynqtgui.altButtonPressed) {
-                    // Cycle between channel, mixer, synths, samples, fx when alt button is pressed
-                    if (bottomStack.slotsBar.channelButton.checked) {
-                        bottomStack.slotsBar.clipsButton.checked = true
-                    } else if (bottomStack.slotsBar.clipsButton.checked) {
-                        bottomStack.slotsBar.synthsButton.checked = true
-                    } else if (bottomStack.slotsBar.synthsButton.checked) {
-                        bottomStack.slotsBar.samplesButton.checked = true
-                    } else if (bottomStack.slotsBar.samplesButton.checked) {
-                        bottomStack.slotsBar.fxButton.checked = true
-                    } else if (bottomStack.slotsBar.fxButton.checked) {
-                        bottomStack.slotsBar.channelButton.checked = true
-                    } else {
-                        bottomStack.slotsBar.channelButton.checked = true
-                    }
-
-                    return true;
-                }
-
-                return false;
-
-            case "SCREEN_ADMIN":
-                if (root.selectedChannel && root.selectedChannel.trackType === "synth") {
-                    var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-
-                    // when synth and slot is active, edit that sound or show popup when empty
-                    if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
-                        zynqtgui.fixed_layers.activate_index(sound)
-                        zynqtgui.control.single_effect_engine = null;
-                        zynqtgui.current_screen_id = "control";
-                        zynqtgui.forced_screen_back = "sketchpad"
-                    } else {
-                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
-                    }
-                } else if (root.selectedChannel && ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
-                    var sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
-
-                    // when sample and slot is active, goto wave editor or show popup when empty
-                    if (sample && !sample.isEmpty) {
-                        zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                        zynqtgui.bottomBarControlObj = root.selectedChannel;
-                        bottomStack.slotsBar.bottomBarButton.checked = true;
-                        bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                    } else {
-                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
-                    }
-                } else if (root.selectedChannel && root.selectedChannel.trackType === "sample-loop") {
-                    var clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-
-                    // when loop and slot is active, goto wave editor or show popup when empty
-                    if (clip && !clip.isEmpty) {
-                        zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                        zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
-                        bottomStack.slotsBar.bottomBarButton.checked = true;
-                        bottomStack.bottomBar.waveEditorAction.trigger();
-                    } else {
-                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
-                    }
-                } else {
-                    // do nothing for other cases
-                    return false
-                }
-
-                return true
-
-            case "KNOB0_TOUCHED":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                    applicationWindow().updateSelectedChannelVolume(0)
-                }
-                returnValue = true;
-                break;
-            case "KNOB0_RELEASED":
-                returnValue = true;
-                break;
-            case "KNOB0_UP":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                    applicationWindow().updateSelectedChannelVolume(1)
-                }
-                return true
-            case "KNOB0_DOWN":
-                if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
-                    applicationWindow().updateSelectedChannelVolume(-1)
-                }
-                return true
-            case "KNOB1_TOUCHED":
-                returnValue = true;
-                break;
-            case "KNOB1_RELEASED":
-                returnValue = true;
-                break;
-            case "KNOB1_UP":
-                // Do nothing
-                return true
-            case "KNOB1_DOWN":
-                // Do nothing
-                return true
-            case "KNOB2_TOUCHED":
-                returnValue = true;
-                break;
-            case "KNOB2_RELEASED":
-                returnValue = true;
-                break;
-            case "KNOB2_UP":
-                // Do nothing
-                return true
-            case "KNOB2_DOWN":
-                // Do nothing
-                return true
-            case "KNOB3_TOUCHED":
-                returnValue = true;
-                break;
-            case "KNOB3_RELEASED":
-                returnValue = true;
-                break;
-            case "KNOB3_UP":
-                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-                return true
-            case "KNOB3_DOWN":
-                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-                return true
-        }
-
-        return false
+        return returnValue
     }
 
     Connections {

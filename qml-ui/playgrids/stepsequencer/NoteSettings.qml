@@ -52,17 +52,15 @@ ColumnLayout {
     function cuiaCallback(cuia) {
         let result = true;
         switch(cuia) {
-            case "ZL_PLAY":
-            case "ZL_STOP":
+            case "SWITCH_PLAY":
+            case "SWITCH_STOP":
                 // Pass basic playback control through
                 result = false
                 break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
                 component.close();
                 break;
             case "NAVIGATE_LEFT":

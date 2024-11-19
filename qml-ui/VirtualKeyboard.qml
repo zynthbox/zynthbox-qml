@@ -69,7 +69,6 @@ Item {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 Qt.inputMethod.hide();
                 applicationWindow().forceActiveFocus()
                 result = true;

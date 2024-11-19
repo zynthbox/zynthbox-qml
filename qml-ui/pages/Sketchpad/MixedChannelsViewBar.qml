@@ -212,7 +212,7 @@ Rectangle {
     }
     function cuiaCallback(cuia) {
         var returnValue = false;
-        console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
+        // console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
                 zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
@@ -424,7 +424,6 @@ Rectangle {
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
                 if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
                     bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
                     returnValue = true;

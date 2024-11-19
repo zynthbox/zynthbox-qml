@@ -94,7 +94,6 @@ Zynthian.ScreenPage {
             break;
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
-        case "SWITCH_BACK_LONG":
             if (root.isCategorySelected) {
                 root.isCategorySelected = false
             } else {
@@ -104,7 +103,6 @@ Zynthian.ScreenPage {
             break;
         case "SWITCH_SELECT_SHORT":
         case "SWITCH_SELECT_BOLD":
-        case "SWITCH_SELECT_LONG":
             if (root.isCategorySelected) {
                 zynqtgui.layer_effect_chooser.activate_index(zynqtgui.layer_effect_chooser.current_index);
             } else {

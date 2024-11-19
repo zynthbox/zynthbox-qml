@@ -38,7 +38,6 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_LONG":
             case "SWITCH_BACK_BOLD":
                 if (zynqtgui.main.visibleCategory === "sessions-versions") {
                     // Mimic back to return to sketchpad folder view when versions are being displayed
@@ -67,28 +66,23 @@ Zynthian.ScreenPage {
                 mainviewGridId.moveCurrentIndexRight();
                 return true;
 
-            case "CHANNEL_1":
-            case "CHANNEL_6":
+            case "TRACK_1":
                 zynqtgui.main.visibleCategory = "modules"
                 return true
 
-            case "CHANNEL_2":
-            case "CHANNEL_7":
+            case "TRACK_2":
                 zynqtgui.main.visibleCategory = "appimages"
                 return true
 
-            case "CHANNEL_3":
-            case "CHANNEL_8":
+            case "TRACK_3":
                 zynqtgui.main.visibleCategory = "sessions"
                 return true
 
-            case "CHANNEL_4":
-            case "CHANNEL_9":
+            case "TRACK_4":
                 zynqtgui.main.visibleCategory = "templates"
                 return true
 
-            case "CHANNEL_5":
-            case "CHANNEL_10":
+            case "TRACK_5":
                 zynqtgui.main.visibleCategory = "discover"
                 return true
 

@@ -363,7 +363,6 @@ Zynthian.ScreenPage {
                     return true;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
-                case "SWITCH_BACK_LONG":
                     zynqtgui.current_screen_id = "layers_for_channel";
                     zynqtgui.go_back();
                     return true;

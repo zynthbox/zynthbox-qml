@@ -38,7 +38,6 @@ QQC2.Dialog {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 root.close()
                 result = true;
                 break;

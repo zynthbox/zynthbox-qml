@@ -110,7 +110,6 @@ Zynthian.Dialog {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 component.close();
                 returnValue = true;
                 break;

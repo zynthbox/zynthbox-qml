@@ -77,7 +77,6 @@ Zynthian.Dialog {
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
                 if (root.saveMode === false && filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isFile) {
                     // We are loading, and have something selected which is a file
                     root.fileSelected(root.selectedFile);
@@ -90,7 +89,6 @@ Zynthian.Dialog {
                 break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 root.reject();
                 result = true;
                 break;

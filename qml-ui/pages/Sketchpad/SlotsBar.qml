@@ -89,8 +89,7 @@ Rectangle {
                 return true;
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-            case "CHANNEL_1":
-            case "CHANNEL_6":
+            case "TRACK_1":
                 if (fxButton.checked) {
                     root.selectedSlotRowItem.channel.selectedFxSlotRow = 0
                 } else {
@@ -99,8 +98,7 @@ Rectangle {
                 handleItemClick()
                 return true
 
-            case "CHANNEL_2":
-            case "CHANNEL_7":
+            case "TRACK_2":
                 if (fxButton.checked) {
                     root.selectedSlotRowItem.channel.selectedFxSlotRow = 1
                 } else {
@@ -109,8 +107,7 @@ Rectangle {
                 handleItemClick()
                 return true
 
-            case "CHANNEL_3":
-            case "CHANNEL_8":
+            case "TRACK_3":
                 if (fxButton.checked) {
                     root.selectedSlotRowItem.channel.selectedFxSlotRow = 2
                 } else {
@@ -119,8 +116,7 @@ Rectangle {
                 handleItemClick()
                 return true
 
-            case "CHANNEL_4":
-            case "CHANNEL_9":
+            case "TRACK_4":
                 if (fxButton.checked) {
                     root.selectedSlotRowItem.channel.selectedFxSlotRow = 3
                 } else {
@@ -129,8 +125,7 @@ Rectangle {
                 handleItemClick()
                 return true
 
-            case "CHANNEL_5":
-            case "CHANNEL_10":
+            case "TRACK_5":
                 if (fxButton.checked) {
                     root.selectedSlotRowItem.channel.selectedFxSlotRow = 4
                 } else {

@@ -1176,7 +1176,6 @@ Kirigami.AbstractApplicationWindow {
 
     Connections {
         target: zynqtgui
-        onMiniPlayGridToggle: miniPlayGridDrawer.visible = !miniPlayGridDrawer.visible
         onRun_start_metronome_and_playback: Zynthian.CommonUtils.startMetronomeAndPlayback()
         onRun_stop_metronome_and_playback: Zynthian.CommonUtils.stopMetronomeAndPlayback()
         onDisplayMainWindow: {
@@ -1189,6 +1188,13 @@ Kirigami.AbstractApplicationWindow {
         onCloseLeftSidebar: slotSelectionDrawer.close()
         onPassiveNotificationChanged: {
             applicationWindow().showPassiveNotification(zynqtgui.passiveNotification, 1500)
+        }
+        onShowMiniPlayGridChanged: {
+            if (zynqtgui.showMiniPlayGrid) {
+                miniPlayGridDrawer.open();
+            } else {
+                miniPlayGridDrawer.close();
+            }
         }
     }
 
@@ -1256,6 +1262,11 @@ Kirigami.AbstractApplicationWindow {
         edge: Qt.BottomEdge
         modal: false
         interactive: !opened
+        onOpenedChanged: {
+            if (zynqtgui.showMiniPlayGrid != miniPlayGridDrawer.opened) {
+                zynqtgui.showMiniPlayGrid = miniPlayGridDrawer.opened;
+            }
+        }
 
         property var cuiaCallback: function(cuia) {
             var returnVal = false;
@@ -1276,23 +1287,23 @@ Kirigami.AbstractApplicationWindow {
             var returnVal = false
 
             switch (cuia) {
-                case "CHANNEL_1":
+                case "TRACK_1":
                     clipBar.handleItemClick(0);
                     returnVal = true;
                     break
-                case "CHANNEL_2":
+                case "TRACK_2":
                     clipBar.handleItemClick(1);
                     returnVal = true;
                     break
-                case "CHANNEL_3":
+                case "TRACK_3":
                     clipBar.handleItemClick(2);
                     returnVal = true;
                     break
-                case "CHANNEL_4":
+                case "TRACK_4":
                     clipBar.handleItemClick(3);
                     returnVal = true;
                     break
-                case "CHANNEL_5":
+                case "TRACK_5":
                     clipBar.handleItemClick(4);
                     returnVal = true;
                     break

@@ -97,12 +97,11 @@ Zynthian.BasePlayGrid {
         // }
 
         if (returnValue === false) {
-            var channelDelta = zynqtgui.channelsModActive ? 5 : 0
+            var trackDelta = zynqtgui.tracksModActive ? 5 : 0
 
             switch (cuia) {
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
-                case "SWITCH_BACK_LONG":
                     if (ignoreNextBack) {
                         // When back button's been used for interaction elsewhere, ignore it here...
                         // Remember to set this, or things will look a bit weird
@@ -136,12 +135,6 @@ Zynthian.BasePlayGrid {
                         _private.previousBar();
                     }
                     break;
-                //case "SELECT_LEFT":
-                    //returnValue = true;
-                    //break;
-                //case "SELECT_RIGHT":
-                    //returnValue = true;
-                    //break;
                 case "NAVIGATE_LEFT":
                     if (zynqtgui.sketchpad.selectedTrackId > 0) {
                         zynqtgui.sketchpad.selectedTrackId = _private.activePatternModel.sketchpadTrack - 1;
@@ -156,24 +149,23 @@ Zynthian.BasePlayGrid {
                     break;
                 case "SWITCH_SELECT_SHORT":
                 case "SWITCH_SELECT_BOLD":
-                case "SWITCH_SELECT_LONG":
                     _private.activateSelectedItem();
                     returnValue = true;
                     break;
-                case "CHANNEL_1":
-                    returnValue = backButtonClearPatternHelper(0 + channelDelta);
+                case "TRACK_1":
+                    returnValue = backButtonClearPatternHelper(0 + trackDelta);
                     break;
-                case "CHANNEL_2":
-                    returnValue = backButtonClearPatternHelper(1 + channelDelta);
+                case "TRACK_2":
+                    returnValue = backButtonClearPatternHelper(1 + trackDelta);
                     break;
-                case "CHANNEL_3":
-                    returnValue = backButtonClearPatternHelper(2 + channelDelta);
+                case "TRACK_3":
+                    returnValue = backButtonClearPatternHelper(2 + trackDelta);
                     break;
-                case "CHANNEL_4":
-                    returnValue = backButtonClearPatternHelper(3 + channelDelta);
+                case "TRACK_4":
+                    returnValue = backButtonClearPatternHelper(3 + trackDelta);
                     break;
-                case "CHANNEL_5":
-                    returnValue = backButtonClearPatternHelper(4 + channelDelta);
+                case "TRACK_5":
+                    returnValue = backButtonClearPatternHelper(4 + trackDelta);
                     break;
                 case "KNOB0_UP":
                     _private.knob0Up();
@@ -215,9 +207,7 @@ Zynthian.BasePlayGrid {
                     }
                     returnValue = true;
                     break;
-                case "MODE_SWITCH_SHORT":
-                case "MODE_SWITCH_BOLD":
-                case "MODE_SWITCH_LONG":
+                case "SWITCH_MODE_RELEASED":
                     if (_private.activePatternModel.performanceActive) {
                         _private.activePatternModel.applyPerformance();
                         _private.activePatternModel.stopPerformance();
@@ -2274,7 +2264,7 @@ Zynthian.BasePlayGrid {
                     }
                 }
                 property var cuiaCallback: function(cuia) {
-                    if (cuia === "SWITCH_BACK_SHORT" || cuia === "SWITCH_BACK_BOLD" || cuia === "SWITCH_BACK_LONG") {
+                    if (cuia === "SWITCH_BACK_SHORT" || cuia === "SWITCH_BACK_BOLD") {
                         clipPicker.close();
                     }
                     return true;

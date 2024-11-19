@@ -94,13 +94,11 @@ QQC2.Button {
                         break;
                     case "SWITCH_SELECT_SHORT":
                     case "SWITCH_SELECT_BOLD":
-                    case "SWITCH_SELECT_LONG":
                         root.activated(root.currentIndex);
                         popupRoot.close();
                         break;
                     case "SWITCH_BACK_SHORT":
                     case "SWITCH_BACK_BOLD":
-                    case "SWITCH_BACK_LONG":
                         popupRoot.close();
                         break;
                 }

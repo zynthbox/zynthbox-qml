@@ -57,13 +57,11 @@ DialogQuestion {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 notePicker.reject();
                 result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
                 notePicker.accept();
                 result = true;
                 break;

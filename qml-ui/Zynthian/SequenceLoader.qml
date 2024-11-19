@@ -100,7 +100,6 @@ Item {
             switch(cuia) {
                 case "SWITCH_SELECT_SHORT":
                 case "SWITCH_SELECT_BOLD":
-                case "SWITCH_SELECT_LONG":
                     if (loadedSequenceOptionsPicker.opened) {
                         loadedSequenceOptionsPicker.accept();
                         result = true;
@@ -114,7 +113,6 @@ Item {
                     break;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
-                case "SWITCH_BACK_LONG":
                     if (loadedSequenceOptionsPicker.opened) {
                         loadedSequenceOptionsPicker.reject();
                         result = true;

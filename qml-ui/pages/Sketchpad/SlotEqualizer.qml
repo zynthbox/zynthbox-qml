@@ -67,7 +67,6 @@ Zynthian.DialogQuestion {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 component.reject();
                 returnValue = true;
                 break;
@@ -83,7 +82,6 @@ Zynthian.DialogQuestion {
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
                 _private.select();
                 returnValue = true;
                 break;
@@ -129,9 +127,7 @@ Zynthian.DialogQuestion {
             case "KNOB3_RELEASED":
                 returnValue = true;
                 break;
-            case "MODE_SWITCH_SHORT":
-            case "MODE_SWITCH_BOLD":
-            case "MODE_SWITCH_LONG":
+            case "SWITCH_MODE_RELEASED":
                 // when this dialog is open, switching tracks or clips would be... a problem in general, so let's not let that happen
                 returnValue = true;
                 break;

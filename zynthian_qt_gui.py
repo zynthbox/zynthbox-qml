@@ -377,27 +377,25 @@ class zynthian_gui(QObject):
         "38": "TOGGLE_MIDI_PLAY",
         "39": "START_MIDI_PLAY",
         "40": "STOP_MIDI_PLAY",
-        "51": "SELECT",
+        "51": "SELECT_ITEM",
         "52": "SELECT_UP",
         "53": "SELECT_DOWN",
-        "54": "BACK_UP",
-        "55": "BACK_DOWN",
         "56": "LAYER_UP",
         "57": "LAYER_DOWN",
         "58": "SNAPSHOT_UP",
         "59": "SNAPSHOT_DOWN",
         "64": "SWITCH_BACK_SHORT",
         "63": "SWITCH_BACK_BOLD",
-        "62": "SWITCH_BACK_LONG",
+        # "62": "SWITCH_BACK_LONG",
         "65": "SWITCH_SELECT_SHORT",
         "66": "SWITCH_SELECT_BOLD",
-        "67": "SWITCH_SELECT_LONG",
+        # "67": "SWITCH_SELECT_LONG",
         "60": "SWITCH_LAYER_SHORT",
         "61": "SWITCH_LAYER_BOLD",
-        "68": "SWITCH_LAYER_LONG",
+        # "68": "SWITCH_LAYER_LONG",
         "71": "SWITCH_SNAPSHOT_SHORT",
         "72": "SWITCH_SNAPSHOT_BOLD",
-        "73": "SWITCH_SNAPSHOT_LONG",
+        # "73": "SWITCH_SNAPSHOT_LONG",
         "80": "SCREEN_ADMIN",
         "81": "SCREEN_LAYER",
         "82": "SCREEN_BANK",
@@ -408,7 +406,7 @@ class zynthian_gui(QObject):
         "92": "MODAL_AUDIO_RECORDER",
         "93": "MODAL_MIDI_RECORDER",
         "94": "MODAL_ALSA_MIXER",
-        "95": "MODAL_STEPSEQ",
+        "95": "SCREEN_PLAYGRID",
         "96": "NAVIGATE_RIGHT",
         "101": "LAYER_1",
         "102": "LAYER_2",
@@ -418,7 +416,7 @@ class zynthian_gui(QObject):
         "106": "LAYER_6",
         "107": "INCREASE",
         "108": "DECREASE",
-        "109": "KEYBOARD",
+        "109": "TOGGLE_KEYBOARD",
     }
 
     def __init__(self, parent=None):
@@ -463,6 +461,7 @@ class zynthian_gui(QObject):
         self.__switch_channels_button_pressed__ = False
         self.__mode_button_pressed__ = False
         self.__alt_button_pressed__ = False
+        self.__global_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
         self.__metronome_button_pressed__ = False
@@ -490,8 +489,11 @@ class zynthian_gui(QObject):
         self.__splash_stopped = False
         self.__start_playback_on_metronome_release = False
 
+        self.__show_mini_play_grid__ = False
+        self.miniPlayGridToggle.connect(self.toggleMiniPlayGrid)
+
         # When true, 1-5 buttons selects channel 6-10
-        self.channels_mod_active = False
+        self.tracks_mod_active = False
 
         self.song_bar_active = False
         self.slots_bar_clips_active = False
@@ -530,10 +532,10 @@ class zynthian_gui(QObject):
 
         # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
         # Use this timer to toggle state after 5000ms
-        self.channelsModTimer = QTimer(self)
-        self.channelsModTimer.setInterval(3000)
-        self.channelsModTimer.setSingleShot(True)
-        self.channelsModTimer.timeout.connect(self.channelsModTimerHandler)
+        self.tracksModTimer = QTimer(self)
+        self.tracksModTimer.setInterval(3000)
+        self.tracksModTimer.setSingleShot(True)
+        self.tracksModTimer.timeout.connect(self.tracksModTimerHandler)
 
         self.info_timer = QTimer(self)
         self.info_timer.setInterval(3000)
@@ -702,18 +704,16 @@ class zynthian_gui(QObject):
             Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_SONG_MANAGER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "playgrid":
             Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_PLAYGRID", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
-        elif theScreenID == "audio_recorder":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_AUDIO_RECORDER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
         elif theScreenID == "alsa_mixer":
-            Zynthbox.MidiRouter.instance().cuiaEventFeedback("MODAL_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
+            Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_ALSA_MIXER", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
 
     @Slot()
-    def channelsModTimerHandler(self):
+    def tracksModTimerHandler(self):
         # If * button is pressed, it toggles itself on/off for 5000ms before returning
         # to state where it shows current channel.
 
-        # Set channelsModActive to true when channel 5-10 is active
-        self.channelsModActive = self.sketchpad.selectedTrackId >= 5
+        # Set tracksModActive to true when channel 5-10 is active
+        self.tracksModActive = self.sketchpad.selectedTrackId >= 5
 
     ### SHOW SCREEN QUEUE
     '''
@@ -998,9 +998,9 @@ class zynthian_gui(QObject):
             self.left_sidebar_active = isActive
 
             if isActive:
-                # If leftSidebar is opened and stop channelsModTimer and call timer handler immediately
-                QMetaObject.invokeMethod(self.channelsModTimer, "stop", Qt.QueuedConnection)
-                QMetaObject.invokeMethod(self, "channelsModTimerHandler", Qt.QueuedConnection)
+                # If leftSidebar is opened and stop tracksModTimer and call timer handler immediately
+                QMetaObject.invokeMethod(self.tracksModTimer, "stop", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "tracksModTimerHandler", Qt.QueuedConnection)
 
             self.leftSidebarActiveChanged.emit()
 
@@ -1296,8 +1296,8 @@ class zynthian_gui(QObject):
         # Initialize MPE Zones
         # self.init_mpe_zones(0, 2)
 
-        # Reset channels LED state on selectedTrackId change
-        self.sketchpad.selected_track_id_changed.connect(self.channelsModTimerHandler)
+        # Reset tracks LED state on selectedTrackId change
+        self.sketchpad.selected_track_id_changed.connect(self.tracksModTimerHandler)
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")
@@ -1685,7 +1685,49 @@ class zynthian_gui(QObject):
     def callable_ui_action(self, cuia, params=[-1], originId=-1, track=-1, slot=-1):
         # logging.error(f"CUIA : {cuia} {params} {originId} {track} {slot}")
 
-        channelDelta = 5 if self.channelsModActive else 0
+        # BEGIN fallback logic for legacy cuias
+        # NOTE If any of these are hit, we will return early from this function
+        rewriteLegacyAs = ""
+        if cuia == "SELECT":
+            rewriteLegacyAs = "SELECT_ITEM"
+        if cuia == "ZL_PLAY":
+            rewriteLegacyAs = "SWITCH_PLAY"
+        elif cuia == "ZL_STOP":
+            rewriteLegacyAs = "SWITCH_STOP"
+        elif cuia == "START_RECORD":
+            rewriteLegacyAs = "SWITCH_RECORD"
+        elif cuia == "KEYBOARD":
+            rewriteLegacyAs = "TOGGLE_KEYBOARD"
+        elif cuia == "MODAL_STEPSEQ":
+            rewriteLegacyAs = "SCREEN_PLAYGRID"
+        elif cuia == "SWITCH_LAYER_LONG":
+            rewriteLegacyAs = "SWITCH_LAYER_BOLD"
+        elif cuia == "SWITCH_BACK_LONG":
+            rewriteLegacyAs = "SWITCH_BACK_BOLD"
+        elif cuia == "SWITCH_SNAPSHOT_LONG":
+            rewriteLegacyAs = "SWITCH_SNAPSHOT_BOLD"
+        elif cuia == "SWITCH_SELECT_LONG":
+            rewriteLegacyAs = "SWITCH_SELECT_BOLD"
+        elif cuia == "SWITCH_TRACKS_MOD_SHORT" or cuia == "SWITCH_TRACKS_MOD_BOLD" or cuia == "SWITCH_TRACKS_MOD_LONG":
+            rewriteLegacyAs = "SWITCH_TRACKS_MOD"
+        elif cuia.startswith("CHANNEL_"):
+            # Catch all five numerical entries, and the two next/previous ones
+            rewriteLegacyAs = cuia.replace("CHANNEL_", "TRACK_")
+        elif cuia == "SCREEN_AUDIO_SETTINGS" or cuia == "MODAL_ALSA_MIXER":
+            rewriteLegacyAs = "SWITCH_GLOBAL_RELEASED"
+        elif cuia in ["START_MIDI_RECORD", "STOP_MIDI_RECORD", "TOGGLE_MIDI_RECORD", "START_MIDI_PLAY", "STOP_MIDI_PLAY", "TOGGLE_MIDI_PLAY", "MODAL_MIDI_RECORDER",
+                      "START_AUDIO_RECORD", "STOP_AUDIO_RECORD", "TOGGLE_AUDIO_RECORD", "START_AUDIO_PLAY", "STOP_AUDIO_PLAY", "TOGGLE_AUDIO_PLAY", "MODAL_AUDIO_RECORDER",
+                      "BACK_UP", "BACK_DOWN",
+                      "MODE_SWITCH_SHORT", "MODE_SWITCH_BOLD", "MODE_SWITCH_LONG"]:
+            # These commands are simply ignored (they have no function, so while they may still show up, we have no use for them)
+            # They became not required when we switched our recorder logic from a split modal page to a globally available popup
+            return
+        if len(rewriteLegacyAs) > 0:
+            self.callable_ui_action(rewriteLegacyAs, params, originId, track, slot)
+            return
+        # END fallback logic for legacy cuias
+
+        trackDelta = 5 if self.tracksModActive else 0
 
         # This will happen if fed an empty parameter list (such as from osc)
         if len(params) == 0:
@@ -1768,43 +1810,7 @@ class zynthian_gui(QObject):
             self.all_notes_off()
             self.all_sounds_off()
 
-        elif cuia == "START_AUDIO_RECORD":
-            self.screens["audio_recorder"].start_recording()
-
-        elif cuia == "STOP_AUDIO_RECORD":
-            self.screens["audio_recorder"].stop_recording()
-
-        elif cuia == "TOGGLE_AUDIO_RECORD":
-            self.screens["audio_recorder"].toggle_recording()
-
-        elif cuia == "START_AUDIO_PLAY":
-            self.screens["audio_recorder"].start_playing()
-
-        elif cuia == "STOP_AUDIO_PLAY":
-            self.screens["audio_recorder"].stop_playing()
-
-        elif cuia == "TOGGLE_AUDIO_PLAY":
-            self.screens["audio_recorder"].toggle_playing()
-
-        elif cuia == "START_MIDI_RECORD":
-            pass
-
-        elif cuia == "STOP_MIDI_RECORD":
-            pass
-
-        elif cuia == "TOGGLE_MIDI_RECORD":
-            pass
-
-        elif cuia == "START_MIDI_PLAY":
-            pass
-
-        elif cuia == "STOP_MIDI_PLAY":
-            pass
-
-        elif cuia == "TOGGLE_MIDI_PLAY":
-            pass
-
-        elif cuia == "SELECT":
+        elif cuia == "SELECT_ITEM":
             try:
                 self.get_current_screen().select(params[0])
             except:
@@ -1819,18 +1825,6 @@ class zynthian_gui(QObject):
         elif cuia == "SELECT_DOWN":
             try:
                 self.get_current_screen().select_down()
-            except:
-                pass
-
-        elif cuia == "BACK_UP":
-            try:
-                self.get_current_screen().back_up()
-            except:
-                pass
-
-        elif cuia == "BACK_DOWN":
-            try:
-                self.get_current_screen().back_down()
             except:
                 pass
 
@@ -1876,17 +1870,11 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_LAYER_BOLD":
             self.zynswitch_bold(0)
 
-        elif cuia == "SWITCH_LAYER_LONG":
-            self.zynswitch_long(0)
-
         elif cuia == "SWITCH_BACK_SHORT":
             self.zynswitch_short(1)
 
         elif cuia == "SWITCH_BACK_BOLD":
             self.zynswitch_bold(1)
-
-        elif cuia == "SWITCH_BACK_LONG":
-            self.zynswitch_long(1)
 
         elif cuia == "SWITCH_SNAPSHOT_SHORT":
             self.zynswitch_short(2)
@@ -1894,17 +1882,11 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_SNAPSHOT_BOLD":
             self.zynswitch_bold(2)
 
-        elif cuia == "SWITCH_SNAPSHOT_LONG":
-            self.zynswitch_long(2)
-
         elif cuia == "SWITCH_SELECT_SHORT":
             self.zynswitch_short(3)
 
         elif cuia == "SWITCH_SELECT_BOLD":
             self.zynswitch_bold(3)
-
-        elif cuia == "SWITCH_SELECT_LONG":
-            self.zynswitch_long(3)
 
         elif cuia == "SCREEN_MAIN":
             if self.get_current_screen_id() == "main":
@@ -1967,11 +1949,8 @@ class zynthian_gui(QObject):
             self.show_modal("playgrid")
             sendCuiaEventFeedback = False
 
-        elif cuia == "SCREEN_AUDIO_SETTINGS":
-            # Toggle global top right popup instead of opening audio settings page
-            # self.toggle_modal("audio_settings")
-            self.globalPopupOpened = not self.globalPopupOpened
-            sendCuiaEventFeedback = False
+        elif cuia == "SCREEN_ALSA_MIXER":
+            self.toggle_modal("alsa_mixer")
 
         elif cuia == "MODAL_SNAPSHOT_LOAD":
             self.toggle_modal("snapshot", "LOAD")
@@ -1979,53 +1958,60 @@ class zynthian_gui(QObject):
         elif cuia == "MODAL_SNAPSHOT_SAVE":
             self.toggle_modal("snapshot", "SAVE")
 
-        elif cuia == "MODAL_AUDIO_RECORDER":
-            self.toggle_modal("audio_recorder")
+        elif cuia == "SWITCH_GLOBAL_DOWN":
+            self.globalButtonPressed = True
+            sendCuiaEventFeedback = False
+        elif cuia == "SWITCH_GLOBAL_RELEASED":
+            self.globalButtonPressed = False
+            self.globalPopupOpened = not self.globalPopupOpened
+            sendCuiaEventFeedback = False
 
-        elif cuia == "MODAL_MIDI_RECORDER":
-            pass
-
-        elif cuia == "MODAL_ALSA_MIXER":
-            self.toggle_modal("alsa_mixer")
-
-        elif (cuia == "MODAL_STEPSEQ"):
-            pass
-
-        elif cuia == "CHANNEL_1":
-            if self.sketchpad.selectedTrackId == 0 + channelDelta and not self.leftSidebarActive:
+        elif cuia == "TRACK_1":
+            if self.sketchpad.selectedTrackId == 0 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.sketchpad.selectedTrackId = 0 + channelDelta
-        elif cuia == "CHANNEL_2":
-            if self.sketchpad.selectedTrackId == 1 + channelDelta and not self.leftSidebarActive:
+                self.sketchpad.selectedTrackId = 0 + trackDelta
+        elif cuia == "TRACK_2":
+            if self.sketchpad.selectedTrackId == 1 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.sketchpad.selectedTrackId = 1 + channelDelta
-        elif cuia == "CHANNEL_3":
-            if self.sketchpad.selectedTrackId == 2 + channelDelta and not self.leftSidebarActive:
+                self.sketchpad.selectedTrackId = 1 + trackDelta
+        elif cuia == "TRACK_3":
+            if self.sketchpad.selectedTrackId == 2 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.sketchpad.selectedTrackId = 2 + channelDelta
-        elif cuia == "CHANNEL_4":
-            if self.sketchpad.selectedTrackId == 3 + channelDelta and not self.leftSidebarActive:
+                self.sketchpad.selectedTrackId = 2 + trackDelta
+        elif cuia == "TRACK_4":
+            if self.sketchpad.selectedTrackId == 3 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.sketchpad.selectedTrackId = 3 + channelDelta
-        elif cuia == "CHANNEL_5":
-            if self.sketchpad.selectedTrackId == 4 + channelDelta and not self.leftSidebarActive:
+                self.sketchpad.selectedTrackId = 3 + trackDelta
+        elif cuia == "TRACK_5":
+            if self.sketchpad.selectedTrackId == 4 + trackDelta and not self.leftSidebarActive:
                 self.openLeftSidebar.emit()
             else:
-                self.sketchpad.selectedTrackId = 4 + channelDelta
-        elif cuia == "CHANNEL_PREVIOUS":
+                self.sketchpad.selectedTrackId = 4 + trackDelta
+        elif cuia == "TRACK_PREVIOUS":
             self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId - 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
-        elif cuia == "CHANNEL_NEXT":
+        elif cuia == "TRACK_NEXT":
             self.sketchpad.selectedTrackId = max(0, min(self.sketchpad.selectedTrackId + 1, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
 
-        elif cuia == "KEYBOARD":
-            logging.info("KEYBOARD")
-            self.miniPlayGridToggle.emit()
+        elif cuia == "TOGGLE_KEYBOARD":
+            # logging.info("TOGGLE_KEYBOARD")
+            self.toggleMiniPlayGrid()
+        elif cuia == "SHOW_KEYBOARD":
+            self.showMiniPlayGrid = True
+        elif cuia == "HIDE_KEYBOARD":
+            self.showMiniPlayGrid = False
 
-        elif cuia == "ZL_PLAY":
+        elif cuia == "SWITCH_ALT_DOWN":
+            self.altButtonPressed = True
+            sendCuiaEventFeedback = False
+        elif cuia == "SWITCH_ALT_RELEASED":
+            self.altButtonPressed = False
+            sendCuiaEventFeedback = False
+
+        elif cuia == "SWITCH_PLAY":
             zl = self.screens["sketchpad"]
 
             if self.metronomeButtonPressed:
@@ -2036,13 +2022,13 @@ class zynthian_gui(QObject):
                     self.run_stop_metronome_and_playback.emit()
                 else:
                     self.run_start_metronome_and_playback.emit()
-        elif cuia == "ZL_STOP":
+        elif cuia == "SWITCH_STOP":
             if Zynthbox.SyncTimer.instance().timerRunning():
                 self.run_stop_metronome_and_playback.emit()
             else:
                 self.callable_ui_action("ALL_NOTES_OFF")
 
-        elif cuia == "START_RECORD":
+        elif cuia == "SWITCH_RECORD":
             zl = self.screens["sketchpad"]
             if self.recording_popup_active or self.metronomeButtonPressed:
                 if zl.isRecording:
@@ -2086,18 +2072,23 @@ class zynthian_gui(QObject):
         elif cuia == "STOP_RECORD":
             self.run_stop_metronome_and_playback.emit()
 
-        elif cuia == "MODE_SWITCH_SHORT" or cuia == "MODE_SWITCH_BOLD" or cuia == "MODE_SWITCH_LONG":
-            if self.leftSidebarActive:
-                self.closeLeftSidebar.emit()
+        elif cuia == "SWITCH_MODE_DOWN":
+            pass
+        elif cuia == "SWITCH_MODE_RELEASED":
+            if self.ignoreNextModeButtonPress:
+                self.ignoreNextModeButtonPress = False
             else:
-                self.openLeftSidebar.emit()
+                if self.leftSidebarActive:
+                    self.closeLeftSidebar.emit()
+                else:
+                    self.openLeftSidebar.emit()
 
-        elif cuia == "SWITCH_CHANNELS_MOD_SHORT" or cuia == "SWITCH_CHANNELS_MOD_BOLD" or cuia == "SWITCH_CHANNELS_MOD_LONG":
-            self.channelsModActive = not self.channelsModActive
+        elif cuia == "SWITCH_TRACKS_MOD":
+            self.tracksModActive = not self.tracksModActive
             # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
             # Since * button is pressed, start timer
-            QMetaObject.invokeMethod(self.channelsModTimer, "start", Qt.QueuedConnection)
-            logging.debug(f'self.channelsModActive({self.channelsModActive})')
+            QMetaObject.invokeMethod(self.tracksModTimer, "start", Qt.QueuedConnection)
+            logging.debug(f'self.tracksModActive({self.tracksModActive})')
 
         # elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
         #     self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
@@ -2212,6 +2203,34 @@ class zynthian_gui(QObject):
                 # TODO Should we be sending something out for external tracks? Is there anything reasonable for this? probably control 7 (channel volume)? (cc 0x07 for MSB and 0x27 for LSB)
                 pass
             sendCuiaEventFeedback = False
+        elif cuia == "SET_SLOT_FILTER_CUTOFF":
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            if theTrack.trackType == "synth":
+                # TODO We need to capture these controllers' changes elsewhere, so we can feed them back however and whenever they change...
+                controller = root.selectedChannel.get_filterCutoffControllers()[slot]
+                if controller != None and controller.controlsCount > 0:
+                    controller.value = np.interp(params[0], (0, 127), (controller.value_min, controller.value_max))
+            elif theTrack.trackType in ["sample-trig", "sample-slice"]:
+                pass
+            elif theTrack.trackType == "sample-loop":
+                pass
+            else:
+                # TODO Probably offer some way to set what CC this changes externally?
+                pass
+        elif cuia == "SET_SLOT_FILTER_RESONANCE":
+            theTrack = self.sketchpad.song.channelsModel.getChannel(track)
+            if theTrack.trackType == "synth":
+                # TODO We need to capture these controllers' changes elsewhere, so we can feed them back however and whenever they change...
+                controller = root.selectedChannel.get_filterResonanceControllers()[slot]
+                if controller != None and controller.controlsCount > 0:
+                    controller.value = np.interp(params[0], (0, 127), (controller.value_min, controller.value_max))
+            elif theTrack.trackType in ["sample-trig", "sample-slice"]:
+                pass
+            elif theTrack.trackType == "sample-loop":
+                pass
+            else:
+                # TODO Probably offer some way to set what CC this changes externally?
+                pass
         elif cuia == "SET_FX_AMOUNT":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.chainedFx[slot]:
@@ -2235,7 +2254,7 @@ class zynthian_gui(QObject):
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:
-                logging.info("Executing CUIA action: {}".format(zynthian_gui_config.custom_switch_ui_actions[i]))
+                # logging.info("Executing CUIA action: {}".format(zynthian_gui_config.custom_switch_ui_actions[i]))
                 self.callable_ui_action(
                     zynthian_gui_config.custom_switch_ui_actions[i][t]
                 )
@@ -2254,7 +2273,7 @@ class zynthian_gui(QObject):
         self.dtsw = [ts] * (zynthian_gui_config.num_zynswitches + 4)
 
     def zynswitches_midi_setup(self, curlayer_chan=None):
-        logging.info("MIDI SWITCHES SETUP...")
+        # logging.info("MIDI SWITCHES SETUP...")
 
         # Configure Custom Switches
         for i in range(0, zynthian_gui_config.n_custom_switches):
@@ -2342,7 +2361,7 @@ class zynthian_gui(QObject):
                 if 5 <= i <= 9:
                     # If * button is pressed, it toggles itself on/off for 5000ms before returning to previous state.
                     # When 1-5 hw button is pressed during that 5000ms, * button state is retained and hence stop timer.
-                    QMetaObject.invokeMethod(self.channelsModTimer, "stop", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self.tracksModTimer, "stop", Qt.QueuedConnection)
 
                 # Handle button press event
                 if i == 10:
@@ -2543,16 +2562,16 @@ class zynthian_gui(QObject):
 
         if press:
             if not fake_key in self.__fake_keys_pressed:
-                # Do not emulate Ctrl key with channelsModActive
-                # if self.channelsModActive:
+                # Do not emulate Ctrl key with tracksModActive
+                # if self.tracksModActive:
                 #     self.fakeKeyboard.press(Key.ctrl)
 
                 self.__fake_keys_pressed.add(fake_key)
                 self.fakeKeyboard.press(fake_key)
         else:
             if fake_key in self.__fake_keys_pressed:
-                # Do not emulate Ctrl key with channelsModActive
-                # if self.channelsModActive:
+                # Do not emulate Ctrl key with tracksModActive
+                # if self.tracksModActive:
                 #     self.fakeKeyboard.release(Key.ctrl)
 
                 self.__fake_keys_pressed.discard(fake_key)
@@ -2562,7 +2581,7 @@ class zynthian_gui(QObject):
 
 
     def zynswitch_long(self, i):
-        logging.info("Looooooooong Switch " + str(i))
+        # logging.info("Looooooooong Switch " + str(i))
         # Disabling ald loong presses for the moment
         return
         #self.start_loading()
@@ -2588,7 +2607,7 @@ class zynthian_gui(QObject):
         #self.stop_loading()
 
     def zynswitch_bold(self, i):
-        logging.info("Bold Switch " + str(i))
+        # logging.info("Bold Switch " + str(i))
         #self.start_loading()
 
         if self.modal_screen in ["stepseq", "keyboard"]:
@@ -3928,6 +3947,10 @@ class zynthian_gui(QObject):
         if self.__mode_button_pressed__ != pressed:
             logging.debug(f"Mode Button pressed : {pressed}")
             self.__mode_button_pressed__ = pressed
+            if pressed:
+                self.callable_ui_action_simple("SWITCH_MODE_DOWN")
+            else:
+                self.callable_ui_action_simple("SWITCH_MODE_RELEASED")
             self.mode_button_pressed_changed.emit()
 
     mode_button_pressed_changed = Signal()
@@ -3943,12 +3966,35 @@ class zynthian_gui(QObject):
         if self.__alt_button_pressed__ != pressed:
             logging.debug(f"alt Button pressed : {pressed}")
             self.__alt_button_pressed__ = pressed
+            if pressed:
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SWITCH_ALT_DOWN", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, -1)
+            else:
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SWITCH_ALT_RELEASED", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, -1)
             self.alt_button_pressed_changed.emit()
 
     alt_button_pressed_changed = Signal()
 
     altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=alt_button_pressed_changed)
     ### END Property altButtonPressed
+
+    ### BEGIN Property globalButtonPressed
+    def get_global_button_pressed(self):
+        return self.__global_button_pressed__
+
+    def set_global_button_pressed(self, pressed):
+        if self.__global_button_pressed__ != pressed:
+            logging.debug(f"Global Button pressed : {pressed}")
+            self.__global_button_pressed__ = pressed
+            if pressed:
+                self.callable_ui_action_simple("SWITCH_GLOBAL_DOWN")
+            else:
+                self.callable_ui_action_simple("SWITCH_GLOBAL_RELEASED")
+            self.global_button_pressed_changed.emit()
+
+    global_button_pressed_changed = Signal()
+
+    globalButtonPressed = Property(bool, get_global_button_pressed, set_global_button_pressed, notify=global_button_pressed_changed)
+    ### END Property globalButtonPressed
 
     ### Property startRecordButtonPressed
     def get_startRecord_button_pressed(self):
@@ -4256,10 +4302,7 @@ class zynthian_gui(QObject):
         if self.__global_popup_opened__ != opened:
             self.__global_popup_opened__ = opened
             self.globalPopupOpenedChanged.emit()
-            if self.__global_popup_opened__:
-                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SCREEN_AUDIO_SETTINGS", -1, Zynthbox.ZynthboxBasics.Track.AnyTrack, Zynthbox.ZynthboxBasics.Slot.AnySlot, 0)
-            else:
-                self.handleCurrentScreenIDChanged() # Technically a bit odd, but logically this is what's happening
+            self.handleCurrentScreenIDChanged() # Technically a bit odd, but logically this is what's happening
 
     globalPopupOpenedChanged = Signal()
 
@@ -4312,19 +4355,19 @@ class zynthian_gui(QObject):
     passiveNotification = Property(str, get_passiveNotification, set_passiveNotification, notify=passiveNotificationChanged)
     ### END Property passiveNotification
 
-    ### Property channelsModActive
-    def get_channelsModActive(self):
-        return self.channels_mod_active
+    ### Property tracksModActive
+    def get_tracksModActive(self):
+        return self.tracks_mod_active
 
-    def set_channelsModActive(self, val):
-        if self.channels_mod_active != val:
-            self.channels_mod_active = val
-            self.channelsModActiveChanged.emit()
+    def set_tracksModActive(self, val):
+        if self.tracks_mod_active != val:
+            self.tracks_mod_active = val
+            self.tracksModActiveChanged.emit()
 
-    channelsModActiveChanged = Signal()
+    tracksModActiveChanged = Signal()
 
-    channelsModActive = Property(bool, get_channelsModActive, set_channelsModActive, notify=channelsModActiveChanged)
-    ### END Property channelsModActive
+    tracksModActive = Property(bool, get_tracksModActive, set_tracksModActive, notify=tracksModActiveChanged)
+    ### END Property tracksModActive
 
     ### Property bottomBarControlObj
     ### This property will store the object that is being controlled by bottomBar
@@ -4461,6 +4504,21 @@ class zynthian_gui(QObject):
 
     doingLongTask = Property(bool, get_doingLongTask, notify=doingLongTaskChanged)
     ### END Property doingLongTask
+
+    ### BEGIN Property showMiniPlayGrid
+    @Slot(None)
+    def toggleMiniPlayGrid(self):
+        self.showMiniPlayGrid = not self.showMiniPlayGrid
+
+    def get_showMiniPlayGrid(self):
+        return self.__show_mini_play_grid__
+    def set_showMiniPlayGrid(self, showMiniPlayGrid):
+        if self.__show_mini_play_grid__ != showMiniPlayGrid:
+            self.__show_mini_play_grid__ = showMiniPlayGrid
+            self.showMiniPlayGridChanged.emit()
+    showMiniPlayGridChanged = Signal()
+    showMiniPlayGrid = Property(bool, get_showMiniPlayGrid, set_showMiniPlayGrid, notify=showMiniPlayGridChanged)
+    ### END Property showMiniPlayGrid
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

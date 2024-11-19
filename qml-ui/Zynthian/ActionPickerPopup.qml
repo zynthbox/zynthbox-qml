@@ -42,13 +42,11 @@ Zynthian.Popup {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 component.close();
                 result = true;
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
                 if (_private.currentIndex > -1 && component.actions[_private.currentIndex].enabled) {
                     component.actions[_private.currentIndex].trigger();
                     component.close();

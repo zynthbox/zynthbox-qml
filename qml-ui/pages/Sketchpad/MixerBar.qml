@@ -47,7 +47,6 @@ Rectangle {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 bottomStack.slotsBar.channelButton.checked = true
                 return true
 

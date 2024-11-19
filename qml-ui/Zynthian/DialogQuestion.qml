@@ -107,7 +107,6 @@ Zynthian.Dialog {
                 break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
                 component.reject();
                 result = true;
                 break;

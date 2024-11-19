@@ -43,23 +43,20 @@ Zynthian.Popup {
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         // This gets called from main when the dialog is not opened, so let's be explicit about what we want in that case
-        if (root.opened || (zynqtgui.sketchpad.isRecording && ["ZL_STOP", "START_RECORD"].indexOf(cuia) > -1)) {
+        if (root.opened || (zynqtgui.sketchpad.isRecording && ["SWITCH_STOP", "SWITCH_RECORD"].indexOf(cuia) > -1)) {
             switch (cuia) {
-                case "CHANNEL_1":
-                case "CHANNEL_2":
-                case "CHANNEL_3":
-                case "CHANNEL_4":
-                case "CHANNEL_5":
+                case "TRACK_1":
+                case "TRACK_2":
+                case "TRACK_3":
+                case "TRACK_4":
+                case "TRACK_5":
                 case "NAVIGATE_LEFT":
                 case "NAVIGATE_RIGHT":
                 case "SELECT_UP":
                 case "SELECT_DOWN":
                 case "SWITCH_SELECT_SHORT":
                 case "SWITCH_SELECT_BOLD":
-                case "SWITCH_SELECT_LONG":
-                case "MODE_SWITCH_SHORT":
-                case "MODE_SWITCH_BOLD":
-                case "MODE_SWITCH_LONG":
+                case "SWITCH_MODE_RELEASED":
                 case "KNOB0_TOUCHED":
                 case "KNOB0_RELEASED":
                 case "KNOB1_TOUCHED":
@@ -106,11 +103,10 @@ Zynthian.Popup {
                     break;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
-                case "SWITCH_BACK_LONG":
                     root.close();
                     returnValue = true;
                     break;
-                case "ZL_STOP":
+                case "SWITCH_STOP":
                     if (zynqtgui.sketchpad.recordingType === "midi" && zynqtgui.sketchpad.isRecording) {
                         // If stopping the recording using the stop button, don't open the dialog back up again
                         _private.selectedPattern.recordLive = false;
@@ -119,7 +115,7 @@ Zynthian.Popup {
                         returnValue = true;
                     }
                     break;
-                case "START_RECORD":
+                case "SWITCH_RECORD":
                     if (zynqtgui.sketchpad.recordingType === "midi") {
                         // Only handle the recording work here if we're recording midi, as audio recording is handled by python logic
                         if (zynqtgui.sketchpad.isRecording) {
@@ -1104,7 +1100,7 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 18
                     icon.name: zynqtgui.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                     onClicked: {
-                        zynqtgui.callable_ui_action_simple("START_RECORD");
+                        zynqtgui.callable_ui_action_simple("SWITCH_RECORD");
                     }
                 }
                 QQC2.Button {
@@ -1114,7 +1110,7 @@ Zynthian.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                     icon.name: "view-grid-symbolic"
                     onClicked: {
-                        zynqtgui.callable_ui_action_simple("KEYBOARD");
+                        zynqtgui.callable_ui_action_simple("SHOW_KEYBOARD");
                     }
                 }
             }

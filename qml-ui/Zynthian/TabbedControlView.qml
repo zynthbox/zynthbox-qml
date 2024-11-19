@@ -61,7 +61,6 @@ Item {
         // Eat select actions
         case "SWITCH_SELECT_SHORT":
         case "SWITCH_SELECT_BOLD":
-        case "SWITCH_SELECT_LONG":
             if (focusedScope === internalStack) {
                 if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
                     Window.activeFocusItem.toggle()

@@ -475,11 +475,9 @@ Zynthian.ScreenPage {
         }
 
         switch (cuia) {
-            case "MODE_SWITCH_SHORT":
-            case "MODE_SWITCH_LONG":
-            case "MODE_SWITCH_BOLD":
+            case "SWITCH_MODE_RELEASED":
                 if (zynqtgui.altButtonPressed) {
-                    // Cycle between channel, mixer, synths, samples, fx when alt button is not pressed
+                    // Cycle between channel, mixer, synths, samples, fx when alt button is pressed
                     if (bottomStack.slotsBar.channelButton.checked) {
                         bottomStack.slotsBar.clipsButton.checked = true
                     } else if (bottomStack.slotsBar.clipsButton.checked) {

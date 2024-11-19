@@ -76,21 +76,19 @@ class zynthian_gui_keybinding(QObject):
 
             "SWITCH_SELECT_SHORT": { "modifier": 0, "keysym": "Return" },
             "SWITCH_SELECT_BOLD": { "modifier": 1, "keysym": "Return" },
-            "SWITCH_SELECT_LONG": { "modifier": 4, "keysym": "Return" },
+            # "SWITCH_SELECT_LONG": { "modifier": 4, "keysym": "Return" },
             "SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape" },
             "SWITCH_BACK_BOLD": { "modifier": 1, "keysym": "BackSpace, Escape" },
-            "SWITCH_BACK_LONG": { "modifier": 4, "keysym": "BackSpace, Escape" },
+            # "SWITCH_BACK_LONG": { "modifier": 4, "keysym": "BackSpace, Escape" },
             "SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
             "SWITCH_LAYER_BOLD": { "modifier": 1, "keysym": "l" },
-            "SWITCH_LAYER_LONG": { "modifier": 4, "keysym": "l" },
+            # "SWITCH_LAYER_LONG": { "modifier": 4, "keysym": "l" },
             #"SWITCH_SNAPSHOT_SHORT": { "modifier": 0, "keysym": "s" },
             #"SWITCH_SNAPSHOT_BOLD": { "modifier": 1, "keysym": "s" },
             #"SWITCH_SNAPSHOT_LONG": { "modifier": 4, "keysym": "s" },
 
             "SELECT_UP": { "modifier": 0, "keysym": "Up" },
             "SELECT_DOWN": { "modifier": 0, "keysym": "Down" },
-            "BACK_UP": { "modifier": 2, "keysym": "Up" },
-            "BACK_DOWN": { "modifier": 2, "keysym": "Down" },
             "LAYER_UP": { "modifier": 1, "keysym": "Up" },
             "LAYER_DOWN": { "modifier": 1, "keysym": "Down" },
             "SNAPSHOT_UP": { "modifier": 4, "keysym": "Up" },
@@ -126,32 +124,32 @@ class zynthian_gui_keybinding(QObject):
             "NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
             "NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
 
-            "CHANNEL_1": { "modifier": 0, "keysym": "1" },
-            "CHANNEL_2": { "modifier": 0, "keysym": "2" },
-            "CHANNEL_3": { "modifier": 0, "keysym": "3" },
-            "CHANNEL_4": { "modifier": 0, "keysym": "4" },
-            "CHANNEL_5": { "modifier": 0, "keysym": "5" },
+            "TRACK_1": { "modifier": 0, "keysym": "1" },
+            "TRACK_2": { "modifier": 0, "keysym": "2" },
+            "TRACK_3": { "modifier": 0, "keysym": "3" },
+            "TRACK_4": { "modifier": 0, "keysym": "4" },
+            "TRACK_5": { "modifier": 0, "keysym": "5" },
 
-            "CHANNEL_6": { "modifier": 4, "keysym": "1" },
-            "CHANNEL_7": { "modifier": 4, "keysym": "2" },
-            "CHANNEL_8": { "modifier": 4, "keysym": "3" },
-            "CHANNEL_9": { "modifier": 4, "keysym": "4" },
-            "CHANNEL_10": { "modifier": 4, "keysym": "5" },
+            # "TRACK_6": { "modifier": 4, "keysym": "1" },
+            # "TRACK_7": { "modifier": 4, "keysym": "2" },
+            # "TRACK_8": { "modifier": 4, "keysym": "3" },
+            # "TRACK_9": { "modifier": 4, "keysym": "4" },
+            # "TRACK_10": { "modifier": 4, "keysym": "5" },
 
-            # "CHANNEL_11": { "modifier": 4, "keysym": "5" }, # Disable channel 11 and 12
-            # "CHANNEL_12": { "modifier": 4, "keysym": "6" }, # Disable channel 11 and 12
+            # "TRACK_11": { "modifier": 4, "keysym": "5" }, # Disable channel 11 and 12
+            # "TRACK_12": { "modifier": 4, "keysym": "6" }, # Disable channel 11 and 12
 
-            "CHANNEL_PREVIOUS": {"modifier": 4, "keysym": "Left"},
-            "CHANNEL_NEXT": { "modifier": 4, "keysym": "Right" },
+            "TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
+            "TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
 
             "INCREASE" : { "modifier": 0, "keysym": "+" },
             "DECREASE" : { "modifier": 0, "keysym": "-" },
 
-            "KEYBOARD" : { "modifier": 0, "keysym": "k" },
-            "ZL_PLAY" : { "modifier": 0, "keysym": "a" },
-            "ZL_STOP" : { "modifier": 0, "keysym": "s" },
+            "TOGGLE_KEYBOARD" : { "modifier": 0, "keysym": "k" },
+            "SWITCH_PLAY" : { "modifier": 0, "keysym": "a" },
+            "SWITCH_STOP" : { "modifier": 0, "keysym": "s" },
 
-            "START_RECORD": {"modifier": 0, "keysym": "`"},
+            "SWITCH_RECORD": {"modifier": 0, "keysym": "`"},
             "STOP_RECORD": {"modifier": 4, "keysym": "`"},
         }
     }

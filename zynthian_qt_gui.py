@@ -3955,9 +3955,9 @@ class zynthian_gui(QObject):
             logging.debug(f"Mode Button pressed : {pressed}")
             self.__mode_button_pressed__ = pressed
             if pressed:
-                self.callable_ui_action_simple("SWITCH_MODE_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MODE_DOWN")
             else:
-                self.callable_ui_action_simple("SWITCH_MODE_RELEASED")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_MODE_RELEASED")
             self.mode_button_pressed_changed.emit()
 
     mode_button_pressed_changed = Signal()
@@ -3993,9 +3993,9 @@ class zynthian_gui(QObject):
             logging.debug(f"Global Button pressed : {pressed}")
             self.__global_button_pressed__ = pressed
             if pressed:
-                self.callable_ui_action_simple("SWITCH_GLOBAL_DOWN")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_DOWN")
             else:
-                self.callable_ui_action_simple("SWITCH_GLOBAL_RELEASED")
+                Zynthbox.MidiRouter.instance().enqueueCuiaCommand("SWITCH_GLOBAL_RELEASED")
             self.global_button_pressed_changed.emit()
 
     global_button_pressed_changed = Signal()

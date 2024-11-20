@@ -318,11 +318,6 @@ MouseArea {
         property var cuiaCallback: function(cuia) {
             var result = popup.opened;
             switch(cuia) {
-                // If Global button is pressed when global popup is open, close it
-                case "SWITCH_GLOBAL_RELEASED":
-                    popup.close();
-                    result = true;
-                    break;
                 case "SELECT_UP":
                 case "SELECT_DOWN":
                 case "NAVIGATE_LEFT":

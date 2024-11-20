@@ -318,10 +318,26 @@ MouseArea {
         property var cuiaCallback: function(cuia) {
             var result = popup.opened;
             switch(cuia) {
+                case "SWITCH_PLAY":
+                case "SWITCH_STOP":
+                case "ALL_NOTES_OFF":
+                case "ALL_SOUNDS_OFF":
+                case "ALL_OFF":
+                    // Playback control is not handled by us, so pass these through
+                    result = false;
+                    break;
                 case "SELECT_UP":
                 case "SELECT_DOWN":
                 case "NAVIGATE_LEFT":
-                case "NAVIGATE_RIGHT":;
+                case "NAVIGATE_RIGHT":
+                    // Let's ensure we don't accidentally switch tracks and whatnot with the popup open
+                    result = true;
+                    break;
+                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_BOLD":
+                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_BOLD":
+                    zynqtgui.globalPopupOpened = false;
                     result = true;
                     break;
                 case "KNOB0_UP":
@@ -355,10 +371,6 @@ MouseArea {
                 case "KNOB3_DOWN":
                     applicationWindow().updateMasterVolume(-1);
                     result = true;
-                    break;
-                case "ALL_NOTES_OFF":
-                    // This is not handled by us, so pass it through
-                    result = false;
                     break;
             }
             return result;

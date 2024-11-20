@@ -248,7 +248,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         if setChannelColor:
             if self.channel.trackType == "synth":
                 buttonColor = self.led_color_channel_synth
-            elif self.channel.trackType in ["sample-trig", "sample-slice"]:
+            elif self.channel.trackType == "sample-trig":
                 buttonColor = self.led_color_channel_sample
             elif self.channel.trackType == "sample-loop":
                 buttonColor = self.led_color_channel_loop

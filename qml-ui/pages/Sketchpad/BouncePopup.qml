@@ -169,7 +169,7 @@ Zynthian.Popup {
                                 _private.canBounce = false;
                                 _private.cannotBounceReason = qsTr("There are no synth engines on this track");
                             }
-                        } else if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
+                        } else if (sketchpadTrack.trackType === "sample-trig") {
                             let hasSound = false;
                             for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                                 if (sketchpadTrack.samples[sampleIndex].cppObjId > -1) {
@@ -235,7 +235,7 @@ Zynthian.Popup {
                         for (let sketchpadTrackIndex = 0; sketchpadTrackIndex < sketchpadTracksToBounce.length; ++sketchpadTrackIndex) {
                             let sketchpadTrackId = sketchpadTracksToBounce[sketchpadTrackIndex];
                             let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(sketchpadTrackId);
-                            if (sketchpadTrack.trackType === "synth" || sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice" || (sketchpadTrack.trackType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
+                            if (sketchpadTrack.trackType === "synth" || sketchpadTrack.trackType === "sample-trig" || (sketchpadTrack.trackType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
                                 let soundIndication = "(unknown)";
                                 if (sketchpadTrack.trackType === "synth") {
                                     for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
@@ -259,7 +259,7 @@ Zynthian.Popup {
                                             break;
                                         }
                                     }
-                                } else if (sketchpadTrack.trackType === "sample-trig" || sketchpadTrack.trackType === "sample-slice") {
+                                } else if (sketchpadTrack.trackType === "sample-trig") {
                                     for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                                         var clip = sketchpadTrack.samples[sampleIndex];
                                         if (clip.cppObjId > -1) {

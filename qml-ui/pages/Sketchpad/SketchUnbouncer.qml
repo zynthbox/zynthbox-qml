@@ -94,9 +94,6 @@ Zynthian.DialogQuestion {
                     if (_private.clip.metadata.audioType === "sample-trig") {
                         console.log("Sketch was recorded via sample-trig, so switch to that");
                         _private.channel.trackType = "sample-trig";
-                    } else if (_private.clip.metadata.audioType === "sample-slice") {
-                        console.log("Sketch was recorded via sample-slice, so switch to that");
-                        _private.channel.trackType = "sample-slice";
                     } else if (_private.clip.metadata.audioType === "sample-loop") {
                         console.log("Sketch was recorded via synth sounds (but was in loop mode), so switch to that");
                         _private.channel.trackType = "synth";

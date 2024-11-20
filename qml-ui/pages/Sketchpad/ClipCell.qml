@@ -239,7 +239,7 @@ QQC2.AbstractButton {
 //                      ? presetText
 //                          ? presetText
 //                          : ""
-//                      : ["sample-trig", "sample-slice"].indexOf(model.channel.trackType) >= 0
+//                      : model.channel.trackType =="sample-trig"
 //                          ? model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
 //                          : model.channel.trackType === "sample-loop"
 //                              ? model.channel.sceneClip.path.split("/").pop()

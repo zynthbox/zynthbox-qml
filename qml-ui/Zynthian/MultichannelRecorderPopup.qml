@@ -61,7 +61,7 @@ Zynthian.Dialog {
                         break;
                     }
                 }
-            } else if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
+            } else if (channel.trackType === "sample-trig") {
                 for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                     if (channel.samples[sampleIndex].cppObjId > -1) {
                         shouldRecord = true;
@@ -179,7 +179,7 @@ Zynthian.Dialog {
                                 break;
                             }
                         }
-                    } else if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
+                    } else if (channel.trackType === "sample-trig") {
                         for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                             var clip = channel.samples[sampleIndex];
                             if (clip.cppObjId > -1) {
@@ -251,7 +251,7 @@ Zynthian.Dialog {
                             if (channel) { // by all rights this should not be possible, but... best safe
                                 metadata["ZYNTHBOX_ACTIVELAYER"] = channel.getChannelSoundSnapshotJson(); // The layer setup which produced the sounds in this recording
                                 metadata["ZYNTHBOX_TRACK_TYPE"] = channel.trackType; // The audio type of this channel
-                                if (channel.trackType === "sample-trig" || channel.trackType === "sample-slice") {
+                                if (channel.trackType === "sample-trig") {
                                     // Store the sample data, if we've been playing in a patterny sample mode
                                     metadata["ZYNTHBOX_SAMPLES"] = channel.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
                                 }

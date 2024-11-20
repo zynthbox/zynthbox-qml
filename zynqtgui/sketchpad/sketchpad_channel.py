@@ -1254,7 +1254,7 @@ class sketchpad_channel(QObject):
     ### End Property muted
 
     ### BEGIN Property trackType
-    # Possible values : "synth", "sample-loop", "sample-trig", "sample-slice", "external"
+    # Possible values : "synth", "sample-loop", "sample-trig", "external"
     # For simplicity, trackType is string in the format "sample-xxxx" or "synth" or "external"
     # TODO : Later implement it properly with model and enums
     def get_track_type(self):
@@ -1294,10 +1294,6 @@ class sketchpad_channel(QObject):
             self.__track_type__ = type
             self.track_type_changed.emit()
 
-            # Set selectedSlotRow to 0 when type is changed to slice as slice mode always operates on slot 0
-            if type == "sample-slice":
-                self.selectedSlotRow = 0
-
             # Set keyZoneMode to "Off"(all-full) state when type is changed to trig
             if type == "sample-trig":
                 self.keyZoneMode = "all-full"
@@ -1327,7 +1323,7 @@ class sketchpad_channel(QObject):
 
         if trackType == "sample-loop":
             return "sketch"
-        elif trackType in ["sample-trig", "sample-slice"]:
+        elif trackType == "sample-trig":
             return "sample"
         return trackType
 
@@ -1643,16 +1639,6 @@ class sketchpad_channel(QObject):
                     occupied_slots.append(True)
                 else:
                     occupied_slots.append(False)
-        elif self.__track_type__ == "sample-slice":
-            # logging.debug(f"### get_occupiedSlots : Sample slice")
-
-            # If type is sample-slice check if samples[0] has wav selected
-            if self.__samples__[0] is not None and \
-                    self.__samples__[0].path is not None and \
-                    len(self.__samples__[0].path) > 0:
-                occupied_slots = [True, None, None, None, None]
-            else:
-                occupied_slots = [False, None, None, None, None]
         else:
             # logging.debug(f"### get_occupiedSlots : Slots not in use")
             # For any other modes, sample slots are not in use. Hence do not increment occupied_slots
@@ -2171,7 +2157,7 @@ class sketchpad_channel(QObject):
             if self.trackType == "synth":
                 emitSlotsChanged = True
         elif whatChanged == "samples":
-            if self.trackType in ["sample-trig", "sample-slice"]:
+            if self.trackType == "sample-trig":
                 emitSlotsChanged = True
         elif whatChanged == "slotsReordered":
             if self.trackType == "sample-loop":
@@ -2194,7 +2180,7 @@ class sketchpad_channel(QObject):
 
         if self.trackType == "synth":
             return self.chainedSoundsNames
-        elif self.trackType in ["sample-trig", "sample-slice"]:
+        elif self.trackType == "sample-trig":
             return self.samples
         elif self.trackType == "sample-loop":
             clips = []
@@ -2294,7 +2280,7 @@ class sketchpad_channel(QObject):
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):
-        if self.trackType in ["sample-trig", "sample-slice"]:
+        if self.trackType == "sample-trig":
             return self.samples[self.selectedSlotRow]
         else:
             return self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
@@ -2400,7 +2386,7 @@ class sketchpad_channel(QObject):
                     self.getClipsModelById(newOrder[index]).__clips__[0] = clip
                     clip.id = newOrder[index]
             self.__song__.schedule_save()
-        elif _trackType in ["sample-trig", "sample-slice"]:
+        elif _trackType == "sample-trig":
             # Reorder samples
             new_order_samples = [self.samples[index] for index in newOrder]
             for index, sample in enumerate(new_order_samples):

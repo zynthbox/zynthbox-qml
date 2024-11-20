@@ -868,7 +868,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
             except:
                 preset_name = "no-layer"
-        elif channel.trackType == "sample-trig" or channel.trackType == "sample-slice":
+        elif channel.trackType == "sample-trig":
             preset_name = "samples"
         count = 0
         base_recording_dir = f"{self.__song__.sketchpad_folder}wav"

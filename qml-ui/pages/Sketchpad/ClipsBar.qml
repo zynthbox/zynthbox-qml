@@ -191,7 +191,7 @@ Rectangle {
 
                         QQC2.Button {
                             Layout.fillWidth: true
-                            visible: root.selectedClipChannel && ["synth", "sample-trig", "sample-slice", "external"].indexOf(root.selectedClipChannel.trackType) > -1
+                            visible: root.selectedClipChannel && ["synth", "sample-trig", "external"].indexOf(root.selectedClipChannel.trackType) > -1
                             text: qsTr("Swap with...")
                             onClicked: {
                                 bottomStack.slotsBar.pickSlotToSwapWith(root.selectedClipChannel, "pattern", clipsBarDelegate.selectedClipPattern.clipIndex);

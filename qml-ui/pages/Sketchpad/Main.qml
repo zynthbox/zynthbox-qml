@@ -515,7 +515,7 @@ Zynthian.ScreenPage {
                                 bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
                             }
                             returnValue = true;
-                        } else if (root.selectedChannel && ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0) {
+                        } else if (root.selectedChannel && root.selectedChannel.trackType == "sample-trig") {
                             let sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow];
                             // when sample and slot is active, goto wave editor or show popup when empty
                             if (sample && !sample.isEmpty) {
@@ -1196,8 +1196,6 @@ Zynthian.ScreenPage {
                                             else if (channelHeaderDelegate.channel.trackType === "sample-loop")
                                                 return zynqtgui.sketchpad.channelTypeSketchesColor
                                             else if (channelHeaderDelegate.channel.trackType === "sample-trig")
-                                                return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.trackType === "sample-slice")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
                                             else if (channelHeaderDelegate.channel.trackType === "external")
                                                 return zynqtgui.sketchpad.channelTypeExternalColor

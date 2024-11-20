@@ -107,7 +107,7 @@ Zynthian.DialogQuestion {
                                             if (sketch.metadata.soundSnapshot === otherSketch.metadata.soundSnapshot) {
                                                 stillTheSame = true;
                                             }
-                                        } else if (sketch.metadata.audioType === "sample-trig" || sketch.metadata.audioType === "sample-slice") {
+                                        } else if (sketch.metadata.audioType === "sample-trig") {
                                             if (sketch.metadata.samples === otherSketch.metadata.samples) {
                                                 stillTheSame = true;
                                             }
@@ -170,7 +170,7 @@ Zynthian.DialogQuestion {
                                         }
                                         return createdDescription;
                                     }
-                                    if (sketch.metadata.audioType === "sample-trig" || sketch.metadata.audioType === "sample-slice") {
+                                    if (sketch.metadata.audioType === "sample-trig") {
                                         let sampleMetadata = sketch.metadata.samples;
                                         for (let sampleSlotIndex = 0; sampleSlotIndex < 5; ++sampleSlotIndex) {
                                             sampleSlotDetails[sampleSlotIndex] = sampleMetadata[sampleSlotIndex]["filename"];
@@ -242,8 +242,8 @@ Zynthian.DialogQuestion {
                     _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadata.audioTypeSettings);
                     //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
                     _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadata.soundSnapshot);
-                    //   - If trackType is sample-trig or sample-slice: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
-                    if (_private.sketchpadTrack.trackType === "sample-trig" || _private.sketchpadTrack.trackType === "sample-slice") {
+                    //   - If trackType is sample-trig: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
+                    if (_private.sketchpadTrack.trackType === "sample-trig") {
                         _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadata.samples);
                     }
                     // - Run through the track's patterns

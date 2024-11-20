@@ -127,7 +127,7 @@ ColumnLayout {
             QQC2.Label {
                 anchors.centerIn: parent
                 font.pointSize: 12
-                visible: ["sample-loop", "sample-trig", "sample-slice", "synth", "external"].indexOf(root.channel.trackType) >= 0
+                visible: ["sample-loop", "sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
                 text: qsTr("%1%2")
                         .arg(root.channel.id + 1)
                         .arg(String.fromCharCode(clipDelegate.clipIndex+65).toLowerCase())

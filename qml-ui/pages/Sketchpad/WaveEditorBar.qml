@@ -588,7 +588,7 @@ GridLayout {
 
         // Handle for setting loop point
         Item {
-            visible: waveBar.channel.trackType !== "sample-slice" && waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle
+            visible: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle
             anchors {
                 verticalCenter: loopLine.verticalCenter
                 left: loopLine.right
@@ -707,7 +707,6 @@ GridLayout {
         // Loop line
         Rectangle {
             id: loopLine
-            visible: waveBar.channel.trackType !== "sample-slice"
             anchors {
                 top: parent.top
                 bottom: parent.bottom
@@ -755,7 +754,7 @@ GridLayout {
             id: dotFetcher
             interval: 1; repeat: false; running: false;
             onTriggered: {
-                progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "sample-slice" || waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
+                progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
                     ? waveBar.cppClipObject.playbackPositions
                     : null
             }
@@ -792,12 +791,10 @@ GridLayout {
             }
         }
 
-        // Create and place beat lines when trackType !== "sample-slice"
+        // Create and place beat lines
         Repeater {
             // Count number of beat lines to be shown as per beat and visible width
-            model: waveBar.channel.trackType !== "sample-slice"
-                    ? Math.ceil(wav.width / wav.pixelsPerBeat)
-                    : 0
+            model: Math.ceil(wav.width / wav.pixelsPerBeat)
             delegate: Rectangle {
                 anchors {
                     top: parent.top
@@ -811,45 +808,6 @@ GridLayout {
             }
         }
 
-        // Create and place slice lines when trackType === "sample-slice"
-        Repeater {
-            // Count number of slice lines to be shown
-            model: waveBar.channel.trackType === "sample-slice"
-                    ? waveBar.controlObj.slices
-                    : 0
-            delegate: Rectangle {
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                color: Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                Kirigami.Theme.highlightColor.g,
-                                Kirigami.Theme.highlightColor.b,
-                                index === 0 ? 0 : 0.8)
-                width: 2
-                // Calculate position of each beat line taking startposition into consideration
-                x: startLoopLine.x + (endLoopLine.x - startLoopLine.x)*modelData/waveBar.controlObj.slices
-
-                Rectangle {
-                    width: Math.min(Kirigami.Units.gridUnit, (endLoopLine.x - startLoopLine.x)/waveBar.controlObj.slices - 4)
-                    height: width
-                    anchors {
-                        left: parent.right
-                        bottom: parent.bottom
-                    }
-
-                    border.width: 1
-                    border.color: "#99ffffff"
-                    color: Kirigami.Theme.backgroundColor
-
-                    QQC2.Label {
-                        anchors.centerIn: parent
-                        text: qsTr("%L1").arg(index+1)
-                        font.pointSize: Math.min(8, parent.width)
-                    }
-                }
-            }
-        }
         QQC2.Button {
             anchors {
                 top: parent.top

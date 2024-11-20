@@ -208,13 +208,12 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && (infoBar.clip.clipChannel.trackType === "sample-trig" ||
-                 infoBar.clip.clipChannel.trackType === "sample-slice")
+        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "sample-trig"
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynqtgui.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.filename.length > 0 ? sample.filename : "--") : ""
     }
-    
+
     Item {
         Layout.fillWidth: true
         Layout.fillHeight: true

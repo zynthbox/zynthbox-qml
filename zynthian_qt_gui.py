@@ -2217,7 +2217,7 @@ class zynthian_gui(QObject):
                 controller = root.selectedChannel.get_filterCutoffControllers()[slot]
                 if controller != None and controller.controlsCount > 0:
                     controller.value = np.interp(params[0], (0, 127), (controller.value_min, controller.value_max))
-            elif theTrack.trackType in ["sample-trig", "sample-slice"]:
+            elif theTrack.trackType == "sample-trig":
                 pass
             elif theTrack.trackType == "sample-loop":
                 pass
@@ -2231,7 +2231,7 @@ class zynthian_gui(QObject):
                 controller = root.selectedChannel.get_filterResonanceControllers()[slot]
                 if controller != None and controller.controlsCount > 0:
                     controller.value = np.interp(params[0], (0, 127), (controller.value_min, controller.value_max))
-            elif theTrack.trackType in ["sample-trig", "sample-slice"]:
+            elif theTrack.trackType == "sample-trig":
                 pass
             elif theTrack.trackType == "sample-loop":
                 pass

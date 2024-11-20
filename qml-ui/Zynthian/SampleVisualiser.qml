@@ -20,7 +20,7 @@ Item {
      * This should be set to the channel audio type string for the channel appropriate for the given sample.
      * If you don't set this, you will have no progress reporting
      * If you are visualising an orphaned sample (for example when previewing one for loading), set this to "sample-loop" to have a single progress line, or "sample-trig" for multiple progress dots
-     * Accepted values are any one of the track audio type strings, so: "sample-trig", "sample-slice", "sample-loop", "external", or "synth"
+     * Accepted values are any one of the track audio type strings, so: "sample-trig", "sample-loop", "external", or "synth"
      */
     property string trackType: ""
     clip: true
@@ -49,7 +49,7 @@ Item {
         property: "progressStyle"
         value: component.trackType === "sample-loop"
             ? 1
-            : component.trackType === "sample-trig" || component.trackType === "sample-slice"
+            : component.trackType === "sample-trig"
                 ? 2
                 : 0
     }

@@ -244,7 +244,7 @@ Rectangle {
 //                root.openBottomDrawerOnLoad = true;
 //                zynqtgui.forced_screen_back = screenBack;
             }
-        } else if (samplesButton.checked || type === "sample-trig" || type === "sample-slice") {
+        } else if (samplesButton.checked || type === "sample-trig") {
             // Clicked entry is samples
             console.log("handleItemClick : Samples")
 

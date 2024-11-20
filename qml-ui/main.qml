@@ -836,7 +836,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             font.pointSize: 11
             onClicked: samplesMenu.visible = true
-            visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.trackType) >= 0
+            visible: root.selectedChannel.trackType == "sample-trig"
 
             Zynthian.Menu {
                 id: samplesMenu
@@ -1430,8 +1430,6 @@ Kirigami.AbstractApplicationWindow {
                                                 return zynqtgui.sketchpad.channelTypeSketchesColor
                                             else if (channelHeaderDelegate.channel.trackType === "sample-trig")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.trackType === "sample-slice")
-                                                return zynqtgui.sketchpad.channelTypeSamplesColor
                                             else if (channelHeaderDelegate.channel.trackType === "external")
                                                 return zynqtgui.sketchpad.channelTypeExternalColor
                                             else
@@ -1508,8 +1506,6 @@ Kirigami.AbstractApplicationWindow {
                                             else if (channelHeaderDelegate2.channel.trackType === "sample-loop")
                                                 return zynqtgui.sketchpad.channelTypeSketchesColor
                                             else if (channelHeaderDelegate2.channel.trackType === "sample-trig")
-                                                return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate2.channel.trackType === "sample-slice")
                                                 return zynqtgui.sketchpad.channelTypeSamplesColor
                                             else if (channelHeaderDelegate2.channel.trackType === "external")
                                                 return zynqtgui.sketchpad.channelTypeExternalColor

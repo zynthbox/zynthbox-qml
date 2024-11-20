@@ -679,7 +679,8 @@ Zynthian.BasePlayGrid {
 
                 DrumsGrid {
                     id: drumsGridItem
-                    model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
+                    // model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
+                    model: _private.activePatternModel ? _private.activePatternModel.gridModel : null
                     positionalVelocity: _private.positionalVelocity
                     showChosenPads: drumPad.channelIsLoopType === false
                     playgrid: component
@@ -1918,7 +1919,7 @@ Zynthian.BasePlayGrid {
                                                             color: soundButton.borderColor
                                                         }
                                                         color: soundButton.backgroundColor
-                                                        property bool sampleVisible: parent.visible && patternsMenuItem.thisPattern != null && (patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination || patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination)
+                                                        property bool sampleVisible: parent.visible && patternsMenuItem.thisPattern != null && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination
                                                         property QtObject channel: null
                                                         Binding {
                                                             target: patternPopupSampleVisualiser
@@ -1994,15 +1995,13 @@ Zynthian.BasePlayGrid {
                                                     text: visible
                                                         ? patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination
                                                             ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
-                                                            : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination
-                                                                ? "Sample Slice Mode"
-                                                                : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.ExternalDestination
-                                                                    ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.sketchpadTrack + 1)
-                                                                    : patternsMenuItem.associatedChannel
-                                                                        ? patternsMenuItem.associatedChannel.connectedSound > -1 && soundName.length > 2
-                                                                            ? "Sound: " + soundName
-                                                                            : "No sound assigned - tap to select one"
-                                                                : "Unassigned - playing to: " + _private.currentSoundName
+                                                            : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.ExternalDestination
+                                                                ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.sketchpadTrack + 1)
+                                                                : patternsMenuItem.associatedChannel
+                                                                    ? patternsMenuItem.associatedChannel.connectedSound > -1 && soundName.length > 2
+                                                                        ? "Sound: " + soundName
+                                                                        : "No sound assigned - tap to select one"
+                                                            : "Unassigned - playing to: " + _private.currentSoundName
                                                         : ""
                                                     onClicked: {
                                                         zynqtgui.current_screen_id = "sketchpad";
@@ -2079,60 +2078,6 @@ Zynthian.BasePlayGrid {
                                                     //checked: patternsMenuItem.thisPattern.bankOffset === 8
                                                     //onClicked: {
                                                         //_private.sequence.setPatternProperty(_private.activePattern, "bankOffset", 8, patternsMenuItem.thisPatternIndex)
-                                                    //}
-                                                //}
-                                            //}
-                                            //ColumnLayout {
-                                                //Layout.fillHeight: true
-                                                //Zynthian.PlayGridButton {
-                                                    //text: "TRIG"
-                                                    //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleTriggerDestination : false
-                                                    //onClicked: {
-                                                        //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.trackType = "external";
-                                                        //} else {
-                                                            //patternsMenuItem.associatedChannel.trackType = "sample-trig";
-                                                        //}
-                                                    //}
-                                                //}
-                                                //Zynthian.PlayGridButton {
-                                                    //text: "SYNTH"
-                                                    //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SynthDestination : false
-                                                    //onClicked: {
-                                                        //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.trackType = "external";
-                                                        //} else {
-                                                            //patternsMenuItem.associatedChannel.trackType = "synth";
-                                                        //}
-                                                    //}
-                                                //}
-                                            //}
-                                            //ColumnLayout {
-                                                //Layout.fillHeight: true
-                                                //Zynthian.PlayGridButton {
-                                                    //text: "SLICE"
-                                                    //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleSlicedDestination : false
-                                                    //onClicked: {
-                                                        //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.trackType = "external";
-                                                        //} else {
-                                                            //patternsMenuItem.associatedChannel.trackType = "sample-slice";
-                                                        //}
-                                                    //}
-                                                //}
-                                                //Zynthian.PlayGridButton {
-                                                    //text: "LOOP"
-                                                    //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                                    //checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === Zynthbox.PatternModel.SampleLoopedDestination : false
-                                                    //onClicked: {
-                                                        //if (checked) {
-                                                            //patternsMenuItem.associatedChannel.trackType = "external";
-                                                        //} else {
-                                                            //patternsMenuItem.associatedChannel.trackType = "sample-loop";
-                                                        //}
                                                     //}
                                                 //}
                                             //}

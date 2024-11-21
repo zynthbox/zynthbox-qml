@@ -442,24 +442,6 @@ Zynthian.ScreenPage {
             text: qsTr("Mixer")
             checked: bottomStack.slotsBar.mixerButton.checked
             onTriggered: zynqtgui.toggleSketchpadMixer()
-            Connections {
-                target: zynqtgui
-                onToggleMixer: {
-                    if (bottomStack.slotsBar.mixerButton.checked) {
-                        bottomStack.slotsBar.channelButton.checked = true;
-                    } else {
-                        bottomStack.slotsBar.mixerButton.checked = true;
-                        zynqtgui.sketchpad.displaySceneButtons = false;
-                    }
-                }
-                onShowMixer: {
-                    bottomStack.slotsBar.mixerButton.checked = true;
-                    zynqtgui.sketchpad.displaySceneButtons = false;
-                }
-                onHideMixer: {
-                    bottomStack.slotsBar.channelButton.checked = true;
-                }
-            }
         }
     ]
 
@@ -612,6 +594,25 @@ Zynthian.ScreenPage {
         }
 
         return returnValue
+    }
+
+    Connections {
+        target: zynqtgui
+        onToggleMixer: {
+            if (bottomStack.slotsBar.mixerButton.checked) {
+                bottomStack.slotsBar.channelButton.checked = true;
+            } else {
+                bottomStack.slotsBar.mixerButton.checked = true;
+                zynqtgui.sketchpad.displaySceneButtons = false;
+            }
+        }
+        onShowMixer: {
+            bottomStack.slotsBar.mixerButton.checked = true;
+            zynqtgui.sketchpad.displaySceneButtons = false;
+        }
+        onHideMixer: {
+            bottomStack.slotsBar.channelButton.checked = true;
+        }
     }
 
     Connections {

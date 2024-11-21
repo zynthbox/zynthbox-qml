@@ -32,6 +32,7 @@ import json
 import os
 import logging
 import Zynthbox
+import numpy as np
 
 from pathlib import Path
 from subprocess import check_output

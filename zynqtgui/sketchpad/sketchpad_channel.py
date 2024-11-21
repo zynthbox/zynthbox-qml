@@ -1589,7 +1589,7 @@ class sketchpad_channel(QObject):
                 knownGain = sample.audioSource.gainAbsolute()
                 knownPan = sample.audioSource.pan()
         elif self.audioTypeKey() == "sketch":
-            theClip = self.getClipsModelById(self.selectedSlotRow).getClip(self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            theClip = self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
             if theClip.audioSource:
                 knownGain = theClip.audioSource.gainAbsolute()
                 knownPan = theClip.audioSource.pan()

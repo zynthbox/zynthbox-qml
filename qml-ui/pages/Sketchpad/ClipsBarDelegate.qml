@@ -132,6 +132,30 @@ ColumnLayout {
                         .arg(root.channel.id + 1)
                         .arg(String.fromCharCode(clipDelegate.clipIndex+65).toLowerCase())
             }
+            QQC2.Label {
+                anchors.fill: parent
+                verticalAlignment: Text.AlignBottom
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 8
+                visible: root.songMode === true && ["sample-loop", "sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
+                text: visible
+                    ? root.channel.trackType == "sample-loop"
+                        ? clipDelegate.cppClipObject && clipDelegate.cppClipObject.durationSeconds > 0
+                            ? "%1s".arg(clipDelegate.cppClipObject.lengthSeconds.toFixed(2))
+                            : ""
+                        : clipDelegate.pattern && clipDelegate.pattern.hasNotes
+                            ? "%1s".arg(patternBarsToSeconds(clipDelegate.pattern, Zynthbox.SyncTimer.bpm).toFixed(2))
+                            : ""
+                    : ""
+                function patternBarsToSeconds(pattern, bpm) {
+                    // Set up the loop points in the new recording
+                    let patternSubbeatToTickMultiplier = (Zynthbox.SyncTimer.getMultiplier() / 32);
+                    // Reset this to beats (rather than pattern subbeats)
+                    let patternDurationInBeats = pattern.patternLength * pattern.stepLength / patternSubbeatToTickMultiplier;
+                    let patternDurationInSeconds = Zynthbox.SyncTimer.subbeatCountToSeconds(bpm, patternDurationInBeats * patternSubbeatToTickMultiplier);
+                    return patternDurationInSeconds;
+                }
+            }
             Rectangle {
                 height: 16
                 anchors {

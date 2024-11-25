@@ -1737,25 +1737,37 @@ class zynthian_gui(QObject):
         # END Button ignore logic
 
         # BEGIN Button-press abort modifiers logic
+        # NOTE If any of these are hit, we will return early from this function
         # If we press the back button when any of the modifier-capable
         # buttons are held down, abort that button's release actions
         if cuia == "SWITCH_BACK_SHORT" or cuia == "SWITCH_BACK_BOLD":
-            if self.globalButtonPressed == True:
+            changedAnything = False
+            if self.globalButtonPressed == True and self.ignoreNextGlobalButtonPress == False:
                 self.ignoreNextGlobalButtonPress = True
-            if self.modeButtonPressed == True:
+                changedAnything = True
+            if self.modeButtonPressed == True and self.ignoreNextModeButtonPress == False:
                 self.ignoreNextModeButtonPress = True
-            if self.menuButtonPressed == True:
+                changedAnything = True
+            if self.menuButtonPressed == True and self.ignoreNextMenuButtonPress == False:
                 self.ignoreNextMenuButtonPress = True
-            if self.playButtonPressed == True:
+                changedAnything = True
+            if self.playButtonPressed == True and self.ignoreNextPlayButtonPress == False:
                 self.ignoreNextPlayButtonPress = True
-            if self.stopButtonPressed == True:
+                changedAnything = True
+            if self.stopButtonPressed == True and self.ignoreNextStopButtonPress == False:
                 self.ignoreNextStopButtonPress = True
-            if self.startRecordButtonPressed == True:
+                changedAnything = True
+            if self.startRecordButtonPressed == True and self.ignoreNextRecordButtonPress == False:
                 self.ignoreNextRecordButtonPress = True
-            if self.metronomeButtonPressed == True:
+                changedAnything = True
+            if self.metronomeButtonPressed == True and self.ignoreNextMetronomeButtonPress == False:
                 self.ignoreNextMetronomeButtonPress = True
-            if self.selectButtonPressed == True:
+                changedAnything = True
+            if self.selectButtonPressed == True and self.ignoreNextSelectButtonPress == False:
                 self.ignoreNextSelectButtonPress = True
+                changedAnything = True
+            if changedAnything == True:
+                return
         # END Button-press abort modifiers logic
 
         trackDelta = 5 if self.tracksModActive else 0
@@ -2050,27 +2062,21 @@ class zynthian_gui(QObject):
             self.altButtonPressed = False
 
         elif cuia == "SWITCH_PLAY":
-            if self.ignoreNextPlayButtonPress == True:
-                self.ignoreNextPlayButtonPress = False
-            else:
-                zl = self.screens["sketchpad"]
+            zl = self.screens["sketchpad"]
 
-                if self.metronomeButtonPressed:
-                    self.__start_playback_on_metronome_release = True
-                else:
-                    # Toggle play/stop with play CUIA action
-                    if zl.isMetronomeRunning:
-                        self.run_stop_metronome_and_playback.emit()
-                    else:
-                        self.run_start_metronome_and_playback.emit()
-        elif cuia == "SWITCH_STOP":
-            if self.ignoreNextStopButtonPress == True:
-                self.ignoreNextStopButtonPress = False
+            if self.metronomeButtonPressed:
+                self.__start_playback_on_metronome_release = True
             else:
-                if Zynthbox.SyncTimer.instance().timerRunning():
+                # Toggle play/stop with play CUIA action
+                if zl.isMetronomeRunning:
                     self.run_stop_metronome_and_playback.emit()
                 else:
-                    self.callable_ui_action("ALL_NOTES_OFF")
+                    self.run_start_metronome_and_playback.emit()
+        elif cuia == "SWITCH_STOP":
+            if Zynthbox.SyncTimer.instance().timerRunning():
+                self.run_stop_metronome_and_playback.emit()
+            else:
+                self.callable_ui_action("ALL_NOTES_OFF")
 
         elif cuia == "SWITCH_RECORD":
             zl = self.screens["sketchpad"]

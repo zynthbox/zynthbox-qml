@@ -432,8 +432,15 @@ class zynthian_gui(QObject):
         self.metronomeVolumeBeforePressingMetronome = 0
         self.delayBeforePressingMetronome = 0
         self.reverbBeforePressingMetronome = 0
+        self.__ignoreNextMenuButtonPress = False
         self.__ignoreNextModeButtonPress = False
+        self.__ignoreNextRecordButtonPress = False
         self.__ignoreNextMetronomeButtonPress = False
+        self.__ignoreNextPlayButtonPress = False
+        self.__ignoreNextStopButtonPress = False
+        self.__ignoreNextGlobalButtonPress = False
+        self.__ignoreNextSelectButtonPress = False
+        self.__ignoreNextBackButtonPress = False
         self.__current_task_message = ""
         self.__show_current_task_message = True
         self.currentTaskMessage = f"Starting Zynthbox"
@@ -1695,6 +1702,62 @@ class zynthian_gui(QObject):
             return
         # END fallback logic for legacy cuias
 
+        # BEGIN Button ignore logic
+        # NOTE If any of these are hit, we will return early from this function
+        if (cuia == "SWITCH_BACK_SHORT" or cuia == "SWITCH_BACK_BOLD") and self.ignoreNextBackButtonPress == True:
+            self.ignoreNextBackButtonPress = False
+            return
+        elif cuia == "SWITCH_MODE_RELEASED" and self.ignoreNextModeButtonPress == True:
+            self.modeButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextModeButtonPress = False
+            return
+        elif cuia == "SWITCH_MENU_RELEASED" and self.ignoreNextMenuButtonPress == True:
+            self.menuButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextMenuButtonPress = False
+            return
+        elif cuia == "SWITCH_PLAY" and self.ignoreNextPlayButtonPress == True:
+            self.ignoreNextPlayButtonPress = False
+            return
+        elif cuia == "SWITCH_STOP" and self.ignoreNextStopButtonPress == True:
+            self.ignoreNextStopButtonPress = False
+            return
+        elif cuia == "SWITCH_RECORD" and self.ignoreNextRecordButtonPress == True:
+            self.ignoreNextRecordButtonPress = False
+            return
+        elif (cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD") and self.ignoreNextMetronomeButtonPress == True:
+            self.ignoreNextMetronomeButtonPress = False
+            return
+        elif cuia == "SWITCH_GLOBAL_RELEASED" and self.ignoreNextGlobalButtonPress == True:
+            self.globalButtonPressed = False # Ensure we have marked the button as released
+            self.ignoreNextGlobalButtonPress = False
+            return
+        elif (cuia == "SWITCH_SELECT_SHORT" or cuia == "SWITCH_SELECT_BOLD") and self.ignoreNextSelectButtonPress == True:
+            self.ignoreNextSelectButtonPress = False
+            return
+        # END Button ignore logic
+
+        # BEGIN Button-press abort modifiers logic
+        # If we press the back button when any of the modifier-capable
+        # buttons are held down, abort that button's release actions
+        if cuia == "SWITCH_BACK_SHORT" or cuia == "SWITCH_BACK_BOLD":
+            if self.globalButtonPressed == True:
+                self.ignoreNextGlobalButtonPress = True
+            if self.modeButtonPressed == True:
+                self.ignoreNextModeButtonPress = True
+            if self.menuButtonPressed == True:
+                self.ignoreNextMenuButtonPress = True
+            if self.playButtonPressed == True:
+                self.ignoreNextPlayButtonPress = True
+            if self.stopButtonPressed == True:
+                self.ignoreNextStopButtonPress = True
+            if self.startRecordButtonPressed == True:
+                self.ignoreNextRecordButtonPress = True
+            if self.metronomeButtonPressed == True:
+                self.ignoreNextMetronomeButtonPress = True
+            if self.selectButtonPressed == True:
+                self.ignoreNextSelectButtonPress = True
+        # END Button-press abort modifiers logic
+
         trackDelta = 5 if self.tracksModActive else 0
 
         # This will happen if fed an empty parameter list (such as from osc)
@@ -1987,21 +2050,27 @@ class zynthian_gui(QObject):
             self.altButtonPressed = False
 
         elif cuia == "SWITCH_PLAY":
-            zl = self.screens["sketchpad"]
-
-            if self.metronomeButtonPressed:
-                self.__start_playback_on_metronome_release = True
+            if self.ignoreNextPlayButtonPress == True:
+                self.ignoreNextPlayButtonPress = False
             else:
-                # Toggle play/stop with play CUIA action
-                if zl.isMetronomeRunning:
+                zl = self.screens["sketchpad"]
+
+                if self.metronomeButtonPressed:
+                    self.__start_playback_on_metronome_release = True
+                else:
+                    # Toggle play/stop with play CUIA action
+                    if zl.isMetronomeRunning:
+                        self.run_stop_metronome_and_playback.emit()
+                    else:
+                        self.run_start_metronome_and_playback.emit()
+        elif cuia == "SWITCH_STOP":
+            if self.ignoreNextStopButtonPress == True:
+                self.ignoreNextStopButtonPress = False
+            else:
+                if Zynthbox.SyncTimer.instance().timerRunning():
                     self.run_stop_metronome_and_playback.emit()
                 else:
-                    self.run_start_metronome_and_playback.emit()
-        elif cuia == "SWITCH_STOP":
-            if Zynthbox.SyncTimer.instance().timerRunning():
-                self.run_stop_metronome_and_playback.emit()
-            else:
-                self.callable_ui_action("ALL_NOTES_OFF")
+                    self.callable_ui_action("ALL_NOTES_OFF")
 
         elif cuia == "SWITCH_RECORD":
             zl = self.screens["sketchpad"]
@@ -2050,14 +2119,10 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_MODE_DOWN":
             self.modeButtonPressed = True
         elif cuia == "SWITCH_MODE_RELEASED":
-            self.modeButtonPressed = False
-            if self.ignoreNextModeButtonPress:
-                self.ignoreNextModeButtonPress = False
+            if self.leftSidebarActive:
+                self.closeLeftSidebar.emit()
             else:
-                if self.leftSidebarActive:
-                    self.closeLeftSidebar.emit()
-                else:
-                    self.openLeftSidebar.emit()
+                self.openLeftSidebar.emit()
 
         # elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
         #     self.screens["sketchpad"].metronomeEnabled = not self.screens["sketchpad"].metronomeEnabled
@@ -2429,22 +2494,13 @@ class zynthian_gui(QObject):
                 if dtus <= 0:
                     pass
                 else:
-                    # Do not emit switch signals if the key is set to be ignored
-                    ignore_switch = False
-                    if i == 11 and self.ignoreNextModeButtonPress:
-                        ignore_switch = True
-                        self.ignoreNextModeButtonPress = False
-                    elif i == 20 and self.ignoreNextMetronomeButtonPress:
-                        ignore_switch = True
-                        self.ignoreNextMetronomeButtonPress = False
-
-                    if not ignore_switch and dtus>zynthian_gui_config.zynswitch_long_us:
+                    if dtus>zynthian_gui_config.zynswitch_long_us:
                         self.zynswitch_long_triggered.emit(i)
-                    elif not ignore_switch and dtus>zynthian_gui_config.zynswitch_bold_us:
+                    elif dtus>zynthian_gui_config.zynswitch_bold_us:
                         # Double switches must be bold!!! => by now ...
                         if not self.zynswitch_double(i):
                             self.zynswitch_bold_triggered.emit(i)
-                    elif not ignore_switch and dtus>0:
+                    elif dtus>0:
                         #print("Switch "+str(i)+" dtus="+str(dtus))
                         self.zynswitch_short_triggered.emit(i)
             i += 1;
@@ -3900,7 +3956,7 @@ class zynthian_gui(QObject):
     forceSongMode = Property(bool, get_forceSongMode, set_forceSongMode, notify=forceSongModeChanged)
     ### END Property forceSongMode
 
-    ### Property menuButtonPressed
+    ### BEGIN Property menuButtonPressed
     def get_menu_button_pressed(self):
         return self.__menu_button_pressed__
 
@@ -3920,7 +3976,21 @@ class zynthian_gui(QObject):
     menuButtonPressed = Property(bool, get_menu_button_pressed, set_menu_button_pressed, notify=menu_button_pressed_changed)
     ### END Property menuButtonPressed
 
-    ### Property switchChannelsButtonPressed
+    ### BEGIN Property ignoreNextMenuButtonPress
+    def get_ignoreNextMenuButtonPress(self):
+        return self.__ignoreNextMenuButtonPress
+
+    def set_ignoreNextMenuButtonPress(self, val):
+        if self.__ignoreNextMenuButtonPress != val:
+            self.__ignoreNextMenuButtonPress = val
+            self.ignoreNextMenuButtonPressChanged.emit()
+
+    ignoreNextMenuButtonPressChanged = Signal()
+
+    ignoreNextMenuButtonPress = Property(bool, get_ignoreNextMenuButtonPress, set_ignoreNextMenuButtonPress, notify=ignoreNextMenuButtonPressChanged)
+    ### END Property ignoreNextMenuButtonPress
+
+    ### BEGIN Property switchChannelsButtonPressed
     def get_switch_channels_button_pressed(self):
         return self.__switch_channels_button_pressed__
 
@@ -3944,7 +4014,7 @@ class zynthian_gui(QObject):
     switchChannelsButtonPressed = Property(bool, get_switch_channels_button_pressed, set_switch_channels_button_pressed, notify=switch_channels_button_pressed_changed)
     ### END Property switchChannelsButtonPressed
 
-    ### Property modeButtonPressed
+    ### BEGIN Property modeButtonPressed
     def get_mode_button_pressed(self):
         return self.__mode_button_pressed__
 
@@ -3963,7 +4033,21 @@ class zynthian_gui(QObject):
     modeButtonPressed = Property(bool, get_mode_button_pressed, set_mode_button_pressed, notify=mode_button_pressed_changed)
     ### END Property modeButtonPressed
 
-    ### Property altButtonPressed
+    ### BEGIN Property ignoreNextModeButtonPress
+    def get_ignoreNextModeButtonPress(self):
+        return self.__ignoreNextModeButtonPress
+
+    def set_ignoreNextModeButtonPress(self, val):
+        if self.__ignoreNextModeButtonPress != val:
+            self.__ignoreNextModeButtonPress = val
+            self.ignoreNextModeButtonPressChanged.emit()
+
+    ignoreNextModeButtonPressChanged = Signal()
+
+    ignoreNextModeButtonPress = Property(bool, get_ignoreNextModeButtonPress, set_ignoreNextModeButtonPress, notify=ignoreNextModeButtonPressChanged)
+    ### END Property ignoreNextModeButtonPress
+
+    ### BEGIN Property altButtonPressed
     def get_alt_button_pressed(self):
         return self.__alt_button_pressed__
 
@@ -4002,6 +4086,20 @@ class zynthian_gui(QObject):
     globalButtonPressed = Property(bool, get_global_button_pressed, set_global_button_pressed, notify=global_button_pressed_changed)
     ### END Property globalButtonPressed
 
+    ### BEGIN Property ignoreNextGlobalButtonPress
+    def get_ignoreNextGlobalButtonPress(self):
+        return self.__ignoreNextGlobalButtonPress
+
+    def set_ignoreNextGlobalButtonPress(self, val):
+        if self.__ignoreNextGlobalButtonPress != val:
+            self.__ignoreNextGlobalButtonPress = val
+            self.ignoreNextGlobalButtonPressChanged.emit()
+
+    ignoreNextGlobalButtonPressChanged = Signal()
+
+    ignoreNextGlobalButtonPress = Property(bool, get_ignoreNextGlobalButtonPress, set_ignoreNextGlobalButtonPress, notify=ignoreNextGlobalButtonPressChanged)
+    ### END Property ignoreNextGlobalButtonPress
+
     ### Property startRecordButtonPressed
     def get_startRecord_button_pressed(self):
         return self.__startRecord_button_pressed__
@@ -4016,6 +4114,20 @@ class zynthian_gui(QObject):
 
     startRecordButtonPressed = Property(bool, get_startRecord_button_pressed, set_startRecord_button_pressed, notify=startRecord_button_pressed_changed)
     ### END Property startRecordButtonPressed
+
+    ### BEGIN Property ignoreNextRecordButtonPress
+    def get_ignoreNextRecordButtonPress(self):
+        return self.__ignoreNextRecordButtonPress
+
+    def set_ignoreNextRecordButtonPress(self, val):
+        if self.__ignoreNextRecordButtonPress != val:
+            self.__ignoreNextRecordButtonPress = val
+            self.ignoreNextRecordButtonPressChanged.emit()
+
+    ignoreNextRecordButtonPressChanged = Signal()
+
+    ignoreNextRecordButtonPress = Property(bool, get_ignoreNextRecordButtonPress, set_ignoreNextRecordButtonPress, notify=ignoreNextRecordButtonPressChanged)
+    ### END Property ignoreNextRecordButtonPress
 
     ### Property playButtonPressed
     def get_play_button_pressed(self):
@@ -4032,7 +4144,21 @@ class zynthian_gui(QObject):
     playButtonPressed = Property(bool, get_play_button_pressed, set_play_button_pressed, notify=play_button_pressed_changed)
     ### END Property playButtonPressed
 
-    ### Property metronomeButtonPressed
+    ### BEGIN Property ignoreNextPlayButtonPress
+    def get_ignoreNextPlayButtonPress(self):
+        return self.__ignoreNextPlayButtonPress
+
+    def set_ignoreNextPlayButtonPress(self, val):
+        if self.__ignoreNextPlayButtonPress != val:
+            self.__ignoreNextPlayButtonPress = val
+            self.ignoreNextPlayButtonPressChanged.emit()
+
+    ignoreNextPlayButtonPressChanged = Signal()
+
+    ignoreNextPlayButtonPress = Property(bool, get_ignoreNextPlayButtonPress, set_ignoreNextPlayButtonPress, notify=ignoreNextPlayButtonPressChanged)
+    ### END Property ignoreNextPlayButtonPress
+
+    ### BEGIN Property metronomeButtonPressed
     def get_metronome_button_pressed(self):
         return self.__metronome_button_pressed__
 
@@ -4046,6 +4172,20 @@ class zynthian_gui(QObject):
 
     metronomeButtonPressed = Property(bool, get_metronome_button_pressed, set_metronome_button_pressed, notify=metronome_button_pressed_changed)
     ### END Property metronomeButtonPressed
+
+    ### BEGIN Property ignoreNextMetronomeButtonPress
+    def get_ignoreNextMetronomeButtonPress(self):
+        return self.__ignoreNextMetronomeButtonPress
+
+    def set_ignoreNextMetronomeButtonPress(self, val):
+        if self.__ignoreNextMetronomeButtonPress != val:
+            self.__ignoreNextMetronomeButtonPress = val
+            self.ignoreNextMetronomeButtonPressChanged.emit()
+
+    ignoreNextMetronomeButtonPressChanged = Signal()
+
+    ignoreNextMetronomeButtonPress = Property(bool, get_ignoreNextMetronomeButtonPress, set_ignoreNextMetronomeButtonPress, notify=ignoreNextMetronomeButtonPressChanged)
+    ### END Property ignoreNextMetronomeButtonPress
 
     ### Property stopButtonPressed
     def get_stop_button_pressed(self):
@@ -4062,6 +4202,20 @@ class zynthian_gui(QObject):
     stopButtonPressed = Property(bool, get_stop_button_pressed, set_stop_button_pressed, notify=stop_button_pressed_changed)
     ### END Property stopButtonPressed
 
+    ### BEGIN Property ignoreNextStopButtonPress
+    def get_ignoreNextStopButtonPress(self):
+        return self.__ignoreNextStopButtonPress
+
+    def set_ignoreNextStopButtonPress(self, val):
+        if self.__ignoreNextStopButtonPress != val:
+            self.__ignoreNextStopButtonPress = val
+            self.ignoreNextStopButtonPressChanged.emit()
+
+    ignoreNextStopButtonPressChanged = Signal()
+
+    ignoreNextStopButtonPress = Property(bool, get_ignoreNextStopButtonPress, set_ignoreNextStopButtonPress, notify=ignoreNextStopButtonPressChanged)
+    ### END Property ignoreNextStopButtonPress
+
     ### Property backButtonPressed
     def get_back_button_pressed(self):
         return self.__back_button_pressed__
@@ -4076,6 +4230,20 @@ class zynthian_gui(QObject):
 
     backButtonPressed = Property(bool, get_back_button_pressed, set_back_button_pressed, notify=back_button_pressed_changed)
     ### END Property backButtonPressed
+
+    ### BEGIN Property ignoreNextBackButtonPress
+    def get_ignoreNextBackButtonPress(self):
+        return self.__ignoreNextBackButtonPress
+
+    def set_ignoreNextBackButtonPress(self, val):
+        if self.__ignoreNextBackButtonPress != val:
+            self.__ignoreNextBackButtonPress = val
+            self.ignoreNextBackButtonPressChanged.emit()
+
+    ignoreNextBackButtonPressChanged = Signal()
+
+    ignoreNextBackButtonPress = Property(bool, get_ignoreNextBackButtonPress, set_ignoreNextBackButtonPress, notify=ignoreNextBackButtonPressChanged)
+    ### END Property ignoreNextBackButtonPress
 
     ### Property upButtonPressed
     def get_up_button_pressed(self):
@@ -4106,6 +4274,20 @@ class zynthian_gui(QObject):
 
     selectButtonPressed = Property(bool, get_select_button_pressed, set_select_button_pressed, notify=select_button_pressed_changed)
     ### END Property selectButtonPressed
+
+    ### BEGIN Property ignoreNextSelectButtonPress
+    def get_ignoreNextSelectButtonPress(self):
+        return self.__ignoreNextSelectButtonPress
+
+    def set_ignoreNextSelectButtonPress(self, val):
+        if self.__ignoreNextSelectButtonPress != val:
+            self.__ignoreNextSelectButtonPress = val
+            self.ignoreNextSelectButtonPressChanged.emit()
+
+    ignoreNextSelectButtonPressChanged = Signal()
+
+    ignoreNextSelectButtonPress = Property(bool, get_ignoreNextSelectButtonPress, set_ignoreNextSelectButtonPress, notify=ignoreNextSelectButtonPressChanged)
+    ### END Property ignoreNextSelectButtonPress
 
     ### Property leftButtonPressed
     def get_left_button_pressed(self):
@@ -4476,34 +4658,6 @@ class zynthian_gui(QObject):
 
     initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
     ### END Property initialMasterVolume
-
-    ### Property ignoreNextModeButtonPress
-    def get_ignoreNextModeButtonPress(self):
-        return self.__ignoreNextModeButtonPress
-
-    def set_ignoreNextModeButtonPress(self, val):
-        if self.__ignoreNextModeButtonPress != val:
-            self.__ignoreNextModeButtonPress = val
-            self.ignoreNextModeButtonPressChanged.emit()
-
-    ignoreNextModeButtonPressChanged = Signal()
-
-    ignoreNextModeButtonPress = Property(bool, get_ignoreNextModeButtonPress, set_ignoreNextModeButtonPress, notify=ignoreNextModeButtonPressChanged)
-    ### END Property ignoreNextModeButtonPress
-
-    ### Property ignoreNextMetronomeButtonPress
-    def get_ignoreNextMetronomeButtonPress(self):
-        return self.__ignoreNextMetronomeButtonPress
-
-    def set_ignoreNextMetronomeButtonPress(self, val):
-        if self.__ignoreNextMetronomeButtonPress != val:
-            self.__ignoreNextMetronomeButtonPress = val
-            self.ignoreNextMetronomeButtonPressChanged.emit()
-
-    ignoreNextMetronomeButtonPressChanged = Signal()
-
-    ignoreNextMetronomeButtonPress = Property(bool, get_ignoreNextMetronomeButtonPress, set_ignoreNextMetronomeButtonPress, notify=ignoreNextMetronomeButtonPressChanged)
-    ### END Property ignoreNextMetronomeButtonPress
 
     ### Property curlayerEngineName
     def get_curlayerEngineName(self):

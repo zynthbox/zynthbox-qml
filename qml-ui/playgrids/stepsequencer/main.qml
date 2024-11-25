@@ -75,11 +75,10 @@ Zynthian.BasePlayGrid {
     //     }
     // ]
 
-    property bool ignoreNextBack: false
     cuiaCallback: function(cuia) {
         var backButtonClearPatternHelper = function(channelIndex) {
             if (zynqtgui.backButtonPressed) {
-                component.ignoreNextBack = true;
+                zynqtgui.ignoreNextBackButtonPress = true;
                 for (var clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
                     var pattern = _private.sequence.getByClipId(channelIndex, clipIndex);
                     if (pattern) {
@@ -102,22 +101,16 @@ Zynthian.BasePlayGrid {
             switch (cuia) {
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
-                    if (ignoreNextBack) {
-                        // When back button's been used for interaction elsewhere, ignore it here...
-                        // Remember to set this, or things will look a bit weird
-                        ignoreNextBack = false;
-                    } else {
-                        if (_private.activePatternModel.performanceActive) {
-                            // Restart the performance
-                            _private.activePatternModel.startPerformance();
-                        } else if (component.patternsMenuVisible) {
-                            component.hidePatternsMenu();
-                        } else if (_private.hasSelection) {
-                            _private.deselectSelectedItem();
-                        } else if (component.heardNotes.length > 0) {
-                            component.heardNotes = [];
-                            component.heardVelocities = [];
-                        }
+                    if (_private.activePatternModel.performanceActive) {
+                        // Restart the performance
+                        _private.activePatternModel.startPerformance();
+                    } else if (component.patternsMenuVisible) {
+                        component.hidePatternsMenu();
+                    } else if (_private.hasSelection) {
+                        _private.deselectSelectedItem();
+                    } else if (component.heardNotes.length > 0) {
+                        component.heardNotes = [];
+                        component.heardVelocities = [];
                     }
                     returnValue = true;
                     break;
@@ -685,7 +678,7 @@ Zynthian.BasePlayGrid {
                     showChosenPads: drumPad.channelIsLoopType === false
                     playgrid: component
                     onRemoveNote: {
-                        component.ignoreNextBack = true;
+                        zynqtgui.ignoreNextBackButtonPress = true;
                         if (_private.workingPatternModel) {
                             for (var row = _private.workingPatternModel.bankOffset; row < _private.workingPatternModel.bankOffset + _private.workingPatternModel.bankLength; ++row) {
                                 for (var column = 0; column < _private.workingPatternModel.width; ++column) {
@@ -2409,7 +2402,7 @@ Zynthian.BasePlayGrid {
                             }
                         } else {
                             if (zynqtgui.backButtonPressed && _private.workingPatternModel) {
-                                component.ignoreNextBack = true;
+                                zynqtgui.ignoreNextBackButtonPress = true;
                                 _private.workingPatternModel.clear();
                             } else {
                                 if (_private.selectedStep > -1) {

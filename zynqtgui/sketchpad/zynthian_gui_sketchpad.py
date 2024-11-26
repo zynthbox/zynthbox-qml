@@ -562,6 +562,20 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             return f"{name}-{counter}"
 
+    # Fallback for loading sequences from old sketchpads. This will try to check if there are any sequences from old sketchpad structure where the sequences were saved globally across all versions.
+    # If old global sequences are found and new sequences directory do not exist, it will copy the global sequences to all the versions.
+    # TODO : Remove after a considerable amount of time or when we are sure that all the old sketchpads got updated. Or maybe before a stable release
+    def checkOldSequencesAndApplyFallback(self, sketchpad_path):
+        sketchpad_path = Path(sketchpad_path)
+        if (sketchpad_path.parent / "sequences" / "global").exists():
+            for version in sketchpad_path.parent.glob("*.sketchpad.json"):
+                version = version.name.replace(".sketchpad.json", "")
+                if not (sketchpad_path.parent / "sequences" / version).exists():
+                    logging.debug(f"Found version {version} that does not have sequences although there is a global sequences dir. Applying fallback.")
+                    shutil.copytree(sketchpad_path.parent / "sequences" / "global", sketchpad_path.parent / "sequences" / version / "global")
+            # Remove the old sequences structure after applying fallback
+            shutil.rmtree(sketchpad_path.parent / "sequences" / "global")
+
     @Slot(str)
     def newSketchpadFromFolder(self, sketchpadFolder):
         justTheFiles = [f for f in os.listdir(sketchpadFolder) if os.path.isfile(os.path.join(sketchpadFolder, f))]
@@ -598,6 +612,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 # Copy community sketchpad to my sketchpads
                 new_sketchpad_name = self.generate_unique_mysketchpad_name(base_sketchpad_path.parent.name)
                 shutil.copytree(base_sketchpad_path.parent, self.__sketchpad_basepath__ / new_sketchpad_name)
+                # TODO : Remove after a considerable amount of time or when we are sure that all the old sketchpads got updated. Or maybe before a stable release
+                self.checkOldSequencesAndApplyFallback(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)
                 logging.info(f"Loading new sketchpad from community sketchpad : {str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)}")
                 self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/", base_sketchpad_path.stem.replace(".sketchpad", ""), self, load_autosave=False)
                 self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
@@ -779,6 +795,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.sketchpadLoadingInProgress = True
                 if self.__song__ is not None:
                     self.__song__.to_be_deleted()
+                # TODO : Remove after a considerable amount of time or when we are sure that all the old sketchpads got updated. Or maybe before a stable release
+                self.checkOldSequencesAndApplyFallback(sketchpad_path)
                 self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_autosave)
                 self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_path))
 

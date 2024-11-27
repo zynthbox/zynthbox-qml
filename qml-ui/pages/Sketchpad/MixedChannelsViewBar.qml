@@ -907,7 +907,7 @@ Rectangle {
                                                             ? synthRepeater.synthData[index].path
                                                               ? synthRepeater.synthData[index].path.split("/").pop()
                                                               : ""
-                                                            : root.selectedChannel.trackType === "external"
+                                                            : root.selectedChannel.trackType === "external" && index < 2 // we only have data for the first two, so let's make sure we don't try and assign an undefined here
                                                                 ? synthRepeater.synthData[index]
                                                                 : ""
 

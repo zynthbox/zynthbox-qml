@@ -216,6 +216,8 @@ Zynthian.Popup {
                     root.selectedChannel.trackType = "sample-loop";
                 }
             }
+            // Clear out the known most-recent clip, because otherwise it'll be kept there forever and ever and ever, and we don't want that...
+            _private.mostRecentlyRecordedClip = null;
         }
         zynqtgui.recordingPopupActive = false
     }

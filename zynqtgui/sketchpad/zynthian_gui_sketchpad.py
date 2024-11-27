@@ -995,6 +995,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     self.load_recorded_file_to_clip()
                     self.set_lastRecordingMidi("")
 
+                    # If recording stopped with the recording popup is closed, change track types to match the newly created recording
+                    if self.zynqtgui.recordingPopupActive == False:
+                        currentTrack = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+                        if self.clip_to_record.isChannelSample:
+                            # When recording a sample, set the track type to sample-trig
+                            currentTrack.trackType = "sample-trig"
+                        else:
+                            # When recording a sketch (any other case), set track type to Sketch explicitly
+                            currentChannel.trackType = "sample-loop"
+
                     self.set_clip_to_record(None)
                     self.clip_to_record_path = None
                     self.__last_recording_type__ = ""
@@ -1004,7 +1014,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     self.isRecording = False
                     self.longOperationDecrement()
                     self.zynqtgui.currentTaskMessage = ""
-                    QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+                    QTimer.singleShot(300, self.zynqtgui.end_long_task)
 
                 self.zynqtgui.currentTaskMessage = "Processing recording"
                 self.longOperationIncrement()
@@ -1046,10 +1056,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
             currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            # When recording a sketch, set track type to Sketch explicitly
-            currentChannel.trackType = "sample-loop"
-            self.zynqtgui.currentTaskMessage = "Loading recording to clip"
             # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
+            self.zynqtgui.currentTaskMessage = "Loading recording to clip"
             self.clip_to_record.set_path(self.clip_to_record_path, should_copy=False)
             self.clip_to_record.enabled = True
             # Set same recorded clip to other additional clips
@@ -1059,14 +1067,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if clip != self.clip_to_record:
                     clip.enabled = True
                     # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
-                    clip.set_path(self.clip_to_record_path, should_copy=True)                
+                    clip.set_path(self.clip_to_record_path, should_copy=True)
                 ### Save clip metadata
                 # When processing a sample, do not write sound metadata. It does not need to have sound metadata
                 # When processing a clip, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data
                 ###
                 clip.metadata.write(writeSoundMetadata=not clip.is_channel_sample, isAutosave=True)
             if self.clip_to_record.isChannelSample:
-                logging.info("Recorded clip is a sample")
+                # logging.info("Recorded clip is a sample")
                 currentChannel.samples_changed.emit()
 
     def get_next_free_layer(self):

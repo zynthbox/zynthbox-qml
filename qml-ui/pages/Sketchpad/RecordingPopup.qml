@@ -206,6 +206,16 @@ Zynthian.Popup {
             // Restore the current track state to also match the previous state
             zynqtgui.sketchpad.selectedTrackId = root.selectedChannel.id;
             root.selectedChannel.selectedSlotRow = root.selectedSlotRow;
+            // Switch the track type to whatever the appropriate one is for the recorded sample if...
+            // ... the recording was completed while the dialog was open (isRecording === false)
+            // ... we did not clear the recording first
+            if (zynqtgui.sketchpad.recordingType === "audio" && _private.mostRecentlyRecordedClip !== null) {
+                if (_private.mostRecentlyRecordedClip.isChannelSample) {
+                    root.selectedChannel.trackType = "sample-trig";
+                } else {
+                    root.selectedChannel.trackType = "sample-loop";
+                }
+            }
         }
         zynqtgui.recordingPopupActive = false
     }
@@ -217,13 +227,15 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.leftMargin: root.spacing
             Layout.topMargin: root.spacing
-            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedPattern.clipName).arg(root.selectedChannel.name) : ""
+            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedClipPattern.clipName).arg(root.selectedChannel.name) : ""
             QtObject {
                 id: _private
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
                 property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelById(root.selectedSlotRow).getClip(root.selectedChannel.id) : null
                 property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
                 property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
+                property QtObject selectedClipPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedSlotRow) : null
+                property QtObject mostRecentlyRecordedClip: null
                 property bool midiSoloTrack: false
                 property int soloChannelOnOpen: -1
                 property bool armRecording: false
@@ -312,6 +324,11 @@ Zynthian.Popup {
                 target: zynqtgui.sketchpad
                 onRecordingTypeChanged: {
                     _private.updateSoloState();
+                }
+                onClipToRecordChanged: {
+                    if (zynqtgui.sketchpad.clipToRecord != null) {
+                        _private.mostRecentlyRecordedClip = zynqtgui.sketchpad.clipToRecord;
+                    }
                 }
             }
         }
@@ -1070,6 +1087,9 @@ Zynthian.Popup {
                             switch(recordingTypeSettingsStack.currentIndex) {
                                 case 0: // Audio Recording
                                     applicationWindow().confirmClearClip(_private.selectedClip);
+                                    if (_private.selectedClip.path == null) {
+                                        _private.mostRecentlyRecordedClip = null;
+                                    }
                                     break;
                                 case 1: // MIDI Recording
                                     if (_private.selectedPattern.hasNotes) {

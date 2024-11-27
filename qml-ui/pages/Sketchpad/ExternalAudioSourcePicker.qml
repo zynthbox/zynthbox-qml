@@ -35,20 +35,20 @@ Zynthian.DialogQuestion {
     id: root
     function pickChannel(channel) {
         _private.selectedChannel = channel;
-        _private.newAudioSource = channel.externalAudioSource;
+        _private.newAudioSourceIndex = _private.newAudioSources.indexOf(channel.externalAudioSource);
         open();
     }
 
     property var cuiaCallback: function(cuia) {
         var returnValue = root.opened;
-        console.log("ExternalAudioSourcePicker cuia:", cuia);
+        // console.log("ExternalAudioSourcePicker cuia:", cuia);
         switch (cuia) {
         case "KNOB3_UP":
-            _private.newAudioSource = "system";
+            _private.newAudioSourceIndex = Math.min(_private.newAudioSourceIndex + 1, 3);
             returnValue = true;
             break;
         case "KNOB3_DOWN":
-            _private.newAudioSource = "";
+            _private.newAudioSourceIndex = Math.max(_private.newAudioSourceIndex - 1, 0);
             returnValue = true;
             break;
         case "SWITCH_BACK_SHORT":
@@ -67,43 +67,43 @@ Zynthian.DialogQuestion {
     rejectText: qsTr("Back")
     acceptText: qsTr("Select")
     title: qsTr("Pick External Audio Source For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+    width: Kirigami.Units.gridUnit * 20
+    height: Kirigami.Units.gridUnit * 15
     onAccepted: {
-        _private.selectedChannel.externalAudioSource = _private.newAudioSource;
+        _private.selectedChannel.externalAudioSource = _private.newAudioSources[_private.newAudioSourceIndex];
     }
 
     contentItem: ColumnLayout {
-        implicitWidth: Kirigami.Units.gridUnit * 50
-        implicitHeight: Kirigami.Units.gridUnit * 25
         QtObject {
             id: _private
             property QtObject selectedChannel
-            property string newAudioSource
+            property int newAudioSourceIndex: 0
+            property var newAudioSources: [
+                "",
+                "system:",
+                "system:capture_1",
+                "system:capture_2",
+            ]
+            property var newAudioSourceNames: [
+                qsTr("No External Audio Source"),
+                qsTr("Capture Microphone In (stereo)"),
+                qsTr("Capture Microphone In (left)"),
+                qsTr("Capture Microphone In (right)"),
+            ]
         }
-        QQC2.Button {
-            Layout.fillWidth: true
-            text: qsTr("No External Audio Source")
-            checked: _private.newAudioSource === ""
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    _private.newAudioSource = "";
+        Repeater {
+            model: 4
+            QQC2.Button {
+                Layout.fillWidth: true
+                text: _private.newAudioSourceNames[model.index]
+                checked: _private.newAudioSourceIndex === model.index
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        _private.newAudioSourceIndex = model.index;
+                    }
                 }
             }
-        }
-        QQC2.Button {
-            Layout.fillWidth: true
-            text: qsTr("Capture Microphone In")
-            checked: _private.newAudioSource === "system"
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    _private.newAudioSource = "system";
-                }
-            }
-        }
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
         }
     }
 }

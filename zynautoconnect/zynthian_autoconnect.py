@@ -632,7 +632,7 @@ def audio_autoconnect(force=False):
                             if len(channel.externalAudioSource) > 0:
                                 if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
                                 try:
-                                    externalSourcePorts = jclient.get_ports(name_pattern=f"{channel.externalAudioSource}:", is_audio=True, is_output=True, is_input=False)
+                                    externalSourcePorts = jclient.get_ports(name_pattern=f"{channel.externalAudioSource}", is_audio=True, is_output=True, is_input=False)
                                     # logging.info(f"External source ports: {externalSourcePorts}")
                                     if len(externalSourcePorts) < 2:
                                         externalSourcePorts.append(externalSourcePorts[0])

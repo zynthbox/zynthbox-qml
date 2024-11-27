@@ -2173,8 +2173,12 @@ class sketchpad_channel(QObject):
         def humanReadableExternalClientName(clientName):
             if clientName == "":
                 return "None"
-            elif clientName == "system":
+            elif clientName == "system:":
                 return "Mic In"
+            elif clientName == "system:capture_1":
+                return "Mic In (L)"
+            elif clientName == "system:capture_2":
+                return "Mic In (R)"
             else:
                 return clientName
 

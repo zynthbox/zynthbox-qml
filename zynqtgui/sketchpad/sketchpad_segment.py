@@ -268,6 +268,18 @@ class sketchpad_segment(QObject):
             self.zynqtgui.sketchpad.song.sketchesModel.clipAdded.emit(self.__sketch.sketchId, self.segmentId, clip)
             self.clipsChanged.emit()
 
+            # If we are editing the model, ensure multiclip is taken into account
+            # For playback purposes, this is done by SegmentHandler, which will check
+            # when updating, whether there are multiple clips set to run on a track,
+            # and then only allow whatever the first one is.
+            if clip.channel and clip.channel.allowMulticlip == False:
+                clipsToRemove = []
+                for otherClip in self.__clips:
+                    if otherClip != clip and otherClip.channel == clip.channel:
+                        clipsToRemove.append(otherClip)
+                for otherClip in clipsToRemove:
+                    self.removeClip(otherClip)
+
             if self.zynqtgui.sketchpad.song is not None:
                 self.zynqtgui.sketchpad.song.schedule_save()
 

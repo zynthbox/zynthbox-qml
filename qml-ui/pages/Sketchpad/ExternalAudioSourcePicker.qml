@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-External midi channel picker component
+External audio source picker component
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 
@@ -23,11 +23,11 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Window 2.1
-import QtQuick.Controls 2.4 as QQC2
-import org.kde.kirigami 2.6 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.7 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
@@ -57,7 +57,7 @@ Zynthian.DialogQuestion {
             returnValue = true;
             break;
         case "SWITCH_SELECT_SHORT":
-            // pick the currently selected channel and close
+            // pick the currently highlighted source and close
             root.accept();
             returnValue = true;
             break;

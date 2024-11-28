@@ -156,6 +156,7 @@ class sketchpad_channel(QObject):
             newSample.channel = self
             self.__samples__.append(newSample)
 
+        self.__allowMulticlip__ = False
         self.__track_type__ = "synth"
         self.__track_routing_style__ = "standard"
         self.__routingData__ = {
@@ -341,9 +342,9 @@ class sketchpad_channel(QObject):
         if clip is not None and clip.enabled is True:
             self.set_selected_clip(clipId)
             # We will now allow playing multiple clips of a sample-loop channel
-            allowMulticlip = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
-            # logging.error(f"Allowing multiclip playback: {allowMulticlip}")
-            if not allowMulticlip:
+            # allowMulticlip = self.trackType == "sample-loop" or (self.trackType == "sample-trig" and (self.keyZoneMode == "all-full" or self.keyZoneMode == "manual"))
+            # logging.error(f"Allowing multiclip playback: {self.__allowMulticlip__}")
+            if not self.__allowMulticlip__:
                 for clipId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     if clipId != self.__selected_clip__:
                         clipForDisabling = self.getClipsModelById(clipId).getClip(trackIndex)
@@ -468,6 +469,7 @@ class sketchpad_channel(QObject):
                 "audioTypeSettings": self.__audioTypeSettings__,
                 "connectedPattern": self.__connected_pattern__,
                 "chainedSounds": self.__chained_sounds__,
+                "allowMulticlip": self.__allowMulticlip__,
                 "trackType": self.__track_type__,
                 "trackRoutingStyle": self.__track_routing_style__,
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
@@ -499,6 +501,11 @@ class sketchpad_channel(QObject):
             if "chainedSounds" in obj:
                 self.__chained_sounds__ = [-1, -1, -1, -1, -1] # When loading, we need to reset this forcibly to ensure things are updated fully
                 self.set_chained_sounds(obj["chainedSounds"])
+
+            if "allowMulticlip" in obj:
+                self.set_allowMulticlip(obj["allowMulticlip"], True)
+            else:
+                self.set_allowMulticlip(False, True)
 
             # TODO : `channelAudioType` key is deprecated and has been renamed to `trackType`. Remove this fallback later
             if "channelAudioType" in obj:
@@ -1235,7 +1242,7 @@ class sketchpad_channel(QObject):
     connectedSoundName = Property(str, get_connected_sound_name, notify=connectedSoundNameChanged)
     ### END Property connectedSoundName
 
-    ### Property muted
+    ### BEGIN Property muted
     def get_muted(self):
         return self.__muted__
 
@@ -1251,7 +1258,29 @@ class sketchpad_channel(QObject):
     mutedChanged = Signal()
 
     muted = Property(bool, get_muted, set_muted, notify=mutedChanged)
-    ### End Property muted
+    ### END Property muted
+
+    ### BEGIN Property allowMulticlip
+    def get_allowMulticlip(self):
+        return self.__allowMulticlip__
+
+    def set_allowMulticlip(self, allowMulticlip, force_set=False):
+        if force_set or self.__allowMulticlip__ != allowMulticlip:
+            self.__allowMulticlip__ = allowMulticlip
+            self.allowMulticlipChanged.emit()
+            if self.__allowMulticlip__ == False and self.__song__.isLoading == False:
+                for clipId in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    clip = self.getClipsModelById(clipId).getClip(self.id)
+                    if clip.enabled:
+                        self.onClipEnabledChanged(self.id, clipId)
+                        break
+            if force_set == False:
+                self.__song__.schedule_save()
+
+    allowMulticlipChanged = Signal()
+
+    allowMulticlip = Property(bool, get_allowMulticlip, set_allowMulticlip, notify=allowMulticlipChanged)
+    ### END Property allowMulticlip
 
     ### BEGIN Property trackType
     # Possible values : "synth", "sample-loop", "sample-trig", "external"
@@ -1293,6 +1322,13 @@ class sketchpad_channel(QObject):
 
             self.__track_type__ = type
             self.track_type_changed.emit()
+
+            # For sample-loop type tracks, we want to allow multiclip by default, otherwise not
+            # NB: Don't update this when force_setting, to ensure we don't overwrite when loading
+            if type == "sample-loop" and force_set == False:
+                self.set_allowMulticlip(True)
+            else:
+                self.set_allowMulticlip(False)
 
             # Set keyZoneMode to "Off"(all-full) state when type is changed to trig
             if type == "sample-trig":

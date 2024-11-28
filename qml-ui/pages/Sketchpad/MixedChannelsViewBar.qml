@@ -494,13 +494,31 @@ Rectangle {
                             Layout.fillHeight: false
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
-                            EditableHeader {
+                            RowLayout {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                controlObj: root.selectedChannel
-                                controlType: "bottombar-controltype-channel"
-
-                                text: qsTr("Track: %1").arg(controlObj ? controlObj.name : "")
+                                Kirigami.Heading {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    wrapMode: Text.NoWrap
+                                    elide: Text.ElideRight
+                                    verticalAlignment: Text.AlignVCenter
+                                    level: 3
+                                    text: qsTr("Track: %1").arg(root.selectedChannel ? root.selectedChannel.name : "")
+                                }
+                                QQC2.Button {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: true
+                                    icon.name: "document-edit"
+                                    onClicked: {
+                                        trackSettingsDialog.showTrackSettings(root.selectedChannel);
+                                    }
+                                    Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
+                                    Layout.preferredHeight: Layout.preferredWidth
+                                    TrackSettingsDialog {
+                                        id: trackSettingsDialog
+                                    }
+                                }
                             }
 
                             QQC2.Button {

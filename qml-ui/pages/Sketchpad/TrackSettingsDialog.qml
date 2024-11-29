@@ -37,6 +37,7 @@ Zynthian.DialogQuestion {
         _private.selectedTrack = track;
         trackNameField.text = track.name;
         trackAllowMulticlipField.checked = track.allowMulticlip;
+        routingStylePicker.selectedRoutingStyle = track.trackRoutingStyle;
         open();
     }
 
@@ -75,6 +76,7 @@ Zynthian.DialogQuestion {
             _private.selectedTrack.name = trackNameField.text;
         }
         _private.selectedTrack.allowMulticlip = trackAllowMulticlipField.checked;
+        _private.selectedTrack.trackRoutingStyle = routingStylePicker.selectedRoutingStyle;
     }
 
     contentItem: Kirigami.FormLayout {
@@ -86,16 +88,37 @@ Zynthian.DialogQuestion {
         QQC2.TextField {
             id: trackNameField
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Kirigami.FormData.label: qsTr("Track Name:")
         }
         QQC2.Switch {
             id: trackAllowMulticlipField
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             implicitWidth: Kirigami.Units.gridUnit * 5
             Layout.minimumWidth: Kirigami.Units.gridUnit * 5
             Kirigami.FormData.label: qsTr("Allow Multiple Enabled Clips:")
+        }
+        QQC2.Button {
+            id: trackRoutingStyleField
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            implicitWidth: Kirigami.Units.gridUnit * 5
+            Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+            Kirigami.FormData.label: qsTr("Slot Routing Style:")
+            text: {
+                if (routingStylePicker.selectedRoutingStyle === "standard") {
+                    return qsTr("Serial");
+                } else if (routingStylePicker.selectedRoutingStyle === "one-to-one") {
+                    return qsTr("One-to-One");
+                } else {
+                    return qsTr("Unknown");
+                }
+            }
+            onClicked: routingStylePicker.pickRoutingStyle(_private.selectedTrack)
+            RoutingStylePicker {
+                id: routingStylePicker
+            }
         }
     }
 }

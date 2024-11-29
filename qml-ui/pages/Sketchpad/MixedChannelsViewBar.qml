@@ -440,10 +440,6 @@ Rectangle {
         id: trackUnbouncer
     }
 
-    RoutingStylePicker {
-        id: routingStylePicker
-    }
-
     SamplePickingStyleSelector {
         id: samplePickingStyleSelector
     }
@@ -617,38 +613,6 @@ Rectangle {
 
                                     Item {
                                         Layout.fillWidth: true
-                                    }
-
-                                    RowLayout {
-                                        Layout.fillHeight: true
-                                        visible: ["synth", "sample-trig"].indexOf(root.selectedChannel.trackType) >= 0
-                                        QQC2.Label {
-                                            Layout.fillHeight: true
-                                            text: qsTr("Routing")
-                                        }
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            onClicked: {
-                                                routingStylePicker.pickRoutingStyle(root.selectedChannel);
-                                            }
-                                            text: {
-                                                if (root.selectedChannel) {
-                                                    if (root.selectedChannel.trackRoutingStyle === "standard") {
-                                                        return qsTr("Serial");
-                                                    } else if (root.selectedChannel.trackRoutingStyle === "one-to-one") {
-                                                        return qsTr("One-to-One");
-                                                    } else {
-                                                        return qsTr("Unknown");
-                                                    }
-                                                }
-                                                return ""
-                                            }
-                                        }
-                                        Item {
-                                            Layout.fillWidth: false
-                                            Layout.fillHeight: false
-                                            Layout.preferredWidth: Kirigami.Units.gridUnit
-                                        }
                                     }
 
                                     RowLayout {

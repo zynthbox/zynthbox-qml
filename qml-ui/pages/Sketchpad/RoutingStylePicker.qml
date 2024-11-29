@@ -34,26 +34,28 @@ import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.DialogQuestion {
     id: component
-    function pickRoutingStyle(channel) {
-        _private.selectedChannel = channel;
-        _private.newRoutingStyle = channel.trackRoutingStyle;
+    function pickRoutingStyle(track) {
+        _private.selectedTrack = track;
+        _private.newRoutingStyle = component.selectedRoutingStyle;
         component.open();
     }
     onAccepted: {
-        if (_private.selectedChannel.trackRoutingStyle !== _private.newRoutingStyle) {
-            _private.selectedChannel.trackRoutingStyle = _private.newRoutingStyle;
+        if (component.selectedRoutingStyle !== _private.newRoutingStyle) {
+            component.selectedRoutingStyle = _private.newRoutingStyle;
         }
     }
+    property string selectedRoutingStyle
+
     height: Kirigami.Units.gridUnit * 18
     width: Kirigami.Units.gridUnit * 35
     acceptText: qsTr("Select")
     rejectText: qsTr("Back")
-    title: qsTr("Pick Audio Routing Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+    title: qsTr("Pick Audio Routing Style For Track %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
 
     contentItem: ColumnLayout {
         QtObject {
             id: _private
-            property QtObject selectedChannel
+            property QtObject selectedTrack
             property string newRoutingStyle
         }
         RowLayout {

@@ -573,6 +573,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if not (sketchpad_path.parent / "sequences" / version).exists():
                     logging.debug(f"Found version {version} that does not have sequences although there is a global sequences dir. Applying fallback.")
                     shutil.copytree(sketchpad_path.parent / "sequences" / "global", sketchpad_path.parent / "sequences" / version / "global")
+            # Save the global patterns to autosave version explicitly
+            shutil.copytree(sketchpad_path.parent / "sequences" / "global", sketchpad_path.parent / "sequences" / "autosave" / "global")
             # Remove the old sequences structure after applying fallback
             shutil.rmtree(sketchpad_path.parent / "sequences" / "global")
 

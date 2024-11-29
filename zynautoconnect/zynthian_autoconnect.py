@@ -27,6 +27,7 @@ import os
 import jack
 import copy
 import logging
+import traceback
 from time import sleep
 from threading  import Thread, Lock
 from collections import OrderedDict
@@ -620,11 +621,11 @@ def audio_autoconnect(force=False):
                 if channel is not None:
                     channelSynthRoutingData = channel.synthRoutingData
                     channelFxRoutingData = channel.fxRoutingData
-                    channelInputLanes = [1] * 5 # The default is a serial layout, meaning all channel output goes through a single lane
+                    channelInputLanes = [0] * 5 # The default is a serial layout, meaning all channel output goes through a single lane
                     if channel.trackRoutingStyle == "one-to-one":
-                        channelInputLanes = [1, 2, 3, 4, 5]
+                        channelInputLanes = [0, 1, 2, 3, 4]
                     for laneId in range(0, 5):
-                        laneInputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-input", is_audio=True, is_output=False, is_input=True)
+                        laneInputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-input", is_audio=True, is_output=False, is_input=True)
                         # BEGIN Handle external inputs for external mode channels
                         # only hook up the first lane, doesn't make super lots of sense otherwise
                         if laneId == 0 and channel.trackType == "external":
@@ -748,7 +749,7 @@ def audio_autoconnect(force=False):
                                 # END Synth Outputs
                         # END Handle synth slots
                         # BEGIN Connect lane to its relevant FX input port (or disconnect if there's no audio input)
-                        laneOutputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-dryOut", is_audio=True, is_output=True, is_input=False)
+                        laneOutputs = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-dryOut", is_audio=True, is_output=True, is_input=False)
                         portsToConnect = globalPlaybackInputPorts + channelAudioLevelsInputPorts
                         # In standard routing mode, any fx on the channel should result in routing to the first slot with an fx - if there are no fx in the track, route it to global out
                         if channel.trackRoutingStyle == "standard":
@@ -759,15 +760,15 @@ def audio_autoconnect(force=False):
                         # In one-to-one mode, check if the matching fx slot for a sound slot has an effect in it, and if there is one, route to it - if there is not one, route it to global out
                         elif channel.trackRoutingStyle == "one-to-one":
                             if channel.chainedFx[laneId] is not None:
-                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId]}:Channel{channelId + 1}-input", is_audio=True, is_output=False, is_input=True)
+                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId] + 1}:Channel{channelId + 1}-input", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(laneOutputs)):
                             # The order of the ports is uncommonly reversed here, to ensure we can use cycle() without causing trouble
                             if laneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[1]), get_jack_port_name(port[0]))
                         # END Connect lane to its relevant FX or GlobalPlayback input port (or disconnect if there's no audio input)
                         # BEGIN Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
-                        laneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
-                        laneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId]}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
+                        laneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
+                        laneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
                         for port in zip(laneOutputsFx1, channelAudioLevelsInputPorts):
                             if laneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -1013,7 +1014,7 @@ def audio_autoconnect(force=False):
         else:
             logging.info("No song yet, clearly ungood - also how?")
     except Exception as e:
-        logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during core routing setup. Reported error: {e}")
+        logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Failed during core routing setup. Reported error: {e} with backtrace {traceback.format_exc()}")
         # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
         # Logic below the return statement will be eventually evaluated when called again after the timeout
         force_next_autoconnect = True;

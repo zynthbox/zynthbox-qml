@@ -2141,7 +2141,7 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
         elif cuia == "ACTIVATE_TRACK_RELATIVE":
             trackDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadTrackCount())
-            self.sketchpad.selectedTrackId = max(0, min((value / trackDivisor), Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+            self.sketchpad.selectedTrackId = max(0, min((params[0] / trackDivisor), Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
             sendCuiaEventFeedback = False
         elif cuia == "TOGGLE_TRACK_MUTED":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
@@ -2182,7 +2182,7 @@ class zynthian_gui(QObject):
                 shouldEmitClipOnly = False
             slotDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadSlotCount())
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.set_selected_clip(max(0, min((value / slotDivisor), Zynthbox.Plugin.instance().sketchpadSlotCount() - 1)), shouldEmitCurrentClipCUIAFeedback=shouldEmitClipOnly)
+            theTrack.set_selected_clip(max(0, min((params[0] / slotDivisor), Zynthbox.Plugin.instance().sketchpadSlotCount() - 1)), shouldEmitCurrentClipCUIAFeedback=shouldEmitClipOnly)
             if shouldEmitClipOnly == False:
                 self.sketchpad.emitCurrentTrackClipCUIAFeedback()
             sendCuiaEventFeedback = False
@@ -2278,7 +2278,7 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_AND_CLIP_CURRRENT_RELATIVE":
             trackSlotDivisor = 128.0 / float(Zynthbox.Plugin.instance().sketchpadSlotCount() * Zynthbox.Plugin.instance().sketchpadTrackCount())
-            cumulativeSlot = value / trackSlotDivisor
+            cumulativeSlot = params[0] / trackSlotDivisor
             theTrackIndex = floor(cumulativeSlot / Zynthbox.Plugin.instance().sketchpadSlotCount())
             theSlotIndex = cumulativeSlot - (theTrackIndex * Zynthbox.Plugin.instance().sketchpadSlotCount())
             self.sketchpad.set_selected_track_id( max(0, min(theTrackIndex, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1)), shouldEmitCurrentTrackClipCUIAFeedback=False)

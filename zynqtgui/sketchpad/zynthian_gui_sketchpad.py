@@ -440,9 +440,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def get_selected_track_id(self):
         return self.__selected_track_id
     def set_selected_track_id(self, track_id, force_set=False, shouldEmitCurrentTrackClipCUIAFeedback=True):
-        if self.__selected_track_id != track_id or force_set is True:
-            logging.debug(f"### Setting selected track : channel({track_id})")
-            self.__selected_track_id = max(0, min(track_id, Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
+        if self.__selected_track_id != int(track_id) or force_set is True:
+            logging.debug(f"### Setting selected track : channel({int(track_id)})")
+            self.__selected_track_id = max(0, min(int(track_id), Zynthbox.Plugin.instance().sketchpadTrackCount() - 1))
             self.selected_track_id_changed.emit()
             if self.__fixed_layers_fill_list_timer is None:
                 self.__fixed_layers_fill_list_timer = QTimer(self)

@@ -898,16 +898,16 @@ def audio_autoconnect(force=False):
 
                                     # Connect dry ports to next to next client
                                     for ports in zip(dry_out_ports, next_next_in_ports):
-                                        logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                        # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                         zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     # Connect wet ports to FX client which is right next to this client in output_client_names
                                     for ports in zip(wet_out_ports, next_in_ports):
-                                        logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                        # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                         zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     # If next to next client is GlobalPlayback then connect the same port to AudioLevels too
                                     if output_client_names[index+2] == "GlobalPlayback":
                                         for ports in zip(dry_out_ports, channelAudioLevelsInputPorts):
-                                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                 else:
                                     # This client is not a FXPassthrough, and not the last client in the list, which means it will be an FX. So connect it's output to the next client
@@ -922,10 +922,10 @@ def audio_autoconnect(force=False):
                                     if next_client_name == "GlobalPlayback":
                                         # Next client is GlobalPlayback then connect the same port to both GlobalPlayback and AudioLevels
                                         for ports in zip(out_ports, channelAudioLevelsInputPorts):
-                                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                         for ports in zip(out_ports, globalPlaybackInputPorts):
-                                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                                     else:
                                         # Next client is not GlobalPlayback. Connect the ports to next client
@@ -936,7 +936,7 @@ def audio_autoconnect(force=False):
                                             next_in_ports = [next_in_ports[0], next_in_ports[0]]
 
                                         for ports in zip(out_ports, next_in_ports):
-                                            logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                     ### END Connect TrackPassthrough to GlobalPlayback and AudioLevels via FX
                     ### BEGIN FX Engine Audio Routing Overrides

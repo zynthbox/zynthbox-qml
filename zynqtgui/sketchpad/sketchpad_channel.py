@@ -38,6 +38,7 @@ import warnings
 
 from pathlib import Path
 from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QThread, QTimer, Qt, Signal, Slot
+from PySide2.QtGui import QColor
 from .sketchpad_clips_model import sketchpad_clips_model
 from .sketchpad_clip import sketchpad_clip
 from .sketchpad_engineRoutingData import sketchpad_engineRoutingData
@@ -85,7 +86,7 @@ class sketchpad_channel(QObject):
         self.__sample_picking_style__ = "same-or-first"
         self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
-        self.__color__ = "#000000"
+        self.__color__ = self.zynqtgui.theme_chooser.trackColors[self.__id__]
         self.__selected_slot_row__ = 0
         self.__selected_fx_slot_row = 0
         self.__selected_clip__ = 0
@@ -464,7 +465,7 @@ class sketchpad_channel(QObject):
                 samplesObj.append(None)
 
         return {"name": self.__name__,
-                "color": self.__color__,
+                "color": self.__color__ if type(self.__color__) == str else self.__color__.name(),
                 "volume": self.__volume__.gainDb(),
                 "audioTypeSettings": self.__audioTypeSettings__,
                 "connectedPattern": self.__connected_pattern__,
@@ -491,8 +492,10 @@ class sketchpad_channel(QObject):
         try:
             if "name" in obj:
                 self.__name__ = obj["name"]
-            if "color" in obj:
-                self.__color__ = obj["color"]
+            if "color" in obj and obj["color"] != "#000000":
+                self.set_color(obj["color"], force_set=True)
+            else:
+                self.set_color(self.zynqtgui.theme_chooser.trackColors[self.__id__])
             if "volume" in obj:
                 self.set_volume(obj["volume"], True)
             if "connectedPattern" in obj:
@@ -722,6 +725,7 @@ class sketchpad_channel(QObject):
                 f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
             clip.clear()
 
+    ### BEGIN Property name
     @Signal
     def __name_changed__(self):
         pass
@@ -739,7 +743,22 @@ class sketchpad_channel(QObject):
             self.__song__.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
+    ### END Property name
 
+    ### BEGIN Property color
+    def get_color(self):
+        return self.__color__
+
+    def set_color(self, color, force_set=False):
+        if self.__color__ != color or force_set:
+            self.__color__ = color
+            self.color_changed.emit()
+            self.__song__.schedule_save()
+
+    color_changed = Signal()
+
+    color = Property('QColor', get_color, set_color, notify=color_changed)
+    ### END Property color
 
     @Signal
     def volume_changed(self):

@@ -1190,18 +1190,12 @@ Zynthian.ScreenPage {
                                         delayed: true
 
                                         value: {
-                                            if (root.copySourceObj && root.copySourceObj.value === model.channel)
+                                            if (root.copySourceObj && root.copySourceObj.value === model.channel) {
                                                 return "#ff2196f3"
-                                            else if (channelHeaderDelegate.channel.trackType === "synth")
-                                                return zynqtgui.sketchpad.channelTypeSynthColor
-                                            else if (channelHeaderDelegate.channel.trackType === "sample-loop")
-                                                return zynqtgui.sketchpad.channelTypeSketchesColor
-                                            else if (channelHeaderDelegate.channel.trackType === "sample-trig")
-                                                return zynqtgui.sketchpad.channelTypeSamplesColor
-                                            else if (channelHeaderDelegate.channel.trackType === "external")
-                                                return zynqtgui.sketchpad.channelTypeExternalColor
-                                            else
-                                                return "#66888888"
+                                            } else if (channelHeaderDelegate.channel.trackType === "external" || channelHeaderDelegate.channel.occupiedSlotsCount > 0) {
+                                                return channelHeaderDelegate.channel.color;
+                                            }
+                                            return "#66888888";
                                         }
                                     }
 

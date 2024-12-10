@@ -36,6 +36,7 @@ Zynthian.DialogQuestion {
     function showTrackSettings(track) {
         _private.selectedTrack = track;
         trackNameField.text = track.name;
+        trackColorField.currentColor = _private.selectedTrack.color;
         trackAllowMulticlipField.checked = track.allowMulticlip;
         routingStylePicker.selectedRoutingStyle = track.trackRoutingStyle;
         open();
@@ -67,7 +68,7 @@ Zynthian.DialogQuestion {
     acceptText: qsTr("Select")
     title: qsTr("Settings for Track %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
     width: Kirigami.Units.gridUnit * 30
-    height: Kirigami.Units.gridUnit * 15
+    height: Kirigami.Units.gridUnit * 17
     onAccepted: {
         if (trackNameField.text == "") {
             // Don't allow people to set an empty track name, that's just silly
@@ -75,6 +76,7 @@ Zynthian.DialogQuestion {
         } else {
             _private.selectedTrack.name = trackNameField.text;
         }
+        _private.selectedTrack.color = trackColorField.currentColor;
         _private.selectedTrack.allowMulticlip = trackAllowMulticlipField.checked;
         _private.selectedTrack.trackRoutingStyle = routingStylePicker.selectedRoutingStyle;
     }
@@ -83,13 +85,38 @@ Zynthian.DialogQuestion {
         QtObject {
             id: _private
             property QtObject selectedTrack
-            property string trackName
         }
         QQC2.TextField {
             id: trackNameField
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Kirigami.FormData.label: qsTr("Track Name:")
+        }
+        Row {
+            id: trackColorField
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            Kirigami.FormData.label: qsTr("Track Color:")
+            spacing: 0
+            property color currentColor: "black"
+            Repeater {
+                model: zynqtgui.theme_chooser.trackColors
+                delegate: Rectangle {
+                    height: width * 2
+                    width: trackColorField.width / zynqtgui.theme_chooser.trackColors.length
+                    color: modelData
+                    border {
+                        width: 1
+                        color: modelData == trackColorField.currentColor ? Kirigami.Theme.highlightColor : "transparent"
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            trackColorField.currentColor = modelData;
+                        }
+                    }
+                }
+            }
         }
         QQC2.Switch {
             id: trackAllowMulticlipField
@@ -105,7 +132,7 @@ Zynthian.DialogQuestion {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             implicitWidth: Kirigami.Units.gridUnit * 5
             Layout.minimumWidth: Kirigami.Units.gridUnit * 5
-            Kirigami.FormData.label: qsTr("Slot Routing Style:")
+            Kirigami.FormData.label: qsTr("FX Routing Style:")
             text: {
                 if (routingStylePicker.selectedRoutingStyle === "standard") {
                     return qsTr("Serial");

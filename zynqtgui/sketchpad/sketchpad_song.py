@@ -245,7 +245,7 @@ class sketchpad_song(QObject):
         }
 
     def save(self, autosave=True):
-        if self.__is_saving__ == False:
+        if self.__is_saving__ == False and self.__is_loading__ == False:
             if self.__to_be_deleted__:
                 return
             self.set_isSaving(True)

@@ -65,7 +65,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
             self.wifiModeChanged.emit()
             self.zynqtgui.end_long_task()
 
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, "Searching for wifi networks...")
 
     ### BELOW METHODS ARE DERIVED FROM WEBCONF wifi_config_handler.py
     def update_available_wifi_networks_list(self):
@@ -291,7 +291,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
             self.wifiModeChanged.emit()
             self.zynqtgui.end_long_task()
 
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, f"Changing wifi mode to {mode}")
 
     wifiModeChanged = Signal()
 

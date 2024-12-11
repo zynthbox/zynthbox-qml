@@ -136,7 +136,7 @@ Zynthian.ActionPickerPopup {
             }
         },
         Kirigami.Action {
-            text: qsTr("Swap With...")
+            text: qsTr("Swap With Slot...")
             onTriggered: {
                 root.requestSlotPicker(root.selectedChannel, "synth", root.selectedChannel.selectedSlotRow);
             }

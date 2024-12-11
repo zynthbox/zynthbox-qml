@@ -890,7 +890,7 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: "Swap With..."
+                text: "Swap With Slot..."
                 onTriggered: {
                     slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlotRow);
                 }

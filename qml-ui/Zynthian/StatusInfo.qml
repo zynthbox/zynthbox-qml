@@ -337,6 +337,17 @@ MouseArea {
                 case "SWITCH_SELECT_BOLD":
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
+                case "SCREEN_MAIN_MENU":
+                case "SCREEN_LAYER":
+                case "SCREEN_LAYER_FX":
+                case "SCREEN_BANK":
+                case "SCREEN_PRESET":
+                case "SCREEN_CONTROL":
+                case "SCREEN_SKETCHPAD":
+                case "SCREEN_SONG_MANAGER":
+                case "SCREEN_PLAYGRID":
+                case "SCREEN_ALSA_MIXER":
+                    // If someone hits one of the under-screen buttons, just close the thing
                     zynqtgui.globalPopupOpened = false;
                     result = true;
                     break;

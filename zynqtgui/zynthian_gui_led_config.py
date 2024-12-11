@@ -45,6 +45,7 @@ led_color_off = (0, 0, 0)
 led_color_red = (color_red.red(), color_red.green(), color_red.blue())
 led_color_green = (color_green.red(), color_green.green(), color_green.blue())
 led_color_blue = (color_blue.red(), color_blue.green(), color_blue.blue())
+led_color_grey = (5, 5, 5)
 
 led_color_inactive = led_color_blue
 led_color_active = led_color_green
@@ -173,6 +174,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         self.led_color_channel_external = (channelTypeExternalColorDarkened.red(), channelTypeExternalColorDarkened.green(), channelTypeExternalColorDarkened.blue())
 
         self.channel = None
+        self.channelColor = (0, 0, 0)
         self.button_config = {}
         self.update_botton_colors_timer = QTimer()
         self.update_botton_colors_timer.setInterval(0)
@@ -246,14 +248,10 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         buttonColor = None
 
         if setChannelColor:
-            if self.channel.trackType == "synth":
-                buttonColor = self.led_color_channel_synth
-            elif self.channel.trackType == "sample-trig":
-                buttonColor = self.led_color_channel_sample
-            elif self.channel.trackType == "sample-loop":
-                buttonColor = self.led_color_channel_loop
-            elif self.channel.trackType == "external":
-                buttonColor = self.led_color_channel_external
+            if self.channel.trackType == "external" or self.channel.occupiedSlotsCount > 0:
+                buttonColor = self.channelColor
+            else:
+                buttonColor = led_color_grey
         else:
             assert color is not None, "color cannot be None when setChannelColor is False"
 
@@ -281,10 +279,6 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
     def connect_dependent_property_signals(self):
         logging.debug("### Connecting dependant property signals")
 
-        # Reset channel as it would change when song changes
-        if self.zynqtgui.sketchpad.song is not None:
-            self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-
         # Connect to required signals for updating led
         self.zynqtgui.isExternalAppActiveChanged.connect(self.update_button_colors)
         self.zynqtgui.sketchpad.song_changed.connect(self.connect_dependent_property_signals)
@@ -303,14 +297,28 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.sketchpad.song.channelsModel.getChannel(channel_id).track_type_changed.connect(
                 self.update_button_colors)
 
-        self.update_button_colors()
+        # Reset channel as it would change when song changes
+        if self.zynqtgui.sketchpad.song is not None:
+            self.selected_track_id_changed_handler()
 
     @Slot()
     def selected_track_id_changed_handler(self):
+        if self.channel is not None:
+            try:
+                self.channel.selectedClipNamesChanged.disconnect(self.update_button_colors)
+                self.channel.colorChanged.disconnect(self.update_track_color)
+            except: pass
         self.channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         # Connect to clips changed when channel changes
         self.channel.selectedClipNamesChanged.connect(self.update_button_colors)
+        self.channel.colorChanged.connect(self.update_track_color)
+        self.update_track_color()
 
+    @Slot()
+    def update_track_color(self):
+        if self.channel is not None:
+            darkerChannelColor = self.channel.color.darker(darkening_factor);
+            self.channelColor = (darkerChannelColor.red(), darkerChannelColor.green(), darkerChannelColor.blue())
         self.update_button_colors()
 
     @Slot()

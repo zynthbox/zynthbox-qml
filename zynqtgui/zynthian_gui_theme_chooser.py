@@ -80,7 +80,7 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
             QColor.fromHsv(0, 80, 255), QColor.fromHsv(33, 90, 255), QColor.fromHsv(65, 100, 255), QColor.fromHsv(98, 110, 255), QColor.fromHsv(131, 120, 255),QColor.fromHsv(164, 130, 255),
             QColor.fromHsv(196, 140, 255), QColor.fromHsv(229, 150, 255)
             ]
-        self.__track_colors__ = [QColor("#E6194B"), QColor("#F58231"), QColor("#808000"), QColor("#000075"), QColor("#3CB44B"), QColor("#9A6324"), QColor("#4363D8"), QColor("#911EB4"), QColor("#469990"), QColor("#800000"), QColor("#008000"), QColor("#000080")]
+        self.__track_colors__ = [QColor("#B34D00"), QColor("#B37A00"), QColor("#B39D00"), QColor("#7CB301"), QColor("#008F00"), QColor("#006642"), QColor("#4F0099"), QColor("#7A00AB"), QColor("#B000A7"), QColor("#E60000"), QColor("#000000"), QColor("#808080")]
         self.audiofx_layer = None
         self.audiofx_layers = None
 

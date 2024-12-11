@@ -267,13 +267,13 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
     def connect(self, ssid, password):
         logging.error(f"Connect to wifi : {ssid}, {password}")
         self.add_new_network(ssid, password)
-        self.set_wifiMode("on")
+        self.set_wifiMode("on", f"Attempting to connect to wifi : {ssid}")
 
     ### Property wifiMode
     def get_wifiMode(self):
         return zynconf.get_current_wifi_mode()
 
-    def set_wifiMode(self, mode):
+    def set_wifiMode(self, mode, message=None):
         def task():
             try:
                 if mode == "on":
@@ -291,7 +291,10 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.zynqtgui):
             self.wifiModeChanged.emit()
             self.zynqtgui.end_long_task()
 
-        self.zynqtgui.do_long_task(task, f"Changing wifi mode to {mode}")
+        if message is None:
+            self.zynqtgui.do_long_task(task, f"Changing wifi mode to {mode}")
+        else:
+            self.zynqtgui.do_long_task(task, message)
 
     wifiModeChanged = Signal()
 

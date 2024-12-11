@@ -751,13 +751,16 @@ class sketchpad_channel(QObject):
 
     def set_color(self, color, force_set=False):
         if self.__color__ != color or force_set:
-            self.__color__ = color
-            self.color_changed.emit()
+            if type(color) == str:
+                self.__color__ = QColor(color)
+            else:
+                self.__color__ = color
+            self.colorChanged.emit()
             self.__song__.schedule_save()
 
-    color_changed = Signal()
+    colorChanged = Signal()
 
-    color = Property('QColor', get_color, set_color, notify=color_changed)
+    color = Property('QColor', get_color, set_color, notify=colorChanged)
     ### END Property color
 
     @Signal

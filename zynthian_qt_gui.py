@@ -1984,6 +1984,9 @@ class zynthian_gui(QObject):
             if self.current_screen_id == "sketchpad":
                 if self.altButtonPressed:
                     self.toggleSketchpadMixer()
+                else:
+                    # no particular need to test anything here, we always want it hidden in this case
+                    self.hideSketchpadMixer()
             else:
                 if self.altButtonPressed:
                     self.showSketchpadMixer()

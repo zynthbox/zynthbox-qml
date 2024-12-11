@@ -92,27 +92,45 @@ Zynthian.DialogQuestion {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Kirigami.FormData.label: qsTr("Track Name:")
         }
-        Row {
+        QQC2.Button {
             id: trackColorField
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Kirigami.FormData.label: qsTr("Track Color:")
-            spacing: 0
             property color currentColor: "black"
-            Repeater {
-                model: zynqtgui.theme_chooser.trackColors
-                delegate: Rectangle {
-                    height: width * 2
-                    width: trackColorField.width / zynqtgui.theme_chooser.trackColors.length
-                    color: modelData
-                    border {
-                        width: 1
-                        color: modelData == trackColorField.currentColor ? Kirigami.Theme.highlightColor : "transparent"
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            trackColorField.currentColor = modelData;
+            onClicked: {
+                trackColorPicker.open();
+            }
+            contentItem: Rectangle {
+                color: trackColorField.currentColor
+            }
+            Zynthian.Popup {
+                id: trackColorPicker
+                width: Kirigami.Units.gridUnit * 30
+                height: Kirigami.Units.gridUnit * 20
+                parent: QQC2.Overlay.overlay
+                x: Math.round(parent.width/2 - width/2)
+                y: Math.round(parent.height/2 - height/2)
+                GridLayout {
+                    anchors.fill: parent
+                    columns: 4
+                    Repeater {
+                        model: zynqtgui.theme_chooser.trackColors
+                        delegate: Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: modelData
+                            border {
+                                width: 1
+                                color: modelData == trackColorField.currentColor ? Kirigami.Theme.highlightColor : "transparent"
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    trackColorField.currentColor = modelData;
+                                    trackColorPicker.close();
+                                }
+                            }
                         }
                     }
                 }

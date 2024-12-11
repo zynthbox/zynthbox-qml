@@ -134,9 +134,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
             self.zynqtgui.end_long_task()
 
-        self.zynqtgui.currentTaskMessage = "Reading and sorting sounds into categories"
         self.__sounds_model__.clear()
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, "Reading and sorting sounds into categories")
 
     @Slot(str)
     def setSoundTypeFilter(self, _filter):
@@ -332,8 +331,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
                     post_removal_task()
             self.zynqtgui.end_long_task()
 
-        self.zynqtgui.currentTaskMessage = "Loading sound"
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, "Loading sound")
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):

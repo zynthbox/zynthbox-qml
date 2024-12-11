@@ -672,13 +672,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             # Schedule a save sketchpad file is available after creating a new sketchpad
             self.song.schedule_save()
             self.longOperationDecrement()
-            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
+            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
         def confirmNewSketchpad(params=None):
-            self.zynqtgui.currentTaskMessage = "Creating New Sketchpad"
             self.longOperationIncrement()
             self.sketchpadLoadingInProgress = True
-            self.zynqtgui.do_long_task(task)
+            self.zynqtgui.do_long_task(task, "Creating New Sketchpad")
 
         if not force and self.zynqtgui.isBootingComplete and self.song.hasUnsavedChanges:
             self.zynqtgui.show_confirm("You have unsaved changes. Do you really want to continue?", confirmNewSketchpad)
@@ -689,10 +688,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def saveSketchpad(self):
         def task():
             self.__song__.save(autosave=False)
-            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
+            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
-        self.zynqtgui.currentTaskMessage = "Saving sketchpad"
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, "Saving sketchpad")
 
     @Slot(str)
     def createSketchpad(self, name):
@@ -743,11 +741,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             self.selectedTrackId = 0
             self.song_changed.emit()
             self.longOperationDecrement()
-            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
+            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
-        self.zynqtgui.currentTaskMessage = f"Saving Sketchpad : {name}"
         self.longOperationIncrement()
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, f"Saving Sketchpad : {name}")
 
     @Slot(str)
     def saveCopy(self, name):
@@ -755,10 +752,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             old_folder = self.__song__.sketchpad_folder
             shutil.copytree(old_folder, self.__sketchpad_basepath__ / name)
 
-            QTimer.singleShot(3000, self.zynqtgui.end_long_task)
+            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
-        self.zynqtgui.currentTaskMessage = "Saving a copy of the sketchpad"
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, "Saving a copy of the sketchpad to {name}")
 
     @Slot(str, bool)
     def loadSketchpad(self, sketchpad, load_autosave, load_snapshot=True, cb=None, load_last_state_snapshot=False):
@@ -839,12 +835,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 if self.zynqtgui.isBootingComplete:
                     self.zynqtgui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
-                QTimer.singleShot(3000, self.zynqtgui.end_long_task)
+                QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
         def confirmLoadSketchpad(params=None):
-            self.zynqtgui.currentTaskMessage = "Loading Sketchpad"
             self.longOperationIncrement()
-            self.zynqtgui.do_long_task(task)
+            self.zynqtgui.do_long_task(task, "Loading Sketchpad")
 
         if self.zynqtgui.isBootingComplete and self.song.hasUnsavedChanges:
             self.zynqtgui.show_confirm("You have unsaved changes. Do you really want to continue?", confirmLoadSketchpad)
@@ -1015,12 +1010,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     self.clipsToRecordChanged.emit()
                     self.isRecording = False
                     self.longOperationDecrement()
-                    self.zynqtgui.currentTaskMessage = ""
                     QTimer.singleShot(300, self.zynqtgui.end_long_task)
 
-                self.zynqtgui.currentTaskMessage = "Processing recording"
                 self.longOperationIncrement()
-                self.zynqtgui.do_long_task(task)
+                self.zynqtgui.do_long_task(task, "Processing recording")
             else:
                 logging.debug("Recording not yet stopped. Retrying in a bit.")
                 self.__stopRecordingRetrier__.start()

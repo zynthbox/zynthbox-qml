@@ -1055,8 +1055,7 @@ class sketchpad_channel(QObject):
                 cb()
             self.zynqtgui.end_long_task()
         self.__chained_sounds_keyzones__[self.selectedSlotRow].clear()
-        self.zynqtgui.currentTaskMessage = f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}"
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, f"Removing {self.chainedSoundsNames[self.selectedSlotRow]} from slot {self.selectedSlotRow + 1} on Track {self.name}")
 
     def updateSynthRoutingData(self):
         self.__synthRoutingDataUpdaterThrottle__.start()
@@ -1184,8 +1183,7 @@ class sketchpad_channel(QObject):
 
                 QTimer.singleShot(3000, self.zynqtgui.end_long_task)
 
-        self.zynqtgui.currentTaskMessage = f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}"
-        self.zynqtgui.do_long_task(task)
+        self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
 
     def updateChainedFxEngineData(self, position, layer):
         if layer is not None:

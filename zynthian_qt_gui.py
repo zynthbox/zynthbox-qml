@@ -3924,9 +3924,11 @@ class zynthian_gui(QObject):
         return self.__zynthbox_plugins_helper
 
     ### Alternative long task handling than show_loading
-    def do_long_task(self, cb):
+    def do_long_task(self, cb, message=None):
         logging.debug("### Start long task")
         # Emit long task started if no other long task is already running
+        if message is not None:
+            self.currentTaskMessage = message
         if self.__long_task_count__ == 0:
             self.longTaskStarted.emit()
         self.__long_task_count__ += 1
@@ -3934,7 +3936,7 @@ class zynthian_gui(QObject):
         if self.__long_task_count__ > 0:
             recent_task_messages.put("command:show")
 
-        QTimer.singleShot(2000, cb)
+        QTimer.singleShot(300, cb)
 
     def end_long_task(self):
         logging.debug("### End long task")

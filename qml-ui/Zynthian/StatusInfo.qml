@@ -337,6 +337,9 @@ MouseArea {
                 case "SWITCH_SELECT_BOLD":
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
+                    zynqtgui.globalPopupOpened = false;
+                    result = true;
+                    break;
                 case "SCREEN_MAIN_MENU":
                 case "SCREEN_LAYER":
                 case "SCREEN_LAYER_FX":
@@ -347,9 +350,10 @@ MouseArea {
                 case "SCREEN_SONG_MANAGER":
                 case "SCREEN_PLAYGRID":
                 case "SCREEN_ALSA_MIXER":
-                    // If someone hits one of the under-screen buttons, just close the thing
+                    // If someone hits one of the under-screen buttons, just close the thing,
+                    // but also pass the buttons through so we can switch to that screen
                     zynqtgui.globalPopupOpened = false;
-                    result = true;
+                    result = false;
                     break;
                 case "KNOB0_UP":
                     applicationWindow().updateSketchpadBpm(1);

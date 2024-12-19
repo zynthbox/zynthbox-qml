@@ -1343,13 +1343,6 @@ class sketchpad_channel(QObject):
             self.__track_type__ = type
             self.track_type_changed.emit()
 
-            # For sample-loop type tracks, we want to allow multiclip by default, otherwise not
-            # NB: Don't update this when force_setting, to ensure we don't overwrite when loading
-            if type == "sample-loop" and force_set == False:
-                self.set_allowMulticlip(True)
-            else:
-                self.set_allowMulticlip(False)
-
             # Set keyZoneMode to "Off"(all-full) state when type is changed to trig
             if type == "sample-trig":
                 self.keyZoneMode = "all-full"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Creates Zynthbox USB Gadget
+Requires=sys-kernel-config.mount
+After=sys-kernel-config.mount
+
+[Service]
+ExecStart=/zynthian/zynthbox-qml/usb-gadget-scripts/create-usb-gadget.sh
+ExecStop=/zynthian/zynthbox-qml/usb-gadget-scripts/create-usb-gadget.sh stop
+RemainAfterExit=yes
+Type=simple
+
+[Install]
+WantedBy=usb-gadget.target

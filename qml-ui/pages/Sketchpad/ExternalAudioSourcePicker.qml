@@ -44,7 +44,7 @@ Zynthian.DialogQuestion {
         // console.log("ExternalAudioSourcePicker cuia:", cuia);
         switch (cuia) {
         case "KNOB3_UP":
-            _private.newAudioSourceIndex = Math.min(_private.newAudioSourceIndex + 1, 3);
+            _private.newAudioSourceIndex = Math.min(_private.newAudioSourceIndex + 1, 6);
             returnValue = true;
             break;
         case "KNOB3_DOWN":
@@ -68,7 +68,7 @@ Zynthian.DialogQuestion {
     acceptText: qsTr("Select")
     title: qsTr("Pick External Audio Source For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
     width: Kirigami.Units.gridUnit * 20
-    height: Kirigami.Units.gridUnit * 15
+    height: Kirigami.Units.gridUnit * 22
     onAccepted: {
         _private.selectedChannel.externalAudioSource = _private.newAudioSources[_private.newAudioSourceIndex];
     }
@@ -83,16 +83,22 @@ Zynthian.DialogQuestion {
                 "system:",
                 "system:capture_1",
                 "system:capture_2",
+                "usb-gadget-in:",
+                "usb-gadget-in:capture_1",
+                "usb-gadget-in:capture_2",
             ]
             property var newAudioSourceNames: [
                 qsTr("No External Audio Source"),
                 qsTr("Capture Microphone In (stereo)"),
                 qsTr("Capture Microphone In (left)"),
                 qsTr("Capture Microphone In (right)"),
+                qsTr("Capture USB In (stereo)"),
+                qsTr("Capture USB In (left)"),
+                qsTr("Capture USB In (right)"),
             ]
         }
         Repeater {
-            model: 4
+            model: 7
             QQC2.Button {
                 Layout.fillWidth: true
                 text: _private.newAudioSourceNames[model.index]

@@ -562,6 +562,8 @@ class sketchpad_channel(QObject):
             self.chainedSoundsKeyzonesChanged.emit()
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
+            if "externalAudioSource" in obj:
+                self.set_externalAudioSource(obj["externalAudioSource"])
             if "externalCaptureVolume" in obj:
                 self.set_externalCaptureVolume(obj["externalCaptureVolume"])
             if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
@@ -2228,6 +2230,12 @@ class sketchpad_channel(QObject):
                 return "Mic In (L)"
             elif clientName == "system:capture_2":
                 return "Mic In (R)"
+            elif clientName == "usb-gadget-in:":
+                return "USB In"
+            elif clientName == "usb-gadget-in:capture_1":
+                return "USB In (L)"
+            elif clientName == "usb-gadget-in:capture_2":
+                return "USB In (R)"
             else:
                 return clientName
 

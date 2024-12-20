@@ -612,6 +612,7 @@ def audio_autoconnect(force=False):
     # logging.info("Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on TrackPassthrough and FXPassthrough")
     # BEGIN Connect channel sound sources (SamplerSynth and synths) to their relevant input lanes on TrackPassthrough and FXPassthrough
     try:
+        usbGadgetInputs = jclient.get_ports(name_pattern="usb-gadget-in:", is_audio=True, is_output=False, is_input=True)
         song = zynthian_gui_config.zynqtgui.screens["sketchpad"].song
         if song:
             for channelId in range(0, 10):
@@ -692,6 +693,14 @@ def audio_autoconnect(force=False):
                                                     capture_ports.append(get_audio_capture_ports()[1]);
                                                 else:
                                                     capture_ports = get_audio_capture_ports()
+                                            elif inputSource.port.startswith("usb-gadget:"):
+                                                # hook up to the usb gadget input
+                                                if inputSource.endswith(":left"):
+                                                    capture_ports.append(usbGadgetInputs[0]);
+                                                elif inputSource.endswith(":right"):
+                                                    capture_ports.append(usbGadgetInputs[1]);
+                                                else:
+                                                    capture_ports = usbGadgetInputs
                                             elif inputSource.port.startswith("internal-master:"):
                                                 # hook up to listen to the master output
                                                 if inputSource.endswith(":left") or inputSource.endswith(":both"):

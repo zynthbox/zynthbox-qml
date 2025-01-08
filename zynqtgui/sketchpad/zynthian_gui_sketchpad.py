@@ -112,7 +112,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         logging.info(f"Initializing Sketchpad")
 
-        self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
         self.clip_to_record = None
         self.clip_to_record_path = None
         self.clip_to_record_path = None

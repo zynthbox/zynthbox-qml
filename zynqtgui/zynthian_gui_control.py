@@ -115,7 +115,6 @@ class zynthian_gui_control(zynthian_gui_selector):
     def __init__(self, selcap='Controllers', parent = None):
         super(zynthian_gui_control, self).__init__(selcap, parent)
 
-        self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
         self.mode=None
 
         self.ctrl_screens={}
@@ -141,7 +140,6 @@ class zynthian_gui_control(zynthian_gui_selector):
         self.__selected_engine = None
         self.__selected_engine_bypass_controller = None
         self.__selected_column = 0
-        self.bigknob_multiplier = 1 if self.isZ2V3 else 100
         self.controller0 = None
         self.controller1 = None
         self.controller2 = None

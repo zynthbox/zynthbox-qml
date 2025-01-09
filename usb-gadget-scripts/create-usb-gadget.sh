@@ -103,13 +103,15 @@ echo 0x1d6b > idVendor # Linux Foundation
 echo 0x0104 > idProduct # Multifunction Composite Gadget
 echo 0x0100 > bcdDevice # v1.0.0
 echo 0x0200 > bcdUSB # USB2
+echo "high-speed" > max_speed
 mkdir -p strings/0x409
-echo "Z2-01" > strings/0x409/serialnumber
+echo "ZPZB0001" > strings/0x409/serialnumber
 echo "Zynthbox Project" > strings/0x409/manufacturer
 echo "Zynthbox" > strings/0x409/product
 
 mkdir -p configs/c.1/strings/0x409
 echo "Zynthbox Default" > configs/c.1/strings/0x409/configuration
+echo 120 > configs/c.1/MaxPower
 
 # Create our audio gadgets (UAC2)
 # For a short description of the available attributes, see: https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget-uac2
@@ -139,7 +141,24 @@ mkdir -p functions/midi.usb0
 echo $MIDI_ID > functions/midi.usb0/id
 echo $MIDI_INPUT_PORT_COUNT > functions/midi.usb0/in_ports
 echo $MIDI_OUTPUT_PORT_COUNT > functions/midi.usb0/out_ports
+echo 1024 > functions/midi.usb0/buflen
+echo 128 > functions/midi.usb0/qlen
 ln -s functions/midi.usb0 configs/c.1/
+# mkdir -p functions/midi2.usb0
+# echo $MIDI_ID > functions/midi2.usb0/iface_name
+# mkdir -p functions/midi2.usb0/ep.0
+# echo $MIDI_ID > functions/midi2.usb0/ep.0/ep_name
+# echo "ZPZB0001" > functions/midi2.usb0/ep.0/product_id
+# echo 0x0001 > functions/midi2.usb0/ep.0/family
+# echo 0x0001 > functions/midi2.usb0/ep.0/model
+# echo 0x123456 > functions/midi2.usb0/ep.0/manufacturer
+# echo 0x00000001 > functions/midi2.usb0/ep.0/sw_revision
+# echo 1 > functions/midi2.usb0/ep.0/protocol # 0 is "legacy", 1 is midi 1.0, 2 is midi 2.0
+# mkdir -p functions/midi2.usb0/ep.0/block.0
+# echo $MIDI_ID > functions/midi2.usb0/ep.0/block.0/name
+# echo 0 > functions/midi2.usb0/ep.0/block.0/first_group
+# echo 1 > functions/midi2.usb0/ep.0/block.0/num_groups
+# ln -s functions/midi2.usb0 configs/c.1
 
 # Ensure that all the devices have been created, and then write
 udevadm settle -t 5

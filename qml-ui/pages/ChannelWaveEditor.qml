@@ -94,6 +94,33 @@ Zynthian.ScreenPage {
     property var cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
+            case "SWITCH_MODE_RELEASED":
+                if (zynqtgui.altButtonPressed) {
+                    // Cycle between the tabs in order when the alt button is held and mode is pressed
+                    if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null) {
+                        if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                            clipSettingsSectionView.currentItem = clipSettingsVoices;
+                        } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
+                            clipSettingsSectionView.currentItem = clipSettingsADSR;
+                        } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
+                            if (clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle) {
+                                clipSettingsSectionView.currentItem = clipSettingsGrainerator;
+                            } else {
+                                clipSettingsSectionView.currentItem = clipSettingsInfoView;
+                            }
+                        } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator") {
+                            clipSettingsSectionView.currentItem = clipSettingsInfoView;
+                        } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsInfoView") {
+                            clipSettingsSectionView.currentItem = clipSettingsBar;
+                        } else {
+                            // This is weird... but reset to clipSettingsBar, and output a message about it being weird :P
+                            console.log("Unlikely situation, our tab is unknown? Apparently its object name is", clipSettingsSectionView.currentItem.objectName, "and the object itself is", clipSettingsSectionView.currentItem);
+                            clipSettingsSectionView.currentItem = clipSettingsBar;
+                        }
+                    }
+                    returnValue = true;
+                }
+                break;
             case "SELECT_UP":
                 returnValue = _private.goUp(cuia);
                 break;

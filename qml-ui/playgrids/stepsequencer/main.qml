@@ -596,7 +596,7 @@ Zynthian.BasePlayGrid {
             if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === _private.activePatternModel.sketchpadTrack && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = true;
-                    // By convention, an "off" note can be either a midi off message, or an off message with a velocity of 0
+                    // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
                     if (byte1 < 144 || byte3 === 0) {
                         setOn = false;
                     }

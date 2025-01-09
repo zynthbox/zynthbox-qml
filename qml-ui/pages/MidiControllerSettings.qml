@@ -133,9 +133,13 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 model: Zynthbox.FilterProxy {
-                    sourceModel: Zynthbox.MidiRouter.model
+                    sourceModel: Zynthbox.FilterProxy {
+                        sourceModel: Zynthbox.MidiRouter.model
+                        filterBoolean: true
+                        filterRole: Zynthbox.MidiRouterDeviceModel.IsHardwareDeviceRole
+                    }
                     filterBoolean: true
-                    filterRole: Zynthbox.MidiRouterDeviceModel.IsHardwareDeviceRole
+                    filterRole: Zynthbox.MidiRouterDeviceModel.VisibleRole
                 }
                 currentIndex: _private.selectedDeviceIndex
                 delegate: Item {

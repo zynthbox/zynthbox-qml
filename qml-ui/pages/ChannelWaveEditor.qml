@@ -80,6 +80,9 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav != newHasWav) {
                 component.selectedClipHasWav = newHasWav;
             }
+            // When switching to a new clip, update the default test note to match the actual/given pitch (rootNote) of that new clip (or C4 if there isn't a clip)
+            testNotePad.midiNote = component.cppClipObject ? component.cppClipObject.rootNote : 60;
+            component.heardNotes = [];
         }
     }
     onSelectedClipChanged: selectedClipHasWavThrottle.restart()
@@ -380,6 +383,63 @@ Zynthian.ScreenPage {
             }
         }
     }
+    Connections {
+        target: Zynthbox.MidiRouter
+        enabled: component.isVisible
+        onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
+            // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current track id", component.selectedChannel.id, "listening on port", listenToPort);
+            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === component.selectedChannel.id && size === 3) {
+                if (127 < byte1 && byte1 < 160) {
+                    let setOn = true;
+                    // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
+                    if (byte1 < 144 || byte3 === 0) {
+                        setOn = false;
+                    }
+                    let midiNote = byte2;
+                    if (setOn === true) {
+                        if (component.noteListeningActivations === 0) {
+                            // Clear the current state, in case there's something there (otherwise things look a little weird)
+                            component.heardNotes = [];
+                        }
+                        // Count up one tick for a note on message
+                        component.noteListeningActivations = component.noteListeningActivations + 1;
+                        // Create a new note based on the new thing that just arrived, but only if it's an on note
+                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, sketchpadTrack);
+                        var existingIndex = component.noteListeningNotes.indexOf(newNote);
+                        if (existingIndex > -1) {
+                            component.noteListeningNotes.splice(existingIndex, 1);
+                        }
+                        component.noteListeningNotes.push(newNote);
+                        // console.log("Registering note on , new activation count is", component.noteListeningActivations, component.noteListeningNotes);
+                    } else if (setOn == false) {
+                        // Count down one for a note off message
+                        component.noteListeningActivations = component.noteListeningActivations - 1;
+                        // console.log("Registering note off, new activation count is", component.noteListeningActivations, component.noteListeningNotes, component.noteListeningVelocities);
+                    }
+                    if (component.noteListeningActivations < 0) {
+                        // this will generally happen after stopping playback (as the playback stops, then all off notes are sent out,
+                        // and we'll end up receiving a bunch of them while not doing playback, without having received matching on notes)
+                        // it might still happen at other times, so we might still need to do some testing later, but... this is the general case.
+                        // console.debug("stepsequencer: Problem, we've received too many off notes compared to on notes, this is bad and shouldn't really be happening.");
+                        component.noteListeningActivations = 0;
+                        component.noteListeningNotes = [];
+                    }
+                    if (component.noteListeningActivations === 0) {
+                        // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
+                        component.heardNotes = component.noteListeningNotes;
+                        component.noteListeningNotes = [];
+                    }
+                } else if (175 < byte1 && byte1 < 192 && byte2 === 123) {
+                    // console.log("Registering all-off, resetting to empty, bytes are", byte1, byte2, byte3);
+                    component.noteListeningActivations = 0;
+                    component.noteListeningNotes = [];
+                }
+            }
+        }
+    }
+    property int noteListeningActivations: 0
+    property var noteListeningNotes: []
+    property var heardNotes: []
 
     contextualActions: [
         Kirigami.Action {
@@ -411,7 +471,6 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
                 visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
-                rows: 3
                 columns: 2
                 rowSpacing: 0
                 columnSpacing: 0
@@ -420,6 +479,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "+1"
+                    visible: component.heardNotes.length === 0
                     onClicked: {
                         testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 1);
                     }
@@ -429,6 +489,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "+12"
+                    visible: component.heardNotes.length === 0
                     onClicked: {
                         testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
                     }
@@ -442,13 +503,18 @@ Zynthian.ScreenPage {
                     positionalVelocity: true
                     highlightOctaveStart: false
                     property int midiNote: 60
-                    note: component.selectedChannel ? Zynthbox.PlayGridManager.getNote(midiNote, component.selectedChannel.id) : null
+                    note: component.selectedChannel
+                        ? component.heardNotes.length === 0
+                            ? Zynthbox.PlayGridManager.getNote(midiNote, component.selectedChannel.id)
+                            : Zynthbox.PlayGridManager.getCompoundNote(component.heardNotes)
+                        : null
                 }
                 QQC2.Button {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "-1"
+                    visible: component.heardNotes.length === 0
                     onClicked: {
                         testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 1);
                     }
@@ -458,8 +524,20 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "-12"
+                    visible: component.heardNotes.length === 0
                     onClicked: {
                         testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 12);
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 0.25
+                    Layout.columnSpan: 2
+                    icon.name: "edit-clear-locationbar"
+                    visible: component.heardNotes.length > 0
+                    onClicked: {
+                        component.heardNotes = [];
                     }
                 }
             }

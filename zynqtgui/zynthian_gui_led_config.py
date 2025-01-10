@@ -257,10 +257,12 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
 
             buttonColor = color
 
+        blinkColor = QColor(buttonColor[0], buttonColor[1], buttonColor[2]).lighter(darkening_factor)
+
         self.button_config[buttonId] = {
             'color': buttonColor,
             'blink': blink,
-            'blinkColor': led_color_off
+            'blinkColor': (blinkColor.red(), blinkColor.green(), blinkColor.blue())
         }
 
         wsleds[buttonId] = buttonColor

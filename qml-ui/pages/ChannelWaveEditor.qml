@@ -451,10 +451,18 @@ Zynthian.ScreenPage {
                         component.noteListeningActivations = 0;
                         component.noteListeningNotes = [];
                     }
-                    if (component.noteListeningActivations === 0) {
+                    if (component.noteListeningActivations > 0) {
                         // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
                         component.heardNotes = component.noteListeningNotes;
+                    }
+                    if (component.noteListeningActivations === 0) {
+                        // Now, if we're back down to zero, then we've had all the notes released, and should be ready to start over
                         component.noteListeningNotes = [];
+                        // If we have captured only a single note, and it is the chosen test note, then we
+                        // don't actually want there to be any captured notes as that makes interaction weird
+                        if (component.heardNotes.length === 1 && component.heardNotes[0].midiNote === testNotePad.midiNote) {
+                            component.heardNotes = [];
+                        }
                     }
                 } else if (175 < byte1 && byte1 < 192 && byte2 === 123) {
                     // console.log("Registering all-off, resetting to empty, bytes are", byte1, byte2, byte3);
@@ -506,7 +514,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "+1"
-                    visible: component.heardNotes.length === 0
+                    visible: testNotePad.displayCompoundNote === false
                     onClicked: {
                         testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 1);
                     }
@@ -516,7 +524,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "+12"
-                    visible: component.heardNotes.length === 0
+                    visible: testNotePad.displayCompoundNote === false
                     onClicked: {
                         testNotePad.midiNote = Math.min(127, testNotePad.midiNote + 12);
                     }
@@ -530,10 +538,12 @@ Zynthian.ScreenPage {
                     positionalVelocity: true
                     highlightOctaveStart: false
                     property int midiNote: 60
+                    property QtObject midiNoteObject: component.selectedChannel ? Zynthbox.PlayGridManager.getNote(testNotePad.midiNote, component.selectedChannel.id) : null
+                    property bool displayCompoundNote: !(component.heardNotes.length === 0 || (component.heardNotes.length === 1 && component.heardNotes[0].midiNote === testNotePad.midiNote))
                     note: component.selectedChannel
-                        ? component.heardNotes.length === 0
-                            ? Zynthbox.PlayGridManager.getNote(midiNote, component.selectedChannel.id)
-                            : Zynthbox.PlayGridManager.getCompoundNote(component.heardNotes)
+                        ? testNotePad.displayCompoundNote
+                            ? Zynthbox.PlayGridManager.getCompoundNote(component.heardNotes)
+                            : midiNoteObject
                         : null
                 }
                 QQC2.Button {
@@ -541,7 +551,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "-1"
-                    visible: component.heardNotes.length === 0
+                    visible: testNotePad.displayCompoundNote === false
                     onClicked: {
                         testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 1);
                     }
@@ -551,7 +561,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                     text: "-12"
-                    visible: component.heardNotes.length === 0
+                    visible: testNotePad.displayCompoundNote === false
                     onClicked: {
                         testNotePad.midiNote = Math.max(0, testNotePad.midiNote - 12);
                     }
@@ -562,7 +572,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 0.25
                     Layout.columnSpan: 2
                     icon.name: "edit-clear-locationbar"
-                    visible: component.heardNotes.length > 0
+                    visible: testNotePad.displayCompoundNote === true
                     onClicked: {
                         component.heardNotes = [];
                     }

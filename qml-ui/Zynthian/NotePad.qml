@@ -86,13 +86,6 @@ Item {
                         ? 1
                         : 0.3
                     : 1
-                QQC2.Label {
-                    anchors.fill: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    color: component.foregroundColor
-                    text: modelData.name + (modelData.octave - 1)
-                }
             }
         }
     }
@@ -121,27 +114,31 @@ Item {
             }
             return color;
         }
-        QQC2.Label {
-            id: padLabel
-            anchors.fill: parent
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            color: component.foregroundColor
-            text: {
-                var text = "";
-                if (component.text == "") {
-                    if (component.note && component.note.name != "") {
+    }
+    QQC2.Label {
+        id: padLabel
+        anchors.fill: parent
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        color: component.foregroundColor
+        text: {
+            var text = "";
+            if (component.text == "") {
+                if (component.note) {
+                    if (component.note.subnotes.length === 0) {
                         if (component.scale == "major") {
-                            text = component.note.name
+                            text = component.note.name;
                         } else {
-                            text = component.note.name + (component.note.octave - 1)
+                            text = component.note.name + (component.note.octave - 1);
                         }
+                    } else {
+                        text = Zynthbox.Chords.symbol(component.note.subnotes, component.currentSequence.activePatternObject.scaleKey, component.currentSequence.activePatternObject.pitchKey, component.currentSequence.activePatternObject.octaveKey);
                     }
-                } else {
-                    text = component.text;
                 }
-                return text;
+            } else {
+                text = component.text;
             }
+            return text;
         }
     }
     Rectangle {

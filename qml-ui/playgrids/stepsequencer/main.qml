@@ -634,10 +634,13 @@ Zynthian.BasePlayGrid {
                         component.noteListeningNotes = [];
                         component.noteListeningVelocities = [];
                     }
-                    if (component.noteListeningActivations === 0) {
-                        // Now, if we're back down to zero, then we've had all the notes released, and should assign all the heard notes to the heard notes thinger
+                    if (component.noteListeningActivations > 0) {
+                        // As we listen, assign all the heard notes to the heard notes thinger so we show things as we listen
                         component.heardNotes = component.noteListeningNotes;
                         component.heardVelocities = component.noteListeningVelocities;
+                    }
+                    if (component.noteListeningActivations === 0) {
+                        // Now, if we're back down to zero, then we've had all the notes released, and we should clear our lists, ready for next go
                         component.noteListeningNotes = [];
                         component.noteListeningVelocities = [];
                     }

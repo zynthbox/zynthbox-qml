@@ -146,7 +146,9 @@ Item {
                     if (component.cppClipObject) {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                            if (component.cppClipObject.subvoiceCount > 0) {
+                                _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                            }
                         } else {
                             if (component.cppClipObject.subvoiceCount > 0) {
                                 component.cppClipObject.subvoiceSettings[_private.editVoice].pan = Math.min(1, component.cppClipObject.subvoiceSettings[_private.editVoice].pan + 0.01);
@@ -170,7 +172,9 @@ Item {
                     if (component.cppClipObject) {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            _private.editVoice = Math.max(0, _private.editVoice - 1);
+                            if (component.cppClipObject.subvoiceCount > 0) {
+                                _private.editVoice = Math.max(0, _private.editVoice - 1);
+                            }
                         } else {
                             if (component.cppClipObject.subvoiceCount > 0) {
                                 component.cppClipObject.subvoiceSettings[_private.editVoice].pan = Math.max(-1, component.cppClipObject.subvoiceSettings[_private.editVoice].pan - 0.01);
@@ -187,7 +191,9 @@ Item {
             switch (currentElement) {
                 case 0:
                     if (component.cppClipObject) {
-                        _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                        if (component.cppClipObject.subvoiceCount > 0) {
+                            _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                        }
                     }
                     break;
                 case 1:
@@ -209,7 +215,9 @@ Item {
             switch (currentElement) {
                 case 0:
                     if (component.cppClipObject) {
-                        _private.editVoice = Math.max(0, _private.editVoice - 1);
+                        if (component.cppClipObject.subvoiceCount > 0) {
+                            _private.editVoice = Math.max(0, _private.editVoice - 1);
+                        }
                     }
                     break;
                 case 1:

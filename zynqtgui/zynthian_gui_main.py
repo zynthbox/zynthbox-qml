@@ -30,6 +30,8 @@ from time import sleep
 from datetime import datetime
 from subprocess import check_output, Popen, PIPE, STDOUT
 import Zynthbox
+import configparser
+import shlex
 
 # Zynthian specific modules
 from . import zynthian_gui_selector, zynthian_gui_config
@@ -99,7 +101,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_metadata.append({"icon":"../../img/snapshots.svg"})
 
         if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
-            apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
+            apps_folder = os.path.expanduser('~') + "/.local/share/zynthbox/apps/"
             if Path(apps_folder).exists():
                 for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
                     try:
@@ -145,13 +147,12 @@ class zynthian_gui_main(zynthian_gui_selector):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":
             self.song_recordings_dir = self.zynqtgui.screens["sketchpad"].song.sketchpad_folder + "wav"
             self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
-            apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             self.__current_module_name__ = self.list_data[i][2]
             self.__current_module_recordalsa__ = self.list_metadata[i]["record_alsa"]
             self.__current_module_recordingports_left__ = self.list_metadata[i]["recording_ports_left"]
             self.__current_module_recordingports_right__ = self.list_metadata[i]["recording_ports_right"]
             self.currentModuleChanged.emit
-            Popen([self.list_data[i][1]])
+            Popen(shlex.split(self.list_data[i][1]))
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
             QTimer.singleShot(5000, lambda: self.zynqtgui.show_modal("sketchpad"))

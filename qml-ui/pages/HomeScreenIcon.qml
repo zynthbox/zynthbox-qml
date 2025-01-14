@@ -23,7 +23,7 @@ Rectangle {
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
         color: Kirigami.Theme.backgroundColor
 
-        Image {
+        Kirigami.Icon {
             id:imageId
             anchors.centerIn: parent
             width:90;height:90

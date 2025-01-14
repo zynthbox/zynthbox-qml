@@ -26,6 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.NewStuffPage {
     id: component
@@ -33,6 +34,12 @@ Zynthian.NewStuffPage {
     title: qsTr("Apps Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
     configFile: Qt.resolvedUrl("zynthbox-apps.knsrc").toString().slice(7)
+    onItemInstalled: {
+        Zynthbox.AppImageHelper.registerAppImage(itemData[NewStuff.ItemsModel.InstalledFilesRole][0])
+    }
+    onItemUninstalled: {
+        Zynthbox.AppImageHelper.unregisterAppImage(itemData[NewStuff.ItemsModel.UnInstalledFilesRole][0])
+    }
     Connections {
         target: component.backAction
         onTriggered: {

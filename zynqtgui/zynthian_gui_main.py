@@ -82,55 +82,64 @@ class zynthian_gui_main(zynthian_gui_selector):
         if self.visibleCategory == "modules":
             # Main Apps
             self.list_data.append((self.sketchpad, 0, "Clips"))
-            self.list_metadata.append({"icon":"../../img/clipsview.svg"})
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/clipsview.svg"})
 
             self.list_data.append((self.playgrid, 0, "Playground"))
-            self.list_metadata.append({"icon":"../../img/playground.svg"})
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/playground.svg"})
 
             self.list_data.append((self.song_manager, 0, "Song Manager"))
-            self.list_metadata.append({"icon":"../../img/song-player.svg"})
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/song-player.svg"})
 
             self.list_data.append((self.layers, 0, "Library"))
-            self.list_metadata.append({"icon":"../../img/library.svg"})
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
 
             self.list_data.append((self.admin, 0, "Settings"))
-            self.list_metadata.append({"icon":"../../img/settings.svg"})
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/settings.svg"})
 
             # As per #299, rename Snapshots to Soundsets
             self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
-            self.list_metadata.append({"icon":"../../img/snapshots.svg"})
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/snapshots.svg"})
 
         if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
-            apps_folder = os.path.expanduser('~') + "/.local/share/zynthbox/apps/"
-            if Path(apps_folder).exists():
-                for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
-                    try:
-                        f = open(apps_folder + appimage_dir + "/metadata.json", "r")
-                        metadata = JSONDecoder().decode(f.read())
-                        if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
-                            continue
-                        autoFilled = False
-                        if not "RecordingPortsLeft" in metadata:
-                            metadata["RecordingPortsLeft"] = ""
-                            autoFilled = True
-                        if not "RecordingPortsRight" in metadata:
-                            metadata["RecordingPortsRight"] = ""
-                            autoFilled = True
-                        # TODO Just some heuristics so we end up with stuff in these for some of our stuff without having to update... We can get rid of these a bit later on
-                        if autoFilled:
-                            if metadata["Name"] == "Norns":
-                                metadata["RecordingPortsLeft"] = "SuperCollider:out_1"
-                                metadata["RecordingPortsRight"] = "SuperCollider:out_2"
-                        recordAlsa = False
-                        if "RecordAlsa" in metadata:
-                            recordAlsa = metadata["RecordAlsa"].lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
-                        self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
-                        # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
-                        # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
-                        self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"], "recording_ports_left" : metadata["RecordingPortsLeft"], "recording_ports_right" : metadata["RecordingPortsRight"], "record_alsa" : recordAlsa})
-                    except Exception as e:
-                        logging.error(e)
+            for file in Path(os.path.expanduser('~') + "/.local/share/applications/").glob("appimagekit*.desktop"):
+                logging.debug(f"Processing Appimage desktop file : {file}")
+                appimage_desktop_file = configparser.ConfigParser()
+                appimage_desktop_file.read(file)
+                if "Exec" in appimage_desktop_file["Desktop Entry"] and Path(appimage_desktop_file["Desktop Entry"]["Exec"]).exists():
+                    self.list_data.append(("appimage", appimage_desktop_file["Desktop Entry"]["Exec"], appimage_desktop_file["Desktop Entry"]["Name"]))
+                    self.list_metadata.append({"icon": appimage_desktop_file["Desktop Entry"]["Icon"], "recordings_file_base" : appimage_desktop_file["Desktop Entry"]["Name"], "recording_ports_left" : "", "recording_ports_right" : "", "record_alsa" : False})
+                else:
+                    logging.error(f"Appimage desktop file {file} is pointing to a file which does not exist. Skipping.")
 
+            # apps_folder = os.path.expanduser('~') + "/.local/share/zynthbox/apps/"
+            # if Path(apps_folder).exists():
+            #     for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
+            #         try:
+            #             f = open(apps_folder + appimage_dir + "/metadata.json", "r")
+            #             metadata = JSONDecoder().decode(f.read())
+            #             if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
+            #                 continue
+            #             autoFilled = False
+            #             if not "RecordingPortsLeft" in metadata:
+            #                 metadata["RecordingPortsLeft"] = ""
+            #                 autoFilled = True
+            #             if not "RecordingPortsRight" in metadata:
+            #                 metadata["RecordingPortsRight"] = ""
+            #                 autoFilled = True
+            #             # TODO Just some heuristics so we end up with stuff in these for some of our stuff without having to update... We can get rid of these a bit later on
+            #             if autoFilled:
+            #                 if metadata["Name"] == "Norns":
+            #                     metadata["RecordingPortsLeft"] = "SuperCollider:out_1"
+            #                     metadata["RecordingPortsRight"] = "SuperCollider:out_2"
+            #             recordAlsa = False
+            #             if "RecordAlsa" in metadata:
+            #                 recordAlsa = metadata["RecordAlsa"].lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
+            #             self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
+            #             # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
+            #             # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
+            #             self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"], "recording_ports_left" : metadata["RecordingPortsLeft"], "recording_ports_right" : metadata["RecordingPortsRight"], "record_alsa" : recordAlsa})
+            #         except Exception as e:
+            #             logging.error(e)
         if self.visibleCategory == "sessions":
             for sketchpad in self.zynqtgui.sketchpad.get_sketchpad_folders():
                 self.list_data.append(("sketchpad", str(sketchpad), sketchpad.stem))

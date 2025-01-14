@@ -257,7 +257,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
         # logging.error("SHOWING {}".format(time.time() * 1000))
         if self.zynqtgui.curlayer:
-            path = "/root/.local/share/zynthian/engineeditpages/"
+            path = "/root/.local/share/zynthbox/engineeditpages/"
             entries = []
             engine = self.zynqtgui.curlayer.engine.nickname
             if self.__single_effect_engine != None:

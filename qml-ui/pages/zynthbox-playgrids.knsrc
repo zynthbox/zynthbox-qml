@@ -2,6 +2,6 @@
 Name=Playgrids
 ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=670
-XdgTargetDir=zynthian/playgrids
+XdgTargetDir=zynthbox/playgrids
 Uncompress=always
 RemoveDeadEntries=true

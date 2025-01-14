@@ -1191,7 +1191,7 @@ class zynthian_gui(QObject):
         # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)
         # self.screens['zs3_options'] = zynthian_gui_zs3_options(self)
         self.screens["main"] = zynthian_gui_main(self)
-        self.screens["module_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["apps_downloader"] = zynthian_gui_newstuff(self)
         self.screens["admin"] = zynthian_gui_admin(self)
         self.screens["audio_settings"] = zynthian_gui_audio_settings(self)
         self.screens["wifi_settings"] = zynthian_gui_wifi_settings(self)
@@ -3789,8 +3789,8 @@ class zynthian_gui(QObject):
     def get_layer_midi_effect_chooser(self):
         return self.screens["layer_midi_effect_chooser"]
 
-    def get_module_downloader(self):
-        return self.screens["module_downloader"]
+    def get_apps_downloader(self):
+        return self.screens["apps_downloader"]
 
     def get_control_downloader(self):
         return self.screens["control_downloader"]
@@ -4839,7 +4839,7 @@ class zynthian_gui(QObject):
     layer_midi_effect_chooser = Property(
         QObject, get_layer_midi_effect_chooser, constant=True
     )
-    module_downloader = Property(QObject, get_module_downloader, constant=True)
+    apps_downloader = Property(QObject, get_apps_downloader, constant=True)
     control_downloader = Property(QObject, get_control_downloader, constant=True)
     fx_control_downloader = Property(QObject, get_fx_control_downloader, constant=True)
     admin = Property(QObject, get_admin, constant=True)

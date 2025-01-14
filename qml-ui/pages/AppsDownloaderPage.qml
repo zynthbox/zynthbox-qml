@@ -29,10 +29,10 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.NewStuffPage {
     id: component
-    screenId: "module_downloader"
-    title: qsTr("Module Downloader")
+    screenId: "apps_downloader"
+    title: qsTr("Apps Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthbox-modules.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynthbox-apps.knsrc").toString().slice(7)
     Connections {
         target: component.backAction
         onTriggered: {

@@ -40,7 +40,7 @@ Zynthian.Stack {
         "option": "OptionPage.qml",
         "theme_chooser": "ThemePage.qml",
         "theme_downloader": "ThemeDownloaderPage.qml",
-        "module_downloader": "ModuleDownloaderPage.qml",
+        "apps_downloader": "AppsDownloaderPage.qml",
         "norns_shield": "NornsPage.qml",
         "test_touchpoints": "TestTouchpoints.qml",
         "audio_settings":"AudioSettingsPage.qml",

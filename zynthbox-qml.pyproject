@@ -53,7 +53,7 @@
         "./qml-ui/pages/MidiChanPage.qml",
         "./qml-ui/pages/MidiFXSetupPage.qml",
         "./qml-ui/pages/MidiKeyRangePage.qml",
-        "./qml-ui/pages/ModuleDownloaderPage.qml",
+        "./qml-ui/pages/AppsDownloaderPage.qml",
         "./qml-ui/pages/NetworkInfoPage.qml",
         "./qml-ui/pages/NetworkPage.qml",
         "./qml-ui/pages/NornsPage.qml",

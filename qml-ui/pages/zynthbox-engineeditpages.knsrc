@@ -2,6 +2,6 @@
 Name=Themes
 ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=667
-XdgTargetDir=zynthian/engineeditpages
+XdgTargetDir=zynthbox/engineeditpages
 Uncompress=always
 RemoveDeadEntries=true

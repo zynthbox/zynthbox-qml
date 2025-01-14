@@ -233,7 +233,7 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Get New Apps")
-            onTriggered: zynqtgui.show_modal("module_downloader")
+            onTriggered: zynqtgui.show_modal("apps_downloader")
         },
         Kirigami.Action {
             text: qsTr("Power")

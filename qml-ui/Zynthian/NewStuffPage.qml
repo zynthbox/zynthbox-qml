@@ -80,6 +80,32 @@ Zynthian.ScreenPage {
      * which can be done by calling zynqtgui.callable_ui_action_simple("SWITCH_BACK_SHORT")
      */
     signal useThis(var installedFiles);
+    /**
+     * \brief Signal fired when an item is installed. The installed item's data is passed as the first argument
+     * itemData is a json structure with the model Roles as key and their respective value as values
+     * For example, the following snippet prints the list of installed files :
+     * <code>
+     * Zynthian.NewStuffPage {
+     *     onItemInstalled: {
+     *         console.log("Installed Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
+     *     }
+     * }
+     * </code>
+     */
+    signal itemInstalled(var itemData);
+    /**
+     * \brief Signal fired when an item is uninstalled. The uninstalled item's data is passed as the first argument
+     * itemData is a json structure with the model Roles as key and their respective value as values
+     * For example, the following snippet prints the list of installed files :
+     * <code>
+     * Zynthian.NewStuffPage {
+     *     onItemUninstalled: {
+     *         console.log("Uninstalled Files", itemData[NewStuff.ItemsModel.UnInstalledFilesRole])
+     *     }
+     * }
+     * </code>
+     */
+    signal itemUninstalled(var itemData);
 
     onIsVisibleChanged: {
         engineUpdater.restart();
@@ -178,6 +204,15 @@ Zynthian.ScreenPage {
         Connections {
             target: contentLoader.item
             onUseThis: component.useThis(installedFiles)
+        }
+        Connections {
+            target: contentLoader.item
+            onItemInstalled: {
+                component.itemInstalled(itemData)
+            }
+            onItemUninstalled: {
+                component.itemUninstalled(itemData)
+            }
         }
         Binding {
             target: contentLoader.item

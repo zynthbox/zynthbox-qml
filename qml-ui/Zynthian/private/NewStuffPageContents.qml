@@ -65,6 +65,32 @@ Item {
      * which can be done by calling zynqtgui.callable_ui_action_simple("SWITCH_BACK_SHORT")
      */
     signal useThis(var installedFiles);
+    /**
+     * \brief Signal fired when an item is installed. The installed item's data is passed as the first argument
+     * itemData is a json structure with the model Roles as key and their respective value as values
+     * For example, the following snippet prints the list of installed files :
+     * <code>
+     * Zynthian.NewStuffPage {
+     *     onItemInstalled: {
+     *         console.log("Installed Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
+     *     }
+     * }
+     * </code>
+     */
+    signal itemInstalled(var itemData);
+    /**
+     * \brief Signal fired when an item is uninstalled. The uninstalled item's data is passed as the first argument
+     * itemData is a json structure with the model Roles as key and their respective value as values
+     * For example, the following snippet prints the list of installed files :
+     * <code>
+     * Zynthian.NewStuffPage {
+     *     onItemUninstalled: {
+     *         console.log("Uninstalled Files", itemData[NewStuff.ItemsModel.UnInstalledFilesRole])
+     *     }
+     * }
+     * </code>
+     */
+    signal itemUninstalled(var itemData);
 
     property list<QtObject> contextualActions: [
         Kirigami.Action {
@@ -133,6 +159,45 @@ Item {
     NewStuff.ItemsModel {
         id: newStuffModel
         engine: newStuffEngine
+        onEntryChanged: {
+            var itemData = {}
+            itemData[NewStuff.ItemsModel.NameRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.NameRole)
+            itemData[NewStuff.ItemsModel.UniqueIdRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.UniqueIdRole)
+            itemData[NewStuff.ItemsModel.CategoryRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.CategoryRole)
+            itemData[NewStuff.ItemsModel.HomepageRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.HomepageRole)
+            itemData[NewStuff.ItemsModel.AuthorRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.AuthorRole)
+            itemData[NewStuff.ItemsModel.LicenseRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.LicenseRole)
+            itemData[NewStuff.ItemsModel.ShortSummaryRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.ShortSummaryRole)
+            itemData[NewStuff.ItemsModel.SummaryRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.SummaryRole)
+            itemData[NewStuff.ItemsModel.ChangelogRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.ChangelogRole)
+            itemData[NewStuff.ItemsModel.VersionRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.VersionRole)
+            itemData[NewStuff.ItemsModel.ReleaseDateRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.ReleaseDateRole)
+            itemData[NewStuff.ItemsModel.UpdateVersionRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.UpdateVersionRole)
+            itemData[NewStuff.ItemsModel.UpdateReleaseDateRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.UpdateReleaseDateRole)
+            itemData[NewStuff.ItemsModel.PayloadRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.PayloadRole)
+            itemData[NewStuff.ItemsModel.PreviewsSmallRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.PreviewsSmallRole)
+            itemData[NewStuff.ItemsModel.PreviewsRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.PreviewsRole)
+            itemData[NewStuff.ItemsModel.InstalledFilesRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.InstalledFilesRole)
+            itemData[NewStuff.ItemsModel.UnInstalledFilesRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.UnInstalledFilesRole)
+            itemData[NewStuff.ItemsModel.RatingRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.RatingRole)
+            itemData[NewStuff.ItemsModel.NumberOfCommentsRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.NumberOfCommentsRole)
+            itemData[NewStuff.ItemsModel.DownloadCountRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.DownloadCountRole)
+            itemData[NewStuff.ItemsModel.NumberFansRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.NumberFansRole)
+            itemData[NewStuff.ItemsModel.NumberKnowledgebaseEntriesRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.NumberKnowledgebaseEntriesRole)
+            itemData[NewStuff.ItemsModel.KnowledgebaseLinkRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.KnowledgebaseLinkRole)
+            itemData[NewStuff.ItemsModel.DownloadLinksRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.DownloadLinksRole)
+            itemData[NewStuff.ItemsModel.DonationLinkRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.DonationLinkRole)
+            itemData[NewStuff.ItemsModel.ProviderIdRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.ProviderIdRole)
+            itemData[NewStuff.ItemsModel.SourceRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.SourceRole)
+            itemData[NewStuff.ItemsModel.StatusRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.StatusRole)
+            itemData[NewStuff.ItemsModel.CommentsModelRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.CommentsModelRole)
+            itemData[NewStuff.ItemsModel.EntryTypeRole] = newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.EntryTypeRole)
+            if (newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.StatusRole) == NewStuff.ItemsModel.InstalledStatus) {
+                component.itemInstalled(itemData)
+            } else if (newStuffModel.data(newStuffModel.index(index, 0), NewStuff.ItemsModel.StatusRole) == NewStuff.ItemsModel.DeletedStatus) {
+                component.itemUninstalled(itemData)
+            }
+        }
     }
     QMM.Audio {
         id: previewPlayer

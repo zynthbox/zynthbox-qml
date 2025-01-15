@@ -410,10 +410,11 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.zynqtgui.currentTaskMessage = "Optimizing App : Updating entry"
             config_filepath = Path("/root/.local/share/applications/").glob(f"appimagekit_{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}*").__next__()
             config = configparser.ConfigParser()
+            config.optionxform=str
             config.read(config_filepath)
             config["Desktop Entry"]["Exec"] = str(appdir / "AppRun")
             with open(config_filepath, "w") as f:
-                config.write(f)
+                config.write(f, space_around_delimiters=False)
             QTimer.singleShot(0, self.zynqtgui.end_long_task)
 
         self.zynqtgui.do_long_task(task, f"Optimizing App")

@@ -195,7 +195,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             timestamp = Zynthbox.Plugin.instance().currentTimestamp();
             self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.sketch.wav"
 
-            self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.__recording_file__))
+            self.recorder_process = Popen(("/usr/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.__recording_file__))
             logging.info("Started recording into the file " + self.__recording_file__)
             self.__is_recording__ = True
             self.is_recording_changed.emit()

@@ -3228,15 +3228,19 @@ class zynthian_gui(QObject):
         self.loading_thread.start()
 
     @Slot(None)
-    def start_loading(self):
+    def start_loading(self, task_message="Please Wait"):
         self.loading = self.loading + 1
         if self.loading < 1:
             self.loading = 1
-        self.currentTaskMessage = "Please wait"
+        self.currentTaskMessage = task_message
         recent_task_messages.put("command:show")
         self.is_loading_changed.emit()
         QGuiApplication.instance().processEvents()
         # logging.debug("START LOADING %d" % self.loading)
+
+    @Slot(str)
+    def start_loading_with_message(self, task_message):
+        self.start_loading(task_message)
 
     @Slot(None)
     def stop_loading(self):

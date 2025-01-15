@@ -191,7 +191,9 @@ Zynthian.ScreenPage {
                             zynqtgui.main.activate_index(model.index);
 
                             if (model.action_id === "appimage") {
-                                zynqtgui.start_loading();
+                                // FIXME : If currentTaskMessage is not cleared before calling start_loading, it displays a blank loading screen without any text
+                                zynqtgui.currentTaskMessage = ""
+                                zynqtgui.start_loading_with_message("Starting " + model.display);
                                 stopLoadingTimer.restart();
                             }
                         }

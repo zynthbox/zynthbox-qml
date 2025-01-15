@@ -3,5 +3,5 @@ Name=Zynthbox Apps
 ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
 Categories=671
 XdgTargetDir=zynthbox/apps
-Uncompress=always
+Uncompress=never
 RemoveDeadEntries=true

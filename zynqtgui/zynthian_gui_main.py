@@ -160,7 +160,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.__current_module_recordalsa__ = self.list_metadata[i]["record_alsa"]
             self.__current_module_recordingports_left__ = self.list_metadata[i]["recording_ports_left"]
             self.__current_module_recordingports_right__ = self.list_metadata[i]["recording_ports_right"]
-            self.currentModuleChanged.emit
+            self.currentModuleChanged.emit()
             Popen(shlex.split(self.list_data[i][1]))
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page

@@ -32,6 +32,8 @@ from subprocess import check_output, Popen, PIPE, STDOUT
 import Zynthbox
 import configparser
 import shlex
+import subprocess
+import shutil
 
 # Zynthian specific modules
 from . import zynthian_gui_selector, zynthian_gui_config
@@ -164,7 +166,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             Popen(shlex.split(self.list_data[i][1]))
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
-            QTimer.singleShot(5000, lambda: self.zynqtgui.show_modal("sketchpad"))
+            QTimer.singleShot(1000, lambda: self.zynqtgui.show_modal("sketchpad"))
         elif self.list_data[i][0] and self.list_data[i][0] == "sketchpad":
             self.__selected_sketchpad_folder__ = self.list_data[i][1]
             self.visibleCategory = "sessions-versions"
@@ -383,6 +385,51 @@ class zynthian_gui_main(zynthian_gui_selector):
     @Slot(None)
     def refresh(self):
         self.fill_list()
+
+    @Slot(str)
+    def registerAppImage(self, path):
+        def task():
+            # AppImage startup time on rpi is very slow probably due to decompression overhead
+            # After an AppImage is downloaded, extract it to make the startup time faster
+
+            # Step 1 : Register appimage to system. This will add a desktop entry to `/root/.local/share/applications`
+            self.zynqtgui.currentTaskMessage = "Optimizing App : Registering app to system"
+            Zynthbox.AppImageHelper.instance().registerAppImage(path)
+
+            # Step 2 : Extract the appimage to `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
+            appdir = Path(path).parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
+            if (Path(path).parent / "squashfs-root").exists():
+                zynqtgui.currentTaskMessage = "Removing existing squashfs-root dir"
+                shutil.rmtree(Path(path).parent / "squashfs-root", ignore_errors=True)
+            self.zynqtgui.currentTaskMessage = "Optimizing App : Extracting Appimage to squashfs-root"
+            subprocess.run((path, "--appimage-extract"), stdout=subprocess.DEVNULL, cwd=Path(path).parent)
+            self.zynqtgui.currentTaskMessage = f"Optimizing App : Renaming AppDir to {appdir}"
+            (Path(path).parent / "squashfs-root").rename(appdir)
+
+            # Step 3 : Modify the desktop file to run the AppRun
+            self.zynqtgui.currentTaskMessage = "Optimizing App : Updating entry"
+            config_filepath = Path("/root/.local/share/applications/").glob(f"appimagekit_{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}*").__next__()
+            config = configparser.ConfigParser()
+            config.read(config_filepath)
+            config["Desktop Entry"]["Exec"] = str(appdir / "AppRun")
+            with open(config_filepath, "w") as f:
+                config.write(f)
+            QTimer.singleShot(0, self.zynqtgui.end_long_task)
+
+        self.zynqtgui.do_long_task(task, f"Optimizing App")
+
+    @Slot(str)
+    def unregisterAppImage(self, path):
+        # AppImage startup time on rpi is very slow probably due to decompression overhead
+        # After an AppImage is downloaded, the appimage is extracted to make the startup time faster. Cleanup all the extracted files
+
+        # Step 1 : Remove the extracted AppDir from `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
+        appdir = Path(path).parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
+        if appdir.exists():
+            self.zynqtgui.currentTaskMessage = f"Removing appdir {appdir}"
+            shutil.rmtree(appdir, ignore_errors=True)
+        # Step 2 : Unregister appimage from system.
+        Zynthbox.AppImageHelper.instance().unregisterAppImage(path)
 
     ### Property visibleCategory
     def get_visibleCategory(self):

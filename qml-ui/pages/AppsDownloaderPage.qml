@@ -36,10 +36,10 @@ Zynthian.NewStuffPage {
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
     configFile: Qt.resolvedUrl("zynthbox-apps.knsrc").toString().slice(7)
     onItemInstalled: {
-        Zynthbox.AppImageHelper.registerAppImage(itemData[NewStuff.ItemsModel.InstalledFilesRole][0])
+        zynqtgui.main.registerAppImage(itemData[NewStuff.ItemsModel.InstalledFilesRole][0])
     }
     onItemUninstalled: {
-        Zynthbox.AppImageHelper.unregisterAppImage(itemData[NewStuff.ItemsModel.UnInstalledFilesRole][0])
+        zynqtgui.main.unregisterAppImage(itemData[NewStuff.ItemsModel.UnInstalledFilesRole][0])
     }
     Connections {
         target: component.backAction

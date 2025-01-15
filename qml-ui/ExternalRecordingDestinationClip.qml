@@ -53,8 +53,21 @@ ColumnLayout {
         } else {
             // If the current module's recording ports are empty, record the system output
             if (zynqtgui.main.currentModuleRecordingPortsLeft === "" && zynqtgui.main.currentModuleRecordingPortsRight === "") {
-                Zynthbox.AudioLevels.addRecordPort("system:playback_1", 0);
-                Zynthbox.AudioLevels.addRecordPort("system:playback_2", 1);
+                // Need to connect to the output ports which are connected to system:playback ports except the GlobalPlayback ports which are zynthbox's audio output ports
+                var playback1Ports = Zynthbox.JackConnectionHandler.getAllConnections("system:playback_1")
+                var playback2Ports = Zynthbox.JackConnectionHandler.getAllConnections("system:playback_2")
+                for (var index in playback1Ports) {
+                    if (!playback1Ports[index].startsWith("GlobalPlayback")) {
+                        console.log("Recording port :", playback1Ports[index])
+                        Zynthbox.AudioLevels.addRecordPort(playback1Ports[index], 0);
+                    }
+                }
+                for (var index in playback2Ports) {
+                    if (!playback2Ports[index].startsWith("GlobalPlayback")) {
+                        console.log("Recording port :", playback2Ports[index])
+                        Zynthbox.AudioLevels.addRecordPort(playback2Ports[index], 1);
+                    }
+                }
             } else {
                 var splitLeftPorts = zynqtgui.main.currentModuleRecordingPortsLeft.split(",");
                 for (var i = 0; i < splitLeftPorts.length; ++i) {

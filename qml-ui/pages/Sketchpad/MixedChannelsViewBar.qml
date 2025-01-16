@@ -831,7 +831,7 @@ Rectangle {
                                                     color: Kirigami.Theme.highlightColor
                                                 }
                                                 Rectangle {
-                                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.gainAbsolute : 0
+                                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
                                                     anchors {
                                                         left: parent.left
                                                         top: parent.top
@@ -915,7 +915,7 @@ Rectangle {
                                                     } else if (root.selectedChannel.trackType == "sample-trig" && synthRepeater.synthData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
                                                         newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                                                         delegateMouseArea.dragHappened = true;
-                                                        slotDelegate.cppClipObject.gainAbsolute = newVal;
+                                                        slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
                                                     }
                                                 }
                                                 onPressAndHold: {
@@ -1174,8 +1174,8 @@ Rectangle {
                                             property real pixelToSecs: (waveformItem.end - waveformItem.start) / waveformItem.width
                                             // Calculate amount of pixels represented by 1 beat
                                             property real pixelsPerBeat: progressDots.cppClipObject ? (60/Zynthbox.SyncTimer.bpm*progressDots.cppClipObject.speedRatio) / waveformItem.pixelToSecs : 1
-                                            start: progressDots.cppClipObject != null && progressDots.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? progressDots.cppClipObject.startPositionSeconds : 0
-                                            end: progressDots.cppClipObject != null ? (progressDots.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? progressDots.cppClipObject.startPositionSeconds + progressDots.cppClipObject.lengthSeconds : length) : 0
+                                            start: progressDots.cppClipObject != null && progressDots.cppClipObject.rootSlice.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? progressDots.cppClipObject.rootSlice.startPositionSeconds : 0
+                                            end: progressDots.cppClipObject != null ? (progressDots.cppClipObject.rootSlice.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? progressDots.cppClipObject.rootSlice.startPositionSeconds + progressDots.cppClipObject.rootSlice.lengthSeconds : length) : 0
                                             readonly property real relativeStart: waveformItem.start / waveformItem.length
                                             readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
@@ -1212,7 +1212,7 @@ Rectangle {
                                                 opacity: 0.8
                                                 width: 1
                                                 property real startPositionRelative: progressDots.cppClipObject
-                                                    ? progressDots.cppClipObject.startPositionSamples / progressDots.cppClipObject.durationSamples
+                                                    ? progressDots.cppClipObject.rootSlice.startPositionSamples / progressDots.cppClipObject.durationSamples
                                                     : 1
                                                 x: progressDots.cppClipObject != null ? Zynthian.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
                                             }
@@ -1228,7 +1228,7 @@ Rectangle {
                                                 opacity: 0.8
                                                 width: 1
                                                 property real loopDeltaRelative: progressDots.cppClipObject
-                                                    ? progressDots.cppClipObject.loopDeltaSamples / progressDots.cppClipObject.durationSamples
+                                                    ? progressDots.cppClipObject.rootSlice.loopDeltaSamples / progressDots.cppClipObject.durationSamples
                                                     : 0
                                                 x: progressDots.cppClipObject
                                                     ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
@@ -1246,7 +1246,7 @@ Rectangle {
                                                 opacity: 0.8
                                                 width: 1
                                                 x: progressDots.cppClipObject
-                                                    ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                                                    ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.rootSlice.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
                                                     : 0
                                             }
 

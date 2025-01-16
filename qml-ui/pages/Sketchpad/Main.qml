@@ -183,7 +183,7 @@ Zynthian.ScreenPage {
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
         function valueSetter(value) {
             if (sample != null && !sample.isEmpty) {
-                clipCppObj.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
+                clipCppObj.rootSlice.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "sample_gain",
                     description: qsTr("%1 Gain").arg(sample.path.split("/").pop()),
@@ -191,10 +191,10 @@ Zynthian.ScreenPage {
                     stop: 1,
                     step: 0.01,
                     defaultValue: 0.5,
-                    currentValue: parseFloat(clipCppObj.gainAbsolute),
+                    currentValue: parseFloat(clipCppObj.rootSlice.gainHandler.gainAbsolute),
                     startLabel: "-100 dB",
                     stopLabel: "24 dB",
-                    valueLabel: qsTr("%1 dB").arg(clipCppObj.gainDb.toFixed(2)),
+                    valueLabel: qsTr("%1 dB").arg(clipCppObj.rootSlice.gainHandler.gainDb.toFixed(2)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -204,7 +204,7 @@ Zynthian.ScreenPage {
                 applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sample"), 2000)
             }
         }
-        valueSetter(clipCppObj.gainAbsolute + sign*0.01)
+        valueSetter(clipCppObj.rootSlice.gainHandler.gainAbsolute + sign*0.01)
     }
     /**
      * Update selected sketch gain
@@ -218,7 +218,7 @@ Zynthian.ScreenPage {
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
-                clipCppObj.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
+                clipCppObj.rootSlice.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
                 applicationWindow().showOsd({
                     parameterName: "clip_gain",
                     description: qsTr("%1 Gain").arg(clip.path.split("/").pop()),
@@ -226,10 +226,10 @@ Zynthian.ScreenPage {
                     stop: 1,
                     step: 0.01,
                     defaultValue: 0.5,
-                    currentValue: parseFloat(clipCppObj.gainAbsolute),
+                    currentValue: parseFloat(clipCppObj.rootSlice.gainHandler.gainAbsolute),
                     startLabel: "-100 dB",
                     stopLabel: "24 dB",
-                    valueLabel: qsTr("%1 dB").arg(clipCppObj.gainDb.toFixed(2)),
+                    valueLabel: qsTr("%1 dB").arg(clipCppObj.rootSlice.gainHandler.gainDb.toFixed(2)),
                     setValueFunction: valueSetter,
                     showValueLabel: true,
                     showResetToDefault: true,
@@ -239,7 +239,7 @@ Zynthian.ScreenPage {
                 applicationWindow().showMessageDialog(qsTr("Selected slot does not have any sketch"), 2000)
             }
         }
-        valueSetter(clipCppObj.gainAbsolute + sign*0.01)
+        valueSetter(clipCppObj.rootSlice.gainHandler.gainAbsolute + sign*0.01)
     }
     /**
      * Update selected channel pan
@@ -338,7 +338,7 @@ Zynthian.ScreenPage {
     function updateClipGain(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.gain = Zynthian.CommonUtils.clamp(clipCppObj.gainAbsolute + sign*0.01, 0, 1)
+            clipCppObj.rootSlice.gainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(clipCppObj.rootSlice.gainHandler.gainAbsolute + sign*0.01, 0, 1)
         }
     }
     /**
@@ -349,7 +349,7 @@ Zynthian.ScreenPage {
     function updateClipPitch(clip, sign) {
         if (clip != null) {
             let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-            clipCppObj.pitch = Zynthian.CommonUtils.clamp(clipCppObj.pitch + sign, -48, 48)
+            clipCppObj.rootSlice.pitch = Zynthian.CommonUtils.clamp(clipCppObj.rootSlice.pitch + sign, -48, 48)
         }
     }
     /**
@@ -1173,13 +1173,13 @@ Zynthian.ScreenPage {
                                                 ];
                                             }
                                             if (sampleSettings.length > 0) {
-                                                for (var i = 0; i < channelHeaderDelegate.channel.samples.length; ++i) {
-                                                    var sample = channelHeaderDelegate.channel.samples[i];
-                                                    var clip = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
+                                                for (let i = 0; i < channelHeaderDelegate.channel.samples.length; ++i) {
+                                                    let sample = channelHeaderDelegate.channel.samples[i];
+                                                    let clip = Zynthbox.PlayGridManager.getClipById(sample.cppObjId);
                                                     if (clip && i < sampleSettings.length) {
-                                                        clip.keyZoneStart = sampleSettings[i][0];
-                                                        clip.keyZoneEnd = sampleSettings[i][1];
-                                                        clip.rootNote = 60 + sampleSettings[i][2];
+                                                        clip.rootSlice.keyZoneStart = sampleSettings[i][0];
+                                                        clip.rootSlice.keyZoneEnd = sampleSettings[i][1];
+                                                        clip.rootSlice.rootNote = 60 + sampleSettings[i][2];
                                                     }
                                                 }
                                             }

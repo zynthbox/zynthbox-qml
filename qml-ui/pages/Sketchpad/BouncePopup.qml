@@ -438,12 +438,12 @@ Zynthian.Popup {
                             clip.metadata.audioType = details["trackType"];
                             // Set the loop points
                             let cppClipObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
-                            cppClipObj.startPositionSeconds = startPosition;
-                            cppClipObj.lengthBeats = playbackLength;
-                            cppClipObj.loopDelta = loopDelta;
-                            cppClipObj.loopDelta2 = loopDelta2;
+                            cppClipObj.selectedSliceObject.startPositionSeconds = startPosition;
+                            cppClipObj.selectedSliceObject.lengthBeats = playbackLength;
+                            cppClipObj.selectedSliceObject.loopDeltaSeconds = loopDelta;
+                            cppClipObj.selectedSliceObject.loopDelta2Seconds = loopDelta2;
                             // Make sure sketches timestretch in a high quality fashion by default
-                            cppClipObj.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchBetter;
+                            cppClipObj.selectedSliceObject.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchBetter;
                             // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
                             clip.metadata.snapLengthToBeat = (Math.floor(playbackLength) === playbackLength);
                             console.log("...and the clip says it is", cppClipObj.durationSeconds, "seconds long");

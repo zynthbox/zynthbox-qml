@@ -81,7 +81,7 @@ Zynthian.ScreenPage {
                 component.selectedClipHasWav = newHasWav;
             }
             // When switching to a new clip, update the default test note to match the actual/given pitch (rootNote) of that new clip (or C4 if there isn't a clip)
-            testNotePad.midiNote = component.cppClipObject ? component.cppClipObject.rootNote : 60;
+            testNotePad.midiNote = component.cppClipObject ? component.cppClipObject.selectedSliceObject.rootNote : 60;
             component.heardNotes = [];
         }
     }
@@ -103,7 +103,7 @@ Zynthian.ScreenPage {
                         } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                             clipSettingsSectionView.currentItem = clipSettingsADSR;
                         } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
-                            if (clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle) {
+                            if (clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle) {
                                 clipSettingsSectionView.currentItem = clipSettingsGrainerator;
                             } else {
                                 clipSettingsSectionView.currentItem = clipSettingsInfoView;
@@ -641,7 +641,7 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit
                 text: qsTr("Granular")
-                visible: clipSettingsGrainerator.clip && (clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
+                visible: clipSettingsGrainerator.sliceObject && (clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle || clipSettingsGrainerator.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle)
                 enabled: component.selectedClipHasWav
                 checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsGrainerator"
                 MouseArea {
@@ -835,8 +835,8 @@ Zynthian.ScreenPage {
                         anchors.fill: parent
                         color: Kirigami.Theme.textColor
                         source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
-                        start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.startPositionSeconds : 0
-                        end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.startPositionSeconds + clipDelegate.cppClipObject.lengthSeconds : 0
+                        start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+                        end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
 
                         visible: clipDelegate.clipHasWav
                     }

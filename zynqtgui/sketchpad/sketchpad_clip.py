@@ -117,6 +117,7 @@ def serializeSubvoiceSettings(audioSource):
         "count": audioSource.subvoiceCount()
     }
 
+
 class sketchpad_clip_metadata(QObject):
     def __init__(self, clip):
         super(sketchpad_clip_metadata, self).__init__(clip)
@@ -198,46 +199,50 @@ class sketchpad_clip_metadata(QObject):
             if write:
                 self.scheduleWrite()
 
-    def set_timeStretchStyle(self, value):
+    def set_timeStretchStyle(self, value, sliceIndex):
         if self.clip.audioSource is not None:
+            sliceSettingsObject = self.clip.audioSource.sliceFromIndex(sliceIndex)
             timeStretchStyle = value
             if timeStretchStyle.startswith("Zynthbox.ClipAudioSource.TimeStretchStyle."):
                 timeStretchStyle = timeStretchStyle.split(".")[-1]
             if timeStretchStyle in Zynthbox.ClipAudioSource.TimeStretchStyle.values:
-                self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.values[timeStretchStyle])
+                sliceSettingsObject.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.values[timeStretchStyle])
             else:
                 if self.clip.is_channel_sample == False:
                     # If we are using this as a Sketch, we should be time-stretching things like pitch shifts by default
-                    self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchBetter)
+                    sliceSettingsObject.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchBetter)
                 else:
-                    self.clip.audioSource.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchOff)
-    def set_playbackStyle(self, value):
+                    sliceSettingsObject.setTimeStretchStyle(Zynthbox.ClipAudioSource.TimeStretchStyle.TimeStretchOff)
+    def set_playbackStyle(self, value, sliceIndex):
         if self.clip.audioSource is not None:
+            sliceSettingsObject = self.clip.audioSource.sliceFromIndex(sliceIndex)
             playbackStyle = value
             if playbackStyle.startswith("Zynthbox.ClipAudioSource.PlaybackStyle."):
                 playbackStyle = playbackStyle.split(".")[-1]
             if playbackStyle in Zynthbox.ClipAudioSource.PlaybackStyle.values:
-                self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
+                sliceSettingsObject.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.values[playbackStyle])
             else:
-                self.clip.audioSource.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
-    def set_loopStartCrossfadeDirection(self, value):
+                sliceSettingsObject.setPlaybackStyle(Zynthbox.ClipAudioSource.PlaybackStyle.LoopingPlaybackStyle)
+    def set_loopStartCrossfadeDirection(self, value, sliceIndex):
         if self.clip.audioSource is not None:
+            sliceSettingsObject = self.clip.audioSource.sliceFromIndex(sliceIndex)
             loopStartCrossfadeDirection = value
             if loopStartCrossfadeDirection.startswith("Zynthbox.ClipAudioSource.CrossfadingDirection."):
                 loopStartCrossfadeDirection = loopStartCrossfadeDirection.split(".")[-1]
             if loopStartCrossfadeDirection in Zynthbox.ClipAudioSource.CrossfadingDirection.values:
-                self.clip.audioSource.setLoopStartCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.values[loopStartCrossfadeDirection])
+                sliceSettingsObject.setLoopStartCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.values[loopStartCrossfadeDirection])
             else:
-                self.clip.audioSource.loopStartCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.CrossfadeOutie)
-    def set_stopCrossfadeDirection(self, value):
+                sliceSettingsObject.loopStartCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.CrossfadeOutie)
+    def set_stopCrossfadeDirection(self, value, sliceIndex):
         if self.clip.audioSource is not None:
+            sliceSettingsObject = self.clip.audioSource.sliceFromIndex(sliceIndex)
             stopCrossfadeDirection = value
             if stopCrossfadeDirection.startswith("Zynthbox.ClipAudioSource.CrossfadingDirection."):
                 stopCrossfadeDirection = stopCrossfadeDirection.split(".")[-1]
             if stopCrossfadeDirection in Zynthbox.ClipAudioSource.CrossfadingDirection.values:
-                self.clip.audioSource.setStopCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.values[stopCrossfadeDirection])
+                sliceSettingsObject.setStopCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.values[stopCrossfadeDirection])
             else:
-                self.clip.audioSource.setStopCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.CrossfadeInnie)
+                sliceSettingsObject.setStopCrossfadeDirection(Zynthbox.ClipAudioSource.CrossfadingDirection.CrossfadeInnie)
     def set_equaliserSettings(self, value):
         if self.clip.audioSource is not None:
             if value is None or value == "":
@@ -259,6 +264,16 @@ class sketchpad_clip_metadata(QObject):
                 except:
                     logging.error(f"Failed to restore (and so restoring to defaults) the subvoice settings for {self.clip} from the data: {value}")
                     setSubvoiceDefaults(self.clip.audioSource)
+    def set_sliceSettings(self, value):
+        if self.clip.audioSource is not None:
+            if value is None or value == "":
+                self.setSliceDefaults()
+            else:
+                try:
+                    self.restoreSliceData(json.loads(value))
+                except:
+                    logging.error(f"Failed to restore (and so restoring to defaults) the slice settings for {self.clip} from the data: {value}")
+                    self.setSliceDefaults()
 
     audioTypeChanged = Signal()
     audioTypeSettingsChanged = Signal()
@@ -310,57 +325,61 @@ class sketchpad_clip_metadata(QObject):
                 equaliserCompressorObject.compressorSettings().attackChanged.connect(self.scheduleWrite)
                 equaliserCompressorObject.compressorSettings().ratioChanged.connect(self.scheduleWrite)
             connectEqualiserAndCompressorForSaving(self.clip.audioSource)
-            self.clip.audioSource.playbackStyleChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.timeStretchStyleChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.pitchChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.bpmChanged.connect(self.scheduleWrite)
             self.clip.audioSource.autoSynchroniseSpeedRatioChanged.connect(self.scheduleWrite)
             self.clip.audioSource.speedRatioChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.bpmChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.startPositionChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.snapLengthToBeatChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.lengthChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.loopDeltaChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.loopDelta2Changed.connect(self.scheduleWrite)
-            self.clip.audioSource.loopCrossfadeAmountChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.loopStartCrossfadeDirectionChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.stopCrossfadeDirectionChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.gainChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.keyZoneStartChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.keyZoneEndChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.rootNoteChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.panChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.adsrParametersChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPositionChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainSprayChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainScanChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainIntervalChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainIntervalAdditionalChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainSizeChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainSizeAdditionalChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPanMinimumChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPanMaximumChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPitchMinimum1Changed.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPitchMaximum1Changed.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPitchMinimum2Changed.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPitchMaximum2Changed.connect(self.scheduleWrite)
-            self.clip.audioSource.grainPitchPriorityChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainSustainChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.grainTiltChanged.connect(self.scheduleWrite)
             self.clip.audioSource.subvoiceCountChanged.connect(self.scheduleWrite)
             for subvoiceSettingsObject in self.clip.audioSource.subvoiceSettings():
                 subvoiceSettingsObject.panChanged.connect(self.scheduleWrite)
                 subvoiceSettingsObject.pitchChanged.connect(self.scheduleWrite)
                 subvoiceSettingsObject.gainChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.gainChanged.connect(self.handleGainChanged)
-            self.clip.audioSource.panChanged.connect(self.handlePanChanged)
+            def connectSliceForSaving(sliceSettingsObject):
+                sliceSettingsObject.gainHandler().gainChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.gainHandler().gainChanged.connect(self.handleGainChanged)
+                sliceSettingsObject.playbackStyleChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.timeStretchStyleChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.pitchChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.startPositionChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.snapLengthToBeatChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.lengthChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.loopDeltaChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.loopDelta2Changed.connect(self.scheduleWrite)
+                sliceSettingsObject.loopCrossfadeAmountChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.loopStartCrossfadeDirectionChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.stopCrossfadeDirectionChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.keyZoneStartChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.keyZoneEndChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.rootNoteChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.panChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.adsrParametersChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPositionChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainSprayChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainScanChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainIntervalChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainIntervalAdditionalChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainSizeChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainSizeAdditionalChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPanMinimumChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPanMaximumChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPitchMinimum1Changed.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPitchMaximum1Changed.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPitchMinimum2Changed.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPitchMaximum2Changed.connect(self.scheduleWrite)
+                sliceSettingsObject.grainPitchPriorityChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainSustainChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.grainTiltChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.panChanged.connect(self.handlePanChanged)
+            connectSliceForSaving(self.clip.audioSource.rootSlice())
+            for sliceObject in self.clip.audioSource.sliceSettings():
+                connectSliceForSaving(sliceObject)
 
     @Slot()
     def handleGainChanged(self):
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Slot(self.clip.__id__), np.interp(self.clip.audioSource.gainAbsolute(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_GAIN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Slot(self.clip.__id__), np.interp(self.clip.audioSource.rootSlice().gainHandler().gainAbsolute(), (0, 1), (0, 127)))
 
     @Slot()
     def handlePanChanged(self):
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Slot(self.clip.__id__), np.interp(self.clip.audioSource.pan(), (0, 1), (0, 127)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.clip.channel.id), Zynthbox.ZynthboxBasics.Slot(self.clip.__id__), np.interp(self.clip.audioSource.rootSlice().pan(), (0, 1), (0, 127)))
 
     # This disconnects all our watcher signals from the clip's current ClipAudioSource instance, if there is one
     def unhook(self):
@@ -372,7 +391,132 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.compressorSettings().disconnect(self)
                 for subvoiceSettingsObject in self.clip.audioSource.subvoiceSettings():
                     subvoiceSettingsObject.disconnect(self)
+                self.clip.audioSource.rootSlice().disconnect(self)
+                for sliceSettingsObject in self.clip.audioSource.sliceSettings():
+                    sliceSettingsObject.disconnect(self)
             except: pass
+
+    def restoreSliceData(self, dataChunk):
+        for index, sliceValues in enumerate(dataChunk["settings"]):
+            sliceObject = self.clip.audioSource.sliceFromIndex(index)
+            sliceObject.setPan(sliceValues["pan"])
+            sliceObject.setPitch(sliceValues["pitch"])
+            sliceObject.gainHandler().setGainAbsolute(sliceValues["gain"])
+            sliceObject.setKeyZoneStart(sliceValues["keyZoneStart"])
+            sliceObject.setKeyZoneEnd(sliceValues["keyZoneEnd"])
+            sliceObject.setRootNote(sliceValues["rootNote"])
+            sliceObject.setADSRAttack(sliceValues["adsrAttack"])
+            sliceObject.setADSRDecay(sliceValues["adsrDecay"])
+            sliceObject.setADSRSustain(sliceValues["adsrSustain"])
+            sliceObject.setADSRRelease(sliceValues["adsrRelease"])
+            sliceObject.setGrainInterval(sliceValues["grainInterval"])
+            sliceObject.setGrainIntervalAdditional(sliceValues["grainIntervalAdditional"])
+            sliceObject.setGrainPanMaximum(sliceValues["grainPanMaximum"])
+            sliceObject.setGrainPanMinimum(sliceValues["grainPanMinimum"])
+            sliceObject.setGrainPitchMaximum1(sliceValues["grainPitchMaximum1"])
+            sliceObject.setGrainPitchMaximum2(sliceValues["grainPitchMaximum2"])
+            sliceObject.setGrainPitchMinimum1(sliceValues["grainPitchMinimum1"])
+            sliceObject.setGrainPitchMinimum2(sliceValues["grainPitchMinimum2"])
+            sliceObject.setGrainPitchPriority(sliceValues["grainPitchPriority"])
+            sliceObject.setGrainPosition(sliceValues["grainPosition"])
+            sliceObject.setGrainScan(sliceValues["grainScan"])
+            sliceObject.setGrainSize(sliceValues["grainSize"])
+            sliceObject.setGrainSizeAdditional(sliceValues["grainSizeAdditional"])
+            sliceObject.setGrainSpray(sliceValues["grainSpray"])
+            sliceObject.setGrainSustain(sliceValues["grainSustain"])
+            sliceObject.setGrainTilt(sliceValues["grainTilt"])
+            self.set_timeStretchStyle(sliceValues["timeStretchStyle"], index)
+            self.set_playbackStyle(sliceValues["playbackStyle"], index)
+            sliceObject.setLoopCrossfadeAmount(sliceValues["loopCrossfadeAmount"])
+            self.set_loopStartCrossfadeDirection(sliceValues["loopStartCrossfadeDirection"], index)
+            self.set_stopCrossfadeDirection(sliceValues["stopCrossfadeDirection"], index)
+            sliceObject.setStartPositionSamples(sliceValues["startPositionSamples"])
+            sliceObject.setLengthSamples(sliceValues["lengthSamples"])
+            sliceObject.setLoopDeltaSamples(sliceValues["loopDeltaSamples"])
+            sliceObject.setLoopDelta2Samples(sliceValues["loopDelta2Samples"])
+        self.clip.audioSource.setSliceCount(dataChunk["count"])
+    def setSliceDefaults(self):
+        for sliceIndex, sliceSettingsObject in enumerate(self.clip.audioSource.sliceSettings()):
+            sliceSettingsObject.setPan(0)
+            sliceSettingsObject.setPitch(0)
+            sliceSettingsObject.gainHandler().setGainAbsolute(1)
+            sliceSettingsObject.setKeyZoneStart(0)
+            sliceSettingsObject.setKeyZoneEnd(127)
+            sliceSettingsObject.setRootNote(60)
+            sliceSettingsObject.setADSRAttack(0)
+            sliceSettingsObject.setADSRDecay(0)
+            sliceSettingsObject.setADSRSustain(1)
+            sliceSettingsObject.setADSRRelease(0)
+            sliceSettingsObject.setGrainInterval(10)
+            sliceSettingsObject.setGrainIntervalAdditional(10)
+            sliceSettingsObject.setGrainPanMinimum(-1)
+            sliceSettingsObject.setGrainPanMaximum(1)
+            sliceSettingsObject.setGrainPitchMaximum1(1)
+            sliceSettingsObject.setGrainPitchMaximum2(1)
+            sliceSettingsObject.setGrainPitchMinimum1(1)
+            sliceSettingsObject.setGrainPitchMinimum2(1)
+            sliceSettingsObject.setGrainPitchPriority(0.5)
+            sliceSettingsObject.setGrainPosition(0)
+            sliceSettingsObject.setGrainScan(0)
+            sliceSettingsObject.setGrainSize(100)
+            sliceSettingsObject.setGrainSizeAdditional(10)
+            sliceSettingsObject.setGrainSpray(1)
+            sliceSettingsObject.setGrainSustain(0.3)
+            sliceSettingsObject.setGrainTilt(0.5)
+            self.set_timeStretchStyle("TimeStretchOff", sliceIndex)
+            self.set_playbackStyle("NonLoopingPlaybackStyle", sliceIndex)
+            sliceSettingsObject.setLoopCrossfadeAmount(0)
+            self.set_loopStartCrossfadeDirection("CrossfadeOutie", sliceIndex)
+            self.set_stopCrossfadeDirection("CrossfadeInnie", sliceIndex)
+            sliceSettingsObject.setStartPositionSamples(0)
+            sliceSettingsObject.setLengthSamples(0)
+            sliceSettingsObject.setLoopDeltaSamples(0)
+            sliceSettingsObject.setLoopDelta2Samples(0)
+        self.clip.audioSource.setSliceCount(0)
+    def serializeSliceSettings(self):
+        sliceSettingsData = []
+        for sliceSettingsObject in self.clip.audioSource.sliceSettings():
+            sliceSettingsData.append({
+                "pan": sliceSettingsObject.pan(),
+                "pitch": sliceSettingsObject.pitch(),
+                "gain": sliceSettingsObject.gainHandler().gainAbsolute(),
+                "keyZoneStart": sliceSettingsObject.keyZoneStart(),
+                "keyZoneEnd": sliceSettingsObject.keyZoneEnd(),
+                "rootNote": sliceSettingsObject.rootNote(),
+                "adsrAttack": sliceSettingsObject.adsrAttack(),
+                "adsrDecay": sliceSettingsObject.adsrDecay(),
+                "adsrSustain": sliceSettingsObject.adsrSustain(),
+                "adsrRelease": sliceSettingsObject.adsrRelease(),
+                "grainInterval": sliceSettingsObject.grainInterval(),
+                "grainIntervalAdditional": sliceSettingsObject.grainIntervalAdditional(),
+                "grainPanMaximum": sliceSettingsObject.grainPanMaximum(),
+                "grainPanMinimum": sliceSettingsObject.grainPanMinimum(),
+                "grainPitchMaximum1": sliceSettingsObject.grainPitchMaximum1(),
+                "grainPitchMaximum2": sliceSettingsObject.grainPitchMaximum2(),
+                "grainPitchMinimum1": sliceSettingsObject.grainPitchMinimum1(),
+                "grainPitchMinimum2": sliceSettingsObject.grainPitchMinimum2(),
+                "grainPitchPriority": sliceSettingsObject.grainPitchPriority(),
+                "grainPosition": sliceSettingsObject.grainPosition(),
+                "grainScan": sliceSettingsObject.grainScan(),
+                "grainSize": sliceSettingsObject.grainSize(),
+                "grainSizeAdditional": sliceSettingsObject.grainSizeAdditional(),
+                "grainSpray": sliceSettingsObject.grainSpray(),
+                "grainSustain": sliceSettingsObject.grainSustain(),
+                "grainTilt": sliceSettingsObject.grainTilt(),
+                "timeStretchStyle": str(sliceSettingsObject.timeStretchStyle()).split(".")[-1],
+                "playbackStyle": str(sliceSettingsObject.playbackStyle()).split(".")[-1],
+                "loopCrossfadeAmount": sliceSettingsObject.loopCrossfadeAmount(),
+                "loopStartCrossfadeDirection": str(sliceSettingsObject.loopStartCrossfadeDirection()).split(".")[-1],
+                "stopCrossfadeDirection": str(sliceSettingsObject.stopCrossfadeDirection()).split(".")[-1],
+                "startPositionSamples": sliceSettingsObject.startPositionSamples(),
+                "lengthSamples": sliceSettingsObject.lengthSamples(),
+                "loopDeltaSamples": sliceSettingsObject.loopDeltaSamples(),
+                "loopDelta2Samples": sliceSettingsObject.loopDelta2Samples()
+            })
+        return {
+            "settings": sliceSettingsData,
+            "count": self.clip.audioSource.sliceCount()
+        }
 
     def read(self, load_autosave=True):
         self.__isReading = True
@@ -402,64 +546,66 @@ class sketchpad_clip_metadata(QObject):
                 self.set_samples(str(self.getMetadataProperty("ZYNTHBOX_SAMPLES", None)), write=False, force=True)
                 self.set_soundSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SNAPSHOT", None)), write=False, force=True)
                 # The clip's playback related settings
-                self.clip.audioSource.setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
-                self.clip.audioSource.setKeyZoneStart(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_START", 0)))
-                self.clip.audioSource.setKeyZoneEnd(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_END", 127)))
-                self.clip.audioSource.setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
-                self.clip.audioSource.setADSRAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)))
-                self.clip.audioSource.setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
-                self.clip.audioSource.setADSRRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)))
-                self.clip.audioSource.setADSRSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)))
                 self.clip.audioSource.setBpm(float(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())))
-                self.clip.audioSource.setGainAbsolute(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)))
-                self.clip.audioSource.setGrainInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
-                self.clip.audioSource.setGrainIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
-                self.clip.audioSource.setGrainPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
-                self.clip.audioSource.setGrainPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)))
-                self.clip.audioSource.setGrainPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)))
-                self.clip.audioSource.setGrainPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)))
-                self.clip.audioSource.setGrainPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)))
-                self.clip.audioSource.setGrainPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)))
-                self.clip.audioSource.setGrainPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)))
-                self.clip.audioSource.setGrainPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
-                self.clip.audioSource.setGrainScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
-                self.clip.audioSource.setGrainSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)))
-                self.clip.audioSource.setGrainSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)))
-                self.clip.audioSource.setGrainSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
-                self.clip.audioSource.setGrainSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
-                self.clip.audioSource.setGrainTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
-                self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")))
-                self.clip.audioSource.setPitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)))
-                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "LoopingPlaybackStyle")))
-                self.clip.audioSource.setSnapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true")
                 self.clip.audioSource.setSpeedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)))
                 self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
                 self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
                 self.set_subvoiceSettings(str(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_SETTINGS", "")))
-                self.clip.audioSource.setLoopCrossfadeAmount(float(self.getMetadataProperty("ZYNTHBOX_LOOP_CROSSFADE_AMOUNT", 0)))
-                self.set_loopStartCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION", "CrossfadeOutie"))
-                self.set_stopCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_STOP_CROSSFADE_DIRECTION", "CrossfadeOutie"))
+                self.set_sliceSettings(str(self.getMetadataProperty("ZYNTHBOX_SLICE_SETTINGS", "")))
+                # The slice related settings (for the root slice)
+                self.clip.audioSource.rootSlice().setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
+                self.clip.audioSource.rootSlice().setKeyZoneStart(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_START", 0)))
+                self.clip.audioSource.rootSlice().setKeyZoneEnd(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_END", 127)))
+                self.clip.audioSource.rootSlice().setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
+                self.clip.audioSource.rootSlice().setADSRAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)))
+                self.clip.audioSource.rootSlice().setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
+                self.clip.audioSource.rootSlice().setADSRSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)))
+                self.clip.audioSource.rootSlice().setADSRRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)))
+                self.clip.audioSource.rootSlice().gainHandler().setGainAbsolute(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)))
+                self.clip.audioSource.rootSlice().setGrainInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
+                self.clip.audioSource.rootSlice().setGrainIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
+                self.clip.audioSource.rootSlice().setGrainPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
+                self.clip.audioSource.rootSlice().setGrainPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)))
+                self.clip.audioSource.rootSlice().setGrainPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)))
+                self.clip.audioSource.rootSlice().setGrainPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)))
+                self.clip.audioSource.rootSlice().setGrainPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)))
+                self.clip.audioSource.rootSlice().setGrainPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)))
+                self.clip.audioSource.rootSlice().setGrainPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)))
+                self.clip.audioSource.rootSlice().setGrainPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
+                self.clip.audioSource.rootSlice().setGrainScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
+                self.clip.audioSource.rootSlice().setGrainSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)))
+                self.clip.audioSource.rootSlice().setGrainSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)))
+                self.clip.audioSource.rootSlice().setGrainSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
+                self.clip.audioSource.rootSlice().setGrainSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
+                self.clip.audioSource.rootSlice().setGrainTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
+                self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")), -1)
+                self.clip.audioSource.rootSlice().setPitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)))
+                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "LoopingPlaybackStyle")), -1)
+                self.clip.audioSource.rootSlice().setLoopCrossfadeAmount(float(self.getMetadataProperty("ZYNTHBOX_LOOP_CROSSFADE_AMOUNT", 0)))
+                self.set_loopStartCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
+                self.set_stopCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_STOP_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
+                self.clip.audioSource.rootSlice().setSnapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true")
                 # Some fallbackery that we can likely remove at some point (or also perhaps get rid of entirely when we switch to using the industry version of slice and loop definitions...)
                 startPositionSamples = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION_SAMPLES", -1))
                 if startPositionSamples == -1:
-                    self.clip.audioSource.setStartPosition(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)))
+                    self.clip.audioSource.rootSlice().setStartPositionSeconds(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)))
                 else:
-                    self.clip.audioSource.setStartPositionSamples(startPositionSamples)
+                    self.clip.audioSource.rootSlice().setStartPositionSamples(startPositionSamples)
                 lengthSamples = float(self.getMetadataProperty("ZYNTHBOX_LENGTH_SAMPLES", -1))
                 if lengthSamples == -1:
-                    self.clip.audioSource.setLengthBeats(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)))
+                    self.clip.audioSource.rootSlice().setLengthBeats(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)))
                 else:
-                    self.clip.audioSource.setLengthSamples(lengthSamples)
+                    self.clip.audioSource.rootSlice().setLengthSamples(lengthSamples)
                 loopDeltaSamples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA_SAMPLES", -1))
                 if loopDeltaSamples == -1:
-                    self.clip.audioSource.setLoopDelta(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)))
+                    self.clip.audioSource.rootSlice().setLoopDeltaSeconds(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)))
                 else:
-                    self.clip.audioSource.setLoopDeltaSamples(loopDeltaSamples)
+                    self.clip.audioSource.rootSlice().setLoopDeltaSamples(loopDeltaSamples)
                 loopDelta2Samples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2_SAMPLES", -1))
                 if loopDelta2Samples == -1:
-                    self.clip.audioSource.setLoopDelta2(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)))
+                    self.clip.audioSource.rootSlice().setLoopDelta2Seconds(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)))
                 else:
-                    self.clip.audioSource.setLoopDelta2Samples(loopDelta2Samples)
+                    self.clip.audioSource.rootSlice().setLoopDelta2Samples(loopDelta2Samples)
         self.__isReading = False
 
     @Slot()
@@ -503,47 +649,49 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_SAMPLES"] = [str(self.__samples)]
                     tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.__soundSnapshot)]
                 if self.clip.audioSource:
-                    tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.keyZoneStart())]
-                    tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.keyZoneEnd())]
-                    tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootNote())]
-                    tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.pan())]
-                    tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.adsrAttack())]
-                    tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.clip.audioSource.adsrDecay())]
-                    tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.clip.audioSource.adsrRelease())]
-                    tags["ZYNTHBOX_ADSR_SUSTAIN"] = [str(self.clip.audioSource.adsrSustain())]
                     tags["ZYNTHBOX_BPM"] = [str(self.clip.audioSource.bpm())]
-                    tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.gainAbsolute())]
-                    tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.clip.audioSource.grainInterval())]
-                    tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.clip.audioSource.grainIntervalAdditional())]
-                    tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.clip.audioSource.grainPanMaximum())]
-                    tags["ZYNTHBOX_GRAINERATOR_PAN_MINIMUM"] = [str(self.clip.audioSource.grainPanMinimum())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1"] = [str(self.clip.audioSource.grainPitchMaximum1())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2"] = [str(self.clip.audioSource.grainPitchMaximum2())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1"] = [str(self.clip.audioSource.grainPitchMinimum1())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2"] = [str(self.clip.audioSource.grainPitchMinimum2())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY"] = [str(self.clip.audioSource.grainPitchPriority())]
-                    tags["ZYNTHBOX_GRAINERATOR_POSITION"] = [str(self.clip.audioSource.grainPosition())]
-                    tags["ZYNTHBOX_GRAINERATOR_SCAN"] = [str(self.clip.audioSource.grainScan())]
-                    tags["ZYNTHBOX_GRAINERATOR_SIZE"] = [str(self.clip.audioSource.grainSize())]
-                    tags["ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL"] = [str(self.clip.audioSource.grainSizeAdditional())]
-                    tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.clip.audioSource.grainSpray())]
-                    tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.clip.audioSource.grainSustain())]
-                    tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.clip.audioSource.grainTilt())]
-                    tags["ZYNTHBOX_STARTPOSITION_SAMPLES"] = [str(self.clip.audioSource.getStartPositionSamples())]
-                    tags["ZYNTHBOX_LENGTH_SAMPLES"] = [str(self.clip.audioSource.getLengthSamples())]
-                    tags["ZYNTHBOX_LOOPDELTA_SAMPLES"] = [str(self.clip.audioSource.loopDeltaSamples())]
-                    tags["ZYNTHBOX_LOOPDELTA2_SAMPLES"] = [str(self.clip.audioSource.loopDelta2Samples())]
-                    tags["ZYNTHBOX_LOOP_CROSSFADE_AMOUNT"] = [str(self.clip.audioSource.loopCrossfadeAmount())]
-                    tags["ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.loopStartCrossfadeDirection()).split(".")[-1]]
-                    tags["ZYNTHBOX_STOP_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.stopCrossfadeDirection()).split(".")[-1]]
-                    tags["ZYNTHBOX_PITCH"] = [str(self.clip.audioSource.pitch())]
-                    tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.clip.audioSource.playbackStyle()).split(".")[-1]]
-                    tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.clip.audioSource.snapLengthToBeat())]
-                    tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.clip.audioSource.timeStretchStyle()).split(".")[-1]]
                     tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
                     tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
                     tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializeEqualiserAndCompressorSettings(self.clip.audioSource)))]
                     tags["ZYNTHBOX_SUBVOICE_SETTINGS"] = [str(json.dumps(serializeSubvoiceSettings(self.clip.audioSource)))]
+                    tags["ZYNTHBOX_SLICE_SETTINGS"] = [str(json.dumps(self.serializeSliceSettings()))]
+                    # Root slice settings
+                    tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.rootSlice().keyZoneStart())]
+                    tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.rootSlice().keyZoneEnd())]
+                    tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootSlice().rootNote())]
+                    tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.rootSlice().pan())]
+                    tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.rootSlice().gainHandler().gainAbsolute())]
+                    tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.rootSlice().adsrAttack())]
+                    tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.clip.audioSource.rootSlice().adsrDecay())]
+                    tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.clip.audioSource.rootSlice().adsrRelease())]
+                    tags["ZYNTHBOX_ADSR_SUSTAIN"] = [str(self.clip.audioSource.rootSlice().adsrSustain())]
+                    tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.clip.audioSource.rootSlice().grainInterval())]
+                    tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.clip.audioSource.rootSlice().grainIntervalAdditional())]
+                    tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().grainPanMaximum())]
+                    tags["ZYNTHBOX_GRAINERATOR_PAN_MINIMUM"] = [str(self.clip.audioSource.rootSlice().grainPanMinimum())]
+                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1"] = [str(self.clip.audioSource.rootSlice().grainPitchMaximum1())]
+                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2"] = [str(self.clip.audioSource.rootSlice().grainPitchMaximum2())]
+                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1"] = [str(self.clip.audioSource.rootSlice().grainPitchMinimum1())]
+                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2"] = [str(self.clip.audioSource.rootSlice().grainPitchMinimum2())]
+                    tags["ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY"] = [str(self.clip.audioSource.rootSlice().grainPitchPriority())]
+                    tags["ZYNTHBOX_GRAINERATOR_POSITION"] = [str(self.clip.audioSource.rootSlice().grainPosition())]
+                    tags["ZYNTHBOX_GRAINERATOR_SCAN"] = [str(self.clip.audioSource.rootSlice().grainScan())]
+                    tags["ZYNTHBOX_GRAINERATOR_SIZE"] = [str(self.clip.audioSource.rootSlice().grainSize())]
+                    tags["ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL"] = [str(self.clip.audioSource.rootSlice().grainSizeAdditional())]
+                    tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.clip.audioSource.rootSlice().grainSpray())]
+                    tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.clip.audioSource.rootSlice().grainSustain())]
+                    tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.clip.audioSource.rootSlice().grainTilt())]
+                    tags["ZYNTHBOX_STARTPOSITION_SAMPLES"] = [str(self.clip.audioSource.rootSlice().startPositionSamples())]
+                    tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.clip.audioSource.rootSlice().snapLengthToBeat())]
+                    tags["ZYNTHBOX_LENGTH_SAMPLES"] = [str(self.clip.audioSource.rootSlice().lengthSamples())]
+                    tags["ZYNTHBOX_LOOPDELTA_SAMPLES"] = [str(self.clip.audioSource.rootSlice().loopDeltaSamples())]
+                    tags["ZYNTHBOX_LOOPDELTA2_SAMPLES"] = [str(self.clip.audioSource.rootSlice().loopDelta2Samples())]
+                    tags["ZYNTHBOX_LOOP_CROSSFADE_AMOUNT"] = [str(self.clip.audioSource.rootSlice().loopCrossfadeAmount())]
+                    tags["ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.rootSlice().loopStartCrossfadeDirection()).split(".")[-1]]
+                    tags["ZYNTHBOX_STOP_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.rootSlice().stopCrossfadeDirection()).split(".")[-1]]
+                    tags["ZYNTHBOX_PITCH"] = [str(self.clip.audioSource.rootSlice().pitch())]
+                    tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.clip.audioSource.rootSlice().playbackStyle()).split(".")[-1]]
+                    tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.clip.audioSource.rootSlice().timeStretchStyle()).split(".")[-1]]
 
                 try:
                     file = taglib.File(self.clip.path)
@@ -928,7 +1076,7 @@ class sketchpad_clip(QObject):
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
         if path is not None:
             self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
-            self.audioSource.lengthChanged.connect(self.sec_per_beat_changed.emit)
+            self.audioSource.rootSlice().lengthChanged.connect(self.sec_per_beat_changed.emit)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
             self.audioSource.setLaneAffinity(self.__lane__)

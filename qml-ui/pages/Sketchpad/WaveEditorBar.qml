@@ -60,11 +60,11 @@ GridLayout {
                 return true;
             case "KNOB0_TOUCHED":
                 if (waveBar.cppClipObject) {
-                    if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    if (waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                        wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                     } else {
                         if (pinchZoomer.scale > 1) {
-                            wav.focusPosition(waveBar.cppClipObject.startPositionSamples);
+                            wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples);
                         }
                     }
                 }
@@ -72,11 +72,11 @@ GridLayout {
                 break;
             case "KNOB1_TOUCHED":
                 if (waveBar.cppClipObject) {
-                    if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    if (waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                        wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                     } else {
                         if (pinchZoomer.scale > 1) {
-                            wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.loopDeltaSamples);
+                            wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples);
                         }
                     }
                 }
@@ -84,11 +84,11 @@ GridLayout {
                 break;
             case "KNOB2_TOUCHED":
                 if (waveBar.cppClipObject) {
-                    if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                        wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    if (waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                        wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                     } else {
                         if (pinchZoomer.scale > 1) {
-                            wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples);
+                            wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                         }
                     }
                 }
@@ -97,142 +97,142 @@ GridLayout {
             case "KNOB3_TOUCHED":
                 return true;
             case "KNOB0_UP":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + 1, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + 1, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                     } else {
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.lengthSamples, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + 1, 0, waveBar.cppClipObject.durationSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + 1, 0, waveBar.cppClipObject.durationSamples);
                     } else {
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples + wav.samplesPerPixel, 0, waveBar.cppClipObject.durationSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + wav.samplesPerPixel, 0, waveBar.cppClipObject.durationSamples);
                     }
                     if (pinchZoomer.scale > 1) {
-                        wav.focusPosition(waveBar.cppClipObject.startPositionSamples);
+                        wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples);
                     }
                 }
                 return true;
             case "KNOB0_DOWN":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - 1, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples - 1, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                     } else {
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - waveBar.cppClipObject.lengthSamples, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - 1, 0, waveBar.cppClipObject.durationSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples - 1, 0, waveBar.cppClipObject.durationSamples);
                     } else {
-                        waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.startPositionSamples - wav.samplesPerPixel, 0, waveBar.cppClipObject.durationSamples);
+                        waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.startPositionSamples - wav.samplesPerPixel, 0, waveBar.cppClipObject.durationSamples);
                     }
                     if (pinchZoomer.scale > 1) {
-                        wav.focusPosition(waveBar.cppClipObject.startPositionSamples);
+                        wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples);
                     }
                 }
                 return true;
             case "KNOB1_UP":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     // No loop delta to work on with the wavetable style sounds (it's locked to 0)
                 } else {
                     if (waveBar.cppClipObject.snapLengthToBeat) {
-                        waveBar.cppClipObject.loopDelta = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDelta + (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.lengthSeconds);
+                        waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds + (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            waveBar.cppClipObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDeltaSamples + 1, 0, waveBar.cppClipObject.lengthSamples);
+                            waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples + 1, 0, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                         } else {
-                            waveBar.cppClipObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDeltaSamples + wav.samplesPerPixel, 0, waveBar.cppClipObject.lengthSamples);
+                            waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples + wav.samplesPerPixel, 0, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                         }
                     }
                     if (pinchZoomer.scale > 1) {
-                        wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.loopDeltaSamples);
+                        wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples);
                     }
                 }
                 return true;
             case "KNOB1_DOWN":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     // No loop delta to work on with the wavetable style sounds (it's locked to 0)
                 } else {
                     if (waveBar.cppClipObject.snapLengthToBeat) {
-                        waveBar.cppClipObject.loopDelta = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDelta - (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.lengthSeconds);
+                        waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds - (60 / waveBar.cppClipObject.bpm), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            waveBar.cppClipObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDeltaSamples - 1, 0, waveBar.cppClipObject.lengthSamples);
+                            waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples - 1, 0, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                         } else {
-                            waveBar.cppClipObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.loopDeltaSamples - wav.samplesPerPixel, 0, waveBar.cppClipObject.lengthSamples);
+                            waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples - wav.samplesPerPixel, 0, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                         }
                     }
                     if (pinchZoomer.scale > 1) {
-                        wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.loopDeltaSamples);
+                        wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples);
                     }
                 }
                 return true;
             case "KNOB2_UP":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        if (waveBar.cppClipObject.lengthSamples < waveBar.cppClipObject.durationSamples) {
-                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.lengthSamples + 1;
+                        if (waveBar.cppClipObject.selectedSliceObject.lengthSamples < waveBar.cppClipObject.durationSamples) {
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.selectedSliceObject.lengthSamples + 1;
                         }
                     } else {
-                        let currentDivision = Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.lengthSamples));
+                        let currentDivision = Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.selectedSliceObject.lengthSamples));
                         if (currentDivision > 1) {
-                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision - 1);
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision - 1);
                         }
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
                     if (waveBar.cppClipObject.snapLengthToBeat) {
-                        waveBar.cppClipObject.lengthBeats = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthBeats + 1, 0, 64);
+                        waveBar.cppClipObject.selectedSliceObject.lengthBeats = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.lengthBeats + 1, 0, 64);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.lengthSamples + 1;
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.selectedSliceObject.lengthSamples + 1;
                         } else {
-                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.lengthSamples + wav.samplesPerPixel;
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.selectedSliceObject.lengthSamples + wav.samplesPerPixel;
                         }
                     }
                     if (pinchZoomer.scale > 1) {
-                        wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples);
+                        wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                     }
                 }
                 return true;
             case "KNOB2_DOWN":
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        if (waveBar.cppClipObject.lengthSamples > 1) {
-                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.lengthSamples - 1;
+                        if (waveBar.cppClipObject.selectedSliceObject.lengthSamples > 1) {
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.selectedSliceObject.lengthSamples - 1;
                         }
                     } else {
-                        let currentDivision = Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.lengthSamples));
+                        let currentDivision = Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.selectedSliceObject.lengthSamples));
                         if (currentDivision < waveBar.cppClipObject.durationSamples) {
-                            waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision + 1);
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision + 1);
                         }
                     }
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                    wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
                     if (waveBar.cppClipObject.snapLengthToBeat) {
-                        waveBar.cppClipObject.lengthBeats = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.lengthBeats - 1, 0, 64);
+                        waveBar.cppClipObject.selectedSliceObject.lengthBeats = Zynthian.CommonUtils.clamp(waveBar.cppClipObject.selectedSliceObject.lengthBeats - 1, 0, 64);
                     } else {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            waveBar.cppClipObject.lengthSamples = Math.max(0, waveBar.cppClipObject.lengthSamples - 1);
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = Math.max(0, waveBar.cppClipObject.selectedSliceObject.lengthSamples - 1);
                         } else {
-                            waveBar.cppClipObject.lengthSamples = Math.max(0, waveBar.cppClipObject.lengthSamples - wav.samplesPerPixel);
+                            waveBar.cppClipObject.selectedSliceObject.lengthSamples = Math.max(0, waveBar.cppClipObject.selectedSliceObject.lengthSamples - wav.samplesPerPixel);
                         }
                     }
                     if (pinchZoomer.scale > 1) {
-                        wav.focusPosition(waveBar.cppClipObject.startPositionSamples + waveBar.cppClipObject.lengthSamples);
+                        wav.focusPosition(waveBar.cppClipObject.selectedSliceObject.startPositionSamples + waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                     }
                 }
                 return true;
@@ -280,8 +280,8 @@ GridLayout {
             interval: 1; running: false; repeat: false;
             onTriggered: {
                 wav.source = waveBar.cppClipObject ? "clip:/%1".arg(waveBar.cppClipObject.id) : ""
-                if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
-                    wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                    wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                 } else {
                     pinchZoomer.scale = 1;
                     pinchZoomer.position = 0;
@@ -336,9 +336,9 @@ GridLayout {
                 onDoubleClicked: {
                     if (pinchZoomer.scale == 1) {
                         // Don't zoom in if... there's nothing small enough to zoom to
-                        if (waveBar.cppClipObject.lengthSamples <= waveBar.cppClipObject.durationSamples / 2) {
+                        if (waveBar.cppClipObject.selectedSliceObject.lengthSamples <= waveBar.cppClipObject.durationSamples / 2) {
                             // Zoom in to fit the current window size (that is, fit twice the size of the window, and then position it in the centre of the viewport)
-                            wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples);
+                            wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                         }
                     } else {
                         pinchZoomer.scale = 1;
@@ -359,11 +359,11 @@ GridLayout {
                     initialX = mouse.x;
                     pressedY = mouse.y;
                     if (waveBar.cppClipObject) {
-                        pinchMouseArea.initialStartPositionSamples = waveBar.cppClipObject.startPositionSamples;
-                        pinchMouseArea.initialLoopDeltaSamples = waveBar.cppClipObject.loopDeltaSamples;
-                        pinchMouseArea.initialLoopDelta = waveBar.cppClipObject.loopDelta;
-                        pinchMouseArea.initialLengthSamples = waveBar.cppClipObject.lengthSamples;
-                        pinchMouseArea.initialLengthBeats = waveBar.cppClipObject.lengthBeats;
+                        pinchMouseArea.initialStartPositionSamples = waveBar.cppClipObject.selectedSliceObject.startPositionSamples;
+                        pinchMouseArea.initialLoopDeltaSamples = waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples;
+                        pinchMouseArea.initialLoopDelta = waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds;
+                        pinchMouseArea.initialLengthSamples = waveBar.cppClipObject.selectedSliceObject.lengthSamples;
+                        pinchMouseArea.initialLengthBeats = waveBar.cppClipObject.selectedSliceObject.lengthBeats;
                     }
                 }
                 onPositionChanged: {
@@ -372,60 +372,60 @@ GridLayout {
                         let deltaX = mouse.x - pinchMouseArea.initialX;
                         if (pressedY < oneThird) {
                             // Upper third (start point)
-                            if (waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                            if (waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                                 if (zynqtgui.modeButtonPressed) {
                                     zynqtgui.ignoreNextModeButtonPress = true;
-                                    waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + deltaX, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                                    waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + deltaX, 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                                 } else {
-                                    waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + (Math.round(deltaX / Kirigami.Units.gridUnit) * waveBar.cppClipObject.lengthSamples), 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.lengthSamples);
+                                    waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + (Math.round(deltaX / Kirigami.Units.gridUnit) * waveBar.cppClipObject.selectedSliceObject.lengthSamples), 0, waveBar.cppClipObject.durationSamples - waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                                 }
-                                wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                                wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                             } else {
                                 if (zynqtgui.modeButtonPressed) {
                                     zynqtgui.ignoreNextModeButtonPress = true;
-                                    waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + deltaX, 0, waveBar.cppClipObject.durationSamples);
+                                    waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + deltaX, 0, waveBar.cppClipObject.durationSamples);
                                 } else {
-                                    waveBar.cppClipObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + (deltaX * wav.samplesPerPixel), 0, waveBar.cppClipObject.durationSamples);
+                                    waveBar.cppClipObject.selectedSliceObject.startPositionSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialStartPositionSamples + (deltaX * wav.samplesPerPixel), 0, waveBar.cppClipObject.durationSamples);
                                 }
                             }
                         } else if (pressedY < twoThirds) {
                             // Centre third (loop point) - this may need some fanciness going on when we add in loopDelta2
-                            if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                            if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                                 // No loop delta to work on with the wavetable style sounds (it's locked to 0)
                             } else {
                                 if (waveBar.cppClipObject.snapLengthToBeat) {
-                                    waveBar.cppClipObject.loopDelta = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLoopDelta + (Math.round(deltaX / wav.pixelsPerBeat) * wav.pixelsPerBeat * wav.pixelToSecs), 0, waveBar.cppClipObject.lengthSeconds);
+                                    waveBar.cppClipObject.selectedSliceObject.loopDeltaSeconds = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLoopDelta + (Math.round(deltaX / wav.pixelsPerBeat) * wav.pixelsPerBeat * wav.pixelToSecs), 0, waveBar.cppClipObject.selectedSliceObject.lengthSeconds);
                                 } else {
                                     if (zynqtgui.modeButtonPressed) {
                                         zynqtgui.ignoreNextModeButtonPress = true;
-                                        waveBar.cppClipObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLoopDeltaSamples + deltaX, 0, waveBar.cppClipObject.lengthSamples);
+                                        waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLoopDeltaSamples + deltaX, 0, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                                     } else {
-                                        waveBar.cppClipObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLoopDeltaSamples + (deltaX * wav.samplesPerPixel), 0, waveBar.cppClipObject.lengthSamples);
+                                        waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLoopDeltaSamples + (deltaX * wav.samplesPerPixel), 0, waveBar.cppClipObject.selectedSliceObject.lengthSamples);
                                     }
                                 }
                             }
                         } else {
                             // Lower third (end point)
-                            if (waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
+                            if (waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle) {
                                 if (zynqtgui.modeButtonPressed) {
                                     zynqtgui.ignoreNextModeButtonPress = true;
-                                    waveBar.cppClipObject.lengthSamples = Math.min(pinchMouseArea.initialLengthSamples + deltaX, waveBar.cppClipObject.durationSamples);
+                                    waveBar.cppClipObject.selectedSliceObject.lengthSamples = Math.min(pinchMouseArea.initialLengthSamples + deltaX, waveBar.cppClipObject.durationSamples);
                                 } else {
                                     let currentDivision = Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, pinchMouseArea.initialLengthSamples));
                                     if (currentDivision > 1) {
-                                        waveBar.cppClipObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision - Math.round(deltaX / Kirigami.Units.gridUnit));
+                                        waveBar.cppClipObject.selectedSliceObject.lengthSamples = waveBar.cppClipObject.durationSamples / (currentDivision - Math.round(deltaX / Kirigami.Units.gridUnit));
                                     }
                                 }
-                                wav.focusSection(waveBar.cppClipObject.startPositionSamples, waveBar.cppClipObject.lengthSamples, 1.0);
+                                wav.focusSection(waveBar.cppClipObject.selectedSliceObject.startPositionSamples, waveBar.cppClipObject.selectedSliceObject.lengthSamples, 1.0);
                             } else {
                                 if (waveBar.cppClipObject.snapLengthToBeat) {
-                                    waveBar.cppClipObject.lengthBeats = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLengthBeats + Math.round(deltaX / wav.pixelsPerBeat), 0, 64);
+                                    waveBar.cppClipObject.selectedSliceObject.lengthBeats = Zynthian.CommonUtils.clamp(pinchMouseArea.initialLengthBeats + Math.round(deltaX / wav.pixelsPerBeat), 0, 64);
                                 } else {
                                     if (zynqtgui.modeButtonPressed) {
                                         zynqtgui.ignoreNextModeButtonPress = true;
-                                        waveBar.cppClipObject.lengthSamples = Math.max(0, pinchMouseArea.initialLengthSamples + deltaX);
+                                        waveBar.cppClipObject.selectedSliceObject.lengthSamples = Math.max(0, pinchMouseArea.initialLengthSamples + deltaX);
                                     } else {
-                                        waveBar.cppClipObject.lengthSamples = Math.max(0, pinchMouseArea.initialLengthSamples + (deltaX * wav.samplesPerPixel));
+                                        waveBar.cppClipObject.selectedSliceObject.lengthSamples = Math.max(0, pinchMouseArea.initialLengthSamples + (deltaX * wav.samplesPerPixel));
                                     }
                                 }
                             }
@@ -588,7 +588,7 @@ GridLayout {
 
         // Handle for setting loop point
         Item {
-            visible: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle
+            visible: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle
             anchors {
                 verticalCenter: loopLine.verticalCenter
                 left: loopLine.right
@@ -647,7 +647,7 @@ GridLayout {
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 color: Kirigami.Theme.textColor
-                font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
+                font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
                 anchors {
                     top: parent.top
                     right: parent.right
@@ -656,21 +656,21 @@ GridLayout {
                 }
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
-                property double currentDivision: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.lengthSamples)) : 1
+                property double currentDivision: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Math.round(waveBar.cppClipObject.durationSamples / Math.max(1, waveBar.cppClipObject.selectedSliceObject.lengthSamples)) : 1
                 text: waveBar.cppClipObject
-                    ? waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle
+                    ? waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle
                         ? "1/%1".arg(Number.isInteger(currentDivision) ? currentDivision : currentDivision.toFixed(2))
                         : qsTr("%1:%2 E", "End")
-                            .arg(Math.floor(waveBar.cppClipObject.lengthBeats / 4))
-                            .arg((waveBar.cppClipObject.lengthBeats % 4).toFixed(waveBar.cppClipObject.snapLengthToBeat ? 0 : 2))
+                            .arg(Math.floor(waveBar.cppClipObject.selectedSliceObject.lengthBeats / 4))
+                            .arg((waveBar.cppClipObject.selectedSliceObject.lengthBeats % 4).toFixed(waveBar.cppClipObject.snapLengthToBeat ? 0 : 2))
                     : ""
             }
             Text {
-                visible: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle
+                visible: waveBar.cppClipObject && waveBar.cppClipObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 color: Kirigami.Theme.textColor
-                font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.playbackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
+                font.pointSize: waveBar.cppClipObject && waveBar.cppClipObject.selectedSliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.WavetableStyle ? Kirigami.Theme.defaultFont.pointSize * 0.8 : Kirigami.Theme.defaultFont.pointSize * 1.2
                 anchors {
                     right: parent.right
                     bottom: parent.top
@@ -681,7 +681,7 @@ GridLayout {
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
                 text: visible
-                    ? qsTr("%1\nsamples").arg(waveBar.cppClipObject.lengthSamples)
+                    ? qsTr("%1\nsamples").arg(waveBar.cppClipObject.selectedSliceObject.lengthSamples)
                     : ""
             }
         }
@@ -697,7 +697,7 @@ GridLayout {
             opacity: 0.6
             width: Math.max(1, 1 / wav.samplesPerPixel)
             property real startPositionRelative: waveBar.cppClipObject
-                ? waveBar.cppClipObject.startPositionSamples / waveBar.cppClipObject.durationSamples
+                ? waveBar.cppClipObject.selectedSliceObject.startPositionSamples / waveBar.cppClipObject.durationSamples
                 : 1
             x: waveBar.cppClipObject
                 ? Zynthian.CommonUtils.fitInWindow(startPositionRelative, wav.relativeStart, wav.relativeEnd) * parent.width
@@ -715,7 +715,7 @@ GridLayout {
             opacity: 0.6
             width: startLoopLine.width
             property real loopDeltaRelative: waveBar.cppClipObject
-                ? waveBar.cppClipObject.loopDeltaSamples / waveBar.cppClipObject.durationSamples
+                ? waveBar.cppClipObject.selectedSliceObject.loopDeltaSamples / waveBar.cppClipObject.durationSamples
                 : 0
             x: waveBar.cppClipObject
                 ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, wav.relativeStart, wav.relativeEnd) * parent.width
@@ -733,7 +733,7 @@ GridLayout {
             opacity: 0.6
             width: startLoopLine.width
             x: waveBar.cppClipObject
-                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (waveBar.cppClipObject.lengthSamples / waveBar.cppClipObject.durationSamples), wav.relativeStart, wav.relativeEnd) * parent.width
+                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (waveBar.cppClipObject.selectedSliceObject.lengthSamples / waveBar.cppClipObject.durationSamples), wav.relativeStart, wav.relativeEnd) * parent.width
                 : 0
         }
 

@@ -85,8 +85,8 @@ ColumnLayout {
                 anchors.fill: parent
                 color: Kirigami.Theme.textColor
                 source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
-                start: clipDelegate.cppClipObject != null ? clipDelegate.cppClipObject.startPositionSeconds : 0
-                end: clipDelegate.cppClipObject != null ? clipDelegate.cppClipObject.startPositionSeconds + clipDelegate.cppClipObject.lengthSeconds : 0
+                start: clipDelegate.cppClipObject != null ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+                end: clipDelegate.cppClipObject != null ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
                 readonly property real relativeStart: waveformItem.start / waveformItem.length
                 readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
@@ -141,7 +141,7 @@ ColumnLayout {
                 text: visible
                     ? root.channel.trackType == "sample-loop"
                         ? clipDelegate.cppClipObject && clipDelegate.cppClipObject.durationSeconds > 0
-                            ? "%1s".arg(clipDelegate.cppClipObject.lengthSeconds.toFixed(2))
+                            ? "%1s".arg(clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds.toFixed(2))
                             : ""
                         : clipDelegate.pattern && clipDelegate.pattern.hasNotes
                             ? "%1s".arg(patternBarsToSeconds(clipDelegate.pattern, Zynthbox.SyncTimer.bpm).toFixed(2))

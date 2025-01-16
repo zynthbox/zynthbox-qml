@@ -56,39 +56,39 @@ Item {
         if (showCrossfadeSettings) {
             switch(currentADSRElement) {
                 case 0:
-                    component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie;
+                    component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie;
                     break;
                 case 1:
-                    component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie;
+                    component.cppClipObject.selectedSliceObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie;
                     break;
                 case 2:
-                    cppClipObject.loopCrossfadeAmount = cppClipObject.loopCrossfadeAmount + 0.01;
+                    component.cppClipObject.selectedSliceObject.loopCrossfadeAmount = component.cppClipObject.selectedSliceObject.loopCrossfadeAmount + 0.01;
                     break;
             }
         } else if (showGranularSettings) {
             switch(currentADSRElement) {
                 case 0:
                 case 2:
-                    cppClipObject.grainSustain = Math.min(1, cppClipObject.grainSustain + 0.01);
+                    component.cppClipObject.selectedSliceObject.grainSustain = Math.min(1, component.cppClipObject.selectedSliceObject.grainSustain + 0.01);
                     break;
                 case 1:
                 case 3:
-                    cppClipObject.grainTilt = Math.min(1, cppClipObject.grainTilt + 0.01);
+                    component.cppClipObject.selectedSliceObject.grainTilt = Math.min(1, component.cppClipObject.selectedSliceObject.grainTilt + 0.01);
                     break;
             }
         } else {
             switch(currentADSRElement) {
                 case 0:
-                    cppClipObject.adsrAttack = cppClipObject.adsrAttack + 0.01;
+                    component.cppClipObject.selectedSliceObject.adsrAttack = component.cppClipObject.selectedSliceObject.adsrAttack + 0.01;
                     break;
                 case 1:
-                    cppClipObject.adsrDecay = cppClipObject.adsrDecay + 0.01;
+                    component.cppClipObject.selectedSliceObject.adsrDecay = component.cppClipObject.selectedSliceObject.adsrDecay + 0.01;
                     break;
                 case 2:
-                    cppClipObject.adsrSustain = Math.min(1, cppClipObject.adsrSustain + 0.01);
+                    component.cppClipObject.selectedSliceObject.adsrSustain = Math.min(1, component.cppClipObject.selectedSliceObject.adsrSustain + 0.01);
                     break;
                 case 3:
-                    cppClipObject.adsrRelease = cppClipObject.adsrRelease + 0.01;
+                    component.cppClipObject.selectedSliceObject.adsrRelease = component.cppClipObject.selectedSliceObject.adsrRelease + 0.01;
                     break;
             }
         }
@@ -97,39 +97,39 @@ Item {
         if (showCrossfadeSettings) {
             switch(currentADSRElement) {
                 case 0:
-                    component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie;
+                    component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie;
                     break;
                 case 1:
-                    component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie;
+                    component.cppClipObject.selectedSliceObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie;
                     break;
                 case 2:
-                    cppClipObject.loopCrossfadeAmount = cppClipObject.loopCrossfadeAmount - 0.01;
+                    component.cppClipObject.selectedSliceObject.loopCrossfadeAmount = component.cppClipObject.selectedSliceObject.loopCrossfadeAmount - 0.01;
                     break;
             }
         } else if (showGranularSettings) {
             switch(currentADSRElement) {
                 case 0:
                 case 2:
-                    cppClipObject.grainSustain = Math.max(0, cppClipObject.grainSustain - 0.01);
+                    component.cppClipObject.selectedSliceObject.grainSustain = Math.max(0, component.cppClipObject.selectedSliceObject.grainSustain - 0.01);
                     break;
                 case 1:
                 case 3:
-                    cppClipObject.grainTilt = Math.max(0, cppClipObject.grainTilt - 0.01);
+                    component.cppClipObject.selectedSliceObject.grainTilt = Math.max(0, component.cppClipObject.selectedSliceObject.grainTilt - 0.01);
                     break;
             }
         } else {
             switch(currentADSRElement) {
                 case 0:
-                    cppClipObject.adsrAttack = Math.max(0, cppClipObject.adsrAttack - 0.01);
+                    component.cppClipObject.selectedSliceObject.adsrAttack = Math.max(0, component.cppClipObject.selectedSliceObject.adsrAttack - 0.01);
                     break;
                 case 1:
-                    cppClipObject.adsrDecay = Math.max(0, cppClipObject.adsrDecay - 0.01);
+                    component.cppClipObject.selectedSliceObject.adsrDecay = Math.max(0, component.cppClipObject.selectedSliceObject.adsrDecay - 0.01);
                     break;
                 case 2:
-                    cppClipObject.adsrSustain = Math.max(0, cppClipObject.adsrSustain - 0.01);
+                    component.cppClipObject.selectedSliceObject.adsrSustain = Math.max(0, component.cppClipObject.selectedSliceObject.adsrSustain - 0.01);
                     break;
                 case 3:
-                    cppClipObject.adsrRelease = Math.max(0, cppClipObject.adsrRelease - 0.01);
+                    component.cppClipObject.selectedSliceObject.adsrRelease = Math.max(0, component.cppClipObject.selectedSliceObject.adsrRelease - 0.01);
                     break;
             }
         }
@@ -139,18 +139,17 @@ Item {
         property int settingsCategory: 0
         property int lastElement: settingsCategory === 2 ? 2 : 3
     }
-    property QtObject cppObj: clip && clip.hasOwnProperty("cppObjId") ? Zynthbox.PlayGridManager.getClipById(clip.cppObjId) : null
     property bool showNotesSettings: showGranularSettings === false && showCrossfadeSettings === false
-    property bool showGranularSettings: cppObj && cppObj.granular ? _private.settingsCategory === 1 : false
+    property bool showGranularSettings: component.cppClipObject && component.cppClipObject.selectedSliceObject.granular ? _private.settingsCategory === 1 : false
     // Wavetable style ignores the crossfade setting anyway, so don't show it
-    property bool showCrossfadeSettings: cppObj && cppObj.looping && cppObj.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle ? _private.settingsCategory === 2 : false
+    property bool showCrossfadeSettings: component.cppClipObject && component.cppClipObject.selectedSliceObject.looping && component.cppClipObject.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle ? _private.settingsCategory === 2 : false
     RowLayout {
         anchors.fill: parent
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-            visible: component.cppObj ? (component.cppObj.granular || (component.cppObj.looping && component.cppObj.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle)) : false
+            visible: component.cppClipObject ? (component.cppClipObject.selectedSliceObject.granular || (component.cppClipObject.selectedSliceObject.looping && component.cppClipObject.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle)) : false
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -169,7 +168,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit
-                visible: component.cppObj ? component.cppObj.granular : false
+                visible: component.cppClipObject ? component.cppClipObject.selectedSliceObject.granular : false
                 text: qsTr("Grains")
                 checked: _private.settingsCategory === 1
                 MouseArea {
@@ -184,7 +183,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit
-                visible: component.cppObj ? (component.cppObj.looping && component.cppObj.playbackStyle != Zynthbox.ClipAudioSource.WavetableStyle) : false
+                visible: component.cppClipObject ? (component.cppClipObject.selectedSliceObject.looping && component.cppClipObject.selectedSliceObject.effectivePlaybackStyle != Zynthbox.ClipAudioSource.WavetableStyle) : false
                 text: qsTr("Loop\nX-Fade")
                 checked: _private.settingsCategory === 2
                 MouseArea {
@@ -197,19 +196,19 @@ Item {
             }
         }
         Connections {
-            target: component.cppClipObject
+            target: component.cppClipObject ? component.cppClipObject.selectedSliceObject : null
             function update() {
-                if (component.cppClipObject.adsrAttack !== attackSlider.value) {
-                    attackSlider.value = component.cppClipObject.adsrAttack;
+                if (component.cppClipObject.selectedSliceObject.adsrAttack !== attackSlider.value) {
+                    attackSlider.value = component.cppClipObject.selectedSliceObject.adsrAttack;
                 }
-                if (component.cppClipObject.adsrDecay !== decaySlider.value) {
-                    decaySlider.value = component.cppClipObject.adsrDecay;
+                if (component.cppClipObject.selectedSliceObject.adsrDecay !== decaySlider.value) {
+                    decaySlider.value = component.cppClipObject.selectedSliceObject.adsrDecay;
                 }
-                if (component.cppClipObject.adsrSustain !== sustainSlider.value) {
-                    sustainSlider.value = component.cppClipObject.adsrSustain;
+                if (component.cppClipObject.selectedSliceObject.adsrSustain !== sustainSlider.value) {
+                    sustainSlider.value = component.cppClipObject.selectedSliceObject.adsrSustain;
                 }
-                if (component.cppClipObject.adsrRelease !== releaseSlider.value) {
-                    releaseSlider.value = component.cppClipObject.adsrRelease;
+                if (component.cppClipObject.selectedSliceObject.adsrRelease !== releaseSlider.value) {
+                    releaseSlider.value = component.cppClipObject.selectedSliceObject.adsrRelease;
                 }
             }
             onAdsrParametersChanged: update()
@@ -222,7 +221,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showNotesSettings
             unitLabel: "\n" + qsTr("seconds")
-            value: component.cppClipObject ? component.cppClipObject.adsrAttack : 0
+            value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.adsrAttack : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -233,8 +232,8 @@ Item {
             selected: component.currentADSRElement === 0
             knobId: 1
             onValueChanged: {
-                if (component.cppClipObject && component.cppClipObject.adsrAttack != attackSlider.value) {
-                    component.cppClipObject.adsrAttack = attackSlider.value
+                if (component.cppClipObject && component.cppClipObject.selectedSliceObject.adsrAttack != attackSlider.value) {
+                    component.cppClipObject.selectedSliceObject.adsrAttack = attackSlider.value
                 }
             }
             KnobIndicator {
@@ -256,7 +255,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showNotesSettings
             unitLabel: "\n" + qsTr("seconds")
-            value: component.cppClipObject ? component.cppClipObject.adsrDecay : 0
+            value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.adsrDecay : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -267,8 +266,8 @@ Item {
             selected: component.currentADSRElement === 1
             knobId: 1
             onValueChanged: {
-                if (component.cppClipObject && component.cppClipObject.adsrDecay != decaySlider.value) {
-                    component.cppClipObject.adsrDecay = decaySlider.value
+                if (component.cppClipObject && component.cppClipObject.selectedSliceObject.adsrDecay != decaySlider.value) {
+                    component.cppClipObject.selectedSliceObject.adsrDecay = decaySlider.value
                 }
             }
             KnobIndicator {
@@ -290,7 +289,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showNotesSettings
             unitLabel: "%"
-            value: component.cppClipObject ? component.cppClipObject.adsrSustain : 0
+            value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.adsrSustain : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -303,8 +302,8 @@ Item {
             selected: component.currentADSRElement === 2
             knobId: 1
             onValueChanged: {
-                if (component.cppClipObject && component.cppClipObject.adsrSustain != sustainSlider.value) {
-                    component.cppClipObject.adsrSustain = sustainSlider.value
+                if (component.cppClipObject && component.cppClipObject.selectedSliceObject.adsrSustain != sustainSlider.value) {
+                    component.cppClipObject.selectedSliceObject.adsrSustain = sustainSlider.value
                 }
             }
             KnobIndicator {
@@ -326,7 +325,7 @@ Item {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 2
             visible: component.showNotesSettings
             unitLabel: "\n" + qsTr("seconds")
-            value: component.cppClipObject ? component.cppClipObject.adsrRelease : 0
+            value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.adsrRelease : 0
             decimals: 2
             increment: 0.1
             slideIncrement: 0.01
@@ -337,8 +336,8 @@ Item {
             selected: component.currentADSRElement === 3
             knobId: 1
             onValueChanged: {
-                if (component.cppClipObject && component.cppClipObject.adsrRelease != releaseSlider.value) {
-                    component.cppClipObject.adsrRelease = releaseSlider.value
+                if (component.cppClipObject && component.cppClipObject.selectedSliceObject.adsrRelease != releaseSlider.value) {
+                    component.cppClipObject.selectedSliceObject.adsrRelease = releaseSlider.value
                 }
             }
             KnobIndicator {
@@ -381,14 +380,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.01
-                value: component.cppClipObject ? component.cppClipObject.grainSustain : 0
+                value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.grainSustain : 0
                 from: 0
                 to: 1
-                onMoved: component.cppClipObject.grainSustain = value
+                onMoved: component.cppClipObject.selectedSliceObject.grainSustain = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.cppClipObject ? component.cppClipObject.grainSustain : 0).toFixed(2)
+                text: (component.cppClipObject ? component.cppClipObject.selectedSliceObject.grainSustain : 0).toFixed(2)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -438,14 +437,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.01
-                value: component.cppClipObject ? component.cppClipObject.grainTilt : 0
+                value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.grainTilt : 0
                 from: 0
                 to: 1
-                onMoved: component.cppClipObject.grainTilt = value
+                onMoved: component.cppClipObject.selectedSliceObject.grainTilt = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.cppClipObject ? component.cppClipObject.grainTilt : 0).toFixed(2)
+                text: (component.cppClipObject ? component.cppClipObject.selectedSliceObject.grainTilt : 0).toFixed(2)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -493,11 +492,11 @@ Item {
                 implicitHeight: 1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                checked: component.cppClipObject ? component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie : false
+                checked: component.cppClipObject ? component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie : false
                 text: qsTr("Innie")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie
+                    onClicked: component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie
                 }
             }
             QQC2.Button {
@@ -505,11 +504,11 @@ Item {
                 implicitHeight: 1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                checked: component.cppClipObject ? component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie : false
+                checked: component.cppClipObject ? component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie : false
                 text: qsTr("Outie")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: component.cppClipObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie
+                    onClicked: component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie
                 }
             }
             Rectangle {
@@ -556,11 +555,11 @@ Item {
                 implicitHeight: 1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                checked: component.cppClipObject ? component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie : false
+                checked: component.cppClipObject ? component.cppClipObject.selectedSliceObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie : false
                 text: qsTr("Innie")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie
+                    onClicked: component.cppClipObject.selectedSliceObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeInnie
                 }
             }
             QQC2.Button {
@@ -568,11 +567,11 @@ Item {
                 implicitHeight: 1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                checked: component.cppClipObject ? component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie : false
+                checked: component.cppClipObject ? component.cppClipObject.selectedSliceObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie : false
                 text: qsTr("Outie")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: component.cppClipObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie
+                    onClicked: component.cppClipObject.selectedSliceObject.stopCrossfadeDirection = Zynthbox.ClipAudioSource.CrossfadeOutie
                 }
             }
             Rectangle {
@@ -621,14 +620,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.01
-                value: component.cppClipObject ? component.cppClipObject.loopCrossfadeAmount : 0
+                value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.loopCrossfadeAmount : 0
                 from: 0
                 to: 0.5
-                onMoved: component.cppClipObject.loopCrossfadeAmount = value
+                onMoved: component.cppClipObject.selectedSliceObject.loopCrossfadeAmount = value
             }
             Kirigami.Heading {
                 level: 2
-                text: qsTr("%1% of\nloop").arg((component.cppClipObject ? component.cppClipObject.loopCrossfadeAmount : 0).toFixed(2) * 100)
+                text: qsTr("%1% of\nloop").arg((component.cppClipObject ? component.cppClipObject.selectedSliceObject.loopCrossfadeAmount : 0).toFixed(2) * 100)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -654,54 +653,54 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-            property double grainRemaining: component.cppClipObject ? (1 - component.cppClipObject.grainSustain) : 1;
+            property double grainRemaining: component.cppClipObject ? (1 - component.cppClipObject.selectedSliceObject.grainSustain) : 1;
 
             property double crossfadeSustainDuration: component.cppClipObject
-                ? component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie && component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie
-                    ? 1 - (component.cppClipObject.loopCrossfadeAmount * 2) // Both are innies
-                    : component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie || component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie
-                        ? 1 - component.cppClipObject.loopCrossfadeAmount // One of the two is an outie
+                ? component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie && component.cppClipObject.selectedSliceObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie
+                    ? 1 - (component.cppClipObject.selectedSliceObject.loopCrossfadeAmount * 2) // Both are innies
+                    : component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie || component.cppClipObject.selectedSliceObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie
+                        ? 1 - component.cppClipObject.selectedSliceObject.loopCrossfadeAmount // One of the two is an outie
                         : 1
                 : 1
-            attackLine: component.showCrossfadeSettings && component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie // vertical line at attack start point
+            attackLine: component.showCrossfadeSettings && component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie // vertical line at attack start point
             attackLabel: qsTr("Loop Area")
             // decayLine: false // vertical line at decay start point - don't need this for this thing (it's functionally similar to the grain envelope, minus tilt, and with slightly different sustain length logic)
             // decayLabel: ""
-            sustainLine: component.showCrossfadeSettings && component.cppClipObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie // vertical line at sustain start point
+            sustainLine: component.showCrossfadeSettings && component.cppClipObject.selectedSliceObject.loopStartCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie // vertical line at sustain start point
             sustainLabel: adsrView.crossfadeSustainDuration > 0 ? qsTr("Loop Area") : ""
-            releaseLine: component.showCrossfadeSettings && component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie // vertical line at release start point
+            releaseLine: component.showCrossfadeSettings && component.cppClipObject.selectedSliceObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeOutie // vertical line at release start point
             // releaseLabel: ""
-            endLine: component.showCrossfadeSettings && component.cppClipObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie // vertical line at envelope end point
+            endLine: component.showCrossfadeSettings && component.cppClipObject.selectedSliceObject.stopCrossfadeDirection == Zynthbox.ClipAudioSource.CrossfadeInnie // vertical line at envelope end point
             // endLabel: ""
             attackValue: component.cppClipObject
                 ? component.showCrossfadeSettings
-                    ? component.cppClipObject.loopCrossfadeAmount
+                    ? component.cppClipObject.selectedSliceObject.loopCrossfadeAmount
                     : component.showGranularSettings
-                        ? grainRemaining * component.cppClipObject.grainTilt
+                        ? grainRemaining * component.cppClipObject.selectedSliceObject.grainTilt
                         : component.showCrossfadeSettings
                             ? 0
-                            : component.cppClipObject.adsrAttack
+                            : component.cppClipObject.selectedSliceObject.adsrAttack
                 : 0
             attackMax: component.cppClipObject
                 ? component.showCrossfadeSettings
                     ? 1
                     : component.showGranularSettings
                         ? 1
-                        : Math.max(1, component.cppClipObject.adsrAttack)
+                        : Math.max(1, component.cppClipObject.selectedSliceObject.adsrAttack)
                 : 1
             decayValue: component.cppClipObject
                 ? component.showCrossfadeSettings
                     ? 0
                     : component.showGranularSettings
                         ? 0
-                        : component.cppClipObject.adsrDecay
+                        : component.cppClipObject.selectedSliceObject.adsrDecay
                 : 0
             decayMax: component.cppClipObject
                 ? component.showCrossfadeSettings
                     ? 2
                     : component.showGranularSettings
                         ? 2
-                        : Math.max(1, component.cppClipObject.adsrDecay)
+                        : Math.max(1, component.cppClipObject.selectedSliceObject.adsrDecay)
                 : 2
             decayWidth: component.cppClipObject
                 ? component.showCrossfadeSettings
@@ -715,29 +714,29 @@ Item {
                     ? 1
                     : component.showGranularSettings
                         ? 1
-                        : component.cppClipObject.adsrSustain
+                        : component.cppClipObject.selectedSliceObject.adsrSustain
                 : 0
             sustainMax: 1
             sustainWidth: component.cppClipObject
                 ? component.showCrossfadeSettings
                     ? adsrView.crossfadeSustainDuration
                     : component.showGranularSettings
-                        ? component.cppClipObject.grainSustain
+                        ? component.cppClipObject.selectedSliceObject.grainSustain
                         : 1
                 : 1
             releaseValue: component.cppClipObject
                 ? component.showCrossfadeSettings
-                    ? component.cppClipObject.loopCrossfadeAmount
+                    ? component.cppClipObject.selectedSliceObject.loopCrossfadeAmount
                     : component.showGranularSettings
-                        ? grainRemaining * (1.0 - component.cppClipObject.grainTilt)
-                        : component.cppClipObject.adsrRelease
+                        ? grainRemaining * (1.0 - component.cppClipObject.selectedSliceObject.grainTilt)
+                        : component.cppClipObject.selectedSliceObject.adsrRelease
                 : 0
             releaseMax: component.cppClipObject
                 ? component.showCrossfadeSettings
                     ? 1
                     : component.showGranularSettings
                         ? 1
-                        : Math.max(1, component.cppClipObject.adsrRelease)
+                        : Math.max(1, component.cppClipObject.selectedSliceObject.adsrRelease)
                 : 1
             Connections {
                 target: component
@@ -753,7 +752,7 @@ Item {
                 }
             }
             Connections {
-                target: component.cppClipObject
+                target: component.cppClipObject ? component.cppClipObject.selectedSliceObject : null
                 function update() {
                     if (component.visible) {
                         adsrView.requestPaint();

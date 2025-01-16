@@ -51,7 +51,7 @@ Zynthian.DialogQuestion {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
-                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneStart = Math.min(clipObj.keyZoneStart + 1, 127);
                 }
@@ -62,7 +62,7 @@ Zynthian.DialogQuestion {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
-                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneStart = Math.max(clipObj.keyZoneStart - 1, -1);
                 }
@@ -73,7 +73,7 @@ Zynthian.DialogQuestion {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
-                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneEnd = Math.min(clipObj.keyZoneEnd + 1, 127);
                 }
@@ -84,7 +84,7 @@ Zynthian.DialogQuestion {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
-                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneEnd = Math.max(clipObj.keyZoneEnd - 1, -1);
                 }
@@ -95,7 +95,7 @@ Zynthian.DialogQuestion {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
-                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.rootNote = Math.min(clipObj.rootNote + 1, 127);
                 }
@@ -106,7 +106,7 @@ Zynthian.DialogQuestion {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
-                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId);
+                        clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.rootNote = Math.max(clipObj.rootNote - 1, 0);
                 }
@@ -175,15 +175,16 @@ Zynthian.DialogQuestion {
                     property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
+                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.trackType === "synth" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
                     enabled: clipObj !== null
                     text: (index === 0 ? "Disable slot " : "") + (index + 1)
                     onClicked: {
                         if (component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
                             component.selectedChannel.keyZoneMode = "manual";
                         }
-                        clipObj.keyZoneStart = -1;
-                        clipObj.keyZoneEnd = -1;
-                        clipObj.rootNote = -1;
+                        keyZoneContainer.keyZoneStart = -1;
+                        keyZoneContainer.keyZoneEnd = -1;
+                        keyZoneContainer.rootNote = -1;
                         component.selectedChannel.selectedSlotRow = index;
                     }
                 }
@@ -196,15 +197,16 @@ Zynthian.DialogQuestion {
                     property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
+                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.trackType === "synth" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
                     enabled: clipObj !== null
                     text: (index === 0 ? "Assign full width to slot " : "") + (index + 1)
                     onClicked: {
                         if (component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
                             component.selectedChannel.keyZoneMode = "manual";
                         }
-                        clipObj.keyZoneStart = 0;
-                        clipObj.keyZoneEnd = 127;
-                        clipObj.rootNote = 60;
+                        keyZoneContainer.keyZoneStart = 0;
+                        keyZoneContainer.keyZoneEnd = 127;
+                        keyZoneContainer.rootNote = 60;
                         component.selectedChannel.selectedSlotRow = index;
                     }
                 }
@@ -266,21 +268,15 @@ Zynthian.DialogQuestion {
                     property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    Connections {
-                        target: clipObj
-                        enabled: clipObj && component.selectedChannel.trackType.startsWith("sample-")
-                        onKeyZoneStartChanged: zynqtgui.sketchpad.song.schedule_save()
-                        onKeyZoneEndChanged: zynqtgui.sketchpad.song.schedule_save()
-                        onRootNoteChanged: zynqtgui.sketchpad.song.schedule_save()
-                    }
+                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.trackType === "synth" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
                     height: parent.height;
                     width: 1
                     property bool isCurrent: component.selectedChannel ? component.selectedChannel.selectedSlotRow === index : false
                     z: isCurrent ? 99 : 0
                     property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-                    property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null
-                    property Item pianoKeyEndItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneEnd) : null
-                    property Item pianoRootNoteItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.rootNote) : null
+                    property Item pianoKeyItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.keyZoneStart) : null
+                    property Item pianoKeyEndItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.keyZoneEnd) : null
+                    property Item pianoRootNoteItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.rootNote) : null
                     x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : (pianoKeysRepeater.itemAt(0) ? -Math.floor(pianoKeysRepeater.itemAt(0).width / 2) : 0)
                     opacity: clipObj ? 1 : 0.3
                     QQC2.Label {
@@ -407,7 +403,7 @@ Zynthian.DialogQuestion {
                         height: 1
                         width: 1
                         x: pianoKeyItem && pianoRootNoteItem ? pianoRootNoteItem.x - pianoKeyItem.x : sampleHandle.x
-                        visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.clipObj && sampleKeyzoneDelegate.clipObj.rootNote > -1 && sampleKeyzoneDelegate.clipObj.rootNote < 128
+                        visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.keyZoneContainer && sampleKeyzoneDelegate.keyZoneContainer.rootNote > -1 && sampleKeyzoneDelegate.keyZoneContainer.rootNote < 128
                         Rectangle {
                             anchors {
                                 topMargin: -height

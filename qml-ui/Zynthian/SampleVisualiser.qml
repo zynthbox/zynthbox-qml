@@ -58,8 +58,8 @@ Item {
         anchors.fill: parent
         color: Kirigami.Theme.textColor
         source: progressDots.cppClipObject ? "clip:/%1".arg(progressDots.cppClipObject.id) : ""
-        start: progressDots.cppClipObject != null ? progressDots.cppClipObject.startPositionSeconds : 0
-        end: progressDots.cppClipObject != null ? progressDots.cppClipObject.startPositionSeconds + progressDots.cppClipObject.lengthSeconds : 0
+        start: progressDots.cppClipObject != null ? progressDots.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+        end: progressDots.cppClipObject != null ? progressDots.cppClipObject.selectedSliceObject.startPositionSeconds + progressDots.cppClipObject.selectedSliceObject.lengthSeconds : 0
         readonly property real relativeStart: waveformItem.start / waveformItem.length
         readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
@@ -98,7 +98,7 @@ Item {
             opacity: 0.8
             width: 1
             property real startPositionRelative: progressDots.cppClipObject
-                ? progressDots.cppClipObject.startPositionSamples / progressDots.cppClipObject.durationSamples
+                ? progressDots.cppClipObject.selectedSliceObject.startPositionSamples / progressDots.cppClipObject.durationSamples
                 : 1
             x: progressDots.cppClipObject != null ? Zynthian.CommonUtils.fitInWindow(startPositionRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width * parent.width : 0
         }
@@ -113,7 +113,7 @@ Item {
             opacity: 0.8
             width: 1
             property real loopDeltaRelative: progressDots.cppClipObject
-                ? progressDots.cppClipObject.loopDeltaSamples / progressDots.cppClipObject.durationSamples
+                ? progressDots.cppClipObject.selectedSliceObject.loopDeltaSamples / progressDots.cppClipObject.durationSamples
                 : 0
             x: progressDots.cppClipObject
                 ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + loopDeltaRelative, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
@@ -131,7 +131,7 @@ Item {
             opacity: 0.8
             width: 1
             x: progressDots.cppClipObject
-                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
+                ? Zynthian.CommonUtils.fitInWindow(startLoopLine.startPositionRelative + (progressDots.cppClipObject.selectedSliceObject.lengthSamples / progressDots.cppClipObject.durationSamples), waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width
                 : 0
         }
 

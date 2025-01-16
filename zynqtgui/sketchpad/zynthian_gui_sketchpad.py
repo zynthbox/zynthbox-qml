@@ -162,9 +162,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.__update_channel_sounds_timer = None
 
         self.metronome_clip_tick = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tick.wav", False, self)
-        self.metronome_clip_tick.setGainAbsolute(self.__metronomeVolume)
+        self.metronome_clip_tick.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
         self.metronome_clip_tock = Zynthbox.ClipAudioSource(dirname(realpath(__file__)) + "/assets/metronome_clip_tock.wav", False, self)
-        self.metronome_clip_tock.setGainAbsolute(self.__metronomeVolume)
+        self.metronome_clip_tock.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
         Zynthbox.SyncTimer.instance().setMetronomeTicks(self.metronome_clip_tick, self.metronome_clip_tock)
         Zynthbox.SyncTimer.instance().audibleMetronomeChanged.connect(self.metronomeEnabledChanged)
         Zynthbox.SyncTimer.instance().timerRunningChanged.connect(self.metronome_running_changed)
@@ -377,8 +377,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def set_metronomeVolume(self, volume):
         if self.__metronomeVolume != volume:
             self.__metronomeVolume = volume
-            self.metronome_clip_tick.setGainAbsolute(self.__metronomeVolume)
-            self.metronome_clip_tock.setGainAbsolute(self.__metronomeVolume)
+            self.metronome_clip_tick.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
+            self.metronome_clip_tock.rootSlice().gainHandler().setGainAbsolute(self.__metronomeVolume)
             self.metronomeVolumeChanged.emit()
 
     metronomeVolumeChanged = Signal()

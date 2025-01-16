@@ -38,6 +38,7 @@ Item {
     property QtObject cppClipObject: component.clip && component.clip.hasOwnProperty("cppObjId")
                                         ? Zynthbox.PlayGridManager.getClipById(component.clip.cppObjId)
                                         : null
+    property QtObject sliceObject: cppClipObject ? cppClipObject.selectedSliceObject : null
     function nextElement() {
         if (_private.currentElement === _private.elementMax) {
             _private.currentElement = 0;
@@ -56,16 +57,16 @@ Item {
         if (_private.settingsCategory === 0) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
+                    component.sliceObject.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
                     break;
                 case 1:
-                    component.cppClipObject.grainPosition = Math.min(1, component.cppClipObject.grainPosition + 0.001);
+                    component.sliceObject.grainPosition = Math.min(1, component.sliceObject.grainPosition + 0.001);
                     break;
                 case 2:
-                    component.cppClipObject.grainSpray = Math.min(1, component.cppClipObject.grainSpray + 0.001);
+                    component.sliceObject.grainSpray = Math.min(1, component.sliceObject.grainSpray + 0.001);
                     break;
                 case 3:
-                    component.cppClipObject.grainScan = Math.min(100, component.cppClipObject.grainScan + 0.01);
+                    component.sliceObject.grainScan = Math.min(100, component.sliceObject.grainScan + 0.01);
                     break;
                 default:
                     break;
@@ -73,16 +74,16 @@ Item {
         } else if (_private.settingsCategory === 1) {
             switch(_private.currentElement) {
                 case 0:
-                    component.cppClipObject.grainInterval = component.cppClipObject.grainInterval + 0.1;
+                    component.sliceObject.grainInterval = component.sliceObject.grainInterval + 0.1;
                     break;
                 case 1:
-                    component.cppClipObject.grainIntervalAdditional = component.cppClipObject.grainIntervalAdditional + 0.1;
+                    component.sliceObject.grainIntervalAdditional = component.sliceObject.grainIntervalAdditional + 0.1;
                     break;
                 case 2:
-                    component.cppClipObject.grainSize = component.cppClipObject.grainSize + 0.1;
+                    component.sliceObject.grainSize = component.sliceObject.grainSize + 0.1;
                     break;
                 case 3:
-                    component.cppClipObject.grainSizeAdditional = component.cppClipObject.grainSizeAdditional + 0.1;
+                    component.sliceObject.grainSizeAdditional = component.sliceObject.grainSizeAdditional + 0.1;
                     break;
                 default:
                     break;
@@ -90,25 +91,25 @@ Item {
         } else if (_private.settingsCategory === 2) {
             switch(_private.currentElement) {
                 case 0:
-                    component.cppClipObject.grainPanMinimum = Math.min(1, component.cppClipObject.grainPanMinimum + 0.01);
+                    component.sliceObject.grainPanMinimum = Math.min(1, component.sliceObject.grainPanMinimum + 0.01);
                     break;
                 case 1:
-                    component.cppClipObject.grainPanMaximum = Math.min(1, component.cppClipObject.grainPanMaximum + 0.01);
+                    component.sliceObject.grainPanMaximum = Math.min(1, component.sliceObject.grainPanMaximum + 0.01);
                     break;
                 case 2:
-                    component.cppClipObject.grainPitchMinimum1 = Math.min(2, component.cppClipObject.grainPitchMinimum1 + 0.01);
+                    component.sliceObject.grainPitchMinimum1 = Math.min(2, component.sliceObject.grainPitchMinimum1 + 0.01);
                     break;
                 case 3:
-                    component.cppClipObject.grainPitchMaximum1 = Math.min(2, component.cppClipObject.grainPitchMaximum1 + 0.01);
+                    component.sliceObject.grainPitchMaximum1 = Math.min(2, component.sliceObject.grainPitchMaximum1 + 0.01);
                     break;
                 case 4:
-                    component.cppClipObject.grainPitchPriority = Math.min(1, component.cppClipObject.grainPitchPriority + 0.01);
+                    component.sliceObject.grainPitchPriority = Math.min(1, component.sliceObject.grainPitchPriority + 0.01);
                     break;
                 case 5:
-                    component.cppClipObject.grainPitchMinimum2 = Math.min(2, component.cppClipObject.grainPitchMinimum2 + 0.01);
+                    component.sliceObject.grainPitchMinimum2 = Math.min(2, component.sliceObject.grainPitchMinimum2 + 0.01);
                     break;
                 case 6:
-                    component.cppClipObject.grainPitchMaximum2 = Math.min(2, component.cppClipObject.grainPitchMaximum2 + 0.01);
+                    component.sliceObject.grainPitchMaximum2 = Math.min(2, component.sliceObject.grainPitchMaximum2 + 0.01);
                     break;
                 default:
                     break;
@@ -119,16 +120,16 @@ Item {
         if (_private.settingsCategory === 0) {
             switch(_private.currentElement) {
                 case 0:
-                    component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
+                    component.sliceObject.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
                     break;
                 case 1:
-                    component.cppClipObject.grainPosition = Math.max(0, component.cppClipObject.grainPosition - 0.001);
+                    component.sliceObject.grainPosition = Math.max(0, component.sliceObject.grainPosition - 0.001);
                     break;
                 case 2:
-                    component.cppClipObject.grainSpray = Math.max(0, component.cppClipObject.grainSpray - 0.001);
+                    component.sliceObject.grainSpray = Math.max(0, component.sliceObject.grainSpray - 0.001);
                     break;
                 case 3:
-                    component.cppClipObject.grainScan = Math.max(-100, component.cppClipObject.grainScan - 0.01);
+                    component.sliceObject.grainScan = Math.max(-100, component.sliceObject.grainScan - 0.01);
                     break;
                 default:
                     break;
@@ -136,16 +137,16 @@ Item {
         } else if (_private.settingsCategory === 1) {
             switch(_private.currentElement) {
                 case 0:
-                    component.cppClipObject.grainInterval = Math.max(1, component.cppClipObject.grainInterval - 0.1);
+                    component.sliceObject.grainInterval = Math.max(1, component.sliceObject.grainInterval - 0.1);
                     break;
                 case 1:
-                    component.cppClipObject.grainIntervalAdditional = Math.max(0, component.cppClipObject.grainIntervalAdditional - 0.1);
+                    component.sliceObject.grainIntervalAdditional = Math.max(0, component.sliceObject.grainIntervalAdditional - 0.1);
                     break;
                 case 2:
-                    component.cppClipObject.grainSize = Math.max(1, component.cppClipObject.grainSize - 0.1);
+                    component.sliceObject.grainSize = Math.max(1, component.sliceObject.grainSize - 0.1);
                     break;
                 case 3:
-                    component.cppClipObject.grainSizeAdditional = Math.max(0, component.cppClipObject.grainSizeAdditional - 0.1);
+                    component.sliceObject.grainSizeAdditional = Math.max(0, component.sliceObject.grainSizeAdditional - 0.1);
                     break;
                 default:
                     break;
@@ -153,25 +154,25 @@ Item {
         } else if (_private.settingsCategory === 2) {
             switch(_private.currentElement) {
                 case 0:
-                    component.cppClipObject.grainPanMinimum = Math.max(-1, component.cppClipObject.grainPanMinimum - 0.01);
+                    component.sliceObject.grainPanMinimum = Math.max(-1, component.sliceObject.grainPanMinimum - 0.01);
                     break;
                 case 1:
-                    component.cppClipObject.grainPanMaximum = Math.max(-1, component.cppClipObject.grainPanMaximum - 0.01);
+                    component.sliceObject.grainPanMaximum = Math.max(-1, component.sliceObject.grainPanMaximum - 0.01);
                     break;
                 case 2:
-                    component.cppClipObject.grainPitchMinimum1 = Math.max(-2, component.cppClipObject.grainPitchMinimum1 - 0.01);
+                    component.sliceObject.grainPitchMinimum1 = Math.max(-2, component.sliceObject.grainPitchMinimum1 - 0.01);
                     break;
                 case 3:
-                    component.cppClipObject.grainPitchMaximum1 = Math.max(-2, component.cppClipObject.grainPitchMaximum1 - 0.01);
+                    component.sliceObject.grainPitchMaximum1 = Math.max(-2, component.sliceObject.grainPitchMaximum1 - 0.01);
                     break;
                 case 4:
-                    component.cppClipObject.grainPitchPriority = Math.max(-1, component.cppClipObject.grainPitchPriority - 0.01);
+                    component.sliceObject.grainPitchPriority = Math.max(-1, component.sliceObject.grainPitchPriority - 0.01);
                     break;
                 case 5:
-                    component.cppClipObject.grainPitchMinimum2 = Math.max(-2, component.cppClipObject.grainPitchMinimum2 - 0.01);
+                    component.sliceObject.grainPitchMinimum2 = Math.max(-2, component.sliceObject.grainPitchMinimum2 - 0.01);
                     break;
                 case 6:
-                    component.cppClipObject.grainPitchMaximum2 = Math.max(-2, component.cppClipObject.grainPitchMaximum2 - 0.01);
+                    component.sliceObject.grainPitchMaximum2 = Math.max(-2, component.sliceObject.grainPitchMaximum2 - 0.01);
                     break;
                 default:
                     break;
@@ -191,7 +192,7 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit
-            enabled: component.cppClipObject && component.cppClipObject.granular
+            enabled: component.sliceObject && component.sliceObject.granular
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -250,10 +251,10 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 function toggleGraineratorLooping() {
-                    if (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) {
-                        component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
+                    if (component.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) {
+                        component.sliceObject.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
                     } else {
-                        component.clip.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
+                        component.sliceObject.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
                     }
                 }
                 MouseArea {
@@ -265,11 +266,11 @@ Item {
                     anchors.centerIn: parent
                     width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
                     height: Kirigami.Units.gridUnit * 3
-                    checked: component.clip ? (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) : false
+                    checked: component.sliceObject ? (component.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle) : false
                     onToggled: toggleGraineratorLooping()
                     Connections {
-                        target: component.cppClipObject
-                        onGranularChanged: granularEnabledSwitch.checked = (component.clip.playbackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle)
+                        target: component.sliceObject
+                        onGranularChanged: granularEnabledSwitch.checked = (component.sliceObject.effectivePlaybackStyle == Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle)
                     }
                 }
             }
@@ -299,14 +300,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.001
-                value: component.cppClipObject ? component.cppClipObject.grainPosition : 0
+                value: component.sliceObject ? component.sliceObject.grainPosition : 0
                 from: 0
                 to: 1
-                onMoved: component.cppClipObject.grainPosition = value
+                onMoved: component.sliceObject.grainPosition = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.cppClipObject ? component.cppClipObject.grainPosition : 0).toFixed(3)
+                text: (component.sliceObject ? component.sliceObject.grainPosition : 0).toFixed(3)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -336,14 +337,14 @@ Item {
                 Layout.fillHeight: true
                 orientation: Qt.Vertical
                 stepSize: 0.001
-                value: component.cppClipObject ? component.cppClipObject.grainSpray : 0
+                value: component.sliceObject ? component.sliceObject.grainSpray : 0
                 from: 0
                 to: 1
-                onMoved: component.cppClipObject.grainSpray = value
+                onMoved: component.sliceObject.grainSpray = value
             }
             Kirigami.Heading {
                 level: 2
-                text: (component.cppClipObject ? component.cppClipObject.grainSpray : 0).toFixed(3)
+                text: (component.sliceObject ? component.sliceObject.grainSpray : 0).toFixed(3)
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -370,7 +371,7 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
-                value: component.cppClipObject ? component.cppClipObject.grainScan : 0
+                value: component.sliceObject ? component.sliceObject.grainScan : 0
                 decimals: 2
                 increment: 0.1
                 slideIncrement: 0.01
@@ -381,10 +382,10 @@ Item {
                 resetOnTap: true
                 resetValue: 0
                 selected: _private.currentElement === 3
-                onValueChanged: component.cppClipObject.grainScan = value
+                onValueChanged: component.sliceObject.grainScan = value
                 Connections {
-                    target: component.cppClipObject
-                    onGrainScanChanged: grainScanSlider.value = component.cppClipObject.grainScan
+                    target: component.sliceObject
+                    onGrainScanChanged: grainScanSlider.value = component.sliceObject.grainScan
                 }
             }
         }
@@ -409,17 +410,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.cppClipObject ? component.cppClipObject.grainInterval : 0
+                value: component.sliceObject ? component.sliceObject.grainInterval : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 0
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainInterval = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainInterval = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainIntervalChanged: grainIntervalSlider.value = component.cppClipObject.grainInterval
+                    target: component.sliceObject
+                    onGrainIntervalChanged: grainIntervalSlider.value = component.sliceObject.grainInterval
                 }
             }
             Zynthian.InfinitySlider {
@@ -428,17 +429,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
-                value: component.cppClipObject ? component.cppClipObject.grainIntervalAdditional : 0
+                value: component.sliceObject ? component.sliceObject.grainIntervalAdditional : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 1
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainIntervalAdditional = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainIntervalAdditional = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainIntervalAdditionalChanged: grainIntervalAdditionalSlider.value = component.cppClipObject.grainIntervalAdditional
+                    target: component.sliceObject
+                    onGrainIntervalAdditionalChanged: grainIntervalAdditionalSlider.value = component.sliceObject.grainIntervalAdditional
                 }
             }
         }
@@ -463,17 +464,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.cppClipObject ? component.cppClipObject.grainSize : 0
+                value: component.sliceObject ? component.sliceObject.grainSize : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 0.1
                 applyLowerBound: true
                 lowerBound: 1
                 selected: _private.currentElement === 2
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainSize = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainSize = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainSizeChanged: grainSizeSlider.value = component.cppClipObject.grainSize
+                    target: component.sliceObject
+                    onGrainSizeChanged: grainSizeSlider.value = component.sliceObject.grainSize
                 }
             }
             Zynthian.InfinitySlider {
@@ -482,17 +483,17 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("More")
-                value: component.cppClipObject ? component.cppClipObject.grainSizeAdditional : 0
+                value: component.sliceObject ? component.sliceObject.grainSizeAdditional : 0
                 decimals: 1
                 increment: 1
                 slideIncrement: 1
                 applyLowerBound: true
                 lowerBound: 0
                 selected: _private.currentElement === 3
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainSizeAdditional = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainSizeAdditional = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainSizeAdditionalChanged: grainSizeAdditionalSlider.value = component.cppClipObject.grainSizeAdditional
+                    target: component.sliceObject
+                    onGrainSizeAdditionalChanged: grainSizeAdditionalSlider.value = component.sliceObject.grainSizeAdditional
                 }
             }
         }
@@ -513,10 +514,10 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                text: component.cppClipObject
+                text: component.sliceObject
                     ? qsTr("Grains\nPer Note:\n%1 to %2")
-                        .arg(Math.ceil(component.cppClipObject.grainSize / (component.cppClipObject.grainInterval + component.cppClipObject.grainIntervalAdditional)))
-                        .arg(Math.floor((component.cppClipObject.grainSize + component.cppClipObject.grainSizeAdditional) / component.cppClipObject.grainInterval))
+                        .arg(Math.ceil(component.sliceObject.grainSize / (component.sliceObject.grainInterval + component.sliceObject.grainIntervalAdditional)))
+                        .arg(Math.floor((component.sliceObject.grainSize + component.sliceObject.grainSizeAdditional) / component.sliceObject.grainInterval))
                     : ""
             }
         }
@@ -541,16 +542,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min")
-                value: component.cppClipObject ? component.cppClipObject.grainPanMinimum : 0
+                value: component.sliceObject ? component.sliceObject.grainPanMinimum : 0
                 applyLowerBound: true
                 lowerBound: -1
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 0
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPanMinimum = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainPanMinimum = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.cppClipObject.grainPanMinimum
+                    target: component.sliceObject
+                    onGrainPanMinimumChanged: grainPanMinimumSlider.value = component.sliceObject.grainPanMinimum
                 }
             }
             Zynthian.InfinitySlider {
@@ -559,16 +560,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max")
-                value: component.cppClipObject ? component.cppClipObject.grainPanMaximum : 0
+                value: component.sliceObject ? component.sliceObject.grainPanMaximum : 0
                 applyLowerBound: true
                 lowerBound: -1
                 applyUpperBound: true
                 upperBound: 1
                 selected: _private.currentElement === 1
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPanMaximum = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainPanMaximum = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainPanMaximumChanged: grainPanMaximumSlider.value = component.cppClipObject.grainPanMaximum
+                    target: component.sliceObject
+                    onGrainPanMaximumChanged: grainPanMaximumSlider.value = component.sliceObject.grainPanMaximum
                 }
             }
         }
@@ -593,16 +594,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min 1")
-                value: component.cppClipObject ? component.cppClipObject.grainPitchMinimum1 : 0
+                value: component.sliceObject ? component.sliceObject.grainPitchMinimum1 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 2
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPitchMinimum1 = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainPitchMinimum1 = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.cppClipObject.grainPitchMinimum1
+                    target: component.sliceObject
+                    onGrainPitchMinimum1Changed: grainPitchMinimum1Slider.value = component.sliceObject.grainPitchMinimum1
                 }
             }
             Zynthian.InfinitySlider {
@@ -611,16 +612,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max 1")
-                value: component.cppClipObject ? component.cppClipObject.grainPitchMaximum1 : 0
+                value: component.sliceObject ? component.sliceObject.grainPitchMaximum1 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 3
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPitchMaximum1 = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainPitchMaximum1 = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainPitchMaximum1Changed: grainPitchMaximum1Slider.value = component.cppClipObject.grainPitchMaximum1
+                    target: component.sliceObject
+                    onGrainPitchMaximum1Changed: grainPitchMaximum1Slider.value = component.sliceObject.grainPitchMaximum1
                 }
             }
             ColumnLayout {
@@ -629,7 +630,7 @@ Item {
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 Kirigami.Heading {
                     level: 2
-                    text: qsTr("%1% ▶").arg(Math.round(component.cppClipObject ? 100 - (100 * component.cppClipObject.grainPitchPriority) : 0))
+                    text: qsTr("%1% ▶").arg(Math.round(component.sliceObject ? 100 - (100 * component.sliceObject.grainPitchPriority) : 0))
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -641,14 +642,14 @@ Item {
                     Layout.fillHeight: true
                     orientation: Qt.Vertical
                     stepSize: 0.01
-                    value: component.cppClipObject ? component.cppClipObject.grainPitchPriority : 0
+                    value: component.sliceObject ? component.sliceObject.grainPitchPriority : 0
                     from: 0
                     to: 1
-                    onMoved: component.cppClipObject.grainPitchPriority = value
+                    onMoved: component.sliceObject.grainPitchPriority = value
                 }
                 Kirigami.Heading {
                     level: 2
-                    text: qsTr("◀ %1%").arg(Math.round(component.cppClipObject ? 100 * component.cppClipObject.grainPitchPriority : 0))
+                    text: qsTr("◀ %1%").arg(Math.round(component.sliceObject ? 100 * component.sliceObject.grainPitchPriority : 0))
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -665,16 +666,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Min 2")
-                value: component.cppClipObject ? component.cppClipObject.grainPitchMinimum2 : 0
+                value: component.sliceObject ? component.sliceObject.grainPitchMinimum2 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 5
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPitchMinimum2 = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainPitchMinimum2 = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.cppClipObject.grainPitchMinimum2
+                    target: component.sliceObject
+                    onGrainPitchMinimum2Changed: grainPitchMinimum2Slider.value = component.sliceObject.grainPitchMinimum2
                 }
             }
             Zynthian.InfinitySlider {
@@ -683,16 +684,16 @@ Item {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit
                 text: qsTr("Max 2")
-                value: component.cppClipObject ? component.cppClipObject.grainPitchMaximum2 : 0
+                value: component.sliceObject ? component.sliceObject.grainPitchMaximum2 : 0
                 applyLowerBound: true
                 lowerBound: -2
                 applyUpperBound: true
                 upperBound: 2
                 selected: _private.currentElement === 6
-                onValueChanged: if (component.cppClipObject) { component.cppClipObject.grainPitchMaximum2 = value }
+                onValueChanged: if (component.sliceObject) { component.sliceObject.grainPitchMaximum2 = value }
                 Connections {
-                    target: component.cppClipObject
-                    onGrainPitchMaximum2Changed: grainPitchMaximum2Slider.value = component.cppClipObject.grainPitchMaximum2
+                    target: component.sliceObject
+                    onGrainPitchMaximum2Changed: grainPitchMaximum2Slider.value = component.sliceObject.grainPitchMaximum2
                 }
             }
         }

@@ -99,9 +99,9 @@ ColumnLayout {
                 if (root.clipAudioSource) {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        root.clipAudioSource.pan = root.clipAudioSource.pan + 0.01;
+                        root.clipAudioSource.selectedSliceObject.pan = root.clipAudioSource.selectedSliceObject.pan + 0.01;
                     } else {
-                        root.clipAudioSource.gainAbsolute = root.clipAudioSource.gainAbsolute + 0.01;
+                        root.clipAudioSource.selectedSliceObject.gainHandler.gainAbsolute = root.clipAudioSource.selectedSliceObject.gainHandler.gainAbsolute + 0.01;
                     }
                 }
                 return true;
@@ -109,9 +109,9 @@ ColumnLayout {
                 if (root.clipAudioSource) {
                     if (zynqtgui.modeButtonPressed) {
                         zynqtgui.ignoreNextModeButtonPress = true;
-                        root.clipAudioSource.pan = root.clipAudioSource.pan - 0.01;
+                        root.clipAudioSource.selectedSliceObject.pan = root.clipAudioSource.selectedSliceObject.pan - 0.01;
                     } else {
-                        root.clipAudioSource.gainAbsolute = root.clipAudioSource.gainAbsolute - 0.01;
+                        root.clipAudioSource.selectedSliceObject.gainHandler.gainAbsolute = root.clipAudioSource.selectedSliceObject.gainHandler.gainAbsolute - 0.01;
                     }
                 }
                 return true;
@@ -160,9 +160,9 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: gainDial
             text: qsTr("Gain (dB)") + "\n"
-            controlObj: root.clipAudioSource
+            controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject.gainHandler : null
             controlProperty: "gainAbsolute"
-            valueString: root.clipAudioSource ? qsTr("%1 dB").arg(root.clipAudioSource.gainDb.toFixed(2)) : 0
+            valueString: root.clipAudioSource ? qsTr("%1 dB").arg(root.clipAudioSource.selectedSliceObject.gainHandler.gainDb.toFixed(2)) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -174,7 +174,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.clipAudioSource.gainAbsolute = root.controlObj.initialGain;
+                root.clipAudioSource.selectedSliceObject.gainHandler.gainAbsolute = root.controlObj.initialGain;
             }
         }
 
@@ -183,7 +183,7 @@ ColumnLayout {
             text: qsTr("Pan") + "\n"
             controlObj: root.clipAudioSource
             controlProperty: "pan"
-            valueString: root.clipAudioSource ? root.clipAudioSource.pan.toFixed(2) : 0
+            valueString: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject.pan.toFixed(2) : 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 5
@@ -195,7 +195,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.clipAudioSource.pan = 0;
+                root.clipAudioSource.selectedSliceObject.pan = 0;
             }
         }
 
@@ -216,7 +216,7 @@ ColumnLayout {
             }
 
             onDoubleClicked: {
-                root.clipAudioSource.pitch = root.controlObj.initialPitch;
+                root.clipAudioSource.selectedSliceObject.pitch = root.controlObj.initialPitch;
             }
         }
 
@@ -375,7 +375,7 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 visible: root.selectedChannel ? root.selectedChannel.trackType !== "sample-loop" : false
-                text: root.clipAudioSource ? qsTr("Playback Style:\n%1").arg(root.clipAudioSource.playbackStyleLabel) : ""
+                text: root.clipAudioSource ? qsTr("Playback Style:\n%1").arg(root.clipAudioSource.selectedSliceObject.playbackStyleLabel) : ""
                 onClicked: {
                     playbackStylePicker.open();
                 }
@@ -383,51 +383,62 @@ ColumnLayout {
                     id: playbackStylePicker
                     actions: [
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle
+                            text: root.clipAudioSource
+                                ? root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle
+                                    ? qsTr("<b>Inherit from Clip</b><br />(currently %1)").arg(root.clipAudioSource.rootSlice.playbackStyleLabel)
+                                    : qsTr("Inherit from Clip\n(currently %1)").arg(root.clipAudioSource.rootSlice.playbackStyleLabel)
+                                : qsTr("No Clip")
+                            visible: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.isRootSlice === false
+                            onTriggered: {
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle;
+                            }
+                        },
+                        Kirigami.Action {
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle
                                 ? qsTr("<b>Non-looping</b>")
                                 : qsTr("Non-looping")
                             onTriggered: {
-                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle;
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.NonLoopingPlaybackStyle;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.LoopingPlaybackStyle
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.LoopingPlaybackStyle
                                 ? qsTr("<b>Looping</b>")
                                 : qsTr("Looping")
                             onTriggered: {
-                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.LoopingPlaybackStyle;
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.LoopingPlaybackStyle;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.OneshotPlaybackStyle
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.OneshotPlaybackStyle
                                 ? qsTr("<b>One-shot</b>")
                                 : qsTr("One-shot")
                             onTriggered: {
-                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.OneshotPlaybackStyle;
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.OneshotPlaybackStyle;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.WavetableStyle
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.WavetableStyle
                                 ? qsTr("<b>Wavetable</b>")
                                 : qsTr("Wavetable")
                             onTriggered: {
-                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.WavetableStyle;
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.WavetableStyle;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle
                                 ? qsTr("<b>Granular Non-looping</b><br />(experimental)")
                                 : qsTr("Granular Non-looping\n(experimental)")
                             onTriggered: {
-                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.GranularNonLoopingPlaybackStyle;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.playbackStyle === Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.playbackStyle === Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle
                                 ? qsTr("<b>Granular Looping</b><br />(experimental)")
                                 : qsTr("Granular Looping\n(experimental)")
                             onTriggered: {
-                                root.clipAudioSource.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
+                                root.clipAudioSource.selectedSliceObject.playbackStyle = Zynthbox.ClipAudioSource.GranularLoopingPlaybackStyle;
                             }
                         }
                     ]
@@ -437,9 +448,9 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                 text: root.clipAudioSource
-                    ? root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
+                    ? root.clipAudioSource.selectedSliceObject.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
                         ? "Pitch Shifting:\nHQ Timestretched"
-                        : root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchStandard
+                        : root.clipAudioSource.selectedSliceObject.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchStandard
                             ? "Pitch Shifting:\nTimestretched"
                             : "Pitch Shifting:\nStandard"
                     : ""
@@ -450,27 +461,27 @@ ColumnLayout {
                     id: timeStretchingPopup
                     actions: [
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchBetter
                                 ? qsTr("<b>HQ Timestretch Pitch Shift</b><br />(retains sample length<br />slower, better quality)")
                                 : qsTr("HQ Timestretch Pitch Shift\n(retains sample length,\nmost cpu, better quality)")
                             onTriggered: {
-                                root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchBetter;
+                                root.clipAudioSource.selectedSliceObject.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchBetter;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchStandard
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchStandard
                                 ? qsTr("<b>Timestretch Pitch Shift</b><br />(retains sample length<br />faster, good quality)")
                                 : qsTr("Timestretch Pitch Shift\n(retains sample length,\nmore cpu, good quality)")
                             onTriggered: {
-                                root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchStandard;
+                                root.clipAudioSource.selectedSliceObject.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchStandard;
                             }
                         },
                         Kirigami.Action {
-                            text: root.clipAudioSource && root.clipAudioSource.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchOff
+                            text: root.clipAudioSource && root.clipAudioSource.selectedSliceObject.timeStretchStyle === Zynthbox.ClipAudioSource.TimeStretchOff
                                 ? qsTr("<b>Standard Pitch Shift</b><br />(changes playback length,<br />least cpu, highest quality)")
                                 : qsTr("Standard Pitch Shift\n(changes playback length\nleast cpu, best quality)")
                             onTriggered: {
-                                root.clipAudioSource.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchOff;
+                                root.clipAudioSource.selectedSliceObject.timeStretchStyle = Zynthbox.ClipAudioSource.TimeStretchOff;
                             }
                         }
                     ]
@@ -483,9 +494,9 @@ ColumnLayout {
             QQC2.Switch {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                checked: root.clipAudioSource ? root.clipAudioSource.snapLengthToBeat : true
+                checked: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject.snapLengthToBeat : true
                 onToggled: {
-                    root.clipAudioSource.snapLengthToBeat = checked
+                    root.clipAudioSource.selectedSliceObject.snapLengthToBeat = checked
                 }
             }
             Item {

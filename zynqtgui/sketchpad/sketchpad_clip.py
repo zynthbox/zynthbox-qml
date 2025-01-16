@@ -347,9 +347,11 @@ class sketchpad_clip_metadata(QObject):
                 sliceSettingsObject.loopCrossfadeAmountChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.loopStartCrossfadeDirectionChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.stopCrossfadeDirectionChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.rootNoteChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.keyZoneStartChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.keyZoneEndChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.rootNoteChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.velocityMinimumChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.velocityMaximumChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.panChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.adsrParametersChanged.connect(self.scheduleWrite)
                 sliceSettingsObject.grainPositionChanged.connect(self.scheduleWrite)
@@ -402,9 +404,11 @@ class sketchpad_clip_metadata(QObject):
             sliceObject.setPan(sliceValues["pan"])
             sliceObject.setPitch(sliceValues["pitch"])
             sliceObject.gainHandler().setGainAbsolute(sliceValues["gain"])
+            sliceObject.setRootNote(sliceValues["rootNote"])
             sliceObject.setKeyZoneStart(sliceValues["keyZoneStart"])
             sliceObject.setKeyZoneEnd(sliceValues["keyZoneEnd"])
-            sliceObject.setRootNote(sliceValues["rootNote"])
+            sliceObject.setVelocityMinimum(sliceValues["velocityMinimum"])
+            sliceObject.setVelocityMaximum(sliceValues["velocityMaximum"])
             sliceObject.setADSRAttack(sliceValues["adsrAttack"])
             sliceObject.setADSRDecay(sliceValues["adsrDecay"])
             sliceObject.setADSRSustain(sliceValues["adsrSustain"])
@@ -440,9 +444,11 @@ class sketchpad_clip_metadata(QObject):
             sliceSettingsObject.setPan(0)
             sliceSettingsObject.setPitch(0)
             sliceSettingsObject.gainHandler().setGainAbsolute(1)
+            sliceSettingsObject.setRootNote(60)
             sliceSettingsObject.setKeyZoneStart(0)
             sliceSettingsObject.setKeyZoneEnd(127)
-            sliceSettingsObject.setRootNote(60)
+            sliceSettingsObject.setVelocityMinimum(1);
+            sliceSettingsObject.setVelocityMaximum(127);
             sliceSettingsObject.setADSRAttack(0)
             sliceSettingsObject.setADSRDecay(0)
             sliceSettingsObject.setADSRSustain(1)
@@ -480,9 +486,11 @@ class sketchpad_clip_metadata(QObject):
                 "pan": sliceSettingsObject.pan(),
                 "pitch": sliceSettingsObject.pitch(),
                 "gain": sliceSettingsObject.gainHandler().gainAbsolute(),
+                "rootNote": sliceSettingsObject.rootNote(),
                 "keyZoneStart": sliceSettingsObject.keyZoneStart(),
                 "keyZoneEnd": sliceSettingsObject.keyZoneEnd(),
-                "rootNote": sliceSettingsObject.rootNote(),
+                "velocityMinimum": sliceSettingsObject.velocityMinimum(),
+                "velocityMaximum": sliceSettingsObject.velocityMaximum(),
                 "adsrAttack": sliceSettingsObject.adsrAttack(),
                 "adsrDecay": sliceSettingsObject.adsrDecay(),
                 "adsrSustain": sliceSettingsObject.adsrSustain(),
@@ -554,9 +562,11 @@ class sketchpad_clip_metadata(QObject):
                 self.set_sliceSettings(str(self.getMetadataProperty("ZYNTHBOX_SLICE_SETTINGS", "")))
                 # The slice related settings (for the root slice)
                 self.clip.audioSource.rootSlice().setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
+                self.clip.audioSource.rootSlice().setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
                 self.clip.audioSource.rootSlice().setKeyZoneStart(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_START", 0)))
                 self.clip.audioSource.rootSlice().setKeyZoneEnd(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_END", 127)))
-                self.clip.audioSource.rootSlice().setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
+                self.clip.audioSource.rootSlice().setVelocityMinimum(int(self.getMetadataProperty("ZYNTHBOX_VELOCITY_MINIMUM", 1)))
+                self.clip.audioSource.rootSlice().setVelocityMaximum(int(self.getMetadataProperty("ZYNTHBOX_VELOCITY_MAXIMUM", 127)))
                 self.clip.audioSource.rootSlice().setADSRAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)))
                 self.clip.audioSource.rootSlice().setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
                 self.clip.audioSource.rootSlice().setADSRSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)))
@@ -656,9 +666,11 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_SUBVOICE_SETTINGS"] = [str(json.dumps(serializeSubvoiceSettings(self.clip.audioSource)))]
                     tags["ZYNTHBOX_SLICE_SETTINGS"] = [str(json.dumps(self.serializeSliceSettings()))]
                     # Root slice settings
+                    tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootSlice().rootNote())]
                     tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.rootSlice().keyZoneStart())]
                     tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.rootSlice().keyZoneEnd())]
-                    tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootSlice().rootNote())]
+                    tags["ZYNTHBOX_VELOCITY_MINIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMinimum())]
+                    tags["ZYNTHBOX_VELOCITY_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMaximum())]
                     tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.rootSlice().pan())]
                     tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.rootSlice().gainHandler().gainAbsolute())]
                     tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.rootSlice().adsrAttack())]

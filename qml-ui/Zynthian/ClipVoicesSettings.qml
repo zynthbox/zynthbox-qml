@@ -113,7 +113,7 @@ Item {
 
         function goLeft() {
             if (currentElement === 0) {
-                if (component.cppClipObject.subvoiceCount > 0) {
+                if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
                     currentElement = elementMax;
                 } else {
                     currentElement = elementMax  - 1;
@@ -126,7 +126,7 @@ Item {
             if (currentElement === elementMax) {
                 currentElement = 0;
             } else {
-                if (component.cppClipObject.subvoiceCount > 0) {
+                if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
                     currentElement = currentElement + 1;
                 }
             }
@@ -139,19 +139,19 @@ Item {
             switch (currentElement) {
                 case 0:
                     if (component.cppClipObject) {
-                        component.cppClipObject.subvoiceCount = Math.min(16, component.cppClipObject.subvoiceCount + 1);
+                        component.cppClipObject.selectedSliceObject.subvoiceCount = Math.min(16, component.cppClipObject.selectedSliceObject.subvoiceCount + 1);
                     }
                     break;
                 case 1:
                     if (component.cppClipObject) {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            if (component.cppClipObject.subvoiceCount > 0) {
-                                _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                            if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
+                                _private.editVoice = Math.min(component.cppClipObject.selectedSliceObject.subvoiceCount - 1, _private.editVoice + 1);
                             }
                         } else {
-                            if (component.cppClipObject.subvoiceCount > 0) {
-                                component.cppClipObject.subvoiceSettings[_private.editVoice].pan = Math.min(1, component.cppClipObject.subvoiceSettings[_private.editVoice].pan + 0.01);
+                            if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
+                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pan = Math.min(1, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pan + 0.01);
                             }
                         }
                     }
@@ -165,19 +165,19 @@ Item {
             switch (currentElement) {
                 case 0:
                     if (component.cppClipObject) {
-                        component.cppClipObject.subvoiceCount = Math.max(0, component.cppClipObject.subvoiceCount - 1);
+                        component.cppClipObject.selectedSliceObject.subvoiceCount = Math.max(0, component.cppClipObject.selectedSliceObject.subvoiceCount - 1);
                     }
                     break;
                 case 1:
                     if (component.cppClipObject) {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            if (component.cppClipObject.subvoiceCount > 0) {
+                            if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
                                 _private.editVoice = Math.max(0, _private.editVoice - 1);
                             }
                         } else {
-                            if (component.cppClipObject.subvoiceCount > 0) {
-                                component.cppClipObject.subvoiceSettings[_private.editVoice].pan = Math.max(-1, component.cppClipObject.subvoiceSettings[_private.editVoice].pan - 0.01);
+                            if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
+                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pan = Math.max(-1, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pan - 0.01);
                             }
                         }
                     }
@@ -191,18 +191,18 @@ Item {
             switch (currentElement) {
                 case 0:
                     if (component.cppClipObject) {
-                        if (component.cppClipObject.subvoiceCount > 0) {
-                            _private.editVoice = Math.min(component.cppClipObject.subvoiceCount - 1, _private.editVoice + 1);
+                        if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
+                            _private.editVoice = Math.min(component.cppClipObject.selectedSliceObject.subvoiceCount - 1, _private.editVoice + 1);
                         }
                     }
                     break;
                 case 1:
-                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
+                    if (component.cppClipObject && component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.min(48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch + 0.01);
+                            component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch = Math.min(48, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch + 0.01);
                         } else {
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.min(48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch + 0.1);
+                            component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch = Math.min(48, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch + 0.1);
                         }
                     }
                     break;
@@ -215,18 +215,18 @@ Item {
             switch (currentElement) {
                 case 0:
                     if (component.cppClipObject) {
-                        if (component.cppClipObject.subvoiceCount > 0) {
+                        if (component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
                             _private.editVoice = Math.max(0, _private.editVoice - 1);
                         }
                     }
                     break;
                 case 1:
-                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
+                    if (component.cppClipObject && component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
                         if (zynqtgui.modeButtonPressed) {
                             zynqtgui.ignoreNextModeButtonPress = true;
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.max(-48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch - 0.01);
+                            component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch = Math.max(-48, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch - 0.01);
                         } else {
-                            component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = Math.max(-48, component.cppClipObject.subvoiceSettings[_private.editVoice].pitch - 0.1);
+                            component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch = Math.max(-48, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch - 0.1);
                         }
                     }
                     break;
@@ -240,8 +240,8 @@ Item {
                 case 0:
                     break;
                 case 1:
-                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
-                        component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = Math.min(1, component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute + 0.01);
+                    if (component.cppClipObject && component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
+                        component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainAbsolute = Math.min(1, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainAbsolute + 0.01);
                     }
                     break;
                 default:
@@ -254,8 +254,8 @@ Item {
                 case 0:
                     break;
                 case 1:
-                    if (component.cppClipObject && component.cppClipObject.subvoiceCount > 0) {
-                        component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = Math.max(-1, component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute - 0.01);
+                    if (component.cppClipObject && component.cppClipObject.selectedSliceObject.subvoiceCount > 0) {
+                        component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainAbsolute = Math.max(-1, component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainAbsolute - 0.01);
                     }
                     break;
                 default:
@@ -273,8 +273,8 @@ Item {
             Layout.fillWidth: true
             Layout.preferredWidth: Kirigami.Units.gridUnit
             text: qsTr("Sub-voices")
-            value: component.cppClipObject ? component.cppClipObject.subvoiceCount : 0
-            valueString: component.cppClipObject ? component.cppClipObject.subvoiceCount : 0
+            value: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceCount : 0
+            valueString: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceCount : 0
             decimals: 0
             increment: 1
             slideIncrement: 0.05
@@ -284,15 +284,15 @@ Item {
             upperBound: 16
             selected: _private.currentElement === 0
             knobId: 0
-            onValueChanged: if (component.cppClipObject) { component.cppClipObject.subvoiceCount = value; }
+            onValueChanged: if (component.cppClipObject) { component.cppClipObject.selectedSliceObject.subvoiceCount = value; }
             Connections {
-                target: component.cppClipObject
+                target: component.cppClipObject ? component.cppClipObject.selectedSliceObject : null
                 onSubvoiceCountChanged: {
-                    subvoiceCountSlider.value = component.cppClipObject.subvoiceCount;
+                    subvoiceCountSlider.value = component.cppClipObject.selectedSliceObject.subvoiceCount;
                     if (_private.editVoice > subvoiceCountSlider.value - 1) {
                         _private.editVoice = Math.max(0, subvoiceCountSlider.value - 1);
                     }
-                    if (component.cppClipObject.subvoiceCount === 0) {
+                    if (component.cppClipObject.selectedSliceObject.subvoiceCount === 0) {
                         _private.currentElement = 0;
                     }
                 }
@@ -322,7 +322,7 @@ Item {
             applyLowerBound: true
             lowerBound: 0
             applyUpperBound: true
-            upperBound: component.cppClipObject ? component.cppClipObject.subvoiceCount - 1 : 1
+            upperBound: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceCount - 1 : 1
             resetOnTap: true
             resetValue: 0
             selected: _private.currentElement === 0
@@ -346,7 +346,7 @@ Item {
             Layout.fillHeight: true
             ColumnLayout {
                 anchors.fill: parent
-                enabled: component.cppClipObject && component.cppClipObject.subvoiceCount > 0
+                enabled: component.cppClipObject && component.cppClipObject.selectedSliceObject.subvoiceCount > 0
                 Kirigami.Heading {
                     level: 2
                     text: qsTr("Sub-voice %1 Changes").arg(_private.editVoice + 1)
@@ -360,9 +360,9 @@ Item {
                     Zynthian.SketchpadDial {
                         id: panDial
                         text: qsTr("Pan")
-                        controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                        controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
                         controlProperty: "pan"
-                        valueString: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice].pan.toFixed(2) : 0
+                        valueString: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pan.toFixed(2) : 0
                         selected: _private.currentElement === 1
                         showKnobIndicator: selected
                         knobId: 0
@@ -376,7 +376,7 @@ Item {
                         }
                         onDoubleClicked: {
                             if (component.cppClipObject) {
-                                component.cppClipObject.subvoiceSettings[_private.editVoice].pan = 0;
+                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pan = 0;
                             }
                         }
                     }
@@ -384,7 +384,7 @@ Item {
                     Zynthian.SketchpadDial {
                         id: pitchDial
                         text: qsTr("Pitch")
-                        controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                        controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
                         controlProperty: "pitch"
                         fixedPointTrail: 2
                         selected: _private.currentElement === 1
@@ -400,7 +400,7 @@ Item {
                         }
                         onDoubleClicked: {
                             if (component.cppClipObject) {
-                                component.cppClipObject.subvoiceSettings[_private.editVoice].pitch = 0;
+                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].pitch = 0;
                             }
                         }
                     }
@@ -408,9 +408,9 @@ Item {
                     Zynthian.SketchpadDial {
                         id: gainDial
                         text: qsTr("Gain (dB)")
-                        controlObj: component.cppClipObject ? component.cppClipObject.subvoiceSettings[_private.editVoice] : null
+                        controlObj: component.cppClipObject ? component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice] : null
                         controlProperty: "gainAbsolute"
-                        valueString: component.cppClipObject ? qsTr("%1 dB").arg(component.cppClipObject.subvoiceSettings[_private.editVoice].gainDb.toFixed(2)) : 0
+                        valueString: component.cppClipObject ? qsTr("%1 dB").arg(component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainDb.toFixed(2)) : 0
                         selected: _private.currentElement === 1
                         showKnobIndicator: selected
                         knobId: 2
@@ -426,7 +426,7 @@ Item {
 
                         onDoubleClicked: {
                             if (component.cppClipObject) {
-                                component.cppClipObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
+                                component.cppClipObject.selectedSliceObject.subvoiceSettings[_private.editVoice].gainAbsolute = 0.5;
                             }
                         }
                     }

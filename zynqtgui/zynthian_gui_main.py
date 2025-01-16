@@ -408,11 +408,13 @@ class zynthian_gui_main(zynthian_gui_selector):
 
             # Step 3 : Modify the desktop file to run the AppRun
             self.zynqtgui.currentTaskMessage = "Optimizing App : Updating entry"
-            config_filepath = Path("/root/.local/share/applications/").glob(f"appimagekit_{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}*").__next__()
+            app_md5 = Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)
+            config_filepath = Path("/root/.local/share/applications/").glob(f"appimagekit_{app_md5}*").__next__()
             config = configparser.ConfigParser()
             config.optionxform=str
             config.read(config_filepath)
             config["Desktop Entry"]["Exec"] = str(appdir / "AppRun")
+            config["Desktop Entry"]["Icon"] = str(Path(f"/root/.cache/thumbnails/large/").glob(f"{app_md5}*").__next__())
             with open(config_filepath, "w") as f:
                 config.write(f, space_around_delimiters=False)
             QTimer.singleShot(0, self.zynqtgui.end_long_task)

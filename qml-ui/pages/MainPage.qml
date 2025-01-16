@@ -213,6 +213,26 @@ Zynthian.ScreenPage {
 
                             text: model.display
                         }
+
+                        QQC2.Button {
+                            anchors {
+                                top: parent.top
+                                right: parent.right
+                                margins: Kirigami.Units.gridUnit
+                            }
+                            width: Kirigami.Units.gridUnit * 2
+                            height: Kirigami.Units.gridUnit * 2
+                            icon.name: "delete-symbolic"
+                            // FIXME : Temporarily disable delete button. Figure out how to notify newstuffModel about app removal otherwise newstuff doesnt know that app got removed
+                            visible: false //model.action_id === "appimage" && model.metadata.path.length > 0
+                            onPressed: {
+                                gridMouseArea.blocked = true
+                                mainviewGridId.currentIndex = index
+                            }
+                            onReleased: gridMouseArea.blocked = false
+                            onCanceled: gridMouseArea.blocked = false
+                            onClicked: zynqtgui.main.unregisterAppImage(model.metadata.path)
+                        }
                     }
                 }
             }

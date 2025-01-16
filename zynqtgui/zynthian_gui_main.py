@@ -108,8 +108,9 @@ class zynthian_gui_main(zynthian_gui_selector):
                 appimage_desktop_file = configparser.ConfigParser()
                 appimage_desktop_file.read(file)
                 if "Exec" in appimage_desktop_file["Desktop Entry"] and Path(appimage_desktop_file["Desktop Entry"]["Exec"]).exists():
+                    appimage_path = appimage_desktop_file["Desktop Entry"]["X-AppImage-Path"] if "X-AppImage-Path" in appimage_desktop_file["Desktop Entry"] else ""
                     self.list_data.append(("appimage", appimage_desktop_file["Desktop Entry"]["Exec"], appimage_desktop_file["Desktop Entry"]["Name"]))
-                    self.list_metadata.append({"icon": appimage_desktop_file["Desktop Entry"]["Icon"], "recordings_file_base" : appimage_desktop_file["Desktop Entry"]["Name"], "recording_ports_left" : "", "recording_ports_right" : "", "record_alsa" : False})
+                    self.list_metadata.append({"path": appimage_path,"icon": appimage_desktop_file["Desktop Entry"]["Icon"], "recordings_file_base" : appimage_desktop_file["Desktop Entry"]["Name"], "recording_ports_left" : "", "recording_ports_right" : "", "record_alsa" : False})
                 else:
                     logging.error(f"Appimage desktop file {file} is pointing to a file which does not exist. Skipping.")
 
@@ -399,11 +400,9 @@ class zynthian_gui_main(zynthian_gui_selector):
             # Step 2 : Extract the appimage to `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
             appdir = Path(path).parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
             if (Path(path).parent / "squashfs-root").exists():
-                zynqtgui.currentTaskMessage = "Removing existing squashfs-root dir"
                 shutil.rmtree(Path(path).parent / "squashfs-root", ignore_errors=True)
-            self.zynqtgui.currentTaskMessage = "Optimizing App : Extracting Appimage to squashfs-root"
+            self.zynqtgui.currentTaskMessage = "Optimizing App : Extracting Appimage"
             subprocess.run((path, "--appimage-extract"), stdout=subprocess.DEVNULL, cwd=Path(path).parent)
-            self.zynqtgui.currentTaskMessage = f"Optimizing App : Renaming AppDir to {appdir}"
             (Path(path).parent / "squashfs-root").rename(appdir)
 
             # Step 3 : Modify the desktop file to run the AppRun
@@ -415,24 +414,29 @@ class zynthian_gui_main(zynthian_gui_selector):
             config.read(config_filepath)
             config["Desktop Entry"]["Exec"] = str(appdir / "AppRun")
             config["Desktop Entry"]["Icon"] = str(Path(f"/root/.cache/thumbnails/large/").glob(f"{app_md5}*").__next__())
+            config["Desktop Entry"]["X-AppImage-Path"] = path
             with open(config_filepath, "w") as f:
                 config.write(f, space_around_delimiters=False)
+            self.fill_list()
             QTimer.singleShot(0, self.zynqtgui.end_long_task)
 
         self.zynqtgui.do_long_task(task, f"Optimizing App")
 
     @Slot(str)
     def unregisterAppImage(self, path):
-        # AppImage startup time on rpi is very slow probably due to decompression overhead
-        # After an AppImage is downloaded, the appimage is extracted to make the startup time faster. Cleanup all the extracted files
+        def task():
+            # AppImage startup time on rpi is very slow probably due to decompression overhead
+            # After an AppImage is downloaded, the appimage is extracted to make the startup time faster. Cleanup all the extracted files
 
-        # Step 1 : Remove the extracted AppDir from `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
-        appdir = Path(path).parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
-        if appdir.exists():
-            self.zynqtgui.currentTaskMessage = f"Removing appdir {appdir}"
-            shutil.rmtree(appdir, ignore_errors=True)
-        # Step 2 : Unregister appimage from system.
-        Zynthbox.AppImageHelper.instance().unregisterAppImage(path)
+            # Step 1 : Remove the extracted AppDir from `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
+            appdir = Path(path).parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
+            if appdir.exists():
+                shutil.rmtree(appdir, ignore_errors=True)
+            # Step 2 : Unregister appimage from system.
+            Zynthbox.AppImageHelper.instance().unregisterAppImage(path)
+            self.fill_list()
+            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+        self.zynqtgui.do_long_task(task, f"Removing App")
 
     ### Property visibleCategory
     def get_visibleCategory(self):

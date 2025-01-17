@@ -461,7 +461,6 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 text: component.cppClipObject && component.cppClipObject.equaliserEnabled === true ? qsTr("Equalizer:\nEnabled") : qsTr("Equalizer:\nDisabled")
-                checked: _private.settingsCategory === 0
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
@@ -473,7 +472,6 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 text: component.cppClipObject && component.cppClipObject.compressorEnabled === true ? qsTr("Compressor:\nEnabled") : qsTr("Compressor:\nDisabled")
-                checked: _private.settingsCategory === 1
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
@@ -485,7 +483,6 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 text: qsTr("Equalizer...")
-                checked: _private.settingsCategory === 2
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {

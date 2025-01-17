@@ -99,6 +99,8 @@ Zynthian.ScreenPage {
                     // Cycle between the tabs in order when the alt button is held and mode is pressed
                     if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null) {
                         if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
+                            clipSettingsSectionView.currentItem = clipSettingsSlices;
+                        } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
                             clipSettingsSectionView.currentItem = clipSettingsVoices;
                         } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                             clipSettingsSectionView.currentItem = clipSettingsADSR;
@@ -179,6 +181,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -194,6 +198,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -209,6 +215,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -236,6 +244,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -263,6 +273,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -276,6 +288,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -291,6 +305,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -306,6 +322,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -319,6 +337,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -334,6 +354,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -349,6 +371,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -362,6 +386,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -375,6 +401,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -388,6 +416,8 @@ Zynthian.ScreenPage {
             if (component.selectedClipHasWav) {
                 if (clipSettingsSectionView.currentItem.objectName === "clipSettingsBar") {
                     returnValue = waveBar.cuiaCallback(cuia);
+                } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices") {
+                    returnValue = clipSettingsSlices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices") {
                     returnValue = clipSettingsVoices.cuiaCallback(cuia);
                 } else if (clipSettingsSectionView.currentItem.objectName === "clipSettingsADSR") {
@@ -614,6 +644,19 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit
+                text: qsTr("Slices")
+                enabled: component.selectedClipHasWav
+                checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsSlices"
+                MouseArea {
+                    anchors.fill: parent;
+                    enabled: component.selectedClipHasWav
+                    onClicked: if (clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null) { clipSettingsSectionView.currentItem = clipSettingsSlices }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit
                 text: qsTr("Voices/EQ")
                 enabled: component.selectedClipHasWav
                 checked: clipSettingsSectionView != null && clipSettingsSectionView.currentItem != null && clipSettingsSectionView.currentItem.objectName != null && clipSettingsSectionView.currentItem.objectName === "clipSettingsVoices"
@@ -712,6 +755,7 @@ Zynthian.ScreenPage {
                     target: component
                     onSelectedClipChanged: {
                         clipSettingsBarControlObjThrottle.restart();
+                        clipSettingsSlicesClipThrottle.restart();
                         clipSettingsVoicesClipThrottle.restart();
                         clipSettingsADSRClipThrottle.restart();
                         clipSettingsGraineratorClipThrottle.restart();
@@ -742,6 +786,21 @@ Zynthian.ScreenPage {
                                     : "bottombar-controltype-channel"
                                 : ""
                     showCopyPasteButtons: false
+                }
+                Zynthian.ClipSlicesSettings {
+                    id: clipSettingsSlices
+                    objectName: "clipSettingsSlices"
+                    visible: clipSettingsSectionView.visible && clipSettingsSectionView.currentItem.objectName === objectName
+                    anchors.fill: parent
+                    clip: null
+                    Timer {
+                        id: clipSettingsSlicesClipThrottle
+                        interval: 1; running: false; repeat: false;
+                        onTriggered: {
+                            clipSettingsSlices.clip = component.selectedClip;
+                            clipSettingsSlices.cppClipObject = component.cppClipObject;
+                        }
+                    }
                 }
                 Zynthian.ClipVoicesSettings {
                     id: clipSettingsVoices

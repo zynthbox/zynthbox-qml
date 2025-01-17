@@ -1269,19 +1269,6 @@ Zynthian.ScreenPage {
                                     root.resetBottomBar(allowToggle ? toggle : false)
                                     zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
                                     zynqtgui.bottomBarControlObj = clipCell.channel;
-
-//                                        zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex = channel.sceneClip.col
-//                                        bottomStack.slotsBar.clipsButton.checked = true
-
-//                                        Qt.callLater(function() {
-//                                            if (channel.connectedPattern >= 0) {
-//                                                zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-//                                                zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                            } else {
-//                                                zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
-//                                                zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                            }
-//                                        })
                                 }
 
                                 Layout.fillWidth: true
@@ -1319,12 +1306,6 @@ Zynthian.ScreenPage {
                                     highlighted: index === root.song.scenesModel.selectedSceneIndex
                                     highlightOnFocus: false
                                     onPressed: {
-//                                            zynqtgui.sketchpad.lastSelectedObj = {
-//                                                className: "sketchpad_scene",
-//                                                value: index,
-//                                                component: sceneHeader
-//                                            }
-
                                             Zynthian.CommonUtils.switchToScene(index);
                                     }
                                 }
@@ -1335,23 +1316,6 @@ Zynthian.ScreenPage {
                                     anchors.fill: parent
                                     channel: model.channel
                                     backgroundColor: "#000000"
-                                    onHighlightedChanged: {
-                                        Qt.callLater(function () {
-                                            //console.log("Clip : (" + channel.sceneClip.row+", "+channel.sceneClip.col+")", "Selected Channel :"+ zynqtgui.sketchpad.selectedTrackId)
-
-                                            // Switch to highlighted clip only if previous selected bottombar object was a clip/pattern
-//                                            if (highlighted && (zynqtgui.bottomBarControlType === "bottombar-controltype-pattern" || zynqtgui.bottomBarControlType === "bottombar-controltype-clip")) {
-//                                                if (channel.connectedPattern >= 0) {
-//                                                    zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-//                                                    zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                                } else {
-//                                                    zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
-//                                                    zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                                }
-//                                            }
-                                        });
-                                    }
-
                                     Connections {
                                         target: channel.sceneClip
                                         onInCurrentSceneChanged: colorTimer.restart()
@@ -1386,20 +1350,6 @@ Zynthian.ScreenPage {
                                         id: colorTimer
                                         interval: 10
                                         onTriggered: {
-                                            // update color
-//                                                if (channel.trackType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && !channel.sceneClip.isEmpty) {
-//                                                    // In scene
-//                                                    clipCell.backgroundColor = "#3381d4fa";
-//                                                } /*else if (channel.sceneClip && (!channel.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col))) {
-//                                                    // Not in scene
-//                                                    clipCell.backgroundColor = "#33f44336";
-//                                                }*/ else if ((channel.connectedPattern >= 0 && clipCell.pattern.hasNotes)
-//                                                    || (channel.trackType === "sample-loop" && !channel.sceneClip.isEmpty)) {
-//                                                    clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
-//                                                } else {
-//                                                    clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
-//                                                }
-
                                             // update isPlaying
                                             if (channel.connectedPattern < 0) {
                                                 clipCell.isPlaying = channel.sceneClip.isPlaying;
@@ -1424,21 +1374,6 @@ Zynthian.ScreenPage {
                                     onPressed: {
                                         clipsDelegate.switchToThisClip(true)
                                     }
-//                                    onPressAndHold: {
-//                                        zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-//                                        zynqtgui.bottomBarControlObj = channel.sceneClip;
-//                                        bottomStack.slotsBar.bottomBarButton.checked = true;
-
-//                                        if (channel.trackType === "sample-loop") {
-//                                            if (channel.sceneClip && !channel.sceneClip.isEmpty) {
-//                                                bottomStack.bottomBar.waveEditorAction.trigger();
-//                                            } else {
-//                                                bottomStack.bottomBar.recordingAction.trigger();
-//                                            }
-//                                        } else {
-//                                            bottomStack.bottomBar.patternAction.trigger();
-//                                        }
-//                                    }
                                 }
 
                                 Rectangle {

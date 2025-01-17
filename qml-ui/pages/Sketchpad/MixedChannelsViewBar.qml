@@ -45,17 +45,6 @@ Rectangle {
         interval: 1; running: false; repeat: false;
         onTriggered: {
             root.selectedChannel = applicationWindow().selectedChannel;
-            // Focus a slot when a clip/channel/slot is not already focused
-            if (zynqtgui.sketchpad.lastSelectedObj.className != "sketchpad_channel" &&
-                    zynqtgui.sketchpad.lastSelectedObj.className != "sketchpad_clip" &&
-                    zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" &&
-                    zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" ) {
-                if (synthRepeater.itemAt(0)) {
-                    synthRepeater.itemAt(0).switchToThisSlot(true)
-                } else {
-                    selectedChannelThrottle.restart();
-                }
-            }
         }
     }
     Connections {

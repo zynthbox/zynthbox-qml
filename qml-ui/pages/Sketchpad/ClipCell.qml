@@ -84,80 +84,6 @@ QQC2.AbstractButton {
     }
 
     contentItem: Item {
-//        Connections {
-//            target: channel
-//            onSelectedClipNamesChanged: {
-//                console.log("### Selected clip names for channel " + channel.name + " : " + channel.selectedClipNames + ", length : " + channel.selectedClipNames.length + ", joined length : ", channel.selectedClipNames.join("").length)
-//            }
-//        }
-
-//        Image {
-//            id: patternVisualiser
-//            anchors.fill: parent
-//            anchors.margins: 2
-//            smooth: false
-
-//            visible: root.isInScene &&
-//                     channel.trackType !== "sample-loop" &&
-//                     root.pattern &&
-//                     root.pattern.hasNotes
-//            source: root.pattern ? root.pattern.thumbnailUrl : ""
-//            cache: false
-//        }
-
-//        QQC2.Label {
-//            anchors {
-//                right: parent.right
-//                bottom: parent.bottom
-//            }
-//            visible: root.isInScene &&
-//                     channel.trackType === "sample-loop" && !channel.sceneClip.isEmpty
-//            text: visible
-//                ? qsTr("%1%2")
-//                    .arg(channel.sceneClip.isPlaying &&
-//                         channel.sceneClip.currentBeat >= 0
-//                            ? (channel.sceneClip.currentBeat+1) + "/"
-//                            : "")
-//                    .arg(channel.sceneClip.metadata.snapLengthToBeat
-//                            ? channel.sceneClip.metadata.length.toFixed(0)
-//                            : channel.sceneClip.metadata.length.toFixed(2))
-//                : ""
-//        }
-
-//        QQC2.Label {
-//            id: patternPlaybackLabel
-//            anchors {
-//                right: parent.right
-//                bottom: parent.bottom
-//            }
-//            visible: root.isInScene &&
-//                     channel.trackType !== "sample-loop" &&
-//                     root.pattern &&
-//                     root.pattern.hasNotes
-//            text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
-//            property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynqtgui.sketchpad.isMetronomeRunning
-//                    ? patternPlaybackLabel.playbackPosition + "/"
-//                    : ""
-//            property int playbackPosition: 1
-//            Connections {
-//                target: root.pattern
-//                enabled: patternPlaybackLabel.visible
-//                onBankPlaybackPositionChanged: {
-//                    let playbackPosition = Math.floor(root.pattern.bankPlaybackPosition/4) + 1
-//                    if (patternPlaybackLabel.playbackPosition != playbackPosition) {
-//                        patternPlaybackLabel.playbackPosition = playbackPosition
-//                    }
-//                }
-//            }
-//        }
-
-//        QQC2.Label {
-//            anchors.centerIn: parent
-//            color: "#f44336"
-//            text: qsTr("Mute")
-//            visible: !root.isInScene
-//        }
-
         ColumnLayout {
             anchors.fill: parent
             anchors.topMargin: spacing
@@ -216,36 +142,6 @@ QQC2.AbstractButton {
                 samples: 11
             }
         }
-
-//        Rectangle {
-//            height: Kirigami.Units.gridUnit * 0.7
-//            anchors.left: parent.left
-//            anchors.right: parent.right
-//            anchors.top: parent.top
-//            color: "#99888888"
-//            visible: presetName.text &&
-//                     presetName.text.length > 0
-
-//            QQC2.Label {
-//                id: presetName
-//                property string presetText: channel.connectedSoundName.split(" > ")[1]
-
-//                anchors.fill: parent
-//                elide: "ElideRight"
-//                horizontalAlignment: "AlignHCenter"
-//                verticalAlignment: "AlignVCenter"
-//                font.pointSize: 8
-//                text: model.channel.trackType === "synth"
-//                      ? presetText
-//                          ? presetText
-//                          : ""
-//                      : model.channel.trackType =="sample-trig"
-//                          ? model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-//                          : model.channel.trackType === "sample-loop"
-//                              ? model.channel.sceneClip.path.split("/").pop()
-//                              : qsTr("Midi %1").arg(model.channel.externalMidiChannel > -1 ? model.channel.externalMidiChannel + 1 : model.channel.id + 1)
-//            }
-//        }
     }
 
     background: Rectangle {

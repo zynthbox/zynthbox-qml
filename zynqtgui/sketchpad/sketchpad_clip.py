@@ -294,6 +294,7 @@ class sketchpad_clip_metadata(QObject):
             self.clip.audioSource.autoSynchroniseSpeedRatioChanged.connect(self.scheduleWrite)
             self.clip.audioSource.speedRatioChanged.connect(self.scheduleWrite)
             self.clip.audioSource.sliceCountChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.slicesContiguousChanged.connect(self.scheduleWrite)
             def connectSliceForSaving(sliceSettingsObject):
                 sliceSettingsObject.subvoiceCountChanged.connect(self.scheduleWrite)
                 for subvoiceSettingsObject in sliceSettingsObject.subvoiceSettings():
@@ -413,6 +414,8 @@ class sketchpad_clip_metadata(QObject):
                     sliceSettingsObject.subvoiceSettings()[index].setGain(subvoiceValues["gain"])
                 sliceSettingsObject.setSubvoiceCount(sliceValues["subvoiceCount"])
         self.clip.audioSource.setSliceCount(dataChunk["count"])
+        if "contiguous" in dataChunk:
+            self.clip.audioSource.setSlicesContiguous(dataChunk["contiguous"])
     def setSliceDefaults(self):
         for sliceIndex, sliceSettingsObject in enumerate(self.clip.audioSource.sliceSettings()):
             sliceSettingsObject.setPan(0)
@@ -458,6 +461,7 @@ class sketchpad_clip_metadata(QObject):
                 subvoiceSettingsObject.setGain(1)
             sliceSettingsObject.setSubvoiceCount(0)
         self.clip.audioSource.setSliceCount(0)
+        self.clip.audioSource.setSlicesContiguous(false)
     def serializeSliceSettings(self):
         sliceSettingsData = []
         for sliceSettingsObject in self.clip.audioSource.sliceSettings():
@@ -511,7 +515,8 @@ class sketchpad_clip_metadata(QObject):
             })
         return {
             "settings": sliceSettingsData,
-            "count": self.clip.audioSource.sliceCount()
+            "count": self.clip.audioSource.sliceCount(),
+            "contiguous": self.clip.audioSource.slicesContiguous()
         }
 
     def read(self, load_autosave=True):

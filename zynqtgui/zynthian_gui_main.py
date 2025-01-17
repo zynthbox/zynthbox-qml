@@ -83,7 +83,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         if self.visibleCategory == "modules":
             # Main Apps
-            self.list_data.append((self.sketchpad, 0, "Clips"))
+            self.list_data.append((self.sketchpad, 0, "Tracks & Clips"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/clipsview.svg"})
 
             self.list_data.append((self.playgrid, 0, "Playground"))
@@ -92,15 +92,15 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.song_manager, 0, "Song Manager"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/song-player.svg"})
 
-            self.list_data.append((self.layers, 0, "Library"))
+            self.list_data.append((self.layers, 0, "Sounds"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
 
             self.list_data.append((self.admin, 0, "Settings"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/settings.svg"})
 
-            # As per #299, rename Snapshots to Soundsets
-            self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
-            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/snapshots.svg"})
+            # We probably no longer need it. Comment it out temporarily and delete later
+            # self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
+            # self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/snapshots.svg"})
 
         if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
             for file in Path(os.path.expanduser('~') + "/.local/share/applications/").glob("appimagekit*.desktop"):

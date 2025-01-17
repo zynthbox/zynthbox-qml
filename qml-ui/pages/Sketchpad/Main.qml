@@ -45,24 +45,24 @@ Zynthian.ScreenPage {
     property bool displayTrackButtons: false
     property bool showOccupiedSlotsHeader: false
     /**
-      * This property will tell the track changed signal to not switch clip automatically
-      * to prevent switching to same clip twice when a clip cell is clicked
+      * This property will tell the track changed signal to not switch item automatically
+      * to prevent switching to different item when a item is clicked
       */
-    property bool ignoreNextClipSwitch: false
+    property bool ignoreNextAutoSwitch: false
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
             root.selectedChannel = applicationWindow().selectedChannel;
-            if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_channel") {
-                channelsHeaderRepeater.itemAt(root.selectedChannel.id).switchToThisChannel();
-            } else if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_clip") {
-                if (!root.ignoreNextClipSwitch) {
+            if (!root.ignoreNextAutoSwitch) {
+                if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_channel") {
+                    channelsHeaderRepeater.itemAt(root.selectedChannel.id).switchToThisChannel();
+                } else if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_clip") {
                     clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip(false);
                 }
             }
-            root.ignoreNextClipSwitch = false
+            root.ignoreNextAutoSwitch = false
         }
     }
     Connections {
@@ -1268,7 +1268,7 @@ Zynthian.ScreenPage {
                                         // Clip is already selected. Toggle between track/clips view
                                         root.resetBottomBar(allowToggle)
                                     } else {
-                                        root.ignoreNextClipSwitch = true
+                                        root.ignoreNextAutoSwitch = true
                                         zynqtgui.sketchpad.lastSelectedObj.className = clipCell.channel.sceneClip.className
                                         zynqtgui.sketchpad.lastSelectedObj.value = clipCell.channel.sceneClip
                                         zynqtgui.sketchpad.lastSelectedObj.component = clipCell

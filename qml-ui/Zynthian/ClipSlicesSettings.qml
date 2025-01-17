@@ -371,7 +371,7 @@ Item {
             resetValue: -1
             selected: _private.currentElement === 0
             knobId: 1
-            onValueChanged: component.cppClipObject.selectedSlice = value
+            onValueChanged: if (component.cppClipObject) { component.cppClipObject.selectedSlice = value; }
             Connections {
                 target: component.cppClipObject
                 onSelectedSliceChanged: editSliceSlider.value = component.cppClipObject.selectedSlice

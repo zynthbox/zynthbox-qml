@@ -44,6 +44,11 @@ Zynthian.ScreenPage {
     property bool displaySceneButtons: zynqtgui.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
     property bool showOccupiedSlotsHeader: false
+    /**
+      * This property will tell the track changed signal to not switch clip automatically
+      * to prevent switching to same clip twice when a clip cell is clicked
+      */
+    property bool ignoreNextClipSwitch: false
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -53,7 +58,11 @@ Zynthian.ScreenPage {
             if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_channel") {
                 channelsHeaderRepeater.itemAt(root.selectedChannel.id).switchToThisChannel();
             } else if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_clip") {
-                clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip(false);
+                if (root.ignoreNextClipSwitch) {
+                    root.ignoreNextClipSwitch = false
+                } else {
+                    clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip(false);
+                }
             }
         }
     }
@@ -1249,26 +1258,23 @@ Zynthian.ScreenPage {
                             delegate: Item {
                                 id: clipsDelegate
                                 function switchToThisClip(allowToggle) {
-                                    var toggle = false;
-
+                                    console.log((new Error).stack)
+                                    console.log(`last name: ${zynqtgui.sketchpad.lastSelectedObj.className}, last value: ${zynqtgui.sketchpad.lastSelectedObj.value}, last component : ${zynqtgui.sketchpad.lastSelectedObj.component}`)
+                                    console.log(` cur name: ${clipCell.channel.sceneClip.className},  cur value: ${clipCell.channel.sceneClip},  cur component : ${clipCell}`)
                                     if (zynqtgui.sketchpad.lastSelectedObj != null &&
                                             zynqtgui.sketchpad.lastSelectedObj.className === clipCell.channel.sceneClip.className &&
                                             zynqtgui.sketchpad.lastSelectedObj.value === clipCell.channel.sceneClip &&
                                             zynqtgui.sketchpad.lastSelectedObj.component != null &&
                                             zynqtgui.sketchpad.lastSelectedObj.component === clipCell) {
                                         // Clip is already selected. Toggle between track/clips view
-                                        toggle = true
+                                        root.resetBottomBar(allowToggle)
+                                    } else {
+                                        root.ignoreNextClipSwitch = true
+                                        zynqtgui.sketchpad.lastSelectedObj.className = clipCell.channel.sceneClip.className
+                                        zynqtgui.sketchpad.lastSelectedObj.value = clipCell.channel.sceneClip
+                                        zynqtgui.sketchpad.lastSelectedObj.component = clipCell
+                                        zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id
                                     }
-
-                                    zynqtgui.sketchpad.lastSelectedObj.className = clipCell.channel.sceneClip.className
-                                    zynqtgui.sketchpad.lastSelectedObj.value = clipCell.channel.sceneClip
-                                    zynqtgui.sketchpad.lastSelectedObj.component = clipCell
-
-                                    zynqtgui.sketchpad.selectedTrackId = clipCell.channel.id;
-
-                                    root.resetBottomBar(allowToggle ? toggle : false)
-                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                    zynqtgui.bottomBarControlObj = clipCell.channel;
                                 }
 
                                 Layout.fillWidth: true

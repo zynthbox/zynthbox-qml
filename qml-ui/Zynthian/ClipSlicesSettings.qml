@@ -139,16 +139,17 @@ Item {
                     break;
                 case 2:
                     if (component.cppClipObject) {
-                        component.cppClipObject.selectedSliceObject.rootNote = component.cppClipObject.selectedSliceObject.rootNote + 1;
+                        component.cppClipObject.selectedSliceObject.velocityMinimum = component.cppClipObject.selectedSliceObject.velocityMinimum + 1;
                     }
                     break;
                 case 3:
                     if (component.cppClipObject) {
-                        component.cppClipObject.selectedSliceObject.velocityMinimum = component.cppClipObject.selectedSliceObject.velocityMinimum + 1;
+                        component.cppClipObject.selectedSliceObject.rootNote = component.cppClipObject.selectedSliceObject.rootNote + 1;
                     }
                     break;
                 case 4:
                     if (component.cppClipObject) {
+                        component.cppClipObject.slicesContiguous = true;
                     }
                     break;
                 default:
@@ -170,16 +171,17 @@ Item {
                     break;
                 case 2:
                     if (component.cppClipObject) {
-                        component.cppClipObject.selectedSliceObject.rootNote = component.cppClipObject.selectedSliceObject.rootNote - 1;
+                        component.cppClipObject.selectedSliceObject.velocityMinimum = component.cppClipObject.selectedSliceObject.velocityMinimum - 1;
                     }
                     break;
                 case 3:
                     if (component.cppClipObject) {
-                        component.cppClipObject.selectedSliceObject.velocityMinimum = component.cppClipObject.selectedSliceObject.velocityMinimum - 1;
+                        component.cppClipObject.selectedSliceObject.rootNote = component.cppClipObject.selectedSliceObject.rootNote - 1;
                     }
                     break;
                 case 4:
                     if (component.cppClipObject) {
+                        component.cppClipObject.slicesContiguous = false;
                     }
                     break;
                 default:
@@ -201,11 +203,11 @@ Item {
                     break;
                 case 2:
                     if (component.cppClipObject) {
+                        component.cppClipObject.selectedSliceObject.velocityMaximum = component.cppClipObject.selectedSliceObject.velocityMaximum + 1;
                     }
                     break;
                 case 3:
                     if (component.cppClipObject) {
-                        component.cppClipObject.selectedSliceObject.velocityMaximum = component.cppClipObject.selectedSliceObject.velocityMaximum + 1;
                     }
                     break;
                 case 4:
@@ -231,11 +233,11 @@ Item {
                     break;
                 case 2:
                     if (component.cppClipObject) {
+                        component.cppClipObject.selectedSliceObject.velocityMaximum = component.cppClipObject.selectedSliceObject.velocityMaximum - 1;
                     }
                     break;
                 case 3:
                     if (component.cppClipObject) {
-                        component.cppClipObject.selectedSliceObject.velocityMaximum = component.cppClipObject.selectedSliceObject.velocityMaximum - 1;
                     }
                     break;
                 case 4:
@@ -462,37 +464,26 @@ Item {
                                 visible: _private.currentElement === 1
                                 knobId: 1
                             }
-                        }
-                    }
-
-                    Item {
-                        Layout.fillHeight: true
-                        Layout.minimumWidth: Kirigami.Units.largeSpacing
-                        Layout.maximumWidth: Kirigami.Units.largeSpacing
-                    }
-
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit
-                        Layout.margins: Kirigami.Units.smallSpacing
-                        text: component.cppClipObject ? qsTr("Sample\nPitch:\n%1").arg(Zynthbox.KeyScales.midiNoteName(component.cppClipObject.selectedSliceObject.rootNote)) : qsTr("Sample\nPitch")
-                        MouseArea {
-                            anchors.fill: parent;
-                            onClicked: {
-                                
+                            Rectangle {
+                                anchors {
+                                    top: parent.bottom
+                                    topMargin: 2
+                                    left: parent.left
+                                    right: parent.right
+                                }
+                                height: 2
+                                color: _private.currentElement === 1 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                                KnobIndicator {
+                                    anchors {
+                                        top: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
+                                    }
+                                    width: Kirigami.Units.iconSizes.small
+                                    height: width
+                                    visible: _private.currentElement === 1
+                                    knobId: 3
+                                }
                             }
-                        }
-                        KnobIndicator {
-                            anchors {
-                                top: parent.top
-                                left: parent.left
-                                margins: Kirigami.Units.smallSpacing
-                            }
-                            width: Kirigami.Units.iconSizes.small
-                            height: width
-                            visible: _private.currentElement === 2
-                            knobId: 0
                         }
                     }
 
@@ -527,7 +518,7 @@ Item {
                                 }
                                 width: Kirigami.Units.iconSizes.small
                                 height: width
-                                visible: _private.currentElement === 3
+                                visible: _private.currentElement === 2
                                 knobId: 0
                             }
                         }
@@ -556,8 +547,28 @@ Item {
                                 }
                                 width: Kirigami.Units.iconSizes.small
                                 height: width
-                                visible: _private.currentElement === 3
+                                visible: _private.currentElement === 2
                                 knobId: 1
+                            }
+                            Rectangle {
+                                anchors {
+                                    top: parent.bottom
+                                    topMargin: 2
+                                    left: parent.left
+                                    right: parent.right
+                                }
+                                height: 2
+                                color: _private.currentElement === 2 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                                KnobIndicator {
+                                    anchors {
+                                        top: parent.bottom
+                                        horizontalCenter: parent.horizontalCenter
+                                    }
+                                    width: Kirigami.Units.iconSizes.small
+                                    height: width
+                                    visible: _private.currentElement === 2
+                                    knobId: 3
+                                }
                             }
                         }
                     }
@@ -581,7 +592,31 @@ Item {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: qsTr("Create Even\nSlices...")
+                text: component.cppClipObject ? qsTr("Sample\nPitch:\n%1").arg(Zynthbox.KeyScales.midiNoteName(component.cppClipObject.selectedSliceObject.rootNote)) : qsTr("Sample\nPitch\n")
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        
+                    }
+                }
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        margins: Kirigami.Units.smallSpacing
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: _private.currentElement === 3
+                    knobId: 0
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                // Select split point in popup (probably snow the sample, and show split point in that popup...)
+                text: qsTr("Split\nSlice...")
+                enabled: false
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
@@ -592,7 +627,93 @@ Item {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: qsTr("Auto-slice...")
+                // What this does will depend on the style... free-form or contiguous
+                // - free-form/overlapping just clears the slice and moves those above down (popup is just confirm/reject)
+                // - contiguous will add the length of the deleted slice to another slice
+                //   - for first slice, offer to remove and add length to next, or simply remove
+                //   - for all others, offer to remove and add length to either next or previous
+                //   - for the last slice, offer to remove and add length to previous, or simply remove
+                text: qsTr("Delete\nSlice...")
+                enabled: false
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        
+                    }
+                }
+                Rectangle {
+                    anchors {
+                        top: parent.bottom
+                        topMargin: 2
+                        left: parent.left
+                        right: parent.right
+                    }
+                    height: 2
+                    color: _private.currentElement === 3 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                    KnobIndicator {
+                        anchors {
+                            top: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                        width: Kirigami.Units.iconSizes.small
+                        height: width
+                        visible: _private.currentElement === 3
+                        knobId: 3
+                    }
+                }
+            }
+        }
+
+        Item {
+            Layout.fillHeight: true
+            Layout.minimumWidth: Kirigami.Units.largeSpacing * 3
+            Layout.maximumWidth: Kirigami.Units.largeSpacing * 3
+        }
+
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit
+            Layout.margins: Kirigami.Units.smallSpacing
+            spacing: Kirigami.Units.smallSpacing
+            enabled: component.cppClipObject
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                // Simply setting this will only apply the logic if things already line up.
+                // In the popup, show an option to force-apply things (sort things by start positions and set lengths to the stop point of the next slice)
+                text: component.cppClipObject
+                    ? component.cppClipObject.slicesContiguous
+                        ? qsTr("Slicing Style:\nContiguous")
+                        : qsTr("Slicing Style:\nFree-form")
+                    : qsTr("Slicing Style:\n(no sample)")
+                enabled: false
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        
+                    }
+                }
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        margins: Kirigami.Units.smallSpacing
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: _private.currentElement === 4
+                    knobId: 0
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                // Offer options for...
+                // - even splits full sample and even split based on some other slice (pre-selecting the current slice)
+                // - beat/transient detection, see juce's detection logic for this (based on some existing slice, pre-selecting current slice)
+                text: qsTr("Auto\nSlice...")
+                enabled: false
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
@@ -603,11 +724,32 @@ Item {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: qsTr("Delete All\nSlices...")
+                text: qsTr("Clear All\nSlices...")
+                enabled: false
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
                         
+                    }
+                }
+                Rectangle {
+                    anchors {
+                        top: parent.bottom
+                        topMargin: 2
+                        left: parent.left
+                        right: parent.right
+                    }
+                    height: 2
+                    color: _private.currentElement === 4 ? Kirigami.Theme.highlightedTextColor : "transparent"
+                    KnobIndicator {
+                        anchors {
+                            top: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                        }
+                        width: Kirigami.Units.iconSizes.small
+                        height: width
+                        visible: _private.currentElement === 4
+                        knobId: 3
                     }
                 }
             }

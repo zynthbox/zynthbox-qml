@@ -328,7 +328,7 @@ QQC2.ScrollView {
                 onClicked: {
                     if (127 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 176) {
                         // Then it's a note on/off message, and we should be picking a note for this value
-                        notePicker.pickNote(component.filterObject.byte2Minimum, function(newNote) {
+                        applicationWindow().pickNote(component.filterObject.byte2Minimum, function(newNote) {
                             component.filterObject.byte2Minimum = newNote;
                             if (component.filterObject.requireRange === false) {
                                 component.filterObject.byte2Maximum = newByte;
@@ -486,7 +486,7 @@ QQC2.ScrollView {
                 onClicked: {
                     if (127 < component.filterObject.byte1Maximum && component.filterObject.byte1Maximum < 176) {
                         // Then it's a note on/off message, and we should be picking a note for this value
-                        notePicker.pickNote(component.filterObject.byte2Maximum, function(newNote) {
+                        applicationWindow().pickNote(component.filterObject.byte2Maximum, function(newNote) {
                             component.filterObject.byte2Maximum = newNote;
                         });
                     } else if (175 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 192) {

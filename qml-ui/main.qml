@@ -1257,6 +1257,13 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    function pickNote(currentNote, callbackFunction) {
+        notePicker.pickNote(currentNote, callbackFunction);
+    }
+    Zynthian.NotePickerPopup {
+        id: notePicker
+    }
+
     Zynthian.Drawer {
         id: miniPlayGridDrawer
         width: root.width

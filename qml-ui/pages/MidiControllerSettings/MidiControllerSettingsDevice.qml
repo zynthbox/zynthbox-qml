@@ -262,7 +262,7 @@ QQC2.ScrollView {
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: _private.selectedDeviceObject === null ? "" : qsTr("Last Note In Lower Split:\n%1").arg(Zynthbox.KeyScales.midiNoteName(_private.selectedDeviceObject.noteSplitPoint))
                 onClicked: {
-                    notePicker.pickNote(_private.selectedDeviceObject.noteSplitPoint, function(newNote) {
+                    applicationWindow().pickNote(_private.selectedDeviceObject.noteSplitPoint, function(newNote) {
                         _private.selectedDeviceObject.noteSplitPoint = newNote;
                         // when setting this, force the lower and upper zone master channels to 0 and 15 respectively, to match the standard mpe zone setup
                         _private.selectedDeviceObject.lowerMasterChannel = 0;

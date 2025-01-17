@@ -415,7 +415,9 @@ Item {
                             MouseArea {
                                 anchors.fill: parent;
                                 onClicked: {
-                                    
+                                    applicationWindow().pickNote(component.cppClipObject.selectedSliceObject.keyZoneStart, function(newNote) {
+                                        component.cppClipObject.selectedSliceObject.keyZoneStart = newNote;
+                                    });
                                 }
                             }
                             KnobIndicator {
@@ -444,7 +446,9 @@ Item {
                             MouseArea {
                                 anchors.fill: parent;
                                 onClicked: {
-                                    
+                                    applicationWindow().pickNote(component.cppClipObject.selectedSliceObject.keyZoneEnd, function(newNote) {
+                                        component.cppClipObject.selectedSliceObject.keyZoneEnd = newNote;
+                                    });
                                 }
                             }
                             KnobIndicator {

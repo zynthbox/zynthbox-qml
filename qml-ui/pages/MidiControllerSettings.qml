@@ -631,10 +631,6 @@ Zynthian.ScreenPage {
         }
     }
 
-    Zynthian.NotePickerPopup {
-        id: notePicker
-    }
-
     Zynthian.DialogQuestion {
         id: midiEventListener
         property var selectedEvent: []

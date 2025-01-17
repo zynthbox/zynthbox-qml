@@ -1637,13 +1637,13 @@ class sketchpad_channel(QObject):
         elif self.audioTypeKey() == "sample":
             sample = self.samples[self.selectedSlotRow]
             if sample.audioSource:
-                knownGain = sample.audioSource.gainAbsolute()
-                knownPan = sample.audioSource.pan()
+                knownGain = sample.audioSource.rootSlice().gainHandler().gainAbsolute()
+                knownPan = sample.audioSource.rootSlice().pan()
         elif self.audioTypeKey() == "sketch":
             theClip = self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
             if theClip.audioSource:
-                knownGain = theClip.audioSource.gainAbsolute()
-                knownPan = theClip.audioSource.pan()
+                knownGain = theClip.audioSource.rootSlice().gainHandler().gainAbsolute()
+                knownPan = theClip.audioSource.rootSlice().pan()
         elif self.audioTypeKey() == "external":
             pass
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_GAIN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownGain, (0, 1), (0, 127)))

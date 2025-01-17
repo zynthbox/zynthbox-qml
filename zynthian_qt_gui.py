@@ -1953,15 +1953,8 @@ class zynthian_gui(QObject):
             # pass
 
         elif cuia == "SCREEN_LAYER":
-            selected_track = self.sketchpad.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
-            if self.sketchpad.lastSelectedObj.className == "MixedChannelsViewBar_fxslot" and selected_track.chainedFx[self.sketchpad.lastSelectedObj.value] != None:
-                zynqtgui.forced_screen_back = "sketchpad"
-                zynqtgui.current_screen_id = "effect_preset"
-                zynqtgui.layer.page_after_layer_creation = "sketchpad"
-            elif self.sketchpad.lastSelectedObj.className == "MixedChannelsViewBar_slot" and selected_track.checkIfLayerExists(selected_track.chainedSounds[self.sketchpad.lastSelectedObj.value]):
-                self.show_screen("preset")
-            else:
-                self.showMessageDialog.emit("Selected slot is empty. Cannot open preset page for empty slot", 2000)
+            self.show_screen("preset")
+            self.show_screen("preset")
             sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_LAYER_FX":

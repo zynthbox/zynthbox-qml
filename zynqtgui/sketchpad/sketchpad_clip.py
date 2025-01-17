@@ -293,6 +293,7 @@ class sketchpad_clip_metadata(QObject):
             self.clip.audioSource.bpmChanged.connect(self.scheduleWrite)
             self.clip.audioSource.autoSynchroniseSpeedRatioChanged.connect(self.scheduleWrite)
             self.clip.audioSource.speedRatioChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.sliceCountChanged.connect(self.scheduleWrite)
             def connectSliceForSaving(sliceSettingsObject):
                 sliceSettingsObject.subvoiceCountChanged.connect(self.scheduleWrite)
                 for subvoiceSettingsObject in sliceSettingsObject.subvoiceSettings():

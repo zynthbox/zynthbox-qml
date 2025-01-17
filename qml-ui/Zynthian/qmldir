@@ -58,3 +58,4 @@ ActionPickerPopup 1.0 ActionPickerPopup.qml
 DialogQuestionButtonFocusHighlight 1.0 DialogQuestionButtonFocusHighlight.qml
 ClipVoicesSettings 1.0 ClipVoicesSettings.qml
 NotePickerPopup 1.0 NotePickerPopup.qml
+ClipSlicesSettings 1.0 ClipSlicesSettings.qml

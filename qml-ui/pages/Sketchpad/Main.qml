@@ -58,12 +58,11 @@ Zynthian.ScreenPage {
             if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_channel") {
                 channelsHeaderRepeater.itemAt(root.selectedChannel.id).switchToThisChannel();
             } else if (zynqtgui.sketchpad.lastSelectedObj.className == "sketchpad_clip") {
-                if (root.ignoreNextClipSwitch) {
-                    root.ignoreNextClipSwitch = false
-                } else {
+                if (!root.ignoreNextClipSwitch) {
                     clipsRepeater.itemAt(root.selectedChannel.id).switchToThisClip(false);
                 }
             }
+            root.ignoreNextClipSwitch = false
         }
     }
     Connections {

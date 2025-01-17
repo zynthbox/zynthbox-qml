@@ -445,10 +445,13 @@ class zynthian_gui_preset(zynthian_gui_selector):
             self.disable_show_fav_presets()
 
     def get_show_only_favorites(self):
-        return self.zynqtgui.curlayer.show_fav_presets
+        if self.zynqtgui.curlayer is not None:
+            return self.zynqtgui.curlayer.show_fav_presets
+        else:
+            return False
 
     def enable_show_fav_presets(self):
-        if not self.zynqtgui.curlayer.show_fav_presets:
+        if self.zynqtgui.curlayer is not None and not self.zynqtgui.curlayer.show_fav_presets:
             self.zynqtgui.curlayer.show_fav_presets = True
             self.set_select_path()
             self.fill_list()
@@ -458,7 +461,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
     def disable_show_fav_presets(self):
-        if self.zynqtgui.curlayer and self.zynqtgui.curlayer.show_fav_presets:
+        if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.show_fav_presets:
             self.zynqtgui.curlayer.show_fav_presets = False
             self.set_select_path()
             self.fill_list()

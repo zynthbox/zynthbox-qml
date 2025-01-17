@@ -175,10 +175,9 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Favorites")
             checkable: true
-            checked: zynqtgui.bank.show_top_sounds
+            checked: zynqtgui.preset.show_only_favorites
             onToggled: {
-                zynqtgui.bank.show_top_sounds = checked;
-                zynqtgui.current_screen_id = "bank";
+                zynqtgui.preset.show_only_favorites = checked
             }
         },
         Kirigami.Action {

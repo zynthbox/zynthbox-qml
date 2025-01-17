@@ -326,7 +326,7 @@ Item {
             knobId: 0
             onValueChanged: if (component.cppClipObject) { component.cppClipObject.sliceCount = value; }
             Connections {
-                target: component.cppClipObject
+                target: component.cppClipObject ? component.cppClipObject.selectedSliceObject : null
                 onSubvoiceCountChanged: {
                     sliceCountSlider.value = component.cppClipObject.sliceCount;
                     if (_private.editVoice > sliceCountSlider.value - 1) {

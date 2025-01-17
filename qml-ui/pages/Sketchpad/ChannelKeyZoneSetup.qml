@@ -268,7 +268,11 @@ Zynthian.DialogQuestion {
                     property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.trackType === "synth" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
+                    property QtObject keyZoneContainer: component.selectedChannel
+                        ? component.selectedChannel.trackType === "synth"
+                            ? (clipObj === undefined ? null : clipObj)
+                            : (clipObj === null || clipObj.selectedSliceObject === undefined ? null : clipObj.selectedSliceObject)
+                        : null
                     height: parent.height;
                     width: 1
                     property bool isCurrent: component.selectedChannel ? component.selectedChannel.selectedSlotRow === index : false

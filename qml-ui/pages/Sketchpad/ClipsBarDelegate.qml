@@ -125,12 +125,12 @@ ColumnLayout {
                 }
             }
             QQC2.Label {
+                property string clipName: String.fromCharCode(clipDelegate.clipIndex+65)
                 anchors.centerIn: parent
                 font.pointSize: 12
                 visible: ["sample-loop", "sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
-                text: qsTr("%1%2")
-                        .arg(root.channel.id + 1)
-                        .arg(String.fromCharCode(clipDelegate.clipIndex+65).toLowerCase())
+                color: Qt.rgba(255, 255, 255, root.channel.selectedClipNames.indexOf(clipName.toLowerCase()) >= 0 ? 1 : 0.3)
+                text: qsTr("%1").arg(clipName)
             }
             QQC2.Label {
                 anchors.fill: parent

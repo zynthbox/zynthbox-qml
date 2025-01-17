@@ -28,7 +28,7 @@ import shutil
 import tempfile
 import traceback
 import taglib
-import json
+import ujson as json
 import os
 import logging
 import Zynthbox

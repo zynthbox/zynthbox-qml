@@ -47,13 +47,12 @@ ColumnLayout {
                         zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(clipDelegate.clip);
                     }
                 } else {
-                    if (root.channel.selectedClip === index) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips" &&
+                            zynqtgui.sketchpad.lastSelectedObj.value === clipDelegate.clip &&
+                            zynqtgui.sketchpad.lastSelectedObj.component === clipDelegate) {
                         clipDelegate.clip.enabled = !clipDelegate.clip.enabled;
-                    } else {
-                        root.channel.selectedClip = index;
-                        clipDelegate.clip.enabled = true;
                     }
-
+                    root.channel.selectedClip = index;
                     root.selectedClipObject = clipDelegate.clip
                     root.selectedClipPattern = clipDelegate.pattern
                     root.selectedComponent = clipDelegate

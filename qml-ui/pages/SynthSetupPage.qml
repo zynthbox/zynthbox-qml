@@ -174,7 +174,12 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Sounds")
-            onTriggered: zynqtgui.show_modal("sound_categories")
+            onTriggered: {
+                // FIXME
+                // Do not immediately show sound_cateopries page as it starts a long task which in turn
+                // does a processEvents call causing some discomfort. Instead start loading sounds from next tick
+                Qt.callLater(function() { zynqtgui.show_modal("sound_categories") })
+            }
         },
         Kirigami.Action {
             text: qsTr("Favorites")

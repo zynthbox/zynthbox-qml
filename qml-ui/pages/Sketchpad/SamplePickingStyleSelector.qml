@@ -46,8 +46,8 @@ Zynthian.DialogQuestion {
     }
     height: Kirigami.Units.gridUnit * 25
     width: Kirigami.Units.gridUnit * 35
-    acceptText: qsTr("Select")
-    rejectText: qsTr("Back")
+    rejectText: qsTr("Cancel")
+    acceptText: qsTr("OK")
     title: qsTr("Choose Sample Picking Style For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
 
     additionalButtons: [styleButtonSameOrFirst, styleButtonSame, styleButtonFirst, styleButtonAll]

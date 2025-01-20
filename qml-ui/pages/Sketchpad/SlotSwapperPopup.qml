@@ -134,8 +134,8 @@ Zynthian.DialogQuestion {
     width: Kirigami.Units.gridUnit * 35
 
     acceptEnabled: _private.swapWithSlotIndex > -1
-    acceptText: qsTr("Select")
-    rejectText: qsTr("Back")
+    rejectText: qsTr("Cancel")
+    acceptText: qsTr("OK")
     title: qsTr("Pick the other slot...")
 
     contentItem: ColumnLayout {

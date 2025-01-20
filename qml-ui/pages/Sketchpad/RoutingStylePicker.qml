@@ -48,8 +48,8 @@ Zynthian.DialogQuestion {
 
     height: Kirigami.Units.gridUnit * 18
     width: Kirigami.Units.gridUnit * 35
-    acceptText: qsTr("Select")
-    rejectText: qsTr("Back")
+    rejectText: qsTr("Cancel")
+    acceptText: qsTr("OK")
     title: qsTr("Pick Audio Routing Style For Track %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
 
     contentItem: ColumnLayout {

@@ -64,8 +64,8 @@ Zynthian.DialogQuestion {
         }
         return returnValue;
     }
-    rejectText: qsTr("Back")
-    acceptText: qsTr("Select")
+    rejectText: qsTr("Cancel")
+    acceptText: qsTr("OK")
     title: qsTr("Pick External Audio Source For Track %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
     width: Kirigami.Units.gridUnit * 20
     height: Kirigami.Units.gridUnit * 22

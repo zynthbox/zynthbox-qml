@@ -99,6 +99,24 @@ Zynthian.BasePlayGrid {
             var trackDelta = zynqtgui.tracksModActive ? 5 : 0
 
             switch (cuia) {
+                case "SCREEN_PLAYGRID":
+                    // If we're already shown, toggle note settings
+                    if (component.noteSettingsPopupVisible) {
+                        component.hideNoteSettingsPopup();
+                    } else {
+                        if (_private.selectedStep > -1) {
+                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], _private.selectedStep, _private.selectedStep);
+                        } else if (component.heardNotes.length > 0) {
+                            var filter = []
+                            for (var i = 0; i < component.heardNotes.length; ++i) {
+                                filter.push(component.heardNotes[i].midiNote);
+                            }
+                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, filter, -1, -1);
+                        } else {
+                            component.showNoteSettingsPopup(_private.workingPatternModel, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, _private.workingPatternModel.activeBar + _private.workingPatternModel.bankOffset, [], -1, -1);
+                        }
+                    }
+                    break;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
                     if (_private.activePatternModel.performanceActive) {
@@ -219,6 +237,8 @@ Zynthian.BasePlayGrid {
     signal showPatternsMenu();
     property bool showPatternSettings: false
     signal showNoteSettingsPopup(QtObject patternModel, int firstBar, int lastBar, var midiNoteFilter, int firstStep, int lastStep);
+    signal hideNoteSettingsPopup();
+    property bool noteSettingsPopupVisible: false
 
     property bool nudgeOverlayEnabled: false
     property bool nudgePerformed: false
@@ -2143,6 +2163,9 @@ Zynthian.BasePlayGrid {
                 height: applicationWindow().height
                 width: applicationWindow().width
                 closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
+                onVisibleChanged: {
+                    component.noteSettingsPopupVisible = noteSettingsPopup.visible;
+                }
                 function showSettings(patternModel, firstBar, lastBar, midiNoteFilter, firstStep = -1, lastStep = -1) {
                     let currentlySelectedBar = -1;
                     let currentSelectedStep = -1;
@@ -2181,6 +2204,9 @@ Zynthian.BasePlayGrid {
                         } else {
                             noteSettingsPopup.showSettings(patternModel, firstBar, lastBar, midiNoteFilter);
                         }
+                    }
+                    onHideNoteSettingsPopup: {
+                        noteSettingsPopup.hide();
                     }
                 }
                 NoteSettings {

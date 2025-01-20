@@ -57,6 +57,20 @@ ColumnLayout {
                 // Pass basic playback control through
                 result = false
                 break;
+            case "SCREEN_LAYER":
+            case "SCREEN_LAYER_FX":
+            case "SCREEN_BANK":
+            case "SCREEN_PRESET":
+            case "SCREEN_CONTROL":
+            case "SCREEN_SKETCHPAD":
+            case "SCREEN_SONG_MANAGER":
+            case "SCREEN_ALSA_MIXER":
+                // For the screen buttons... pass those through explicitly
+                result = false;
+                component.close();
+                break;
+            case "SCREEN_PLAYGRID":
+                // To partner with the bit in main which shows it, this will cause us to toggle when hitting the playgrid button
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_SELECT_SHORT":

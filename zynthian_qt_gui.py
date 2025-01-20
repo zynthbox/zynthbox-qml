@@ -1953,8 +1953,10 @@ class zynthian_gui(QObject):
             # pass
 
         elif cuia == "SCREEN_LAYER":
-            self.show_screen("preset")
-            self.show_screen("preset")
+            if self.current_screen_id == "preset":
+                self.preset.toggle_show_fav_presets()
+            else:
+                self.show_screen("preset")
             sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_LAYER_FX":
@@ -1966,7 +1968,10 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_PRESET":
-            self.show_screen("preset")
+            if self.current_screen_id == "preset":
+                self.preset.toggle_show_fav_presets()
+            else:
+                self.show_screen("preset")
             sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_CONTROL":
@@ -1975,11 +1980,8 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCREEN_SKETCHPAD":
             if self.current_screen_id == "sketchpad":
-                if self.altButtonPressed:
-                    self.toggleSketchpadMixer()
-                else:
-                    # no particular need to test anything here, we always want it hidden in this case
-                    self.hideSketchpadMixer()
+                # If already on sketchpad, toggle the mixer when taping the sketchpad button
+                self.toggleSketchpadMixer()
             else:
                 if self.altButtonPressed:
                     self.showSketchpadMixer()

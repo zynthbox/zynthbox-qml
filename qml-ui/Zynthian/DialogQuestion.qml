@@ -40,6 +40,7 @@ Zynthian.Dialog {
     property string text
     /**
      * The string used for the accept button
+     * Set this to "" to hide the button
      */
     property string acceptText: qsTr("Yes")
     /**
@@ -48,6 +49,7 @@ Zynthian.Dialog {
     property alias acceptEnabled: acceptButton.enabled
     /**
      * The string used for the reject button
+     * Set this to "" to hide the button
      */
     property string rejectText: qsTr("No")
     /**

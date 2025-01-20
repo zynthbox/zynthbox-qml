@@ -208,6 +208,7 @@ Item {
                     break;
                 case 3:
                     if (component.cppClipObject) {
+                        component.cppClipObject.selectedSliceObject.exclusivityGroup = component.cppClipObject.selectedSliceObject.exclusivityGroup + 1;
                     }
                     break;
                 case 4:
@@ -238,6 +239,7 @@ Item {
                     break;
                 case 3:
                     if (component.cppClipObject) {
+                        component.cppClipObject.selectedSliceObject.exclusivityGroup = component.cppClipObject.selectedSliceObject.exclusivityGroup - 1
                     }
                     break;
                 case 4:
@@ -614,8 +616,11 @@ Item {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                // Select split point in popup (probably snow the sample, and show split point in that popup...)
-                text: qsTr("Split\nSlice...")
+                text: component.cppClipObject
+                    ? component.cppClipObject.selectedSliceObject.exclusivityGroup === -1
+                        ? qsTr("Exclusivity\nGroup:\nNone")
+                        : qsTr("Exclusivity\nGroup:\n%1").arg(component.cppClipObject.selectedSliceObject.exclusivityGroup + 1)
+                    : ""
                 enabled: false
                 MouseArea {
                     anchors.fill: parent;
@@ -623,17 +628,32 @@ Item {
                         
                     }
                 }
+                KnobIndicator {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        margins: Kirigami.Units.smallSpacing
+                    }
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    visible: _private.currentElement === 3
+                    knobId: 1
+                }
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                // What this does will depend on the style... free-form or contiguous
-                // - free-form/overlapping just clears the slice and moves those above down (popup is just confirm/reject)
-                // - contiguous will add the length of the deleted slice to another slice
-                //   - for first slice, offer to remove and add length to next, or simply remove
-                //   - for all others, offer to remove and add length to either next or previous
-                //   - for the last slice, offer to remove and add length to previous, or simply remove
-                text: qsTr("Delete\nSlice...")
+                // Show popup with various options:
+                // - Split Slice...
+                //   - Select split point in popup (probably snow the sample, and show split point in that popup...)
+                // - Delete Slice...
+                //   - What this does will depend on the style... free-form or contiguous
+                //     - free-form/overlapping just clears the slice and moves those above down (popup is just confirm/reject)
+                //     - contiguous will add the length of the deleted slice to another slice
+                //       - for first slice, offer to remove and add length to next, or simply remove
+                //       - for all others, offer to remove and add length to either next or previous
+                //       - for the last slice, offer to remove and add length to previous, or simply remove
+                text: qsTr("Slice\nActions...")
                 enabled: false
                 MouseArea {
                     anchors.fill: parent;

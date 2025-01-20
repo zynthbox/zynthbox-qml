@@ -36,7 +36,7 @@ Zynthian.DialogQuestion {
     function showTrackSettings(track) {
         _private.selectedTrack = track;
         trackNameField.text = track.name;
-        trackColorField.currentColor = _private.selectedTrack.color;
+        trackColorField.currentColor = track.color;
         trackAllowMulticlipField.checked = track.allowMulticlip;
         routingStylePicker.selectedRoutingStyle = track.trackRoutingStyle;
         open();
@@ -64,22 +64,11 @@ Zynthian.DialogQuestion {
         }
         return returnValue;
     }
-    rejectText: qsTr("Back")
-    acceptText: qsTr("Select")
+    rejectText: ""
+    acceptText: qsTr("Close")
     title: qsTr("Settings for Track %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
     width: Kirigami.Units.gridUnit * 30
     height: Kirigami.Units.gridUnit * 17
-    onAccepted: {
-        if (trackNameField.text == "") {
-            // Don't allow people to set an empty track name, that's just silly
-            _private.selectedTrack.name = "T%1".arg(_private.selectedTrack.id + 1);
-        } else {
-            _private.selectedTrack.name = trackNameField.text;
-        }
-        _private.selectedTrack.color = trackColorField.currentColor;
-        _private.selectedTrack.allowMulticlip = trackAllowMulticlipField.checked;
-        _private.selectedTrack.trackRoutingStyle = routingStylePicker.selectedRoutingStyle;
-    }
 
     contentItem: Kirigami.FormLayout {
         QtObject {
@@ -91,6 +80,17 @@ Zynthian.DialogQuestion {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             Kirigami.FormData.label: qsTr("Track Name:")
+            onTextChanged: {
+                if (_private.selectedTrack.name != trackNameField.text) {
+                    if (trackNameField.text == "") {
+                        // Don't allow people to set an empty track name, that's just silly
+                        _private.selectedTrack.name = "T%1".arg(_private.selectedTrack.id + 1);
+                        trackNameField.text = _private.selectedTrack.name;
+                    } else {
+                        _private.selectedTrack.name = trackNameField.text;
+                    }
+                }
+            }
         }
         QQC2.Button {
             id: trackColorField
@@ -102,7 +102,7 @@ Zynthian.DialogQuestion {
                 trackColorPicker.open();
             }
             contentItem: Rectangle {
-                color: trackColorField.currentColor
+                color: _private.selectedTrack ? _private.selectedTrack.color : "transparent"
             }
             Zynthian.Popup {
                 id: trackColorPicker
@@ -122,12 +122,14 @@ Zynthian.DialogQuestion {
                             color: modelData
                             border {
                                 width: 1
-                                color: modelData == trackColorField.currentColor ? Kirigami.Theme.highlightColor : "transparent"
+                                color: _private.selectedTrack && modelData == _private.selectedTrack.color ? Kirigami.Theme.highlightColor : "transparent"
                             }
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    trackColorField.currentColor = modelData;
+                                    if (_private.selectedTrack.color != modelData) {
+                                        _private.selectedTrack.color = modelData;
+                                    }
                                     trackColorPicker.close();
                                 }
                             }
@@ -143,6 +145,11 @@ Zynthian.DialogQuestion {
             implicitWidth: Kirigami.Units.gridUnit * 5
             Layout.minimumWidth: Kirigami.Units.gridUnit * 5
             Kirigami.FormData.label: qsTr("Allow Multiple Enabled Clips:")
+            onCheckedChanged: {
+                if (_private.selectedTrack.allowMulticlip !== trackAllowMulticlipField.checked) {
+                    _private.selectedTrack.allowMulticlip = trackAllowMulticlipField.checked;
+                }
+            }
         }
         QQC2.Button {
             id: trackRoutingStyleField
@@ -163,6 +170,11 @@ Zynthian.DialogQuestion {
             onClicked: routingStylePicker.pickRoutingStyle(_private.selectedTrack)
             RoutingStylePicker {
                 id: routingStylePicker
+                onSelectedRoutingStyleChanged: {
+                    if (_private.selectedTrack.trackRoutingStyle != routingStylePicker.selectedRoutingStyle) {
+                        _private.selectedTrack.trackRoutingStyle = routingStylePicker.selectedRoutingStyle;
+                    }
+                }
             }
         }
     }

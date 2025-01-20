@@ -598,7 +598,9 @@ Item {
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        
+                        applicationWindow().pickNote(component.cppClipObject.selectedSliceObject.rootNote, function(newNote) {
+                            component.cppClipObject.selectedSliceObject.rootNote = newNote;
+                        });
                     }
                 }
                 KnobIndicator {
@@ -625,7 +627,10 @@ Item {
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        
+                        // Popup wants to offer some helpful guidance type stuff:
+                        // - "none" (part of the list below, but must always be shown)
+                        // - a list of existing groups used by slices in clips on this track
+                        // - one entry which is an unused group
                     }
                 }
                 KnobIndicator {

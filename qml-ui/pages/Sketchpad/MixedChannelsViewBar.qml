@@ -210,24 +210,26 @@ Rectangle {
                 break;
 
             case "SELECT_UP":
-                // #346 asks to disable up/down preset control
-                // root.pickFirstAndBestSlot();
-                // if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                //     root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                // } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                //     root.selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                // }
+                if (zynqtgui.altButtonPressed) {
+                    root.pickFirstAndBestSlot();
+                    if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        root.selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                    }
+                }
                 returnValue = true;
                 break;
 
             case "SELECT_DOWN":
-                // #346 asks to disable up/down preset control
-                // root.pickFirstAndBestSlot();
-                // if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
-                //     root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                // } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
-                //     root.selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                // }
+                if (zynqtgui.altButtonPressed) {
+                    root.pickFirstAndBestSlot();
+                    if (root.selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        root.selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                    }
+                }
                 returnValue = true;
                 break;
             case "KNOB0_TOUCHED":

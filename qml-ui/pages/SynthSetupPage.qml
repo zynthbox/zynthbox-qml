@@ -173,16 +173,16 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
+            text: qsTr("Sounds")
+            onTriggered: zynqtgui.show_modal("sound_categories")
+        },
+        Kirigami.Action {
             text: qsTr("Favorites")
             checkable: true
             checked: zynqtgui.preset.show_only_favorites
             onToggled: {
                 zynqtgui.preset.show_only_favorites = checked
             }
-        },
-        Kirigami.Action {
-            enabled: false
-            visible: false
         },
 //        Kirigami.Action {
 //            text: qsTr("Sounds")

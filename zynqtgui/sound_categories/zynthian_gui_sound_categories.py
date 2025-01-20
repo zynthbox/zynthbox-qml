@@ -67,7 +67,9 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             "99": "FX/Other",
         }
 
-        self.load_sounds_model()
+        # Do not immediately call load_sounds_model as it starts a long task which in turn
+        # does a processEvents call causing some discomfort. Instead start loading sounds from next tick
+        QTimer.singleShot(0, self.load_sounds_model)
 
     def show(self):
         pass

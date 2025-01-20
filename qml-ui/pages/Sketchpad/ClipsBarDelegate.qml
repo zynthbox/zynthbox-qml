@@ -72,10 +72,10 @@ ColumnLayout {
             border{
                 color: root.songMode
                         ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
-                            ? Kirigami.Theme.highlightColor
+                            ? Qt.rgba(255, 255, 255, 0.8)
                             : "#000000"
                         : clipDelegate.clip && clipDelegate.clip.inCurrentScene
-                            ? Kirigami.Theme.highlightColor
+                            ? Qt.rgba(255, 255, 255, 0.8)
                             : "#000000"
                 width: 1
             }

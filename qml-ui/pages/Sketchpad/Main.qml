@@ -893,7 +893,7 @@ Zynthian.ScreenPage {
 
             z: 1000
             border.width: 2
-            border.color: Qt.rgba(255, 255, 255, 0.8)
+            border.color: zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips" ? Kirigami.Theme.highlightColor : Qt.rgba(255, 255, 255, 0.8)
             function updateLastSelectedObjIndicatorPosition() {
                 lastSelectedObjIndicatorPositioner.restart();
             }

@@ -1257,9 +1257,6 @@ Zynthian.ScreenPage {
                             delegate: Item {
                                 id: clipsDelegate
                                 function switchToThisClip(allowToggle) {
-                                    console.log((new Error).stack)
-                                    console.log(`last name: ${zynqtgui.sketchpad.lastSelectedObj.className}, last value: ${zynqtgui.sketchpad.lastSelectedObj.value}, last component : ${zynqtgui.sketchpad.lastSelectedObj.component}`)
-                                    console.log(` cur name: ${clipCell.channel.sceneClip.className},  cur value: ${clipCell.channel.sceneClip},  cur component : ${clipCell}`)
                                     if (zynqtgui.sketchpad.lastSelectedObj != null &&
                                             zynqtgui.sketchpad.lastSelectedObj.className === clipCell.channel.sceneClip.className &&
                                             zynqtgui.sketchpad.lastSelectedObj.value === clipCell.channel.sceneClip &&

@@ -200,19 +200,13 @@ Rectangle {
         // console.log(`MixedChannelsViewBar : cuia: ${cuia}, altButtonPressed: ${zynqtgui.altButtonPressed}, modeButtonPressed: ${zynqtgui.modeButtonPressed}`)
         switch (cuia) {
             case "NAVIGATE_LEFT":
-                // #346 asks to change track selection to Alt+left/right button
-                if (zynqtgui.altButtonPressed) {
-                    zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-                    returnValue = true;
-                }
+                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId - 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+                returnValue = true;
                 break;
 
             case "NAVIGATE_RIGHT":
-                // #346 asks to change track selection to Alt+left/right button
-                if (zynqtgui.altButtonPressed) {
-                    zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
-                    returnValue = true;
-                }
+                zynqtgui.sketchpad.selectedTrackId = Zynthian.CommonUtils.clamp(zynqtgui.sketchpad.selectedTrackId + 1, 0, Zynthbox.Plugin.sketchpadTrackCount - 1)
+                returnValue = true;
                 break;
 
             case "SELECT_UP":

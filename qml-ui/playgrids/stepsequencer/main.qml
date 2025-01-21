@@ -119,16 +119,20 @@ Zynthian.BasePlayGrid {
                     break;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
-                    if (_private.activePatternModel.performanceActive) {
-                        // Restart the performance
-                        _private.activePatternModel.startPerformance();
-                    } else if (component.patternsMenuVisible) {
-                        component.hidePatternsMenu();
-                    } else if (_private.hasSelection) {
-                        _private.deselectSelectedItem();
-                    } else if (component.heardNotes.length > 0) {
-                        component.heardNotes = [];
-                        component.heardVelocities = [];
+                    if (zynqtgui.altButtonPressed) {
+                        _private.workingPatternModel.clear();
+                    } else {
+                        if (_private.activePatternModel.performanceActive) {
+                            // Restart the performance
+                            _private.activePatternModel.startPerformance();
+                        } else if (component.patternsMenuVisible) {
+                            component.hidePatternsMenu();
+                        } else if (_private.hasSelection) {
+                            _private.deselectSelectedItem();
+                        } else if (component.heardNotes.length > 0) {
+                            component.heardNotes = [];
+                            component.heardVelocities = [];
+                        }
                     }
                     returnValue = true;
                     break;

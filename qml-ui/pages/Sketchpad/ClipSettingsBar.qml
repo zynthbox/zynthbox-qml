@@ -181,7 +181,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: panDial
             text: qsTr("Pan") + "\n"
-            controlObj: root.clipAudioSource
+            controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject : null
             controlProperty: "pan"
             valueString: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject.pan.toFixed(2) : 0
             Layout.fillWidth: true

@@ -133,27 +133,27 @@ Zynthian.ScreenPage {
         }
 
         function valueSetter(value) {
-            root.selectedChannel.set_passthroughValue("synthPassthrough", slot, "dryAmount", Zynthian.CommonUtils.clamp(value, 0, 1))
+            synthPassthroughClient.dryGainHandler.gainAbsolute = Zynthian.CommonUtils.clamp(value, 0, 1)
             applicationWindow().showOsd({
                 parameterName: "layer_volume",
                 description: qsTr("%1 Volume").arg(synthName),
                 start: 0,
                 stop: 1,
                 step: 0.01,
-                defaultValue: null,
-                currentValue: synthPassthroughClient.dryAmount,
-                startLabel: "0",
-                stopLabel: "1",
-                valueLabel: qsTr("%1").arg(synthPassthroughClient.dryAmount.toFixed(2)),
+                defaultValue: synthPassthroughClient.dryGainHandler.absoluteGainAtZeroDb,
+                currentValue: synthPassthroughClient.dryGainHandler.gainAbsolute,
+                startLabel: "-24 dB",
+                stopLabel: "+24 dB",
+                valueLabel: qsTr("%1 dB").arg(synthPassthroughClient.dryGainHandler.gainDb.toFixed(2)),
                 setValueFunction: valueSetter,
                 showValueLabel: true,
-                showResetToDefault: false,
-                showVisualZero: false
+                showResetToDefault: true,
+                showVisualZero: true
             })
         }
 
         if (synthPassthroughClient != null && root.selectedChannel.checkIfLayerExists(midiChannel)) {
-            valueSetter(synthPassthroughClient.dryAmount + sign * 0.01)
+            valueSetter(synthPassthroughClient.dryGainHandler.gainAbsolute + sign * 0.01)
         } else {
             applicationWindow().showMessageDialog(qsTr("Selected slot does not have any synth"), 2000)
         }

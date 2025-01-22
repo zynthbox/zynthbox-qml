@@ -50,7 +50,7 @@ RowLayout {
             radius: 4
 
             function switchToThisSlot(onlyFocus=false) {
-                if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index || onlyFocus) {
+                if (zynqtgui.sketchpad.lastSelectedObj.component != slotDelegate || onlyFocus) {
                     zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
                     zynqtgui.sketchpad.lastSelectedObj.value = index
                     zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
@@ -114,7 +114,7 @@ RowLayout {
                         margins: Kirigami.Units.smallSpacing
                     }
                     Rectangle {
-                        width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryAmount : 0
+                        width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryGainHandler.gainAbsolute : 0
                         anchors {
                             left: parent.left
                             top: parent.top

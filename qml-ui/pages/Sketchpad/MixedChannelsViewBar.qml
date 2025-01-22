@@ -757,6 +757,13 @@ Rectangle {
                                 slotType: "sample-loop"
                                 visible: !fxTabButton.checked && root.selectedChannel.trackType == "sample-loop"
                             }
+                            Item {
+                                // id: sketchesSpacer
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                visible: sketchesRow.visible
+                            }
 
                             TrackSlotsData {
                                 id: externalRow
@@ -766,6 +773,13 @@ Rectangle {
                                 slotData: root.selectedChannel.externalSlotsData
                                 slotType: "external"
                                 visible: !fxTabButton.checked && root.selectedChannel.trackType == "external"
+                            }
+                            Item {
+                                // id: externalSpacer
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                visible: externalRow.visible
                             }
 
                             RowLayout {
@@ -792,7 +806,7 @@ Rectangle {
                                         radius: 4
 
                                         function switchToThisSlot(onlyFocus=false) {
-                                            if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" || zynqtgui.sketchpad.lastSelectedObj.value != index || onlyFocus) {
+                                            if (zynqtgui.sketchpad.lastSelectedObj.component != fxRowDelegate || onlyFocus) {
                                                 zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
                                                 zynqtgui.sketchpad.lastSelectedObj.value = index
                                                 zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
@@ -883,6 +897,13 @@ Rectangle {
                                     }
                                 }
                             }
+                            Item {
+                                // id: fxSpacer
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                visible: fxRow.visible
+                            }
 
                             Item {
                                 Layout.fillWidth: true
@@ -902,8 +923,10 @@ Rectangle {
                                         waveformContainer.clip = root.selectedChannel.trackType === "sample-loop"
                                             ? root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                             : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                                        // We show the waveform container for all track types except external
                                         waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-trig" ||
-                                                                         root.selectedChannel.trackType === "sample-loop"
+                                                                         root.selectedChannel.trackType === "sample-loop" ||
+                                                                         root.selectedChannel.trackType === "synth"
                                     }
                                 }
                                 Connections {

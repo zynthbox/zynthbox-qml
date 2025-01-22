@@ -1912,7 +1912,7 @@ class sketchpad_channel(QObject):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
             # dryAmount = self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"]
             # logging.info(f"Changing channel dry amount for {self.__id__} lane {laneId} from {passthroughClient.dryAmount()} to {dryAmount}")
-            passthroughClient.setDryAmount(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] * volume)
+            passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] * volume)
 
     dryAmount = Property(float, get_dryAmount, set_dryAmount, notify=dryAmountChanged)
     ### END Property wetFx2Amount
@@ -1939,7 +1939,7 @@ class sketchpad_channel(QObject):
         volume = self.__volume__.gain()
         for laneId in range(5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.setWetFx1Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
+            passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
@@ -1967,11 +1967,11 @@ class sketchpad_channel(QObject):
         volume = self.__volume__.gain()
         for laneId in range(0, 5):
             passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.setWetFx2Amount(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
+            passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
     """
-    Store wetFx1Amount for current channel as a property and set it to JackPassthrough when value changes
-    Stored value ranges from 0-100 and accepted range by setWetFx1Amount is 0-1
+    Store wetFx2Amount for current channel as a property and set it to JackPassthrough when value changes
+    Stored value ranges from 0-100 and accepted range by setWetFx2Amount is 0-1
     """
     wetFx2Amount = Property(float, get_wetFx2Amount, set_wetFx2Amount, notify=wetFx2AmountChanged)
     ### END Property wetFx2Amount
@@ -2003,7 +2003,7 @@ class sketchpad_channel(QObject):
                 dryAmount = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][laneId]["dryAmount"]
                 # logging.info(f"Changing pan/dry amounts for {self.__id__} lane {laneId} from {synthPassthroughClient.panAmount()} and {synthPassthroughClient.dryAmount()} from {panAmount} to {dryAmount}")
                 synthPassthroughClient.setPanAmount(panAmount)
-                synthPassthroughClient.setDryAmount(dryAmount)
+                synthPassthroughClient.dryGainHandler().setGain(dryAmount)
                 self.__song__.schedule_save()
 
     @Slot(None)

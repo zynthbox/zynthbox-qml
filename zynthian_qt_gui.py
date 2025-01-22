@@ -616,7 +616,10 @@ class zynthian_gui(QObject):
 
         # Create Lock object to avoid concurrence problems
         self.lock = Lock()
+
         self.osc_server = None
+
+        self.__test_wave_clip = None
 
         # Load keyboard binding map
         zynthian_gui_keybinding.getInstance(self).load()
@@ -2285,6 +2288,27 @@ class zynthian_gui(QObject):
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             theTrack.set_selected_clip(max(0, min(theSlotIndex, Zynthbox.Plugin.instance().sketchpadSlotCount() - 1)), shouldEmitCurrentClipCUIAFeedback=False)
             self.sketchpad.emitCurrentTrackClipCUIAFeedback()
+            sendCuiaEventFeedback = False
+
+        # These two go together to form a bit of useful test functionality mostly relevant for doing things from external scripts (for e.g. webconf)
+        elif cuia == "PLAY_WAVE_FILE":
+            if len(params) > 0:
+                testWaveFile = params[0]
+                if self.__test_wave_clip is not None:
+                    self.__test_wave_clip.stop()
+                    if self.__test_wave_clip.getFilePath() != testWaveFile:
+                        self.__test_wave_clip.deleteLater()
+                        self.__test_wave_clip = None
+                if self.__test_wave_clip is None:
+                    self.__test_wave_clip = Zynthbox.ClipAudioSource(str(testWaveFile), False, self)
+                    self.__test_wave_clip.setLaneAffinity(1)
+            # Allow calling the function again without passing an explicit filename to the function
+            if self.__test_wave_clip is not None:
+                self.__test_wave_clip.play()
+            sendCuiaEventFeedback = False
+        elif cuia == "STOP_WAVE_FILE":
+            if self.__test_wave_clip is not None:
+                self.__test_wave_clip.stop()
             sendCuiaEventFeedback = False
 
         # Finally, report back to MidiRouter that we've handled the action

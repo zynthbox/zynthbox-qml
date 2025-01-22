@@ -461,7 +461,7 @@ class sketchpad_clip_metadata(QObject):
                 subvoiceSettingsObject.setGain(1)
             sliceSettingsObject.setSubvoiceCount(0)
         self.clip.audioSource.setSliceCount(0)
-        self.clip.audioSource.setSlicesContiguous(false)
+        self.clip.audioSource.setSlicesContiguous(False)
     def serializeSliceSettings(self):
         sliceSettingsData = []
         for sliceSettingsObject in self.clip.audioSource.sliceSettings():

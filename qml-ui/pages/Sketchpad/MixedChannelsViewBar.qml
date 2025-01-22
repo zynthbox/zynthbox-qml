@@ -516,7 +516,7 @@ Rectangle {
                                 Layout.fillHeight: true
                                 checkable: true
                                 checked: root.selectedChannel.trackType === "synth"
-                                text: qsTr("Synth")
+                                text: qsTr("Sound")
                                 onClicked: {
                                     root.selectedChannel.trackType = "synth"
                                     fxTabButton.checked = false
@@ -920,9 +920,9 @@ Rectangle {
                                     id: waveformThrottle
                                     interval: 1; repeat: false; running: false;
                                     onTriggered: {
-                                        waveformContainer.clip = root.selectedChannel.trackType === "sample-loop"
-                                            ? root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                            : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
+                                        waveformContainer.clip = zynqtgui.sketchpad.lastSelectedObj.component && zynqtgui.sketchpad.lastSelectedObj.component.clip && zynqtgui.sketchpad.lastSelectedObj.component.clip.hasOwnProperty("className") && zynqtgui.sketchpad.lastSelectedObj.component.clip.className == "sketchpad_clip"
+                                            ? zynqtgui.sketchpad.lastSelectedObj.component.clip
+                                            : null
                                         // We show the waveform container for all track types except external
                                         waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-trig" ||
                                                                          root.selectedChannel.trackType === "sample-loop" ||
@@ -932,6 +932,10 @@ Rectangle {
                                 Connections {
                                     target: root
                                     onSelectedChannelChanged: waveformThrottle.restart()
+                                }
+                                Connections {
+                                    target: zynqtgui.sketchpad.lastSelectedObj
+                                    onComponentChanged: waveformThrottle.restart()
                                 }
                                 Connections {
                                     target: root.selectedChannel

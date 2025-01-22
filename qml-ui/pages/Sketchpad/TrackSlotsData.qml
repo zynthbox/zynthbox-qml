@@ -39,6 +39,7 @@ RowLayout {
             property bool highlighted: root.selectedChannel.selectedSlotRow === index
             property int slotIndex: index
             property bool isSketchpadClip: control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
+            property QtObject clip: isSketchpadClip ? control.slotData[index] : null
             property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[index].cppObjId) : null
 
             Layout.fillWidth: true

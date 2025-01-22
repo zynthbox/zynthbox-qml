@@ -444,7 +444,7 @@ class zynthian_gui(QObject):
         self.__current_task_message = ""
         self.__show_current_task_message = True
         self.currentTaskMessage = f"Starting Zynthbox"
-        self.__master_volume = self.get_initialMasterVolume()
+        self.__master_volume = -1
 
         self.zynmidi = None
         self.screens = {}
@@ -667,6 +667,8 @@ class zynthian_gui(QObject):
         Zynthbox.MidiRouter.instance().midiMessage.connect(self.handleMidiMessage)
         Zynthbox.MidiRouter.instance().cuiaEvent.connect(self.handleMidiRouterCuiaEvent)
         self.current_screen_id_changed.connect(self.handleCurrentScreenIDChanged)
+        # Make sure we initialise the master volume to be what it's supposed to be
+        self.masterVolume = self.get_initialMasterVolume()
 
     @Slot(int, int, int, int, int, int, bool)
     def handleMidiMessage(self, port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal):
@@ -4654,7 +4656,7 @@ class zynthian_gui(QObject):
         if self.__master_volume != value:
             self.__master_volume = value
             # JackPassthroughClient expects dryAmount to be ranging from 0-1
-            Zynthbox.Plugin.instance().globalPlaybackClient().setDryAmount(np.interp(value, (0, 100), (0, 1)))
+            Zynthbox.Plugin.instance().globalPlaybackClient().dryGainHandler().setGainAbsolute(np.interp(value, (0, 100), (0, 1)))
             self.masterVolumeChanged.emit()
 
     masterVolumeChanged = Signal()
@@ -4664,7 +4666,7 @@ class zynthian_gui(QObject):
 
     ### Property initialMasterVolume
     def get_initialMasterVolume(self):
-        return 25
+        return 50
 
     initialMasterVolume = Property(int, get_initialMasterVolume, constant=True)
     ### END Property initialMasterVolume

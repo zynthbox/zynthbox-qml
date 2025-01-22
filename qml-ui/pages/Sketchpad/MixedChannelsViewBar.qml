@@ -519,7 +519,8 @@ Rectangle {
                                 text: qsTr("Synth")
                                 onClicked: {
                                     root.selectedChannel.trackType = "synth"
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
+                                    fxTabButton.checked = false
+                                    synthsRow.switchToSlot(0, true)
                                 }
                                 QQC2.Button {
                                     anchors {
@@ -555,15 +556,15 @@ Rectangle {
                                 }
                             }
                             QQC2.Button {
+                                id: fxTabButton
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checkable: true
-                                checked: root.selectedChannel.trackType === "sample-trig"
-                                text: qsTr("Sample")
+                                text: qsTr("Fx")
                                 onClicked: {
-                                    root.selectedChannel.trackType = "sample-trig"
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
+                                    fxTabButton.checked = true
+                                    fxRepeater.itemAt(0).switchToThisSlot(true)
                                 }
                             }
                             QQC2.Button {
@@ -574,8 +575,9 @@ Rectangle {
                                 checked: root.selectedChannel.trackType.startsWith("sample-loop")
                                 text: qsTr("Sketch")
                                 onClicked: {
+                                    fxTabButton.checked = false
                                     root.selectedChannel.trackType = "sample-loop"
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
+                                    sketchesRow.switchToSlot(0, true)
                                 }
                             }
                             QQC2.Button {
@@ -586,8 +588,9 @@ Rectangle {
                                 checked: root.selectedChannel.trackType === "external"
                                 text: qsTr("External")
                                 onClicked: {
+                                    fxTabButton.checked = false
                                     root.selectedChannel.trackType = "external"
-                                    synthRepeater.itemAt(0).switchToThisSlot(true)
+                                    externalRow.switchToSlot(0, true)
                                 }
                             }
                         }
@@ -610,7 +613,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: ["sample-trig"].indexOf(root.selectedChannel.trackType) >= 0
+                                        visible: !fxTabButton.checked && root.selectedChannel.trackType == "synth"
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
@@ -686,7 +689,7 @@ Rectangle {
                                     RowLayout {
                                         id: bounceButtonLayout
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.trackType !== "sample-loop" && root.selectedChannel.trackType !== "external"
+                                        visible: root.selectedChannel.trackType == "synth"
                                         QQC2.Button {
                                             text: qsTr("Bounce To Sketch")
                                             icon.name: "go-next"
@@ -725,264 +728,57 @@ Rectangle {
                                 Layout.fillHeight: true
                             }
 
-                            RowLayout {
+                            TrackSlotsData {
+                                id: synthsRow
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-
-                                Repeater {
-                                    id: synthRepeater
-
-                                    model: Zynthbox.Plugin.sketchpadSlotCount
-                                    property var synthData: root.selectedChannel.slotsData
-                                    delegate: Rectangle {
-                                        id: slotDelegate
-                                        property bool highlighted: root.selectedChannel.selectedSlotRow === index
-                                        property int slotIndex: index
-                                        property bool isSketchpadClip: synthRepeater.synthData[index] != null && synthRepeater.synthData[index].hasOwnProperty("className") && synthRepeater.synthData[index].className == "sketchpad_clip"
-                                        property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(synthRepeater.synthData[index].cppObjId) : null
-
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-//                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
-//                                        border.width: 2
-                                        color: "transparent"
-                                        radius: 4
-
-                                        function switchToThisSlot(onlyFocus=false) {
-                                            if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_slot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
-                                                zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
-                                                zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
-                                                root.selectedChannel.selectedSlotRow = index
-                                                // zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                                // zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
-                                            } else {
-                                                if (root.selectedChannel.trackType === "external") {
-                                                    // If channel type is external, then it has 2 slots visible
-                                                    // and the respective selectedSlotRow is already selected. Hence directly handle item click
-                                                    if (!onlyFocus) {
-                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
-                                                    }
-                                                } else {
-                                                    // For synth, handle item click only if not dragged. For other cases handle click immediately
-                                                    if ((root.selectedChannel.trackType == "synth" && !delegateMouseArea.dragHappened) || root.selectedChannel.trackType != "synth") {
-                                                        if (!onlyFocus) {
-                                                            bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType)
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            if (root.selectedChannel.trackType == "synth") {
-                                                root.selectedChannel.setCurlayerByType("synth")
-                                            } else if (root.selectedChannel.trackType == "sample-trig") {
-                                                root.selectedChannel.setCurlayerByType("sample")
-                                            } else if (root.selectedChannel.trackType == "sample-loop") {
-                                                root.selectedChannel.setCurlayerByType("loop")
-                                            } else if (root.selectedChannel.trackType == "external") {
-                                                root.selectedChannel.setCurlayerByType("external")
-                                            } else {
-                                                root.selectedChannel.setCurlayerByType("")
-                                            }
-                                        }
-
-                                        Rectangle {
-                                            id: delegate
-                                            property int midiChannel: root.selectedChannel.chainedSounds[index]
-                                            property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
-
-                                            anchors.fill: parent
-                                            anchors.margins: 4
-                                            Kirigami.Theme.inherit: false
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                            color: Kirigami.Theme.backgroundColor
-                                            border.color: root.selectedChannel.trackType === "sample-loop" && synthRepeater.synthData[index].enabled ? Kirigami.Theme.highlightColor :"#ff999999"
-                                            border.width: 2
-                                            radius: 4
-                                            // For external mode the first two slots are visible
-                                            // For other modes all slots are visible
-                                            enabled: (root.selectedChannel.trackType !== "external") ||
-                                                     (root.selectedChannel.trackType === "external" && (index === 0 || index === 1))
-                                            opacity: enabled ? 1 : 0
-                                            visible: enabled
-
-                                            Item {
-                                                id: slotDelegateVisualsContainer
-                                                anchors {
-                                                    fill: parent
-                                                    margins: Kirigami.Units.smallSpacing
-                                                }
-                                                Rectangle {
-                                                    width: delegate.synthPassthroughClient ? parent.width * delegate.synthPassthroughClient.dryAmount : 0
-                                                    anchors {
-                                                        left: parent.left
-                                                        top: parent.top
-                                                        bottom: parent.bottom
-                                                    }
-                                                    radius: 4
-                                                    opacity: 0.8
-                                                    visible: root.selectedChannel.trackType === "synth" && synthNameLabel.text.trim().length > 0
-                                                    color: Kirigami.Theme.highlightColor
-                                                }
-                                                Rectangle {
-                                                    width: slotDelegate.cppClipObject ? parent.width * slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute : 0
-                                                    anchors {
-                                                        left: parent.left
-                                                        top: parent.top
-                                                        bottom: parent.bottom
-                                                    }
-                                                    radius: 4
-                                                    opacity: 0.8
-                                                    visible: slotDelegate.cppClipObject
-                                                    color: Kirigami.Theme.highlightColor
-                                                }
-                                                property int availableWidth: width - 6
-                                                Rectangle {
-                                                    anchors {
-                                                        top: parent.top
-                                                        left: parent.left
-                                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                                    }
-                                                    height: 1
-                                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
-                                                    opacity: width > 1 ? 0.8 : 0
-                                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainLeft * slotDelegateVisualsContainer.availableWidth) : 0
-                                                }
-                                                Rectangle {
-                                                    anchors {
-                                                        left: parent.left
-                                                        bottom: parent.bottom
-                                                        bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
-                                                        leftMargin: 3 // because of the radius of the rectangles we're "inside"
-                                                    }
-                                                    height: 1
-                                                    color: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions && slotDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
-                                                    opacity: width > 1 ? 0.8 : 0
-                                                    width: slotDelegate.cppClipObject && slotDelegate.cppClipObject.playbackPositions ? Math.min(slotDelegateVisualsContainer.availableWidth, slotDelegate.cppClipObject.playbackPositions.peakGainRight * slotDelegateVisualsContainer.availableWidth) : 0
-                                                }
-                                            }
-
-                                            QQC2.Label {
-                                                id: synthNameLabel
-                                                anchors {
-                                                    verticalCenter: parent.verticalCenter
-                                                    left: parent.left
-                                                    right: parent.right
-                                                    leftMargin: Kirigami.Units.gridUnit*0.5
-                                                    rightMargin: Kirigami.Units.gridUnit*0.5
-                                                }
-                                                horizontalAlignment: Text.AlignLeft
-                                                text: root.selectedChannel.trackType === "synth" && synthRepeater.synthData[index] && synthRepeater.synthData[index].className == null // Check if synthRepeater.synthData[index] is not a channel/clip object by checking if it has the className property
-                                                        ? synthRepeater.synthData[index]
-                                                        : (root.selectedChannel.trackType === "sample-trig" ||
-                                                          root.selectedChannel.trackType === "sample-loop") &&
-                                                          synthRepeater.synthData[index]
-                                                            ? synthRepeater.synthData[index].path
-                                                              ? synthRepeater.synthData[index].path.split("/").pop()
-                                                              : ""
-                                                            : root.selectedChannel.trackType === "external" && index < 2 // we only have data for the first two, so let's make sure we don't try and assign an undefined here
-                                                                ? synthRepeater.synthData[index]
-                                                                : ""
-
-                                                elide: "ElideRight"
-                                            }
-
-                                            MouseArea {
-                                                id: delegateMouseArea
-                                                property real initialMouseX
-                                                property bool dragHappened: false
-
-                                                anchors.fill: parent
-                                                onPressed: {
-                                                    delegateMouseArea.initialMouseX = mouse.x
-                                                }
-                                                onReleased: {
-                                                    dragHappenedResetTimer.restart()
-                                                }
-                                                onClicked: slotDelegate.switchToThisSlot()
-                                                onMouseXChanged: {
-                                                    var newVal
-                                                    if (root.selectedChannel.trackType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                                        newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                                        delegateMouseArea.dragHappened = true;
-                                                        root.selectedChannel.set_passthroughValue("synthPassthrough", slotDelegate.slotIndex, "dryAmount", newVal)
-                                                    } else if (root.selectedChannel.trackType == "sample-trig" && synthRepeater.synthData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
-                                                        newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
-                                                        delegateMouseArea.dragHappened = true;
-                                                        slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
-                                                    }
-                                                }
-                                                onPressAndHold: {
-                                                    if (!delegateMouseArea.dragHappened) {
-                                                        if (root.selectedChannel.trackType === "sample-loop") {
-                                                            // If channel type is sample-loop open clip wave editor
-                                                            if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                                                zynqtgui.bottomBarControlType = "bottombar-controltype-clip";
-                                                                zynqtgui.bottomBarControlObj = waveformContainer.clip;
-                                                                bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                                Qt.callLater(function() {
-                                                                    bottomStack.bottomBar.waveEditorAction.trigger();
-                                                                })
-                                                            }
-                                                        } else if (root.selectedChannel.trackType.startsWith("sample")) {
-                                                            // If channel type is sample then open channel wave editor
-                                                            if (waveformContainer.clip && !waveformContainer.clip.isEmpty) {
-                                                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                                                zynqtgui.bottomBarControlObj = root.selectedChannel;
-                                                                bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                                Qt.callLater(function() {
-                                                                    bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                                                                })
-                                                            }
-                                                        } else if (root.selectedChannel.trackType === "synth") {
-                                                            // If channel type is synth open synth edit page
-                                                            if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[index])) {
-                                                                zynqtgui.fixed_layers.activate_index(root.selectedChannel.chainedSounds[index])
-                                                                zynqtgui.control.single_effect_engine = null;
-                                                                zynqtgui.current_screen_id = "control";
-                                                                zynqtgui.forced_screen_back = "sketchpad"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                Timer {
-                                                    id: dragHappenedResetTimer
-                                                    interval: 100
-                                                    repeat: false
-                                                    onTriggered: {
-                                                        delegateMouseArea.dragHappened = false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                slotData: root.selectedChannel.synthSlotsData
+                                slotType: "synth"
+                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "synth"
                             }
 
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                            }
-
-                            RowLayout {
+                            TrackSlotsData {
+                                id: samplesRow
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                slotData: root.selectedChannel.sampleSlotsData
+                                slotType: "sample-trig"
+                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "synth"
+                            }
 
-                                Binding { //Optimization
-                                    target: fxRepeater
-                                    property: "fxData"
-                                    delayed: true
-                                    value: root.selectedChannel.chainedFxNames
-                                }
+                            TrackSlotsData {
+                                id: sketchesRow
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                slotData: root.selectedChannel.sketchSlotsData
+                                slotType: "sample-loop"
+                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "sample-loop"
+                            }
+
+                            TrackSlotsData {
+                                id: externalRow
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                slotData: root.selectedChannel.externalSlotsData
+                                slotType: "external"
+                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "external"
+                            }
+
+                            RowLayout {
+                                id: fxRow
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                visible: fxTabButton.checked
 
                                 Repeater {
                                     id: fxRepeater
-
                                     model: 5
-                                    property var fxData: [null, null, null, null, null]
+                                    property var fxData: root.selectedChannel.fxSlotsData
                                     delegate: Rectangle {
                                         id: fxRowDelegate
                                         property bool highlighted: root.selectedChannel.selectedFxSlotRow === index
@@ -995,23 +791,19 @@ Rectangle {
                                         color: "transparent"
                                         radius: 4
 
-                                        function switchToThisSlot() {
-                                            if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" || zynqtgui.sketchpad.lastSelectedObj.value != index) {
+                                        function switchToThisSlot(onlyFocus=false) {
+                                            if (zynqtgui.sketchpad.lastSelectedObj.className != "MixedChannelsViewBar_fxslot" || zynqtgui.sketchpad.lastSelectedObj.value != index || onlyFocus) {
                                                 zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_fxslot"
                                                 zynqtgui.sketchpad.lastSelectedObj.value = index
                                                 zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
                                                 root.selectedChannel.selectedFxSlotRow = index
                                             } else {
-                                                if (!fxDelegateMouseArea.dragHappened) {
+                                                if (!fxDelegateMouseArea.dragHappened && !onlyFocus) {
                                                     bottomStack.slotsBar.handleItemClick("fx")
                                                 }
                                             }
                                             root.selectedChannel.setCurlayerByType("fx")
                                         }
-                                        // Show fx slots for all modes except sketch
-                                        enabled: root.selectedChannel.trackType !== "sample-loop"
-                                        opacity: enabled ? 1 : 0
-                                        visible: enabled
 
                                         Rectangle {
                                             anchors.fill: parent

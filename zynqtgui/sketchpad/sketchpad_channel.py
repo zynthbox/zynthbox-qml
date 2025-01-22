@@ -237,13 +237,10 @@ class sketchpad_channel(QObject):
             fxClient.dryWetMixAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientDryWetMixAmountChanged(theClient))
             fxClient.panAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientPanAmountChanged(theClient))
 
-        # Connect to respective signals when any of the slot data changes for property slotsData
-        self.track_type_changed.connect(lambda: self.emitSlotsDataChanged("trackType"))
-        self.chainedSoundsNamesChanged.connect(lambda: self.emitSlotsDataChanged("chainedSoundsNames"))
-        self.samples_changed.connect(lambda: self.emitSlotsDataChanged("samples"))
-        self.slotsReordered.connect(lambda: self.emitSlotsDataChanged("slotsReordered"))
-        self.externalAudioSourceChanged.connect(lambda: self.emitSlotsDataChanged("externalAudioSource"))
-        self.externalMidiChannelChanged.connect(lambda: self.emitSlotsDataChanged("externalMidiChannel"))
+        # Connect to respective signals when any of the slot data changes
+        self.slotsReordered.connect(self.sketchSlotsDataChanged.emit)
+        self.externalAudioSourceChanged.connect(self.externalSlotsDataChanged.emit)
+        self.externalMidiChannelChanged.connect(self.externalSlotsDataChanged.emit)
 
     def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
         if theSender in self.__trackPassthroughClients:
@@ -2198,29 +2195,37 @@ class sketchpad_channel(QObject):
     chainedSoundsAcceptedChannels = Property("QVariantList", get_chainedSoundsAcceptedChannels, notify=chainedSoundsAcceptedChannelsChanged)
     ### End property chainedSoundsAcceptedChannels
 
-    ### BEGIN Property slotsData
-    def emitSlotsDataChanged(self, whatChanged):
-        emitSlotsChanged = False
+    ### BEGIN Property synthSlotsData
+    def get_synthSlotsData(self):
+        return self.chainedSoundsNames
+    synthSlotsData = Property("QVariantList", get_synthSlotsData, notify=chainedSoundsNamesChanged)
+    ### END Property synthSlotsData
 
-        if whatChanged == "trackType":
-            emitSlotsChanged = True
-        elif whatChanged == "chainedSoundsNames":
-            if self.trackType == "synth":
-                emitSlotsChanged = True
-        elif whatChanged == "samples":
-            if self.trackType == "sample-trig":
-                emitSlotsChanged = True
-        elif whatChanged == "slotsReordered":
-            if self.trackType == "sample-loop":
-                emitSlotsChanged = True
-        elif whatChanged in ["externalAudioSource", "externalMidiChannel"]:
-            if self.trackType == "external":
-                emitSlotsChanged = True
+    ### BEGIN Property sampleSlotsData
+    def get_sampleSlotsData(self):
+        return self.samples
+    sampleSlotsData = Property("QVariantList", get_sampleSlotsData, notify=samples_changed)
+    ### END Property sampleSlotsData
 
-        if emitSlotsChanged:
-            self.slotsDataChanged.emit()
+    ### BEGIN Property sketchSlotsData
+    def get_sketchSlotsData(self):
+        clips = []
+        for clip_index in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+            clips_model = self.getClipsModelById(clip_index)
+            clips.append(clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex))
+        return clips
+    sketchSlotsDataChanged = Signal()
+    sketchSlotsData = Property("QVariantList", get_sketchSlotsData, notify=sketchSlotsDataChanged)
+    ### END Property sketchSlotsData
 
-    def get_slotsData(self):
+    ### BEGIN Property fxSlotsData
+    def get_fxSlotsData(self):
+        return self.chainedFxNames
+    fxSlotsData = Property("QVariantList", get_fxSlotsData, notify=chainedFxNamesChanged)
+    ### END Property fxSlotsData
+
+    ### BEGIN Property externalSlotsData
+    def get_externalSlotsData(self):
         def humanReadableExternalClientName(clientName):
             if clientName == "":
                 return "None"
@@ -2239,27 +2244,14 @@ class sketchpad_channel(QObject):
             else:
                 return clientName
 
-        if self.trackType == "synth":
-            return self.chainedSoundsNames
-        elif self.trackType == "sample-trig":
-            return self.samples
-        elif self.trackType == "sample-loop":
-            clips = []
-            for clip_index in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                clips_model = self.getClipsModelById(clip_index)
-                clips.append(clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex))
-            return clips
-        elif self.trackType == "external":
-            return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
-                    f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
-                    None,
-                    None,
-                    None]
-        else:
-            return [None, None, None, None, None]
-    slotsDataChanged = Signal()
-    slotsData = Property("QVariantList", get_slotsData, notify=slotsDataChanged)
-    ### END Property slotsData
+        return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
+                f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
+                None,
+                None,
+                None]
+    externalSlotsDataChanged = Signal()
+    externalSlotsData = Property("QVariantList", get_externalSlotsData, notify=externalSlotsDataChanged)
+    ### END Property externalSlotsData
 
     @Slot(int)
     def selectPreviousSynthPreset(self, slot_index):

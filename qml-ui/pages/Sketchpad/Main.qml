@@ -481,27 +481,28 @@ Zynthian.ScreenPage {
                         break;
                     case "SCREEN_ADMIN":
                         if (root.selectedChannel && root.selectedChannel.trackType === "synth") {
-                            let sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-                            // when synth and slot is active, edit that sound or show popup when empty
-                            if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
-                                zynqtgui.fixed_layers.activate_index(sound);
-                                zynqtgui.control.single_effect_engine = null;
-                                zynqtgui.current_screen_id = "control";
-                                zynqtgui.forced_screen_back = "sketchpad"
+                            if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_synthslot") {
+                                let sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+                                // when synth and slot is active, edit that sound or show popup when empty
+                                if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
+                                    zynqtgui.fixed_layers.activate_index(sound);
+                                    zynqtgui.control.single_effect_engine = null;
+                                    zynqtgui.current_screen_id = "control";
+                                    zynqtgui.forced_screen_back = "sketchpad"
+                                } else {
+                                    bottomStack.slotsBar.handleItemClick("synth");
+                                }
                             } else {
-                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
-                            }
-                            returnValue = true;
-                        } else if (root.selectedChannel && root.selectedChannel.trackType == "sample-trig") {
-                            let sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow];
-                            // when sample and slot is active, goto wave editor or show popup when empty
-                            if (sample && !sample.isEmpty) {
-                                zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
-                                zynqtgui.bottomBarControlObj = root.selectedChannel;
-                                bottomStack.slotsBar.bottomBarButton.checked = true;
-                                bottomStack.bottomBar.channelWaveEditorAction.trigger();
-                            } else {
-                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
+                                let sample = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow];
+                                // when sample and slot is active, goto wave editor or show popup when empty
+                                if (sample && !sample.isEmpty) {
+                                    zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
+                                    zynqtgui.bottomBarControlObj = root.selectedChannel;
+                                    bottomStack.slotsBar.bottomBarButton.checked = true;
+                                    bottomStack.bottomBar.channelWaveEditorAction.trigger();
+                                } else {
+                                    bottomStack.slotsBar.handleItemClick("sample-trig");
+                                }
                             }
                             returnValue = true;
                         } else if (root.selectedChannel && root.selectedChannel.trackType === "sample-loop") {
@@ -513,7 +514,7 @@ Zynthian.ScreenPage {
                                 bottomStack.slotsBar.bottomBarButton.checked = true;
                                 bottomStack.bottomBar.waveEditorAction.trigger();
                             } else {
-                                bottomStack.slotsBar.handleItemClick(root.selectedChannel.trackType);
+                                bottomStack.slotsBar.handleItemClick("sample-loop");
                             }
                             returnValue = true;
                         } else {
@@ -886,7 +887,7 @@ Zynthian.ScreenPage {
                                             ? root.displaySceneButtons
                                             : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
                                                 ? root.displayTrackButtons
-                                                : ["TracksBar_slot", "TracksBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
+                                                : ["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot", "TracksBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
                                                     ? zynqtgui.slotsBarChannelActive
                                                     : false
                             : false
@@ -1642,7 +1643,10 @@ Zynthian.ScreenPage {
                 id: bottomStack
 
                 property alias bottomBar: bottomBar
+                property alias mixerBar: mixerBar
                 property alias slotsBar: slotsBar
+                property alias tracksBar: tracksBar
+                property alias clipsBar: clipsBar
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true

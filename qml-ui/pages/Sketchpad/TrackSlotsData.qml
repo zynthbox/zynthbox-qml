@@ -52,10 +52,27 @@ RowLayout {
 
             function switchToThisSlot(onlyFocus=false) {
                 if (zynqtgui.sketchpad.lastSelectedObj.component != slotDelegate || onlyFocus) {
-                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_slot"
-                    zynqtgui.sketchpad.lastSelectedObj.value = index
-                    zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
-                    root.selectedChannel.selectedSlotRow = index
+                    switch (control.slotType) {
+                        case "synth":
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                            break;
+                        case "sample-trig":
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
+                            break;
+                        case "sample-loop":
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
+                            break;
+                        case "external":
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
+                            break;
+                        default:
+                            console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                            break;
+                    }
+                    zynqtgui.sketchpad.lastSelectedObj.value = index;
+                    zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate;
+                    root.selectedChannel.selectedSlotRow = index;
                     // zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
                     // zynqtgui.bottomBarControlObj = root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                 } else {

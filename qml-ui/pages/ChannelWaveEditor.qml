@@ -64,7 +64,7 @@ Zynthian.ScreenPage {
         selectedChannelThrottle.restart()
     }
     property QtObject selectedClip: component.selectedChannel
-                                    ? ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
+                                    ? component.selectedChannel.trackType === "sample-loop"
                                         ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                         : component.selectedChannel.samples[component.selectedChannel.selectedSlotRow]
                                     : null
@@ -875,7 +875,7 @@ Zynthian.ScreenPage {
                 delegate: Rectangle {
                     id: clipDelegate
 
-                    property QtObject clip: ["synth", "sample-loop"].indexOf(component.selectedChannel.trackType) >= 0
+                    property QtObject clip: component.selectedChannel.trackType === "sample-loop"
                                                         ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                                                         : component.selectedChannel.samples[index]
                     property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")

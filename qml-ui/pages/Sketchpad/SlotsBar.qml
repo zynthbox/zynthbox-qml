@@ -199,7 +199,7 @@ Rectangle {
 
     function handleItemClick(type) {
         // Type will be used to invoke the respective handler when
-        // required from MixedChannelsViewBar or something else in future
+        // required from TracksBar or something else in future
         // This allows us to invoke specific handler frmo other page
         // when when the buttons are not checked
         if (!type) {

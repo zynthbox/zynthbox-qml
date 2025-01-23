@@ -886,7 +886,7 @@ Zynthian.ScreenPage {
                                             ? root.displaySceneButtons
                                             : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
                                                 ? root.displayTrackButtons
-                                                : ["MixedChannelsViewBar_slot", "MixedChannelsViewBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
+                                                : ["TracksBar_slot", "TracksBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
                                                     ? zynqtgui.slotsBarChannelActive
                                                     : false
                             : false
@@ -1033,7 +1033,7 @@ Zynthian.ScreenPage {
                                     zynqtgui.sketchpad.lastSelectedObj.component = channelHeaderDelegate
                                     zynqtgui.sketchpad.selectedTrackId = index;
                                     Qt.callLater(function() {
-                                        // Open MixedChannelsViewBar and switch to channel
+                                        // Open TracksBar and switch to channel
                                         // bottomStack.slotsBar.channelButton.checked = true
                                         root.resetBottomBar(false)
                                         zynqtgui.bottomBarControlType = "bottombar-controltype-channel";
@@ -1666,8 +1666,8 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                 }
 
-                MixedChannelsViewBar {
-                    id: mixedChannelsViewBar
+                TracksBar {
+                    id: tracksBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }

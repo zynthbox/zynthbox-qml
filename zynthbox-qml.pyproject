@@ -79,7 +79,7 @@
         "./qml-ui/pages/Sketchpad/FXBar.qml",
         "./qml-ui/pages/Sketchpad/InfoBar.qml",
         "./qml-ui/pages/Sketchpad/Main.qml",
-        "./qml-ui/pages/Sketchpad/MixedChannelsViewBar.qml",
+        "./qml-ui/pages/Sketchpad/TracksBar.qml",
         "./qml-ui/pages/Sketchpad/MixerBar.qml",
         "./qml-ui/pages/Sketchpad/ClipsBar.qml",
         "./qml-ui/pages/Sketchpad/ClipsBarDelegate.qml",

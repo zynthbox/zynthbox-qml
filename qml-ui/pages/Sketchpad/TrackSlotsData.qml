@@ -52,7 +52,7 @@ RowLayout {
 
             function switchToThisSlot(onlyFocus=false) {
                 if (zynqtgui.sketchpad.lastSelectedObj.component != slotDelegate || onlyFocus) {
-                    zynqtgui.sketchpad.lastSelectedObj.className = "MixedChannelsViewBar_slot"
+                    zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_slot"
                     zynqtgui.sketchpad.lastSelectedObj.value = index
                     zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate
                     root.selectedChannel.selectedSlotRow = index

@@ -644,9 +644,9 @@ don't want to have to dig too far...
                 if (delta > 0) {
                     let selectedChannel = applicationWindow().selectedChannel;
                     while (delta > 0) {
-                        if (selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_slot") {
                             selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
                             selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                         }
                         delta = delta - 1;
@@ -655,9 +655,9 @@ don't want to have to dig too far...
                 } else if (delta < 0) {
                     let selectedChannel = applicationWindow().selectedChannel;
                     while (delta < 0) {
-                        if (selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                        if (selectedChannel.trackType === "synth" && zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_slot") {
                             selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
                             selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
                         }
                         delta = delta + 1;

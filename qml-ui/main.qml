@@ -251,7 +251,7 @@ Kirigami.AbstractApplicationWindow {
                 case "SCREEN_EDIT_CONTEXTUAL":
                     // In case the global popup is open, hide it when switching to the context editor
                     zynqtgui.globalPopupOpened = false;
-                    if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_slot") {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_slot") {
                         if (root.selectedChannel.trackType.startsWith("sample-")) {
                             zynqtgui.show_modal("channel_wave_editor");
                         } else if (root.selectedChannel.trackType === "synth") {
@@ -264,7 +264,7 @@ Kirigami.AbstractApplicationWindow {
                         } else if (root.selectedChannel.trackType === "external") {
                             show_modal("channel_external_setup");
                         }
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "MixedChannelsViewBar_fxslot") {
+                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
                         if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
                             zynqtgui.show_screen("control");
                         } else {

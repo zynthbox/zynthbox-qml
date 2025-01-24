@@ -34,6 +34,8 @@ import configparser
 import shlex
 import subprocess
 import shutil
+import os
+import stat
 
 # Zynthian specific modules
 from . import zynthian_gui_selector, zynthian_gui_config
@@ -402,6 +404,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             if (Path(path).parent / "squashfs-root").exists():
                 shutil.rmtree(Path(path).parent / "squashfs-root", ignore_errors=True)
             self.zynqtgui.currentTaskMessage = "Optimizing App : Extracting Appimage"
+            os.chmod(path, stat.S_IRWXU) # Make the appimage executable before running --appimage-extract
             subprocess.run((path, "--appimage-extract"), stdout=subprocess.DEVNULL, cwd=Path(path).parent)
             (Path(path).parent / "squashfs-root").rename(appdir)
 

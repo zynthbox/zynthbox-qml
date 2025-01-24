@@ -153,8 +153,8 @@ class sketchpad_song(QObject):
                         clip = sketchpad_clip(channel.id, song_index, clip_index, self, clipsModel)
                         clipsModel.add_clip(clip)
 
-            # Add first clip of track T1 and T2 to current scene as default snapshot has preselected scenes only on T1 and T2
-            for trackIndex in range(2):
+            # Add first clip of track T1, T2 and T3 to current scene as default snapshot has preselected scenes only on T1, T2 and T3
+            for trackIndex in range(3):
                 channel = self.__channels_model__.getChannel(trackIndex)
                 for songIndex in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
                     channel.getClipsModelById(0).getClip(songIndex).enabled = True

@@ -65,11 +65,13 @@ Zynthian.Stack {
         "sound_categories": "SoundCategories/Main.qml",
         "wifi_settings":"WifiSettingsPage.qml",
         "test_knobs":"TestKnobsPage.qml",
-        "midicontroller_settings": "MidiControllerSettings.qml"
+        "midicontroller_settings": "MidiControllerSettings.qml",
+        "sample_library": "SampleLibraryPage.qml"
     }
     readonly property var pageDisplayNames: {
         "main": "Main Menu",
         "control": "Synth Edit",
+        "sample_library": "Sample Library",
         "layers_for_channel": "Library",
         "layer_effects": "FX Library",
         "layer_midi_effects": "MidiFX Library",
@@ -87,6 +89,7 @@ Zynthian.Stack {
         "sketchpad",
         "main",
         "control",
+        "sample_library",
         "layers_for_channel",
         "layer_effects",
         "layer_midi_effects",

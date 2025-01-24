@@ -342,7 +342,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.zynqtgui):
         sketchpad_page_active = self.zynqtgui.current_screen_id == "sketchpad"
         playgrid_page_active = self.zynqtgui.current_screen_id == "playgrid"
         song_manager_page_active = self.zynqtgui.current_screen_id == "song_manager"
-        library_page_active = self.zynqtgui.current_screen_id in ["layers_for_channel", "bank", "preset", "fixed_effects", "effect_preset"]
+        library_page_active = self.zynqtgui.current_screen_id in ["layers_for_channel", "bank", "preset", "fixed_effects", "effect_preset", "sample_library"]
         edit_page_active = self.zynqtgui.current_screen_id == "control" or self.zynqtgui.current_screen_id in ["channel_wave_editor", "channel_external_setup"]
 
         # Light up 1-5 buttons when respective clip is enabled when leftSidebar is active

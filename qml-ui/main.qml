@@ -248,6 +248,20 @@ Kirigami.AbstractApplicationWindow {
                         result = true;
                     }
                     break;
+                case "SCREEN_LAYER":
+                case "SCREEN_PRESET":
+                    if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
+                        // Before switching, let's just make sure we actually have a slot picked...0
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
+                        if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(zynqtgui.sketchpad.lastSelectedObj.className)) {
+                            // Then we are selecting samples and sketches, show the sample library
+                            zynqtgui.show_screen("sample_library");
+                        } else {
+                            zynqtgui.show_screen("preset");
+                        }
+                        result = true;
+                    }
+                    break;
                 case "SCREEN_EDIT_CONTEXTUAL":
                     // In case the global popup is open, hide it when switching to the context editor
                     pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();

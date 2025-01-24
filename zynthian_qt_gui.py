@@ -123,6 +123,7 @@ from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
 from zynqtgui.zynthian_gui_control import zynthian_gui_control
 from zynqtgui.zynthian_gui_channel import zynthian_gui_channel
+from zynqtgui.zynthian_gui_sample_library import zynthian_gui_sample_library
 from zynqtgui.zynthian_gui_channel_external_setup import zynthian_gui_channel_external_setup
 from zynqtgui.zynthian_gui_channel_wave_editor import zynthian_gui_channel_wave_editor
 
@@ -353,6 +354,7 @@ class zynthian_gui(QObject):
         "layer_midi_effects",
         "midi_effect_types",
         "layer_midi_effect_chooser",
+        "sample_library"
     )
 
     note2cuia = {
@@ -1179,6 +1181,7 @@ class zynthian_gui(QObject):
         self.screens['audio_in'] = zynthian_gui_audio_in(self)
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
+        self.screens["sample_library"] = zynthian_gui_sample_library(self)
 
         # effect_preset is the same instance as preset screen
         # This is done to be able to differentiate if the preset page is open from SynthSetupPage or FXSetupPage
@@ -1957,12 +1960,12 @@ class zynthian_gui(QObject):
             # self.show_modal("admin")
             # pass
 
-        elif cuia == "SCREEN_LAYER":
-            if self.current_screen_id == "preset":
-                self.preset.toggle_show_fav_presets()
-            else:
-                self.show_screen("preset")
-            sendCuiaEventFeedback = False
+        # elif cuia == "SCREEN_LAYER":
+        #     if self.current_screen_id == "preset":
+        #         self.preset.toggle_show_fav_presets()
+        #     else:
+        #         self.show_screen("preset")
+        #     sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_LAYER_FX":
             self.show_screen("layer_effects")
@@ -1972,12 +1975,12 @@ class zynthian_gui(QObject):
             self.show_screen("bank")
             sendCuiaEventFeedback = False
 
-        elif cuia == "SCREEN_PRESET":
-            if self.current_screen_id == "preset":
-                self.preset.toggle_show_fav_presets()
-            else:
-                self.show_screen("preset")
-            sendCuiaEventFeedback = False
+        # elif cuia == "SCREEN_PRESET":
+        #     if self.current_screen_id == "preset":
+        #         self.preset.toggle_show_fav_presets()
+        #     else:
+        #         self.show_screen("preset")
+        #     sendCuiaEventFeedback = False
 
         elif cuia == "SCREEN_CONTROL":
             self.show_screen("control")
@@ -3945,6 +3948,9 @@ class zynthian_gui(QObject):
     def bluetooth_config(self):
         return self.screens["bluetooth_config"]
 
+    def sample_library(self):
+        return self.screens["sample_library"]
+
     def osd(self):
         return self.__osd
 
@@ -4794,6 +4800,7 @@ class zynthian_gui(QObject):
     sound_categories = Property(QObject, sound_categories, constant=True)
     led_config = Property(QObject, led_config, constant=True)
     bluetooth_config = Property(QObject, bluetooth_config, constant=True)
+    sample_library = Property(QObject, sample_library, constant=True)
     osd = Property(QObject, osd, constant=True)
     zynthbox_plugins_helper = Property(QObject, zynthbox_plugins_helper, constant=True)
 

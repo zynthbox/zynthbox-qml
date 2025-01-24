@@ -145,6 +145,33 @@ Rectangle {
                 break;
         }
     }
+    function switchToSlot(slotType, slotIndex) {
+        switch(slotType) {
+            case "synth":
+                fxTabButton.checked = false;
+                synthsRow.switchToSlot(slotIndex, true);
+                break;
+            case "sample":
+                fxTabButton.checked = false;
+                samplesRow.switchToSlot(slotIndex, true);
+                break;
+            case "sketch":
+                fxTabButton.checked = false;
+                sketchesRow.switchToSlot(slotIndex, true);
+                break;
+            case "fx":
+                fxTabButton.checked = true;
+                fxRow.itemAt(slotIndex).switchToThisSlot(true);
+                break;
+            case "external":
+                fxTabButton.checked = false;
+                externalRow.switchToSlot(slotIndex, true);
+                break;
+            default:
+                console.log("Unknown slot type:", slotType)
+                break;
+        }
+    }
     // Depending on track type, select the first and best (occupied) slot
     // If there is a selected slot which has stuff in it, that is the one we will use.
     // If there is is a selected slot, but there is nothing in that slot, we will reset the selection to

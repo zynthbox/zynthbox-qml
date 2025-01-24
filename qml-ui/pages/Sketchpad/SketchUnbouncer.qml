@@ -91,17 +91,12 @@ Zynthian.DialogQuestion {
                     // Start long-running task
                     zynqtgui.start_loading();
                     zynqtgui.currentTaskMessage = qsTr("Unbouncing Sketch to Track %2").arg(_private.channel.name);
-                    if (_private.clip.metadata.audioType === "sample-trig") {
-                        console.log("Sketch was recorded via sample-trig, so switch to that");
-                        _private.channel.trackType = "sample-trig";
-                    } else if (_private.clip.metadata.audioType === "sample-loop") {
-                        console.log("Sketch was recorded via synth sounds (but was in loop mode), so switch to that");
-                        _private.channel.trackType = "synth";
-                    } else if (_private.clip.metadata.audioType === "synth") {
-                        console.log("Sketch was recorded via synth sounds, so switch to that");
-                        _private.channel.trackType = "synth";
+                    if (_private.clip.metadata.audioType === "external") {
+                        console.log("Sketch was recorded via external gear, so switch to that");
+                        _private.channel.trackType = "external";
                     } else {
-                        console.log("Weird audio type:", _private.clip.metadata.audioType);
+                        console.log("Sketch was recorded using internal sounds, so switch to synth mode");
+                        _private.channel.trackType = "synth"
                     }
                     if (replacePattern.sketchHasData && replacePattern.checked) {
                         if (_private.clip.metadata.patternJson !== null && _private.clip.metadata.patternJson.length > 5) {

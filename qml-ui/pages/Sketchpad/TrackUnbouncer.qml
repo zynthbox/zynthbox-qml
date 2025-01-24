@@ -230,11 +230,11 @@ Zynthian.DialogQuestion {
                     // - Pick out the specific clip selected for sound source
                     let originSketch = _private.sketches[_private.soundSourceSketch];
                     //   - Set track trackType to match ZYNTHBOX_TRACK_TYPE (clip.metadata.audioType)
-                    if (originSketch.metadata.audioType === "sample-loop") {
-                        console.log("Sketch was recorded via synth sounds (but was in loop mode), so switch to that");
-                        _private.sketchpadTrack.trackType = "synth";
+                    if (originSketch.metadata.audioType === "external") {
+                        console.log("Sketch was recorded using external sounds, so switch to that");
+                        _private.sketchpadTrack.trackType = "external";
                     } else {
-                        _private.sketchpadTrack.trackType = originSketch.metadata.audioType;
+                        _private.sketchpadTrack.trackType = "synth";
                     }
                     //   - Set track trackRoutingStyle to match ZYNTHBOX_ROUTING_STYLE (clip.metadata.routingStyle)
                     _private.sketchpadTrack.trackRoutingStyle = originSketch.metadata.routingStyle;
@@ -242,10 +242,8 @@ Zynthian.DialogQuestion {
                     _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadata.audioTypeSettings);
                     //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
                     _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadata.soundSnapshot);
-                    //   - If trackType is sample-trig: set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
-                    if (_private.sketchpadTrack.trackType === "sample-trig") {
-                        _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadata.samples);
-                    }
+                    //   - set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
+                    _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadata.samples);
                     // - Run through the track's patterns
                     let sequence = Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName);
                     let enabledAClip = false;

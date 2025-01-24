@@ -342,6 +342,9 @@ Zynthian.ScreenPage {
 
             // Since CUIA event is not handled by selector view, handle it here
             switch (cuia) {
+                case "SCREEN_PRESET":
+                    zynqtgui.preset.toggle_show_fav_presets();
+                    return true;
                 case "SWITCH_SELECT_SHORT":
                     if (zynqtgui.current_screen_id == "layers_for_channel" && !zynqtgui.fixed_layers.current_index_valid) {
                         layerSetupDialog.open();

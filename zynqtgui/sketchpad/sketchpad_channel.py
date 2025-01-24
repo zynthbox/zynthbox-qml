@@ -157,7 +157,8 @@ class sketchpad_channel(QObject):
             newSample.channel = self
             self.__samples__.append(newSample)
 
-        self.__allowMulticlip__ = False
+        # All tracks should be multiclip by default
+        self.__allowMulticlip__ = True
         self.__track_type__ = "synth"
         self.__track_routing_style__ = "standard"
         self.__routingData__ = {

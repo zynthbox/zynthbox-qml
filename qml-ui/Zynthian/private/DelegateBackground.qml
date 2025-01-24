@@ -31,7 +31,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 PlasmaCore.FrameSvgItem {
     property QQC2.ItemDelegate delegate
-    visible: delegate.ListView.isCurrentItem || delegate.pressed
+    visible: delegate.ListView.isCurrentItem || delegate.pressed || delegate.checked
     imagePath: "widgets/viewitem"
     
     // Always add hover prefix as it should not show filled background for selected items

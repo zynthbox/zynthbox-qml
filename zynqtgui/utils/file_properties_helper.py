@@ -33,40 +33,42 @@ class file_properties_helper(QObject):
     def get_file_path(self):
         return self.file_path
     def set_file_path(self, path):
-        self.file_path = Path(path)
-        self.file_path_changed.emit()
+        newPath = Path(path)
+        if self.file_path != newPath:
+            self.file_path = newPath
+            self.file_path_changed.emit()
 
-        is_wav = self.file_path.name.endswith(".wav")
+            is_wav = self.file_path.name.endswith(".wav")
 
-        is_sketch = False
-        if is_wav:
-            properties = self.getWavData(self.file_path)
-            is_sketch = "zynthbox" in properties
-        else:
-            properties = []
+            is_sketch = False
+            if is_wav:
+                properties = self.getWavData(self.file_path)
+                is_sketch = "zynthbox" in properties
+            else:
+                properties = []
 
-        file_stat = self.file_path.stat()
+            file_stat = self.file_path.stat()
 
-        is_read_write = False
-        # If the a file or directory is in one of our user-folders (the ones called something with "my-"), then we define them as read-write
-        for testPath in self.__user_folders:
-            if testPath != self.file_path and self.file_path.is_relative_to(testPath):
-                is_read_write = True
-                break
+            is_read_write = False
+            # If the a file or directory is in one of our user-folders (the ones called something with "my-"), then we define them as read-write
+            for testPath in self.__user_folders:
+                if testPath != self.file_path and self.file_path.is_relative_to(testPath):
+                    is_read_write = True
+                    break
 
-        self.file_metadata = {
-            "filepath": str(self.file_path),
-            "filename": self.file_path.name,
-            "size": file_stat.st_size,
-            "humanSize": sizeof_fmt(file_stat.st_size),
-            "isWav": is_wav,
-            "isSketch": is_sketch,
-            "isDir": self.file_path.is_dir(),
-            "isFile": self.file_path.is_file(),
-            "isReadWrite": is_read_write,
-            "properties": properties
-        }
-        self.file_metadata_changed.emit()
+            self.file_metadata = {
+                "filepath": str(self.file_path),
+                "filename": self.file_path.name,
+                "size": file_stat.st_size,
+                "humanSize": sizeof_fmt(file_stat.st_size),
+                "isWav": is_wav,
+                "isSketch": is_sketch,
+                "isDir": self.file_path.is_dir(),
+                "isFile": self.file_path.is_file(),
+                "isReadWrite": is_read_write,
+                "properties": properties
+            }
+            self.file_metadata_changed.emit()
     file_path_changed = Signal()
     filePath = Property(str, get_file_path, set_file_path, notify=file_path_changed)
     ### END Property filePath
@@ -258,11 +260,15 @@ class file_properties_helper(QObject):
         if self.file_metadata is not None and self.file_metadata["isWav"]:
             if self.preview_clip is not None:
                 self.preview_clip.stop()
-                self.preview_clip.deleteLater()
-            self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), False, self)
-            self.preview_clip.setLaneAffinity(1)
+                if self.preview_clip.getFilePath() != self.file_path:
+                    self.preview_clip.deleteLater()
+                    self.preview_clip = None
+            if self.preview_clip is None:
+                self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), False, self)
+                self.preview_clip.setLaneAffinity(1)
+                self.preview_clip_changed.emit()
 
-            self.preview_clip.play()
+            self.preview_clip.play(False)
             self.is_preview_playing = True
             self.is_preview_playing_changed.emit()
 
@@ -272,3 +278,10 @@ class file_properties_helper(QObject):
             self.preview_clip.stop()
             self.is_preview_playing = False
             self.is_preview_playing_changed.emit()
+
+    # BEGIN Property previewClip
+    def get_preview_clip(self):
+        return self.preview_clip
+    preview_clip_changed = Signal()
+    previewClip = Property(QObject, get_preview_clip, notify=preview_clip_changed)
+    # END Property previewClip

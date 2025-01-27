@@ -145,6 +145,31 @@ Rectangle {
                 break;
         }
     }
+    function activateSlot(slotType, slotIndex) {
+        // First ensure we have the given slot selected
+        switchToSlot(slotType, slotIndex);
+        // Then activate it
+        switch(slotType) {
+            case "synth":
+                synthsRow.switchToSlot(slotIndex);
+                break;
+            case "sample":
+                samplesRow.switchToSlot(slotIndex);
+                break;
+            case "sketch":
+                sketchesRow.switchToSlot(slotIndex);
+                break;
+            case "fx":
+                fxRow.itemAt(slotIndex).switchToThisSlot();
+                break;
+            case "external":
+                externalRow.switchToSlot(slotIndex);
+                break;
+            default:
+                console.log("Unknown slot type:", slotType)
+                break;
+        }
+    }
     function switchToSlot(slotType, slotIndex) {
         switch(slotType) {
             case "synth":

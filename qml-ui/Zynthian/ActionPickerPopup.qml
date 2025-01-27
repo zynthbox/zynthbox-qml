@@ -36,6 +36,7 @@ Zynthian.Popup {
     property list<QQC2.Action> actions
     property int rows: 3
     property int columns: Math.ceil(component.actions.length / 3) // Auto calculate columns if not provided
+    property alias currentIndex: _private.currentIndex
 
     property var cuiaCallback: function(cuia) {
         var result = component.opened;

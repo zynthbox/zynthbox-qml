@@ -279,19 +279,13 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                 level: 2
-                text: qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                text: component.selectedChannel
+                                ? component.selectedChannel.trackType === "sample-loop"
+                                    ? qsTr("Track %1 Sketches").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                                    : qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                                : ""
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
-                Rectangle {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.bottom
-                    }
-                    height: Kirigami.Units.smallSpacing
-                    visible: _private.selectedColumn === 0
-                    color: parent.color
-                }
             }
             Kirigami.Heading {
                 Layout.fillWidth: true
@@ -300,16 +294,6 @@ Zynthian.ScreenPage {
                 text: qsTr("Folders")
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
-                Rectangle {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.bottom
-                    }
-                    height: Kirigami.Units.smallSpacing
-                    visible: _private.selectedColumn === 1
-                    color: parent.color
-                }
             }
             Kirigami.Heading {
                 Layout.fillWidth: true
@@ -318,16 +302,6 @@ Zynthian.ScreenPage {
                 text: qsTr("Samples In Folder")
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
-                Rectangle {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.bottom
-                    }
-                    height: Kirigami.Units.smallSpacing
-                    visible: _private.selectedColumn === 2
-                    color: parent.color
-                }
             }
         }
         RowLayout {
@@ -337,31 +311,20 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                highlighted: _private.selectedColumn === 0
                 ColumnLayout {
-                    anchors.fill: parent
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.smallSpacing
+                    }
                     Repeater {
                         model: Zynthbox.Plugin.sketchpadSlotCount
-                        delegate: Zynthian.BasicDelegate {
+                        delegate: Zynthian.Card {
                             id: clipDelegate
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            onClicked: {
-                                if (zynqtgui.sketchpad.lastSelectedObj.value === model.index) {
-                                    if (component.selectedChannel.trackType === "sample-loop") {
-                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", zynqtgui.sketchpad.lastSelectedObj.value);
-                                    } else {
-                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", zynqtgui.sketchpad.lastSelectedObj.value);
-                                    }
-                                } else {
-                                    if (component.selectedChannel.trackType === "sample-loop") {
-                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index);
-                                    } else {
-                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index);
-                                    }
-                                }
-                            }
-                            checked: model.index === zynqtgui.sketchpad.lastSelectedObj.value
+                            highlighted: model.index === zynqtgui.sketchpad.lastSelectedObj.value
                             property QtObject clip: component.selectedChannel
                                 ? component.selectedChannel.trackType === "sample-loop"
                                     ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
@@ -371,29 +334,63 @@ Zynthian.ScreenPage {
                                 ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
                                 : null
                             property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
-                            contentItem: ColumnLayout {
-                                RowLayout {
-                                    QQC2.Label {
-                                        id: mainLabel
-                                        Layout.fillWidth: true
-                                        text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot").arg(model.index + 1))
-                                        elide: Text.ElideRight
+                            contentItem: Item {
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (zynqtgui.sketchpad.lastSelectedObj.value === model.index) {
+                                            if (component.selectedChannel.trackType === "sample-loop") {
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", zynqtgui.sketchpad.lastSelectedObj.value);
+                                            } else {
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", zynqtgui.sketchpad.lastSelectedObj.value);
+                                            }
+                                        } else {
+                                            if (component.selectedChannel.trackType === "sample-loop") {
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index);
+                                            } else {
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index);
+                                            }
+                                        }
                                     }
                                 }
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    color: "#222222"
-                                    border.width: 1
-                                    border.color: "#ff999999"
-                                    radius: 4
-                                    Zynthbox.WaveFormItem {
-                                        anchors.fill: parent
-                                        color: Kirigami.Theme.textColor
-                                        source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
-                                        start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
-                                        end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
-                                        visible: clipDelegate.clipHasWav
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    RowLayout {
+                                        QQC2.Label {
+                                            id: mainLabel
+                                            Layout.fillWidth: true
+                                            text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot"))
+                                            elide: Text.ElideRight
+                                        }
+                                    }
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        color: "#222222"
+                                        border.width: 1
+                                        border.color: "#ff999999"
+                                        radius: 4
+                                        Zynthbox.WaveFormItem {
+                                            anchors {
+                                                fill: parent
+                                                margins: 1
+                                            }
+                                            color: Kirigami.Theme.textColor
+                                            source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
+                                            start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+                                            end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
+                                            visible: clipDelegate.clipHasWav
+                                        }
+                                        Rectangle {
+                                            anchors {
+                                                left: parent.left
+                                                bottom: parent.bottom
+                                            }
+                                            width: clipDelegate.cppClipObject ? parent.width * clipDelegate.cppClipObject.selectedSliceObject.gainHandler.gainAbsolute : 0
+                                            height: Kirigami.Units.gridUnit * 0.5
+                                            color: Kirigami.Theme.highlightColor
+                                            opacity: 0.7
+                                        }
                                     }
                                 }
                             }
@@ -405,9 +402,13 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                highlighted: _private.selectedColumn === 1
                 ListView {
                     id: folderListView
-                    anchors.fill: parent
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.smallSpacing
+                    }
                     model: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
                         ? _private.filePropertiesHelper.getOnlySubdirectoryList("/zynthian/zynthian-my-data/sketches")
                         : _private.filePropertiesHelper.getOnlySubdirectoryList("/zynthian/zynthian-my-data/samples")
@@ -456,9 +457,13 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                highlighted: _private.selectedColumn === 2
                 ListView {
                     id: filesListView
-                    anchors.fill: parent
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.smallSpacing
+                    }
                     model: FolderListModel {
                         id: folderModel
                         caseSensitive: false

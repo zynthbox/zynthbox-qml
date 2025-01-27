@@ -122,6 +122,54 @@ Zynthian.ScreenPage {
                 }
                 returnValue = true;
                 break;
+            case "KNOB0_TOUCHED":
+                switch (_private.selectedColumn) {
+                    case 0:
+                        if (component.selectedChannel.trackType === "sample-loop") {
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value);
+                        } else {
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value);
+                        }
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                }
+                break;
+            case "KNOB0_RELEASED":
+                returnValue = true;
+                break;
+            case "KNOB0_UP":
+                switch (_private.selectedColumn) {
+                    case 0:
+                        if (component.selectedChannel.trackType === "sample-loop") {
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value);
+                        } else {
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value);
+                        }
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                }
+                break;
+            case "KNOB0_DOWN":
+                switch (_private.selectedColumn) {
+                    case 0:
+                        if (component.selectedChannel.trackType === "sample-loop") {
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value);
+                        } else {
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value);
+                        }
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                }
+                break;
             case "SELECT_DOWN":
             case "KNOB3_UP":
                 switch (_private.selectedColumn) {
@@ -190,7 +238,6 @@ Zynthian.ScreenPage {
             sampleSlotAssigner.currentIndex = zynqtgui.sketchpad.lastSelectedObj.value;
         }
         property string pathName: ""
-        property QtObject sketch: component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         actions: [
             QQC2.Action {
                 property int slotIndex: 0

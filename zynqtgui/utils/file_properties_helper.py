@@ -125,6 +125,22 @@ class file_properties_helper(QObject):
             subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
         return subdirectories
 
+    # Returns an ordered list of subdirectories for the given pathname, containing objects with the keys path, subpath and name
+    # The list does not include the given path itself, only subdirectories
+    # path contains the fill file system path of the entry
+    # subpath contains the last part of the path, *excluding* the search path's last directory
+    # name contains only the entry's directory name
+    @Slot(str, result='QVariantList')
+    def getOnlySubdirectoryList(self, pathname):
+        subdirectories = []
+        pathStringLength = len(pathname + "/")
+        afterFirstDir = False # As we want to exclude the given path, skip the first entry (which when using os.walk will always be that one)
+        for dirpath, dirnames, filenames in os.walk(pathname, onerror=print, followlinks=False):
+            if afterFirstDir:
+                subdirectories.append({"path": dirpath, "subpath": dirpath[pathStringLength:], "name": dirpath.split('/')[-1]})
+            afterFirstDir = True
+        return subdirectories
+
     @Slot(str, 'QVariantMap')
     def writeMetadata(self, filename, values: dict):
         # for key, value in values.items():

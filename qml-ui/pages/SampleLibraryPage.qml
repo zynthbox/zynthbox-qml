@@ -131,10 +131,10 @@ Zynthian.ScreenPage {
                         }
                         break;
                     case 1:
-                        folderListView.currentIndex = Math.max(-1, folderListView.currentIndex - 1);
+                        folderListView.currentIndex = Math.max(0, folderListView.currentIndex - 1);
                         break;
                     case 2:
-                        filesListView.currentIndex = Math.max(-1, filesListView.currentIndex - 1);
+                        filesListView.currentIndex = Math.max(0, filesListView.currentIndex - 1);
                         break;
                 }
                 returnValue = true;
@@ -284,10 +284,10 @@ Zynthian.ScreenPage {
                     id: folderListView
                     anchors.fill: parent
                     model: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                        ? _private.filePropertiesHelper.getSubdirectoryList("/zynthian/zynthian-my-data/sketches")
-                        : _private.filePropertiesHelper.getSubdirectoryList("/zynthian/zynthian-my-data/samples")
+                        ? _private.filePropertiesHelper.getOnlySubdirectoryList("/zynthian/zynthian-my-data/sketches")
+                        : _private.filePropertiesHelper.getOnlySubdirectoryList("/zynthian/zynthian-my-data/samples")
                     onModelChanged: {
-                        currentIndex = 1;
+                        currentIndex = 0;
                     }
                     onCurrentItemChanged: {
                         if (folderListView.currentItem) {

@@ -103,6 +103,26 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         let returnValue = false;
         switch (cuia) {
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+                switch (_private.selectedColumn) {
+                    case 0:
+                        if (component.selectedChannel.trackType === "sample-loop") {
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", zynqtgui.sketchpad.lastSelectedObj.value);
+                        } else {
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", zynqtgui.sketchpad.lastSelectedObj.value);
+                        }
+                        break;
+                    case 1:
+                        _private.selectedColumn = 2;
+                        break;
+                    case 2:
+                        filesListView.currentItem.onClicked();
+                        break;
+                }
+                returnValue = true;
+                break;
+            case "SELECT_DOWN":
             case "KNOB3_UP":
                 switch (_private.selectedColumn) {
                     case 0:
@@ -121,6 +141,7 @@ Zynthian.ScreenPage {
                 }
                 returnValue = true;
                 break;
+            case "SELECT_UP":
             case "KNOB3_DOWN":
                 switch (_private.selectedColumn) {
                     case 0:
@@ -158,6 +179,95 @@ Zynthian.ScreenPage {
         property QtObject filePropertiesHelper: Helpers.FilePropertiesHelper {
             filePath: "/zynthian/zynthian-my-data"
         }
+    }
+    Zynthian.ActionPickerPopup {
+        id: sampleSlotAssigner
+        objectName: ""
+        rows: 5
+        function assignToSlot(samplePathName) {
+            sampleSlotAssigner.pathName = samplePathName;
+            sampleSlotAssigner.open();
+            sampleSlotAssigner.currentIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+        }
+        property string pathName: ""
+        property QtObject sketch: component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+        actions: [
+            QQC2.Action {
+                property int slotIndex: 0
+                text: sampleSlotAssigner.opened
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            QQC2.Action {
+                property int slotIndex: 1
+                text: sampleSlotAssigner.opened
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            QQC2.Action {
+                property int slotIndex: 2
+                text: sampleSlotAssigner.opened
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            QQC2.Action {
+                property int slotIndex: 3
+                text: sampleSlotAssigner.opened
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            },
+            QQC2.Action {
+                property int slotIndex: 4
+                text: sampleSlotAssigner.opened
+                    ? (component.selectedChannel.trackType === "sample-loop" && component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).isEmpty) || component.selectedChannel.samples[slotIndex].isEmpty
+                        ? qsTr("Assign To\nSlot %1").arg(slotIndex + 1)
+                        : qsTr("Replace Sample\nIn Slot %1").arg(slotIndex + 1)
+                    : ""
+                onTriggered: {
+                    if (component.selectedChannel.trackType === "sample-loop") {
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                    } else {
+                        component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
+                    }
+                }
+            }
+        ]
     }
     contentItem: ColumnLayout {
         id: layout
@@ -237,13 +347,21 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                             onClicked: {
-                                if (component.selectedChannel.trackType === "sample-loop") {
-                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index);
+                                if (zynqtgui.sketchpad.lastSelectedObj.value === model.index) {
+                                    if (component.selectedChannel.trackType === "sample-loop") {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", zynqtgui.sketchpad.lastSelectedObj.value);
+                                    } else {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", zynqtgui.sketchpad.lastSelectedObj.value);
+                                    }
                                 } else {
-                                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index);
+                                    if (component.selectedChannel.trackType === "sample-loop") {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index);
+                                    } else {
+                                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index);
+                                    }
                                 }
                             }
-                            checked: index === zynqtgui.sketchpad.lastSelectedObj.value
+                            checked: model.index === zynqtgui.sketchpad.lastSelectedObj.value
                             property QtObject clip: component.selectedChannel
                                 ? component.selectedChannel.trackType === "sample-loop"
                                     ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
@@ -252,24 +370,31 @@ Zynthian.ScreenPage {
                             property QtObject cppClipObject: clipDelegate.clip && clipDelegate.clip.hasOwnProperty("cppObjId")
                                 ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
                                 : null
-                            property bool clipHasWav: clipDelegate.clip && !clipDelegate.isEmpty
+                            property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
                             contentItem: ColumnLayout {
                                 RowLayout {
                                     QQC2.Label {
                                         id: mainLabel
                                         Layout.fillWidth: true
-                                        text: clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : ""
+                                        text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot").arg(model.index + 1))
                                         elide: Text.ElideRight
                                     }
                                 }
-                                Zynthbox.WaveFormItem {
+                                Rectangle {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    color: Kirigami.Theme.textColor
-                                    source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
-                                    start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
-                                    end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
-                                    visible: clipDelegate.clipHasWav
+                                    color: "#222222"
+                                    border.width: 1
+                                    border.color: "#ff999999"
+                                    radius: 4
+                                    Zynthbox.WaveFormItem {
+                                        anchors.fill: parent
+                                        color: Kirigami.Theme.textColor
+                                        source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
+                                        start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
+                                        end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
+                                        visible: clipDelegate.clipHasWav
+                                    }
                                 }
                             }
                         }
@@ -321,7 +446,7 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 text: folderDelegate.text
-                                elide: Text.ElideRight
+                                elide: Text.ElideLeft
                             }
                         }
                     }
@@ -358,27 +483,74 @@ Zynthian.ScreenPage {
                         height: Kirigami.Units.iconSizes.large
                         text: model.fileName
                         onClicked: {
-                            filesListView.currentIndex = model.index;
-                        }
-                        contentItem: RowLayout {
-                            Layout.fillWidth: true
-                            Item {
-                                Layout.fillHeight: true
-                                Layout.minimumWidth: height
-                                Layout.maximumWidth: height
-                                Kirigami.Icon {
-                                    anchors {
-                                        fill: parent
-                                        margins: Kirigami.Units.smallSpacing
-                                    }
-                                    source: "folder-music-symbolic"
-                                }
+                            if (filesListView.currentIndex != model.index) {
+                                filesListView.currentIndex = model.index;
+                            } else {
+                                sampleSlotAssigner.assignToSlot(model.filePath);
                             }
-                            QQC2.Label {
+                        }
+                        contentItem: ColumnLayout {
+                            spacing: 0
+                            Layout.fillWidth: true
+                            RowLayout {
+                                spacing: 0
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: folderDelegate.text
-                                elide: Text.ElideRight
+                                Item {
+                                    Layout.fillHeight: true
+                                    Layout.minimumWidth: height
+                                    Layout.maximumWidth: height
+                                    Kirigami.Icon {
+                                        anchors {
+                                            fill: parent
+                                            margins: Kirigami.Units.smallSpacing
+                                        }
+                                        source: "folder-music-symbolic"
+                                    }
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    text: folderDelegate.text
+                                    elide: Text.ElideRight
+                                }
+                                Item {
+                                    Layout.fillHeight: true
+                                    Layout.minimumWidth: height
+                                    Layout.maximumWidth: height
+                                    Kirigami.Icon {
+                                        anchors {
+                                            fill: parent
+                                            margins: Kirigami.Units.smallSpacing
+                                        }
+                                        source: _private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying ? "media-playback-stop" : "media-playback-start"
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
+                                                _private.filePropertiesHelper.stopPreview();
+                                            } else {
+                                                _private.filePropertiesHelper.filePath = model.filePath;
+                                                _private.filePropertiesHelper.playPreview();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.minimumHeight: 1
+                                Layout.maximumHeight: 1
+                                Rectangle {
+                                    anchors {
+                                        top: parent.top
+                                        left: parent.left
+                                        bottom: parent.bottom
+                                    }
+                                    width: _private.filePropertiesHelper.previewClip ? parent.width * (_private.filePropertiesHelper.previewClip.position) : 0
+                                    color: Kirigami.Theme.textColor
+                                }
                             }
                         }
                     }

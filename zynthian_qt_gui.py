@@ -2296,7 +2296,8 @@ class zynthian_gui(QObject):
         # These two go together to form a bit of useful test functionality mostly relevant for doing things from external scripts (for e.g. webconf)
         elif cuia == "PLAY_WAVE_FILE":
             if len(params) > 0:
-                testWaveFile = params[0]
+                # TODO If the last thing is a numerical value between 0 and 127, we should probably assume that is a note value we should use... otherwise the while whole shebang is a filename with spaces in it
+                testWaveFile = ' '.join(params)
                 if self.__test_wave_clip is not None:
                     self.__test_wave_clip.stop()
                     if self.__test_wave_clip.getFilePath() != testWaveFile:
@@ -2307,7 +2308,7 @@ class zynthian_gui(QObject):
                     self.__test_wave_clip.setLaneAffinity(1)
             # Allow calling the function again without passing an explicit filename to the function
             if self.__test_wave_clip is not None:
-                self.__test_wave_clip.play()
+                self.__test_wave_clip.play(False)
             sendCuiaEventFeedback = False
         elif cuia == "STOP_WAVE_FILE":
             if self.__test_wave_clip is not None:

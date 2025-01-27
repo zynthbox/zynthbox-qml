@@ -260,7 +260,7 @@ class file_properties_helper(QObject):
         if self.file_metadata is not None and self.file_metadata["isWav"]:
             if self.preview_clip is not None:
                 self.preview_clip.stop()
-                if self.preview_clip.getFilePath() != self.file_path:
+                if self.preview_clip.getFilePath() != str(self.file_path):
                     self.preview_clip.deleteLater()
                     self.preview_clip = None
             if self.preview_clip is None:

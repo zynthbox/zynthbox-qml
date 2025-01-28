@@ -245,7 +245,8 @@ RowLayout {
                         if (control.slotType === "synth" && root.selectedChannel.checkIfLayerExists(delegate.midiChannel) && mouse.x - delegateMouseArea.initialMouseX != 0) {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;
-                            root.selectedChannel.set_passthroughValue("synthPassthrough", slotDelegate.slotIndex, "dryAmount", newVal)
+                            let synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel]
+                            synthPassthroughClient.dryGainHandler.gainAbsolute = newVal;
                         } else if (control.slotType == "sample-trig" && control.slotData[index] != null && mouse.x - delegateMouseArea.initialMouseX != 0) {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;

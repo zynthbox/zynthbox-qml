@@ -29,11 +29,12 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
+import '../Sketchpad' as Sketchpad
 
 Zynthian.ScreenPage {
     id: root
 
-    property QtObject channel: applicationWindow().selectedChannel
+    property QtObject selectedChannel: applicationWindow().selectedChannel
     property QtObject soundCopySource
 
     title: qsTr("Sound Categories")
@@ -154,21 +155,27 @@ Zynthian.ScreenPage {
         }
     }
     
-    contentItem : GridLayout {
+    contentItem : ColumnLayout {
         id: content
 
-        rows: 1
-        columns: 5
-
-        Rectangle {
-            Layout.fillWidth: false
+        // Top Row : Sound categories button and area to display sound files
+        RowLayout {
+            Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-            color: Kirigami.Theme.backgroundColor
 
             ColumnLayout {
-                anchors.fill: parent
+                Layout.fillWidth: false
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                 spacing: 0
+
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                    horizontalAlignment: Qt.AlignHCenter
+                    verticalAlignment: Qt.AlignVCenter
+                    text: qsTr("Categories")
+                }
 
                 Kirigami.Separator {
                     Layout.fillWidth: true
@@ -239,40 +246,26 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-        }
-
-        Rectangle {
-            Layout.columnSpan: 3
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            color: Kirigami.Theme.backgroundColor
 
             ColumnLayout {
-                id: middleColumn
-                anchors.fill: parent
+                id: soundsDisplayContainer
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                Item {
+                RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                    Layout.alignment: Qt.AlignCenter
 
                     QQC2.ComboBox {
                         id: soundTypeComboBox
-
-                        width: Kirigami.Units.gridUnit * 10
-                        anchors {
-                            top: parent.top
-                            bottom: parent.bottom
-                            margins: Kirigami.Units.gridUnit
-                            centerIn: parent
-                        }
-
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                         model: ["my-sounds", "community-sounds"]
                         onActivated: {
                             zynqtgui.sound_categories.setSoundTypeFilter(model[index])
                         }
-
                         delegate: QQC2.ItemDelegate {
                             id: itemDelegate
                             width: parent.width
@@ -280,7 +273,6 @@ Zynthian.ScreenPage {
                             font.weight: soundTypeComboBox.currentIndex === index ? Font.DemiBold : Font.Normal
                             highlighted: soundTypeComboBox.highlightedIndex === index
                             hoverEnabled: soundTypeComboBox.hoverEnabled
-
                             contentItem: QQC2.Label {
                                 text: itemDelegate.text
                                 font: itemDelegate.font
@@ -292,14 +284,8 @@ Zynthian.ScreenPage {
                     }
 
                     QQC2.Button {
-                        anchors {
-                            right: parent.right
-                            rightMargin: Kirigami.Units.gridUnit
-                            verticalCenter: parent.verticalCenter
-                        }
-
-                        width: Kirigami.Units.gridUnit * 2
-                        height: soundTypeComboBox.height
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: height
                         onClicked: zynqtgui.sound_categories.load_sounds_model()
 
                         Kirigami.Icon {
@@ -312,17 +298,21 @@ Zynthian.ScreenPage {
                 }
 
                 Flickable {
+                    id: scrollView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-
                     // Take into consideration the top and bottom margin of Kirigami.Units.gridUnit each
                     contentHeight: soundGrid.height + Kirigami.Units.gridUnit * 2
-
                     flickableDirection: Flickable.AutoFlickDirection
                     clip: true
-
+                    QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                        width: Kirigami.Units.gridUnit
+                        height: Kirigami.Units.gridUnit * 3
+                        anchors.right: parent.right - width
+                        policy: QQC2.ScrollBar.AlwaysOn
+                    }
                     Item {
-                        width: middleColumn.width
+                        width: soundsDisplayContainer.width
 
                         QQC2.ButtonGroup {
                             id: soundButtonGroup
@@ -341,7 +331,7 @@ Zynthian.ScreenPage {
                                 margins: Kirigami.Units.gridUnit
                             }
 
-                            columns: 3
+                            columns: 5
                             rowSpacing: Kirigami.Units.gridUnit
                             columnSpacing: Kirigami.Units.gridUnit
 
@@ -354,7 +344,7 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredWidth: soundGrid.cellWidth
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                                     checkable: true
 
                                     QQC2.Label {
@@ -389,19 +379,19 @@ Zynthian.ScreenPage {
                                 }
                             }
 
-                            /** When soundsModel has less than 3 columns, alignment issue occurs because of
+                            /** When soundsModel has less `soundGrid.columns`, alignment issue occurs because of
                               * less amount of items than columns. Add spacers of same width and height as elements
                               */
                             Repeater {
-                                model: soundButtonsRepeater.count < 3
-                                        ? 3 - soundButtonsRepeater.count
+                                model: soundButtonsRepeater.count < soundGrid.columns
+                                        ? soundGrid.columns - soundButtonsRepeater.count
                                         : 0
                                 delegate: Item {
                                     id: spacer
                                     Layout.fillWidth: false
                                     Layout.fillHeight: false
                                     Layout.preferredWidth: soundGrid.cellWidth
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                                 }
                             }
                         }
@@ -410,137 +400,75 @@ Zynthian.ScreenPage {
             }
         }
 
-        Rectangle {
-            Layout.fillWidth: false
-            Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 24
-            color: Kirigami.Theme.backgroundColor
+        // Bottom Row : Display current sound/sample/fx data
+        ColumnLayout {
+            Layout.fillWidth: true
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Layout.leftMargin: Kirigami.Units.gridUnit
+                Layout.rightMargin: Kirigami.Units.gridUnit
+                horizontalAlignment: Qt.AlignLeft
+                verticalAlignment: Qt.AlignVCenter
+                elide: "ElideRight"
+                font.pointSize: 16
+                text: soundButtonGroup.checkedButton != null &&
+                      soundButtonGroup.checkedButton.checked
+                        ? soundButtonGroup.checkedButton.soundObj.name.replace(".sound", "")
+                        : qsTr("Current")
+            }
 
+            Kirigami.Separator {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 2
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
                 QQC2.Label {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*3
-                    Layout.leftMargin: Kirigami.Units.gridUnit
-                    Layout.rightMargin: Kirigami.Units.gridUnit
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    elide: "ElideRight"
-                    font.pointSize: 16
-                    text: soundButtonGroup.checkedButton != null &&
-                          soundButtonGroup.checkedButton.checked
-                            ? soundButtonGroup.checkedButton.soundObj.name.replace(".sound", "")
-                            : qsTr("Current")
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                    horizontalAlignment: Qt.AlignRight
+                    verticalAlignment: Qt.AlignVCenter
+                    text: qsTr("Synth :")
                 }
-
-                Kirigami.Separator {
+                Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: 2
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    slotData: root.selectedChannel.synthSlotsData
+                    slotType: "synth"
                 }
+            }
 
-                RowLayout {
+            RowLayout {
+                Layout.fillWidth: true
+                QQC2.Label {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                    horizontalAlignment: Qt.AlignRight
+                    verticalAlignment: Qt.AlignVCenter
+                    text: qsTr("Samples :")
+                }
+                Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    slotData: root.selectedChannel.synthSlotsData
+                    slotType: "sample-trig"
+                }
+            }
 
-                    ListView {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        spacing: content.rowSpacing
-                        flickableDirection: Flickable.VerticalFlick
-                        orientation: ListView.Vertical
-                        clip: true
-                        model: root.visible
-                                ? soundButtonGroup.checkedButton != null &&
-                                  soundButtonGroup.checkedButton.checked
-                                    ? zynqtgui.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                                    : root.channel.chainedSoundsNames
-                                : null
-
-                        delegate: Item {
-                            width: ListView.view.width
-                            height: (ListView.view.height - ListView.view.spacing * 4) / 5
-
-                            Rectangle {
-                                anchors.centerIn: parent
-                                width: parent.width - Kirigami.Units.gridUnit * 2
-                                height: Kirigami.Units.gridUnit * 2
-
-                                Kirigami.Theme.inherit: false
-                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                color: Kirigami.Theme.backgroundColor
-
-                                border.color: "#ff999999"
-                                border.width: 1
-                                radius: 4
-
-                                QQC2.Label {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        left: parent.left
-                                        right: parent.right
-                                        leftMargin: Kirigami.Units.gridUnit*0.5
-                                        rightMargin: Kirigami.Units.gridUnit*0.5
-                                    }
-                                    horizontalAlignment: Text.AlignLeft
-                                    text: modelData
-
-                                    elide: "ElideRight"
-                                }
-                            }
-                        }
-                    }
-
-                    ListView {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        spacing: content.rowSpacing
-                        flickableDirection: Flickable.VerticalFlick
-                        orientation: ListView.Vertical
-                        clip: true
-                        model: root.visible
-                                ? soundButtonGroup.checkedButton != null &&
-                                  soundButtonGroup.checkedButton.checked
-                                    ? zynqtgui.sound_categories.getFxNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                                    : root.channel.chainedFxNames
-                                : null
-
-                        delegate: Item {
-                            width: ListView.view.width
-                            height: (ListView.view.height - ListView.view.spacing * 4) / 5
-
-                            Rectangle {
-                                anchors.centerIn: parent
-                                width: parent.width - Kirigami.Units.gridUnit * 2
-                                height: Kirigami.Units.gridUnit * 2
-
-                                Kirigami.Theme.inherit: false
-                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                color: Kirigami.Theme.backgroundColor
-
-                                border.color: "#ff999999"
-                                border.width: 1
-                                radius: 4
-
-                                QQC2.Label {
-                                    anchors {
-                                        verticalCenter: parent.verticalCenter
-                                        left: parent.left
-                                        right: parent.right
-                                        leftMargin: Kirigami.Units.gridUnit*0.5
-                                        rightMargin: Kirigami.Units.gridUnit*0.5
-                                    }
-                                    horizontalAlignment: Text.AlignLeft
-                                    text: modelData
-
-                                    elide: "ElideRight"
-                                }
-                            }
-                        }
-                    }
+            RowLayout {
+                Layout.fillWidth: true
+                QQC2.Label {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                    horizontalAlignment: Qt.AlignRight
+                    verticalAlignment: Qt.AlignVCenter
+                    text: qsTr("Fx :")
+                }
+                Sketchpad.TrackSlotsData {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    slotData: root.selectedChannel.synthSlotsData
+                    slotType: "synth"
                 }
             }
         }

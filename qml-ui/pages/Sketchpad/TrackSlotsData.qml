@@ -65,6 +65,9 @@ RowLayout {
                         case "external":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
                             break;
+                        case "fx":
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
+                            break;
                         default:
                             console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
@@ -100,6 +103,8 @@ RowLayout {
                     root.selectedChannel.setCurlayerByType("loop")
                 } else if (control.slotType == "external") {
                     root.selectedChannel.setCurlayerByType("external")
+                } else if (control.slotType == "fx") {
+                    root.selectedChannel.setCurlayerByType("fx")
                 } else {
                     root.selectedChannel.setCurlayerByType("")
                 }
@@ -109,6 +114,7 @@ RowLayout {
                 id: delegate
                 property int midiChannel: root.selectedChannel.chainedSounds[index]
                 property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
+                property QtObject fxPassthroughClient: Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
 
                 anchors.fill: parent
                 anchors.margins: 4
@@ -155,6 +161,20 @@ RowLayout {
                         visible: slotDelegate.cppClipObject
                         color: Kirigami.Theme.highlightColor
                     }
+                    Rectangle {
+                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                        width: delegate.fxPassthroughClient && delegate.fxPassthroughClient.dryWetMixAmount >= 0 ? delegate.width * Zynthian.CommonUtils.interp(delegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        radius: 4
+                        opacity: 0.8
+                        visible: control.slotType === "fx" && control.slotData[index] != null && control.slotData[index].length > 0
+                        color: Kirigami.Theme.highlightColor
+                    }
+
                     property int availableWidth: width - 6
                     Rectangle {
                         anchors {
@@ -191,16 +211,19 @@ RowLayout {
                         rightMargin: Kirigami.Units.gridUnit*0.5
                     }
                     horizontalAlignment: Text.AlignLeft
-                    text: control.slotType === "synth" && control.slotData[index] && control.slotData[index].className == null // Check if control.slotData[index] is not a channel/clip object by checking if it has the className property
-                            ? control.slotData[index]
-                            : (control.slotType === "sample-trig" || control.slotType === "sample-loop") && control.slotData[index]
-                                ? control.slotData[index].path
-                                    ? control.slotData[index].path.split("/").pop()
-                                    : ""
-                                : control.slotType === "external" && index < 2 // we only have data for the first two, so let's make sure we don't try and assign an undefined here
-                                    ? control.slotData[index]
-                                    : ""
-
+                    text: {
+                        if (control.slotType === "synth" && control.slotData[index] != null) {
+                            return control.slotData[index]
+                        } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop") && control.slotData[index] && control.slotData[index].path) {
+                            return control.slotData[index].path.split("/").pop()
+                        } else if (control.slotType === "external" && index < 2) {
+                            return control.slotData[index]
+                        } else if (control.slotType === "fx" && control.slotData[index] != null ) {
+                            return control.slotData[index]
+                        } else {
+                            return ""
+                        }
+                    }
                     elide: "ElideRight"
                 }
 
@@ -227,6 +250,11 @@ RowLayout {
                             newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
                             delegateMouseArea.dragHappened = true;
                             slotDelegate.cppClipObject.rootSlice.gainHandler.gainAbsolute = newVal;
+                        } else if (control.slotType == "fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                            newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                            delegateMouseArea.dragHappened = true;
+                            // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                            root.selectedChannel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
                         }
                     }
                     onPressAndHold: {

@@ -229,16 +229,6 @@ class sketchpad_clip_metadata(QObject):
                 except:
                     logging.error(f"Failed to restore (and so restoring to defaults) the equaliser/compressor settings for {self.clip} from the data: {value}")
                     setEqualiserAndCompressorDefaults(self.clip.audioSource)
-    def set_sliceSettings(self, value):
-        if self.clip.audioSource is not None:
-            if value is None or value == "":
-                self.setSliceDefaults()
-            else:
-                try:
-                    self.restoreSliceData(json.loads(value))
-                except Exception as e:
-                    logging.error(f"Exception {e}\nFailed to restore (and so restoring to defaults) the slice settings for {self.clip} from the data: {value}")
-                    self.setSliceDefaults()
 
     audioTypeChanged = Signal()
     audioTypeSettingsChanged = Signal()
@@ -367,158 +357,6 @@ class sketchpad_clip_metadata(QObject):
                     sliceSettingsObject.disconnect(self)
             except: pass
 
-    def restoreSliceData(self, dataChunk):
-        for index, sliceValues in enumerate(dataChunk["settings"]):
-            sliceSettingsObject = self.clip.audioSource.sliceFromIndex(index)
-            sliceSettingsObject.setPan(sliceValues["pan"])
-            sliceSettingsObject.setPitch(sliceValues["pitch"])
-            sliceSettingsObject.gainHandler().setGainAbsolute(sliceValues["gain"])
-            sliceSettingsObject.setRootNote(sliceValues["rootNote"])
-            sliceSettingsObject.setKeyZoneStart(sliceValues["keyZoneStart"])
-            sliceSettingsObject.setKeyZoneEnd(sliceValues["keyZoneEnd"])
-            sliceSettingsObject.setVelocityMinimum(sliceValues["velocityMinimum"])
-            sliceSettingsObject.setVelocityMaximum(sliceValues["velocityMaximum"])
-            sliceSettingsObject.setADSRAttack(sliceValues["adsrAttack"])
-            sliceSettingsObject.setADSRDecay(sliceValues["adsrDecay"])
-            sliceSettingsObject.setADSRSustain(sliceValues["adsrSustain"])
-            sliceSettingsObject.setADSRRelease(sliceValues["adsrRelease"])
-            sliceSettingsObject.setGrainInterval(sliceValues["grainInterval"])
-            sliceSettingsObject.setGrainIntervalAdditional(sliceValues["grainIntervalAdditional"])
-            sliceSettingsObject.setGrainPanMaximum(sliceValues["grainPanMaximum"])
-            sliceSettingsObject.setGrainPanMinimum(sliceValues["grainPanMinimum"])
-            sliceSettingsObject.setGrainPitchMaximum1(sliceValues["grainPitchMaximum1"])
-            sliceSettingsObject.setGrainPitchMaximum2(sliceValues["grainPitchMaximum2"])
-            sliceSettingsObject.setGrainPitchMinimum1(sliceValues["grainPitchMinimum1"])
-            sliceSettingsObject.setGrainPitchMinimum2(sliceValues["grainPitchMinimum2"])
-            sliceSettingsObject.setGrainPitchPriority(sliceValues["grainPitchPriority"])
-            sliceSettingsObject.setGrainPosition(sliceValues["grainPosition"])
-            sliceSettingsObject.setGrainScan(sliceValues["grainScan"])
-            sliceSettingsObject.setGrainSize(sliceValues["grainSize"])
-            sliceSettingsObject.setGrainSizeAdditional(sliceValues["grainSizeAdditional"])
-            sliceSettingsObject.setGrainSpray(sliceValues["grainSpray"])
-            sliceSettingsObject.setGrainSustain(sliceValues["grainSustain"])
-            sliceSettingsObject.setGrainTilt(sliceValues["grainTilt"])
-            self.set_timeStretchStyle(sliceValues["timeStretchStyle"], index)
-            self.set_playbackStyle(sliceValues["playbackStyle"], index)
-            sliceSettingsObject.setLoopCrossfadeAmount(sliceValues["loopCrossfadeAmount"])
-            self.set_loopStartCrossfadeDirection(sliceValues["loopStartCrossfadeDirection"], index)
-            self.set_stopCrossfadeDirection(sliceValues["stopCrossfadeDirection"], index)
-            sliceSettingsObject.setStartPositionSamples(sliceValues["startPositionSamples"])
-            sliceSettingsObject.setLengthSamples(sliceValues["lengthSamples"])
-            sliceSettingsObject.setLoopDeltaSamples(sliceValues["loopDeltaSamples"])
-            sliceSettingsObject.setLoopDelta2Samples(sliceValues["loopDelta2Samples"])
-            if "subvoices" in sliceValues:
-                for index, subvoiceValues in enumerate(sliceValues["subvoices"]):
-                    sliceSettingsObject.subvoiceSettings()[index].setPan(subvoiceValues["pan"])
-                    sliceSettingsObject.subvoiceSettings()[index].setPitch(subvoiceValues["pitch"])
-                    sliceSettingsObject.subvoiceSettings()[index].setGain(subvoiceValues["gain"])
-                sliceSettingsObject.setSubvoiceCount(sliceValues["subvoiceCount"])
-        self.clip.audioSource.setSliceCount(dataChunk["count"])
-        if "contiguous" in dataChunk:
-            self.clip.audioSource.setSlicesContiguous(dataChunk["contiguous"])
-    def setSliceDefaults(self):
-        for sliceIndex, sliceSettingsObject in enumerate(self.clip.audioSource.sliceSettings()):
-            sliceSettingsObject.setPan(0)
-            sliceSettingsObject.setPitch(0)
-            sliceSettingsObject.gainHandler().setGainAbsolute(1)
-            sliceSettingsObject.setRootNote(60)
-            sliceSettingsObject.setKeyZoneStart(0)
-            sliceSettingsObject.setKeyZoneEnd(127)
-            sliceSettingsObject.setVelocityMinimum(1);
-            sliceSettingsObject.setVelocityMaximum(127);
-            sliceSettingsObject.setADSRAttack(0)
-            sliceSettingsObject.setADSRDecay(0)
-            sliceSettingsObject.setADSRSustain(1)
-            sliceSettingsObject.setADSRRelease(0)
-            sliceSettingsObject.setGrainInterval(10)
-            sliceSettingsObject.setGrainIntervalAdditional(10)
-            sliceSettingsObject.setGrainPanMinimum(-1)
-            sliceSettingsObject.setGrainPanMaximum(1)
-            sliceSettingsObject.setGrainPitchMaximum1(1)
-            sliceSettingsObject.setGrainPitchMaximum2(1)
-            sliceSettingsObject.setGrainPitchMinimum1(1)
-            sliceSettingsObject.setGrainPitchMinimum2(1)
-            sliceSettingsObject.setGrainPitchPriority(0.5)
-            sliceSettingsObject.setGrainPosition(0)
-            sliceSettingsObject.setGrainScan(0)
-            sliceSettingsObject.setGrainSize(100)
-            sliceSettingsObject.setGrainSizeAdditional(10)
-            sliceSettingsObject.setGrainSpray(1)
-            sliceSettingsObject.setGrainSustain(0.3)
-            sliceSettingsObject.setGrainTilt(0.5)
-            self.set_timeStretchStyle("TimeStretchOff", sliceIndex)
-            self.set_playbackStyle("NonLoopingPlaybackStyle", sliceIndex)
-            sliceSettingsObject.setLoopCrossfadeAmount(0)
-            self.set_loopStartCrossfadeDirection("CrossfadeOutie", sliceIndex)
-            self.set_stopCrossfadeDirection("CrossfadeInnie", sliceIndex)
-            sliceSettingsObject.setStartPositionSamples(0)
-            sliceSettingsObject.setLengthSamples(0)
-            sliceSettingsObject.setLoopDeltaSamples(0)
-            sliceSettingsObject.setLoopDelta2Samples(0)
-            for subvoiceSettingsObject in sliceSettingsObject.subvoiceSettings():
-                subvoiceSettingsObject.setPan(0)
-                subvoiceSettingsObject.setPitch(0)
-                subvoiceSettingsObject.setGain(1)
-            sliceSettingsObject.setSubvoiceCount(0)
-        self.clip.audioSource.setSliceCount(0)
-        self.clip.audioSource.setSlicesContiguous(False)
-    def serializeSliceSettings(self):
-        sliceSettingsData = []
-        for sliceSettingsObject in self.clip.audioSource.sliceSettings():
-            subvoiceSettingsData = []
-            for subvoiceSettingsObject in sliceSettingsObject.subvoiceSettings():
-                subvoiceSettingsData.append({
-                    "pan": subvoiceSettingsObject.pan(),
-                    "pitch": subvoiceSettingsObject.pitch(),
-                    "gain": subvoiceSettingsObject.gain()
-                })
-            sliceSettingsData.append({
-                "pan": sliceSettingsObject.pan(),
-                "pitch": sliceSettingsObject.pitch(),
-                "gain": sliceSettingsObject.gainHandler().gainAbsolute(),
-                "rootNote": sliceSettingsObject.rootNote(),
-                "keyZoneStart": sliceSettingsObject.keyZoneStart(),
-                "keyZoneEnd": sliceSettingsObject.keyZoneEnd(),
-                "velocityMinimum": sliceSettingsObject.velocityMinimum(),
-                "velocityMaximum": sliceSettingsObject.velocityMaximum(),
-                "adsrAttack": sliceSettingsObject.adsrAttack(),
-                "adsrDecay": sliceSettingsObject.adsrDecay(),
-                "adsrSustain": sliceSettingsObject.adsrSustain(),
-                "adsrRelease": sliceSettingsObject.adsrRelease(),
-                "grainInterval": sliceSettingsObject.grainInterval(),
-                "grainIntervalAdditional": sliceSettingsObject.grainIntervalAdditional(),
-                "grainPanMaximum": sliceSettingsObject.grainPanMaximum(),
-                "grainPanMinimum": sliceSettingsObject.grainPanMinimum(),
-                "grainPitchMaximum1": sliceSettingsObject.grainPitchMaximum1(),
-                "grainPitchMaximum2": sliceSettingsObject.grainPitchMaximum2(),
-                "grainPitchMinimum1": sliceSettingsObject.grainPitchMinimum1(),
-                "grainPitchMinimum2": sliceSettingsObject.grainPitchMinimum2(),
-                "grainPitchPriority": sliceSettingsObject.grainPitchPriority(),
-                "grainPosition": sliceSettingsObject.grainPosition(),
-                "grainScan": sliceSettingsObject.grainScan(),
-                "grainSize": sliceSettingsObject.grainSize(),
-                "grainSizeAdditional": sliceSettingsObject.grainSizeAdditional(),
-                "grainSpray": sliceSettingsObject.grainSpray(),
-                "grainSustain": sliceSettingsObject.grainSustain(),
-                "grainTilt": sliceSettingsObject.grainTilt(),
-                "timeStretchStyle": str(sliceSettingsObject.timeStretchStyle()).split(".")[-1],
-                "playbackStyle": str(sliceSettingsObject.playbackStyle()).split(".")[-1],
-                "loopCrossfadeAmount": sliceSettingsObject.loopCrossfadeAmount(),
-                "loopStartCrossfadeDirection": str(sliceSettingsObject.loopStartCrossfadeDirection()).split(".")[-1],
-                "stopCrossfadeDirection": str(sliceSettingsObject.stopCrossfadeDirection()).split(".")[-1],
-                "startPositionSamples": sliceSettingsObject.startPositionSamples(),
-                "lengthSamples": sliceSettingsObject.lengthSamples(),
-                "loopDeltaSamples": sliceSettingsObject.loopDeltaSamples(),
-                "loopDelta2Samples": sliceSettingsObject.loopDelta2Samples(),
-                "subvoices": subvoiceSettingsData,
-                "subvoiceCount": sliceSettingsObject.subvoiceCount()
-            })
-        return {
-            "settings": sliceSettingsData,
-            "count": self.clip.audioSource.sliceCount(),
-            "contiguous": self.clip.audioSource.slicesContiguous()
-        }
-
     def read(self, load_autosave=True):
         self.__isReading = True
         if not self.clip.isEmpty:
@@ -551,7 +389,7 @@ class sketchpad_clip_metadata(QObject):
                 self.clip.audioSource.setSpeedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)))
                 self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
                 self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
-                self.set_sliceSettings(str(self.getMetadataProperty("ZYNTHBOX_SLICE_SETTINGS", "")))
+                self.clip.audioSource.stringToSlices(str(self.getMetadataProperty("ZYNTHBOX_SLICE_SETTINGS", "")))
                 # The slice related settings (for the root slice)
                 self.clip.audioSource.rootSlice().setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
                 self.clip.audioSource.rootSlice().setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
@@ -668,7 +506,7 @@ class sketchpad_clip_metadata(QObject):
                     tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
                     tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
                     tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializeEqualiserAndCompressorSettings(self.clip.audioSource)))]
-                    tags["ZYNTHBOX_SLICE_SETTINGS"] = [str(json.dumps(self.serializeSliceSettings()))]
+                    tags["ZYNTHBOX_SLICE_SETTINGS"] = [self.clip.audioSource.slicesToString()]
                     # Root slice settings
                     tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootSlice().rootNote())]
                     tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.rootSlice().keyZoneStart())]

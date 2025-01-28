@@ -136,6 +136,7 @@ Zynthian.ScreenPage {
                     case 2:
                         break;
                 }
+                returnValue = true;
                 break;
             case "KNOB0_RELEASED":
                 returnValue = true;
@@ -154,6 +155,7 @@ Zynthian.ScreenPage {
                     case 2:
                         break;
                 }
+                returnValue = true;
                 break;
             case "KNOB0_DOWN":
                 switch (_private.selectedColumn) {
@@ -169,6 +171,7 @@ Zynthian.ScreenPage {
                     case 2:
                         break;
                 }
+                returnValue = true;
                 break;
             case "SELECT_DOWN":
             case "KNOB3_UP":

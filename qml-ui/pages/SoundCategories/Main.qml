@@ -467,8 +467,8 @@ Zynthian.ScreenPage {
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-                    slotData: root.selectedChannel.synthSlotsData
-                    slotType: "synth"
+                    slotData: root.selectedChannel.fxSlotsData
+                    slotType: "fx"
                 }
             }
         }

@@ -93,9 +93,9 @@ Rectangle {
                 break;
             case "TracksBar_fxslot":
                 if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
-                    fxRepeater.itemAt(0).switchToThisSlot(true);
+                    fxRow.switchToSlot(0, true);
                 } else {
-                    fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value + 1).switchToThisSlot(true);
+                    fxRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value + 1, true);
                 }
                 break;
             default:
@@ -135,9 +135,9 @@ Rectangle {
                 break;
             case "TracksBar_fxslot":
                 if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
-                    fxRepeater.itemAt(4).switchToThisSlot(true);
+                    fxRow.switchToSlot(4, true);
                 } else {
-                    fxRepeater.itemAt(zynqtgui.sketchpad.lastSelectedObj.value - 1).switchToThisSlot(true);
+                    fxRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value - 1, true);
                 }
                 break;
             default:
@@ -231,12 +231,12 @@ Rectangle {
                     slotHasContents = true;
                 }
                 if (switchIfEmpty && (slotHasContents === false)) {
-                    fxRepeater.itemAt(0).switchToThisSlot(true);
+                    fxRow.switchToSlot(0, true);
                 }
             } else if (switchIfEmpty) {
                 // Select the first and best option for the given TracksBar layout
                 if (fxTabButton.checked) {
-                    fxRepeater.itemAt(0).switchToThisSlot(true);
+                    fxRow.switchToSlot(0, true);
                 } else if (root.selectedChannel.trackType === "synth") {
                     synthsRow.switchToSlot(0, true);
                 } else if (root.selectedChannel.trackType === "sample-loop") {
@@ -267,9 +267,9 @@ Rectangle {
             // If we have reached this point and still have nothing selected, make sure we select the whatever was previously selected (or default to the first sound slot)
             if (slotHasContents === false) {
                 if (initialSlotType === 0) {
-                    synthRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+                    synthsRow.switchToSlot(initialSlotIndex, true);
                 } else if (initialSlotType === 1) {
-                    fxRepeater.itemAt(initialSlotIndex).switchToThisSlot(true);
+                    fxRow.switchToSlot(initialSlotIndex, true);
                 }
             }
         }
@@ -785,7 +785,7 @@ Rectangle {
                                 text: qsTr("Fx")
                                 onClicked: {
                                     fxTabButton.checked = true
-                                    fxRepeater.itemAt(0).switchToThisSlot(true)
+                                    fxRow.switchToSlot(0, true)
                                 }
                             }
                             QQC2.Button {

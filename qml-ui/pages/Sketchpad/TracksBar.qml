@@ -1003,120 +1003,14 @@ Rectangle {
                                 visible: externalRow.visible
                             }
 
-                            RowLayout {
+                            TrackSlotsData {
                                 id: fxRow
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                slotData: root.selectedChannel.fxSlotsData
+                                slotType: "fx"
                                 visible: fxTabButton.checked
-
-                                Repeater {
-                                    id: fxRepeater
-                                    model: 5
-                                    property var fxData: root.selectedChannel.fxSlotsData
-                                    delegate: Rectangle {
-                                        id: fxRowDelegate
-                                        property bool highlighted: root.selectedChannel.selectedFxSlotRow === index
-                                        property QtObject fxPassthroughClient: Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-//                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
-//                                        border.width: 2
-                                        color: "transparent"
-                                        radius: 4
-
-                                        function switchToThisSlot(onlyFocus=false) {
-                                            if (zynqtgui.sketchpad.lastSelectedObj.component != fxRowDelegate || onlyFocus) {
-                                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot"
-                                                zynqtgui.sketchpad.lastSelectedObj.value = index
-                                                zynqtgui.sketchpad.lastSelectedObj.component = fxRowDelegate
-                                                root.selectedChannel.selectedFxSlotRow = index
-                                            } else {
-                                                if (!fxDelegateMouseArea.dragHappened && !onlyFocus) {
-                                                    bottomStack.slotsBar.handleItemClick("fx")
-                                                }
-                                            }
-                                            root.selectedChannel.setCurlayerByType("fx")
-                                        }
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            anchors.margins: 4
-                                            Kirigami.Theme.inherit: false
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                            color: Kirigami.Theme.backgroundColor
-                                            border.color: "#ff999999"
-                                            border.width: 1
-                                            radius: 4
-
-                                            Item {
-                                                anchors {
-                                                    fill: parent
-                                                    margins: Kirigami.Units.smallSpacing
-                                                }
-                                                Rectangle {
-                                                    // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                                                    width: fxRowDelegate.fxPassthroughClient && fxRowDelegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(fxRowDelegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
-                                                    anchors {
-                                                        left: parent.left
-                                                        top: parent.top
-                                                        bottom: parent.bottom
-                                                    }
-                                                    radius: 4
-                                                    opacity: 0.8
-                                                    visible: fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0
-                                                    color: Kirigami.Theme.highlightColor
-                                                }
-                                            }
-
-                                            QQC2.Label {
-                                                anchors {
-                                                    verticalCenter: parent.verticalCenter
-                                                    left: parent.left
-                                                    right: parent.right
-                                                    leftMargin: Kirigami.Units.gridUnit*0.5
-                                                    rightMargin: Kirigami.Units.gridUnit*0.5
-                                                }
-                                                horizontalAlignment: Text.AlignLeft
-                                                text: fxRepeater.fxData[index] ? fxRepeater.fxData[index] : ""
-
-                                                elide: "ElideRight"
-                                            }
-
-                                            MouseArea {
-                                                id: fxDelegateMouseArea
-                                                property real initialMouseX
-                                                property bool dragHappened: false
-
-                                                anchors.fill: parent
-                                                onPressed: {
-                                                    fxDelegateMouseArea.initialMouseX = mouse.x
-                                                }
-                                                onReleased: {
-                                                    fxDelegateDragHappenedResetTimer.restart()
-                                                }
-                                                onMouseXChanged: {
-                                                    if (fxRepeater.fxData[index] != null && fxRepeater.fxData[index].length > 0 && mouse.x - fxDelegateMouseArea.initialMouseX != 0) {
-                                                        var newVal = Zynthian.CommonUtils.clamp(mouse.x / fxRowDelegate.width, 0, 1);
-                                                        fxDelegateMouseArea.dragHappened = true;
-                                                        // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
-                                                        root.selectedChannel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
-                                                    }
-                                                }
-                                                onClicked: fxRowDelegate.switchToThisSlot()
-                                                Timer {
-                                                    id: fxDelegateDragHappenedResetTimer
-                                                    interval: 100
-                                                    repeat: false
-                                                    onTriggered: {
-                                                        fxDelegateMouseArea.dragHappened = false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
                             }
                             Item {
                                 // id: fxSpacer

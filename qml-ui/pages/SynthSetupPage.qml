@@ -342,6 +342,7 @@ Zynthian.ScreenPage {
 
             // Since CUIA event is not handled by selector view, handle it here
             switch (cuia) {
+                case "SCREEN_LAYER":
                 case "SCREEN_PRESET":
                     zynqtgui.preset.toggle_show_fav_presets();
                     return true;

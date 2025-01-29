@@ -251,8 +251,6 @@ Kirigami.AbstractApplicationWindow {
                 case "SCREEN_LAYER":
                 case "SCREEN_PRESET":
                     if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
-                        // Before switching, let's just make sure we actually have a slot picked...0
-                        pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
                         if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                             // Then we are selecting samples and sketches, show the sample library
                             zynqtgui.show_screen("sample_library");
@@ -264,9 +262,9 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "SCREEN_EDIT_CONTEXTUAL":
                     // In case the global popup is open, hide it when switching to the context editor
-                    pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
+                    zynqtgui.globalPopupOpened = false;
                     if (root.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
-                        var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
+                        var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value];
                         if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
                             zynqtgui.show_screen("control");
                         } else {
@@ -279,7 +277,7 @@ Kirigami.AbstractApplicationWindow {
                     } else if (root.selectedChannel.selectedSlot.className === "TracksBar_externalslot") {
                          zynqtgui.show_modal("channel_external_setup");
                     } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
-                        if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
+                        if (root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value] != null) {
                             zynqtgui.show_screen("control");
                         } else {
                             applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);

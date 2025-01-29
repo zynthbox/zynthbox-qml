@@ -27,11 +27,52 @@ RowLayout {
       * Emulate a click to slot at specified index
       */
     function switchToSlot(index, onlyFocus=false) {
-        synthRepeater.itemAt(index).switchToThisSlot(onlyFocus)
+        // This function may conceivably (and does, or this wouldn't be here) be called during incubation, so let's just... not cause errors
+        let slotItem = slotRepeater.itemAt(index);
+        if (slotItem) {
+            slotItem.switchToThisSlot(onlyFocus);
+        }
+    }
+
+    QtObject {
+        id: _private
+        readonly property string className: slotTypeToClassName(control.slotType)
+        function classNameToSlotType(className) {
+            switch(className) {
+                case "TracksBar_synthslot":
+                    return "synth";
+                case "TracksBar_sampleslot":
+                    return "sample-trig";
+                case "TracksBar_sketchslot":
+                    return "sample-loop";
+                case "TracksBar_fxslot":
+                    return "fx";
+                case "TracksBar_externalslot":
+                    return "external";
+                default:
+                    return "unknown-className:%1".arg(className);
+            }
+        }
+        function slotTypeToClassName(slotType) {
+            switch(slotType) {
+                case "synth":
+                    return "TracksBar_synthslot";
+                case "sample-trig":
+                    return "TracksBar_sampleslot";
+                case "sample-loop":
+                    return "TracksBar_sketchslot";
+                case "fx":
+                    return "TracksBar_fxslot";
+                case "external":
+                    return "TracksBar_fxslot";
+                default:
+                    return "unknown-slotType:%1".arg(slotType);
+            }
+        }
     }
 
     Repeater {
-        id: synthRepeater
+        id: slotRepeater
 
         model: Zynthbox.Plugin.sketchpadSlotCount
         delegate: Rectangle {
@@ -55,22 +96,28 @@ RowLayout {
                     switch (control.slotType) {
                         case "synth":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                            root.selectedChannel.displayFx = false;
                             break;
                         case "sample-trig":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
+                            root.selectedChannel.displayFx = false;
                             break;
                         case "sample-loop":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
+                            root.selectedChannel.displayFx = false;
                             break;
                         case "external":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
+                            root.selectedChannel.displayFx = false;
                             break;
                         case "fx":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
+                            root.selectedChannel.displayFx = true;
                             break;
                         default:
                             console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                            root.selectedChannel.displayFx = false;
                             break;
                     }
                     zynqtgui.sketchpad.lastSelectedObj.value = index;
@@ -94,6 +141,7 @@ RowLayout {
                         }
                     }
                 }
+                root.selectedChannel.selectedSlot.setTo(zynqtgui.sketchpad.lastSelectedObj.className, index, slotDelegate);
 
                 if (control.slotType == "synth") {
                     root.selectedChannel.setCurlayerByType("synth")
@@ -131,6 +179,18 @@ RowLayout {
                 opacity: enabled ? 1 : 0
                 visible: enabled
 
+                Rectangle {
+                    anchors {
+                        fill: parent
+                        margins: -4
+                    }
+                    opacity: root.selectedChannel.selectedSlot.component === slotDelegate ? 0.8 : 0
+                    color: "transparent"
+                    border {
+                        width: 2
+                        color: "white"
+                    }
+                }
                 Item {
                     id: slotDelegateVisualsContainer
                     anchors {

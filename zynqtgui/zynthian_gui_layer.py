@@ -492,12 +492,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         self.zynqtgui.screens['bank'].select_action(0)
                 else:
                     track_index = self.zynqtgui.sketchpad.selectedTrackId
+                    slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedSlot.value
                     if zyngine.type=="Audio Effect":
                         midich = 15
-                        slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedFxSlotRow
-                    elif zyngine.type=="MIDI Synth":
-                        slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedSlotRow
-
                     layer = zynthian_layer(zyngine, midich, self.zynqtgui, slot_index, track_index)
 
                 self.zynqtgui.set_curlayer(layer, queue=False)

@@ -340,12 +340,21 @@ Zynthian.ScreenPage {
                                 model: zynqtgui.sound_categories.soundsModel
                                 delegate: QQC2.Button {
                                     property QtObject soundObj: model.sound
-
+                                    property bool wasChecked
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredWidth: soundGrid.cellWidth
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
                                     checkable: true
+                                    // Little bit of hula-hooping to allow unchecking buttons in an exclusive button group
+                                    // Source : https://stackoverflow.com/a/51098266
+                                    onPressed: wasChecked = checked
+                                    onReleased: {
+                                        if (wasChecked) {
+                                            checked = false;
+                                            toggled(); // emit the toggled signal manually, since we changed the checked value programmatically but it still originated as an user interaction.
+                                        }
+                                    }
 
                                     QQC2.Label {
                                         anchors.fill: parent
@@ -415,8 +424,8 @@ Zynthian.ScreenPage {
                 font.pointSize: 16
                 text: soundButtonGroup.checkedButton != null &&
                       soundButtonGroup.checkedButton.checked
-                        ? soundButtonGroup.checkedButton.soundObj.name.replace(".sound", "")
-                        : qsTr("Current")
+                        ? soundButtonGroup.checkedButton.soundObj.name
+                        : qsTr("Track %1 Current Sound").arg(root.selectedChannel.name)
             }
 
             Kirigami.Separator {

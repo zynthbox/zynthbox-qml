@@ -33,7 +33,7 @@ from pathlib import Path
 from PySide2.QtCore import Property, QObject, QSortFilterProxyModel, Qt, Slot
 
 from .sound_categories_sounds_model import sound_categories_sounds_model
-from .sounds_model_sound_dto import sounds_model_sound_dto
+from .zynthbox_sound import zynthbox_sound
 from .. import zynthian_qt_gui_base
 
 
@@ -84,18 +84,18 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     #     elif sound.type == "my-sounds":
     #         self.save_category(self.__my_sounds_path__ / sound.name, toCategory)
 
-    # Returns the category index if found otherwise returns 0 for uncategorized entries
-    @staticmethod
-    def get_category_for_sound(sound_file):
-        category = "0"
+    # # Returns the category index if found otherwise returns 0 for uncategorized entries
+    # @staticmethod
+    # def get_category_for_sound(sound_file):
+    #     category = "0"
 
-        with open(sound_file, "r") as file:
-            sound_json = json.load(file)
-            try:
-                category = sound_json["category"]
-            except: pass
+    #     with open(sound_file, "r") as file:
+    #         sound_json = json.load(file)
+    #         try:
+    #             category = sound_json["category"]
+    #         except: pass
 
-        return category
+    #     return category
 
     @Slot(str, result=str)
     def getCategoryNameFromKey(self, key):
@@ -109,26 +109,26 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     def load_sounds_model(self):
         def task():
             # Fill community-sounds list
-            for file in self.__community_sounds_path__.glob("**/*.sound"):
+            for file in self.__community_sounds_path__.glob("**/*.sound.wav"):
                 self.__sounds_model__.add_sound(
-                    sounds_model_sound_dto(
+                    zynthbox_sound(
                         self,
                         self.zynqtgui,
                         file.name,
-                        "community-sounds",
-                        self.get_category_for_sound(file)
+                        "community-sounds"#,
+                        #self.get_category_for_sound(file)
                     )
                 )
 
             # Fill my-sounds list
-            for file in self.__my_sounds_path__.glob("**/*.sound"):
+            for file in self.__my_sounds_path__.glob("**/*.sound.wav"):
                 self.__sounds_model__.add_sound(
-                    sounds_model_sound_dto(
+                    zynthbox_sound(
                         self,
                         self.zynqtgui,
                         file.name,
-                        "my-sounds",
-                        self.get_category_for_sound(file)
+                        "my-sounds"#,
+                        #self.get_category_for_sound(file)
                     )
                 )
 

@@ -27,7 +27,7 @@ from enum import IntEnum, auto
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt, Property, Signal, Slot, QObject
 
-from zynqtgui.sound_categories.sounds_model_sound_dto import sounds_model_sound_dto
+from zynqtgui.sound_categories.zynthbox_sound import zynthbox_sound
 
 
 class sound_categories_sounds_model(QAbstractListModel):
@@ -39,7 +39,7 @@ class sound_categories_sounds_model(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # List of sounds_model_sound_dto instance
+        # List of zynthbox_sound instances
         self.sounds = []
 
     ### Property count
@@ -57,7 +57,7 @@ class sound_categories_sounds_model(QAbstractListModel):
             return None
 
         if role == Qt.DisplayRole:
-            return self.sounds[index.row()].name.replace(".sound", "")
+            return self.sounds[index.row()].name
         elif role == self.Roles.SoundTypeRole:
             return self.sounds[index.row()].type
         elif role == self.Roles.CategoryRole:
@@ -80,7 +80,7 @@ class sound_categories_sounds_model(QAbstractListModel):
     def rowCount(self, index):
         return len(self.sounds)
 
-    def add_sound(self, sound: sounds_model_sound_dto):
+    def add_sound(self, sound: zynthbox_sound):
         if sound.name.startswith("."):
             return
 
@@ -97,5 +97,6 @@ class sound_categories_sounds_model(QAbstractListModel):
         self.endResetModel()
 
     def emit_category_updated(self, sound):
+        # TODO
         sound_index = self.sounds.index(sound)
         self.dataChanged.emit(self.index(sound_index, 0), self.index(sound_index, 0), [self.Roles.CategoryRole])

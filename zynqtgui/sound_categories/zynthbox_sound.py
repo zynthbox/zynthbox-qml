@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to store sounds by categories
+# Create and manipulate zynthbox sound wav files
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -24,21 +24,22 @@
 # ******************************************************************************
 import json
 import os
+import subprocess
+import shlex
 from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, Signal
 
 
-class sounds_model_sound_dto(QObject):
-    def __init__(self, parent, zynqtgui, name, type, category="0"):
+class zynthbox_sound(QObject):
+    def __init__(self, parent, zynqtgui, name, type):
         super().__init__(parent)
         self.__sounds_base_path__ = Path('/zynthian/zynthian-my-data/sounds')
-        self.__community_sounds_path__ = self.__sounds_base_path__ / 'community-sounds'
-        self.__my_sounds_path__ = self.__sounds_base_path__ / 'my-sounds'
 
         self.zynqtgui = zynqtgui
         self.__name__ = name
         self.__type__ = type
+        self.__sound_file = self.__sounds_base_path__ / type / self.__name__
 
         # Valid category values
         # 0 : Uncategorized
@@ -47,7 +48,12 @@ class sounds_model_sound_dto(QObject):
         # 3: Leads
         # 4: Keys/Pads
         # 99: Other
-        self.__category__ = category
+        ## self.__category__ = category
+        # TODO : Read metadata and assign category
+
+        # Create empty sound file if not exists
+        if not self.__sound_file.exists():
+            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {str(self.__sound_file)}"))
 
     ### Property name
     def get_name(self):
@@ -71,29 +77,29 @@ class sounds_model_sound_dto(QObject):
         if self.__category__ != category:
             self.__category__ = category
 
-            # Update category in sound file
-            if self.type == "my-sounds":
-                sound_file = self.__my_sounds_path__ / self.name
-            elif self.type == "community-sounds":
-                sound_file = self.__community_sounds_path__ / self.name
+            # # Update category in sound file
+            # if self.type == "my-sounds":
+            #     sound_file = self.__my_sounds_path__ / self.name
+            # elif self.type == "community-sounds":
+            #     sound_file = self.__community_sounds_path__ / self.name
 
-            if sound_file is not None:
-                with open(sound_file, "r+") as file:
-                    sound_json = json.load(file)
-                    file.seek(0)
+            # if sound_file is not None:
+            #     with open(sound_file, "r+") as file:
+            #         sound_json = json.load(file)
+            #         file.seek(0)
 
-                    if category in ["0", "*"]:
-                        del sound_json["category"]
-                    else:
-                        sound_json["category"] = category
+            #         if category in ["0", "*"]:
+            #             del sound_json["category"]
+            #         else:
+            #             sound_json["category"] = category
 
-                    json.dump(sound_json, file)
-                    file.truncate()
-                    file.flush()
-                    os.fsync(file.fileno())
+            #         json.dump(sound_json, file)
+            #         file.truncate()
+            #         file.flush()
+            #         os.fsync(file.fileno())
 
-            # Notify model about updated item
-            self.zynqtgui.sound_categories.__sounds_model__.emit_category_updated(self)
+            # # Notify model about updated item
+            # self.zynqtgui.sound_categories.__sounds_model__.emit_category_updated(self)
             self.category_changed.emit()
 
     category_changed = Signal()

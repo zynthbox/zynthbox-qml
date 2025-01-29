@@ -847,7 +847,7 @@ Rectangle {
         objectName: "sketchPickerPopup"
         columns: 3
         rows: 3
-        property QtObject sketch: root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+        property QtObject sketch: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot" ? root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
         actions: [
             QQC2.Action {
                 text: qsTr("Save A Copy...")
@@ -868,7 +868,7 @@ Rectangle {
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1 && shouldUnbounce
                 property bool shouldUnbounce: sketchPickerPopup.sketch && sketchPickerPopup.sketch.metadata.audioType && sketchPickerPopup.sketch.metadata.audioType.length > 0
                 onTriggered: {
-                    sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                    sketchUnbouncer.unbounce(sketchPickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlot.value);
                 }
             },
             QQC2.Action {
@@ -892,7 +892,7 @@ Rectangle {
             QQC2.Action {
                 text: "Swap With Slot..."
                 onTriggered: {
-                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlotRow);
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch", root.selectedChannel.selectedSlot.value);
                 }
             },
             QQC2.Action {
@@ -914,7 +914,7 @@ Rectangle {
     Zynthian.ActionPickerPopup {
         id: samplePickerPopup
         objectName: "samplePickerPopup"
-        property QtObject sketch: root.selectedSlotRowItem && root.selectedSlotRowItem.channel ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow] : null
+        property QtObject sketch: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? root.selectedChannel.samples[root.selectedChannel.selectedSlot.value] : null
         columns: 3
         rows: 3
         actions: [
@@ -922,7 +922,7 @@ Rectangle {
                 text: qsTr("Save A Copy...")
                 enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "save-location");
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "save-location");
                 }
             },
             QQC2.Action {
@@ -937,31 +937,31 @@ Rectangle {
                 enabled: (samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false) && shouldUnbounce
                 property bool shouldUnbounce: samplePickerPopup.sketch && samplePickerPopup.sketch.metadata.audioType && samplePickerPopup.sketch.metadata.audioType.length > 0
                 onTriggered: {
-                    sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlotRow);
+                    sketchUnbouncer.unbounce(samplePickerPopup.sketch, zynqtgui.sketchpad.song.scenesModel.selectedSequenceName, root.selectedChannel, root.selectedChannel.selectedSlot.value);
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick recording...")
                 onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "recording");
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "recording");
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick sample...")
                 onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sample");
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "sample");
                 }
             },
             QQC2.Action {
                 text: qsTr("Pick sketch...")
                 onTriggered: {
-                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlotRow, "sketch");
+                    samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "sketch");
                 }
             },
             QQC2.Action {
                 text: "Swap with..."
                 onTriggered: {
-                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sample", root.selectedChannel.selectedSlotRow);
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sample", root.selectedChannel.selectedSlot.value);
                 }
             },
             QQC2.Action {
@@ -1013,7 +1013,7 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: fxSetupDialog
-        property var selectedFx: root.selectedSlotRowItem && root.selectedSlotRowItem.channel ? root.selectedSlotRowItem.channel.chainedFx[root.selectedSlotRowItem.channel.selectedFxSlotRow] : null
+        property var selectedFx: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot" ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value] : null
 
         actions: [
             Kirigami.Action {
@@ -1046,20 +1046,20 @@ Rectangle {
                 text: "Equalizer..."
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    root.requestSlotEqualizer(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
+                    root.requestSlotEqualizer(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
                 }
             },
             Kirigami.Action {
                 text: qsTr("Swap with...")
                 onTriggered: {
-                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
+                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
                 }
             },
             Kirigami.Action {
                 text: "Set Input Overrides..."
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    slotInputPicker.pickSlotInputs(root.selectedChannel, "fx", root.selectedChannel.selectedSlotRow);
+                    slotInputPicker.pickSlotInputs(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
                 }
             },
             Kirigami.Action {

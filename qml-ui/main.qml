@@ -254,6 +254,9 @@ Kirigami.AbstractApplicationWindow {
                         if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                             // Then we are selecting samples and sketches, show the sample library
                             zynqtgui.show_screen("sample_library");
+                        } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+                            // Then it's an fx slot and we should show that particular type of preset selector
+                            zynqtgui.show_screen("effect_preset");
                         } else {
                             zynqtgui.show_screen("preset");
                         }

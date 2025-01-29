@@ -90,7 +90,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
             except Exception as e:
                 logging.exception(e)
             self.zynqtgui.currentTaskMessage = ""
-            QTimer.singleShot(2000, self.zynqtgui.end_long_task)
+            QTimer.singleShot(1000, self.zynqtgui.end_long_task)
         engine = self.list_data[i][0]
         self.zynqtgui.do_long_task(task, f"Adding FX {engine}")
 

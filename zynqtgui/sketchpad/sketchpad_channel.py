@@ -1252,7 +1252,7 @@ class sketchpad_channel(QObject):
                 except Exception as e:
                     logging.exception(e)
 
-                QTimer.singleShot(3000, self.zynqtgui.end_long_task)
+                QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
 

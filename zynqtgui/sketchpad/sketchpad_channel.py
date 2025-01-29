@@ -46,6 +46,75 @@ from .sketchpad_keyzoneData import sketchpad_keyzoneData
 from zynqtgui import zynthian_gui_config
 from ..zynthian_gui_multi_controller import MultiController
 
+class last_selected_obj_dto(QObject):
+    def __init__(self, parent=None):
+        super(last_selected_obj_dto, self).__init__(parent)
+        self.__className = None
+        self.__value = None
+        self.__component = None
+
+    @Slot()
+    def reset(self):
+        self.__className = None
+        self.__value = None
+        self.__component = None
+
+        self.classNameChanged.emit()
+        self.valueChanged.emit()
+        self.componentChanged.emit()
+
+    @Slot(str, 'QVariant', QObject)
+    def setTo(self,className, value, component):
+        if self.__className != className or self.__value != value or self.__component != component:
+            self.__className = className
+            self.__value = value
+            self.__component = component
+            self.classNameChanged.emit()
+            self.valueChanged.emit()
+            self.componentChanged.emit()
+
+    ### BEGIN Property className
+    def get_className(self):
+        return self.__className
+
+    def set_className(self, val):
+        if self.__className != val:
+            self.__className = val
+            self.classNameChanged.emit()
+
+    classNameChanged = Signal()
+
+    className = Property(str, get_className, set_className, notify=classNameChanged)
+    ### END Property className
+
+    ### BEGIN Property value
+    def get_value(self):
+        return self.__value
+
+    def set_value(self, val):
+        if self.__value != val:
+            self.__value = val
+            self.valueChanged.emit()
+
+    valueChanged = Signal()
+
+    value = Property("QVariant", get_value, set_value, notify=valueChanged)
+    ### END Property value
+
+    ### BEGIN Property component
+    def get_component(self):
+        return self.__component
+
+    def set_component(self, val):
+        if self.__component != val:
+            self.__component = val
+            self.componentChanged.emit()
+
+    componentChanged = Signal()
+
+    component = Property(QObject, get_component, set_component, notify=componentChanged)
+    ### END Property component
+
 class sketchpad_channel(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
@@ -87,6 +156,8 @@ class sketchpad_channel(QObject):
         self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
         self.__color__ = self.zynqtgui.theme_chooser.trackColors[self.__id__]
+        self.__selected_slot_obj = last_selected_obj_dto(self)
+        self.__displayFx = False
         self.__selected_slot_row__ = 0
         self.__selected_fx_slot_row = 0
         self.__selected_clip__ = 0
@@ -1606,6 +1677,23 @@ class sketchpad_channel(QObject):
     chainedSoundsInfo = Property('QVariantList', get_chainedSoundsInfo, notify=chainedSoundsInfoChanged)
 
     ### END Property chained_sounds_presets
+
+    ### BEGIN Property selectedSlot
+    def get_selectedSlot(self):
+        return self.__selected_slot_obj
+    selectedSlot = Property(QObject, get_selectedSlot, constant=True)
+    ### END Property selectedSlot
+
+    ### BEGIN Property displayFx
+    def get_displayFx(self):
+        return self.__displayFx
+    def set_displayFx(self, displayFx):
+        if self.__displayFx != displayFx:
+            self.__displayFx = displayFx
+            self.displayFxChanged.emit()
+    displayFxChanged = Signal()
+    displayFx = Property(bool, get_displayFx, set_displayFx, notify=displayFxChanged)
+    ### END Property displayFx
 
     ### Property selectedSlotRow
     def get_selectedSlotRow(self):

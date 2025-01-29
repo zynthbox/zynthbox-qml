@@ -38,73 +38,13 @@ from os.path import dirname, realpath
 from pathlib import Path
 from PySide2.QtCore import QMetaObject, Qt, Property, QObject, QTimer, Signal, Slot
 from PySide2.QtGui import QColor, QGuiApplication
+from .sketchpad_channel import last_selected_obj_dto
 from ..zynthian_gui_multi_controller import MultiController
 from . import sketchpad_clip, sketchpad_song
 from .. import zynthian_qt_gui_base
 from .. import zynthian_gui_controller
 from .. import zynthian_gui_config
 from zyngine import zynthian_controller
-
-
-class last_selected_obj_dto(QObject):
-    def __init__(self, parent=None):
-        super(last_selected_obj_dto, self).__init__(parent)
-        self.__className = None
-        self.__value = None
-        self.__component = None
-
-    @Slot()
-    def reset(self):
-        self.__className = None
-        self.__value = None
-        self.__component = None
-
-        self.classNameChanged.emit()
-        self.valueChanged.emit()
-        self.componentChanged.emit()
-
-    ### BEGIN Property className
-    def get_className(self):
-        return self.__className
-
-    def set_className(self, val):
-        if self.__className != val:
-            self.__className = val
-            self.classNameChanged.emit()
-
-    classNameChanged = Signal()
-
-    className = Property(str, get_className, set_className, notify=classNameChanged)
-    ### END Property className
-
-    ### BEGIN Property value
-    def get_value(self):
-        return self.__value
-
-    def set_value(self, val):
-        if self.__value != val:
-            self.__value = val
-            self.valueChanged.emit()
-
-    valueChanged = Signal()
-
-    value = Property("QVariant", get_value, set_value, notify=valueChanged)
-    ### END Property value
-
-    ### BEGIN Property component
-    def get_component(self):
-        return self.__component
-
-    def set_component(self, val):
-        if self.__component != val:
-            self.__component = val
-            self.componentChanged.emit()
-
-    componentChanged = Signal()
-
-    component = Property(QObject, get_component, set_component, notify=componentChanged)
-    ### END Property component
-
 
 class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
     def __init__(self, parent=None):

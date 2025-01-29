@@ -86,8 +86,6 @@ RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-            //                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
-            //                                        border.width: 2
             color: "transparent"
             radius: 4
 
@@ -142,6 +140,9 @@ RowLayout {
                     }
                 }
                 root.selectedChannel.selectedSlot.setTo(zynqtgui.sketchpad.lastSelectedObj.className, index, slotDelegate);
+                // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
+                root.selectedChannel.selectedSlotRow = index;
+                root.selectedChannel.selectedFxSlotRow = index;
 
                 if (control.slotType == "synth") {
                     root.selectedChannel.setCurlayerByType("synth")

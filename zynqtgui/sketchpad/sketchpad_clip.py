@@ -647,13 +647,14 @@ class sketchpad_clip(QObject):
         self.__autoStopTimer__.setSingleShot(True)
         self.__autoStopTimer__.timeout.connect(self.stop_audio)
 
-        try:
-            # Check if a dir named <somerandomname>.<channel_id> exists.
-            # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
-            bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
-        except:
-            bank_name = "sample-bank"
-        self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
+        # Disable custom named bank temporarily. Find out if we need this or not
+        # try:
+        #     # Check if a dir named <somerandomname>.<channel_id> exists.
+        #     # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
+        #     bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
+        # except:
+        #     bank_name = "sample-bank"
+        self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'sample-bank.{self.row + 1}'
 
         try:
             self.channel = self.__song__.channelsModel.getChannel(self.__row_index__)

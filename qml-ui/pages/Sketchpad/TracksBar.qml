@@ -45,6 +45,9 @@ Rectangle {
         interval: 1; running: false; repeat: false;
         onTriggered: {
             root.selectedChannel = applicationWindow().selectedChannel;
+            if (root.selectedChannel.selectedSlot.component === null && zynqtgui.isBootingComplete) {
+                Qt.callLater(root.pickFirstAndBestSlot);
+            }
         }
     }
     Connections {
@@ -62,86 +65,86 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     function pickNextSlot() {
-        switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+        switch (root.selectedChannel.selectedSlot.className) {
             case "TracksBar_synthslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                if (root.selectedChannel.selectedSlot.value === 4) {
                     samplesRow.switchToSlot(0, true);
                 } else {
-                    synthsRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value + 1, true);
+                    synthsRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             case "TracksBar_sampleslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                if (root.selectedChannel.selectedSlot.value === 4) {
                     synthsRow.switchToSlot(0, true);
                 } else {
-                    samplesRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value + 1, true);
+                    samplesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             case "TracksBar_sketchslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                if (root.selectedChannel.selectedSlot.value === 4) {
                     sketchesRow.switchToSlot(0, true);
                 } else {
-                    sketchesRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value + 1, true);
+                    sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             case "TracksBar_externalslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 1) {
+                if (root.selectedChannel.selectedSlot.value === 1) {
                     sketchesRow.switchToSlot(0, true);
                 } else {
-                    sketchesRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value + 1, true);
+                    sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             case "TracksBar_fxslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 4) {
+                if (root.selectedChannel.selectedSlot.value === 4) {
                     fxRow.switchToSlot(0, true);
                 } else {
-                    fxRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value + 1, true);
+                    fxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             default:
-                console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                 break;
         }
     }
     function pickPreviousSlot() {
-        switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+        switch (root.selectedChannel.selectedSlot.className) {
             case "TracksBar_synthslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                if (root.selectedChannel.selectedSlot.value === 0) {
                     samplesRow.switchToSlot(4, true);
                 } else {
-                    synthsRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value - 1, true);
+                    synthsRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }
                 break;
             case "TracksBar_sampleslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                if (root.selectedChannel.selectedSlot.value === 0) {
                     synthsRow.switchToSlot(4, true);
                 } else {
-                    samplesRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value - 1, true);
+                    samplesRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }
                 break;
             case "TracksBar_sketchslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                if (root.selectedChannel.selectedSlot.value === 0) {
                     sketchesRow.switchToSlot(4, true);
                 } else {
-                    sketchesRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value - 1, true);
+                    sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }
                 break;
             case "TracksBar_externalslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                if (root.selectedChannel.selectedSlot.value === 0) {
                     externalRow.switchToSlot(1, true);
                 } else {
-                    externalRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value - 1, true);
+                    externalRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }
                 break;
             case "TracksBar_fxslot":
-                if (zynqtgui.sketchpad.lastSelectedObj.value === 0) {
+                if (root.selectedChannel.selectedSlot.value === 0) {
                     fxRow.switchToSlot(4, true);
                 } else {
-                    fxRow.switchToSlot(zynqtgui.sketchpad.lastSelectedObj.value - 1, true);
+                    fxRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }
                 break;
             default:
-                console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                 break;
         }
     }
@@ -160,7 +163,7 @@ Rectangle {
                 sketchesRow.switchToSlot(slotIndex);
                 break;
             case "fx":
-                fxRow.itemAt(slotIndex).switchToThisSlot();
+                fxRow.switchToSlot(slotIndex);
                 break;
             case "external":
                 externalRow.switchToSlot(slotIndex);
@@ -173,23 +176,23 @@ Rectangle {
     function switchToSlot(slotType, slotIndex) {
         switch(slotType) {
             case "synth":
-                fxTabButton.checked = false;
+                root.selectedChannel.displayFx = false;
                 synthsRow.switchToSlot(slotIndex, true);
                 break;
             case "sample":
-                fxTabButton.checked = false;
+                root.selectedChannel.displayFx = false;
                 samplesRow.switchToSlot(slotIndex, true);
                 break;
             case "sketch":
-                fxTabButton.checked = false;
+                root.selectedChannel.displayFx = false;
                 sketchesRow.switchToSlot(slotIndex, true);
                 break;
             case "fx":
-                fxTabButton.checked = true;
-                fxRow.itemAt(slotIndex).switchToThisSlot(true);
+                root.selectedChannel.displayFx = true;
+                fxRow.switchToSlot(slotIndex, true);
                 break;
             case "external":
-                fxTabButton.checked = false;
+                root.selectedChannel.displayFx = false;
                 externalRow.switchToSlot(slotIndex, true);
                 break;
             default:
@@ -206,28 +209,28 @@ Rectangle {
     function pickFirstAndBestSlot() {
         function checkCurrent(switchIfEmpty) {
             let slotHasContents = false;
-            if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_synthslot") {
-                slotHasContents = root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value]);
+            if (root.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+                slotHasContents = root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value]);
                 if (switchIfEmpty && slotHasContents === false) {
                     synthsRow.switchToSlot(0, true);
                 }
-            } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_sampleslot") {
-                slotHasContents = root.selectedChannel.sampleSlotsData[zynqtgui.sketchpad.lastSelectedObj.value].cppObjId > -1;
+            } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot") {
+                slotHasContents = root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].cppObjId > -1;
                 if (switchIfEmpty && slotHasContents === false) {
                     samplesRow.switchToSlot(0, true);
                 }
-            } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_sketchslot") {
-                slotHasContents = root.selectedChannel.sketchSlotsData[zynqtgui.sketchpad.lastSelectedObj.value].cppObjId > -1;
+            } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot") {
+                slotHasContents = root.selectedChannel.sketchSlotsData[root.selectedChannel.selectedSlot.value].cppObjId > -1;
                 if (switchIfEmpty && slotHasContents === false) {
                     sketchesRow.switchToSlot(0, true);
                 }
-            } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_externalslot") {
-                slotHasContents = (root.selectedChannel.externalSlotsData[zynqtgui.sketchpad.lastSelectedObj.value] !== undefined);
+            } else if (root.selectedChannel.selectedSlot.className === "TracksBar_externalslot") {
+                slotHasContents = (root.selectedChannel.externalSlotsData[root.selectedChannel.selectedSlot.value] !== undefined);
                 if (switchIfEmpty && slotHasContents === false) {
                     externalRow.switchToSlot(0, true);
                 }
-            } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
-                if (root.selectedChannel.chainedFx[zynqtgui.sketchpad.lastSelectedObj.value] != null) {
+            } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+                if (root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value] != null) {
                     slotHasContents = true;
                 }
                 if (switchIfEmpty && (slotHasContents === false)) {
@@ -235,7 +238,7 @@ Rectangle {
                 }
             } else if (switchIfEmpty) {
                 // Select the first and best option for the given TracksBar layout
-                if (fxTabButton.checked) {
+                if (root.selectedChannel.displayFx === true) {
                     fxRow.switchToSlot(0, true);
                 } else if (root.selectedChannel.trackType === "synth") {
                     synthsRow.switchToSlot(0, true);
@@ -249,11 +252,11 @@ Rectangle {
         }
         let initialSlotIndex = 0;
         let initialSlotType = 0;
-        if (["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot"].includes(zynqtgui.sketchpad.lastSelectedObj.className)) {
-            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
-        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
+        if (["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot"].includes(root.selectedChannel.selectedSlot.className)) {
+            initialSlotIndex = root.selectedChannel.selectedSlot.value;
+        } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
             initialSlotType = 1;
-            initialSlotIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+            initialSlotIndex = root.selectedChannel.selectedSlot.value;
         }
         let slotHasContents = checkCurrent(true);
         if (slotHasContents === false) {
@@ -291,9 +294,9 @@ Rectangle {
             case "SELECT_UP":
                 if (zynqtgui.altButtonPressed) {
                     root.pickFirstAndBestSlot();
-                    switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                    switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
-                            root.selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                            root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
                             break;
                         case "TracksBar_sampleslot":
                             break;
@@ -302,10 +305,10 @@ Rectangle {
                         case "TracksBar_externalslot":
                             break;
                         case "TracksBar_fxslot":
-                            root.selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                            root.selectedChannel.selectPreviousFxPreset(root.selectedChannel.selectedSlot.value);
                             break;
                         default:
-                            console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                            console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                             break;
                     }
                 }
@@ -315,9 +318,9 @@ Rectangle {
             case "SELECT_DOWN":
                 if (zynqtgui.altButtonPressed) {
                     root.pickFirstAndBestSlot();
-                    switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                    switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
-                            root.selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                            root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
                             break;
                         case "TracksBar_sampleslot":
                             break;
@@ -326,10 +329,10 @@ Rectangle {
                         case "TracksBar_externalslot":
                             break;
                         case "TracksBar_fxslot":
-                            root.selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                            root.selectedChannel.selectNextFxPreset(root.selectedChannel.selectedSlot.value);
                             break;
                         default:
-                            console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                            console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                             break;
                     }
                 }
@@ -338,30 +341,30 @@ Rectangle {
             case "KNOB0_TOUCHED":
                 if (!applicationWindow().osd.opened) {
                     root.pickFirstAndBestSlot();
-                    switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                    switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
-                            pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 0)
+                            pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], 0)
                             break;
                         case "TracksBar_sampleslot":
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, root.selectedChannel.selectedSlot.value)
                             break;
                         case "TracksBar_sketchslot":
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, root.selectedChannel.selectedSlot.value)
                             break;
                         case "TracksBar_externalslot":
                             break;
                         case "TracksBar_fxslot":
-                            pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                            pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, root.selectedChannel.selectedSlot.value)
                             break;
                         default:
-                            console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                            console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                             break;
                     }
                     returnValue = true;
                 }
                 break;
             case "KNOB0_RELEASED":
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         break;
                     case "TracksBar_sampleslot":
@@ -373,53 +376,53 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
                 break;
             case "KNOB0_UP":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
-                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], 1)
+                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], 1)
                         break;
                     case "TracksBar_sampleslot":
-                        pageManager.getPage("sketchpad").updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_sketchslot":
-                        pageManager.getPage("sketchpad").updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_externalslot":
                         break;
                     case "TracksBar_fxslot":
-                        pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(1, root.selectedChannel.selectedSlot.value)
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
-                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[zynqtgui.sketchpad.lastSelectedObj.value], -1)
+                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], -1)
                         break;
                     case "TracksBar_sampleslot":
-                        pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_sketchslot":
-                        pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_externalslot":
                         break;
                     case "TracksBar_fxslot":
-                        pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
@@ -427,9 +430,9 @@ Rectangle {
             case "KNOB1_TOUCHED":
                 if (!applicationWindow().osd.opened) {
                     root.pickFirstAndBestSlot();
-                    switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                    switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
-                            pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                            pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, root.selectedChannel.selectedSlot.value)
                             break;
                         case "TracksBar_sampleslot":
                             break;
@@ -441,14 +444,14 @@ Rectangle {
                             // Do nothing
                             break;
                         default:
-                            console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                            console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                             break;
                     }
                     returnValue = true;
                 }
                 break;
             case "KNOB1_RELEASED":
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         break;
                     case "TracksBar_sampleslot":
@@ -460,16 +463,16 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
                 break;
             case "KNOB1_UP":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
-                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_sampleslot":
                         break;
@@ -480,16 +483,16 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
                 break;
             case "KNOB1_DOWN":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
-                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_sampleslot":
                         break;
@@ -500,7 +503,7 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
@@ -508,9 +511,9 @@ Rectangle {
             case "KNOB2_TOUCHED":
                 if (!applicationWindow().osd.opened) {
                     root.pickFirstAndBestSlot();
-                    switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                    switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
-                            pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, zynqtgui.sketchpad.lastSelectedObj.value)
+                            pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, root.selectedChannel.selectedSlot.value)
                             break;
                         case "TracksBar_sampleslot":
                             break;
@@ -521,14 +524,14 @@ Rectangle {
                         case "TracksBar_fxslot":
                             break;
                         default:
-                            console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                            console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                             break;
                     }
                     returnValue = true;
                 }
                 break;
             case "KNOB2_RELEASED":
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         break;
                     case "TracksBar_sampleslot":
@@ -540,16 +543,16 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
                 break;
             case "KNOB2_UP":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
-                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_sampleslot":
                         break;
@@ -560,16 +563,16 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
                 break;
             case "KNOB2_DOWN":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
-                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, zynqtgui.sketchpad.lastSelectedObj.value)
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     case "TracksBar_sampleslot":
                         break;
@@ -580,7 +583,7 @@ Rectangle {
                     case "TracksBar_fxslot":
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
@@ -600,9 +603,6 @@ Rectangle {
             case "KNOB3_UP":
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
-                    if (zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_") === false) {
-                        root.pickFirstAndBestSlot();
-                    }
                     root.pickNextSlot();
                     returnValue = true;
                 }
@@ -610,9 +610,6 @@ Rectangle {
             case "KNOB3_DOWN":
                 if (zynqtgui.modeButtonPressed) {
                     zynqtgui.ignoreNextModeButtonPress = true;
-                    if (zynqtgui.sketchpad.lastSelectedObj.className.startsWith("TracksBar_") === false) {
-                        root.pickFirstAndBestSlot();
-                    }
                     root.pickPreviousSlot();
                     returnValue = true;
                 }
@@ -620,7 +617,7 @@ Rectangle {
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
                 root.pickFirstAndBestSlot();
-                switch (zynqtgui.sketchpad.lastSelectedObj.className) {
+                switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         bottomStack.slotsBar.handleItemClick("synth")
                         break;
@@ -637,7 +634,7 @@ Rectangle {
                         bottomStack.slotsBar.handleItemClick("fx")
                         break;
                     default:
-                        console.log("Unknown slot type", zynqtgui.sketchpad.lastSelectedObj.className);
+                        console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                         break;
                 }
                 returnValue = true;
@@ -735,13 +732,11 @@ Rectangle {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checkable: true
-                                checked: root.selectedChannel.trackType === "synth"
+                                checked: root.selectedChannel.trackType === "synth" && root.selectedChannel.displayFx === false
                                 text: qsTr("Sound")
                                 onClicked: {
-                                    root.selectedChannel.trackType = "synth"
-                                    fxTabButton.checked = false
-                                    synthsRow.switchToSlot(0, true)
+                                    root.selectedChannel.trackType = "synth";
+                                    synthsRow.switchToSlot(0, true);
                                 }
                                 QQC2.Button {
                                     anchors {
@@ -781,37 +776,32 @@ Rectangle {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checkable: true
+                                checked: root.selectedChannel.displayFx === true
                                 text: qsTr("Fx")
                                 onClicked: {
-                                    fxTabButton.checked = true
-                                    fxRow.switchToSlot(0, true)
+                                    fxRow.switchToSlot(0, true);
                                 }
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checkable: true
-                                checked: root.selectedChannel.trackType.startsWith("sample-loop")
+                                checked: root.selectedChannel.trackType === "sample-loop" && root.selectedChannel.displayFx === false
                                 text: qsTr("Sketch")
                                 onClicked: {
-                                    fxTabButton.checked = false
-                                    root.selectedChannel.trackType = "sample-loop"
-                                    sketchesRow.switchToSlot(0, true)
+                                    root.selectedChannel.trackType = "sample-loop";
+                                    sketchesRow.switchToSlot(0, true);
                                 }
                             }
                             QQC2.Button {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checkable: true
-                                checked: root.selectedChannel.trackType === "external"
+                                checked: root.selectedChannel.trackType === "external" && root.selectedChannel.displayFx === false
                                 text: qsTr("External")
                                 onClicked: {
-                                    fxTabButton.checked = false
-                                    root.selectedChannel.trackType = "external"
-                                    externalRow.switchToSlot(0, true)
+                                    root.selectedChannel.trackType = "external";
+                                    externalRow.switchToSlot(0, true);
                                 }
                             }
                         }
@@ -834,7 +824,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: !fxTabButton.checked && root.selectedChannel.trackType == "synth"
+                                        visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "synth"
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
@@ -956,7 +946,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.synthSlotsData
                                 slotType: "synth"
-                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "synth"
+                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "synth"
                             }
 
                             TrackSlotsData {
@@ -966,7 +956,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.sampleSlotsData
                                 slotType: "sample-trig"
-                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "synth"
+                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "synth"
                             }
 
                             TrackSlotsData {
@@ -976,7 +966,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.sketchSlotsData
                                 slotType: "sample-loop"
-                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "sample-loop"
+                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "sample-loop"
                             }
                             Item {
                                 // id: sketchesSpacer
@@ -993,7 +983,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.externalSlotsData
                                 slotType: "external"
-                                visible: !fxTabButton.checked && root.selectedChannel.trackType == "external"
+                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "external"
                             }
                             Item {
                                 // id: externalSpacer
@@ -1010,7 +1000,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.fxSlotsData
                                 slotType: "fx"
-                                visible: fxTabButton.checked
+                                visible: root.selectedChannel.displayFx === true
                             }
                             Item {
                                 // id: fxSpacer

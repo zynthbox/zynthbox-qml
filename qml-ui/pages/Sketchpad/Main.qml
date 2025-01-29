@@ -481,7 +481,7 @@ Zynthian.ScreenPage {
                         break;
                     case "SCREEN_ADMIN":
                         if (root.selectedChannel && root.selectedChannel.trackType === "synth") {
-                            if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_synthslot") {
+                            if (root.channel.selectedSlot.className === "TracksBar_synthslot") {
                                 let sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
                                 // when synth and slot is active, edit that sound or show popup when empty
                                 if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
@@ -887,8 +887,8 @@ Zynthian.ScreenPage {
                                             ? root.displaySceneButtons
                                             : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track"
                                                 ? root.displayTrackButtons
-                                                : ["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot", "TracksBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
-                                                    ? zynqtgui.slotsBarChannelActive
+                                                // : ["TracksBar_synthslot", "TracksBar_sampleslot", "TracksBar_sketchslot", "TracksBar_externalslot", "TracksBar_fxslot"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
+                                                    // ? zynqtgui.slotsBarChannelActive
                                                     : false
                             : false
 

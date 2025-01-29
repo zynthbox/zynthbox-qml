@@ -108,9 +108,9 @@ Zynthian.ScreenPage {
                 switch (_private.selectedColumn) {
                     case 0:
                         if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
                         } else {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
                         }
                         break;
                     case 1:
@@ -126,9 +126,9 @@ Zynthian.ScreenPage {
                 switch (_private.selectedColumn) {
                     case 0:
                         if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
                         } else {
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
                         }
                         break;
                     case 1:
@@ -145,9 +145,9 @@ Zynthian.ScreenPage {
                 switch (_private.selectedColumn) {
                     case 0:
                         if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(1, zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
                         } else {
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(1, zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
                         }
                         break;
                     case 1:
@@ -161,9 +161,9 @@ Zynthian.ScreenPage {
                 switch (_private.selectedColumn) {
                     case 0:
                         if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
                         } else {
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, zynqtgui.sketchpad.lastSelectedObj.value);
+                            pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
                         }
                         break;
                     case 1:
@@ -178,9 +178,9 @@ Zynthian.ScreenPage {
                 switch (_private.selectedColumn) {
                     case 0:
                         if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, zynqtgui.sketchpad.lastSelectedObj.value + 1));
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, component.selectedChannel.selectedSlot.value + 1));
                         } else {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, zynqtgui.sketchpad.lastSelectedObj.value + 1));
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, component.selectedChannel.selectedSlot.value + 1));
                         }
                         break;
                     case 1:
@@ -197,9 +197,9 @@ Zynthian.ScreenPage {
                 switch (_private.selectedColumn) {
                     case 0:
                         if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.max(0, zynqtgui.sketchpad.lastSelectedObj.value - 1));
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.max(0, component.selectedChannel.selectedSlot.value - 1));
                         } else {
-                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.max(0, zynqtgui.sketchpad.lastSelectedObj.value - 1));
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.max(0, component.selectedChannel.selectedSlot.value - 1));
                         }
                         break;
                     case 1:
@@ -238,7 +238,7 @@ Zynthian.ScreenPage {
         function assignToSlot(samplePathName) {
             sampleSlotAssigner.pathName = samplePathName;
             sampleSlotAssigner.open();
-            sampleSlotAssigner.currentIndex = zynqtgui.sketchpad.lastSelectedObj.value;
+            sampleSlotAssigner.currentIndex = component.selectedChannel.selectedSlot.value;
         }
         property string pathName: ""
         actions: [
@@ -374,7 +374,7 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                            highlighted: model.index === zynqtgui.sketchpad.lastSelectedObj.value
+                            highlighted: component.selectedChannel && model.index === component.selectedChannel.selectedSlot.value
                             property QtObject clip: component.selectedChannel
                                 ? component.selectedChannel.trackType === "sample-loop"
                                     ? component.selectedChannel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
@@ -388,11 +388,11 @@ Zynthian.ScreenPage {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        if (zynqtgui.sketchpad.lastSelectedObj.value === model.index) {
+                                        if (component.selectedChannel.selectedSlot.value === model.index) {
                                             if (component.selectedChannel.trackType === "sample-loop") {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", zynqtgui.sketchpad.lastSelectedObj.value);
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sketch", component.selectedChannel.selectedSlot.value);
                                             } else {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", zynqtgui.sketchpad.lastSelectedObj.value);
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.activateSlot("sample", component.selectedChannel.selectedSlot.value);
                                             }
                                         } else {
                                             if (component.selectedChannel.trackType === "sample-loop") {

@@ -253,7 +253,7 @@ Kirigami.AbstractApplicationWindow {
                     if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
                         // Before switching, let's just make sure we actually have a slot picked...0
                         pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
-                        if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(zynqtgui.sketchpad.lastSelectedObj.className)) {
+                        if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                             // Then we are selecting samples and sketches, show the sample library
                             zynqtgui.show_screen("sample_library");
                         } else {
@@ -265,20 +265,20 @@ Kirigami.AbstractApplicationWindow {
                 case "SCREEN_EDIT_CONTEXTUAL":
                     // In case the global popup is open, hide it when switching to the context editor
                     pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
-                    if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_synthslot") {
+                    if (root.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow];
                         if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {
                             zynqtgui.show_screen("control");
                         } else {
                             applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
                         }
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_sampleslot") {
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot") {
                         zynqtgui.show_modal("channel_wave_editor");
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_sketchslot") {
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot") {
                         zynqtgui.show_modal("channel_wave_editor");
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_externalslot") {
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_externalslot") {
                          zynqtgui.show_modal("channel_external_setup");
-                    } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
                         if (root.selectedChannel.chainedFx[root.selectedChannel.selectedFxSlotRow] != null) {
                             zynqtgui.show_screen("control");
                         } else {
@@ -1096,9 +1096,13 @@ Kirigami.AbstractApplicationWindow {
         target: zynqtgui.sketchpad.song
         onIsLoadingChanged: {
             if (zynqtgui.sketchpad.song.isLoading === false) {
-                selectedChannelThrottle.restart();
+                handleLoadingDone();
             }
         }
+    }
+    function handleLoadingDone() {
+        root.selectedChannel = root.channels[zynqtgui.sketchpad.selectedTrackId];
+        pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
     }
     Timer {
         id: selectedChannelThrottle
@@ -1210,6 +1214,11 @@ Kirigami.AbstractApplicationWindow {
                 miniPlayGridDrawer.open();
             } else {
                 miniPlayGridDrawer.close();
+            }
+        }
+        onIsBootingCompleteChanged: {
+            if (zynqtgui.isBootingComplete === true) {
+                handleLoadingDone();
             }
         }
     }

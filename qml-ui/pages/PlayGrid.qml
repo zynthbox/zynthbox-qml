@@ -644,10 +644,10 @@ don't want to have to dig too far...
                 if (delta > 0) {
                     let selectedChannel = applicationWindow().selectedChannel;
                     while (delta > 0) {
-                        if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_synthslot") {
-                            selectedChannel.selectNextSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
-                            selectedChannel.selectNextFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                        if (selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+                            selectedChannel.selectNextSynthPreset(selectedChannel.selectedSlot.value);
+                        } else if (selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+                            selectedChannel.selectNextFxPreset(selectedChannel.selectedSlot.value);
                         }
                         delta = delta - 1;
                     }
@@ -655,10 +655,10 @@ don't want to have to dig too far...
                 } else if (delta < 0) {
                     let selectedChannel = applicationWindow().selectedChannel;
                     while (delta < 0) {
-                        if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_synthslot") {
-                            selectedChannel.selectPreviousSynthPreset(zynqtgui.sketchpad.lastSelectedObj.value);
-                        } else if (zynqtgui.sketchpad.lastSelectedObj.className === "TracksBar_fxslot") {
-                            selectedChannel.selectPreviousFxPreset(zynqtgui.sketchpad.lastSelectedObj.value);
+                        if (selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+                            selectedChannel.selectPreviousSynthPreset(selectedChannel.selectedSlot.value);
+                        } else if (selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+                            selectedChannel.selectPreviousFxPreset(selectedChannel.selectedSlot.value);
                         }
                         delta = delta + 1;
                     }

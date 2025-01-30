@@ -54,7 +54,7 @@ Zynthian.ScreenPage {
                          soundButtonGroup.checkedButton.checked
                 text: qsTr("Move")
                 onTriggered: {
-                    root.soundCopySource = soundButtonGroup.checkedButton.soundObj
+                    // root.soundCopySource = soundButtonGroup.checkedButton.soundObj
                 }
             }
             Kirigami.Action {
@@ -64,15 +64,15 @@ Zynthian.ScreenPage {
                          categoryButtonGroup.checkedButton.category !== root.soundCopySource.category
                 text: qsTr("Paste")
                 onTriggered: {
-                    root.soundCopySource.category = categoryButtonGroup.checkedButton.category
-                    root.soundCopySource = null
+                    // root.soundCopySource.category = categoryButtonGroup.checkedButton.category
+                    // root.soundCopySource = null
                 }
             }
             Kirigami.Action {
                 enabled: root.soundCopySource != null
                 text: qsTr("Cancel")
                 onTriggered: {
-                    root.soundCopySource = null
+                    // root.soundCopySource = null
                 }
             }
             Kirigami.Action {
@@ -81,7 +81,7 @@ Zynthian.ScreenPage {
                          soundButtonGroup.checkedButton.soundObj.category !== "0"
                 text: qsTr("Clear Category")
                 onTriggered: {
-                    soundButtonGroup.checkedButton.soundObj.category = "0"
+                    // soundButtonGroup.checkedButton.soundObj.category = "0"
                 }
             }
         },
@@ -98,7 +98,7 @@ Zynthian.ScreenPage {
                     saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
                     saveSoundDialog.open()
                 } else {
-                    zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
+                    // zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
                 }
             }
         },
@@ -382,7 +382,7 @@ Zynthian.ScreenPage {
                                             margins: Kirigami.Units.gridUnit * 0.5
                                         }
 
-                                        text: zynqtgui.layer.load_layer_channels_from_file(soundObj.path).length
+                                        text: zynqtgui.layer.load_layer_channels_from_json(soundObj.metadata.synthFxSnapshot).length
                                         font.pointSize: 8
                                     }
                                 }
@@ -411,6 +411,8 @@ Zynthian.ScreenPage {
 
         // Bottom Row : Display current sound/sample/fx data
         ColumnLayout {
+            id: soundDetails
+            property bool displaySelectedSoundData: soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked
             Layout.fillWidth: true
 
             QQC2.Label {
@@ -422,8 +424,7 @@ Zynthian.ScreenPage {
                 verticalAlignment: Qt.AlignVCenter
                 elide: "ElideRight"
                 font.pointSize: 16
-                text: soundButtonGroup.checkedButton != null &&
-                      soundButtonGroup.checkedButton.checked
+                text: soundDetails.displaySelectedSoundData
                         ? soundButtonGroup.checkedButton.soundObj.name
                         : qsTr("Track %1 Current Sound").arg(root.selectedChannel.name)
             }
@@ -444,8 +445,12 @@ Zynthian.ScreenPage {
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-                    slotData: root.selectedChannel.synthSlotsData
-                    slotType: "synth"
+                    slotData: soundDetails.displaySelectedSoundData
+                                ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
+                                : root.selectedChannel.synthSlotsData
+                    slotType: soundDetails.displaySelectedSoundData
+                                ? "text"
+                                : "synth"
                 }
             }
 
@@ -460,8 +465,12 @@ Zynthian.ScreenPage {
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-                    slotData: root.selectedChannel.sampleSlotsData
-                    slotType: "sample-trig"
+                    slotData: soundDetails.displaySelectedSoundData
+                                ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
+                                : root.selectedChannel.sampleSlotsData
+                    slotType: soundDetails.displaySelectedSoundData
+                                ? "text"
+                                : "sample-trig"
                 }
             }
 
@@ -476,8 +485,12 @@ Zynthian.ScreenPage {
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-                    slotData: root.selectedChannel.fxSlotsData
-                    slotType: "fx"
+                    slotData: soundDetails.displaySelectedSoundData
+                                ? soundButtonGroup.checkedButton.soundObj.fxSlotsData
+                                : root.selectedChannel.fxSlotsData
+                    slotType: soundDetails.displaySelectedSoundData
+                                ? "text"
+                                : "fx"
                 }
             }
         }

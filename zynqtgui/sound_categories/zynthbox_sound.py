@@ -22,6 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+
 import json
 import os
 import subprocess
@@ -29,8 +30,7 @@ import shlex
 import logging
 import taglib
 from pathlib import Path
-
-from PySide2.QtCore import Qt, Property, QObject, Signal, QTimer, QMetaObject
+from PySide2.QtCore import Property, QObject, Signal
 
 
 class zynthbox_sound_metadata(QObject):
@@ -176,3 +176,44 @@ class zynthbox_sound(QObject):
 
     metadata = Property(QObject, get_metadata, constant=True)
     ### END Property metadata
+
+    ### Property synthSlotsData
+    def get_synthSlotsData(self):
+        metadata = self.zynqtgui.layer.sound_metadata_from_json(self.__metadata.synthFxSnapshot)
+        res = ["", "", "", "", ""]
+        for layer in metadata:
+            if "engine_type" in layer and "slot_index" in layer and layer["engine_type"] == "MIDI Synth":
+                if "preset_name" in layer and layer['preset_name'] is not None and layer['preset_name'] != "None":
+                    res[layer["slot_index"]] = f"{layer['name']} > {layer['preset_name']}"
+                else:
+                    res[layer["slot_index"]] = layer['name']
+        return res
+
+    synthSlotsData = Property("QVariantList", get_synthSlotsData, constant=True)
+    ### END Property synthSlotsData
+
+    ### Property sampleSlotsData
+    def get_sampleSlotsData(self):
+        res = ["", "", "", "", ""]
+        sampleData = json.JSONDecoder().decode(self.__metadata.samples)
+        for index, key in enumerate(sampleData):
+            res[index] = sampleData[key]["filename"]
+        return res
+
+    sampleSlotsData = Property("QVariantList", get_sampleSlotsData, constant=True)
+    ### END Property sampleSlotsData
+
+    ### Property fxSlotsData
+    def get_fxSlotsData(self):
+        metadata = self.zynqtgui.layer.sound_metadata_from_json(self.__metadata.synthFxSnapshot)
+        res = ["", "", "", "", ""]
+        for layer in metadata:
+            if "engine_type" in layer and "slot_index" in layer and layer["engine_type"] == "Audio Effect":
+                if "preset_name" in layer and layer['preset_name'] is not None and layer['preset_name'] != "None":
+                    res[layer["slot_index"]] = f"{layer['name']} > {layer['preset_name']}"
+                else:
+                    res[layer["slot_index"]] = layer['name']
+        return res
+
+    fxSlotsData = Property("QVariantList", get_fxSlotsData, constant=True)
+    ### END Property sampleSlotsData

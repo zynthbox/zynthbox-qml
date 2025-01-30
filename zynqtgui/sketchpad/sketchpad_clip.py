@@ -907,22 +907,22 @@ class sketchpad_clip(QObject):
     def set_path(self, path, should_copy=True, load_autosave=True):
         logging.debug(f"{path}, {should_copy}, {load_autosave}")
         if path is not None:
-            selected_path = Path(path)
             new_filename = ""
+            selected_path = Path(path)
 
             if self.is_channel_sample:
                 if should_copy:
                     new_filename = self.generate_unique_filename(selected_path, self.bank_path)
-                    logging.info(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
+                    logging.error(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
                     self.bank_path.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(selected_path, self.bank_path / new_filename)
             else:
                 if should_copy:
                     new_filename = self.generate_unique_filename(selected_path, self.wav_path)
-                    logging.info(f"Copying clip({path}) into sketchpad folder ({self.wav_path / new_filename})")
+                    logging.error(f"Copying clip({path}) into sketchpad folder ({self.wav_path / new_filename})")
                     shutil.copy2(selected_path, self.wav_path / new_filename)
 
-            if new_filename == "" :
+            if new_filename == "":
                 self.__path__ = str(selected_path.name)
             else:
                 self.__path__ = str(new_filename)
@@ -938,8 +938,8 @@ class sketchpad_clip(QObject):
             except: pass
 
         self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
-        if path is not None:
-            self.audioSource = Zynthbox.ClipAudioSource(path, False, self)
+        if self.__path__ is not None:
+            self.audioSource = Zynthbox.ClipAudioSource(self.path, False, self)
             self.audioSource.rootSlice().lengthChanged.connect(self.sec_per_beat_changed.emit)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)

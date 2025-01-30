@@ -463,9 +463,6 @@ class zynthian_gui(QObject):
         # 2nd element of the set is the zynthian controller to control fx
         self.global_fx_engines = []
 
-        self.__channelToRecord = None
-        self.__channelRecordingSlotType = None
-        self.__channelRecordingSlotIndex = None
         self.__clipToRecord = None
         self.__forceSongMode__ = False
         self.__menu_button_pressed__ = False
@@ -2092,39 +2089,28 @@ class zynthian_gui(QObject):
                     # Some Clip is currently being recorded
                     logging.info("Some Clip is currently being recorded. Stopping record")
                     self.run_stop_metronome_and_playback.emit()
-                    self.__channelToRecord = None
-                    self.__channelRecordingSlotType = None
-                    self.__channelRecordingSlotIndex = None
-                    self.__clipToRecord = None
+                    self.clipToRecord = None
                 else:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
                     # Ensure that if we have been asked to start recording without opening the dialog (that is, by
                     # holding down the metronome button and then pressing record, for instant recording), we still
                     # end up actually recording into what's expected
-                    if self.__channelToRecord is None:
-                        self.__channelToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
-                    if self.__channelRecordingSlotIndex is None:
-                        self.__channelRecordingSlotType = "TracksBar_sketchslot" if self.__channelToRecord.selectedSlot.className in ["TracksBar_sketchslot", "sketch"] else "TracksBar_sampleslot"
-                        self.__channelRecordingSlotIndex = self.__channelToRecord.selectedSlot.value
-                    if self.__clipToRecord is None:
-                        self.__clipToRecord = self.__channelToRecord.getClipToRecord()
+                    if self.clipToRecord is None:
+                        self.clipToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId).getClipToRecord()
 
                     # Ensure the track also knows which slip we're recording (there can be multiple here, but
                     # that's more of a side effect of some internal detail, just set it to the single entry)
-                    zl.clipsToRecord = [self.__clipToRecord]
+                    zl.clipsToRecord = [self.clipToRecord]
 
-                    logging.info(f"Recording Clip : {self.__clipToRecord}")
-                    if self.__clipToRecord.queueRecording():
+                    logging.info(f"Recording Clip : {self.clipToRecord}")
+                    if self.clipToRecord.queueRecording():
                         self.run_start_metronome_and_playback.emit()
                     else:
                         logging.error("Error while trying to queue clip to record")
             else:
                 if zl.isRecording == False:
-                    self.__channelToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
-                    self.__channelRecordingSlotType = "TracksBar_sketchslot" if self.__channelToRecord.selectedSlot.className in ["TracksBar_sketchslot", "sketch"] else "TracksBar_sampleslot"
-                    self.__channelRecordingSlotIndex = self.__channelToRecord.selectedSlot.value
-                    self.__clipToRecord = self.__channelToRecord.getClipToRecord()
+                    self.clipToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId).getClipToRecord()
                 self.displayRecordingPopup.emit()
 
         elif cuia == "STOP_RECORD":
@@ -4632,6 +4618,20 @@ class zynthian_gui(QObject):
 
     bottomBarControlObj = Property(QObject, get_bottomBarControlObj, set_bottomBarControlObj, notify=bottomBarControlObjChanged)
     ### END Property bottomBarControlObj
+
+    ### BEGIN Property clipToRecord
+    def get_clipToRecord(self):
+        return self.__clipToRecord
+
+    def set_clipToRecord(self, clipToRecord):
+        if self.__clipToRecord != clipToRecord:
+            self.__clipToRecord = clipToRecord
+            self.clipToRecordChanged.emit()
+
+    clipToRecordChanged = Signal()
+
+    clipToRecord = Property(QObject, get_clipToRecord, set_clipToRecord, notify=clipToRecordChanged)
+    ### END Property clipToRecord
 
     ### Property bottomBarControlType
     ### This property will store the type of object that is being controlled by bottombar

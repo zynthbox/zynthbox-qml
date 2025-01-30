@@ -988,13 +988,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     def load_recorded_file_to_clip(self):
         if self.recordingType == "audio":
-            logging.info(f"Loading recorded wav to ({self.clip_to_record_path}) clip({self.clip_to_record})")
+            logging.info(f"Loading recorded wav to ({self.clip_to_record_path}) clip({self.clip_to_record}) {self.clip_to_record.channel.id} {self.clip_to_record.id}")
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
-            currentChannel = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
             self.zynqtgui.currentTaskMessage = "Loading recording to clip"
-            self.clip_to_record.set_path(self.clip_to_record_path, should_copy=False)
+            self.clip_to_record.set_path(self.clip_to_record_path, should_copy=True)
             self.clip_to_record.enabled = True
             # Set same recorded clip to other additional clips
             for clip in self.clips_to_record:
@@ -1011,7 +1010,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 clip.metadata.write(writeSoundMetadata=not clip.is_channel_sample, isAutosave=True)
             if self.clip_to_record.isChannelSample:
                 # logging.info("Recorded clip is a sample")
-                currentChannel.samples_changed.emit()
+                self.clip_to_record.channel.samples_changed.emit()
 
     def get_next_free_layer(self):
         logging.debug(self.zynqtgui.screens["layers"].layers)

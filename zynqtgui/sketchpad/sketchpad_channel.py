@@ -222,7 +222,7 @@ class sketchpad_channel(QObject):
 
         # Create 5 clip objects for 5 samples per channel
         for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-            newSample = sketchpad_clip(self.id, -1, -1, self.__song__, self, True)
+            newSample = sketchpad_clip(self.id, i, i, self.__song__, self, True)
             newSample.set_lane(i)
             # Explicitly set channel as it is a channelSample
             newSample.channel = self
@@ -2615,6 +2615,7 @@ class sketchpad_channel(QObject):
             # Reorder samples
             new_order_samples = [self.samples[index] for index in newOrder]
             for index, sample in enumerate(new_order_samples):
+                sample.id = index
                 sample.set_lane(index)
             self.__samples__ = new_order_samples
             self.samples_changed.emit()

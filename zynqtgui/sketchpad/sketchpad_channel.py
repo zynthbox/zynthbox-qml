@@ -1824,12 +1824,14 @@ class sketchpad_channel(QObject):
             self.__selected_clip__ = selected_clip
             self.selectedClipChanged.emit()
             if self.trackType == "sample-loop":
-                self.selectedSlotRow = selected_clip
+                self.requestSwitchToSlot.emit("sketch", self.__selected_clip__)
             if shouldEmitCurrentClipCUIAFeedback:
                 self.emitCurrentClipCUIAFeedback()
     selectedClipChanged = Signal()
     selectedClip = Property(int, get_selected_clip, set_selected_clip, notify=selectedClipChanged)
     # END Property selectedClip
+
+    requestSwitchToSlot = Signal(str, int, arguments=["slotType", "slotIndex"])
 
     @Slot(None)
     def emitCurrentClipCUIAFeedback(self):
@@ -2422,10 +2424,10 @@ class sketchpad_channel(QObject):
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):
-        if self.trackType == "sample-trig":
-            return self.samples[self.selectedSlotRow]
+        if self.selectedSlot.className == "TracksBar_sketchslot":
+            return self.getClipsModelById(self.selectedSlot.value).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
         else:
-            return self.getClipsModelById(self.selectedSlotRow).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
+            return self.samples[self.selectedSlot.value]
 
     @Slot(str)
     def setChannelSamplesFromSnapshot(self, snapshot: str):

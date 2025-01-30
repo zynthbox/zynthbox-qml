@@ -57,6 +57,12 @@ Rectangle {
     Component.onCompleted: {
         selectedChannelThrottle.restart()
     }
+    Connections {
+        target: selectedChannel
+        function onRequestSwitchToSlot(slotType, slotIndex) {
+            root.switchToSlot(slotType, slotIndex);
+        }
+    }
 
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
     property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
@@ -154,18 +160,23 @@ Rectangle {
         // Then activate it
         switch(slotType) {
             case "synth":
+            case "TracksBar_synthslot":
                 synthsRow.switchToSlot(slotIndex);
                 break;
             case "sample":
+            case "TracksBar_sampleslot":
                 samplesRow.switchToSlot(slotIndex);
                 break;
             case "sketch":
+            case "TracksBar_sketchslot":
                 sketchesRow.switchToSlot(slotIndex);
                 break;
             case "fx":
+            case "TracksBar_fxslot":
                 fxRow.switchToSlot(slotIndex);
                 break;
             case "external":
+            case "TracksBar_externalslot":
                 externalRow.switchToSlot(slotIndex);
                 break;
             default:
@@ -176,22 +187,27 @@ Rectangle {
     function switchToSlot(slotType, slotIndex) {
         switch(slotType) {
             case "synth":
+            case "TracksBar_synthslot":
                 root.selectedChannel.displayFx = false;
                 synthsRow.switchToSlot(slotIndex, true);
                 break;
             case "sample":
+            case "TracksBar_sampleslot":
                 root.selectedChannel.displayFx = false;
                 samplesRow.switchToSlot(slotIndex, true);
                 break;
             case "sketch":
+            case "TracksBar_sketchslot":
                 root.selectedChannel.displayFx = false;
                 sketchesRow.switchToSlot(slotIndex, true);
                 break;
             case "fx":
+            case "TracksBar_fxslot":
                 root.selectedChannel.displayFx = true;
                 fxRow.switchToSlot(slotIndex, true);
                 break;
             case "external":
+            case "TracksBar_externalslot":
                 root.selectedChannel.displayFx = false;
                 externalRow.switchToSlot(slotIndex, true);
                 break;

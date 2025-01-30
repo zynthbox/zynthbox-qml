@@ -149,41 +149,53 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(str, result=bool)
     def checkIfSoundFileExists(self, filename):
-        return len(list(self.__my_sounds_path__.glob(f"**/{filename}.*.sound"))) > 0
+        return len(list(self.__my_sounds_path__.glob(f"**/{filename}.sound.wav"))) > 0
 
-    @Slot(str, str)
-    def saveSound(self, filename, category):
-        file_name = str(self.__my_sounds_path__ / filename)
-        track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        # Only store layers from snapshot as sounds
-        snapshot = {
-            'layers': self.zynqtgui.layer.generate_snapshot(track)['layers']
-        }
+    @Slot(str, int, result=QObject)
+    def saveSound(self, name: str, category: int):
+        if not name.endswith(".sound.wav"):
+            name = f"{name}.sound.wav"
+        selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+        sound = zynthbox_sound(self, self.zynqtgui, name, "my-sounds")
+        sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshotJson()
+        sound.metadata.samples = selectedTrack.getChannelSampleSnapshot()
+        sound.metadata.category = category
+        sound.metadata.write()
+        self.__sounds_model__.add_sound(sound)
 
-        try:
-            final_name = file_name.split(".")[0] + "." + str(len(snapshot["layers"])) + ".sound"
-            saveToPath = Path(final_name)
-            final_name = saveToPath.name
-            saveToPath = saveToPath.parent
-            saveToPath.mkdir(parents=True, exist_ok=True)
+    # @Slot(str, str)
+    # def saveSound(self, filename, category):
+    #     file_name = str(self.__my_sounds_path__ / filename)
+    #     track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+    #     # Only store layers from snapshot as sounds
+    #     snapshot = {
+    #         'layers': self.zynqtgui.layer.generate_snapshot(track)['layers']
+    #     }
 
-            if category not in ["0", "*"]:
-                snapshot["category"] = category
+    #     try:
+    #         final_name = file_name.split(".")[0] + "." + str(len(snapshot["layers"])) + ".sound"
+    #         saveToPath = Path(final_name)
+    #         final_name = saveToPath.name
+    #         saveToPath = saveToPath.parent
+    #         saveToPath.mkdir(parents=True, exist_ok=True)
 
-            f = open(saveToPath / final_name, "w")
-            f.write(JSONEncoder().encode(snapshot))
-            f.flush()
-            os.fsync(f.fileno())
-            f.close()
-            logging.info(f"Saved sound file to {str(self.__my_sounds_path__ / filename)}")
-        except Exception as e:
-            logging.error(f"Error saving sound file : {str(e)}")
+    #         if category not in ["0", "*"]:
+    #             snapshot["category"] = category
 
-        self.load_sounds_model()
+    #         f = open(saveToPath / final_name, "w")
+    #         f.write(JSONEncoder().encode(snapshot))
+    #         f.flush()
+    #         os.fsync(f.fileno())
+    #         f.close()
+    #         logging.info(f"Saved sound file to {str(self.__my_sounds_path__ / filename)}")
+    #     except Exception as e:
+    #         logging.error(f"Error saving sound file : {str(e)}")
 
-    @Slot(QObject)
-    def loadSound(self, sound):
-        self.loadSoundFromFile(sound.path)
+    #     self.load_sounds_model()
+
+    # @Slot(QObject)
+    # def loadSound(self, sound):
+    #     self.loadSoundFromFile(sound.path)
 
     @Slot(int, str)
     def loadChannelSoundFromJson(self, channelIndex, soundJson, run_autoconnect=False):
@@ -315,17 +327,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         except: pass
 
         return suggested
-
-    @Slot(str, int, result=QObject)
-    def createNewSound(self, name: str, category: int):
-        if not name.endswith(".sound.wav"):
-            name = f"{name}.sound.wav"
-        selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        sound = zynthbox_sound(self, self.zynqtgui, name, "my-sounds")
-        sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshotJson()
-        sound.metadata.samples = selectedTrack.getChannelSampleSnapshot()
-        sound.metadata.category = category
-        sound.metadata.write()
 
     ### Property soundsModel
     def get_sounds_model(self):

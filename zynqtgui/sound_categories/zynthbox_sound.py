@@ -134,6 +134,8 @@ class zynthbox_sound(QObject):
         self.__type = type
         self.__sound_file = self.__sounds_base_path / type / self.__name
 
+        # Create parent dir if not exists
+        self.__sound_file.parent.mkdir(parents=True, exist_ok=True)
         # Create empty sound file if not exists
         if not self.__sound_file.exists():
             subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {shlex.quote(str(self.__sound_file))}"))

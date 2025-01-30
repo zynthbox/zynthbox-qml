@@ -754,7 +754,7 @@ GridLayout {
             id: dotFetcher
             interval: 1; repeat: false; running: false;
             onTriggered: {
-                progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "sample-trig") && waveBar.cppClipObject
+                progressDots.playbackPositions = waveBar.visible && (waveBar.channel.trackType === "synth") && waveBar.cppClipObject
                     ? waveBar.cppClipObject.playbackPositions
                     : null
             }

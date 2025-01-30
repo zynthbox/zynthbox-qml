@@ -54,16 +54,15 @@ Zynthian.Dialog {
                         break;
                     }
                 }
-            } else if (channel.trackType === "sample-loop") {
-                for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                    if (channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
+                for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
+                    if (channel.samples[sampleIndex].cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
                 }
-            } else if (channel.trackType === "sample-trig") {
-                for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
-                    if (channel.samples[sampleIndex].cppObjId > -1) {
+            } else if (channel.trackType === "sample-loop") {
+                for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
+                    if (channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
@@ -164,11 +163,10 @@ Zynthian.Dialog {
                                 break;
                             }
                         }
-                    } else if (channel.trackType === "sample-loop") {
-                        for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                            var clip = channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                        for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
+                            var clip = channel.samples[sampleIndex];
                             if (clip.cppObjId > -1) {
-                                // We pick the name of whatever the first loop is here, just so we've got one
+                                // We pick the name of whatever the first sample is here, just so we've got one
                                 soundIndication = clip.path.split("/").pop();
                                 soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
                                 if (soundIndication.endsWith(".clip")) {
@@ -179,11 +177,11 @@ Zynthian.Dialog {
                                 break;
                             }
                         }
-                    } else if (channel.trackType === "sample-trig") {
-                        for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
-                            var clip = channel.samples[sampleIndex];
+                    } else if (channel.trackType === "sample-loop") {
+                        for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
+                            var clip = channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                             if (clip.cppObjId > -1) {
-                                // We pick the name of whatever the first sample is here, just so we've got one
+                                // We pick the name of whatever the first loop is here, just so we've got one
                                 soundIndication = clip.path.split("/").pop();
                                 soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
                                 if (soundIndication.endsWith(".clip")) {
@@ -251,7 +249,7 @@ Zynthian.Dialog {
                             if (channel) { // by all rights this should not be possible, but... best safe
                                 metadata["ZYNTHBOX_ACTIVELAYER"] = channel.getChannelSoundSnapshot(); // The layer setup which produced the sounds in this recording
                                 metadata["ZYNTHBOX_TRACK_TYPE"] = channel.trackType; // The audio type of this channel
-                                if (channel.trackType === "sample-trig") {
+                                if (channel.trackType === "synth") {
                                     // Store the sample data, if we've been playing in a patterny sample mode
                                     metadata["ZYNTHBOX_SAMPLES"] = channel.getChannelSampleSnapshot(); // Store the samples that made this recording happen in a serialised fashion (similar to the base64 midi recording)
                                 }

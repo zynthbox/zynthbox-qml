@@ -127,7 +127,7 @@ QQC2.AbstractButton {
 
                     Image {
                         visible: (root.channel.trackType === "synth" && synthImage.status === Image.Error && root.channel.occupiedSlotsCount > 0) ||
-                                 ["sample-loop", "sample-trig"].indexOf(root.channel.trackType) >= 0
+                                 root.channel.trackType === "sample-loop"
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectCrop
                         horizontalAlignment: Image.AlignHCenter

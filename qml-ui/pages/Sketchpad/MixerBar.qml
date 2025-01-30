@@ -265,10 +265,10 @@ Rectangle {
                                                     Connections {
                                                         target: model.channel
                                                         onChainedSoundsChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
-                                                        onSamplesChanged: model.channel.trackType === "sample-trig" ? soundnameUpdater.restart() : false
+                                                        onSamplesChanged: model.channel.trackType === "synth" ? soundnameUpdater.restart() : false
                                                         onTrackTypeChanged: soundnameUpdater.restart()
                                                         onSceneClipChanged: model.channel.trackType === "sample-loop" ? soundnameUpdater.restart() : false
-                                                        onSelectedSlotRowChanged: ["sample-trig", "external"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
+                                                        onSelectedSlotRowChanged: ["synth", "external"].indexOf(model.channel.trackType) >= 0 ? soundnameUpdater.restart() : false
                                                     }
 
                                                     Connections {
@@ -293,10 +293,11 @@ Rectangle {
                                                                         break;
                                                                     }
                                                                 }
-                                                            } else if (model.channel.trackType === "sample-trig") {
-                                                                try {
-                                                                    text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-                                                                } catch (e) {}
+                                                                if (text === "") {
+                                                                    try {
+                                                                        text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                                                                    } catch (e) {}
+                                                                }
                                                             } else if (model.channel.trackType === "sample-loop") {
                                                                 try {
                                                                     text = model.channel.sceneClip.path.split("/").pop()

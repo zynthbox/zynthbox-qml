@@ -107,8 +107,7 @@ Zynthian.DialogQuestion {
                                             if (sketch.metadata.soundSnapshot === otherSketch.metadata.soundSnapshot) {
                                                 stillTheSame = true;
                                             }
-                                        } else if (sketch.metadata.audioType === "sample-trig") {
-                                            if (sketch.metadata.samples === otherSketch.metadata.samples) {
+                                            if (stillTheSame === false && sketch.metadata.samples === otherSketch.metadata.samples) {
                                                 stillTheSame = true;
                                             }
                                         } else {
@@ -170,7 +169,7 @@ Zynthian.DialogQuestion {
                                         }
                                         return createdDescription;
                                     }
-                                    if (sketch.metadata.audioType === "sample-trig") {
+                                    // if (sketch.metadata.audioType === "sample-trig") {
                                         let sampleMetadata = sketch.metadata.samples;
                                         for (let sampleSlotIndex = 0; sampleSlotIndex < 5; ++sampleSlotIndex) {
                                             sampleSlotDetails[sampleSlotIndex] = sampleMetadata[sampleSlotIndex]["filename"];
@@ -180,10 +179,10 @@ Zynthian.DialogQuestion {
                                         if (hasSynthSlotDetails) {
                                             sketchDetails.description = qsTr("%1<br/><i>Note:</i>Unbouncing this sketch will also result in the following new synths being added:<br/>%2").arg(sketchDetails.description).arg(createSlotDescriptions(synthSlotDetails));
                                         }
-                                    } else {
-                                        // The order of things: A header line, then the sound sources, then the fx they'll go through
-                                        sketchDetails.description = qsTr("Synths: %1<br/>FX: %2").arg(createSlotDescriptions(synthSlotDetails)).arg(createSlotDescriptions(fxSlotDetails));
-                                    }
+                                    // } else {
+                                    //     // The order of things: A header line, then the sound sources, then the fx they'll go through
+                                    //     sketchDetails.description = qsTr("Synths: %1<br/>FX: %2").arg(createSlotDescriptions(synthSlotDetails)).arg(createSlotDescriptions(fxSlotDetails));
+                                    // }
                                     // There isn't a detail for this one already, so let's actually add that temporary one we used for comparison as a proper entry
                                     soundSourceIndex = newDetails.length;
                                     newDetails.push(sketchDetails);

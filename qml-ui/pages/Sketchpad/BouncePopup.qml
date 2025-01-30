@@ -235,7 +235,7 @@ Zynthian.Popup {
                         for (let sketchpadTrackIndex = 0; sketchpadTrackIndex < sketchpadTracksToBounce.length; ++sketchpadTrackIndex) {
                             let sketchpadTrackId = sketchpadTracksToBounce[sketchpadTrackIndex];
                             let sketchpadTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(sketchpadTrackId);
-                            if (sketchpadTrack.trackType === "synth" || sketchpadTrack.trackType === "sample-trig" || (sketchpadTrack.trackType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
+                            if (sketchpadTrack.trackType === "synth" || (sketchpadTrack.trackType === "external" && sketchpadTrack.externalAudioSource.length > 0)) {
                                 let soundIndication = "(unknown)";
                                 if (sketchpadTrack.trackType === "synth") {
                                     for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
@@ -244,26 +244,27 @@ Zynthian.Popup {
                                             break;
                                         }
                                     }
+                                    if (soundIndication === "") {
+                                        for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
+                                            var clip = sketchpadTrack.samples[sampleIndex];
+                                            if (clip.cppObjId > -1) {
+                                                // We pick the name of whatever the first sample is here, just so we've got one
+                                                soundIndication = clip.path.split("/").pop();
+                                                soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
+                                                if (soundIndication.endsWith(".clip")) {
+                                                    soundIndication = soundIndication.substring(0, soundIndication.length - 5);
+                                                } else if (soundIndication.endsWith(".sketch")) {
+                                                    soundIndication = soundIndication.substring(0, soundIndication.length - 7);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
                                 } else if (sketchpadTrack.trackType === "sample-loop") {
                                     for (var loopIndex = 0; loopIndex < Zynthbox.Plugin.sketchpadSlotCount; ++loopIndex) {
                                         var clip = sketchpadTrack.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (clip.cppObjId > -1) {
                                             // We pick the name of whatever the first loop is here, just so we've got one
-                                            soundIndication = clip.path.split("/").pop();
-                                            soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
-                                            if (soundIndication.endsWith(".clip")) {
-                                                soundIndication = soundIndication.substring(0, soundIndication.length - 5);
-                                            } else if (soundIndication.endsWith(".sketch")) {
-                                                soundIndication = soundIndication.substring(0, soundIndication.length - 7);
-                                            }
-                                            break;
-                                        }
-                                    }
-                                } else if (sketchpadTrack.trackType === "sample-trig") {
-                                    for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
-                                        var clip = sketchpadTrack.samples[sampleIndex];
-                                        if (clip.cppObjId > -1) {
-                                            // We pick the name of whatever the first sample is here, just so we've got one
                                             soundIndication = clip.path.split("/").pop();
                                             soundIndication = soundIndication.substring(0, soundIndication.lastIndexOf("."));
                                             if (soundIndication.endsWith(".clip")) {

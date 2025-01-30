@@ -1045,8 +1045,7 @@ Rectangle {
                                             ? root.selectedChannel.selectedSlot.component.clip
                                             : null
                                         // We show the waveform container for all track types except external
-                                        waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-trig" ||
-                                                                         root.selectedChannel.trackType === "sample-loop" ||
+                                        waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-loop" ||
                                                                          root.selectedChannel.trackType === "synth"
                                     }
                                 }
@@ -1202,7 +1201,7 @@ Rectangle {
                                                 id: dotFetcher
                                                 interval: 1; repeat: false; running: false;
                                                 onTriggered: {
-                                                    progressDots.playbackPositions = root.visible && root.selectedChannel.trackType === "sample-trig" && progressDots.cppClipObject
+                                                    progressDots.playbackPositions = root.visible && root.selectedChannel.trackType === "synth" && progressDots.cppClipObject
                                                         ? progressDots.cppClipObject.playbackPositions
                                                         : null
                                                 }
@@ -1303,8 +1302,7 @@ Rectangle {
                                     id: patternContainer
 
                                     property bool showPattern: root.selectedChannel.trackType === "synth" ||
-                                                               root.selectedChannel.trackType === "external" ||
-                                                               root.selectedChannel.trackType === "sample-trig"
+                                                               root.selectedChannel.trackType === "external"
 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true

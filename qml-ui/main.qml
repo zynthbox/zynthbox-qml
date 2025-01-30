@@ -266,6 +266,7 @@ Kirigami.AbstractApplicationWindow {
                 case "SCREEN_EDIT_CONTEXTUAL":
                     // In case the global popup is open, hide it when switching to the context editor
                     zynqtgui.globalPopupOpened = false;
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot();
                     if (root.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         var sound = root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value];
                         if (sound >= 0 && root.selectedChannel.checkIfLayerExists(sound)) {

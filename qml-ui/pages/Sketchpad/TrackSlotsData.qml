@@ -244,7 +244,7 @@ RowLayout {
                     }
                     Rectangle {
                         // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
-                        width: delegate.fxPassthroughClient && delegate.fxPassthroughClient.dryWetMixAmount >= 0 ? delegate.width * Zynthian.CommonUtils.interp(delegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        width: delegate.fxPassthroughClient && delegate.fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(delegate.fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
                         anchors {
                             left: parent.left
                             top: parent.top

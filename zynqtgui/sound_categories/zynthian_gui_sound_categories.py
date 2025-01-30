@@ -352,6 +352,17 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
         return suggested
 
+    @Slot(str, int, result=QObject)
+    def createNewSound(self, name: str, category: int):
+        if not name.endswith(".sound.wav"):
+            name = f"{name}.sound.wav"
+        selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+        sound = zynthbox_sound(self, self.zynqtgui, name, "my-sounds")
+        sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshotJson()
+        sound.metadata.samples = selectedTrack.getChannelSampleSnapshot()
+        sound.metadata.category = category
+        sound.metadata.write()
+
     ### Property soundsModel
     def get_sounds_model(self):
         return self.__sound_category_filter_proxy_model__

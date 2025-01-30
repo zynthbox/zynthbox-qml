@@ -36,7 +36,9 @@ import Zynthian 1.0 as Zynthian
 Zynthian.Popup {
     id: root
     property QtObject selectedChannel: null
-    property int selectedSlotRow: 0
+    property string selectedSlotType: "synth"
+    property int selectedSlotIndex: 0
+    property int selectedClip: 0
 
     spacing: Kirigami.Units.gridUnit * 0.5
 
@@ -191,7 +193,9 @@ Zynthian.Popup {
             }
             // If we're not already recording, take a snapshot of our current state, so we can keep that stable when changing settings
             root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
-            root.selectedSlotRow = root.selectedChannel.selectedSlotRow;
+            root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
+            root.selectedSlotType = root.selectedChannel.selectedSlot.className;
+            root.selectedClip = root.selectedChannel.selectedClip;
             // Ensure that the solo state is restored when we close, but also that it matches what (if any) was set in the dialogue previously
             _private.soloChannelOnOpen = zynqtgui.sketchpad.song.playChannelSolo;
             _private.updateSoloState();
@@ -205,13 +209,15 @@ Zynthian.Popup {
             }
             // Restore the current track state to also match the previous state
             zynqtgui.sketchpad.selectedTrackId = root.selectedChannel.id;
-            root.selectedChannel.selectedSlotRow = root.selectedSlotRow;
+            applicationWindow().pageStack.getPage("sketchpad").bottomStack.tracksBar.switchToSlot(root.selectedSlotType, root.selectedSlotIndex);
+            root.selectedChannel.selectedClip = root.selectedClip;
             // Switch the track type to whatever the appropriate one is for the recorded sample if...
-            // ... the recording was completed while the dialog was open (isRecording === false)
+            // ... the recording was completed while the dialog was open (zynqtgui.sketchpad.isRecording === false)
+            // ... we were doing audio recording (this doesn't make sense for midi)
             // ... we did not clear the recording first
             if (zynqtgui.sketchpad.recordingType === "audio" && _private.mostRecentlyRecordedClip !== null) {
                 if (_private.mostRecentlyRecordedClip.isChannelSample) {
-                    root.selectedChannel.trackType = "sample-trig";
+                    root.selectedChannel.trackType = "synth";
                 } else {
                     root.selectedChannel.trackType = "sample-loop";
                 }
@@ -229,14 +235,23 @@ Zynthian.Popup {
             Layout.fillWidth: true
             Layout.leftMargin: root.spacing
             Layout.topMargin: root.spacing
-            text: root.selectedChannel && _private.selectedPattern ? qsTr("Record into Clip %1%2 on Track %3").arg(root.selectedChannel.id + 1).arg(_private.selectedClipPattern.clipName).arg(root.selectedChannel.name) : ""
+            text: root.selectedChannel
+                ? _private.recordingIntoSketch
+                    ? qsTr("Record into Sketch Slot %1 on Track %2").arg(root.selectedSlotIndex + 1).arg(root.selectedChannel.name)
+                    : qsTr("Record into Sample Slot %1 on Track %2").arg(root.selectedSlotIndex + 1).arg(root.selectedChannel.name)
+                : ""
             QtObject {
                 id: _private
                 readonly property double preferredRowHeight: Kirigami.Units.gridUnit * 2.3
-                property QtObject selectedClip: root.selectedChannel ? root.selectedChannel.getClipsModelById(root.selectedSlotRow).getClip(root.selectedChannel.id) : null
-                property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
-                property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
-                property QtObject selectedClipPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedSlotRow) : null
+                readonly property bool recordingIntoSketch: ["TracksBar_sketchslot", "sketch"].includes(root.selectedSlotType)
+                readonly property QtObject selectedClip: root.selectedChannel
+                    ? recordingIntoSketch
+                        ? root.selectedChannel.getClipsModelById(root.selectedSlotIndex).getClip(root.selectedChannel.id)
+                        : root.selectedChannel.samples[root.selectedSlotIndex]
+                    : null
+                readonly property QtObject selectedSequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+                readonly property QtObject selectedPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedChannel.selectedClip) : null
+                readonly property QtObject selectedClipPattern: sequence && root.selectedChannel ? sequence.getByClipId(root.selectedChannel.id, root.selectedSlotIndex) : null
                 property QtObject mostRecentlyRecordedClip: null
                 property bool midiSoloTrack: false
                 property int soloChannelOnOpen: -1
@@ -709,7 +724,6 @@ Zynthian.Popup {
                             }
                         }
                         ColumnLayout {
-                            // TODO : Implement midi recording and add midi settings here
                             RowLayout {
                                 Layout.fillHeight: true; Layout.fillWidth: true
                                 Layout.preferredHeight: _private.preferredRowHeight

@@ -464,7 +464,8 @@ class zynthian_gui(QObject):
         self.global_fx_engines = []
 
         self.__channelToRecord = None
-        self.__channelRecordingRow = None
+        self.__channelRecordingSlotType = None
+        self.__channelRecordingSlotIndex = None
         self.__clipToRecord = None
         self.__forceSongMode__ = False
         self.__menu_button_pressed__ = False
@@ -2092,7 +2093,8 @@ class zynthian_gui(QObject):
                     logging.info("Some Clip is currently being recorded. Stopping record")
                     self.run_stop_metronome_and_playback.emit()
                     self.__channelToRecord = None
-                    self.__channelRecordingRow = None
+                    self.__channelRecordingSlotType = None
+                    self.__channelRecordingSlotIndex = None
                     self.__clipToRecord = None
                 else:
                     # No clips are currently being recorded
@@ -2102,16 +2104,15 @@ class zynthian_gui(QObject):
                     # end up actually recording into what's expected
                     if self.__channelToRecord is None:
                         self.__channelToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
-                    if self.__channelRecordingRow is None:
-                        self.__channelRecordingRow = self.__channelToRecord.selectedSlotRow
+                    if self.__channelRecordingSlotIndex is None:
+                        self.__channelRecordingSlotType = "TracksBar_sketchslot" if self.__channelToRecord.selectedSlot.className in ["TracksBar_sketchslot", "sketch"] else "TracksBar_sampleslot"
+                        self.__channelRecordingSlotIndex = self.__channelToRecord.selectedSlot.value
                     if self.__clipToRecord is None:
                         self.__clipToRecord = self.__channelToRecord.getClipToRecord()
 
-                    # If sample[0] is empty, set sample[0] to recorded file along with selectedTrackId's clip
-                    if self.__channelToRecord.samples[self.__channelRecordingRow].path is not None and len(self.__channelToRecord.samples[self.__channelRecordingRow].path) > 0:
-                        zl.clipsToRecord = [self.__clipToRecord]
-                    else:
-                        zl.clipsToRecord = [self.__clipToRecord, self.__channelToRecord.samples[self.__channelRecordingRow]]
+                    # Ensure the track also knows which slip we're recording (there can be multiple here, but
+                    # that's more of a side effect of some internal detail, just set it to the single entry)
+                    zl.clipsToRecord = [self.__clipToRecord]
 
                     logging.info(f"Recording Clip : {self.__clipToRecord}")
                     if self.__clipToRecord.queueRecording():
@@ -2121,7 +2122,8 @@ class zynthian_gui(QObject):
             else:
                 if zl.isRecording == False:
                     self.__channelToRecord = zl.song.channelsModel.getChannel(self.sketchpad.selectedTrackId)
-                    self.__channelRecordingRow = self.__channelToRecord.selectedSlotRow
+                    self.__channelRecordingSlotType = "TracksBar_sketchslot" if self.__channelToRecord.selectedSlot.className in ["TracksBar_sketchslot", "sketch"] else "TracksBar_sampleslot"
+                    self.__channelRecordingSlotIndex = self.__channelToRecord.selectedSlot.value
                     self.__clipToRecord = self.__channelToRecord.getClipToRecord()
                 self.displayRecordingPopup.emit()
 

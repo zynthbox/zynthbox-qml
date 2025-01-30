@@ -937,8 +937,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     if self.zynqtgui.recordingPopupActive == False:
                         currentTrack = self.__song__.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
                         if self.clip_to_record.isChannelSample:
-                            # When recording a sample, set the track type to sample-trig
-                            currentTrack.trackType = "sample-trig"
+                            # When recording a sample, set the track type to synth
+                            currentTrack.trackType = "synth"
                         else:
                             # When recording a sketch (any other case), set track type to Sketch explicitly
                             currentChannel.trackType = "sample-loop"

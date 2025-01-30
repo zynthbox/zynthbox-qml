@@ -136,7 +136,7 @@ class zynthbox_sound(QObject):
 
         # Create empty sound file if not exists
         if not self.__sound_file.exists():
-            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {str(self.__sound_file)}"))
+            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {shlex.quote(str(self.__sound_file))}"))
 
         self.__metadata = zynthbox_sound_metadata(self)
         self.__metadata.read()

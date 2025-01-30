@@ -421,6 +421,7 @@ Zynthian.ScreenPage {
                                         border.color: "#ff999999"
                                         radius: 4
                                         Zynthbox.WaveFormItem {
+                                            id: waveformItem
                                             anchors {
                                                 fill: parent
                                                 margins: 1
@@ -429,7 +430,53 @@ Zynthian.ScreenPage {
                                             source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
                                             start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
                                             end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
+                                            readonly property real relativeStart: waveformItem.start / waveformItem.length
+                                            readonly property real relativeEnd: waveformItem.end / waveformItem.length
                                             visible: clipDelegate.clipHasWav
+                                            // SamplerSynth progress dots
+                                            Timer {
+                                                id: dotFetcher
+                                                interval: 1; repeat: false; running: false;
+                                                onTriggered: {
+                                                    progressDots.playbackPositions = component.visible && clipDelegate.cppClipObject
+                                                        ? clipDelegate.cppClipObject.playbackPositions
+                                                        : null
+                                                }
+                                            }
+                                            Connections {
+                                                target: component
+                                                onVisibleChanged: dotFetcher.restart();
+                                            }
+                                            Connections {
+                                                target: component.selectedChannel
+                                                onTrack_type_changed: dotFetcher.restart();
+                                            }
+                                            Connections {
+                                                target: clipDelegate
+                                                onCppClipObjectChanged: dotFetcher.restart();
+                                            }
+                                            Repeater {
+                                                id: progressDots
+                                                model: Zynthbox.Plugin.clipMaximumPositionCount
+                                                property QtObject playbackPositions: null
+                                                delegate: Item {
+                                                    property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                                                    visible: progressEntry && progressEntry.id > -1
+                                                    Rectangle {
+                                                        anchors.centerIn: parent
+                                                        rotation: 45
+                                                        color: Kirigami.Theme.highlightColor
+                                                        width: Kirigami.Units.largeSpacing
+                                                        height:  Kirigami.Units.largeSpacing
+                                                        scale: progressEntry ? 0.5 + progressEntry.gain : 1
+                                                    }
+                                                    anchors {
+                                                        top: parent.verticalCenter
+                                                        topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
+                                                    }
+                                                    x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                                                }
+                                            }
                                         }
                                         Rectangle {
                                             anchors {

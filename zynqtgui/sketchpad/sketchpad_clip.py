@@ -491,7 +491,7 @@ class sketchpad_clip_metadata(QObject):
                     self.set_routingStyle(self.clip.channel.trackRoutingStyle, write=False, force=True)
                     self.set_samplePickingStyle(self.clip.channel.samplePickingStyle, write=False, force=True)
                     self.set_samples(self.clip.channel.getChannelSampleSnapshot(), write=False, force=True)
-                    self.set_soundSnapshot(self.clip.channel.getChannelSoundSnapshotJson(), write=False, force=True)
+                    self.set_soundSnapshot(self.clip.channel.getChannelSoundSnapshot(), write=False, force=True)
 
                     tags["ZYNTHBOX_TRACK_TYPE"] = [str(self.__audioType)]
                     tags["ZYNTHBOX_TRACK_AUDIOTYPESETTINGS"] = [str(self.__audioTypeSettings)]

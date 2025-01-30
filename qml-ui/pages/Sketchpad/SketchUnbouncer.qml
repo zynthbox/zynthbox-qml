@@ -79,7 +79,7 @@ Zynthian.DialogQuestion {
                     replacePattern.sketchHasData = _private.clip !== null && ((_private.clip.metadata.midiRecording !== null && _private.clip.metadata.midiRecording.length > 10) || (_private.clip.metadata.patternJson !== null && _private.clip.metadata.patternJson.length > 5));
                     replacePattern.checked = !replacePattern.hasExistingData;
                     // If there is synth information in the sketch, ask first
-                    replaceSounds.hasExistingData = _private.channel !== null && _private.channel.getChannelSoundSnapshotJson().length > 10;
+                    replaceSounds.hasExistingData = _private.channel !== null && _private.channel.getChannelSoundSnapshot().length > 10;
                     replaceSounds.sketchHasData = _private.clip !== null && _private.clip.sketchContainsSound === true;
                     replaceSounds.checked = !replaceSounds.hasExistingData;
                     // If there is sample information in the sketch, ask first
@@ -119,7 +119,7 @@ Zynthian.DialogQuestion {
                     }
                     if (replaceSounds.sketchHasData && replaceSounds.checked) {
                         console.log("Replace the channel's current sound setup with what's stored in the sketch");
-                        _private.channel.setChannelSoundFromSnapshotJson(_private.clip.metadata.soundSnapshot);
+                        _private.channel.setChannelSoundFromSnapshot(_private.clip.metadata.soundSnapshot);
                         _private.channel.setAudioTypeSettings(_private.clip.metadata.audioTypeSettings);
                         _private.channel.audioRoutingStyle = _private.clip.metadata.routingStyle;
                     }

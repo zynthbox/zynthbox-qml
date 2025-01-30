@@ -2431,25 +2431,26 @@ class sketchpad_channel(QObject):
 
     @Slot(str)
     def setChannelSamplesFromSnapshot(self, snapshot: str):
-        sampleData = json.loads(snapshot)
-        i = 0
-        for sample in sampleData:
-            if i > 4:
-                logging.error("For some reason we have more than five elements in the encoded sample data, what happened?!")
-                break;
-            filename = sample["filename"]
-            # Clear out the existing sample, whether or not there's a new sample to go into that spot
-            # If the filename is an empty string, nothing to load
-            if len(filename) == 0:
-                # Store the new sample in a temporary file
-                with tempfile.TemporaryDirectory() as tmp:
-                    temporaryFile = Path(tmp) / filename
-                    with open(temporaryFile, "wb") as file:
-                        file.write(base64.b64decode(sample["sampledata"]))
-                    # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
-                    self.__samples__[i].set_path(temporaryFile, should_copy=True)
-            i += 1
-        pass
+        def task():
+            snapshot_obj = json.loads(snapshot)
+            for index, key in enumerate(snapshot_obj):
+                if index > 4:
+                    logging.error("For some reason we have more than five elements in the encoded sample data, what happened?!")
+                    break;
+                filename = snapshot_obj[key]["filename"]
+                # Clear out the existing sample, whether or not there's a new sample to go into that spot
+                self.__samples__[index].clear()
+                # If the filename is an empty string, nothing to load
+                if len(filename) > 0:
+                    # Store the new sample in a temporary file
+                    with tempfile.TemporaryDirectory() as tmp:
+                        temporaryFile = Path(tmp) / filename
+                        with open(temporaryFile, "wb") as file:
+                            file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
+                        # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
+                        self.__samples__[index].set_path(str(temporaryFile), should_copy=True)
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Loading samples")
 
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):
@@ -2468,7 +2469,7 @@ class sketchpad_channel(QObject):
         return json.dumps(encodedSampleData)
 
     @Slot(None, result=str)
-    def getChannelSoundSnapshotJson(self):
+    def getChannelSoundSnapshot(self):
         if self.__sound_snapshot_changed:
             # logging.debug(f"Updating sound snapshot json of Track {self.name}")
             self.__sound_json_snapshot__ = json.dumps(self.zynqtgui.layer.generate_snapshot(self))
@@ -2476,8 +2477,88 @@ class sketchpad_channel(QObject):
         return self.__sound_json_snapshot__
 
     @Slot(str, result=None)
-    def setChannelSoundFromSnapshotJson(self, snapshot):
-        self.zynqtgui.sound_categories.loadChannelSoundFromJson(self.id, snapshot, True)
+    def setChannelSoundFromSnapshot(self, snapshot):
+        def task():
+            snapshot_obj = json.loads(snapshot)
+            source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
+            free_layers = self.getFreeLayers()
+            used_layers = []
+
+            for i in self.chainedSounds:
+                if i >= 0 and self.checkIfLayerExists(i):
+                    used_layers.append(i)
+
+            logging.debug("### Before Removing")
+            logging.debug(f"# Selected Channel         : {self.id}")
+            logging.debug(f"# Source Channels        : {source_channels}")
+            logging.debug(f"# Free Layers            : {free_layers}")
+            logging.debug(f"# Used Layers            : {used_layers}")
+            logging.debug(f"# Chained Sounds         : {self.chainedSounds}")
+            logging.debug(f"# Source Channels Count  : {len(source_channels)}")
+            logging.debug(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
+
+            # Check if count of channels required to load sound is available or not
+            # Available count of channels : used layers by current channel (will get replaced) + free layers
+            if (len(free_layers) + len(used_layers)) < len(source_channels):
+                logging.debug(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from channels to continue.")
+            else:
+                # Required free channel count condition satisfied. Continue loading.
+
+                # A counter to keep channel of numner of callbacks called
+                # so that post_removal_task can be executed after all callbacks are called
+                cb_counter = 0
+
+                def post_removal_task():
+                    nonlocal cb_counter
+                    cb_counter -= 1
+
+                    # Check if all callbacks are called
+                    # If all callbacks are called then continue with post_removal_task
+                    # Otherwise return
+                    if cb_counter > 0:
+                        return
+                    else:
+                        # Repopulate after removing current channel layers
+                        free_layers = self.getFreeLayers()
+                        # Populate new chained sounds and update channel
+                        new_chained_sounds = [-1, -1, -1, -1, -1]
+
+                        # Iterate over all the layers in snapshot_obj and update midi_chan such as
+                        # - In case of a MIDI Synth, it is a new free layer
+                        # - In case of an Audio Effect, it is the track id
+                        for index, _ in enumerate(snapshot_obj["layers"]):
+                            if snapshot_obj["layers"][index]["engine_type"] == "MIDI Synth":
+                                snapshot_obj["layers"][index]["midi_chan"] = free_layers[index]
+                                snapshot_obj["layers"][index]["track_index"] = self.id
+                                new_chained_sounds[snapshot_obj["layers"][index]["slot_index"]] = free_layers[index]
+                            elif snapshot_obj["layers"][index]["engine_type"] == "Audio Effect":
+                                snapshot_obj["layers"][index]["track_index"] = self.id
+
+                        self.zynqtgui.currentTaskMessage = f"Loading selected sounds in Track {self.name}"
+                        self.zynqtgui.layer.load_channels_snapshot(snapshot_obj)
+
+                        self.chainedSounds = new_chained_sounds
+
+                        # Repopulate after loading sound
+                        free_layers = self.getFreeLayers()
+
+                        logging.debug("### After Loading")
+                        logging.debug(f"# Free Layers            : {free_layers}")
+                        logging.debug(f"# Chained Sounds         : {self.chainedSounds}")
+
+                        # Run autoconnect after completing loading sounds
+                        self.zynqtgui.zynautoconnect()
+
+                if len(used_layers) > 0:
+                    # Remove all current sounds from channel
+                    for i in used_layers:
+                        cb_counter += 1
+                        self.remove_and_unchain_sound(i, post_removal_task)
+                else:
+                    # If there are no sounds in curent channel, immediately do post removal task
+                    post_removal_task()
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Loading sound")
 
     @Slot(str)
     def setCurlayerByType(self, type):

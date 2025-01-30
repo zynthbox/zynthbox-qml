@@ -240,8 +240,8 @@ Zynthian.DialogQuestion {
                     _private.sketchpadTrack.trackRoutingStyle = originSketch.metadata.routingStyle;
                     //   - Set track setAudioTypeSettings to ZYNTHBOX_TRACK_AUDIOTYPESETTINGS (clip.metadata.audioTypeSettings)
                     _private.sketchpadTrack.setAudioTypeSettings(originSketch.metadata.audioTypeSettings);
-                    //   - setChannelSoundFromSnapshotJson to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
-                    _private.sketchpadTrack.setChannelSoundFromSnapshotJson(originSketch.metadata.soundSnapshot);
+                    //   - setChannelSoundFromSnapshot to ZYNTHBOX_SOUND_SNAPSHOT (clip.metadata.soundSnapshot)
+                    _private.sketchpadTrack.setChannelSoundFromSnapshot(originSketch.metadata.soundSnapshot);
                     //   - set samples to ZYNTHBOX_SAMPLES  (setChannelSamplesFromSnapshot(clip.metadata.samples))
                     _private.sketchpadTrack.setChannelSamplesFromSnapshot(otherSketch.metadata.samples);
                     // - Run through the track's patterns

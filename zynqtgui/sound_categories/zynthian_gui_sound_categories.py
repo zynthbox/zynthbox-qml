@@ -157,157 +157,19 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             name = f"{name}.sound.wav"
         selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         sound = zynthbox_sound(self, self.zynqtgui, name, "my-sounds")
-        sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshotJson()
-        sound.metadata.samples = selectedTrack.getChannelSampleSnapshot()
+        sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshot()
+        sound.metadata.sampleSnapshot = selectedTrack.getChannelSampleSnapshot()
         sound.metadata.category = category
         sound.metadata.write()
         self.__sounds_model__.add_sound(sound)
 
-    # @Slot(str, str)
-    # def saveSound(self, filename, category):
-    #     file_name = str(self.__my_sounds_path__ / filename)
-    #     track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-    #     # Only store layers from snapshot as sounds
-    #     snapshot = {
-    #         'layers': self.zynqtgui.layer.generate_snapshot(track)['layers']
-    #     }
-
-    #     try:
-    #         final_name = file_name.split(".")[0] + "." + str(len(snapshot["layers"])) + ".sound"
-    #         saveToPath = Path(final_name)
-    #         final_name = saveToPath.name
-    #         saveToPath = saveToPath.parent
-    #         saveToPath.mkdir(parents=True, exist_ok=True)
-
-    #         if category not in ["0", "*"]:
-    #             snapshot["category"] = category
-
-    #         f = open(saveToPath / final_name, "w")
-    #         f.write(JSONEncoder().encode(snapshot))
-    #         f.flush()
-    #         os.fsync(f.fileno())
-    #         f.close()
-    #         logging.info(f"Saved sound file to {str(self.__my_sounds_path__ / filename)}")
-    #     except Exception as e:
-    #         logging.error(f"Error saving sound file : {str(e)}")
-
-    #     self.load_sounds_model()
-
-    # @Slot(QObject)
-    # def loadSound(self, sound):
-    #     self.loadSoundFromFile(sound.path)
-
-    @Slot(int, str)
-    def loadChannelSoundFromJson(self, channelIndex, soundJson, run_autoconnect=False):
-        tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".Ch{channelIndex+1}.sound", delete=False)
-        sound_path = tempSoundJson.name
-
-        try:
-            tempSoundJson.write(bytes(soundJson, encoding='utf8'))
-            tempSoundJson.flush()
-            os.fsync(tempSoundJson.fileno())
-        except: pass
-        finally:
-            tempSoundJson.close()
-
-        self.loadSoundFromFile(sound_path, channelIndex, run_autoconnect)
-
-    @Slot(str)
-    def loadSoundFromFile(self, filepath, channelIndex=-1, run_autoconnect=False):
-        def task():
-            logging.debug(f"### Loading sound : {filepath}")
-            with open(filepath, "r") as f:
-                sound_json = json.load(f)
-
-            if channelIndex == -1:
-                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            else:
-                channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(channelIndex)
-
-            source_channels = self.zynqtgui.layer.load_layer_channels_from_json(sound_json)
-            free_layers = channel.getFreeLayers()
-            used_layers = []
-
-            for i in channel.chainedSounds:
-                if i >= 0 and channel.checkIfLayerExists(i):
-                    used_layers.append(i)
-
-            logging.debug("### Before Removing")
-            logging.debug(f"# Selected Channel         : {self.zynqtgui.sketchpad.selectedTrackId}")
-            logging.debug(f"# Source Channels        : {source_channels}")
-            logging.debug(f"# Free Layers            : {free_layers}")
-            logging.debug(f"# Used Layers            : {used_layers}")
-            logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
-            logging.debug(f"# Source Channels Count  : {len(source_channels)}")
-            logging.debug(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
-            # logging.debug(f"# Sound json             : {sound_json}")
-
-            # Check if count of channels required to load sound is available or not
-            # Available count of channels : used layers by current channel (will get replaced) + free layers
-            if (len(free_layers) + len(used_layers)) < len(source_channels):
-                logging.debug(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from channels to continue.")
-            else:
-                # Required free channel count condition satisfied. Continue loading.
-
-                # A counter to keep channel of numner of callbacks called
-                # so that post_removal_task can be executed after all callbacks are called
-                cb_counter = 0
-
-                def post_removal_task():
-                    nonlocal cb_counter
-                    nonlocal channel
-                    cb_counter -= 1
-
-                    # Check if all callbacks are called
-                    # If all callbacks are called then continue with post_removal_task
-                    # Otherwise return
-                    if cb_counter > 0:
-                        return
-                    else:
-                        # Repopulate after removing current channel layers
-                        free_layers = channel.getFreeLayers()
-                        # Populate new chained sounds and update channel
-                        new_chained_sounds = [-1, -1, -1, -1, -1]
-
-                        # Iterate over all the layers in sound_json and update midi_chan such as
-                        # - In case of a MIDI Synth, it is a new free layer
-                        # - In case of an Audio Effect, it is the track id
-                        for index, _ in enumerate(sound_json["layers"]):
-                            if sound_json["layers"][index]["engine_type"] == "MIDI Synth":
-                                sound_json["layers"][index]["midi_chan"] = free_layers[index]
-                                sound_json["layers"][index]["track_index"] = channel.id
-                                new_chained_sounds[sound_json["layers"][index]["slot_index"]] = free_layers[index]
-                            elif sound_json["layers"][index]["engine_type"] == "Audio Effect":
-                                sound_json["layers"][index]["track_index"] = channel.id
-
-                        self.zynqtgui.currentTaskMessage = f"Loading selected sounds in Track {channel.name}"
-                        self.zynqtgui.layer.load_channels_snapshot(sound_json)
-
-                        channel.chainedSounds = new_chained_sounds
-
-                        # Repopulate after loading sound
-                        free_layers = channel.getFreeLayers()
-
-                        logging.debug("### After Loading")
-                        logging.debug(f"# Free Layers            : {free_layers}")
-                        logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
-                        # logging.debug(f"# Sound json             : {sound_json}")
-
-                        # Run autoconnect after completing loading sounds
-                        if run_autoconnect:
-                            self.zynqtgui.zynautoconnect()
-
-                if len(used_layers) > 0:
-                    # Remove all current sounds from channel
-                    for i in used_layers:
-                        cb_counter += 1
-                        channel.remove_and_unchain_sound(i, post_removal_task)
-                else:
-                    # If there are no sounds in curent channel, immediately do post removal task
-                    post_removal_task()
-            self.zynqtgui.end_long_task()
-
-        self.zynqtgui.do_long_task(task, "Loading sound")
+    @Slot(QObject)
+    def loadSound(self, sound: zynthbox_sound):
+        def confirmLoadSound(params=None):
+            selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+            selectedTrack.setChannelSoundFromSnapshot(sound.metadata.synthFxSnapshot)
+            selectedTrack.setChannelSamplesFromSnapshot(sound.metadata.sampleSnapshot)
+        self.zynqtgui.show_confirm("Loading sound will replace all synth, samples and fx in track. Do you really want to continue?", confirmLoadSound)
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):

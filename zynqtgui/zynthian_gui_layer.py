@@ -1661,34 +1661,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
     @Slot(str, result='QVariantList')
     def load_layer_channels_from_json(self, snapshot):
         result = []
+        snapshot_obj = json.loads(snapshot)
         try:
-            if not isinstance(snapshot, dict):
+            if not isinstance(snapshot_obj, dict):
                 return
-            if not "layers" in snapshot:
+            if not "layers" in snapshot_obj:
                 return
-            if not isinstance(snapshot["layers"], list):
+            if not isinstance(snapshot_obj["layers"], list):
                 return
-            for layer_data in snapshot["layers"]:
+            for layer_data in snapshot_obj["layers"]:
                 if "midi_chan" in layer_data and layer_data["engine_type"] in ["MIDI Synth", "Audio Effect"]:
                     midi_chan = layer_data['midi_chan']
                     if not midi_chan in result:
                         result.append(midi_chan)
         except Exception as e:
-            logging.error("Attempted to load from json data. Reported error was {} and the data was {}".format(e, snapshot));
-        return result
-
-    @Slot(str, result='QVariantList')
-    def load_layer_channels_from_file(self, file_name):
-        result = []
-        try:
-            if file_name.startswith("/"):
-                actualPath = Path(file_name)
-            else:
-                actualPath = Path(self.__sounds_basepath__ + file_name)
-            f = open(actualPath, "r")
-            result = self.load_layer_channels_from_json(json.load(f))
-        except Exception as e:
-            logging.error(e)
+            logging.error("Attempted to load from json data. Reported error was {} and the data was {}".format(e, snapshot_obj));
         return result
 
     @Slot(str, 'QVariantMap')

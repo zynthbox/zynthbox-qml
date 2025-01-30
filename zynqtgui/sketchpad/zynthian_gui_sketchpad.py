@@ -819,7 +819,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         generated_path = ""
         preset_name = "no-preset"
         if channel.trackType == "synth":
-            layers_snapshot = json.loads(channel.getChannelSoundSnapshotJson())
+            layers_snapshot = json.loads(channel.getChannelSoundSnapshot())
             try:
                 preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
             except:

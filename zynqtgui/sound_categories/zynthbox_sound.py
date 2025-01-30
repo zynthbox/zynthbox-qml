@@ -42,32 +42,32 @@ class zynthbox_sound_metadata(QObject):
 
         # Sound metadata
         self.__synthFxSnapshot = None
-        self.__samples = None
+        self.__sampleSnapshot = None
         self.__category = None
 
     def get_synthFxSnapshot(self): return self.__synthFxSnapshot
-    def get_samples(self): return self.__samples
+    def get_sampleSnapshot(self): return self.__sampleSnapshot
     def get_category(self): return self.__category
 
     def set_synthFxSnapshot(self, value, force=False):
         if value != self.__synthFxSnapshot or force:
             self.__synthFxSnapshot = value
             self.synthFxSnapshotChanged.emit()
-    def set_samples(self, value, force=False):
-        if value != self.__samples or force:
-            self.__samples = value
-            self.samplesChanged.emit()
+    def set_sampleSnapshot(self, value, force=False):
+        if value != self.__sampleSnapshot or force:
+            self.__sampleSnapshot = value
+            self.sampleSnapshotChanged.emit()
     def set_category(self, value, force=False):
         if value != self.__category or force:
             self.__category = value
             self.categoryChanged.emit()
 
     synthFxSnapshotChanged = Signal()
-    samplesChanged = Signal()
+    sampleSnapshotChanged = Signal()
     categoryChanged = Signal()
 
     synthFxSnapshot = Property(str, get_synthFxSnapshot, set_synthFxSnapshot, notify=synthFxSnapshotChanged)
-    samples = Property(str, get_samples, set_samples, notify=samplesChanged)
+    sampleSnapshot = Property(str, get_sampleSnapshot, set_sampleSnapshot, notify=sampleSnapshotChanged)
     # Valid category values
     # 0 : Uncategorized
     # 1: Drums
@@ -100,14 +100,14 @@ class zynthbox_sound_metadata(QObject):
 
             # TODO Probably have some fault safety here, in case there's bunk metadata?
             self.set_synthFxSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT", None)), force=True)
-            self.set_samples(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SAMPLES", None)), force=True)
+            self.set_sampleSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT", None)), force=True)
             self.set_category(int(self.getMetadataProperty("ZYNTHBOX_SOUND_CATEGORY", 0)), force=True)
 
     def write(self):
         if self.sound.exists():
             tags = {}
             tags["ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT"] = [str(self.__synthFxSnapshot)]
-            tags["ZYNTHBOX_SOUND_SAMPLES"] = [str(self.__samples)]
+            tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"] = [str(self.__sampleSnapshot)]
             tags["ZYNTHBOX_SOUND_CATEGORY"] = [str(self.__category)]
             try:
                 file = taglib.File(self.sound.path)
@@ -120,7 +120,7 @@ class zynthbox_sound_metadata(QObject):
 
     def clear(self):
         self.set_synthFxSnapshot(None, write=False, force=True)
-        self.set_samples(None, write=False, force=True)
+        self.set_sampleSnapshot(None, write=False, force=True)
         self.set_category(None, write=False, force=True)
 
 
@@ -197,9 +197,9 @@ class zynthbox_sound(QObject):
     ### Property sampleSlotsData
     def get_sampleSlotsData(self):
         res = ["", "", "", "", ""]
-        sampleData = json.JSONDecoder().decode(self.__metadata.samples)
-        for index, key in enumerate(sampleData):
-            res[index] = sampleData[key]["filename"]
+        snapshot_obj = json.loads(self.__metadata.sampleSnapshot)
+        for index, key in enumerate(snapshot_obj):
+            res[index] = snapshot_obj[key]["filename"]
         return res
 
     sampleSlotsData = Property("QVariantList", get_sampleSlotsData, constant=True)

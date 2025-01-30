@@ -460,7 +460,7 @@ Zynthian.ScreenPage {
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
-                    slotData: root.selectedChannel.synthSlotsData
+                    slotData: root.selectedChannel.sampleSlotsData
                     slotType: "sample-trig"
                 }
             }

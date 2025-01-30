@@ -110,28 +110,11 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         def task():
             # Fill community-sounds list
             for file in self.__community_sounds_path__.glob("**/*.sound.wav"):
-                self.__sounds_model__.add_sound(
-                    zynthbox_sound(
-                        self,
-                        self.zynqtgui,
-                        file.name,
-                        "community-sounds"
-                    )
-                )
-
+                self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "community-sounds"))
             # Fill my-sounds list
             for file in self.__my_sounds_path__.glob("**/*.sound.wav"):
-                self.__sounds_model__.add_sound(
-                    zynthbox_sound(
-                        self,
-                        self.zynqtgui,
-                        file.name,
-                        "my-sounds"
-                    )
-                )
-
+                self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "my-sounds"))
             self.zynqtgui.end_long_task()
-
         self.__sounds_model__.clear()
         self.zynqtgui.do_long_task(task, "Reading and sorting sounds into categories")
 

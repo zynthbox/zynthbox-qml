@@ -61,7 +61,7 @@ class sound_categories_sounds_model(QAbstractListModel):
         elif role == self.Roles.SoundTypeRole:
             return self.sounds[index.row()].type
         elif role == self.Roles.CategoryRole:
-            return self.sounds[index.row()].category
+            return self.sounds[index.row()].metadata.category
         elif role == self.Roles.SoundRole:
             return self.sounds[index.row()]
         else:

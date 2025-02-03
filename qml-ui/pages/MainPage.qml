@@ -211,7 +211,7 @@ Zynthian.ScreenPage {
                                 }
                             }
 
-                            text: model.display
+                            text: model.display ? model.display : ""
                         }
 
                         QQC2.Button {

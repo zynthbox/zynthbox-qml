@@ -30,7 +30,7 @@ import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-
+import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.AbstractButton {
     id: root
@@ -110,7 +110,7 @@ QQC2.AbstractButton {
 //                    }
                     width: parent.width
                     height: parent.height
-                    visible: root.synthDetailsVisible
+                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] == root.channel.id && root.synthDetailsVisible
 
                     Image {
                         id: synthImage
@@ -135,6 +135,17 @@ QQC2.AbstractButton {
                         clip: true
                         opacity: 0.5
                         source: Qt.resolvedUrl("../../../img/synths/zynth-default.png")
+                    }
+                }
+
+                Item {
+                    anchors.fill: parent
+                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] != root.channel.id
+                    QQC2.Label {
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignHCenter
+                        text: "↪ T%1".arg(Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] + 1)
                     }
                 }
 

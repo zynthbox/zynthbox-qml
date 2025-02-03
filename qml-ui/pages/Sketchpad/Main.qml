@@ -1176,7 +1176,7 @@ Zynthian.ScreenPage {
                                         onSamplesChanged: updateKeyZones();
                                     }
                                     subText: null
-                                    subSubText: channelHeaderDelegate.channel.channelTypeDisplayName
+                                    subSubText: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id ? channelHeaderDelegate.channel.channelTypeDisplayName : qsTr("Redirected")
                                     subSubTextSize: 7
 
                                     Binding {
@@ -1205,6 +1205,7 @@ Zynthian.ScreenPage {
 
                                 Extras.Gauge {
                                     id: volumeGauge
+                                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[channelHeaderDelegate.channel.id] == channelHeaderDelegate.channel.id
                                     anchors {
                                         top: parent.top
                                         bottom: parent.bottom

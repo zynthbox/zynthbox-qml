@@ -30,6 +30,7 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.7 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.DialogQuestion {
     id: root
@@ -68,7 +69,7 @@ Zynthian.DialogQuestion {
     acceptText: qsTr("Close")
     title: qsTr("Settings for Track %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
     width: Kirigami.Units.gridUnit * 30
-    height: Kirigami.Units.gridUnit * 17
+    height: Kirigami.Units.gridUnit * 20
 
     contentItem: Kirigami.FormLayout {
         QtObject {
@@ -173,6 +174,57 @@ Zynthian.DialogQuestion {
                 onSelectedRoutingStyleChanged: {
                     if (_private.selectedTrack.trackRoutingStyle != routingStylePicker.selectedRoutingStyle) {
                         _private.selectedTrack.trackRoutingStyle = routingStylePicker.selectedRoutingStyle;
+                    }
+                }
+            }
+        }
+        QQC2.Button {
+            id: targetTrack
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            implicitWidth: Kirigami.Units.gridUnit * 5
+            Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+            Kirigami.FormData.label: qsTr("Sequencer Target Track:")
+            text: _private.selectedTrack ? Zynthbox.ZynthboxBasics.trackLabelText(Zynthbox.MidiRouter.sketchpadTrackTargetTracks[_private.selectedTrack.id]) : "(no track)"
+            onClicked: {
+                trackPicker.pickTrack(Zynthbox.MidiRouter.sketchpadTrackTargetTracks[_private.selectedTrack.id], function(newTarget) {
+                    Zynthbox.MidiRouter.setSketchpadTrackTargetTrack(_private.selectedTrack.id, newTarget);
+                });
+            }
+            Zynthian.ComboBox {
+                id: trackPicker
+                visible: false
+                property int trackValue: -1
+                function pickTrack(currentTrack, callbackFunction) {
+                    for (let testIndex = 0; testIndex < model.count; ++testIndex) {
+                        let testElement = model.get(testIndex);
+                        if (testElement.value === currentTrack) {
+                            trackPicker.currentIndex = testIndex;
+                            break;
+                        }
+                    }
+                    trackPicker.callbackFunction = callbackFunction;
+                    trackPicker.onClicked();
+                }
+                property var callbackFunction: null
+                model: ListModel {
+                    ListElement { text: "Current Track"; value: -1 }
+                    ListElement { text: "Track 1"; value: 0 }
+                    ListElement { text: "Track 2"; value: 1 }
+                    ListElement { text: "Track 3"; value: 2 }
+                    ListElement { text: "Track 4"; value: 3 }
+                    ListElement { text: "Track 5"; value: 4 }
+                    ListElement { text: "Track 6"; value: 5 }
+                    ListElement { text: "Track 7"; value: 6 }
+                    ListElement { text: "Track 8"; value: 7 }
+                    ListElement { text: "Track 9"; value: 8 }
+                    ListElement { text: "Track 10"; value: 9 }
+                }
+                textRole: "text"
+                onActivated: function(activatedIndex) {
+                    trackPicker.trackValue = trackPicker.model.get(activatedIndex).value;
+                    if (trackPicker.callbackFunction) {
+                        trackPicker.callbackFunction(trackPicker.trackValue);
                     }
                 }
             }

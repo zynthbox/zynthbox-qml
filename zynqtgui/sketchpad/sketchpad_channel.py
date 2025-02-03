@@ -161,6 +161,7 @@ class sketchpad_channel(QObject):
         self.__selected_slot_row__ = 0
         self.__selected_fx_slot_row = 0
         self.__selected_clip__ = 0
+        Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__));
         self.__externalMidiChannel__ = -1
         self.__externalCaptureVolume__ = 0
         self.__externalAudioSource__ = ""
@@ -545,6 +546,7 @@ class sketchpad_channel(QObject):
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
                 "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
+                "targetTrack": int(Zynthbox.MidiRouter.instance().sketchpadTrackTargetTracks()[self.__id__]),
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "externalCaptureVolume" : self.__externalCaptureVolume__,
                 "externalAudioSource": self.__externalAudioSource__,
@@ -629,6 +631,12 @@ class sketchpad_channel(QObject):
                 for entry in self.__chained_sounds_keyzones__:
                     entry.clear()
             self.chainedSoundsKeyzonesChanged.emit()
+
+            if "targetTrack" in obj:
+                Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(obj["targetTrack"]))
+            else:
+                Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__))
+
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "externalAudioSource" in obj:

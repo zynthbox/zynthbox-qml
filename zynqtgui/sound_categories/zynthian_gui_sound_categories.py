@@ -109,10 +109,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     def load_sounds_model(self):
         def task():
             # Fill community-sounds list
-            for file in self.__community_sounds_path__.glob("**/*.sound.wav"):
+            for file in self.__community_sounds_path__.glob("**/*.snd"):
                 self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "community-sounds"))
             # Fill my-sounds list
-            for file in self.__my_sounds_path__.glob("**/*.sound.wav"):
+            for file in self.__my_sounds_path__.glob("**/*.snd"):
                 self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "my-sounds"))
             self.zynqtgui.end_long_task()
         self.__sounds_model__.clear()
@@ -132,12 +132,12 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
 
     @Slot(str, result=bool)
     def checkIfSoundFileExists(self, filename):
-        return len(list(self.__my_sounds_path__.glob(f"**/{filename}.sound.wav"))) > 0
+        return len(list(self.__my_sounds_path__.glob(f"**/{filename}.snd"))) > 0
 
     @Slot(str, int, result=QObject)
     def saveSound(self, name: str, category: int):
-        if not name.endswith(".sound.wav"):
-            name = f"{name}.sound.wav"
+        if not name.endswith(".snd"):
+            name = f"{name}.snd"
         selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         sound = zynthbox_sound(self, self.zynqtgui, name, "my-sounds")
         sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshot()

@@ -109,9 +109,9 @@ class zynthbox_sound_metadata(QObject):
     def write(self):
         if self.sound.exists():
             tags = {}
-            tags["ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT"] = [str(self.__synthFxSnapshot)]
-            tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"] = [str(self.__sampleSnapshot)]
-            tags["ZYNTHBOX_SOUND_CATEGORY"] = [str(self.__category)]
+            tags["ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT"] = str(self.__synthFxSnapshot)
+            tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"] = str(self.__sampleSnapshot)
+            tags["ZYNTHBOX_SOUND_CATEGORY"] = str(self.__category)
             try:
                 logging.debug(f"Writing sound metadata {self.sound} : {self.sound.path}")
                 # file = taglib.File(self.sound.path)
@@ -142,8 +142,7 @@ class zynthbox_sound(QObject):
         self.__sound_file.parent.mkdir(parents=True, exist_ok=True)
         # Create empty sound file if not exists
         if not self.__sound_file.exists():
-            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {shlex.quote(str(self.__sound_file) + '.wav')}"))
-            os.rename(f"{str(self.__sound_file)}.wav", str(self.__sound_file))
+            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y -f wav {shlex.quote(str(self.__sound_file))}"))
 
         self.__metadata = zynthbox_sound_metadata(self)
         self.__metadata.read()

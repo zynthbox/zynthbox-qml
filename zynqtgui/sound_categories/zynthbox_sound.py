@@ -29,6 +29,7 @@ import subprocess
 import shlex
 import logging
 import taglib
+import Zynthbox
 from pathlib import Path
 from PySide2.QtCore import Property, QObject, Signal
 
@@ -79,7 +80,8 @@ class zynthbox_sound_metadata(QObject):
 
     def getMetadataProperty(self, name, default=None):
         try:
-            value = self.__wavMetadata[name][0]
+            # value = self.__wavMetadata[name][0]
+            value = self.__wavMetadata[name]
             if value == "None":
                 # If 'None' value is saved, return default
                 return default
@@ -90,10 +92,11 @@ class zynthbox_sound_metadata(QObject):
     def read(self, load_autosave=True):
         if self.sound.exists():
             try:
-                file = taglib.File(self.sound.path)
                 logging.debug(f"Reading sound metadata for {self.sound} : {self.sound.path}")
-                self.__wavMetadata = file.tags
-                file.close()
+                # file = taglib.File(self.sound.path)
+                # self.__wavMetadata = file.tags
+                # file.close()
+                self.__wavMetadata = Zynthbox.AudioTagHelper.instance().readWavMetadata(str(self.sound.path))
             except Exception as e:
                 self.__wavMetadata = None
                 logging.error(f"Error reading metadata from sound {self.sound.path} : {str(e)}")
@@ -110,11 +113,12 @@ class zynthbox_sound_metadata(QObject):
             tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"] = [str(self.__sampleSnapshot)]
             tags["ZYNTHBOX_SOUND_CATEGORY"] = [str(self.__category)]
             try:
-                file = taglib.File(self.sound.path)
                 logging.debug(f"Writing sound metadata {self.sound} : {self.sound.path}")
-                for key, value in tags.items():
-                    file.tags[key] = value
-                file.save()
+                # file = taglib.File(self.sound.path)
+                # for key, value in tags.items():
+                #     file.tags[key] = value
+                # file.save()
+                Zynthbox.AudioTagHelper.instance().saveWavMetadata(str(self.sound.path), tags)
             except Exception as e:
                 logging.exception(f"Error writing metadata : {str(e)}")
 
@@ -138,7 +142,8 @@ class zynthbox_sound(QObject):
         self.__sound_file.parent.mkdir(parents=True, exist_ok=True)
         # Create empty sound file if not exists
         if not self.__sound_file.exists():
-            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {shlex.quote(str(self.__sound_file))}"))
+            subprocess.run(shlex.split(f"ffmpeg -f lavfi -t 0 -i anullsrc=channel_layout=stereo:sample_rate=48000:d=0 -y {shlex.quote(str(self.__sound_file) + '.wav')}"))
+            os.rename(f"{str(self.__sound_file)}.wav", str(self.__sound_file))
 
         self.__metadata = zynthbox_sound_metadata(self)
         self.__metadata.read()

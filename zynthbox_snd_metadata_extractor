@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+import argparse
+import magic
+import json
+import os
+import sys
+import taglib
+import Zynthbox
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugins_helper
+
+
+plugins_helper = zynthbox_plugins_helper()
+
+
+def testFileExists(filename):
+    if os.path.isfile(filename):
+        if filename.endswith(".snd"):
+            return {"isValid": True}
+        else:
+            return {"isValid": False, "errorString": "The file does not have the expected suffix .snd"}
+    else:
+        return {"isValid": False, "errorString": "The file does not exist"}
+
+def testIsWaveFile(filename):
+    resultData = testFileExists(filename)
+    if resultData["isValid"]:
+        mime = magic.from_file(filename, mime = True)
+        if mime != "audio/x-wav":
+            resultData = {"isValid": False, "errorString": "Not a wave audio file (and definitely not a Zynthbox snd file)"}
+    return resultData
+
+def testIsSnd(filename):
+    global plugins_helper
+
+    resultData = testIsWaveFile(filename)
+    if resultData["isValid"]:
+        tags = None
+        try:
+            tags = Zynthbox.AudioTagHelper.instance().readWavMetadata(filename)
+            resultData = {"isValid": True}
+        except:
+            resultData = {"isValid": False, "erorrString": "Could not open file to read the tags"}
+        if resultData["isValid"]:
+            # Basic testing out of the way at this point, time to actually perform Zynthbox Sketch linting
+            if "ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT" in tags:
+                if "ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT" in tags:
+                    if "ZYNTHBOX_SOUND_CATEGORY" in tags:
+                        synthSlotsData = ["", "", "", "", ""]
+                        sampleSlotsData = ["", "", "", "", ""]
+                        fxSlotsData = ["", "", "", "", ""]
+                        snapshotObj = json.loads(tags["ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT"])
+                        samplesObj = json.loads(tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"])
+                        for layer_data in snapshotObj["layers"]:
+                            if layer_data["engine_type"] == "MIDI Synth":
+                                layer_data_translated = plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
+                                synthSlotsData[layer_data_translated["slot_index"]] = f"{layer_data_translated['engine_name'].split('/')[-1]} > {layer_data_translated['preset_name']}"
+                            elif layer_data["engine_type"] == "Audio Effect":
+                                layer_data_translated = plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
+                                fxSlotsData[layer_data_translated["slot_index"]] = f"{layer_data_translated['engine_name'].split('/')[-1]} > {layer_data_translated['preset_name']}"
+                        for index, key in enumerate(samplesObj):
+                            sampleSlotsData[index] = samplesObj[key]["filename"]
+                        resultData["path"] = filename
+                        resultData["synthSlotsData"] = synthSlotsData
+                        resultData["sampleSlotsData"] = sampleSlotsData
+                        resultData["fxSlotsData"] = fxSlotsData
+                        resultData["category"] = tags["ZYNTHBOX_SOUND_CATEGORY"]
+                    else:
+                        resultData = {"isValid": False, "errorString": "This snd file does not contain the Synth Fx Snapshot tag required to be recognized as a Zynthbox snd file"}
+                else:
+                    resultData = {"isValid": False, "errorString": "This snd file does not contain the Sample Snapshot tag required to be recognized as a Zynthbox snd file"}
+            else:
+                resultData = {"isValid": False, "errorString": "This snd file does not contain the Category tag required to be recognized as a Zynthbox snd file"}
+
+    return resultData
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog=sys.argv[0],
+        description='Tool for testing and extracting metadata from Zynthbox snd files',
+        epilog='The output will be a json formatted string. The root object will always contain the element isValid, which will be true if the file is a valid Zynthbox snd file, and false if not. In the case of failure, it will also contain the key errorString, containing a human-readable description of the failure. In the case of a successful result, there will be keys with the names "synthFxSlotsData", "samplesSlotsData" and "fxSlotsData". Each of the keys will have an array of length 5 with corresponding display text for each slot')
+    parser.add_argument('snd_files',
+        nargs='+',
+        help='The Zynthbox snd file(s) to test - these are created by Zynthbox and will have the suffix .snd')
+    args = parser.parse_args()
+
+    resultData = [testIsSnd(file) for file in args.snd_files]
+    print(json.dumps(resultData))

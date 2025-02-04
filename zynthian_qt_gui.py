@@ -2303,8 +2303,17 @@ class zynthian_gui(QObject):
                 self.__test_wave_clip.stop()
             sendCuiaEventFeedback = False
 
+        # Allow creating empty sketchpads from external scripts (for e.g. webconf)
+        elif cuia == "CREATE_EMPTY_SKETCHPAD":
+            if len(params) > 0:
+                sketchpadName = ' '.join(params)
+                self.sketchpad.createNamedEmptySketchpad(sketchpadName)
+
         # Finally, report back to MidiRouter that we've handled the action
         if sendCuiaEventFeedback == True:
+            if not type(params[0]) == int:
+                # TODO Fix cuiaEventFeedback to accept parameters other than int type
+                params[0] = 0
             Zynthbox.MidiRouter.instance().cuiaEventFeedback(cuia, originId, Zynthbox.ZynthboxBasics.Track(track), Zynthbox.ZynthboxBasics.Slot(slot), params[0])
 
     def custom_switch_ui_action(self, i, t):

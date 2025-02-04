@@ -787,6 +787,17 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         else:
             confirmLoadSketchpad()
 
+    @Slot(str)
+    def createNamedEmptySketchpad(self, name):
+        """
+        A helper method to create a named empty sketchpad for use with webconf via OSC
+        """
+        sketchpad_name = name.replace(".sketchpad.json", "")
+        song = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / sketchpad_name), sketchpad_name, self, load_autosave=False)
+        song.save(autosave=False, save_empty=True)
+        song.to_be_deleted()
+        song.deleteLater()
+
     @Slot(str, result=bool)
     def sketchpadExists(self, name):
         sketchpad_path = self.__sketchpad_basepath__ / name

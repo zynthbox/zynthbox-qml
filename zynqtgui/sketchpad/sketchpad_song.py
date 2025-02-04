@@ -243,7 +243,7 @@ class sketchpad_song(QObject):
             "synthPassthroughClients": synthPassthroughClientsData
         }
 
-    def save(self, autosave=True):
+    def save(self, autosave=True, save_empty=False):
         if self.__is_saving__ == False and self.__is_loading__ == False:
             if self.__to_be_deleted__:
                 return
@@ -280,11 +280,13 @@ class sketchpad_song(QObject):
                 # Also delete the cache file as we are performing a sketchpad save initiated by user
                 Path(self.sketchpad_folder + "Autosave.sketchpad.json").unlink(missing_ok=True)
 
-            # Save current operating sketchpad file to lastSelectedSketchpad
-            self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
+            # When saving an empty sketchpad, we are not switching to it. Do not set lastSelectedSketchpad
+            if not save_empty:
+                # Save current operating sketchpad file to lastSelectedSketchpad
+                self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(sketchpad_file))
 
-            # Save a sequence for this version if not a temp sketchpad and not an autosave version
-            if not self.isTemp and not autosave:
+            # Save a sequence for this version if not a temp sketchpad and not an autosave version and not saving an empty sketchpad
+            if not self.isTemp and not autosave and not save_empty:
                 sequenceModel = Zynthbox.PlayGridManager.instance().getSequenceModel(self.scenesModel.selectedSequenceName)
                 sequenceModel.exportTo(f"{self.sketchpad_folder}/sequences/{self.name}/{sequenceModel.objectName().lower().replace(' ', '-')}/metadata.sequence.json")
 
@@ -297,13 +299,16 @@ class sketchpad_song(QObject):
             except Exception as e:
                 logging.exception(f"Error writing sketchpad json to {str(sketchpad_file)} : {e}")
 
-            if save_snapshot:
-                snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
+            snapshot_file = str(soundsets_dir) + "/" + self.__name__ + ".zss"
+            soundsets_dir.mkdir(parents=True, exist_ok=True)
+            if save_snapshot and not save_empty:
                 try:
-                    soundsets_dir.mkdir(parents=True, exist_ok=True)
                     self.zynqtgui.layer.save_snapshot(snapshot_file)
                 except Exception as e:
                     logging.error(f"Error saving snapshot to {snapshot_file} : {str(e)}")
+            elif save_empty:
+                Path(snapshot_file).unlink(missing_ok=True)
+                shutil.copyfile("/zynthian/zynthian-my-data/snapshots/default.zss", snapshot_file)
             self.set_isSaving(False)
 
             for trackId in range(self.__channels_model__.count):

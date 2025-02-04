@@ -191,6 +191,21 @@ Zynthian.DialogQuestion {
                     Zynthbox.MidiRouter.setSketchpadTrackTargetTrack(_private.selectedTrack.id, newTarget);
                 });
             }
+            QQC2.Button {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.right
+                    leftMargin: Kirigami.Units.smallSpacing
+                }
+                width: height
+                display: QQC2.AbstractButton.IconOnly
+                icon.name: "edit-clear"
+                enabled: _private.selectedTrack ? Zynthbox.MidiRouter.sketchpadTrackTargetTracks[_private.selectedTrack.id] != _private.selectedTrack.id : false
+                onClicked: {
+                    Zynthbox.MidiRouter.setSketchpadTrackTargetTrack(_private.selectedTrack.id, _private.selectedTrack.id);
+                }
+            }
             Zynthian.ComboBox {
                 id: trackPicker
                 visible: false

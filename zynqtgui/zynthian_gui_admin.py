@@ -778,8 +778,9 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 apt_pkg.config.set("DPkg::Options::", "--force-confdef")
                 apt_pkg.config.set("DPkg::Options::", "--force-confold")
                 apt_pkg.config.set("DPkg::Options::", "--force-overwrite")
-
-                process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=True)
+                try:
+                    process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=False)
+                except: pass
 
                 #cache = apt.cache.Cache()
                 #cache.open()

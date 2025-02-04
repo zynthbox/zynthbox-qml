@@ -321,24 +321,42 @@ Zynthian.ScreenPage {
     }
     contentItem: ColumnLayout {
         id: layout
-        spacing: Kirigami.Units.gridUnit
-
         RowLayout {
             Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit
+            spacing: Kirigami.Units.gridUnit
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                visible: component.selectedChannel && component.selectedChannel.trackType !== "sample-loop"
+                onClicked: {
+                    applicationWindow().libraryTypePicker.open();
+                }
+                contentItem: Kirigami.Heading {
+                    level: 2
+                    text: component.selectedChannel
+                        ? qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        : ""
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+            }
             Kirigami.Heading {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                 level: 2
+                visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
                 text: component.selectedChannel
-                                ? component.selectedChannel.trackType === "sample-loop"
-                                    ? qsTr("Track %1 Sketches").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                                    : qsTr("Track %1 Samples").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                                : ""
+                    ? qsTr("Track %1 Sketches").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                    : ""
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
             }
             Kirigami.Heading {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                 level: 2
                 text: qsTr("Folders")
@@ -347,6 +365,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Heading {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
                 level: 2
                 text: qsTr("Samples In Folder")
@@ -357,6 +376,8 @@ Zynthian.ScreenPage {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 14
+            spacing: Kirigami.Units.gridUnit
             Zynthian.Card {
                 Layout.fillWidth: true
                 Layout.fillHeight: true

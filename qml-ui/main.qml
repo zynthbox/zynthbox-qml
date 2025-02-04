@@ -1243,6 +1243,37 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    readonly property QtObject libraryTypePicker: libraryTypePicker
+    Zynthian.ActionPickerPopup {
+        id: libraryTypePicker
+        actions: [
+            QQC2.Action {
+                text: qsTr("Show Synth Slots")
+                enabled: zynqtgui.current_screen_id !== "preset"
+                onTriggered: {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", 0);
+                    zynqtgui.show_screen("preset");
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Show Sample Slots")
+                enabled: zynqtgui.current_screen_id !== "sample_library"
+                onTriggered: {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", 0);
+                    zynqtgui.show_screen("sample_library");
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Show FX Slots")
+                enabled: zynqtgui.current_screen_id !== "effect_preset"
+                onTriggered: {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", 0);
+                    zynqtgui.show_screen("effect_preset");
+                }
+            }
+        ]
+    }
+
     Sketchpad.RecordingPopup {
         id: recordingPopup
     }

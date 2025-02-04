@@ -23,9 +23,9 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -112,12 +112,18 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             Layout.preferredWidth: layout.columnWidth
 
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Track %1 FX").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                Kirigami.Theme.inherit: false
-                // TODO: this should eventually go to Window and the panels to View
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: favToggleButton.height
+                contentItem: Kirigami.Heading {
+                    level: 2
+                    text: qsTr("Track %1 FX").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+                onClicked: {
+                    applicationWindow().libraryTypePicker.open();
+                }
             }
 
             Zynthian.SelectorView {
@@ -212,6 +218,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                 }
                 QQC2.Button {
+                    id: favToggleButton
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                     text: zynqtgui.preset.show_only_favorites ? qsTr("Show All") : qsTr("Show Favorites")
                     onClicked: {

@@ -430,13 +430,18 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: layout.columnWidth
             RowLayout {
                 Layout.fillWidth: true
-                Kirigami.Heading {
+                QQC2.Button {
                     Layout.fillWidth: true
-                    level: 2
-                    text: qsTr("Track %1 Sounds").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
                     Layout.preferredHeight: favToggleButton.height
+                    contentItem: Kirigami.Heading {
+                        level: 2
+                        text: qsTr("Track %1 Sounds").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    }
+                    onClicked: {
+                        applicationWindow().libraryTypePicker.open();
+                    }
                 }
             }
             Zynthian.SelectorView {

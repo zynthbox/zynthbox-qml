@@ -182,12 +182,8 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: qsTr("Favorites")
-            checkable: true
-            checked: zynqtgui.preset.show_only_favorites
-            onToggled: {
-                zynqtgui.preset.show_only_favorites = checked
-            }
+            text: ""
+            enabled: false
         },
 //        Kirigami.Action {
 //            text: qsTr("Sounds")
@@ -432,7 +428,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 QQC2.Button {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: favToggleButton.height
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
                     contentItem: Kirigami.Heading {
                         level: 2
                         text: qsTr("Track %1 Synths").arg(zynqtgui.sketchpad.selectedTrackId+1)
@@ -635,14 +631,27 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 RowLayout {
+                    Layout.fillWidth: true
                     Kirigami.Heading {
                         id: banksHeading
                         Layout.fillWidth: true
-                        level: 2
-                        text: visible ? qsTr("Banks (%1)").arg(zynqtgui.bank.effective_count) : "";
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
-                        Layout.preferredHeight: favToggleButton.height
+                        level: 2
+                        text: visible ? qsTr("Banks (%1)").arg(zynqtgui.bank.effective_count) : "";
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                    }
+                    QQC2.Button {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                        text: qsTr("All Favorites")
+                        checked: zynqtgui.preset.show_only_favorites
+                        onClicked: {
+                            zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                        }
                     }
                 }
                 Zynthian.SelectorView {
@@ -755,8 +764,8 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                 }
                 QQC2.Button {
-                    id: favToggleButton
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
                     text: qsTr("FAV Presets")
                     checked: zynqtgui.preset.show_only_favorites
                     onClicked: {

@@ -14,6 +14,7 @@ Zynthian.Dialog {
     property alias fileName: fileName.text
     property string conflictText: qsTr("File Exists")
     property bool overwriteOnConflict: true
+    property alias additionalContent: additionalContentColumn.data
 
     id: saveDialog
     header: Kirigami.Heading {
@@ -25,8 +26,8 @@ Zynthian.Dialog {
     z: 999999999
     x: Math.round(parent.width/2 - width/2)
     y: Math.round(parent.height/2 - height/2)
-    width: Kirigami.Units.gridUnit * 15
-    height: Kirigami.Units.gridUnit * 10
+    width: Kirigami.Units.gridUnit * 25
+    height: Kirigami.Units.gridUnit * 10 + additionalContentColumn.height
     onVisibleChanged : {
         cancelSaveButton.forceActiveFocus();
 
@@ -95,6 +96,10 @@ Zynthian.Dialog {
                 Layout.fillWidth: true
                 text: conflictText
             }
+        }
+        ColumnLayout {
+            id: additionalContentColumn
+            Layout.fillWidth: true
         }
     }
     footer: QQC2.Control {

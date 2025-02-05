@@ -435,7 +435,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: favToggleButton.height
                     contentItem: Kirigami.Heading {
                         level: 2
-                        text: qsTr("Track %1 Sounds").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        text: qsTr("Track %1 Synths").arg(zynqtgui.sketchpad.selectedTrackId+1)
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
                     }

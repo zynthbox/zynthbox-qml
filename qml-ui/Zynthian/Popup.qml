@@ -32,6 +32,7 @@ QQC2.Popup {
     exit: null; enter: null;
     modal: true
     focus: true
+    z: 999999999
 
     property var cuiaCallback: function(cuia) {
         var result = component.opened;

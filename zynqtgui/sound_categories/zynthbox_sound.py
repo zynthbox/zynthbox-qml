@@ -69,13 +69,6 @@ class zynthbox_sound_metadata(QObject):
 
     synthFxSnapshot = Property(str, get_synthFxSnapshot, set_synthFxSnapshot, notify=synthFxSnapshotChanged)
     sampleSnapshot = Property(str, get_sampleSnapshot, set_sampleSnapshot, notify=sampleSnapshotChanged)
-    # Valid category values
-    # 0 : Uncategorized
-    # 1: Drums
-    # 2: Bass
-    # 3: Leads
-    # 4: Keys/Pads
-    # 99: Other
     category = Property(int, get_category, set_category, notify=categoryChanged)
 
     def getMetadataProperty(self, name, default=None):

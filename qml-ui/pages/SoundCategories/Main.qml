@@ -198,55 +198,51 @@ Zynthian.ScreenPage {
 
                 ColumnLayout {
                     id: categoryButtons
-
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.margins: spacing
                     spacing: content.rowSpacing
-
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         category: "*"
                         checked: true
                     }
-
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         category: "0"
                     }
-
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "3"
-                    }
-
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "2"
-                    }
-
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         category: "4"
                     }
-
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         category: "5"
                     }
-
+                    CategoryButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        category: "3"
+                    }
+                    CategoryButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        category: "6"
+                    }
+                    CategoryButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        category: "2"
+                    }
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         category: "1"
                     }
-
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true

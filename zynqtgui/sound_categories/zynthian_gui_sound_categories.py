@@ -64,6 +64,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             "3": "Leads",
             "4": "Synth/Keys",
             "5": "Strings/Pads",
+            "6": "Guitar/Plucks",
             "99": "FX/Other",
         }
 

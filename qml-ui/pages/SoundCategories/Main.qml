@@ -49,7 +49,6 @@ Zynthian.ScreenPage {
     topPadding: 8
     bottomPadding: 8
     onShowSaveSoundDialog: {
-        saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
         saveSoundDialog.open()
     }
     contextualActions: [
@@ -103,7 +102,6 @@ Zynthian.ScreenPage {
                     : qsTr("Load")
             onTriggered: {
                 if (isSaveBtn) {
-                    saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
                     saveSoundDialog.open()
                 } else {
                     zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
@@ -142,13 +140,41 @@ Zynthian.ScreenPage {
     Zynthian.SaveFileDialog {
         id: saveSoundDialog
         visible: false
-
         headerText: qsTr("Save Sound")
         conflictText: qsTr("Sound file exists")
         overwriteOnConflict: false
-
         onFileNameChanged: {
             fileCheckTimer.restart()
+        }
+        onAccepted: {
+            zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, categoryComboModel.get(categoryCombo.currentIndex).value)
+        }
+        onOpened: {
+            categoryCombo.selectIndex(0)
+            saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
+        }
+        additionalContent: RowLayout {
+            Layout.fillWidth: true
+            QQC2.Label {
+                text: "Category"
+            }
+            Zynthian.ComboBox {
+                id: categoryCombo
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                Layout.alignment: Qt.AlignCenter
+                model: ListModel {
+                    id: categoryComboModel
+                    ListElement { text: "Synth/Keys"; value: "4" }
+                    ListElement { text: "Strings/Pads"; value: "5" }
+                    ListElement { text: "Leads"; value: "3" }
+                    ListElement { text: "Guitar/Plucks"; value: "6" }
+                    ListElement { text: "Bass"; value: "2" }
+                    ListElement { text: "Drums"; value: "1" }
+                    ListElement { text: "FX/Other"; value: "99" }
+                }
+                textRole: "text"
+            }
         }
         Timer {
             id: fileCheckTimer
@@ -156,10 +182,6 @@ Zynthian.ScreenPage {
             onTriggered: {
                 saveSoundDialog.conflict = zynqtgui.sound_categories.checkIfSoundFileExists(saveSoundDialog.fileName);
             }
-        }
-
-        onAccepted: {
-            zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, categoryButtonGroup.checkedButton.category)
         }
     }
     

@@ -104,7 +104,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             # self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
             # self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/snapshots.svg"})
 
-        if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
+        if self.visibleCategory == "appimages":
             for file in Path(os.path.expanduser('~') + "/.local/share/applications/").glob("appimagekit*.desktop"):
                 logging.debug(f"Processing Appimage desktop file : {file}")
                 appimage_desktop_file = configparser.ConfigParser()

@@ -173,7 +173,7 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Sounds")
+            text: qsTr("Load Sound")
             onTriggered: {
                 // FIXME
                 // Do not immediately show sound_cateopries page as it starts a long task which in turn
@@ -182,8 +182,10 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: ""
-            enabled: false
+            text: "Save Sound"
+            onTriggered: {
+                applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
+            }
         },
 //        Kirigami.Action {
 //            text: qsTr("Sounds")

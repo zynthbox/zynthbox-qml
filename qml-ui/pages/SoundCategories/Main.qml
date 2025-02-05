@@ -36,6 +36,11 @@ Zynthian.ScreenPage {
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property QtObject soundCopySource
+    /**
+      * This signal will be emitted when some other page wants to
+      * open the sound saving dialog
+      */
+    signal showSaveSoundDialog()
 
     title: qsTr("Sound Categories")
     screenId: "sound_categories"
@@ -43,7 +48,10 @@ Zynthian.ScreenPage {
     rightPadding: 8
     topPadding: 8
     bottomPadding: 8
-
+    onShowSaveSoundDialog: {
+        saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
+        saveSoundDialog.open()
+    }
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Move/Paste")

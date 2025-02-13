@@ -406,6 +406,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.zynqtgui.currentTaskMessage = "Optimizing App : Extracting Appimage"
             os.chmod(path, stat.S_IRWXU) # Make the appimage executable before running --appimage-extract
             subprocess.run((path, "--appimage-extract"), stdout=subprocess.DEVNULL, cwd=Path(path).parent)
+            shutil.rmtree(appdir, ignore_errors=True)
             (Path(path).parent / "squashfs-root").rename(appdir)
 
             # Step 3 : Modify the desktop file to run the AppRun

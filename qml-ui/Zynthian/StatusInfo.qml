@@ -34,8 +34,8 @@ import "private" as Private
 
 MouseArea {
     id: root
-    implicitWidth: Kirigami.Units.gridUnit * 10
     Layout.minimumWidth: Kirigami.Units.gridUnit * 10
+    Layout.maximumWidth: Kirigami.Units.gridUnit * 10
     Layout.fillHeight: true
 
     onClicked: zynqtgui.globalPopupOpened = true

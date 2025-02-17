@@ -190,7 +190,7 @@ class zynthian_gui_status_data(QObject):
         self.status_info["overtemp"] = False
         self.status_info["audio_recorder"] = False
 
-        self.dpm_rangedB = 30  # Lowest meter reading in -dBFS
+        self.dpm_rangedB = 40  # Lowest meter reading in -dBFS
         self.dpm_highdB = 10  # Start of yellow zone in -dBFS
         self.dpm_overdB = 3  # Start of red zone in -dBFS
         self.dpm_high = 1 - self.dpm_highdB / self.dpm_rangedB

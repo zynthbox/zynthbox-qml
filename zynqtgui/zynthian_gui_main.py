@@ -433,11 +433,14 @@ class zynthian_gui_main(zynthian_gui_selector):
             # After an AppImage is downloaded, the appimage is extracted to make the startup time faster. Cleanup all the extracted files
 
             # Step 1 : Remove the extracted AppDir from `<appimage_download_dir>/<appimage_md5_hash>.AppDir`
-            appdir = Path(path).parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
+            appimage_path = Path(path)
+            appdir = appimage_path.parent / f"{Zynthbox.AppImageHelper.instance().getAppImageMd5Hash(path)}.AppDir"
             if appdir.exists():
                 shutil.rmtree(appdir, ignore_errors=True)
             # Step 2 : Unregister appimage from system.
             Zynthbox.AppImageHelper.instance().unregisterAppImage(path)
+            if appimage_path.exists():
+                appimage_path.unlink(missing_ok=True)
             self.fill_list()
             QTimer.singleShot(1000, self.zynqtgui.end_long_task)
         self.zynqtgui.do_long_task(task, f"Removing App")

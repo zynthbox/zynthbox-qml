@@ -223,7 +223,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.margins: spacing
-                    spacing: content.rowSpacing
+                    spacing: content.spacing
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -334,7 +334,10 @@ Zynthian.ScreenPage {
                     QQC2.ScrollBar.vertical: QQC2.ScrollBar {
                         width: Kirigami.Units.gridUnit
                         height: Kirigami.Units.gridUnit * 3
-                        anchors.right: parent.right - width
+                        anchors {
+                            right: parent.right
+                            rightMargin: width
+                        }
                         policy: QQC2.ScrollBar.AlwaysOn
                     }
                     Item {

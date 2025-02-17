@@ -106,6 +106,19 @@ Zynthian.ScreenPage {
      * </code>
      */
     signal itemUninstalled(var itemData);
+    /**
+     * \brief Signal fired before an item is updated. The item's data is passed as the first argument
+     * itemData is a json structure with the model Roles as key and their respective value as values
+     * For example, the following snippet prints the list of installed files :
+     * <code>
+     * Zynthian.NewStuffPage {
+     *     onItemUpdating: {
+     *         console.log("Updating Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
+     *     }
+     * }
+     * </code>
+     */
+    signal itemUpdating(var itemData);
 
     onIsVisibleChanged: {
         engineUpdater.restart();
@@ -212,6 +225,9 @@ Zynthian.ScreenPage {
             }
             onItemUninstalled: {
                 component.itemUninstalled(itemData)
+            }
+            onItemUpdating: {
+                component.itemUpdating(itemData)
             }
         }
         Binding {

@@ -91,6 +91,19 @@ Item {
      * </code>
      */
     signal itemUninstalled(var itemData);
+    /**
+     * \brief Signal fired before an item is updated. The item's data is passed as the first argument
+     * itemData is a json structure with the model Roles as key and their respective value as values
+     * For example, the following snippet prints the list of installed files :
+     * <code>
+     * Zynthian.NewStuffPage {
+     *     onItemUpdating: {
+     *         console.log("Updating Files", itemData[NewStuff.ItemsModel.InstalledFilesRole])
+     *     }
+     * }
+     * </code>
+     */
+    signal itemUpdating(var itemData);
 
     property list<QtObject> contextualActions: [
         Kirigami.Action {
@@ -98,6 +111,39 @@ Item {
             text: proxyView.currentItem ? (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install")) : ""
             onTriggered: {
                 if (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus) {
+                    var itemData = {}
+                    itemData[NewStuff.ItemsModel.NameRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.NameRole)
+                    itemData[NewStuff.ItemsModel.UniqueIdRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.UniqueIdRole)
+                    itemData[NewStuff.ItemsModel.CategoryRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.CategoryRole)
+                    itemData[NewStuff.ItemsModel.HomepageRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.HomepageRole)
+                    itemData[NewStuff.ItemsModel.AuthorRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.AuthorRole)
+                    itemData[NewStuff.ItemsModel.LicenseRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.LicenseRole)
+                    itemData[NewStuff.ItemsModel.ShortSummaryRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.ShortSummaryRole)
+                    itemData[NewStuff.ItemsModel.SummaryRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.SummaryRole)
+                    itemData[NewStuff.ItemsModel.ChangelogRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.ChangelogRole)
+                    itemData[NewStuff.ItemsModel.VersionRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.VersionRole)
+                    itemData[NewStuff.ItemsModel.ReleaseDateRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.ReleaseDateRole)
+                    itemData[NewStuff.ItemsModel.UpdateVersionRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.UpdateVersionRole)
+                    itemData[NewStuff.ItemsModel.UpdateReleaseDateRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.UpdateReleaseDateRole)
+                    itemData[NewStuff.ItemsModel.PayloadRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.PayloadRole)
+                    itemData[NewStuff.ItemsModel.PreviewsSmallRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.PreviewsSmallRole)
+                    itemData[NewStuff.ItemsModel.PreviewsRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.PreviewsRole)
+                    itemData[NewStuff.ItemsModel.InstalledFilesRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.InstalledFilesRole)
+                    itemData[NewStuff.ItemsModel.UnInstalledFilesRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.UnInstalledFilesRole)
+                    itemData[NewStuff.ItemsModel.RatingRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.RatingRole)
+                    itemData[NewStuff.ItemsModel.NumberOfCommentsRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.NumberOfCommentsRole)
+                    itemData[NewStuff.ItemsModel.DownloadCountRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.DownloadCountRole)
+                    itemData[NewStuff.ItemsModel.NumberFansRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.NumberFansRole)
+                    itemData[NewStuff.ItemsModel.NumberKnowledgebaseEntriesRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.NumberKnowledgebaseEntriesRole)
+                    itemData[NewStuff.ItemsModel.KnowledgebaseLinkRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.KnowledgebaseLinkRole)
+                    itemData[NewStuff.ItemsModel.DownloadLinksRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.DownloadLinksRole)
+                    itemData[NewStuff.ItemsModel.DonationLinkRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.DonationLinkRole)
+                    itemData[NewStuff.ItemsModel.ProviderIdRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.ProviderIdRole)
+                    itemData[NewStuff.ItemsModel.SourceRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.SourceRole)
+                    itemData[NewStuff.ItemsModel.StatusRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.StatusRole)
+                    itemData[NewStuff.ItemsModel.CommentsModelRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.CommentsModelRole)
+                    itemData[NewStuff.ItemsModel.EntryTypeRole] = newStuffModel.data(newStuffModel.index(proxyView.currentIndex, 0), NewStuff.ItemsModel.EntryTypeRole)
+                    component.itemUpdating(itemData)
                     newStuffModel.updateItem(proxyView.currentIndex);
                 } else {
                     newStuffModel.installItem(proxyView.currentIndex, 1);

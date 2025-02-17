@@ -116,6 +116,12 @@ class zynthian_gui_main(zynthian_gui_selector):
                 else:
                     logging.error(f"Appimage desktop file {file} is pointing to a file which does not exist. Skipping.")
 
+            # Sort the list by name when listing appimages
+            # The following snippet zips list_data and list_metadata so both of them gets sorted together otherwise *BOOM*.
+            # sorted's key lambda sorts the zipped list_data and list_metadata by list_data[2] which is the name of the appimage
+            # The outermost zip paired with `*` operator is to allow unzipping the lists : https://docs.python.org/3.3/library/functions.html#zip
+            self.list_data, self.list_metadata = zip(*sorted(zip(self.list_data, self.list_metadata), key=lambda entry: entry[0][2].lower()))
+
             # apps_folder = os.path.expanduser('~') + "/.local/share/zynthbox/apps/"
             # if Path(apps_folder).exists():
             #     for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:

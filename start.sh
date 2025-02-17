@@ -82,10 +82,6 @@ fi
 #HACK
 rm ../config/keybinding.yaml
 
-# HACK : Attica caches some things and causes delay when there are updates. Remove them on start
-rm -rf /root/.cache/zynthbox/libzynthbox/attica
-rm -rf /root/.cache/zynthbox/libzynthbox/knewstuff
-
 export QSG_RENDER_LOOP=threaded
 export QT_AUTO_SCREEN_SCALE_FACTOR=0
 export QT_IM_MODULE=qtvirtualkeyboard

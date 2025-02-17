@@ -41,6 +41,10 @@ Zynthian.NewStuffPage {
     onItemUninstalled: {
         zynqtgui.main.unregisterAppImage(itemData[NewStuff.ItemsModel.UnInstalledFilesRole][0])
     }
+    onItemUpdating: {
+        zynqtgui.main.unregisterAppImage(itemData[NewStuff.ItemsModel.InstalledFilesRole][0])
+    }
+
     Connections {
         target: component.backAction
         onTriggered: {

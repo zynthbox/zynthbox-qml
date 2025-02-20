@@ -61,3 +61,4 @@ NotePickerPopup 1.0 NotePickerPopup.qml
 ClipSlicesSettings 1.0 ClipSlicesSettings.qml
 BasicDelegate 1.0 BasicDelegate.qml
 BaseExternalEditor 1.0 BaseExternalEditor.qml
+MidiBytePickerPopup 1.0 MidiBytePickerPopup.qml

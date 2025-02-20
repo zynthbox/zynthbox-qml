@@ -432,11 +432,7 @@ Zynthian.ScreenPage {
         enabled: component.isVisible
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
-                if (applicationWindow().selectedChannel.trackType === "synth") {
-                    zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                } else if (applicationWindow().selectedChannel.trackType === "external") {
-                    zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                }
+                zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
             }
         }
     }

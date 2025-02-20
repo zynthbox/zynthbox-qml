@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Channel Wave Editor
+External mode editor page
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 
@@ -23,11 +23,11 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Window 2.1
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
+import org.kde.plasma.components 3.0 as PlasmaComponents
 
 import io.zynthbox.components 1.0 as Zynthbox
 import Zynthian 1.0 as Zynthian
@@ -39,96 +39,65 @@ Zynthian.ScreenPage {
     property bool isVisible:zynqtgui.current_screen_id === "channel_external_setup"
 
     property var cuiaCallback: function(cuia) {
-        var returnValue = false;
-        switch (cuia) {
-            case "NAVIGATE_LEFT":
-            case "SELECT_DOWN":
-                _private.goLeft();
-                returnValue = true;
-                break;
-            case "NAVIGATE_RIGHT":
-            case "SELECT_UP":
-                _private.goRight();
-                returnValue = true;
-                break;
-            case "KNOB0_UP":
-                _private.knob0Up();
-                returnValue = true;
-                break;
-            case "KNOB0_DOWN":
-                _private.knob0Down();
-                returnValue = true;
-                break;
-            case "KNOB1_UP":
-                _private.knob1Up();
-                returnValue = true;
-                break;
-            case "KNOB1_DOWN":
-                _private.knob1Down();
-                returnValue = true;
-                break;
-            case "KNOB2_UP":
-                _private.knob2Up();
-                returnValue = true;
-                break;
-            case "KNOB2_DOWN":
-                _private.knob2Down();
-                returnValue = true;
-                break;
-            case "KNOB3_UP":
-                _private.goRight();
-                returnValue = true;
-                break;
-            case "KNOB3_DOWN":
-                _private.goLeft();
-                returnValue = true;
-                break;
+        let returnValue = false;
+        if (contentLoader.item && contentLoader.item.hasOwnProperty("cuiaCallback")) {
+            returnValue = contentLoader.item.cuiaCallback(cuia);
         }
         return returnValue;
-    }
-    QtObject {
-        id: _private
-        property QtObject selectedChannel: component.isVisible ? applicationWindow().selectedChannel : null
-        function goLeft() {
-            if (_private.selectedChannel && _private.selectedChannel.externalMidiChannel > -1) {
-                _private.selectedChannel.externalMidiChannel -= 1;
-            }
-        }
-        function goRight() {
-            if (_private.selectedChannel && _private.selectedChannel.externalMidiChannel < 15) {
-                _private.selectedChannel.externalMidiChannel += 1;
-            }
-        }
-        function knob1Up() {
-        }
-        function knob1Down() {
-        }
-        function knob2Up() {
-        }
-        function knob2Down() {
-        }
-        function knob3Up() {
-        }
-        function knob3Down() {
-        }
     }
     Connections {
         target: applicationWindow()
         enabled: component.isVisible
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
-                if (applicationWindow().selectedChannel.trackType === "synth") {
-                    zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                } else if (applicationWindow().selectedChannel.trackType.startsWith("sample-")) {
-                    zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
-                }
+                zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
             }
         }
+    }
+    QtObject {
+        id: _private
+        property QtObject selectedChannel: null
+    }
+    Timer {
+        id: selectedChannelThrottle
+        interval: 1; running: false; repeat: false;
+        onTriggered: {
+            _private.selectedChannel = null;
+            _private.selectedChannel = applicationWindow().selectedChannel;
+            if (_private.selectedChannel) {
+                if (_private.selectedChannel.externalSettings.selectedModule === "") {
+                    // Use the default module if none has been selected
+                    contentLoader.source = "ChannelExternalSetupDefaultModule.qml";
+                } else {
+                    // TODO When we have a list, use that list to check if the selected module exists, and if not, use the default module
+                }
+            } else {
+                // No particular reason to do anything, this is a temporary state and we'll be getting a track shortly
+            }
+        }
+    }
+    Connections {
+        target: applicationWindow()
+        onSelectedChannelChanged: selectedChannelThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad
+        onSongChanged: selectedChannelThrottle.restart()
+    }
+    Connections {
+        target: zynqtgui.sketchpad.song
+        onIsLoadingChanged: selectedChannelThrottle.restart()
+    }
+    Component.onCompleted: {
+        selectedChannelThrottle.restart()
     }
 
     contextualActions: [
         Kirigami.Action {
-            enabled: false
+            enabled: true
+            text: qsTr("PICK MODULE")
+            onTriggered: {
+            }
         },
         Kirigami.Action {
             enabled: false
@@ -138,46 +107,21 @@ Zynthian.ScreenPage {
         }
     ]
 
-    ColumnLayout {
+    Item {
         anchors.fill: parent
-        Kirigami.Heading {
-            Layout.fillWidth: true
-            text: qsTr("Pick External Midi Channel For Channel %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
+        PlasmaComponents.BusyIndicator {
+            visible: contentLoader.status == Loader.Loading
+            anchors.centerIn: parent
+            height: Kirigami.Units.gridUnit * 3
+            width: height
+            running: visible
+            background: Item {} // Quiet some warnings
         }
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.minimumHeight: 1
-            Layout.maximumHeight: 1
-            color: Kirigami.Theme.textColor
-            opacity: 0.5
-        }
-        GridLayout {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            columns: 4
-            Repeater {
-                model: 16
-                delegate: Zynthian.PlayGridButton {
-                    id: channelDelegate
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                    text: _private.selectedChannel
-                        ? (_private.selectedChannel.externalMidiChannel === model.index
-                            ? qsTr("Reset to default from %1").arg(model.index + 1)
-                            : qsTr("Set to channel %1").arg(model.index + 1)
-                            ) +
-                          (_private.selectedChannel.id === model.index ? qsTr("\n(default)") : "\n")
-                        : ""
-                    onClicked: {
-                        if (_private.selectedChannel.externalMidiChannel === model.index) {
-                            _private.selectedChannel.externalMidiChannel = -1;
-                        } else {
-                            _private.selectedChannel.externalMidiChannel = model.index;
-                        }
-                    }
-                    checked: _private.selectedChannel && (_private.selectedChannel.externalMidiChannel === model.index || (_private.selectedChannel.externalMidiChannel === -1 && _private.selectedChannel.id === model.index))
-                }
-            }
+        Loader {
+            id: contentLoader
+            anchors.fill: parent
+            asynchronous: true
+            visible: status == Loader.Ready
         }
     }
 }

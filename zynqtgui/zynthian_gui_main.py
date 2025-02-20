@@ -97,6 +97,9 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.layers, 0, "Sounds"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
 
+            self.list_data.append((self.sound_editor, 0, "Editor"))
+            self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/library.svg"})
+
             self.list_data.append((self.admin, 0, "Settings"))
             self.list_metadata.append({"icon":"/zynthian/zynthbox-qml/img/settings.svg"})
 
@@ -330,6 +333,10 @@ class zynthian_gui_main(zynthian_gui_selector):
     def layers(self):
         logging.info("Layers")
         self.zynqtgui.show_screen("layer")
+
+    def sound_editor(self):
+        logging.info("Sound Editor")
+        self.zynqtgui.show_screen("sound_categories")
 
     def load_snapshot(self):
         logging.info("Load Snapshot")

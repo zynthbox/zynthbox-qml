@@ -1320,6 +1320,11 @@ Kirigami.AbstractApplicationWindow {
         id: notePicker
     }
 
+    readonly property QtObject midiBytePicker: midiBytePicker
+    Zynthian.MidiBytePickerPopup {
+        id: midiBytePicker
+    }
+
     Zynthian.Drawer {
         id: miniPlayGridDrawer
         width: root.width

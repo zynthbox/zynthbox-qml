@@ -276,7 +276,7 @@ ColumnLayout {
                 ? "(no filter rule selected)"
                 : component.filterRuleObject.byte1 === Zynthbox.MidiRouterFilterEntryRewriter.OriginalByte1
                     ? qsTr("Byte 1 Value:\n(original)")
-                    : qsTr("Byte 1 Value:\n%1").arg(midiBytePicker.byteValueToMessageName(component.filterRuleObject.byte1 + 128))
+                    : qsTr("Byte 1 Value:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterRuleObject.byte1 + 128))
             onClicked: {
             }
             Zynthian.KnobIndicator {

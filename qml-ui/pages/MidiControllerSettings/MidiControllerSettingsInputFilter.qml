@@ -239,14 +239,14 @@ QQC2.ScrollView {
             function goPrevious() { component.currentRow = inputFilterFirstSettings; }
             function knob0up() {
                 component.filterObject.byte1Minimum = Math.min(255, component.filterObject.byte1Minimum + 1);
-                component.filterObject.requiredBytes = midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Minimum);
+                component.filterObject.requiredBytes = applicationWindow().midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Minimum);
                 if (component.filterObject.requireRange === false) {
                     component.filterObject.byte1Maximum = component.filterObject.byte1Minimum;
                 }
             }
             function knob0down() {
                 component.filterObject.byte1Minimum = Math.max(128, component.filterObject.byte1Minimum - 1);
-                component.filterObject.requiredBytes = midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Minimum);
+                component.filterObject.requiredBytes = applicationWindow().midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Minimum);
                 if (component.filterObject.requireRange === false) {
                     component.filterObject.byte1Maximum = component.filterObject.byte1Minimum;
                 }
@@ -283,10 +283,10 @@ QQC2.ScrollView {
                 text: component.filterObject === null
                     ? ""
                     : component.filterObject.requireRange
-                        ? qsTr("Message Type Minimum:\n%1").arg(midiBytePicker.byteValueToMessageName(component.filterObject.byte1Minimum))
-                        : qsTr("Message Type:\n%1").arg(midiBytePicker.byteValueToMessageName(component.filterObject.byte1Minimum))
+                        ? qsTr("Message Type Minimum:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterObject.byte1Minimum))
+                        : qsTr("Message Type:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterObject.byte1Minimum))
                 onClicked: {
-                    midiBytePicker.pickByte(component.filterObject.byte1Minimum, 0, function(newByte, messageSize) {
+                    applicationWindow().midiBytePicker.pickByte(component.filterObject.byte1Minimum, 0, function(newByte, messageSize) {
                         // Picking byte value resets the message size to match
                         component.filterObject.requiredBytes = messageSize;
                         component.filterObject.byte1Minimum = newByte;
@@ -320,8 +320,8 @@ QQC2.ScrollView {
                             : qsTr("Note:\n%1").arg(Zynthbox.KeyScales.midiNoteName(component.filterObject.byte2Minimum))
                         : (175 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 192)
                             ? component.filterObject.requireRange
-                                ? qsTr("First CC Function:\n%1").arg(midiBytePicker.byteValueToCCName(component.filterObject.byte2Minimum))
-                                : qsTr("CC Function:\n%1").arg(midiBytePicker.byteValueToCCName(component.filterObject.byte2Minimum))
+                                ? qsTr("First CC Function:\n%1").arg(applicationWindow().midiBytePicker.byteValueToCCName(component.filterObject.byte2Minimum))
+                                : qsTr("CC Function:\n%1").arg(applicationWindow().midiBytePicker.byteValueToCCName(component.filterObject.byte2Minimum))
                             : component.filterObject.requireRange
                                 ? qsTr("Byte 2 Minimum:\n%1").arg(component.filterObject.byte2Minimum)
                                 : qsTr("Byte 2:\n%1").arg(component.filterObject.byte2Minimum)
@@ -335,14 +335,14 @@ QQC2.ScrollView {
                             }
                         });
                     } else if (175 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 192) {
-                        midiBytePicker.pickByte(component.filterObject.byte2Minimum, 2, function(newByte, messageSize) {
+                        applicationWindow().midiBytePicker.pickByte(component.filterObject.byte2Minimum, 2, function(newByte, messageSize) {
                             component.filterObject.byte2Minimum = newByte;
                             if (component.filterObject.requireRange === false) {
                                 component.filterObject.byte2Maximum = newByte;
                             }
                         });
                     } else {
-                        midiBytePicker.pickByte(component.filterObject.byte2Minimum, 1, function(newByte, messageSize) {
+                        applicationWindow().midiBytePicker.pickByte(component.filterObject.byte2Minimum, 1, function(newByte, messageSize) {
                             component.filterObject.byte2Minimum = newByte;
                             if (component.filterObject.requireRange === false) {
                                 component.filterObject.byte2Maximum = newByte;
@@ -393,7 +393,7 @@ QQC2.ScrollView {
                                                 ? qsTr("Byte 3 Minimum:\n%1").arg(component.filterObject.byte3Minimum)
                                                 : qsTr("Byte 3:\n%1").arg(component.filterObject.byte3Minimum)
                 onClicked: {
-                    midiBytePicker.pickByte(component.filterObject.byte3Minimum, 1, function(newByte, messageSize) {
+                    applicationWindow().midiBytePicker.pickByte(component.filterObject.byte3Minimum, 1, function(newByte, messageSize) {
                         component.filterObject.byte3Minimum = newByte;
                         if (component.filterObject.requireRange === false) {
                             component.filterObject.byte3Maximum = newByte;
@@ -419,11 +419,11 @@ QQC2.ScrollView {
             function goPrevious() { component.currentRow = inputFilterMinimumRow; }
             function knob0up() {
                 component.filterObject.byte1Maximum = Math.min(255, component.filterObject.byte1Maximum + 1);
-                component.filterObject.requiredBytes = midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Maximum);
+                component.filterObject.requiredBytes = applicationWindow().midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Maximum);
             }
             function knob0down() {
                 component.filterObject.byte1Maximum = Math.max(128, component.filterObject.byte1Maximum - 1);
-                component.filterObject.requiredBytes = midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Maximum);
+                component.filterObject.requiredBytes = applicationWindow().midiBytePicker.byteValueToMessageSize(component.filterObject.byte1Maximum);
             }
             function knob1up() {
                 component.filterObject.byte2Maximum = Math.min(127, component.filterObject.byte2Maximum + 1);
@@ -446,10 +446,10 @@ QQC2.ScrollView {
                 text: component.filterObject === null
                     ? ""
                     : component.filterObject.requireRange
-                        ? qsTr("Message Type Maximum:\n%1").arg(midiBytePicker.byteValueToMessageName(component.filterObject.byte1Maximum))
-                        : qsTr("Message Type:\n%1").arg(midiBytePicker.byteValueToMessageName(component.filterObject.byte1Maximum))
+                        ? qsTr("Message Type Maximum:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterObject.byte1Maximum))
+                        : qsTr("Message Type:\n%1").arg(applicationWindow().midiBytePicker.byteValueToMessageName(component.filterObject.byte1Maximum))
                 onClicked: {
-                    midiBytePicker.pickByte(component.filterObject.byte1Maximum, 0, function(newByte, messageSize) {
+                    applicationWindow().midiBytePicker.pickByte(component.filterObject.byte1Maximum, 0, function(newByte, messageSize) {
                         // Picking byte value resets the message size to match
                         component.filterObject.requiredBytes = messageSize;
                         component.filterObject.byte1Maximum = newByte;
@@ -477,7 +477,7 @@ QQC2.ScrollView {
                     : 127 < component.filterObject.byte1Maximum && component.filterObject.byte1Maximum < 176
                         ? qsTr("Last Note:\n%1").arg(Zynthbox.KeyScales.midiNoteName(component.filterObject.byte2Maximum))
                         : (175 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 192)
-                             ? qsTr("Last CC Function:\n%1").arg(midiBytePicker.byteValueToCCName(component.filterObject.byte2Maximum))
+                             ? qsTr("Last CC Function:\n%1").arg(applicationWindow().midiBytePicker.byteValueToCCName(component.filterObject.byte2Maximum))
                              : (191 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 208)
                                 ? qsTr("Last Program:\n%1").arg(component.filterObject.byte2Maximum)
                                 : (207 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 224)
@@ -490,11 +490,11 @@ QQC2.ScrollView {
                             component.filterObject.byte2Maximum = newNote;
                         });
                     } else if (175 < component.filterObject.byte1Minimum && component.filterObject.byte1Minimum < 192) {
-                        midiBytePicker.pickByte(component.filterObject.byte2Maximum, 2, function(newByte, messageSize) {
+                        applicationWindow().midiBytePicker.pickByte(component.filterObject.byte2Maximum, 2, function(newByte, messageSize) {
                             component.filterObject.byte2Maximum = newByte;
                         });
                     } else {
-                        midiBytePicker.pickByte(component.filterObject.byte2Maximum, 1, function(newByte, messageSize) {
+                        applicationWindow().midiBytePicker.pickByte(component.filterObject.byte2Maximum, 1, function(newByte, messageSize) {
                             component.filterObject.byte2Maximum = newByte;
                         });
                     }
@@ -526,7 +526,7 @@ QQC2.ScrollView {
                                 ? qsTr("CC Value Maximum:\n%1").arg(component.filterObject.byte3Maximum)
                                 : qsTr("Byte 3 Maximum:\n%1").arg(component.filterObject.byte3Maximum)
                 onClicked: {
-                    midiBytePicker.pickByte(component.filterObject.byte3Maximum, 2, function(newByte, messageSize) {
+                    applicationWindow().midiBytePicker.pickByte(component.filterObject.byte3Maximum, 2, function(newByte, messageSize) {
                         component.filterObject.byte3Maximum = newByte;
                     });
                 }

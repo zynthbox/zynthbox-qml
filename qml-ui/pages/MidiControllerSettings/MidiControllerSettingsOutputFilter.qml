@@ -281,7 +281,7 @@ QQC2.ScrollView {
                     ? ""
                     : qsTr("Minimum Value:\n%1").arg(component.filterObject.valueMinimum)
                 onClicked: {
-                    midiBytePicker.pickByte(component.filterObject.valueMinimum, 1, function(newByte, messageSize) {
+                    applicationWindow().midiBytePicker.pickByte(component.filterObject.valueMinimum, 1, function(newByte, messageSize) {
                         component.filterObject.valueMinimum = newByte;
                     });
                 }
@@ -305,7 +305,7 @@ QQC2.ScrollView {
                     ? ""
                     : qsTr("Maximum Value:\n%1").arg(component.filterObject.valueMaximum)
                 onClicked: {
-                    midiBytePicker.pickByte(component.filterObject.valueMaximum, 1, function(newByte, messageSize) {
+                    applicationWindow().midiBytePicker.pickByte(component.filterObject.valueMaximum, 1, function(newByte, messageSize) {
                         component.filterObject.valueMaximum = newByte;
                     });
                 }

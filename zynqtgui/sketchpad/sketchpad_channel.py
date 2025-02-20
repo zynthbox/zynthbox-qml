@@ -115,6 +115,132 @@ class last_selected_obj_dto(QObject):
     component = Property(QObject, get_component, set_component, notify=componentChanged)
     ### END Property component
 
+class external_mode_settings(QObject):
+    def __init__(self, parent: QObject = None):
+        super(external_mode_settings, self).__init__(parent)
+        self.__keyValueStores__ = {}
+        self.__defaultKeyValueStore__ = {
+            "controls": [
+                { "midiChannel": -1, "ccControl": 2},
+                { "midiChannel": -1, "ccControl": 4},
+                { "midiChannel": -1, "ccControl": 5},
+                { "midiChannel": -1, "ccControl": 7},
+                { "midiChannel": -1, "ccControl": 8},
+                { "midiChannel": -1, "ccControl": 10},
+                { "midiChannel": -1, "ccControl": 11},
+                { "midiChannel": -1, "ccControl": 12},
+                { "midiChannel": -1, "ccControl": 13},
+                { "midiChannel": -1, "ccControl": 16},
+                { "midiChannel": -1, "ccControl": 17},
+                { "midiChannel": -1, "ccControl": 18}
+            ]
+        }
+        self.__selectedModule__ = ""
+        self.__midiChannel__ = -1
+        self.__captureVolume__ = 0
+        self.__audioSource__ = ""
+        self.keyValueStoreChanged.connect(self.somethingChanged)
+        self.selectedModuleChanged.connect(self.somethingChanged)
+        self.midiChannelChanged.connect(self.somethingChanged)
+        self.captureVolumeChanged.connect(self.somethingChanged)
+        self.audioSourceChanged.connect(self.somethingChanged)
+
+    # Fired whenever something changes (see also the connections in the ctor)
+    somethingChanged = Signal()
+
+    # BEGIN Property keyValueStore
+    # A simple key/value store, intended for use by the currently selected module (a separate one will be available to each specific module)
+    def get_keyValueStore(self):
+        if self.__selectedModule__ == "":
+            return self.__defaultKeyValueStore__
+        elif self.__selectedModule__ not in self.__keyValueStores__:
+            return {}
+        return self.__keyValueStores__[self.__selectedModule__]
+
+    @Slot(str, 'QVariant')
+    def setValue(self, key, value):
+        if self.__selectedModule__ == "" or self.__selectedModule__ not in self.__keyValueStores__:
+            self.__defaultKeyValueStore__[key] = value
+        else:
+            self.__keyValueStores__[self.__selectedModule__][key] = value
+        self.keyValueStoreChanged.emit()
+
+    @Slot(str, str, 'QVariant')
+    def setSubValue(self, key, subkey, value):
+        if self.__selectedModule__ == "" or self.__selectedModule__ not in self.__keyValueStores__:
+            self.__defaultKeyValueStore__[key][subkey] = value
+        else:
+            self.__keyValueStores__[self.__selectedModule__][key][subkey] = value
+        self.keyValueStoreChanged.emit()
+
+    @Slot(str, int, str, 'QVariant')
+    def setSubIndexValue(self, key, index, subkey, value):
+        if self.__selectedModule__ == "" or self.__selectedModule__ not in self.__keyValueStores__:
+            self.__defaultKeyValueStore__[key][index][subkey] = value
+        else:
+            self.__keyValueStores__[self.__selectedModule__][key][index][subkey] = value
+        self.keyValueStoreChanged.emit()
+
+    @Slot(str)
+    def clearValue(self, key):
+        if self.__selectedModule__ == "" or self.__selectedModule__ not in self.__keyValueStores__:
+            self.__defaultKeyValueStore__.pop(key, None)
+        else:
+            self.__keyValueStores__[self.__selectedModule__].pop(key, None)
+        self.keyValueStoreChanged.emit()
+
+    keyValueStoreChanged = Signal()
+    keyValueStore = Property('QVariant', get_keyValueStore, notify=keyValueStoreChanged)
+    # END Property keyValueStore
+
+    # BEGIN Property selectedModule
+    # If set to the name of some module, the external control page will attempt to load that module (and fall back gracefully to the default if that module doesn't exist)
+    def get_selectedModule(self):
+        return self.__selectedModule__
+    def set_selectedModule(self, selectedModule):
+        if self.__selectedModule__ != selectedModule:
+            self.__selectedModule__ = selectedModule
+            if selectedModule != "" and selectedModule not in self.__keyValueStores__:
+                self.__keyValueStores__[selectedModule] = {}
+            self.selectedModuleChanged.emit()
+            self.keyValueStoreChanged.emit()
+    selectedModuleChanged = Signal()
+    selectedModule = Property(str, get_selectedModule, set_selectedModule, notify=selectedModuleChanged)
+    # END Property selectedModule
+
+    # BEGIN Property midiChannel
+    def get_midiChannel(self):
+        return self.__midiChannel__
+    def set_midiChannel(self, midiChannel):
+        if self.__midiChannel__ != midiChannel:
+            self.__midiChannel__ = midiChannel
+            self.midiChannelChanged.emit()
+    midiChannelChanged = Signal()
+    midiChannel = Property(int, get_midiChannel, set_midiChannel, notify=midiChannelChanged)
+    # END Property midiChannel
+
+    # BEGIN Property captureVolume
+    def get_captureVolume(self):
+        return self.__captureVolume__
+    def set_captureVolume(self, captureVolume):
+        if self.__captureVolume__ != captureVolume:
+            self.__captureVolume__ = captureVolume
+            self.captureVolumeChanged.emit()
+    captureVolumeChanged = Signal()
+    captureVolume = Property(float, get_captureVolume, set_captureVolume, notify=captureVolumeChanged)
+    # END Property captureVolume
+
+    # BEGIN Property audioSource
+    def get_audioSource(self):
+        return self.__audioSource__
+    def set_audioSource(self, audioSource):
+        if self.__audioSource__ != audioSource:
+            self.__audioSource__ = audioSource
+            self.audioSourceChanged.emit()
+    audioSourceChanged = Signal()
+    audioSource = Property(str, get_audioSource, set_audioSource, notify=audioSourceChanged)
+    # END Property audioSource
+
 class sketchpad_channel(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
@@ -162,9 +288,8 @@ class sketchpad_channel(QObject):
         self.__selected_fx_slot_row = 0
         self.__selected_clip__ = 0
         Zynthbox.MidiRouter.instance().setSketchpadTrackTargetTrack(Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Track(self.__id__));
-        self.__externalMidiChannel__ = -1
-        self.__externalCaptureVolume__ = 0
-        self.__externalAudioSource__ = ""
+        self.__externalSettings__ = external_mode_settings(self)
+        self.__externalSettings__.somethingChanged.connect(self.__song__.schedule_save)
         self.__sound_json_snapshot__ = ""
         self.__sound_snapshot_changed = True
         self.route_through_global_fx = True
@@ -547,9 +672,12 @@ class sketchpad_channel(QObject):
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
                 "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
                 "targetTrack": int(Zynthbox.MidiRouter.instance().sketchpadTrackTargetTracks()[self.__id__]),
-                "externalMidiChannel" : self.__externalMidiChannel__,
-                "externalCaptureVolume" : self.__externalCaptureVolume__,
-                "externalAudioSource": self.__externalAudioSource__,
+                "externalMidiChannel" : self.__externalSettings__.midiChannel,
+                "externalCaptureVolume" : self.__externalSettings__.captureVolume,
+                "externalAudioSource": self.__externalSettings__.audioSource,
+                "externalKeyValueStores": self.__externalSettings__.__keyValueStores__,
+                "externalDefaultKeyValueStore": self.__externalSettings__.__defaultKeyValueStore__,
+                "externalSelectedModule": self.__externalSettings__.selectedModule,
                 "clips": [self.__clips_model__[clipId].serialize() for clipId in range(0, 5)],
                 "selectedClip": self.__selected_clip__,
                 "samples": samplesObj,
@@ -643,6 +771,14 @@ class sketchpad_channel(QObject):
                 self.set_externalAudioSource(obj["externalAudioSource"])
             if "externalCaptureVolume" in obj:
                 self.set_externalCaptureVolume(obj["externalCaptureVolume"])
+            if "externalDefaultKeyValueStore" in obj:
+                self.__externalSettings__.__defaultKeyValueStore__ = obj["externalDefaultKeyValueStore"]
+                self.__externalSettings__.keyValueStoreChanged.emit()
+            if "externalKeyValueStores" in obj:
+                self.__externalSettings__.__keyValueStores__ = obj["externalKeyValueStores"]
+                self.__externalSettings__.keyValueStoreChanged.emit()
+            if "externalSelectedModule" in obj:
+                self.__externalSettings__.selectedModule = obj["externalSelectedModule"]
             if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
                 # TODO : `sample-bank.json` file is deprecated. sample data is now stored in sketchpad json. Remove this fallback later
                 # Read sample-bank.json and inject sample data to all saved versions as it should have with new latest sketchpad structure
@@ -1848,43 +1984,52 @@ class sketchpad_channel(QObject):
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
         # Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_CLIP_CURRENT_RELATIVE", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(self.__selected_clip__), -1)
 
-    ### Property externalMidiChannel
+    # BEGIN Property externalSettings
+    def get_externalSettings(self):
+        return self.__externalSettings__
+    externalSettings = Property(QObject, get_externalSettings, constant=True)
+    # END Property externalSettings
+
+    # END Property externalMidiChannel
+    # DEPRECATED Switch to accessing the externalSettings property directly
     # Logic for this is, -1 is "just use the normal one", anything else is a specific channel
     def get_externalMidiChannel(self):
-        return self.__externalMidiChannel__
+        return self.__externalSettings__.midiChannel
 
     def set_externalMidiChannel(self, externalMidiChannel):
-        if externalMidiChannel != self.__externalMidiChannel__:
-            self.__externalMidiChannel__ = externalMidiChannel
+        if externalMidiChannel != self.__externalSettings__.midiChannel:
+            self.__externalSettings__.midiChannel = externalMidiChannel
             self.externalMidiChannelChanged.emit()
 
     externalMidiChannelChanged = Signal()
 
     externalMidiChannel = Property(int, get_externalMidiChannel, set_externalMidiChannel, notify=externalMidiChannelChanged)
-    ### END Property externalMidiChannel
+    # END Property externalMidiChannel
 
-    ### BEGIN Property externalCaptureVolume
+    # BEGIN Property externalCaptureVolume
+    # DEPRECATED Switch to accessing the externalSettings property directly
     def get_externalCaptureVolume(self):
-        return self.__externalCaptureVolume__
+        return self.__externalSettings__.captureVolume
 
     def set_externalCaptureVolume(self, newVolume):
-        if newVolume != self.__externalCaptureVolume__:
-            self.__externalCaptureVolume__ = newVolume
+        if newVolume != self.__externalSettings__.captureVolume:
+            self.__externalSettings__.captureVolume__ = newVolume
             self.externalMidiChannelChanged.emit()
 
     externalCaptureVolumeChanged = Signal()
 
     # This is on a scale from 0 (no sound should happen) to 1 (all the sound please)
     externalCaptureVolume = Property(float, get_externalCaptureVolume, set_externalCaptureVolume, notify=externalCaptureVolumeChanged)
-    ### END Property externalCaptureVolume
+    # END Property externalCaptureVolume
 
-    ### BEGIN Property externalAudioSource
+    # BEGIN Property externalAudioSource
+    # DEPRECATED Switch to accessing the externalSettings property directly
     def get_externalAudioSource(self):
-        return self.__externalAudioSource__
+        return self.__externalSettings__.audioSource
 
     def set_externalAudioSource(self, newAudioSource):
-        if newAudioSource != self.__externalAudioSource__:
-            self.__externalAudioSource__ = newAudioSource
+        if newAudioSource != self.__externalSettings__.audioSource:
+            self.__externalSettings__.audioSource = newAudioSource
             self.externalAudioSourceChanged.emit()
             self.zynqtgui.zynautoconnect()
             self.__song__.schedule_save()
@@ -1892,7 +2037,7 @@ class sketchpad_channel(QObject):
     externalAudioSourceChanged = Signal()
 
     externalAudioSource = Property(str, get_externalAudioSource, set_externalAudioSource, notify=externalAudioSourceChanged)
-    ### END Property externalAudioSource
+    # END Property externalAudioSource
 
     ### Property selectedClipNames
     def get_selectedClipNames(self):

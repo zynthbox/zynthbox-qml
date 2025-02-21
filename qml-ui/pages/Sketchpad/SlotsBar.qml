@@ -268,11 +268,14 @@ Rectangle {
             console.log("handleItemClick : External")
             switch (root.selectedChannel.selectedSlotRow) {
                 case 0:
+                default:
                     externalAudioSourcePicker.pickChannel(root.selectedChannel);
                     break;
                 case 1:
-                default:
                     externalMidiChannelPicker.pickChannel(root.selectedChannel);
+                    break;
+                case 2:
+                    externalMidiOutPicker.pickOutput(root.selectedChannel);
                     break;
             }
         }
@@ -1009,6 +1012,38 @@ Rectangle {
     }
     ExternalMidiChannelPicker {
         id: externalMidiChannelPicker
+    }
+    Zynthian.ComboBox {
+        id: externalMidiOutPicker
+        visible: false
+        function pickOutput(channel) {
+            externalMidiOutPicker.channel = channel;
+                for (let index = 0; index < Zynthbox.MidiRouter.model.midiOutSources.length; ++index) {
+                    let entry = Zynthbox.MidiRouter.model.midiOutSources[index];
+                    if (channel.externalSettings.midiOutDevice === "") {
+                        if (entry.value === "external:ttymidi:MIDI") {
+                            externalMidiOutPicker.selectIndex(index);
+                            break;
+                        }
+                    } else {
+                        if (entry.value === channel.externalSettings.midiOutDevice) {
+                            externalMidiOutPicker.selectIndex(index);
+                            break;
+                        }
+                }
+            }
+            externalMidiOutPicker.onClicked();
+        }
+        property QtObject channel
+        model: Zynthbox.MidiRouter.model.midiOutSources
+        textRole: "text"
+        onActivated: {
+            if (index === -1) {
+                externalMidiOutPicker.channel.externalSettings.midiOutDevice = "";
+            } else {
+                externalMidiOutPicker.channel.externalSettings.midiOutDevice = Zynthbox.MidiRouter.model.midiOutSources[index].value;
+            }
+        }
     }
 
     Zynthian.ActionPickerPopup {

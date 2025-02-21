@@ -193,10 +193,9 @@ RowLayout {
                 border.color: control.slotType === "sample-loop" && control.slotData[index].enabled ? Kirigami.Theme.highlightColor :"#ff999999"
                 border.width: 2
                 radius: 4
-                // For external mode the first two slots are visible
+                // For external mode the first three slots are visible
                 // For other modes all slots are visible
-                enabled: (control.slotType !== "external") ||
-                (control.slotType === "external" && (index === 0 || index === 1))
+                enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
                 opacity: enabled ? 1 : 0
                 visible: enabled
 
@@ -297,7 +296,7 @@ RowLayout {
                             return control.slotData[index]
                         } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop") && control.slotData[index] && control.slotData[index].path) {
                             return control.slotData[index].path.split("/").pop()
-                        } else if (control.slotType === "external" && index < 2) {
+                        } else if (control.slotType === "external" && index < 3) {
                             return control.slotData[index]
                         } else if (control.slotType === "fx" && control.slotData[index] != null ) {
                             return control.slotData[index]

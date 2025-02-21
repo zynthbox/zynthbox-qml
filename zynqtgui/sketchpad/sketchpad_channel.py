@@ -139,11 +139,13 @@ class external_mode_settings(QObject):
         self.__midiChannel__ = -1
         self.__captureVolume__ = 0
         self.__audioSource__ = ""
+        self.__midiOutDevice__ = "" # Default is the midi 5-pin output
         self.keyValueStoreChanged.connect(self.somethingChanged)
         self.selectedModuleChanged.connect(self.somethingChanged)
         self.midiChannelChanged.connect(self.somethingChanged)
         self.captureVolumeChanged.connect(self.somethingChanged)
         self.audioSourceChanged.connect(self.somethingChanged)
+        self.midiOutDeviceChanged.connect(self.somethingChanged)
 
     # Fired whenever something changes (see also the connections in the ctor)
     somethingChanged = Signal()
@@ -240,6 +242,17 @@ class external_mode_settings(QObject):
     audioSourceChanged = Signal()
     audioSource = Property(str, get_audioSource, set_audioSource, notify=audioSourceChanged)
     # END Property audioSource
+
+    # BEGIN Property midiOutDevice
+    def get_midiOutDevice(self):
+        return self.__midiOutDevice__
+    def set_midiOutDevice(self, midiOutDevice):
+        if self.__midiOutDevice__ != midiOutDevice:
+            self.__midiOutDevice__ = midiOutDevice
+            self.midiOutDeviceChanged.emit()
+    midiOutDeviceChanged = Signal()
+    midiOutDevice = Property(str, get_midiOutDevice, set_midiOutDevice, notify=midiOutDeviceChanged)
+    # END Property midiOutDevice
 
 class sketchpad_channel(QObject):
     # Possible Values : "audio", "video"
@@ -439,6 +452,7 @@ class sketchpad_channel(QObject):
         self.slotsReordered.connect(self.sketchSlotsDataChanged.emit)
         self.externalAudioSourceChanged.connect(self.externalSlotsDataChanged.emit)
         self.externalMidiChannelChanged.connect(self.externalSlotsDataChanged.emit)
+        self.__externalSettings__.midiOutDeviceChanged.connect(self.externalSlotsDataChanged.emit)
 
     def handlePassthroughClientSomethingChanged(self, theSender, theSomething, theValue):
         if theSender in self.__trackPassthroughClients:
@@ -678,6 +692,7 @@ class sketchpad_channel(QObject):
                 "externalKeyValueStores": self.__externalSettings__.__keyValueStores__,
                 "externalDefaultKeyValueStore": self.__externalSettings__.__defaultKeyValueStore__,
                 "externalSelectedModule": self.__externalSettings__.selectedModule,
+                "externalMidiOutDevice": self.__externalSettings__.midiOutDevice,
                 "clips": [self.__clips_model__[clipId].serialize() for clipId in range(0, 5)],
                 "selectedClip": self.__selected_clip__,
                 "samples": samplesObj,
@@ -779,6 +794,8 @@ class sketchpad_channel(QObject):
                 self.__externalSettings__.keyValueStoreChanged.emit()
             if "externalSelectedModule" in obj:
                 self.__externalSettings__.selectedModule = obj["externalSelectedModule"]
+            if "externalMidiOutDevice" in obj:
+                self.__externalSettings__.midiOutDevice = obj["externalMidiOutDevice"]
             if not "samples" in obj and (Path(self.bankDir) / "sample-bank.json").exists():
                 # TODO : `sample-bank.json` file is deprecated. sample data is now stored in sketchpad json. Remove this fallback later
                 # Read sample-bank.json and inject sample data to all saved versions as it should have with new latest sketchpad structure
@@ -2488,9 +2505,20 @@ class sketchpad_channel(QObject):
             else:
                 return clientName
 
+        midiOutDeviceName = "Midi Out Device"
+        if self.__externalSettings__.midiOutDevice == "":
+            midiOutDeviceName = "Midi 5-Pin"
+        else:
+            midiOutDeviceName = self.__externalSettings__.midiOutDevice
+            availableDevices = Zynthbox.MidiRouter.instance().model().midiOutSources()
+            for device in availableDevices:
+                if device["value"] == self.__externalSettings__.midiOutDevice:
+                    midiOutDeviceName = device["text"]
+                    break
+
         return [f"Capture: {humanReadableExternalClientName(self.externalAudioSource)}",
                 f"Midi Channel: {(self.externalMidiChannel + 1) if self.externalMidiChannel > -1 else (self.id + 1)}",
-                None,
+                midiOutDeviceName,
                 None,
                 None]
     externalSlotsDataChanged = Signal()

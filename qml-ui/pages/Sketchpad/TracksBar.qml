@@ -94,10 +94,10 @@ Rectangle {
                 }
                 break;
             case "TracksBar_externalslot":
-                if (root.selectedChannel.selectedSlot.value === 1) {
-                    sketchesRow.switchToSlot(0, true);
+                if (root.selectedChannel.selectedSlot.value === 2) {
+                    externalRow.switchToSlot(0, true);
                 } else {
-                    sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    externalRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             case "TracksBar_fxslot":
@@ -137,7 +137,7 @@ Rectangle {
                 break;
             case "TracksBar_externalslot":
                 if (root.selectedChannel.selectedSlot.value === 0) {
-                    externalRow.switchToSlot(1, true);
+                    externalRow.switchToSlot(2, true);
                 } else {
                     externalRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }

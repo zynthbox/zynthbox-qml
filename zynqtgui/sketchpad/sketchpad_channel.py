@@ -118,6 +118,7 @@ class last_selected_obj_dto(QObject):
 class external_mode_settings(QObject):
     def __init__(self, parent: QObject = None):
         super(external_mode_settings, self).__init__(parent)
+        self.__track__ = parent
         self.__keyValueStores__ = {}
         self.__defaultKeyValueStore__ = {
             "controls": [
@@ -250,6 +251,7 @@ class external_mode_settings(QObject):
         if self.__midiOutDevice__ != midiOutDevice:
             self.__midiOutDevice__ = midiOutDevice
             self.midiOutDeviceChanged.emit()
+            Zynthbox.MidiRouter.instance().setSketchpadTrackExternalDeviceTarget(Zynthbox.ZynthboxBasics.Track(self.__track__.id), self.__midiOutDevice__)
     midiOutDeviceChanged = Signal()
     midiOutDevice = Property(str, get_midiOutDevice, set_midiOutDevice, notify=midiOutDeviceChanged)
     # END Property midiOutDevice

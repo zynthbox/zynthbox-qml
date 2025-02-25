@@ -207,7 +207,7 @@ QQC2.ScrollView {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.sendTimecode ? qsTr("Send MIDI Timecode (24 PPQN):\nYes") : qsTr("Send MIDI Timecode (24 PPQN):\nNo")
+                text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.sendTimecode ? qsTr("Send MIDI Timecode:\nYes") : qsTr("Send MIDI Timecode:\nNo")
                 onClicked: {
                     _private.selectedDeviceObject.sendTimecode = !_private.selectedDeviceObject.sendTimecode;
                 }
@@ -306,7 +306,7 @@ QQC2.ScrollView {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.sendBeatClock ? qsTr("Send MIDI Beat Clock:\nYes") : qsTr("Send MIDI Beat Clock:\nNo")
+                text: _private.selectedDeviceObject === null ? "" : _private.selectedDeviceObject.sendBeatClock ? qsTr("Send MIDI Beat Clock (24 PPQN):\nYes") : qsTr("Send MIDI Beat Clock (24 PPQN):\nNo")
                 onClicked: {
                     _private.selectedDeviceObject.sendBeatClock = !_private.selectedDeviceObject.sendBeatClock;
                 }

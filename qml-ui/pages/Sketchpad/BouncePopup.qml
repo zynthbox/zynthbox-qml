@@ -262,7 +262,7 @@ Zynthian.Popup {
                                     }
                                 } else if (sketchpadTrack.trackType === "sample-loop") {
                                     for (var loopIndex = 0; loopIndex < Zynthbox.Plugin.sketchpadSlotCount; ++loopIndex) {
-                                        var clip = sketchpadTrack.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                        var clip = sketchpadTrack.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex);
                                         if (clip.cppObjId > -1) {
                                             // We pick the name of whatever the first loop is here, just so we've got one
                                             soundIndication = clip.path.split("/").pop();
@@ -329,16 +329,16 @@ Zynthian.Popup {
                             // and ensure their positions exist across the entire given range to add the clips where they
                             // should go in the song
                             // Create a new song for us to use temporarily
-                            _private.previouslySelectedSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
-                            let newSegmentsModelIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.newSegmentsModel();
-                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = newSegmentsModelIndex;
+                            _private.previouslySelectedSegmentsModel = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex;
+                            let newSegmentsModelIndex = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.newSegmentsModel();
+                            zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex = newSegmentsModelIndex;
                             for (let clipDetailsIndex = 0; clipDetailsIndex < _private.clipDetails.length; ++clipDetailsIndex) {
                                 let details = _private.clipDetails[clipDetailsIndex];
                                 let clip = zynqtgui.sketchpad.song.getClipById(details["sketchpadTrackId"], details["sceneId"], details["clipId"]);
                                 // Add the clip itself
-                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.insert_clip(clip, details["startPosition"] / Zynthbox.SyncTimer.getMultiplier(), details["stopPlaybackPosition"] / Zynthbox.SyncTimer.getMultiplier());
+                                zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.insert_clip(clip, details["startPosition"] / Zynthbox.SyncTimer.getMultiplier(), details["stopPlaybackPosition"] / Zynthbox.SyncTimer.getMultiplier());
                                 // Now just make sure there's also a matching position to keep playing and then stop the recording
-                                zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.ensure_split(details["stopRecordingPosition"] / Zynthbox.SyncTimer.getMultiplier());
+                                zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.ensure_split(details["stopRecordingPosition"] / Zynthbox.SyncTimer.getMultiplier());
                                 details["recordingFilename"] = Zynthbox.AudioLevels.scheduleChannelRecorderStart(details["startPosition"] + waitForStart, details["sketchpadTrackId"], details["recordingPrefix"], details["recordingSuffix"]);
                                 Zynthbox.AudioLevels.scheduleChannelRecorderStop(details["stopRecordingPosition"] + waitForStart, details["sketchpadTrackId"]);
                                 // Ensure we're outputting a stop-all-sounds message on the track as well, so we can be sure that there's no long tails sneaking into the next recording on that track
@@ -376,7 +376,7 @@ Zynthian.Popup {
             }
             Timer {
                 id: endOfRecordingTimer
-                property int totalDuration: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count > 0 ? Zynthbox.SyncTimer.getMultiplier() * zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 1
+                property int totalDuration: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.count > 0 ? Zynthbox.SyncTimer.getMultiplier() * zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.totalBeatDuration : 1
                 interval: 50; repeat: true; running: false;
                 onTriggered: {
                     // While recording, check each beat whether we have reached the end of playback, and once we have, and we are done recording and all that, pull things out and clean up
@@ -451,9 +451,9 @@ Zynthian.Popup {
                         }
 
                         // Clean up the temporary segments model
-                        let ourSegmentsModel = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex;
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = _private.previouslySelectedSegmentsModel;
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.removeSegmentsModel(ourSegmentsModel);
+                        let ourSegmentsModel = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex;
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex = _private.previouslySelectedSegmentsModel;
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.removeSegmentsModel(ourSegmentsModel);
                         // Close out and we're done
                         root.close();
                         // Just reset back to -1 so we're ready to bounce again

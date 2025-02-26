@@ -72,13 +72,13 @@ Zynthian.Popup {
             QtObject {
                 id: _private
                 function goPrevious() {
-                    if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex > 0) {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex -= 1;
+                    if (zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex > 0) {
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex -= 1;
                     }
                 }
                 function goNext() {
-                    if (zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex < zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelsCount - 1) {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex += 1;
+                    if (zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex < zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelsCount - 1) {
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex += 1;
                     }
                 }
             }
@@ -90,7 +90,7 @@ Zynthian.Popup {
                 }
                 property int variantIndex: -1
                 onAccepted: {
-                    zynqtgui.sketchpad.song.sketchesModel.selectedSketch.removeSegmentsModel(modelRemover.variantIndex);
+                    zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.removeSegmentsModel(modelRemover.variantIndex);
                 }
                 title: qsTr("Remove Variant?")
                 text: qsTr("Do you wish to remove Variant %1?\n\nThis cannot be undone.").arg(modelRemover.variantIndex + 1)
@@ -102,19 +102,19 @@ Zynthian.Popup {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             Layout.preferredHeight: Kirigami.Units.gridUnit * 20
             clip: true
-            model: component.opened ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelsCount : 0
+            model: component.opened ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelsCount : 0
             delegate: Zynthian.Card {
                 id: variantDelegate
                 width: ListView.view.width
                 height: ListView.view.height / 7.1
-                highlighted: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex === model.index
-                property QtObject segmentsModel: zynqtgui.sketchpad.song.sketchesModel.selectedSketch.getSegmentsModel(model.index)
+                highlighted: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex === model.index
+                property QtObject segmentsModel: zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.getSegmentsModel(model.index)
                 property int barLength: segmentsModel.totalBeatDuration / 4
                 property int beatLength: segmentsModel.totalBeatDuration - (barLength * 4)
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = model.index;
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex = model.index;
                         component.close();
                     }
                 }
@@ -134,8 +134,8 @@ Zynthian.Popup {
                         Layout.fillHeight: true
                         text: qsTr("Clone As New")
                         onClicked: {
-                            var newSegmentsModelIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.cloneAsNew(model.index);
-                            zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = newSegmentsModelIndex;
+                            var newSegmentsModelIndex = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.cloneAsNew(model.index);
+                            zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex = newSegmentsModelIndex;
                             component.close();
                         }
                     }
@@ -158,8 +158,8 @@ Zynthian.Popup {
             QQC2.Button {
                 text: qsTr("New Blank Variant")
                 onClicked: {
-                    var newSegmentsModelIndex = zynqtgui.sketchpad.song.sketchesModel.selectedSketch.newSegmentsModel();
-                    zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModelIndex = newSegmentsModelIndex;
+                    var newSegmentsModelIndex = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.newSegmentsModel();
+                    zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModelIndex = newSegmentsModelIndex;
                     component.close();
                 }
             }

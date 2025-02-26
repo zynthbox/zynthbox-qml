@@ -32,8 +32,8 @@ import warnings
 
 from pathlib import Path
 from PySide2.QtCore import Qt, QTimer, QMetaObject, Property, QObject, Signal, Slot
-from .sketchpad_sketch import sketchpad_sketch
-from .sketchpad_sketches_model import sketchpad_sketches_model
+from .sketchpad_arrangement import sketchpad_arrangement
+from .sketchpad_arrangements_model import sketchpad_arrangements_model
 from .sketchpad_scenes_model import sketchpad_scenes_model
 from .sketchpad_segment import sketchpad_segment
 from .sketchpad_channel import sketchpad_channel
@@ -83,7 +83,7 @@ class sketchpad_song(QObject):
         self.isLoadingChanged.emit()
         self.__channels_model__ = sketchpad_channels_model(self)
         self.__scenes_model__ = sketchpad_scenes_model(self)
-        self.__sketches_model__ = sketchpad_sketches_model(self)
+        self.__arrangements_model__ = sketchpad_arrangements_model(self)
         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
         self.__volume__ = 100
         self.__index__ = 0
@@ -138,7 +138,7 @@ class sketchpad_song(QObject):
             # First, clear out any cruft that might have occurred during a failed load attempt
             self.__channels_model__ = sketchpad_channels_model(self)
             self.__scenes_model__ = sketchpad_scenes_model(self)
-            self.__sketches_model__ = sketchpad_sketches_model(self)
+            self.__arrangements_model__ = sketchpad_arrangements_model(self)
 
             for _ in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                 channel = sketchpad_channel(self.__channels_model__.count, self, self.__channels_model__)
@@ -159,13 +159,13 @@ class sketchpad_song(QObject):
                 for songIndex in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
                     channel.getClipsModelById(0).getClip(songIndex).enabled = True
 
-            # Add default Sketches and Segments
-            for sketch_index in range(10):
-                sketch = sketchpad_sketch(sketch_index, self)
-                segment = sketchpad_segment(sketch, sketch.segmentsModel, self)
-                sketch.segmentsModel.add_segment(0, segment)
+            # Add default Arrangements and Segments
+            for arrangement_index in range(10):
+                arrangement = sketchpad_arrangement(arrangement_index, self)
+                segment = sketchpad_segment(arrangement, arrangement.segmentsModel, self)
+                arrangement.segmentsModel.add_segment(0, segment)
 
-                self.__sketches_model__.add_sketch(sketch_index, sketch)
+                self.__arrangements_model__.add_arrangement(arrangement_index, arrangement)
 
             # Clear all the passthrough clients to default state
             setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
@@ -237,7 +237,7 @@ class sketchpad_song(QObject):
             "octave": self.__octave__,
             "tracks": self.__channels_model__.serialize(),
             "scenes": self.__scenes_model__.serialize(),
-            "sketches": self.__sketches_model__.serialize(),
+            "arrangements": self.__arrangements_model__.serialize(),
             "globalPlaybackClient": serializePassthroughData(Zynthbox.Plugin.instance().globalPlaybackClient()),
             "trackPassthroughClients": trackPassthroughClientsData,
             "synthPassthroughClients": synthPassthroughClientsData
@@ -391,8 +391,13 @@ class sketchpad_song(QObject):
 
                     if "scenes" in sketchpad:
                         self.__scenes_model__.deserialize(sketchpad["scenes"])
+
+                    # TODO Remove this when we're reasonably certain there are no more of these
                     if "sketches" in sketchpad:
-                        self.__sketches_model__.deserialize(sketchpad["sketches"])
+                        self.__arrangements_model__.deserialize(sketchpad["sketches"])
+                    if "arrangements" in sketchpad:
+                        self.__arrangements_model__.deserialize(sketchpad["arrangements"])
+
                     if "bpm" in sketchpad:
                         # In older sketchpad files, bpm would still be an int instead of a list
                         # So if bpm is not a list, then generate a list and store it
@@ -574,12 +579,19 @@ class sketchpad_song(QObject):
 
     ### Property sketchesModel
     def get_sketchesModel(self):
-        return self.__sketches_model__
+        return self.__arrangements_model__
 
     sketchesModelChanged = Signal()
 
     sketchesModel = Property(QObject, get_sketchesModel, notify=sketchesModelChanged)
     ### END Property sketchesModel
+
+    ### BEGIN Property arrangementsModel
+    def get_arrangementsModel(self):
+        return self.__arrangements_model__
+    arrangementsModelChanged = Signal()
+    arrangementsModel = Property(QObject, get_arrangementsModel, notify=arrangementsModelChanged)
+    ### END Property arrangementsModel
 
     def isPlaying(self):
         return self.__is_playing__

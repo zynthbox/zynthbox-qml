@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Sketchpad Sketch: An object to store sketch
+# Sketchpad Arrangement: An object to store a song arrangement (essentially, a list of segments)
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -30,34 +30,36 @@ from .sketchpad_segments_model import sketchpad_segments_model
 from zynqtgui import zynthian_gui_config
 
 
-class sketchpad_sketch(QObject):
-    def __init__(self, sketch_id, song):
+class sketchpad_arrangement(QObject):
+    def __init__(self, arrangement_id, song):
         super().__init__(song)
         self.zynqtgui = zynthian_gui_config.zynqtgui
 
         self.__song = song
-        self.__sketch_id = sketch_id
+        self.__arrangement_id = arrangement_id
         self.__segments_models = [sketchpad_segments_model(song, self)]
         self.__segments_model = 0
         self.__is_empty = True
 
     def serialize(self):
-        logging.debug("### Serializing Sketch")
+        logging.debug("### Serializing Arrangement")
 
         segmentsData = []
         for segmentsModel in self.__segments_models:
             segmentsData.append(segmentsModel.serialize())
         return {
-            "sketchId": self.__sketch_id,
+            "arrangementId": self.__arrangement_id,
             "segments": segmentsData,
         }
 
     def deserialize(self, obj):
-        logging.debug("### Deserializing Sketch")
+        logging.debug("### Deserializing Arrangement")
 
         self.__segments_models = []
         if "sketchId" in obj:
-            self.set_sketchId(obj["sketchId"], True)
+            self.set_arrangementId(obj["sketchId"], True)
+        if "arrangementId" in obj:
+            self.set_arrangementId(obj["arrangementId"], True)
         if "segments" in obj:
             if "barLength" in obj["segments"]:
                 # In this case, we've got an old single segment sitting around - we can get rid of this bit in a little bit
@@ -79,31 +81,31 @@ class sketchpad_sketch(QObject):
 
     ### Property className
     def get_className(self):
-        return "sketchpad_sketch"
+        return "sketchpad_arrangement"
 
     className = Property(str, get_className, constant=True)
     ### END Property className
 
     ### Property name
     def get_name(self):
-        return f"Sketch {self.__sketch_id + 1}"
+        return f"Arrangement {self.__sketch_id + 1}"
 
     name = Property(str, get_name, constant=True)
     ### END Property name
 
-    ### Property sketchId
-    def get_sketchId(self):
-        return self.__sketch_id
+    ### Property arrangementId
+    def get_arrangementId(self):
+        return self.__arrangement_id
 
-    def set_sketchId(self, sketch_id, force_set=False):
-        if self.__sketch_id != sketch_id or force_set:
-            self.__sketch_id = sketch_id
-            self.sketchIdChanged.emit()
+    def set_arrangementId(self, arrangement_id, force_set=False):
+        if self.__arrangement_id != arrangement_id or force_set:
+            self.__arrangement_id = arrangement_id
+            self.arrangementIdChanged.emit()
 
-    sketchIdChanged = Signal()
+    arrangementIdChanged = Signal()
 
-    sketchId = Property(int, get_sketchId, notify=sketchIdChanged)
-    ### END Property sketchId
+    arrangementId = Property(int, get_arrangementId, notify=arrangementIdChanged)
+    ### END Property arrangementId
 
     @Slot(None, result=int)
     def newSegmentsModel(self):
@@ -203,8 +205,8 @@ class sketchpad_sketch(QObject):
         self.set_isEmpty(is_empty)
 
     @Slot(QObject)
-    def copyFrom(self, dest_sketch):
-        self.segmentsModel.copyFrom(dest_sketch.segmentsModel)
+    def copyFrom(self, dest_arrangement):
+        self.segmentsModel.copyFrom(dest_arrangement.segmentsModel)
 
     @Slot()
     def clear(self):

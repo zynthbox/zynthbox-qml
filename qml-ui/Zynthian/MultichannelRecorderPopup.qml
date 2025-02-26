@@ -62,7 +62,7 @@ Zynthian.Dialog {
                 }
             } else if (channel.trackType === "sample-loop") {
                 for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                    if (channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).cppObjId > -1) {
+                    if (channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
@@ -141,7 +141,7 @@ Zynthian.Dialog {
             property bool songMode: zynqtgui.current_screen_id === "song_manager"
 
             property int songDurationInTicks: song && _private.songMode
-                ? Zynthbox.SyncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
+                ? Zynthbox.SyncTimer.getMultiplier() * song.arrangementsModel.selectedArrangement.segmentsModel.totalBeatDuration
                 : Zynthbox.SyncTimer.getMultiplier() * songDurationSpin.value
             property int leadinDurationInTicks: leadinSpin.value * Zynthbox.SyncTimer.getMultiplier()
             property int fadeoutDurationInTicks: fadeoutSpin.value * Zynthbox.SyncTimer.getMultiplier()
@@ -179,7 +179,7 @@ Zynthian.Dialog {
                         }
                     } else if (channel.trackType === "sample-loop") {
                         for (var loopIndex = 0; loopIndex < 5; ++loopIndex) {
-                            var clip = channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                            var clip = channel.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex);
                             if (clip.cppObjId > -1) {
                                 // We pick the name of whatever the first loop is here, just so we've got one
                                 soundIndication = clip.path.split("/").pop();
@@ -462,8 +462,8 @@ Zynthian.Dialog {
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 Repeater {
                     id: segmentsRepeater
-                    property double totalDuration: _private.song ? Zynthbox.SyncTimer.getMultiplier() * _private.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
-                    model: component.visible && totalDuration > 0 ? _private.song.sketchesModel.selectedSketch.segmentsModel : 0
+                    property double totalDuration: _private.song ? Zynthbox.SyncTimer.getMultiplier() * _private.song.arrangementsModel.selectedArrangement.segmentsModel.totalBeatDuration : 0
+                    model: component.visible && totalDuration > 0 ? _private.song.arrangementsModel.selectedArrangement.segmentsModel : 0
                     delegate: Item {
                         id: segmentDelegate
                         property QtObject segment: model.segment

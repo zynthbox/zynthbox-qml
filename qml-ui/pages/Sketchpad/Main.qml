@@ -201,7 +201,7 @@ Zynthian.ScreenPage {
         if (slot === -1) {
             slot = root.selectedChannel.selectedSlotRow
         }
-        var clip = root.selectedChannel.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+        var clip = root.selectedChannel.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
@@ -506,11 +506,11 @@ Zynthian.ScreenPage {
                             }
                             returnValue = true;
                         } else if (root.selectedChannel && root.selectedChannel.trackType === "sample-loop") {
-                            let clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                            let clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
                             // when loop and slot is active, goto wave editor or show popup when empty
                             if (clip && !clip.isEmpty) {
                                 zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex);
                                 bottomStack.slotsBar.bottomBarButton.checked = true;
                                 bottomStack.bottomBar.waveEditorAction.trigger();
                             } else {
@@ -877,7 +877,7 @@ Zynthian.ScreenPage {
             visible: zynqtgui.sketchpad.lastSelectedObj && zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips"
                         ? zynqtgui.slotsBarClipsActive
                         : zynqtgui.sketchpad.lastSelectedObj != null
-                            ? ["sketchpad_segment", "sketchpad_sketch"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
+                            ? ["sketchpad_segment", "sketchpad_arrangement"].indexOf(zynqtgui.sketchpad.lastSelectedObj.className) >= 0
                                 ? false
                                 : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel"
                                     ? !root.displayTrackButtons
@@ -965,7 +965,7 @@ Zynthian.ScreenPage {
 
                         highlightOnFocus: false
                         highlighted: root.showOccupiedSlotsHeader
-//                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedSketchpadSongIndex + 1)
+//                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedArrangementpadSongIndex + 1)
                         text: root.showOccupiedSlotsHeader
                                 ? qsTr("Inputs")
                                 : qsTr("Track State")
@@ -1004,11 +1004,11 @@ Zynthian.ScreenPage {
                     spacing: 1
 
                     // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
-                    property bool shouldShowSegmentArrows: root.song.sketchesModel.selectedSketch.segmentsModel.count > 10
+                    property bool shouldShowSegmentArrows: root.song.arrangementsModel.selectedArrangement.segmentsModel.count > 10
                     // Segment offset will determine what is the first segment to display when arrow keys are displayed
                     property int segmentOffset: 0
                     // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
-                    property int maximumSegmentOffset: root.song.sketchesModel.selectedSketch.segmentsModel.count - 10 + 2
+                    property int maximumSegmentOffset: root.song.arrangementsModel.selectedArrangement.segmentsModel.count - 10 + 2
 
                     RowLayout {
                         Layout.fillWidth: true
@@ -1063,14 +1063,14 @@ Zynthian.ScreenPage {
 
 //                                TableHeader {
 //                                    id: trackHeaderDelegate
-//                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
+//                                    property QtObject sketch: root.song.arrangementsModel.getArrangement(index)
 
 //                                    visible: root.displayTrackButtons
 //                                    anchors.fill: parent
 //                                    color: Kirigami.Theme.backgroundColor
 //                                    highlightOnFocus: false
 //                                    highlighted: root.displayTrackButtons
-//                                                    ? root.song.scenesModel.selectedSketchpadSongIndex === index
+//                                                    ? root.song.scenesModel.selectedArrangementpadSongIndex === index
 //                                                    : ""
 
 //                                    text: root.displayTrackButtons
@@ -1085,7 +1085,7 @@ Zynthian.ScreenPage {
 //                                                value: index,
 //                                                component: trackHeaderDelegate
 //                                            }
-//                                            root.song.scenesModel.selectedSketchpadSongIndex = index
+//                                            root.song.scenesModel.selectedArrangementpadSongIndex = index
 //                                        }
 //                                    }
 //                                }
@@ -1453,8 +1453,8 @@ Zynthian.ScreenPage {
                                                               ? qsTr("Clip")
                                                               : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment"
                                                                 ? qsTr("Segment")
-                                                                : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_sketch"
-                                                                  ? qsTr("Sketch")
+                                                                : zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement"
+                                                                  ? qsTr("Arrangement")
                                                                   : ""
                                                   : "")
                         visible: root.copySourceObj == null
@@ -1493,7 +1493,7 @@ Zynthian.ScreenPage {
 
                                 // Check if source and destination are same
                                 if (root.copySourceObj.className === "sketchpad_clip" &&
-                                    root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) &&
+                                    root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex) &&
                                     zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_channel" &&
@@ -1501,7 +1501,7 @@ Zynthian.ScreenPage {
                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_track" &&
-                                           root.copySourceObj.value !== root.song.scenesModel.selectedSketchpadSongIndex &&
+                                           root.copySourceObj.value !== root.song.scenesModel.selectedArrangementpadSongIndex &&
                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_clips" &&
@@ -1513,9 +1513,9 @@ Zynthian.ScreenPage {
                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" &&
                                            root.copySourceObj.value.sketchId === zynqtgui.sketchpad.lastSelectedObj.value.sketchId) {
                                    return true
-                                } else if (root.copySourceObj.className === "sketchpad_sketch" &&
+                                } else if (root.copySourceObj.className === "sketchpad_arrangement" &&
                                            root.copySourceObj.value !== zynqtgui.sketchpad.lastSelectedObj.value &&
-                                           zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_sketch") {
+                                           zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement") {
                                    return true
                                 }
                             }
@@ -1533,14 +1533,14 @@ Zynthian.ScreenPage {
                                                                      ? qsTr("Clip")
                                                                      : root.copySourceObj.className === "sketchpad_segment"
                                                                        ? qsTr("Segment")
-                                                                       : root.copySourceObj.className === "sketchpad_sketch"
-                                                                         ? qsTr("Sketch")
+                                                                       : root.copySourceObj.className === "sketchpad_arrangement"
+                                                                         ? qsTr("Arrangement")
                                                                          : ""
                                                        : "")
                         onPressed: {
                             if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clip") {
                                 var sourceClip = root.copySourceObj.value
-                                var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
 
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
@@ -1576,7 +1576,7 @@ Zynthian.ScreenPage {
                                 zynqtgui.start_loading()
 
                                 // Copy Track
-                                root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedSketchpadSongIndex)
+                                root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedArrangementpadSongIndex)
 
                                 for (var i=0; i<root.song.channelsModel.count; i++) {
                                     var channel = root.song.channelsModel.getChannel(i)
@@ -1604,7 +1604,7 @@ Zynthian.ScreenPage {
                             } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_segment") {
                                 zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
                                 root.copySourceObj = null
-                            } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_sketch") {
+                            } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_arrangement") {
                                 zynqtgui.sketchpad.lastSelectedObj.value.copyFrom(root.copySourceObj.value)
                                 root.copySourceObj = null
                             }
@@ -1620,7 +1620,7 @@ Zynthian.ScreenPage {
                                  zynqtgui.sketchpad.lastSelectedObj.className != null &&
                                  (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip" ||
                                   zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_segment" ||
-                                  zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_sketch")
+                                  zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_arrangement")
                         text: qsTr("Clear")
                         onPressed: {
                             if (zynqtgui.sketchpad.lastSelectedObj.value.clear) {

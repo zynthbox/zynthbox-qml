@@ -36,15 +36,15 @@ ColumnLayout {
             id: clipDelegate
             property int clipIndex: index
             property QtObject pattern: root.sequence.getByClipId(root.channel.id, model.index)
-            property QtObject clip: root.channel.getClipsModelById(clipDelegate.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            property QtObject clip: root.channel.getClipsModelById(clipDelegate.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
             property bool clipHasWav: clipDelegate.clip && !clipDelegate.clip.isEmpty
             property QtObject cppClipObject: root.visible && root.channel.trackType === "sample-loop" && clipDelegate.clipHasWav ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId) : null;
             function handleItemClick() {
                 if (root.songMode) {
                     if (zynqtgui.altButtonPressed) {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.setRestartClip(clipDelegate.clip, !zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(clipDelegate.clip));
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.setRestartClip(clipDelegate.clip, !zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.restartClip(clipDelegate.clip));
                     } else {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(clipDelegate.clip);
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.toggleClip(clipDelegate.clip);
                     }
                 } else {
                     if (zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clips" &&
@@ -71,7 +71,7 @@ ColumnLayout {
             color: "#000000"
             border{
                 color: root.songMode
-                        ? zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
+                        ? zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.clips.indexOf(clipDelegate.clip) >= 0
                             ? Qt.rgba(255, 255, 255, 0.8)
                             : "#000000"
                         : clipDelegate.clip && clipDelegate.clip.inCurrentScene
@@ -185,7 +185,7 @@ ColumnLayout {
                 }
                 height: Kirigami.Units.largeSpacing
                 width: Kirigami.Units.largeSpacing
-                visible: root.songMode && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClips && zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(clipDelegate.clip)
+                visible: root.songMode && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment != null && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.restartClips && zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.restartClip(clipDelegate.clip)
                 source: "media-skip-backward-symbolic"
             }
             Kirigami.Icon {
@@ -220,7 +220,7 @@ ColumnLayout {
                 onClicked: clipDelegate.handleItemClick()
                 onPressAndHold: {
                     if (root.songMode) {
-                        zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.setRestartClip(clipDelegate.clip, !zynqtgui.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.restartClip(clipDelegate.clip));
+                        zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.setRestartClip(clipDelegate.clip, !zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.selectedSegment.restartClip(clipDelegate.clip));
                     } else {
                         clipDelegate.clip.enabled = true;
                         root.channel.selectedClip = index;

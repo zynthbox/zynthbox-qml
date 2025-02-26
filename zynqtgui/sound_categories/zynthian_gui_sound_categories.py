@@ -27,6 +27,7 @@ import logging
 import os
 import tempfile
 import json
+import Zynthbox
 from json import JSONEncoder
 from pathlib import Path
 
@@ -109,12 +110,13 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     @Slot()
     def load_sounds_model(self):
         def task():
-            # Fill community-sounds list
-            for file in self.__community_sounds_path__.glob("**/*.snd"):
-                self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "community-sounds"))
-            # Fill my-sounds list
-            for file in self.__my_sounds_path__.glob("**/*.snd"):
-                self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "my-sounds"))
+            # TODO : Implement reading from statistics file
+            # # Fill community-sounds list
+            # for file in self.__community_sounds_path__.glob("**/*.snd"):
+            #     self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "community-sounds"))
+            # # Fill my-sounds list
+            # for file in self.__my_sounds_path__.glob("**/*.snd"):
+            #     self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "my-sounds"))
             self.zynqtgui.end_long_task()
         self.__sounds_model__.clear()
         self.zynqtgui.do_long_task(task, "Reading and sorting sounds into categories")
@@ -173,6 +175,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         except: pass
 
         return suggested
+
+    @Slot()
+    def generateStatFiles(self):
+        def task():
+            Zynthbox.SndLibraryHelper.instance().serializeTo("/zynthian/zynthian-my-data/sounds/my-sounds", "/zynthian/zynthian-my-data/sounds/my-sounds/.stat.json")
+            Zynthbox.SndLibraryHelper.instance().serializeTo("/zynthian/zynthian-my-data/sounds/community-sounds", "/zynthian/zynthian-my-data/sounds/community-sounds/.stat.json")
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Generating sound statistics")
 
     ### Property soundsModel
     def get_sounds_model(self):

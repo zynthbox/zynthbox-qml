@@ -30,6 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
 import '../Sketchpad' as Sketchpad
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.ScreenPage {
     id: root
@@ -128,7 +129,6 @@ Zynthian.ScreenPage {
             if (zynqtgui.current_screen_id === root.screenId) {
                 soundTypeComboBox.currentIndex = 0
                 zynqtgui.sound_categories.setSoundTypeFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
-                zynqtgui.sound_categories.load_sounds_model()
 
                 if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
                     soundButtonGroup.checkedButton.checked = false
@@ -312,7 +312,10 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillHeight: true
                         Layout.preferredWidth: height
-                        onClicked: zynqtgui.sound_categories.load_sounds_model()
+                        onClicked: {
+                            zynqtgui.sound_categories.generateStatFiles()
+                            zynqtgui.sound_categories.load_sounds_model()
+                        }
 
                         Kirigami.Icon {
                             anchors.fill: parent

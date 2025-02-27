@@ -675,7 +675,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             # Since snapshot is not loaded when creating a sketchpad from temp, add FX layers to channels explicitly here
             for layer in self.zynqtgui.layer.layers:
                 if layer.engine.type == "Audio Effect":
-                    self.song.channelsModel.getChannel(layer.midi_chan).setFxToChain(layer, layer.slot_index)
+                    self.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer, layer.slot_index)
 
             self.zynqtgui.global_settings.setValue("Sketchpad/lastSelectedSketchpad", str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
             self.__song__.save(False)

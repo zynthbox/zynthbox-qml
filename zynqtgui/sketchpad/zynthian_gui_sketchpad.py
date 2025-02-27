@@ -54,7 +54,6 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
         self.clip_to_record = None
         self.clip_to_record_path = None
-        self.clip_to_record_path = None
         self.__current_beat__ = -1
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
@@ -1002,26 +1001,27 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             logging.info(f"Loading recorded wav to ({self.clip_to_record_path}) clip({self.clip_to_record}) {self.clip_to_record.channel.id} {self.clip_to_record.id}")
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
-            # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
-            self.zynqtgui.currentTaskMessage = "Loading recording to clip"
-            self.clip_to_record.set_path(self.clip_to_record_path, should_copy=True)
-            self.clip_to_record.enabled = True
-            # Set same recorded clip to other additional clips
-            for clip in self.clips_to_record:
-                # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
-                # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
-                if clip != self.clip_to_record:
-                    clip.enabled = True
-                    # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
-                    clip.set_path(self.clip_to_record_path, should_copy=True)
-                ### Save clip metadata
-                # When processing a sample, do not write sound metadata. It does not need to have sound metadata
-                # When processing a clip, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data
-                ###
-                clip.metadata.write(writeSoundMetadata=not clip.is_channel_sample, isAutosave=True)
-            if self.clip_to_record.isChannelSample:
-                # logging.info("Recorded clip is a sample")
-                self.clip_to_record.channel.samples_changed.emit()
+            else:
+                # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
+                self.zynqtgui.currentTaskMessage = "Loading recording to clip"
+                self.clip_to_record.set_path(self.clip_to_record_path, should_copy=True)
+                self.clip_to_record.enabled = True
+                # Set same recorded clip to other additional clips
+                for clip in self.clips_to_record:
+                    # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
+                    # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
+                    if clip != self.clip_to_record:
+                        clip.enabled = True
+                        # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
+                        clip.set_path(self.clip_to_record_path, should_copy=True)
+                    ### Save clip metadata
+                    # When processing a sample, do not write sound metadata. It does not need to have sound metadata
+                    # When processing a clip, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data
+                    ###
+                    clip.metadata.write(writeSoundMetadata=not clip.is_channel_sample, isAutosave=True)
+                if self.clip_to_record.isChannelSample:
+                    # logging.info("Recorded clip is a sample")
+                    self.clip_to_record.channel.samples_changed.emit()
 
     def get_next_free_layer(self):
         logging.debug(self.zynqtgui.screens["layers"].layers)

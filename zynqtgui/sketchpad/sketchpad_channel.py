@@ -50,13 +50,13 @@ class last_selected_obj_dto(QObject):
     def __init__(self, parent=None):
         super(last_selected_obj_dto, self).__init__(parent)
         self.__className = None
-        self.__value = None
+        self.__value = 0
         self.__component = None
 
     @Slot()
     def reset(self):
         self.__className = None
-        self.__value = None
+        self.__value = 0
         self.__component = None
 
         self.classNameChanged.emit()

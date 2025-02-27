@@ -44,10 +44,19 @@ Rectangle {
         id: selectedChannelThrottle
         interval: 1; running: false; repeat: false;
         onTriggered: {
-            root.selectedChannel = applicationWindow().selectedChannel;
-            if (root.selectedChannel.selectedSlot.component === null && zynqtgui.isBootingComplete) {
-                root.pickFirstAndBestSlot();
+            if (root.song && root.song.isLoading == false) {
+                root.selectedChannel = applicationWindow().selectedChannel;
+                if (root.selectedChannel) {
+                    if (root.selectedChannel.selectedSlot.component === null && zynqtgui.isBootingComplete) {
+                        root.pickFirstAndBestSlot();
+                    }
+                } else {
+                    selectedChannelThrottle.restart();
+                }
+            } else {
+                selectedChannelThrottle.restart();
             }
+            console.log("Selected channel throttle time, let's goooo...");
         }
     }
     Connections {
@@ -62,6 +71,17 @@ Rectangle {
         function onRequestSwitchToSlot(slotType, slotIndex) {
             root.switchToSlot(slotType, slotIndex);
         }
+    }
+    Connections {
+        target: root.song
+        onIsLoadingChanged: {
+            if (root.song.isLoading == false) {
+                selectedChannelThrottle.restart();
+            }
+        }
+    }
+    onSongChanged: {
+        selectedChannelThrottle.restart();
     }
 
     property QtObject sequence: root.selectedChannel ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
@@ -186,6 +206,8 @@ Rectangle {
     }
     function switchToSlot(slotType, slotIndex) {
         switch(slotType) {
+            default:
+                console.log("Unknown slot type: \"" + slotType + "\" - assuming synth")
             case "synth":
             case "TracksBar_synthslot":
                 root.selectedChannel.displayFx = false;
@@ -210,9 +232,6 @@ Rectangle {
             case "TracksBar_externalslot":
                 root.selectedChannel.displayFx = false;
                 externalRow.switchToSlot(slotIndex, true);
-                break;
-            default:
-                console.log("Unknown slot type:", slotType)
                 break;
         }
     }

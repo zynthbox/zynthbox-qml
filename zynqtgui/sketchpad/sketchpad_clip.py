@@ -676,7 +676,7 @@ class sketchpad_clip(QObject):
     # A helper method to generate unique name when copying a wave file into a folder
     # Arg file : Full Path of file to be copied
     # Arg copy_dir : Full Path of destination dir where the file will be copied
-    # Returns : An unique filename as string in the format f"{file_basename}-{counter}.{category}.wav" (where category is either "clip" or "sketch")
+    # Returns : An unique filename as string in the format f"{file_basename}-{counter}{.category}.wav" (where category is either "" or ".sketch")
     @staticmethod
     def generate_unique_filename(file, copy_dir):
         file_path = Path(file)
@@ -684,17 +684,23 @@ class sketchpad_clip(QObject):
         counter = 1
 
         # Find the base filename excluding our suffix (wav)
-        file_basename = file_path.name.split(".wav")[0]
+        category = ""
+        file_basename = ""
+        if file_path.name.lower().endswith(".sketch.wav"):
+            category = ".sketch"
+            file_basename = file_path.name.split(".sketch.wav")[0]
+        else:
+            file_basename = file_path.name.split(".wav")[0]
         # Remove the `counter` part from the string if exists
         file_basename = re.sub('-\d*$', '', file_basename)
 
-        if not (copy_dir_path / f"{file_basename}.wav").exists():
-            return f"{file_basename}.wav"
+        if not (copy_dir_path / f"{file_basename}{category}.wav").exists():
+            return f"{file_basename}{category}.wav"
         else:
-            while Path(copy_dir_path / f"{file_basename}-{counter}.wav").exists():
+            while Path(copy_dir_path / f"{file_basename}-{counter}{category}.wav").exists():
                 counter += 1
 
-            return f"{file_basename}-{counter}.wav"
+            return f"{file_basename}-{counter}{category}.wav"
 
     def className(self):
         return "sketchpad_clip"

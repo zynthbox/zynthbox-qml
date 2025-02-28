@@ -47,7 +47,7 @@ Rectangle {
             if (root.song && root.song.isLoading == false) {
                 root.selectedChannel = applicationWindow().selectedChannel;
                 if (root.selectedChannel) {
-                    if (root.selectedChannel.selectedSlot.component === null && zynqtgui.isBootingComplete) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.className == null && root.selectedChannel.selectedSlot.component === null && zynqtgui.isBootingComplete) {
                         root.pickFirstAndBestSlot();
                     }
                 } else {

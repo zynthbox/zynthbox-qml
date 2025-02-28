@@ -277,6 +277,9 @@ class sketchpad_channel(QObject):
         self.__initial_pan__ = 0
         self.__audio_level__ = -200
         self.__clips_model__ = [sketchpad_clips_model(song, self, 0), sketchpad_clips_model(song, self, 1), sketchpad_clips_model(song, self, 2), sketchpad_clips_model(song, self, 3), sketchpad_clips_model(song, self, 4)]
+        for clip_model in self.__clips_model__:
+            for clip in clip_model.__clips__:
+                clip.path_changed.connect(self.sketchSlotsDataChanged.emit)
         self.__layers_snapshot = []
         self.master_volume = Zynthbox.Plugin.instance().dBFromVolume(self.zynqtgui.masterVolume/100)
         self.zynqtgui.masterVolumeChanged.connect(lambda: self.master_volume_changed())
@@ -367,6 +370,7 @@ class sketchpad_channel(QObject):
             newSample.set_lane(i)
             # Explicitly set channel as it is a channelSample
             newSample.channel = self
+            newSample.path_changed.connect(self.samples_changed.emit)
             self.__samples__.append(newSample)
 
         # All tracks should be multiclip by default
@@ -585,6 +589,7 @@ class sketchpad_channel(QObject):
     def chainedFxChangedHandler(self):
         self.clearFxPassthroughForEmtpySlots()
         self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+        self.chainedFxNamesChanged.emit()
 
     def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()

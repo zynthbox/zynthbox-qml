@@ -179,8 +179,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     @Slot()
     def generateStatFiles(self):
         def task():
-            Zynthbox.SndLibraryHelper.instance().serializeTo("/zynthian/zynthian-my-data/sounds/my-sounds", "/zynthian/zynthian-my-data/sounds/my-sounds/.stat.json")
-            Zynthbox.SndLibraryHelper.instance().serializeTo("/zynthian/zynthian-my-data/sounds/community-sounds", "/zynthian/zynthian-my-data/sounds/community-sounds/.stat.json")
+            Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/my-sounds", "/zynthian/zynthian-my-data/sounds/my-sounds/.stat.json")
+            Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/community-sounds", "/zynthian/zynthian-my-data/sounds/community-sounds/.stat.json")
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Generating sound statistics")
 

@@ -128,7 +128,7 @@ Zynthian.ScreenPage {
             // Refresh sounds model on page open
             if (zynqtgui.current_screen_id === root.screenId) {
                 soundTypeComboBox.currentIndex = 0
-                zynqtgui.sound_categories.setSoundTypeFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
+                Zynthbox.SndLibrary.setOriginFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
 
                 if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
                     soundButtonGroup.checkedButton.checked = false
@@ -290,7 +290,7 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                         model: ["my-sounds", "community-sounds"]
                         onActivated: {
-                            zynqtgui.sound_categories.setSoundTypeFilter(model[index])
+                            Zynthbox.SndLibrary.setOriginFilter(model[index])
                         }
                         delegate: QQC2.ItemDelegate {
                             id: itemDelegate
@@ -314,7 +314,6 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: height
                         onClicked: {
                             zynqtgui.sound_categories.generateStatFiles()
-                            zynqtgui.sound_categories.load_sounds_model()
                         }
 
                         Kirigami.Icon {
@@ -340,7 +339,7 @@ Zynthian.ScreenPage {
                     cellWidth: (width - spacing * (columns - 1)) / columns
                     cellHeight: Kirigami.Units.gridUnit * 4.5
                     clip: true
-                    model: zynqtgui.sound_categories.soundsModel
+                    model: Zynthbox.SndLibrary.model
                     reuseItems: true
                     QQC2.ScrollBar.vertical: QQC2.ScrollBar {
                         width: Kirigami.Units.gridUnit

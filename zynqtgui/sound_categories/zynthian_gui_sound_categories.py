@@ -44,18 +44,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         self.__sounds_base_path__ = Path('/zynthian/zynthian-my-data/sounds')
         self.__community_sounds_path__ = self.__sounds_base_path__ / 'community-sounds'
         self.__my_sounds_path__ = self.__sounds_base_path__ / 'my-sounds'
-
-        self.__sound_type_filter_proxy_model__ = QSortFilterProxyModel()
-        self.__sound_type_filter_proxy_model__.setSourceModel(Zynthbox.SndLibrary.instance().sourceModel())
-        self.__sound_type_filter_proxy_model__.setFilterRole(Zynthbox.SndLibraryModel.Roles.OriginRole)
-        self.__sound_type_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.__sound_type_filter_proxy_model__.setFilterFixedString("my-sounds")
-
-        self.__sound_category_filter_proxy_model__ = QSortFilterProxyModel()
-        self.__sound_category_filter_proxy_model__.setSourceModel(self.__sound_type_filter_proxy_model__)
-        self.__sound_category_filter_proxy_model__.setFilterRole(Zynthbox.SndLibraryModel.Roles.CategoryRole)
-        self.__sound_category_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
-
         self.__sound_category_name_mapping__ = {
             "*": "All",
             "0": "Uncategorized",
@@ -67,8 +55,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             "6": "Guitar/Plucks",
             "99": "FX/Other",
         }
-
-        self.load_sounds_model()
 
     def show(self):
         pass
@@ -105,32 +91,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         except Exception as e:
             logging.debug(f"Sound Category with key `{key}` not found : {str(e)}")
             return ""
-
-    @Slot()
-    def load_sounds_model(self):
-        def task():
-            # TODO : Implement reading from statistics file
-            # # Fill community-sounds list
-            # for file in self.__community_sounds_path__.glob("**/*.snd"):
-            #     self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "community-sounds"))
-            # # Fill my-sounds list
-            # for file in self.__my_sounds_path__.glob("**/*.snd"):
-            #     self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "my-sounds"))
-            self.zynqtgui.end_long_task()
-        # self.__sounds_model__.clear()
-        self.zynqtgui.do_long_task(task, "Reading and sorting sounds into categories")
-
-    @Slot(str)
-    def setSoundTypeFilter(self, _filter):
-        self.__sound_type_filter_proxy_model__.setFilterFixedString(_filter)
-
-    @Slot(str)
-    def setCategoryFilter(self, _filter):
-        # If qml sends category filter as `*`, clear any filtering and display all sounds
-        if _filter == "*":
-            self.__sound_category_filter_proxy_model__.setFilterRegExp("")
-        else:
-            self.__sound_category_filter_proxy_model__.setFilterFixedString(f"{_filter}")
 
     @Slot(str, result=bool)
     def checkIfSoundFileExists(self, filename):
@@ -180,13 +140,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         def task():
             Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/my-sounds", "/zynthian/zynthian-my-data/sounds/my-sounds/.stat.json")
             Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/community-sounds", "/zynthian/zynthian-my-data/sounds/community-sounds/.stat.json")
+            # Refresh the models after generating stats files to update the UI
             Zynthbox.SndLibrary.instance().refresh()
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Generating sound statistics")
-
-    ### Property soundsModel
-    def get_sounds_model(self):
-        return self.__sound_category_filter_proxy_model__
-
-    soundsModel = Property(QObject, get_sounds_model, constant=True)
-    ### END Property soundsModel

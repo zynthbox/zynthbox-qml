@@ -25,11 +25,12 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.Button {
     property string category: "*"
 
     checkable: true
     text: zynqtgui.sound_categories.getCategoryNameFromKey(category)
-    onClicked: zynqtgui.sound_categories.setCategoryFilter(category)
+    onClicked: Zynthbox.SndLibrary.setCategoryFilter(category)
 }

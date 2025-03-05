@@ -44,17 +44,16 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         self.__sounds_base_path__ = Path('/zynthian/zynthian-my-data/sounds')
         self.__community_sounds_path__ = self.__sounds_base_path__ / 'community-sounds'
         self.__my_sounds_path__ = self.__sounds_base_path__ / 'my-sounds'
-        self.__sounds_model__ = sound_categories_sounds_model(self)
 
         self.__sound_type_filter_proxy_model__ = QSortFilterProxyModel()
-        self.__sound_type_filter_proxy_model__.setSourceModel(self.__sounds_model__)
-        self.__sound_type_filter_proxy_model__.setFilterRole(sound_categories_sounds_model.Roles.SoundTypeRole)
+        self.__sound_type_filter_proxy_model__.setSourceModel(Zynthbox.SndLibrary.instance().sourceModel())
+        self.__sound_type_filter_proxy_model__.setFilterRole(Zynthbox.SndLibraryModel.Roles.OriginRole)
         self.__sound_type_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self.__sound_type_filter_proxy_model__.setFilterFixedString("my-sounds")
 
         self.__sound_category_filter_proxy_model__ = QSortFilterProxyModel()
         self.__sound_category_filter_proxy_model__.setSourceModel(self.__sound_type_filter_proxy_model__)
-        self.__sound_category_filter_proxy_model__.setFilterRole(sound_categories_sounds_model.Roles.CategoryRole)
+        self.__sound_category_filter_proxy_model__.setFilterRole(Zynthbox.SndLibraryModel.Roles.CategoryRole)
         self.__sound_category_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
         self.__sound_category_name_mapping__ = {
@@ -118,7 +117,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             # for file in self.__my_sounds_path__.glob("**/*.snd"):
             #     self.__sounds_model__.add_sound(zynthbox_sound(self, self.zynqtgui, file.name, "my-sounds"))
             self.zynqtgui.end_long_task()
-        self.__sounds_model__.clear()
+        # self.__sounds_model__.clear()
         self.zynqtgui.do_long_task(task, "Reading and sorting sounds into categories")
 
     @Slot(str)
@@ -147,7 +146,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         sound.metadata.sampleSnapshot = selectedTrack.getChannelSampleSnapshot()
         sound.metadata.category = category
         sound.metadata.write()
-        self.__sounds_model__.add_sound(sound)
+        # self.__sounds_model__.add_sound(sound)
 
     @Slot(QObject)
     def loadSound(self, sound: zynthbox_sound):
@@ -181,6 +180,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         def task():
             Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/my-sounds", "/zynthian/zynthian-my-data/sounds/my-sounds/.stat.json")
             Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/community-sounds", "/zynthian/zynthian-my-data/sounds/community-sounds/.stat.json")
+            Zynthbox.SndLibrary.instance().refresh()
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Generating sound statistics")
 

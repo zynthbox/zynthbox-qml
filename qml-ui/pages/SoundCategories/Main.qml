@@ -23,9 +23,9 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.10
+import QtQuick 2.15
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
@@ -324,16 +324,24 @@ Zynthian.ScreenPage {
                             color: "#ffffffff"
                         }
                     }
+                }                
+
+                QQC2.ButtonGroup {
+                    id: soundButtonGroup
                 }
 
-                Flickable {
-                    id: scrollView
+                GridView {
+                    id: soundsGrid
+                    property int columns: 5
+                    property real spacing: Kirigami.Units.largeSpacing
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    // Take into consideration the top and bottom margin of Kirigami.Units.gridUnit each
-                    contentHeight: soundGrid.height + Kirigami.Units.gridUnit * 2
-                    flickableDirection: Flickable.AutoFlickDirection
+                    cellWidth: (width - spacing * (columns - 1)) / columns
+                    cellHeight: Kirigami.Units.gridUnit * 4.5
                     clip: true
+                    model: zynqtgui.sound_categories.soundsModel
+                    reuseItems: true
                     QQC2.ScrollBar.vertical: QQC2.ScrollBar {
                         width: Kirigami.Units.gridUnit
                         height: Kirigami.Units.gridUnit * 3
@@ -343,97 +351,45 @@ Zynthian.ScreenPage {
                         }
                         policy: QQC2.ScrollBar.AlwaysOn
                     }
-                    Item {
-                        width: soundsDisplayContainer.width
+                    delegate: Item {
+                        width: soundsGrid.cellWidth
+                        height: soundsGrid.cellHeight
 
-                        QQC2.ButtonGroup {
-                            id: soundButtonGroup
-                            buttons: soundGrid.children
-                        }
-
-                        GridLayout {
-                            id: soundGrid
-
-                            property real cellWidth: (width - columnSpacing * (columns-1))/columns
-
-                            anchors {
-                                top: parent.top
-                                left: parent.left
-                                right: parent.right
-                                margins: Kirigami.Units.gridUnit
-                            }
-
-                            columns: 5
-                            rowSpacing: Kirigami.Units.gridUnit
-                            columnSpacing: Kirigami.Units.gridUnit
-
-                            Repeater {
-                                id: soundButtonsRepeater
-                                model: zynqtgui.sound_categories.soundsModel
-                                delegate: QQC2.Button {
-                                    property QtObject soundObj: model.sound
-                                    property bool wasChecked
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.preferredWidth: soundGrid.cellWidth
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
-                                    checkable: true
-                                    // Little bit of hula-hooping to allow unchecking buttons in an exclusive button group
-                                    // Source : https://stackoverflow.com/a/51098266
-                                    onPressed: wasChecked = checked
-                                    onReleased: {
-                                        if (wasChecked) {
-                                            checked = false;
-                                            toggled(); // emit the toggled signal manually, since we changed the checked value programmatically but it still originated as an user interaction.
-                                        }
-                                    }
-
-                                    QQC2.Label {
-                                        anchors.fill: parent
-                                        text: model.display
-                                        wrapMode: QQC2.Label.WrapAtWordBoundaryOrAnywhere
-                                        horizontalAlignment: QQC2.Label.AlignHCenter
-                                        verticalAlignment: QQC2.Label.AlignVCenter
-                                    }
-
-                                    QQC2.Label {
-                                        anchors {
-                                            right: parent.right
-                                            bottom: parent.bottom
-                                            margins: Kirigami.Units.gridUnit * 0.5
-                                        }
-
-                                        text: zynqtgui.sound_categories.getCategoryNameFromKey(soundObj.category)
-                                        font.pointSize: 8
-                                    }
-
-                                    QQC2.Label {
-                                        anchors {
-                                            left: parent.left
-                                            bottom: parent.bottom
-                                            margins: Kirigami.Units.gridUnit * 0.5
-                                        }
-
-                                        text: zynqtgui.layer.load_layer_channels_from_json(soundObj.metadata.synthFxSnapshot).length
-                                        font.pointSize: 8
-                                    }
+                        QQC2.Button {
+                            id: soundButton
+                            property QtObject soundObj: model.sound
+                            property bool wasChecked
+                            anchors.fill: parent
+                            anchors.margins: soundsGrid.spacing
+                            QQC2.ButtonGroup.group: soundButtonGroup
+                            checkable: true
+                            // Little bit of hula-hooping to allow unchecking buttons in an exclusive button group
+                            // Source : https://stackoverflow.com/a/51098266
+                            onPressed: wasChecked = checked
+                            onReleased: {
+                                if (wasChecked) {
+                                    checked = false;
+                                    toggled(); // emit the toggled signal manually, since we changed the checked value programmatically but it still originated as an user interaction.
                                 }
                             }
 
-                            /** When soundsModel has less `soundGrid.columns`, alignment issue occurs because of
-                              * less amount of items than columns. Add spacers of same width and height as elements
-                              */
-                            Repeater {
-                                model: soundButtonsRepeater.count < soundGrid.columns
-                                        ? soundGrid.columns - soundButtonsRepeater.count
-                                        : 0
-                                delegate: Item {
-                                    id: spacer
-                                    Layout.fillWidth: false
-                                    Layout.fillHeight: false
-                                    Layout.preferredWidth: soundGrid.cellWidth
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4.5
+                            QQC2.Label {
+                                anchors.fill: parent
+                                text: model.name
+                                wrapMode: QQC2.Label.WrapAtWordBoundaryOrAnywhere
+                                horizontalAlignment: QQC2.Label.AlignHCenter
+                                verticalAlignment: QQC2.Label.AlignVCenter
+                            }
+
+                            QQC2.Label {
+                                anchors {
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                    margins: Kirigami.Units.gridUnit * 0.5
                                 }
+
+                                text: zynqtgui.sound_categories.getCategoryNameFromKey(soundButton.soundObj.category)
+                                font.pointSize: 8
                             }
                         }
                     }

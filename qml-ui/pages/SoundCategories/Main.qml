@@ -230,11 +230,11 @@ Zynthian.ScreenPage {
                         category: "*"
                         checked: true
                     }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "0"
-                    }
+                    // CategoryButton {
+                    //     Layout.fillWidth: true
+                    //     Layout.fillHeight: true
+                    //     category: "0"
+                    // }
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true

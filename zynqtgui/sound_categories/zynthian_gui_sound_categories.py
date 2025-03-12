@@ -34,7 +34,7 @@ from pathlib import Path
 from PySide2.QtCore import Property, QObject, QSortFilterProxyModel, Qt, Slot
 
 from .sound_categories_sounds_model import sound_categories_sounds_model
-from .zynthbox_sound import zynthbox_sound
+from .zynthbox_sndfile import zynthbox_sndfile
 from .. import zynthian_qt_gui_base
 
 
@@ -101,15 +101,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         if not name.endswith(".snd"):
             name = f"{name}.snd"
         selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        sound = zynthbox_sound(self, self.zynqtgui, name, "my-sounds")
+        sound = zynthbox_sndfile(self, self.zynqtgui, name, "my-sounds")
         sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshot()
         sound.metadata.sampleSnapshot = selectedTrack.getChannelSampleSnapshot()
         sound.metadata.category = category
         sound.metadata.write()
-        # self.__sounds_model__.add_sound(sound)
+        Zynthbox.SndLibrary.instance().addSndFiles([sound.path], sound.type, f"/zynthian/zynthian-my-data/sounds/{sound.type}/.stat.json")
 
     @Slot(QObject)
-    def loadSound(self, sound: zynthbox_sound):
+    def loadSound(self, sound: zynthbox_sndfile):
         def confirmLoadSound(params=None):
             selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             selectedTrack.setChannelSoundFromSnapshot(sound.metadata.synthFxSnapshot)
@@ -138,8 +138,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     @Slot()
     def generateStatFiles(self):
         def task():
-            Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/my-sounds", "/zynthian/zynthian-my-data/sounds/my-sounds/.stat.json")
-            Zynthbox.SndLibrary.instance().serializeTo("/zynthian/zynthian-my-data/sounds/community-sounds", "/zynthian/zynthian-my-data/sounds/community-sounds/.stat.json")
+            for origin in ["my-sounds", "community-sounds"]:
+                Zynthbox.SndLibrary.instance().serializeTo(f"/zynthian/zynthian-my-data/sounds/{origin}", origin, f"/zynthian/zynthian-my-data/sounds/{origin}/.stat.json")
             # Refresh the models after generating stats files to update the UI
             Zynthbox.SndLibrary.instance().refresh()
             self.zynqtgui.end_long_task()

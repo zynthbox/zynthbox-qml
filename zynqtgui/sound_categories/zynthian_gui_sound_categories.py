@@ -33,7 +33,6 @@ from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, QSortFilterProxyModel, Qt, Slot
 
-from .sound_categories_sounds_model import sound_categories_sounds_model
 from .zynthbox_sndfile import zynthbox_sndfile
 from .. import zynthian_qt_gui_base
 

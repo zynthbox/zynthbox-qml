@@ -45,10 +45,16 @@ class zynthbox_sndfile_metadata(QObject):
         self.__synthFxSnapshot = None
         self.__sampleSnapshot = None
         self.__category = None
+        self.__synthSlotsData = None
+        self.__sampleSlotsData = None
+        self.__fxSlotsData = None
 
     def get_synthFxSnapshot(self): return self.__synthFxSnapshot
     def get_sampleSnapshot(self): return self.__sampleSnapshot
     def get_category(self): return self.__category
+    def get_synthSlotsData(self): return self.__synthSlotsData
+    def get_sampleSlotsData(self): return self.__sampleSlotsData
+    def get_fxSlotsData(self): return self.__fxSlotsData
 
     def set_synthFxSnapshot(self, value, force=False):
         if value != self.__synthFxSnapshot or force:
@@ -62,14 +68,32 @@ class zynthbox_sndfile_metadata(QObject):
         if value != self.__category or force:
             self.__category = value
             self.categoryChanged.emit()
+    def set_synthSlotsData(self, value, force=False):
+        if value != self.__synthSlotsData or force:
+            self.__synthSlotsData = value
+            self.synthSlotsDataChanged.emit()
+    def set_sampleSlotsData(self, value, force=False):
+        if value != self.__sampleSlotsData or force:
+            self.__sampleSlotsData = value
+            self.sampleSlotsDataChanged.emit()
+    def set_fxSlotsData(self, value, force=False):
+        if value != self.__fxSlotsData or force:
+            self.__fxSlotsData = value
+            self.fxSlotsDataChanged.emit()
 
     synthFxSnapshotChanged = Signal()
     sampleSnapshotChanged = Signal()
     categoryChanged = Signal()
+    synthSlotsDataChanged = Signal()
+    sampleSlotsDataChanged = Signal()
+    fxSlotsDataChanged = Signal()
 
     synthFxSnapshot = Property(str, get_synthFxSnapshot, set_synthFxSnapshot, notify=synthFxSnapshotChanged)
     sampleSnapshot = Property(str, get_sampleSnapshot, set_sampleSnapshot, notify=sampleSnapshotChanged)
     category = Property(int, get_category, set_category, notify=categoryChanged)
+    synthSlotsData = Property(str, get_synthSlotsData, set_synthSlotsData, notify=synthSlotsDataChanged)
+    sampleSlotsData = Property(str, get_sampleSlotsData, set_sampleSlotsData, notify=sampleSlotsDataChanged)
+    fxSlotsData = Property(str, get_fxSlotsData, set_fxSlotsData, notify=fxSlotsDataChanged)
 
     def getMetadataProperty(self, name, default=None):
         try:
@@ -98,6 +122,9 @@ class zynthbox_sndfile_metadata(QObject):
             self.set_synthFxSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT", None)), force=True)
             self.set_sampleSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT", None)), force=True)
             self.set_category(int(self.getMetadataProperty("ZYNTHBOX_SOUND_CATEGORY", 0)), force=True)
+            self.set_synthSlotsData(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SYNTH_SLOTS_DATA", 0)), force=True)
+            self.set_sampleSlotsData(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SAMPLE_SLOTS_DATA", 0)), force=True)
+            self.set_fxSlotsData(str(self.getMetadataProperty("ZYNTHBOX_SOUND_FX_SLOTS_DATA", 0)), force=True)
 
     def write(self):
         if self.sound.exists():
@@ -105,6 +132,9 @@ class zynthbox_sndfile_metadata(QObject):
             tags["ZYNTHBOX_SOUND_SYNTH_FX_SNAPSHOT"] = str(self.__synthFxSnapshot)
             tags["ZYNTHBOX_SOUND_SAMPLE_SNAPSHOT"] = str(self.__sampleSnapshot)
             tags["ZYNTHBOX_SOUND_CATEGORY"] = str(self.__category)
+            tags["ZYNTHBOX_SOUND_SYNTH_SLOTS_DATA"] = str(self.__synthSlotsData)
+            tags["ZYNTHBOX_SOUND_SAMPLE_SLOTS_DATA"] = str(self.__sampleSlotsData)
+            tags["ZYNTHBOX_SOUND_FX_SLOTS_DATA"] = str(self.__fxSlotsData)
             try:
                 logging.debug(f"Writing sound metadata {self.sound} : {self.sound.path}")
                 # file = taglib.File(self.sound.path)
@@ -119,6 +149,9 @@ class zynthbox_sndfile_metadata(QObject):
         self.set_synthFxSnapshot(None, write=False, force=True)
         self.set_sampleSnapshot(None, write=False, force=True)
         self.set_category(None, write=False, force=True)
+        self.set_synthSlotsData(None, write=False, force=True)
+        self.set_sampleSlotsData(None, write=False, force=True)
+        self.set_fxSlotsData(None, write=False, force=True)
 
 
 class zynthbox_sndfile(QObject):
@@ -176,44 +209,3 @@ class zynthbox_sndfile(QObject):
 
     metadata = Property(QObject, get_metadata, constant=True)
     ### END Property metadata
-
-    ### Property synthSlotsData
-    def get_synthSlotsData(self):
-        metadata = self.zynqtgui.layer.sound_metadata_from_json(self.__metadata.synthFxSnapshot)
-        res = ["", "", "", "", ""]
-        for layer in metadata:
-            if "engine_type" in layer and "slot_index" in layer and layer["engine_type"] == "MIDI Synth":
-                if "preset_name" in layer and layer['preset_name'] is not None and layer['preset_name'] != "None":
-                    res[layer["slot_index"]] = f"{layer['name']} > {layer['preset_name']}"
-                else:
-                    res[layer["slot_index"]] = layer['name']
-        return res
-
-    synthSlotsData = Property("QVariantList", get_synthSlotsData, constant=True)
-    ### END Property synthSlotsData
-
-    ### Property sampleSlotsData
-    def get_sampleSlotsData(self):
-        res = ["", "", "", "", ""]
-        snapshot_obj = json.loads(self.__metadata.sampleSnapshot)
-        for index, key in enumerate(snapshot_obj):
-            res[index] = snapshot_obj[key]["filename"]
-        return res
-
-    sampleSlotsData = Property("QVariantList", get_sampleSlotsData, constant=True)
-    ### END Property sampleSlotsData
-
-    ### Property fxSlotsData
-    def get_fxSlotsData(self):
-        metadata = self.zynqtgui.layer.sound_metadata_from_json(self.__metadata.synthFxSnapshot)
-        res = ["", "", "", "", ""]
-        for layer in metadata:
-            if "engine_type" in layer and "slot_index" in layer and layer["engine_type"] == "Audio Effect":
-                if "preset_name" in layer and layer['preset_name'] is not None and layer['preset_name'] != "None":
-                    res[layer["slot_index"]] = f"{layer['name']} > {layer['preset_name']}"
-                else:
-                    res[layer["slot_index"]] = layer['name']
-        return res
-
-    fxSlotsData = Property("QVariantList", get_fxSlotsData, constant=True)
-    ### END Property sampleSlotsData

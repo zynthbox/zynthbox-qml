@@ -105,6 +105,12 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         sound.metadata.synthFxSnapshot = selectedTrack.getChannelSoundSnapshot()
         sound.metadata.sampleSnapshot = selectedTrack.getChannelSampleSnapshot()
         sound.metadata.category = category
+        # selectedTrack.synthSlotsData is a list of strings (just what we need)
+        sound.metadata.synthSlotsData = json.dumps(selectedTrack.synthSlotsData)
+        # selectedTrack.sampleSlotsData is a list of clips (Map to a list of filenames)
+        sound.metadata.sampleSlotsData = json.dumps([Path(f.path if f.path is not None else "").name for f in selectedTrack.sampleSlotsData])
+        # selectedTrack.fxSlotsData is a list of strings (just what we need)
+        sound.metadata.fxSlotsData = json.dumps(selectedTrack.fxSlotsData)
         sound.metadata.write()
         Zynthbox.SndLibrary.instance().addSndFiles([sound.path], sound.type, f"/zynthian/zynthian-my-data/sounds/{sound.type}/.stat.json")
 

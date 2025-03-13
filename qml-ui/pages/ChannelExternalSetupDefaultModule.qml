@@ -37,6 +37,11 @@ Zynthian.BaseExternalEditor {
     cuiaCallback: function(cuia) {
         var returnValue = false;
         switch (cuia) {
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+                _private.selectPressed();
+                returnValue = true;
+                break;
             case "SELECT_UP":
                 _private.goUp();
                 returnValue = true;
@@ -91,22 +96,45 @@ Zynthian.BaseExternalEditor {
     QtObject {
         id: _private
         property int currentColumn: 0
+        property int currentPage: 0
         property QtObject sketchpadTrackController: component.selectedChannel ? Zynthbox.MidiRouter.getSketchpadTrackControllerDevice(component.selectedChannel.id) : null
+        property QtObject sketchpadTrackExternalDevice: component.selectedChannel ? Zynthbox.MidiRouter.getSketchpadTrackExternalDevice(component.selectedChannel.id) : null
+        function selectPressed() {
+            if (_private.currentPage == 1) {
+                requestIdentityButton.onClicked();
+            }
+        }
         function goUp() {
+            _private.currentPage = Math.max(0, _private.currentPage - 1);
         }
         function goLeft() {
             _private.currentColumn = Math.max(0, _private.currentColumn - 1);
         }
         function goDown() {
+            _private.currentPage = Math.min(1, _private.currentPage + 1);
         }
         function goRight() {
             _private.currentColumn = Math.min(3, _private.currentColumn + 1);
         }
         function knob0Up() {
-            sendCCValueChange((currentColumn * 3), 1);
+            if (_private.currentPage == 0) {
+                sendCCValueChange((currentColumn * 3), 1);
+            } else {
+                filterCutoffDial.value = Math.min(127, filterCutoffDial.value + 1);
+                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
+                _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
+            }
         }
         function knob0Down() {
-            sendCCValueChange((currentColumn * 3), -1);
+            if (_private.currentPage == 0) {
+                sendCCValueChange((currentColumn * 3), -1);
+            } else {
+                filterCutoffDial.value = Math.max(0, filterCutoffDial.value - 1);
+                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
+                _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
+            }
         }
         function knob1Up() {
             sendCCValueChange((currentColumn * 3) + 1, 1);
@@ -138,11 +166,141 @@ Zynthian.BaseExternalEditor {
         }
     }
 
+    Column {
+        id: pageSelectorColumn
+        anchors {
+            top: parent.top
+            left: parent.left
+            bottom: parent.bottom
+        }
+        width: component.width * 0.15
+        Repeater {
+            model: 2
+            delegate: Rectangle {
+                width: pageSelectorColumn.width
+                height: pageSelectorColumn.height / 8
+                color: "transparent"
+                border.color: _private.currentPage === index ? "#88ffffff" : "transparent"
+                border.width: 2
+                radius: 2
+
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    text: qsTr("Page %1").arg(index+1)
+                }
+
+                Kirigami.Separator {
+                    height: 1
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        _private.currentPage = index
+                    }
+                }
+            }
+        }
+    }
     Row {
-        anchors.fill: parent
+        visible: _private.currentPage === 0
+        anchors {
+            fill: parent
+            leftMargin: component.width * 0.15 + Kirigami.Units.largeSpacing
+        }
         Repeater {
             model: 4
             delegate: columnDelegateComponent
+        }
+    }
+    Item {
+        visible: _private.currentPage === 1
+        anchors {
+            fill: parent
+            leftMargin: component.width * 0.15 + Kirigami.Units.largeSpacing
+        }
+        Row {
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            height: component.height * 0.1
+            QQC2.Label {
+                height: parent.height
+                width: parent.width * 0.8
+                text: _private.sketchpadTrackExternalDevice
+                    ? _private.sketchpadTrackExternalDevice.sysexHelper.identity
+                        ? "Identity: %1".arg(_private.sketchpadTrackExternalDevice.sysexHelper.identity.description)
+                        : "External Device identity unknown, click the button to try and get one..."
+                    : "External Device missing - you likely need to plug it in"
+            }
+            QQC2.Button {
+                id: requestIdentityButton
+                height: parent.height
+                width: parent.width * 0.2
+                text: "Request Identity"
+                enabled: _private.sketchpadTrackExternalDevice && _private.sketchpadTrackExternalDevice.sysexHelper
+                onClicked: {
+                    console.log("Identity", _private.sketchpadTrackExternalDevice.sysexHelper.identity, "on external device", _private.sketchpadTrackExternalDevice);
+                    let identityRequestMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createKnownMessage(Zynthbox.SysexHelper.IdentityRequestMessage);
+                    identityRequestMessage.deleteOnSend = true;
+                    _private.sketchpadTrackExternalDevice.sysexHelper.send(identityRequestMessage);
+                }
+            }
+        }
+        Item {
+            anchors {
+                fill: parent
+                topMargin: component.height * 0.1 + Kirigami.Units.largeSpacing
+            }
+            // Sysex format for sound parameter changes for Waldorf Microwave 2 (does not require a checksum):
+            // 0x3E (for Waldorf)
+            // 0x0E (for Microwave 2)
+            // 0x7F (for "broadcast")
+            // 0x20 (for Sound Parameter Change
+            // 0xLL (for Location - either 00 (for Sound Mode Edit Buffer), or 00 through 07 (for Multi Mode Instrument 1..8 sound buffer))
+            // 0xHH (Parameter index high bit, for parameter indexes above 127 - meaning these two are functionally a (right-aligned) 14 bit number together)
+            // 0xPP (Parameter index)
+            // 0xXX (New parameter value - range dependent on parameter)
+            // For the filter cutoff:
+            // Parameter index 62 (0x00, 0x3E)
+            // Range 0 through 127 (0x00 through 0x7F)
+            QQC2.Dial {
+                id: filterCutoffDial
+                anchors.centerIn: parent
+                inputMode: QQC2.Dial.Vertical
+                width: Math.min(parent.height, parent.width)
+                height: Math.min(parent.height, parent.width)
+                stepSize: 1
+                from: 0
+                to: 127
+                value: 127
+                onMoved: {
+                    let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                    let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
+                    _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
+                }
+
+                QQC2.Label {
+                    id: valueLabel
+                    anchors {
+                        fill: parent
+                        margins: filterCutoffDial.handle.width / 2
+                    }
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    fontSizeMode: Text.Fit
+                    minimumPointSize: 8
+                    font.pointSize: 18
+                    text: qsTr("Waldorf Microwave 2\nFilter Cutoff:\n%1").arg(filterCutoffDial.value)
+                }
+            }
         }
     }
     Component {

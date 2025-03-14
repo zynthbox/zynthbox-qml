@@ -2309,6 +2309,12 @@ class zynthian_gui(QObject):
                 sketchpadName = ' '.join(params)
                 self.sketchpad.createNamedEmptySketchpad(sketchpadName)
 
+        # Allow adding sounds to stats file from external scripts (for e.g. webconf)
+        elif cuia == "ADD_SOUNDS_TO_STATS":
+            if len(params) > 1:
+                origin = params[0]
+                logging.debug(f"Adding sounds to {origin} : {params[1:]}")
+
         # Finally, report back to MidiRouter that we've handled the action
         if sendCuiaEventFeedback == True:
             if not type(params[0]) == int:

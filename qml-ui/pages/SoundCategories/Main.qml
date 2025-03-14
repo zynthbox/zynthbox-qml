@@ -196,7 +196,7 @@ Zynthian.ScreenPage {
             ColumnLayout {
                 Layout.fillWidth: false
                 Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 12
                 spacing: 0
 
                 QQC2.Label {

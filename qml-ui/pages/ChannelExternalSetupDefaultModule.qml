@@ -137,16 +137,28 @@ Zynthian.BaseExternalEditor {
             }
         }
         function knob1Up() {
-            sendCCValueChange((currentColumn * 3) + 1, 1);
+            if (_private.currentPage == 0) {
+                sendCCValueChange((currentColumn * 3), 1);
+            } else {
+                sendCCValueChange(filterControlDelegate.entryIndex, 1);
+            }
         }
         function knob1Down() {
-            sendCCValueChange((currentColumn * 3) + 1, -1);
+            if (_private.currentPage == 0) {
+                sendCCValueChange((currentColumn * 3), -1);
+            } else {
+                sendCCValueChange(filterControlDelegate.entryIndex, -1);
+            }
         }
         function knob2Up() {
-            sendCCValueChange((currentColumn * 3) + 2, 1);
+            if (_private.currentPage == 0) {
+                sendCCValueChange((currentColumn * 3) + 2, 1);
+            }
         }
         function knob2Down() {
-            sendCCValueChange((currentColumn * 3) + 2, -1);
+            if (_private.currentPage == 0) {
+                sendCCValueChange((currentColumn * 3) + 2, -1);
+            }
         }
         function knob3Up() {
             goRight();
@@ -254,7 +266,7 @@ Zynthian.BaseExternalEditor {
                 }
             }
         }
-        Item {
+        Row {
             anchors {
                 fill: parent
                 topMargin: component.height * 0.1 + Kirigami.Units.largeSpacing
@@ -271,34 +283,159 @@ Zynthian.BaseExternalEditor {
             // For the filter cutoff:
             // Parameter index 62 (0x00, 0x3E)
             // Range 0 through 127 (0x00 through 0x7F)
-            QQC2.Dial {
-                id: filterCutoffDial
-                anchors.centerIn: parent
-                inputMode: QQC2.Dial.Vertical
-                width: Math.min(parent.height, parent.width)
-                height: Math.min(parent.height, parent.width)
-                stepSize: 1
-                from: 0
-                to: 127
-                value: 127
-                onMoved: {
-                    let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
-                    let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
-                    _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
-                }
-
-                QQC2.Label {
-                    id: valueLabel
-                    anchors {
-                        fill: parent
-                        margins: filterCutoffDial.handle.width / 2
+            Item {
+                height: parent.height
+                width: parent.width / 2
+                QQC2.Dial {
+                    id: filterCutoffDial
+                    anchors.centerIn: parent
+                    inputMode: QQC2.Dial.Circular
+                    width: Math.min(parent.height, parent.width) - Kirigami.Units.largeSpacing * 2
+                    height: Math.min(parent.height, parent.width) - Kirigami.Units.largeSpacing * 2
+                    stepSize: 1
+                    from: 0
+                    to: 127
+                    value: 127
+                    onMoved: {
+                        let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                        let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
+                        _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
                     }
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    fontSizeMode: Text.Fit
-                    minimumPointSize: 8
-                    font.pointSize: 18
-                    text: qsTr("Waldorf Microwave 2\nFilter Cutoff:\n%1").arg(filterCutoffDial.value)
+
+                    QQC2.Label {
+                        id: valueLabel
+                        anchors {
+                            fill: parent
+                            margins: filterCutoffDial.handle.width / 2
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        fontSizeMode: Text.Fit
+                        minimumPointSize: 8
+                        font.pointSize: 18
+                        text: qsTr("Waldorf Microwave 2\nFilter Cutoff:\n%1").arg(filterCutoffDial.value)
+                    }
+                    Item {
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                        }
+                        height: Kirigami.Units.iconSizes.medium
+                        width: Kirigami.Units.iconSizes.medium
+                        Zynthian.KnobIndicator {
+                            anchors.centerIn: parent
+                            height: Kirigami.Units.iconSizes.small
+                            width: Kirigami.Units.iconSizes.small
+                            knobId: 0
+                        }
+                    }
+                }
+            }
+            Item {
+                id: filterControlDelegate
+                height: parent.height
+                width: parent.width / 2
+                readonly property int entryIndex: 0
+                readonly property int midiChannel: component.externalSettings
+                    ? component.externalSettings.keyValueStore["controls"][entryIndex]["midiChannel"] == -1
+                        ? (component.externalSettings.midiChannel == -1 ? component.selectedChannel.id : component.externalSettings.midiChannel)
+                        : component.externalSettings.keyValueStore["controls"][entryIndex]["midiChannel"]
+                    : -1
+                readonly property int ccControl: component.externalSettings ? component.externalSettings.keyValueStore["controls"][entryIndex]["ccControl"] : -1
+                property int ccValue: 0
+                Connections {
+                    target: _private.sketchpadTrackController
+                    function onCcValueChanged(midiChannel, ccControl, ccValue) {
+                        if (midiChannel == filterControlDelegate.midiChannel && ccControl == filterControlDelegate.ccControl) {
+                            filterControlDelegate.ccValue = ccValue;
+                        }
+                    }
+                }
+                Timer {
+                    id: ccValueUpdater
+                    interval: 1; running: false; repeat: false;
+                    onTriggered: {
+                        if (filterControlDelegate.midiChannel > -1 && filterControlDelegate.ccControl > -1) {
+                            filterControlDelegate.ccValue = _private.sketchpadTrackController.ccValue(filterControlDelegate.midiChannel, filterControlDelegate.ccControl);
+                        }
+                    }
+                }
+                onMidiChannelChanged: ccValueUpdater.restart()
+                onCcControlChanged: ccValueUpdater.restart()
+                Component.onCompleted: ccValueUpdater.restart()
+                Connections {
+                    target: component
+                    onSelectedChannelChanged: ccValueUpdater.restart()
+                }
+                QQC2.Dial {
+                    id: filterControlDial
+                    anchors.centerIn: parent
+                    inputMode: QQC2.Dial.Circular
+                    width: Math.min(parent.height, parent.width) - Kirigami.Units.largeSpacing * 2
+                    height: Math.min(parent.height, parent.width) - Kirigami.Units.largeSpacing * 2
+                    stepSize: 1
+                    from: 0
+                    to: 127
+
+                    value: filterControlDelegate.ccValue
+
+                    onMoved: {
+                        Zynthbox.SyncTimer.sendCCMessageImmediately(filterControlDelegate.midiChannel, filterControlDelegate.ccControl, value, component.selectedChannel.id);
+                    }
+
+                    QQC2.Label {
+                        anchors {
+                            fill: parent
+                            margins: filterControlDial.handle.width / 2
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        fontSizeMode: Text.Fit
+                        minimumPointSize: 8
+                        font.pointSize: 18
+                        text: qsTr("%1\n%2").arg(filterControlDelegate.ccControl > -1 ? applicationWindow().midiBytePicker.byteValueToCCShorthand(filterControlDelegate.ccControl) : "").arg(filterControlDial.value)
+                    }
+                }
+                QQC2.ToolButton {
+                    anchors {
+                        bottom: parent.bottom
+                        left: parent.left
+                    }
+                    height: Kirigami.Units.iconSizes.medium
+                    width: Kirigami.Units.iconSizes.medium
+                    icon.name: "overflow-menu"
+                    onClicked: {
+                        optionPickerPopup.pickOptions(filterControlDelegate.entryIndex);
+                    }
+                    QQC2.Label {
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            topMargin: -Kirigami.Units.smallSpacing
+                        }
+                        transformOrigin: Item.TopLeft
+                        rotation: -90
+                        height: parent.height
+                        text: filterControlDelegate.ccControl > -1 ? "ch%2/cc%1".arg(filterControlDelegate.ccControl + 1).arg(filterControlDelegate.midiChannel + 1) : ""
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: height * 0.5
+                        opacity: 0.5
+                    }
+                }
+                Item {
+                    anchors {
+                        bottom: parent.bottom
+                        right: parent.right
+                    }
+                    height: Kirigami.Units.iconSizes.medium
+                    width: Kirigami.Units.iconSizes.medium
+                    Zynthian.KnobIndicator {
+                        anchors.centerIn: parent
+                        height: Kirigami.Units.iconSizes.small
+                        width: Kirigami.Units.iconSizes.small
+                        visible: filterControlDelegate.knobId > -1
+                        knobId: 2
+                    }
                 }
             }
         }

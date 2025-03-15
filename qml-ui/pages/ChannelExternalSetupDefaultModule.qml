@@ -121,7 +121,7 @@ Zynthian.BaseExternalEditor {
                 sendCCValueChange((currentColumn * 3), 1);
             } else {
                 filterCutoffDial.value = Math.min(127, filterCutoffDial.value + 1);
-                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x00, 0x3E, filterCutoffDial.value];
                 let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
                 _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
             }
@@ -131,7 +131,7 @@ Zynthian.BaseExternalEditor {
                 sendCCValueChange((currentColumn * 3), -1);
             } else {
                 filterCutoffDial.value = Math.max(0, filterCutoffDial.value - 1);
-                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x00, 0x3E, filterCutoffDial.value];
                 let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
                 _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
             }
@@ -297,7 +297,7 @@ Zynthian.BaseExternalEditor {
                     to: 127
                     value: 127
                     onMoved: {
-                        let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x3E, filterCutoffDial.value];
+                        let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x00, 0x3E, filterCutoffDial.value];
                         let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
                         _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
                     }

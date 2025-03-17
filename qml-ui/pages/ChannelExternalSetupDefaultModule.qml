@@ -391,7 +391,7 @@ Zynthian.BaseExternalEditor {
                 height: parent.height
                 width: parent.width / 2
                 readonly property int entryIndex: 0
-                readonly property int midiChannel: component.externalSettings
+                readonly property int midiChannel: component.externalSettings && component.selectedChannel
                     ? component.externalSettings.keyValueStore["controls"][entryIndex]["midiChannel"] == -1
                         ? (component.externalSettings.midiChannel == -1 ? component.selectedChannel.id : component.externalSettings.midiChannel)
                         : component.externalSettings.keyValueStore["controls"][entryIndex]["midiChannel"]
@@ -524,7 +524,7 @@ Zynthian.BaseExternalEditor {
                         height: parent.height / 3
                         readonly property int knobId: columnDelegate.isCurrent ? model.index : -1
                         readonly property int entryIndex: (columnDelegate.columnIndex * 3) + model.index
-                        readonly property int midiChannel: component.externalSettings
+                        readonly property int midiChannel: component.externalSettings && component.selectedChannel
                             ? component.externalSettings.keyValueStore["controls"][entryIndex]["midiChannel"] == -1
                                 ? (component.externalSettings.midiChannel == -1 ? component.selectedChannel.id : component.externalSettings.midiChannel)
                                 : component.externalSettings.keyValueStore["controls"][entryIndex]["midiChannel"]

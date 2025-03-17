@@ -121,7 +121,7 @@ Zynthian.BaseExternalEditor {
                 sendCCValueChange((currentColumn * 3), 1);
             } else {
                 filterCutoffDial.value = Math.min(127, filterCutoffDial.value + 1);
-                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x00, 0x3E, filterCutoffDial.value];
+                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, waldorfLocationDial.value, 0x00, 0x3E, filterCutoffDial.value];
                 let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
                 _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
             }
@@ -131,7 +131,7 @@ Zynthian.BaseExternalEditor {
                 sendCCValueChange((currentColumn * 3), -1);
             } else {
                 filterCutoffDial.value = Math.max(0, filterCutoffDial.value - 1);
-                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x00, 0x3E, filterCutoffDial.value];
+                let theBytes = [0x3E, 0x0E, 0x7F, 0x20, waldorfLocationDial.value, 0x00, 0x3E, filterCutoffDial.value];
                 let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
                 _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
             }
@@ -140,24 +140,28 @@ Zynthian.BaseExternalEditor {
             if (_private.currentPage == 0) {
                 sendCCValueChange((currentColumn * 3), 1);
             } else {
-                sendCCValueChange(filterControlDelegate.entryIndex, 1);
+                waldorfLocationDial.value = Math.min(7, waldorfLocationDial.value + 1);
             }
         }
         function knob1Down() {
             if (_private.currentPage == 0) {
                 sendCCValueChange((currentColumn * 3), -1);
             } else {
-                sendCCValueChange(filterControlDelegate.entryIndex, -1);
+                waldorfLocationDial.value = Math.max(0, waldorfLocationDial.value - 1);
             }
         }
         function knob2Up() {
             if (_private.currentPage == 0) {
                 sendCCValueChange((currentColumn * 3) + 2, 1);
+            } else {
+                sendCCValueChange(filterControlDelegate.entryIndex, 1);
             }
         }
         function knob2Down() {
             if (_private.currentPage == 0) {
                 sendCCValueChange((currentColumn * 3) + 2, -1);
+            } else {
+                sendCCValueChange(filterControlDelegate.entryIndex, -1);
             }
         }
         function knob3Up() {
@@ -297,7 +301,7 @@ Zynthian.BaseExternalEditor {
                     to: 127
                     value: 127
                     onMoved: {
-                        let theBytes = [0x3E, 0x0E, 0x7F, 0x20, 0x00, 0x00, 0x3E, filterCutoffDial.value];
+                        let theBytes = [0x3E, 0x0E, 0x7F, 0x20, waldorfLocationDial.value, 0x00, 0x3E, filterCutoffDial.value];
                         let parameterChangeMessage = _private.sketchpadTrackExternalDevice.sysexHelper.createMessage(theBytes);
                         _private.sketchpadTrackExternalDevice.sysexHelper.send(parameterChangeMessage);
                     }
@@ -320,13 +324,64 @@ Zynthian.BaseExternalEditor {
                             bottom: parent.bottom
                             right: parent.right
                         }
+                        height: Kirigami.Units.iconSizes.small
+                        width: Kirigami.Units.iconSizes.small
+                        Zynthian.KnobIndicator {
+                            anchors.centerIn: parent
+                            height: Kirigami.Units.iconSizes.small
+                            width: Kirigami.Units.iconSizes.small
+                            knobId: 0
+                        }
+                    }
+                }
+                QQC2.Dial {
+                    id: waldorfLocationDial
+                    anchors {
+                        bottom: parent.bottom
+                        left: parent.left
+                    }
+                    inputMode: QQC2.Dial.Circular
+                    width: parent.width * 0.2
+                    height: width
+                    stepSize: 1
+                    from: 0
+                    to: 7
+                    value: 0
+
+                    QQC2.Label {
+                        anchors {
+                            bottom: parent.top
+                            left: parent.left
+                        }
+                        horizontalAlignment: Text.AlignLeft
+                        verticalAlignment: Text.Bottom
+                        font.pointSize: 10
+                        text: "Location:"
+                    }
+                    QQC2.Label {
+                        anchors {
+                            fill: parent
+                            margins: waldorfLocationDial.handle.width / 2
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        fontSizeMode: Text.Fit
+                        minimumPointSize: 8
+                        font.pointSize: 18
+                        text: qsTr("%1").arg(waldorfLocationDial.value)
+                    }
+                    Item {
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                        }
                         height: Kirigami.Units.iconSizes.medium
                         width: Kirigami.Units.iconSizes.medium
                         Zynthian.KnobIndicator {
                             anchors.centerIn: parent
                             height: Kirigami.Units.iconSizes.small
                             width: Kirigami.Units.iconSizes.small
-                            knobId: 0
+                            knobId: 1
                         }
                     }
                 }
@@ -433,8 +488,7 @@ Zynthian.BaseExternalEditor {
                         anchors.centerIn: parent
                         height: Kirigami.Units.iconSizes.small
                         width: Kirigami.Units.iconSizes.small
-                        visible: filterControlDelegate.knobId > -1
-                        knobId: 2
+                        knobId: 3
                     }
                 }
             }

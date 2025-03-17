@@ -97,8 +97,8 @@ Zynthian.BaseExternalEditor {
         id: _private
         property int currentColumn: 0
         property int currentPage: 0
-        property QtObject sketchpadTrackController: component.selectedChannel ? Zynthbox.MidiRouter.getSketchpadTrackControllerDevice(component.selectedChannel.id) : null
-        property QtObject sketchpadTrackExternalDevice: component.selectedChannel ? Zynthbox.MidiRouter.getSketchpadTrackExternalDevice(component.selectedChannel.id) : null
+        property QtObject sketchpadTrackController: component.sketchpadTrackInfo ? component.sketchpadTrackInfo.controllerDevice : null
+        property QtObject sketchpadTrackExternalDevice: component.sketchpadTrackInfo ? component.sketchpadTrackInfo.externalDevice : null
         function selectPressed() {
             if (_private.currentPage == 1) {
                 requestIdentityButton.onClicked();

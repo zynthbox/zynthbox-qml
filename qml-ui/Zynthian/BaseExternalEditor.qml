@@ -36,6 +36,7 @@ Item {
     readonly property bool isVisible:zynqtgui.current_screen_id === "channel_external_setup"
     readonly property QtObject externalSettings: _private.selectedChannel ? _private.selectedChannel.externalSettings : null
     readonly property QtObject selectedChannel: _private.selectedChannel
+    readonly property QtObject sketchpadTrackInfo: _private.selectedChannel ? Zynthbox.MidiRouter.getSketchpadTrackInfo(_private.selectedChannel.id) : null
     property var cuiaCallback: function(cuia) { return false; }
     QtObject {
         id: _private

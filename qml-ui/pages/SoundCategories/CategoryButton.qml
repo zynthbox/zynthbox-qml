@@ -30,8 +30,6 @@ import io.zynthbox.components 1.0 as Zynthbox
 QQC2.Button {
     property string category: "*"
     readonly property QtObject categoryInfo: Zynthbox.SndLibrary.categories[category]
-
     checkable: true
     text: "%1 (%2)".arg(categoryInfo.name).arg(categoryInfo.fileCount)
-    onClicked: Zynthbox.SndLibrary.setCategoryFilter(category)
 }

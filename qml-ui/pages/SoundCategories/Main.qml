@@ -224,51 +224,23 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                     Layout.margins: spacing
                     spacing: content.spacing
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "*"
-                        checked: true
-                    }
-                    // CategoryButton {
-                    //     Layout.fillWidth: true
-                    //     Layout.fillHeight: true
-                    //     category: "0"
-                    // }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "4"
-                    }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "5"
-                    }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "3"
-                    }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "6"
-                    }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "2"
-                    }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "1"
-                    }
-                    CategoryButton {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        category: "99"
+                    Repeater {
+                        id: categoryButtonsRepeater
+                        model: ["*", "4", "5", "3", "6", "2", "1", "99"]
+                        delegate: CategoryButton {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            category: modelData
+                            checked: modelData == "*" // All button is checked by default
+                            onCheckedChanged: {
+                                if (checked) {
+                                    // If scrollview is not at top and category is set, UI seems to hang when sort calls are made
+                                    // Hence, scroll to top before swtiching category.
+                                    soundsGrid.contentY = 0;
+                                    Qt.callLater(Zynthbox.SndLibrary.setCategoryFilter, category);
+                                }
+                            }
+                        }
                     }
                 }
             }

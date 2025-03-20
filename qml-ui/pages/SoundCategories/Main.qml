@@ -36,7 +36,6 @@ Zynthian.ScreenPage {
     id: root
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
-    property QtObject soundCopySource
     /**
       * This signal will be emitted when some other page wants to
       * open the sound saving dialog
@@ -85,51 +84,23 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Move/Paste")
-            enabled: root.state === "displayMode"
-
-            Kirigami.Action {
-                enabled: root.soundCopySource == null &&
-                         soundButtonGroup.checkedButton != null &&
-                         soundButtonGroup.checkedButton.checked
-                text: qsTr("Move")
-                onTriggered: {
-                    // root.soundCopySource = soundButtonGroup.checkedButton.soundObj
-                }
-            }
-            Kirigami.Action {
-                enabled: root.soundCopySource != null &&
-                         categoryButtonGroup.checkedButton &&
-                         categoryButtonGroup.checkedButton.category !== "*" &&
-                         categoryButtonGroup.checkedButton.category !== root.soundCopySource.category
-                text: qsTr("Paste")
-                onTriggered: {
-                    // root.soundCopySource.category = categoryButtonGroup.checkedButton.category
-                    // root.soundCopySource = null
-                }
-            }
-            Kirigami.Action {
-                enabled: root.soundCopySource != null
-                text: qsTr("Cancel")
-                onTriggered: {
-                    // root.soundCopySource = null
-                }
-            }
-            Kirigami.Action {
-                enabled: soundButtonGroup.checkedButton != null &&
-                         soundButtonGroup.checkedButton.checked &&
-                         soundButtonGroup.checkedButton.soundObj.category !== "0"
-                text: qsTr("Clear Category")
-                onTriggered: {
-                    // soundButtonGroup.checkedButton.soundObj.category = "0"
+            text: root.state !== "updateCategoryMode"
+                    ? qsTr("Change Category")
+                    : qsTr("Cancel")
+            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked) ||
+                     root.state === "updateCategoryMode"
+            onTriggered: {
+                if (root.state == "displayMode") {
+                    root.state = "updateCategoryMode"
+                } else {
+                    root.state = "displayMode"
                 }
             }
         },
         Kirigami.Action {
             // True when action acts as save button, false when acts as load button
             property bool isSaveBtn: soundButtonGroup.checkedButton == null || !soundButtonGroup.checkedButton.checked
-
-            enabled: root.soundCopySource == null
+            enabled: root.state === "displayMode" || root.state === "saveMode"
             text: isSaveBtn
                     ? root.state === "saveMode"
                         ? qsTr("Cancel")
@@ -146,13 +117,6 @@ Zynthian.ScreenPage {
                 } else {
                     zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
                 }
-            }
-        },
-        Kirigami.Action {
-            enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked && root.state === "displayMode"
-            text: qsTr("Clear Selection")
-            onTriggered: {
-                soundButtonGroup.checkedButton.checked = false
             }
         }
     ]
@@ -249,8 +213,8 @@ Zynthian.ScreenPage {
                             checkable: root.state === "displayMode"
                             checked: modelData == "*" // `All` button is checked by default
                             highlighted: root.state === "displayMode" && checked
-                            // `All` button should be disabled when in save mode
-                            enabled: root.state === "displayMode" || (root.state === "saveMode" && modelData != "*")
+                            // `All` button should be disabled when in save mode or updateCategoryMode
+                            enabled: root.state === "displayMode" || (root.state === "saveMode" && modelData != "*") || (root.state === "updateCategoryMode" && modelData != "*" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != modelData)
                             onCheckedChanged: {
                                 if (root.state === "displayMode" && checked) {
                                     // If scrollview is not at top and category is set, UI seems to hang when sort calls are made
@@ -263,6 +227,9 @@ Zynthian.ScreenPage {
                                 if (root.state === "saveMode") {
                                     zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, modelData)
                                     // Reset to display mode after saving sound
+                                    root.state = "displayMode"
+                                } else if (root.state === "updateCategoryMode") {
+                                    console.log(`Update category of ${soundButtonGroup.checkedButton.soundObj.name} to ${modelData}`)
                                     root.state = "displayMode"
                                 }
                             }
@@ -278,8 +245,14 @@ Zynthian.ScreenPage {
 
                 QQC2.Label {
                     anchors.centerIn: parent
-                    visible: root.state === "saveMode" || root.state === "updateCategoryMode"
+                    visible: root.state === "saveMode"
                     text: qsTr("Pick a category to save snd file to")
+                }
+
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    visible: root.state === "updateCategoryMode"
+                    text: qsTr("Pick a category to update selected snd file's category")
                 }
 
                 ColumnLayout {

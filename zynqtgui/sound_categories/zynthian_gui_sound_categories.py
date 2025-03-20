@@ -153,3 +153,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             Zynthbox.SndLibrary.instance().refresh()
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Generating sound statistics")
+
+    @Slot(QObject, str)
+    def changeCategory(self, sndFile, newCategory):
+        def task():
+            Zynthbox.SndLibrary.instance().changeSndFileCategory(sndFile, newCategory)
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Updating category")

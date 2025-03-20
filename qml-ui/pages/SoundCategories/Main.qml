@@ -38,19 +38,42 @@ Zynthian.ScreenPage {
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property QtObject soundCopySource
     /**
-      * This property will be used to allow picking a category when saving a snd file
-      * When saveMode is set to true, display a help text in place of snd files grid
-      * and clicking on category button will save the snd file to that category
-      * Irrevelant contextualActions should get disabled and "Save" button should
-      * allow cancelling when category is yet to be picked
-      */
-    property bool saveMode: false
-    /**
       * This signal will be emitted when some other page wants to
       * open the sound saving dialog
       */
     signal showSaveSoundDialog()
 
+    states: [
+        /**
+         * This mode will be used to display snd files
+         * When state is set to displayMode, display the snd files grid
+         * and clicking on category button will switch to that category
+         **/
+        State {
+            name: "displayMode"
+        },
+        /**
+         * This mode will be used to allow picking a category when saving a snd file
+         * When state is set to saveMode, display a help text in place of snd files grid
+         * and clicking on category button will save the snd file to that category
+         * Irrevelant contextualActions should get disabled and "Save" button should
+         * allow cancelling when category is yet to be picked
+         **/
+        State {
+            name: "saveMode"
+        },
+        /**
+         * This mode will be used to allow updating a category of selected snd file
+         * When state is set to updateCategoryMode, display a help text in place of snd files grid
+         * and clicking on category button will update the selected snd file's category to that category
+         * Irrevelant contextualActions should get disabled and "Move" button should
+         * allow cancelling when category is yet to be picked
+         **/
+        State {
+            name: "updateCategoryMode"
+        }
+    ]
+    state: "displayMode"
     title: qsTr("Sound Categories")
     screenId: "sound_categories"
     leftPadding: 8
@@ -63,7 +86,7 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Move/Paste")
-            enabled: !root.saveMode
+            enabled: root.state === "displayMode"
 
             Kirigami.Action {
                 enabled: root.soundCopySource == null &&
@@ -108,14 +131,15 @@ Zynthian.ScreenPage {
 
             enabled: root.soundCopySource == null
             text: isSaveBtn
-                    ? root.saveMode
+                    ? root.state === "saveMode"
                         ? qsTr("Cancel")
                         : qsTr("Save")
                     : qsTr("Load")
             onTriggered: {
                 if (isSaveBtn) {
-                    if (root.saveMode) {
-                        root.saveMode = false
+                    if (root.state === "saveMode") {
+                        // Reset to displayMode when cancel button is pressed
+                        root.state = "displayMode"
                     } else {
                         saveSoundDialog.open()
                     }
@@ -125,7 +149,7 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked && !root.saveMode
+            enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked && root.state === "displayMode"
             text: qsTr("Clear Selection")
             onTriggered: {
                 soundButtonGroup.checkedButton.checked = false
@@ -162,7 +186,7 @@ Zynthian.ScreenPage {
             fileCheckTimer.restart()
         }
         onAccepted: {
-            root.saveMode = true
+            root.state = "saveMode"
         }
         onOpened: {
             saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
@@ -222,13 +246,13 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             category: modelData
-                            checkable: !root.saveMode
+                            checkable: root.state === "displayMode"
                             checked: modelData == "*" // `All` button is checked by default
-                            highlighted: !root.saveMode && checked
+                            highlighted: root.state === "displayMode" && checked
                             // `All` button should be disabled when in save mode
-                            enabled: (root.saveMode && modelData != "*") || (!root.saveMode)
+                            enabled: root.state === "displayMode" || (root.state === "saveMode" && modelData != "*")
                             onCheckedChanged: {
-                                if (!root.saveMode && checked) {
+                                if (root.state === "displayMode" && checked) {
                                     // If scrollview is not at top and category is set, UI seems to hang when sort calls are made
                                     // Hence, scroll to top before swtiching category.
                                     soundsGrid.contentY = 0;
@@ -236,9 +260,10 @@ Zynthian.ScreenPage {
                                 }
                             }
                             onClicked: {
-                                if (root.saveMode) {
+                                if (root.state === "saveMode") {
                                     zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, modelData)
-                                    root.saveMode = false
+                                    // Reset to display mode after saving sound
+                                    root.state = "displayMode"
                                 }
                             }
                         }
@@ -253,13 +278,13 @@ Zynthian.ScreenPage {
 
                 QQC2.Label {
                     anchors.centerIn: parent
-                    visible: root.saveMode
+                    visible: root.state === "saveMode" || root.state === "updateCategoryMode"
                     text: qsTr("Pick a category to save snd file to")
                 }
 
                 ColumnLayout {
                     anchors.fill: parent
-                    visible: !root.saveMode
+                    visible: root.state === "displayMode"
 
                     RowLayout {
                         Layout.fillWidth: true

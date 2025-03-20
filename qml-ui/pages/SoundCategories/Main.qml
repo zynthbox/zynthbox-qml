@@ -214,7 +214,10 @@ Zynthian.ScreenPage {
                             checked: modelData == "*" // `All` button is checked by default
                             highlighted: root.state === "displayMode" && checked
                             // `All` button should be disabled when in save mode or updateCategoryMode
-                            enabled: root.state === "displayMode" || (root.state === "saveMode" && modelData != "*") || (root.state === "updateCategoryMode" && modelData != "*" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != modelData)
+                            // Also selected snd files current category button should be disabled when in updateCategoryMode
+                            enabled: root.state === "displayMode" ||
+                                     (root.state === "saveMode" && modelData != "*") ||
+                                     (root.state === "updateCategoryMode" && modelData != "*" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != modelData)
                             onCheckedChanged: {
                                 if (root.state === "displayMode" && checked) {
                                     // If scrollview is not at top and category is set, UI seems to hang when sort calls are made

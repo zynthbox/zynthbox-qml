@@ -184,6 +184,7 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: "Save Sound"
             onTriggered: {
+                zynqtgui.show_modal("sound_categories")
                 applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
             }
         },

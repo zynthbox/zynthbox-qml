@@ -28,8 +28,15 @@ import org.kde.kirigami 2.4 as Kirigami
 import io.zynthbox.components 1.0 as Zynthbox
 
 QQC2.Button {
+    id: control
     property string category: "*"
     readonly property QtObject categoryInfo: Zynthbox.SndLibrary.categories[category]
+    background: Rectangle {
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+        radius: control.radius
+        color: control.highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+    }
     checkable: true
     text: "%1 (%2)".arg(categoryInfo.name).arg(categoryInfo.fileCount)
 }

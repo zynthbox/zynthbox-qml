@@ -38,6 +38,14 @@ Zynthian.ScreenPage {
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property QtObject soundCopySource
     /**
+      * This property will be used to allow picking a category when saving a snd file
+      * When saveMode is set to true, display a help text in place of snd files grid
+      * and clicking on category button will save the snd file to that category
+      * Irrevelant contextualActions should get disabled and "Save" button should
+      * allow cancelling when category is yet to be picked
+      */
+    property bool saveMode: false
+    /**
       * This signal will be emitted when some other page wants to
       * open the sound saving dialog
       */
@@ -55,6 +63,7 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Move/Paste")
+            enabled: !root.saveMode
 
             Kirigami.Action {
                 enabled: root.soundCopySource == null &&
@@ -99,18 +108,24 @@ Zynthian.ScreenPage {
 
             enabled: root.soundCopySource == null
             text: isSaveBtn
-                    ? qsTr("Save")
+                    ? root.saveMode
+                        ? qsTr("Cancel")
+                        : qsTr("Save")
                     : qsTr("Load")
             onTriggered: {
                 if (isSaveBtn) {
-                    saveSoundDialog.open()
+                    if (root.saveMode) {
+                        root.saveMode = false
+                    } else {
+                        saveSoundDialog.open()
+                    }
                 } else {
                     zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
                 }
             }
         },
         Kirigami.Action {
-            enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked
+            enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked && !root.saveMode
             text: qsTr("Clear Selection")
             onTriggered: {
                 soundButtonGroup.checkedButton.checked = false
@@ -147,34 +162,10 @@ Zynthian.ScreenPage {
             fileCheckTimer.restart()
         }
         onAccepted: {
-            zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, categoryComboModel.get(categoryCombo.currentIndex).value)
+            root.saveMode = true
         }
         onOpened: {
-            categoryCombo.selectIndex(0)
             saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
-        }
-        additionalContent: RowLayout {
-            Layout.fillWidth: true
-            QQC2.Label {
-                text: "Category"
-            }
-            Zynthian.ComboBox {
-                id: categoryCombo
-                Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                Layout.alignment: Qt.AlignCenter
-                model: ListModel {
-                    id: categoryComboModel
-                    ListElement { text: "Synth/Keys"; value: "4" }
-                    ListElement { text: "Strings/Pads"; value: "5" }
-                    ListElement { text: "Leads"; value: "3" }
-                    ListElement { text: "Guitar/Plucks"; value: "6" }
-                    ListElement { text: "Bass"; value: "2" }
-                    ListElement { text: "Drums"; value: "1" }
-                    ListElement { text: "FX/Other"; value: "99" }
-                }
-                textRole: "text"
-            }
         }
         Timer {
             id: fileCheckTimer
@@ -231,13 +222,23 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             category: modelData
-                            checked: modelData == "*" // All button is checked by default
+                            checkable: !root.saveMode
+                            checked: modelData == "*" // `All` button is checked by default
+                            highlighted: !root.saveMode && checked
+                            // `All` button should be disabled when in save mode
+                            enabled: (root.saveMode && modelData != "*") || (!root.saveMode)
                             onCheckedChanged: {
-                                if (checked) {
+                                if (!root.saveMode && checked) {
                                     // If scrollview is not at top and category is set, UI seems to hang when sort calls are made
                                     // Hence, scroll to top before swtiching category.
                                     soundsGrid.contentY = 0;
                                     Qt.callLater(Zynthbox.SndLibrary.setCategoryFilter, category);
+                                }
+                            }
+                            onClicked: {
+                                if (root.saveMode) {
+                                    zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, modelData)
+                                    root.saveMode = false
                                 }
                             }
                         }
@@ -245,122 +246,132 @@ Zynthian.ScreenPage {
                 }
             }
 
-            ColumnLayout {
+            Item {
                 id: soundsDisplayContainer
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                    Layout.alignment: Qt.AlignCenter
-
-                    QQC2.ComboBox {
-                        id: soundTypeComboBox
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                        model: ["my-sounds", "community-sounds"]
-                        onActivated: {
-                            Zynthbox.SndLibrary.setOriginFilter(model[index])
-                        }
-                        delegate: QQC2.ItemDelegate {
-                            id: itemDelegate
-                            width: parent.width
-                            text: soundTypeComboBox.textRole ? (Array.isArray(soundTypeComboBox.model) ? modelData[soundTypeComboBox.textRole] : model[soundTypeComboBox.textRole]) : modelData
-                            font.weight: soundTypeComboBox.currentIndex === index ? Font.DemiBold : Font.Normal
-                            highlighted: soundTypeComboBox.highlightedIndex === index
-                            hoverEnabled: soundTypeComboBox.hoverEnabled
-                            contentItem: QQC2.Label {
-                                text: itemDelegate.text
-                                font: itemDelegate.font
-                                elide: QQC2.Label.ElideRight
-                                verticalAlignment: QQC2.Label.AlignVCenter
-                                horizontalAlignment: QQC2.Label.AlignHCenter
-                            }
-                        }
-                    }
-
-                    QQC2.Button {
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: height
-                        onClicked: {
-                            zynqtgui.sound_categories.generateStatFiles()
-                        }
-
-                        Kirigami.Icon {
-                            anchors.fill: parent
-                            anchors.margins: 4
-                            source: Qt.resolvedUrl("../../../img/refresh.svg")
-                            color: "#ffffffff"
-                        }
-                    }
-                }                
-
-                QQC2.ButtonGroup {
-                    id: soundButtonGroup
+                QQC2.Label {
+                    anchors.centerIn: parent
+                    visible: root.saveMode
+                    text: qsTr("Pick a category to save snd file to")
                 }
 
-                GridView {
-                    id: soundsGrid
-                    property int columns: 5
-                    property real spacing: Kirigami.Units.largeSpacing
+                ColumnLayout {
+                    anchors.fill: parent
+                    visible: !root.saveMode
 
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    cellWidth: (width - spacing * (columns - 1)) / columns
-                    cellHeight: Kirigami.Units.gridUnit * 4.5
-                    clip: true
-                    model: Zynthbox.SndLibrary.model
-                    reuseItems: true
-                    QQC2.ScrollBar.vertical: QQC2.ScrollBar {
-                        width: Kirigami.Units.gridUnit
-                        height: Kirigami.Units.gridUnit * 3
-                        anchors {
-                            right: parent.right
-                            rightMargin: width
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                        Layout.alignment: Qt.AlignCenter
+
+                        QQC2.ComboBox {
+                            id: soundTypeComboBox
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                            model: ["my-sounds", "community-sounds"]
+                            onActivated: {
+                                Zynthbox.SndLibrary.setOriginFilter(model[index])
+                            }
+                            delegate: QQC2.ItemDelegate {
+                                id: itemDelegate
+                                width: parent.width
+                                text: soundTypeComboBox.textRole ? (Array.isArray(soundTypeComboBox.model) ? modelData[soundTypeComboBox.textRole] : model[soundTypeComboBox.textRole]) : modelData
+                                font.weight: soundTypeComboBox.currentIndex === index ? Font.DemiBold : Font.Normal
+                                highlighted: soundTypeComboBox.highlightedIndex === index
+                                hoverEnabled: soundTypeComboBox.hoverEnabled
+                                contentItem: QQC2.Label {
+                                    text: itemDelegate.text
+                                    font: itemDelegate.font
+                                    elide: QQC2.Label.ElideRight
+                                    verticalAlignment: QQC2.Label.AlignVCenter
+                                    horizontalAlignment: QQC2.Label.AlignHCenter
+                                }
+                            }
                         }
-                        policy: QQC2.ScrollBar.AlwaysOn
-                    }
-                    delegate: Item {
-                        width: soundsGrid.cellWidth
-                        height: soundsGrid.cellHeight
 
                         QQC2.Button {
-                            id: soundButton
-                            property QtObject soundObj: model.sound
-                            property bool wasChecked
-                            anchors.fill: parent
-                            anchors.margins: soundsGrid.spacing
-                            QQC2.ButtonGroup.group: soundButtonGroup
-                            checkable: true
-                            // Little bit of hula-hooping to allow unchecking buttons in an exclusive button group
-                            // Source : https://stackoverflow.com/a/51098266
-                            onPressed: wasChecked = checked
-                            onReleased: {
-                                if (wasChecked) {
-                                    checked = false;
-                                    toggled(); // emit the toggled signal manually, since we changed the checked value programmatically but it still originated as an user interaction.
-                                }
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: height
+                            onClicked: {
+                                zynqtgui.sound_categories.generateStatFiles()
                             }
 
-                            QQC2.Label {
+                            Kirigami.Icon {
                                 anchors.fill: parent
-                                text: model.name
-                                wrapMode: QQC2.Label.WrapAtWordBoundaryOrAnywhere
-                                horizontalAlignment: QQC2.Label.AlignHCenter
-                                verticalAlignment: QQC2.Label.AlignVCenter
+                                anchors.margins: 4
+                                source: Qt.resolvedUrl("../../../img/refresh.svg")
+                                color: "#ffffffff"
                             }
+                        }
+                    }
 
-                            QQC2.Label {
-                                anchors {
-                                    right: parent.right
-                                    bottom: parent.bottom
-                                    margins: Kirigami.Units.gridUnit * 0.5
+                    QQC2.ButtonGroup {
+                        id: soundButtonGroup
+                    }
+
+                    GridView {
+                        id: soundsGrid
+                        property int columns: 5
+                        property real spacing: Kirigami.Units.largeSpacing
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        cellWidth: (width - spacing * (columns - 1)) / columns
+                        cellHeight: Kirigami.Units.gridUnit * 4.5
+                        clip: true
+                        model: Zynthbox.SndLibrary.model
+                        reuseItems: true
+                        QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                            width: Kirigami.Units.gridUnit
+                            height: Kirigami.Units.gridUnit * 3
+                            anchors {
+                                right: parent.right
+                                rightMargin: width
+                            }
+                            policy: QQC2.ScrollBar.AlwaysOn
+                        }
+                        delegate: Item {
+                            width: soundsGrid.cellWidth
+                            height: soundsGrid.cellHeight
+
+                            QQC2.Button {
+                                id: soundButton
+                                property QtObject soundObj: model.sound
+                                property bool wasChecked
+                                anchors.fill: parent
+                                anchors.margins: soundsGrid.spacing
+                                QQC2.ButtonGroup.group: soundButtonGroup
+                                checkable: true
+                                // Little bit of hula-hooping to allow unchecking buttons in an exclusive button group
+                                // Source : https://stackoverflow.com/a/51098266
+                                onPressed: wasChecked = checked
+                                onReleased: {
+                                    if (wasChecked) {
+                                        checked = false;
+                                        toggled(); // emit the toggled signal manually, since we changed the checked value programmatically but it still originated as an user interaction.
+                                    }
                                 }
 
-                                text: zynqtgui.sound_categories.getCategoryNameFromKey(soundButton.soundObj.category)
-                                font.pointSize: 8
+                                QQC2.Label {
+                                    anchors.fill: parent
+                                    text: model.name
+                                    wrapMode: QQC2.Label.WrapAtWordBoundaryOrAnywhere
+                                    horizontalAlignment: QQC2.Label.AlignHCenter
+                                    verticalAlignment: QQC2.Label.AlignVCenter
+                                }
+
+                                QQC2.Label {
+                                    anchors {
+                                        right: parent.right
+                                        bottom: parent.bottom
+                                        margins: Kirigami.Units.smallSpacing
+                                    }
+                                    text: zynqtgui.sound_categories.getCategoryNameFromKey(soundButton.soundObj.category)
+                                    font.pointSize: 8
+                                }
                             }
                         }
                     }
@@ -403,7 +414,7 @@ Zynthian.ScreenPage {
                 }
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
                     slotData: soundDetails.displaySelectedSoundData
                                 ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
                                 : root.selectedChannel.synthSlotsData
@@ -423,7 +434,7 @@ Zynthian.ScreenPage {
                 }
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
                     slotData: soundDetails.displaySelectedSoundData
                                 ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
                                 : root.selectedChannel.sampleSlotsData
@@ -443,7 +454,7 @@ Zynthian.ScreenPage {
                 }
                 Sketchpad.TrackSlotsData {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
                     slotData: soundDetails.displaySelectedSoundData
                                 ? soundButtonGroup.checkedButton.soundObj.fxSlotsData
                                 : root.selectedChannel.fxSlotsData

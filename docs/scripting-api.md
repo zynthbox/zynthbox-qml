@@ -1,0 +1,3 @@
+# Scripting API
+
+This will hold the documentation as exists for scripting purposes. It is a combination of the generated doxygen output for libzynthbox and zynthbox-qml, and a higher level overview of the general structure and flow of scripting for Zynthbox. The specific details for scripting for a particular purpose can be found in the documentation for each purpose (for e.g. page implementation can be found in the [Custom Pages](docs/custom-pages.md) document, and the micro-scripts for control surfaces can be found in the [Control Surface Microscripts](docs/control-surface-microscripts.md) document.

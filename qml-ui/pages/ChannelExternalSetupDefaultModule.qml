@@ -340,7 +340,7 @@ Zynthian.BaseExternalEditor {
                         bottom: parent.bottom
                         left: parent.left
                     }
-                    inputMode: QQC2.Dial.Circular
+                    inputMode: QQC2.Dial.Vertical
                     width: parent.width * 0.2
                     height: width
                     stepSize: 1

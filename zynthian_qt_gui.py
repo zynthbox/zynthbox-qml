@@ -159,6 +159,7 @@ from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.zynthian_osd import zynthian_osd
+from zynqtgui.utils.webconf_fifo_handler import webconf_fifo_handler
 
 import Zynthbox
 
@@ -672,6 +673,8 @@ class zynthian_gui(QObject):
         self.current_screen_id_changed.connect(self.handleCurrentScreenIDChanged)
         # Make sure we initialise the master volume to be what it's supposed to be
         self.masterVolume = self.get_initialMasterVolume()
+        # Create our webconf communication bridge (must happen late, to ensure we've got most of our things initialised)
+        self.__webconf_fifo_handler = webconf_fifo_handler(self)
 
     @Slot(int, int, int, int, int, int, bool)
     def handleMidiMessage(self, port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal):
@@ -2201,6 +2204,7 @@ class zynthian_gui(QObject):
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             theClip = theTrack.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
             theClip.enabled = not theClip.enabled
+        # FIXME These expect a situation that is no longer true, and we need the slot type to be able to correctly identify the intent (that is, otherwise we can never set a sample slot's state, only the synth slot)
         elif cuia == "SET_SLOT_GAIN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.audioTypeKey() == "synth":
@@ -2219,6 +2223,7 @@ class zynthian_gui(QObject):
                 # TODO Should we be sending something out for external tracks? Is there anything reasonable for this? probably control 7 (channel volume)? (cc 0x07 for MSB and 0x27 for LSB)
                 pass
             sendCuiaEventFeedback = False
+        # FIXME These expect a situation that is no longer true, and we need the slot type to be able to correctly identify the intent (that is, otherwise we can never set a sample slot's state, only the synth slot)
         elif cuia == "SET_SLOT_PAN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.audioTypeKey() == "synth":
@@ -2237,6 +2242,7 @@ class zynthian_gui(QObject):
                 # TODO Should we be sending something out for external tracks? Is there anything reasonable for this? probably control 7 (channel volume)? (cc 0x07 for MSB and 0x27 for LSB)
                 pass
             sendCuiaEventFeedback = False
+        # FIXME These expect a situation that is no longer true, and we need the slot type to be able to correctly identify the intent (that is, otherwise we can never set a sample slot's state, only the synth slot)
         elif cuia == "SET_SLOT_FILTER_CUTOFF":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.trackType == "synth":
@@ -2251,6 +2257,7 @@ class zynthian_gui(QObject):
             else:
                 # TODO Probably offer some way to set what CC this changes externally?
                 pass
+        # FIXME These expect a situation that is no longer true, and we need the slot type to be able to correctly identify the intent (that is, otherwise we can never set a sample slot's state, only the synth slot)
         elif cuia == "SET_SLOT_FILTER_RESONANCE":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
             if theTrack.trackType == "synth":
@@ -3210,7 +3217,7 @@ class zynthian_gui(QObject):
 
                     data = ""
                     while True:
-                        data = self.__boot_log_file.readline()[:-1].strip()
+                        data = watchdog_fifo.readline()[:-1].strip()
                         if len(data) == 0:
                             break
                         else:
@@ -4497,6 +4504,13 @@ class zynthian_gui(QObject):
             logging.warning("The dialog we attempted to pop from the list is not in the list of opened dialogs. Something's out of wack.")
 
     ### End Property openedDialog
+
+    ### BEGIN Property webconf
+    def get_webconf(self):
+        return self.__webconf_fifo_handler
+
+    webconf = Property(QObject, get_webconf, constant=True)
+    ### END Property webconf
 
     ### Property leftSidebar
     def get_leftSidebar(self):

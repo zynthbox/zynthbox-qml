@@ -48,12 +48,13 @@ import Zynthbox
 # Sending to Webconf
 # ==================
 #
-# To send a command (or other data) to Webconf, use the send(data:str)
-# function.
+# To send a command, or other data, to Webconf: use the send(data:str) function.
 #
 # Any CUIA command issued to the system will automatically be returned to
 # Webconf as feedback, using the same format used for those commands sent to
 # Zynthbox QML from webconf (see formatting guidelines below).
+#
+# Progress information will be sent in the form of messages starting with task.
 #
 # Receiving from Webconf
 # ======================
@@ -71,6 +72,8 @@ class webconf_fifo_handler(QObject):
     def __init__(self, parent=None):
         super(webconf_fifo_handler, self).__init__(parent)
         self.core_gui = parent
+        self.core_gui.currentTaskMessageChanged.connect(self.handleCurrentTaskMessageChanged)
+        self.core_gui.is_loading_changed.connect(self.handleIsLoadingChanged)
         self.data_for_webconf = queue.SimpleQueue()
 
         if not Path("/tmp/webconf-writes-to-this-fifo").exists():
@@ -88,6 +91,23 @@ class webconf_fifo_handler(QObject):
         Zynthbox.MidiRouter.instance().cuiaEventHandled.connect(self.handleMidiRouterCuiaEventHandled)
 
     ### Send the given string data to Webconf
+    # CUIA feedback will happen automatically, and will have an identical layout to what Webconf would send us (see handle_input(inputData:str))
+    #
+    # Further strings would include:
+    #
+    # task/description/text
+    #   A clear-text description of the currently on-going task (any line-breaks will be converted to xhtml style <br />)
+    #   If there is an ongoing long-running task, update the description of that task to match what is received here
+    #   If there is no ongoing long-running task, simply show a short-term auto-hide notification popup type thing
+    # task/long/start
+    #   A long-running task has been initiated (show an indication that something is going on, such as a spinner, and a short text to say "Working..." or similar)
+    #   If this is received more than once, you can safely ignore the subsequent ones (that is, task/long/start and task/long/end should be considered an explicit toggle between two states)
+    # task/long/end
+    #   The long-runing task has ended (hide the progress/spinner)
+    #   If this is received more than once, you can safely ignore the subsequent ones (that is, task/long/start and task/long/end should be considered an explicit toggle between two states)
+    # task/long/progress/value
+    #   If we know the current progress of the task, we will update this with a value from 1 through 100 to indicate some amount of percentile progress. If value is -1, return to the spinner-style progress indication described for task/long/start
+    #
     #   @param data The string to send to Webconf
     @Slot(str)
     def send(self, data:str):
@@ -105,7 +125,7 @@ class webconf_fifo_handler(QObject):
     #   doesn't require a slot, so you can pass -1 for the slot value, like so:
     #   cuia/SET_TRACK_VOLUME/9/-1/63 (which would set track 10 (index 9) to 50% volume (0 through 127)
     #   or if you wish to activate a track, you can safely pass any value to the slot and value parameters:
-    #   cuia/ACTIVATE_TRACK/1/-1/0 (which activates track 1 (index 0)
+    #   cuia/ACTIVATE_TRACK/1/-1/0 (which activates track 1 (index 0))
     #   For commands which are singular (such as button presses), you don't have to pass track, slot, and value:
     #   cuia/switch_play (which will simulate pressing the play button)
     #
@@ -150,6 +170,19 @@ class webconf_fifo_handler(QObject):
             # theTrack.selectedFxSlotRow - the property holding that information...
         self.send(f"cuia/{cuia}/{int(track)}/{int(slot)}/{int(value)}")
 
+    @Slot(None)
+    def handleCurrentTaskMessageChanged(self):
+        message = self.core_gui.currentTaskMessage
+        message.replace("\n", "<br />")
+        self.send(f"task/description/{message}")
+
+    @Slot(None)
+    def handleIsLoadingChanged(self):
+        if self.core_gui.is_loading:
+            self.send("task/long/start");
+        else:
+            self.send("task/long/end");
+
     def fifo_reader(self):
         input_fifo = None
         while not self.core_gui.exit_flag:
@@ -182,7 +215,6 @@ class webconf_fifo_handler(QObject):
 
                 data = self.data_for_webconf.get()
                 if len(data) > 0:
-                    logging.error(f"Outputting {data}")
                     os.write(output_fifo, f"{data}\n".encode())
             except Exception as e:
                 logging.error(f"Error while attempting to write to the webconf output fifo: {e}")

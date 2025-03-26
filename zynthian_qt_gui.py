@@ -3981,7 +3981,7 @@ class zynthian_gui(QObject):
         if self.__long_task_count__ > 0:
             recent_task_messages.put("command:show")
 
-        QTimer.singleShot(300, cb)
+        QTimer.singleShot(1, cb)
 
     def end_long_task(self):
         logging.debug("### End long task")
@@ -4596,7 +4596,6 @@ class zynthian_gui(QObject):
             self.__current_task_message = value
             recent_task_messages.put(value)
             self.currentTaskMessageChanged.emit()
-            QGuiApplication.instance().processEvents()
 
     currentTaskMessageChanged = Signal()
 

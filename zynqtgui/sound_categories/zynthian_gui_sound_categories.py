@@ -143,3 +143,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         except: pass
 
         return suggested
+
+    @Slot("QVariantList")
+    def processSndFiles(self, sources):
+        def task():
+            Zynthbox.SndLibrary.instance().processSndFiles(sources)
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, "Indexing snd files")

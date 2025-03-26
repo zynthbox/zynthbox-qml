@@ -89,6 +89,7 @@ class webconf_fifo_handler(QObject):
         self.fifo_writer_thread.start()
 
         Zynthbox.MidiRouter.instance().cuiaEventHandled.connect(self.handleMidiRouterCuiaEventHandled)
+        Zynthbox.SndLibrary.instance().sndFileAdded.connect(self.handleSndFileAdded)
 
     ### Send the given string data to Webconf
     # CUIA feedback will happen automatically, and will have an identical layout to what Webconf would send us (see handle_input(inputData:str))
@@ -107,6 +108,8 @@ class webconf_fifo_handler(QObject):
     #   If this is received more than once, you can safely ignore the subsequent ones (that is, task/long/start and task/long/end should be considered an explicit toggle between two states)
     # task/long/progress/value
     #   If we know the current progress of the task, we will update this with a value from 1 through 100 to indicate some amount of percentile progress. If value is -1, return to the spinner-style progress indication described for task/long/start
+    # sounds/added/pathname
+    #   The pathname file was discovered by the system and added to the library
     #
     #   @param data The string to send to Webconf
     @Slot(str)
@@ -182,6 +185,10 @@ class webconf_fifo_handler(QObject):
             self.send("task/long/start");
         else:
             self.send("task/long/end");
+
+    @Slot(str)
+    def handleSndFileAdded(self, fileIdentifier):
+        self.send(f"sound/added/{fileIdentifier}")
 
     def fifo_reader(self):
         input_fifo = None

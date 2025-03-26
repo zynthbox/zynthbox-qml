@@ -35,25 +35,30 @@ class BootLogInterface(QObject):
                 if self.__boot_log_file is None:
                     self.__boot_log_file = open("/tmp/bootlog.fifo", "r")
 
-                data = self.__boot_log_file.readline()[:-1].strip()
 
-                if data.startswith("command:"):
-                    if data == "command:exit":
-                        logging.debug("Received exit command. Cleaning up and exiting")
-                        self.bootLog = "Shutting down"
-                        self.exit_flag = True
-                        QGuiApplication.quit()
-                    elif data == "command:play-extro":
-                        logging.debug("Received play-extro command. Playing extro video")
-                        self.bootLog = ""
-                        self.playExtroAndHide.emit()
-                    elif data == "command:show":
-                        self.showBootlog.emit()
-                    elif data == "command:hide" and self.bootCompleted:
-                        self.bootLog = ""
-                        self.hideBootlog.emit()
-                elif len(data) > 0:
-                    self.bootLog = data
+                while True:
+                    data = self.__boot_log_file.readline()[:-1].strip()
+
+                    if len(data) == 0:
+                        break
+                    else:
+                        if data.startswith("command:"):
+                            if data == "command:exit":
+                                logging.debug("Received exit command. Cleaning up and exiting")
+                                self.bootLog = "Shutting down"
+                                self.exit_flag = True
+                                QGuiApplication.quit()
+                            elif data == "command:play-extro":
+                                logging.debug("Received play-extro command. Playing extro video")
+                                self.bootLog = ""
+                                self.playExtroAndHide.emit()
+                            elif data == "command:show":
+                                self.showBootlog.emit()
+                            elif data == "command:hide" and self.bootCompleted:
+                                self.bootLog = ""
+                                self.hideBootlog.emit()
+                        else:
+                            self.bootLog = data
             time.sleep(0.1)
         if self.__boot_log_file is not None:
             self.__boot_log_file.close()

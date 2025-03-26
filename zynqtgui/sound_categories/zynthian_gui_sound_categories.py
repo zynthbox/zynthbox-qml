@@ -112,17 +112,17 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             # selectedTrack.fxSlotsData is a list of strings (just what we need)
             sound.metadata.fxSlotsData = json.dumps(selectedTrack.fxSlotsData)
             sound.metadata.write()
-            # Zynthbox.SndLibrary.instance().addSndFiles([sound.path], sound.type, f"/zynthian/zynthian-my-data/sounds/{sound.type}/.stat.json")
+            Zynthbox.SndLibrary.instance().processSndFiles([sound.path])
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Saving snd file")
 
 
     @Slot(QObject)
-    def loadSound(self, sound: zynthbox_sndfile):
+    def loadSound(self, sound: Zynthbox.SndFileInfo):
         def confirmLoadSound(params=None):
             selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            selectedTrack.setChannelSoundFromSnapshot(sound.metadata.synthFxSnapshot)
-            selectedTrack.setChannelSamplesFromSnapshot(sound.metadata.sampleSnapshot)
+            selectedTrack.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
+            selectedTrack.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
         self.zynqtgui.show_confirm("Loading sound will replace all synth, samples and fx in track. Do you really want to continue?", confirmLoadSound)
 
     @Slot(None, result=str)

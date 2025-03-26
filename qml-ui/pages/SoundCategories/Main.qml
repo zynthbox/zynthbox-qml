@@ -118,6 +118,10 @@ Zynthian.ScreenPage {
                     zynqtgui.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
                 }
             }
+        },
+        Kirigami.Action {
+            text: qsTr("Get More Sounds")
+            onTriggered: zynqtgui.show_modal("sound_downloader")
         }
     ]
 

@@ -1,7 +1,8 @@
 [KNewStuff3]
 Name=Sounds
 ProvidersUrl=https://autoconfig.zynthbox.io/ocs/provider.xml
-Categories=676
+#Categories=716
+Categories=Sounds
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sounds/community-sounds/
 Uncompress=never
 RemoveDeadEntries=true

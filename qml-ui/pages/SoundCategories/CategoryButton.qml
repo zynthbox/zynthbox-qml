@@ -34,7 +34,7 @@ QQC2.Button {
     background: Rectangle {
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
-        radius: control.radius
+        radius: control.radius ? control.radius : 2
         color: control.highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
     }
     checkable: true

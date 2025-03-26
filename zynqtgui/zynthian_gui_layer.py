@@ -1670,7 +1670,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
             if not isinstance(snapshot_obj["layers"], list):
                 return
             for layer_data in snapshot_obj["layers"]:
-                if "midi_chan" in layer_data and layer_data["engine_type"] in ["MIDI Synth", "Audio Effect"]:
+                if "midi_chan" in layer_data and layer_data["engine_type"] in ["MIDI Synth"]:
                     midi_chan = layer_data['midi_chan']
                     if not midi_chan in result:
                         result.append(midi_chan)

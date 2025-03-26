@@ -54,6 +54,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             "6": "Guitar/Plucks",
             "99": "FX/Other",
         }
+        self.filesDiscoveredThisTime = 0
+        Zynthbox.SndLibrary.instance().sndFileAdded.connect(self.handleSndFileAdded)
 
     def show(self):
         pass
@@ -112,10 +114,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             # selectedTrack.fxSlotsData is a list of strings (just what we need)
             sound.metadata.fxSlotsData = json.dumps(selectedTrack.fxSlotsData)
             sound.metadata.write()
+            self.filesDiscoveredThisTime = 0
             Zynthbox.SndLibrary.instance().processSndFiles([sound.path])
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Saving snd file")
-
 
     @Slot(QObject)
     def loadSound(self, sound: Zynthbox.SndFileInfo):
@@ -149,4 +151,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         def task():
             Zynthbox.SndLibrary.instance().processSndFiles(sources)
             self.zynqtgui.end_long_task()
-        self.zynqtgui.do_long_task(task, "Indexing snd files")
+        self.filesDiscoveredThisTime = 0
+        self.zynqtgui.do_long_task(task, "Indexing snd files<br />Initializing...")
+
+    @Slot(str)
+    def handleSndFileAdded(self, fileIdentifier):
+        self.filesDiscoveredThisTime += 1
+        self.zynqtgui.currentTaskMessage = f"Indexing snd files ({self.filesDiscoveredThisTime}):<br />{fileIdentifier}"

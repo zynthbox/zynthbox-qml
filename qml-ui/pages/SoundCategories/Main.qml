@@ -120,13 +120,101 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: qsTr("Get More Sounds")
+            text: qsTr("Get New Sounds")
             onTriggered: zynqtgui.show_modal("sound_downloader")
         }
     ]
 
     cuiaCallback: function(cuia) {
-        return false;
+        // TODO: Refactor some of the various selection logic in the views below to use currentIndex and currentItem instead of doing manual item checking...
+        let result = false;
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_LONG":
+            {
+                switch (root.state) {
+                    case "updateCategoryMode":
+                        root.state = "saveMode";
+                        result = true;
+                        break;
+                    case "saveMode":
+                        root.state = "displayMode";
+                        result = true;
+                        break;
+                    default:
+                    case "displayMode":
+                        break;
+                }
+                break;
+            }
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_LONG":
+                // For now, toggle whatever's the current item as selected... (when not in updateCategoryMode)
+                switch (root.state) {
+                    case "updateCategoryMode":
+                        break;
+                    case "saveMode":
+                        break;
+                    default:
+                    case "displayMode":
+                        break;
+                }
+                result = true;
+                break;
+            case "SELECT_UP":
+                // Select the next category up (when not in updateCategoryMode)
+                switch (root.state) {
+                    case "updateCategoryMode":
+                        break;
+                    case "saveMode":
+                        break;
+                    default:
+                    case "displayMode":
+                        break;
+                }
+                result = true;
+                break;
+            case "SELECT_DOWN":
+                // Select the next category down (when not in updateCategoryMode)
+                switch (root.state) {
+                    case "updateCategoryMode":
+                        break;
+                    case "saveMode":
+                        break;
+                    default:
+                    case "displayMode":
+                        break;
+                }
+                result = true;
+                break;
+            case "KNOB3_UP":
+                // Select the next item in the sounds list, and make it actually selected (when not in updateCategoryMode)
+                switch (root.state) {
+                    case "updateCategoryMode":
+                        break;
+                    case "saveMode":
+                        break;
+                    default:
+                    case "displayMode":
+                        break;
+                }
+                result = true;
+                break;
+            case "KNOB3_DOWN":
+                // Select the previous item in the sounds, and make it actually selected (when not in updateCategoryMode)
+                switch (root.state) {
+                    case "updateCategoryMode":
+                        break;
+                    case "saveMode":
+                        break;
+                    default:
+                    case "displayMode":
+                        break;
+                }
+                result = true;
+                break;
+        }
+        return result;
     }
 
     Connections {
@@ -167,7 +255,7 @@ Zynthian.ScreenPage {
             }
         }
     }
-    
+
     contentItem : ColumnLayout {
         id: content
 

@@ -297,7 +297,7 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             Layout.preferredWidth: height
                             onClicked: {
-                                zynqtgui.sound_categories.generateStatFiles()
+                                Zynthbox.SndLibrary.processSndFiles("/zynthian/zynthian-my-data/sounds/" + soundTypeComboBox.model[soundTypeComboBox.currentIndex])
                             }
 
                             Kirigami.Icon {

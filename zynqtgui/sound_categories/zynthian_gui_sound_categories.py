@@ -112,7 +112,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             # selectedTrack.fxSlotsData is a list of strings (just what we need)
             sound.metadata.fxSlotsData = json.dumps(selectedTrack.fxSlotsData)
             sound.metadata.write()
-            Zynthbox.SndLibrary.instance().addSndFiles([sound.path], sound.type, f"/zynthian/zynthian-my-data/sounds/{sound.type}/.stat.json")
+            # Zynthbox.SndLibrary.instance().addSndFiles([sound.path], sound.type, f"/zynthian/zynthian-my-data/sounds/{sound.type}/.stat.json")
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Saving snd file")
 
@@ -143,20 +143,3 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         except: pass
 
         return suggested
-
-    @Slot()
-    def generateStatFiles(self):
-        def task():
-            for origin in ["my-sounds", "community-sounds"]:
-                Zynthbox.SndLibrary.instance().serializeTo(f"/zynthian/zynthian-my-data/sounds/{origin}", origin, f"/zynthian/zynthian-my-data/sounds/{origin}/.stat.json")
-            # Refresh the models after generating stats files to update the UI
-            Zynthbox.SndLibrary.instance().refresh()
-            self.zynqtgui.end_long_task()
-        self.zynqtgui.do_long_task(task, "Generating sound statistics")
-
-    @Slot(QObject, str)
-    def changeCategory(self, sndFile, newCategory):
-        def task():
-            Zynthbox.SndLibrary.instance().changeSndFileCategory(sndFile, newCategory)
-            self.zynqtgui.end_long_task()
-        self.zynqtgui.do_long_task(task, "Updating category")

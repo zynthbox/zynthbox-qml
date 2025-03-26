@@ -1284,7 +1284,7 @@ Zynthian.BasePlayGrid {
                                 activeBar:_private.activeBar
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
-                                opacity: padNoteNumber < _private.workingPatternModel.patternLength ? 1 : 0.3
+                                opacity: _private.workingPatternModel && padNoteNumber < _private.workingPatternModel.patternLength ? 1 : 0.3
                                 enabled: opacity === 1
                                 note: visible && _private.workingPatternModel ? _private.workingPatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
                                 isCurrent: visible && model.index == drumPadRepeater.selectedIndex
@@ -1460,7 +1460,7 @@ Zynthian.BasePlayGrid {
                                         id:noteLengthLabel
                                         Layout.alignment: Qt.AlignHCenter
                                         horizontalAlignment: Text.AlignHCenter
-                                        text: "step length:\n%1".arg(_private.workingPatternModel.stepLengthName(_private.stepLength))
+                                        text: _private.workingPatternModel ? "step length:\n%1".arg(_private.workingPatternModel.stepLengthName(_private.stepLength)) : ""
                                     }
 
                                     Zynthian.PlayGridButton {
@@ -1567,9 +1567,11 @@ Zynthian.BasePlayGrid {
                                     QQC2.Label {
                                         Layout.alignment: Qt.AlignHCenter
                                         Layout.preferredHeight: noteLengthLabel.height
-                                        text: _private.workingPatternModel.availableBars * _private.workingPatternModel.width === _private.workingPatternModel.patternLength
-                                            ? _private.workingPatternModel.availableBars + " Bars"
-                                            : "%1.%2 Bars".arg(_private.workingPatternModel.availableBars - 1).arg(_private.workingPatternModel.patternLength - ((_private.workingPatternModel.availableBars - 1) * _private.workingPatternModel.width))
+                                        text: _private.workingPatternModel
+                                            ? _private.workingPatternModel.availableBars * _private.workingPatternModel.width === _private.workingPatternModel.patternLength
+                                                ? _private.workingPatternModel.availableBars + " Bars"
+                                                : "%1.%2 Bars".arg(_private.workingPatternModel.availableBars - 1).arg(_private.workingPatternModel.patternLength - ((_private.workingPatternModel.availableBars - 1) * _private.workingPatternModel.width))
+                                            : ""
                                         MultiPointTouchArea {
                                             anchors.fill: parent
                                             touchPoints: [
@@ -1577,7 +1579,7 @@ Zynthian.BasePlayGrid {
                                                     id: patternLengthSlidePoint;
                                                     property double increment: 1
                                                     property double slideIncrement: 0.2
-                                                    property double upperBound: _private.workingPatternModel.bankLength * _private.workingPatternModel.width
+                                                    property double upperBound: _private.workingPatternModel ? _private.workingPatternModel.bankLength * _private.workingPatternModel.width : 128
                                                     property double lowerBound: 1
                                                     property var currentValue: undefined
                                                     onPressedChanged: {

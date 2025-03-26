@@ -224,6 +224,9 @@ Zynthian.ScreenPage {
                                     // Hence, scroll to top before swtiching category.
                                     soundsGrid.contentY = 0;
                                     Qt.callLater(Zynthbox.SndLibrary.setCategoryFilter, category);
+                                    if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
+                                        soundButtonGroup.checkedButton.checked = false
+                                    }
                                 }
                             }
                             onClicked: {

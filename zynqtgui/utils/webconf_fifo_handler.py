@@ -26,6 +26,7 @@
 import logging
 import os
 import queue
+import stat
 import time
 
 from pathlib import Path
@@ -78,6 +79,7 @@ class webconf_fifo_handler(QObject):
 
         if not Path("/tmp/webconf-writes-to-this-fifo").exists():
             os.mkfifo("/tmp/webconf-writes-to-this-fifo")
+            os.chmod("/tmp/webconf-writes-to-this-fifo", stat.S_IWGRP | stat.S_IRGRP | stat.S_IRUSR | stat.S_IWUSR | stat.S_IWOTH | stat.S_IROTH)
         if not Path("/tmp/webconf-reads-from-this-fifo").exists():
             os.mkfifo("/tmp/webconf-reads-from-this-fifo")
 

@@ -518,11 +518,19 @@ Rectangle {
                                                 anchors.fill: parent
                                                 onClicked: {
                                                     if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
-                                                        ((!fxButton.checked && channelDelegate.channel.selectedSlotRow !== index) || (fxButton.checked && channelDelegate.channel.selectedFxSlotRow !== index))) {
+                                                        (synthsButton.checked && (root.selectedChannel.selectedSlot.className != "TracksBar_synthslot" || root.selectedChannel.selectedSlot.value != index)) ||
+                                                        (samplesButton.checked && (root.selectedChannel.selectedSlot.className != "TracksBar_sampleslot" || root.selectedChannel.selectedSlot.value != index)) ||
+                                                        (fxButton.checked && (root.selectedChannel.selectedSlot.className != "TracksBar_fxslot" || root.selectedChannel.selectedSlot.value != index))
+                                                    ) {
                                                         channelsSlotsRow.currentIndex = index
                                                         if (fxButton.checked) {
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
                                                             channelDelegate.channel.selectedFxSlotRow = index
-                                                        } else {
+                                                        } else if (samplesButton.checked) {
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample-trig", index);
+                                                            channelDelegate.channel.selectedSlotRow = index
+                                                        } else if (synthsButton.checked) {
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
                                                             channelDelegate.channel.selectedSlotRow = index
                                                         }
 

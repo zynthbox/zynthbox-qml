@@ -389,8 +389,10 @@ class sketchpad_channel(QObject):
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
 
-        if self.__id__ < 5:
-            # self.__connected_sound__ = self.__id__
+        # Default snapshot has 3 preselected synths at midi channel 0, 1 and 2
+        # When creating new sketchpad, set first 3 track's first slot to the default synths
+        # When later any sketchpad is restored, chainedSounds will be reset
+        if self.__id__ <= 2:
             self.__chained_sounds__[0] = self.__id__
 
         # Connect to default patterns on init

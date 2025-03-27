@@ -12,4 +12,5 @@ RemoveDeadEntries=true
 # - name (a file-system safe version of the author's name, will fall back to id if none is provided)
 # - nameandid (a file-system safe version of the author's name, will fall back to id if none is provided)
 # - email (the author's email, will fall back to id if none is provided)
+# - nameandemail (the author's name with their email in a parenthesis after it, replacing the name with "unknown" if undefined, and the email with the id if undefined)
 AuthorSubdir=name

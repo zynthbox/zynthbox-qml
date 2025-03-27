@@ -5,3 +5,4 @@ Categories=679
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sketchpads/community-sketchpads/
 Uncompress=always
 RemoveDeadEntries=true
+AuthorSubdir=name

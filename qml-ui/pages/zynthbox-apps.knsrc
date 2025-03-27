@@ -5,3 +5,4 @@ Categories=671
 XdgTargetDir=zynthbox/apps
 Uncompress=never
 RemoveDeadEntries=true
+AuthorSubdir=name

@@ -327,7 +327,7 @@ Zynthian.ScreenPage {
                                     // Reset to display mode after saving sound
                                     root.state = "displayMode"
                                 } else if (root.state === "updateCategoryMode") {
-                                    zynqtgui.sound_categories.changeCategory(soundButtonGroup.checkedButton.soundObj, modelData)
+                                    Zynthbox.SndLibrary.updateSndFileCategory(soundButtonGroup.checkedButton.soundObj, modelData)
                                     root.state = "displayMode"
                                 }
                             }

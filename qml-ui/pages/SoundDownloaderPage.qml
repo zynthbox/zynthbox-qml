@@ -27,6 +27,7 @@ import QtQuick 2.10
 import org.kde.newstuff 1.0 as NewStuff
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.NewStuffPage {
     id: component

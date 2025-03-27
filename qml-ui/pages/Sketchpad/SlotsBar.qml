@@ -518,24 +518,40 @@ Rectangle {
                                                 anchors.fill: parent
                                                 onClicked: {
                                                     if (zynqtgui.sketchpad.selectedTrackId !== channelDelegate.channelIndex ||
-                                                        (synthsButton.checked && (root.selectedChannel.selectedSlot.className != "TracksBar_synthslot" || root.selectedChannel.selectedSlot.value != index)) ||
-                                                        (samplesButton.checked && (root.selectedChannel.selectedSlot.className != "TracksBar_sampleslot" || root.selectedChannel.selectedSlot.value != index)) ||
-                                                        (fxButton.checked && (root.selectedChannel.selectedSlot.className != "TracksBar_fxslot" || root.selectedChannel.selectedSlot.value != index))
+                                                        (synthsButton.checked && root.selectedChannel.selectedSlot.value != index) ||
+                                                        (samplesButton.checked && root.selectedChannel.selectedSlot.value != index) ||
+                                                        (fxButton.checked && root.selectedChannel.selectedSlot.value != index)
                                                     ) {
+                                                        // Check only if slot index matches selected index. This will allow us overcoming the situation
+                                                        // Where a slot index is already selected for another slot type but would require clicking twice if
+                                                        // slot type is checked here to switch first and then activate the slot. Hence when activating, make sure to
+                                                        // switch to slot to have consistent selected slot type.
                                                         channelsSlotsRow.currentIndex = index
                                                         if (fxButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
                                                             channelDelegate.channel.selectedFxSlotRow = index
                                                         } else if (samplesButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample-trig", index);
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
                                                             channelDelegate.channel.selectedSlotRow = index
                                                         } else if (synthsButton.checked) {
-                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
                                                             channelDelegate.channel.selectedSlotRow = index
                                                         }
 
                                                         zynqtgui.sketchpad.selectedTrackId = channelDelegate.channelIndex;
                                                     } else {
+                                                        // As mentioned in the above if clause, when a slot index is already selected, the slot will want activation
+                                                        // but can have wrong slot type selected. Hence make sure to always have correct slot type before activating
+                                                        if (fxButton.checked) {
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_fxslot", index);
+                                                            channelDelegate.channel.selectedFxSlotRow = index
+                                                        } else if (samplesButton.checked) {
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_sampleslot", index);
+                                                            channelDelegate.channel.selectedSlotRow = index
+                                                        } else if (synthsButton.checked) {
+                                                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("TracksBar_synthslot", index);
+                                                            channelDelegate.channel.selectedSlotRow = index
+                                                        }
                                                         handleItemClick()
                                                     }
                                                 }

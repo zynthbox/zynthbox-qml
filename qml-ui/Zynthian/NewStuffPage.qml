@@ -184,12 +184,13 @@ Zynthian.ScreenPage {
                 margins: Kirigami.Units.largeSpacing
             }
             height: Kirigami.Units.gridUnit * 5
+            width: Kirigami.Units.gridUnit * 5
             visible: contentLoader.status != Loader.Ready
             Zynthian.Card {
                 anchors {
                     top: parent.top
-                    left: busyWithEngineStuffLabel.left
-                    right: busyWithEngineStuffLabel.right
+                    left: parent.left
+                    right: parent.right
                     bottom: parent.bottom
                     topMargin: -Kirigami.Units.largeSpacing
                     leftMargin: -Kirigami.Units.gridUnit * 2.5

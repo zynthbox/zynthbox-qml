@@ -6,3 +6,10 @@ Categories=Sounds
 AbsoluteInstallPath=/zynthian/zynthian-my-data/sounds/community-sounds/
 Uncompress=never
 RemoveDeadEntries=true
+# Author subdir can be either of:
+# - none (default)
+# - id (the author's ID)
+# - name (a file-system safe version of the author's name, will fall back to id if none is provided)
+# - nameandid (a file-system safe version of the author's name, will fall back to id if none is provided)
+# - email (the author's email, will fall back to id if none is provided)
+AuthorSubdir=name

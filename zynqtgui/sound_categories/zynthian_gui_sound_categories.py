@@ -124,51 +124,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
         def confirmLoadSound(params=None):
             def task():
                 selectedTrack = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-                snapshotObj = json.loads(sound.synthFxSnapshot())
-                hasWrongSlotIndex = False
-
-                # Heuristic to check if the slot index in snapshot is correctly set
-                # There might be some corner case which is causing the slot index for all synths to be 0
-                # which will mess up the snapshot. To prevent catastropic issues, the following
-                # heuristic will check for wrong slot indices by comparing the slot index with
-                # the metadata ZYNTHBOX_SOUND_SYNTH_SLOTS_DATA. If any discrepencies are found
-                # the snapshot object will be modified to have slot data that represents the occupied slots
-                # in the ZYNTHBOX_SOUND_SYNTH_SLOTS_DATA
-                # FIXME : Find the actual reason behind having wrong slot_index in snapshot
-                try:
-                    for layer in snapshotObj["layers"]:
-                        layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer)
-                        engine_name = ""
-                        if layer_snapshot["engine_nick"].startswith("JV/"):
-                            # Jalv stores the plugin name in its nickname and name like `JV/<plugin name>` and `Jalv/<plugin name>`
-                            engine_name = layer_snapshot["engine_nick"].replace("JV/", "")
-                        elif layer_snapshot["engine_nick"].startswith("JY/"):
-                            # Jucy stores the plugin name in its nickname and name like `JY/<plugin name>` and `Jucy/<plugin name>`
-                            engine_name = layer_snapshot["engine_nick"].replace("JY/", "")
-                        elif layer_snapshot["engine_nick"] == "SF":
-                            # SFizz stores the plugin name in preset_name
-                            engine_name = layer_snapshot["preset_name"]
-                        elif layer_snapshot["engine_nick"] == "FS":
-                            # Fluidsynth stores the plugin name in preset_name
-                            engine_name = layer_snapshot["preset_name"]
-                        slots_data = []
-                        if layer["engine_type"] == "MIDI Synth":
-                            slots_data = sound.synthSlotsData()
-                        elif layer["engine_type"] == "Audio Effect":
-                            slots_data = sound.fxSlotsData()
-                        if not engine_name in slots_data[layer["slot_index"]]:
-                            logging.debug(f"Engine Name : {engine_name}, slot_index: {layer['slot_index']}")
-                            for index, slotData in enumerate(slots_data):
-                                if engine_name in slotData:
-                                    logging.debug(f"  Assigning new slot index : {index}")
-                                    layer["slot_index"] = index
-                                    hasWrongSlotIndex = True
-                                    break
-                except Exception as e: logging.exception(f"Error in snd file validation heuristics : {e}")
-                if hasWrongSlotIndex:
-                    selectedTrack.setChannelSoundFromSnapshot(json.dumps(snapshotObj))
-                else:
-                    selectedTrack.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
+                selectedTrack.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
                 selectedTrack.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
                 self.zynqtgui.end_long_task()
             self.zynqtgui.do_long_task(task, "Loading snd file")

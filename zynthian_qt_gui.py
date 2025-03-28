@@ -676,6 +676,8 @@ class zynthian_gui(QObject):
         # Create our webconf communication bridge (must happen late, to ensure we've got most of our things initialised)
         self.__webconf_fifo_handler = webconf_fifo_handler(self)
 
+        self.requestProcessSndFiles.connect(Zynthbox.SndLibrary.instance().processSndFiles)
+
     @Slot(int, int, int, int, int, int, bool)
     def handleMidiMessage(self, port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal):
         # logging.error(f"Port {port} event size {size} on track {sketchpadTrack} from internal: {fromInternal} - {byte1} {byte2} {byte3}")
@@ -2320,7 +2322,7 @@ class zynthian_gui(QObject):
         elif cuia == "PROCESS_SND_FILES":
             if len(params) > 0:
                 logging.debug(f"Processing snd files : {params}")
-                Zynthbox.SndLibrary.instance().processSndFiles(params)
+                self.requestProcessSndFiles.emit(params)
 
         # Finally, report back to MidiRouter that we've handled the action
         if sendCuiaEventFeedback == True:
@@ -4811,6 +4813,7 @@ class zynthian_gui(QObject):
     # Arg 1 : Message to display
     # Arg 2 : If non zero, then hide dialog after timeout seconds otherwise show until closed
     showMessageDialog = Signal(str, int)
+    requestProcessSndFiles = Signal("QStringList")
 
     about = Property(QObject, about, constant=True)
     audio_out = Property(QObject, audio_out, constant=True)

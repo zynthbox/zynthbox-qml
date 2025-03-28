@@ -87,7 +87,7 @@ Zynthian.ScreenPage {
             text: root.state !== "updateCategoryMode"
                     ? qsTr("Change Category")
                     : qsTr("Cancel")
-            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked) ||
+            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked && soundTypeComboBox.model[soundTypeComboBox.currentIndex] == "my-sounds") ||
                      root.state === "updateCategoryMode"
             onTriggered: {
                 if (root.state == "displayMode") {

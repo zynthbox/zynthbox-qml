@@ -38,5 +38,11 @@ QQC2.Button {
         color: control.highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
     }
     checkable: true
-    text: "%1 (%2)".arg(categoryInfo.name).arg(categoryInfo.fileCount)
+    text: "%1 (%2)"
+            .arg(categoryInfo.name)
+            .arg(soundTypeComboBox.model[soundTypeComboBox.currentIndex] == "my-sounds"
+                    ? categoryInfo.myFileCount
+                    : soundTypeComboBox.model[soundTypeComboBox.currentIndex] == "community-sounds"
+                        ? categoryInfo.communityFileCount
+                        : 0)
 }

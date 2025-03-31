@@ -29,7 +29,6 @@ import copy
 
 import alsaaudio
 import liblo
-import queue
 import signal
 import math
 
@@ -326,7 +325,6 @@ class zynthian_gui_status_data(QObject):
 # Zynthian Main GUI Class
 # -------------------------------------------------------------------------------
 
-recent_task_messages = queue.SimpleQueue()
 class zynthian_gui(QObject):
 
     screens_sequence = (
@@ -426,9 +424,9 @@ class zynthian_gui(QObject):
         super(zynthian_gui, self).__init__(parent)
 
         self.exit_flag = False
-        self.bootsplash_thread = Thread(target=self.bootsplash_worker, args=())
-        self.bootsplash_thread.daemon = True # thread will exit with the program
-        self.bootsplash_thread.start()
+        if not os.path.exists("/tmp/bootlog.fifo"):
+            os.mkfifo("/tmp/bootlog.fifo")
+        self.bootsplashFifo = Zynthbox.FifoHandler("/tmp/bootlog.fifo", Zynthbox.FifoHandler.WritingDirection, self)
 
         self.bpmBeforePressingMetronome = 0
         self.volumeBeforePressingMetronome = 0
@@ -570,9 +568,6 @@ class zynthian_gui(QObject):
 
         self.cpu_status_info_undervoltage = Event()
         self.cpu_status_info_overtemp = Event()
-        self.cpu_status_thread = Thread(target=self.cpu_status_refresh, args=(self.cpu_status_info_undervoltage, self.cpu_status_info_overtemp))
-        self.cpu_status_thread.daemon = True # thread will exit with the program
-        self.cpu_status_thread.start()
 
         self.midi_filter_script = None
         self.midi_learn_mode = False
@@ -3207,57 +3202,35 @@ class zynthian_gui(QObject):
         except Exception as e:
             logging.error(e)
 
-    def cpu_status_refresh(self, cpu_status_info_undervoltage, cpu_status_info_overtemp):
-        watchdog_process = Popen(["python3", "cpu_watchdog.py"])
-        watchdog_fifo = None
-        while not self.exit_flag:
-            # Do not refresh when booting is in progress
-            if self.isBootingComplete and zynthian_gui_config.show_cpu_status:
-                try:
-                    if watchdog_fifo is None:
-                        watchdog_fifo = open("/tmp/cpu_watchdog", "r")
+    # This is called by set_isBootingComplete
+    def init_cpu_status(self):
+        if not os.path.exists("/tmp/cpu_watchdog"):
+            os.mkfifo("/tmp/cpu_watchdog")
+        self.watchdog_process = Popen(["python3", "cpu_watchdog.py"])
+        self.destroyed.connect(self.cpuStatusCleanup)
+        self.cpuStatusFifo = Zynthbox.FifoHandler("/tmp/cpu_watchdog", Zynthbox.FifoHandler.ReadingDirection, self)
+        self.cpuStatusFifo.received.connect(self.handleCpuStatusData)
+        self.cpuStatusFifo.start()
 
-                    data = ""
-                    while True:
-                        data = watchdog_fifo.readline()[:-1].strip()
-                        if len(data) == 0:
-                            break
-                        else:
-                            if data.startswith("overtemp"):
-                                splitData = data.split(" ")
-                                if splitData[1] == "True":
-                                    cpu_status_info_overtemp.set()
-                                else:
-                                    cpu_status_info_overtemp.clear()
-                            if data.startswith("undervoltage"):
-                                splitData = data.split(" ")
-                                if splitData[1] == "True":
-                                    cpu_status_info_undervoltage.set()
-                                else:
-                                    cpu_status_info_undervoltage.clear()
+    @Slot(None)
+    def cpuStatusCleanup(self):
+        if self.watchdog_process is not None:
+            self.watchdog_process.kill()
 
-                except Exception as e:
-                    logging.error(e)
-            time.sleep(0.3)
-        if watchdog_fifo is not None:
-            watchdog_fifo.close()
-        if watchdog_process is not None:
-            watchdog_process.kill()
-
-    def bootsplash_worker(self):
-        bootsplash_fifo = None
-        if not Path("/tmp/bootlog.fifo").exists():
-            os.mkfifo("/tmp/bootlog.fifo")
-        while not self.exit_flag:
-            try:
-                if bootsplash_fifo is None:
-                    bootsplash_fifo = os.open("/tmp/bootlog.fifo", os.O_WRONLY)
-
-                bootsplashEntry = recent_task_messages.get()
-                if len(bootsplashEntry) > 0:
-                    os.write(bootsplash_fifo, f"{bootsplashEntry}\n".encode())
-            except Exception as e:
-                logging.error(e)
+    @Slot(str)
+    def handleCpuStatusData(self, data):
+        if data.startswith("overtemp"):
+            splitData = data.split(" ")
+            if splitData[1] == "True":
+                self.cpu_status_info_overtemp.set()
+            else:
+                self.cpu_status_info_overtemp.clear()
+        if data.startswith("undervoltage"):
+            splitData = data.split(" ")
+            if splitData[1] == "True":
+                self.cpu_status_info_undervoltage.set()
+            else:
+                self.cpu_status_info_undervoltage.clear()
 
     def start_loading_thread(self):
         self.loading_thread = Thread(target=self.loading_refresh, args=())
@@ -3270,7 +3243,7 @@ class zynthian_gui(QObject):
         if self.loading < 1:
             self.loading = 1
         self.currentTaskMessage = task_message
-        recent_task_messages.put("command:show")
+        self.bootsplashFifo.send("command:show")
         self.is_loading_changed.emit()
         QGuiApplication.instance().processEvents()
         # logging.debug("START LOADING %d" % self.loading)
@@ -3287,14 +3260,14 @@ class zynthian_gui(QObject):
 
         if self.loading == 0:
             if self.__long_task_count__ == 0:
-                recent_task_messages.put("command:hide")
+                self.bootsplashFifo.send("command:hide")
             self.is_loading_changed.emit()
             QGuiApplication.instance().processEvents()
         # logging.debug("STOP LOADING %d" % self.loading)
 
     def reset_loading(self):
         if self.__long_task_count__ == 0:
-            recent_task_messages.put("command:hide")
+            self.bootsplashFifo.send("command:hide")
         self.loading = 0
         self.is_loading_changed.emit()
         QGuiApplication.instance().processEvents()
@@ -3756,7 +3729,7 @@ class zynthian_gui(QObject):
         # Display main window as soon as possible so it doesn't take time to load after splash stops
         self.displayMainWindow.emit()
         self.isBootingComplete = True
-        recent_task_messages.put("command:play-extro")        
+        self.bootsplashFifo.send("command:play-extro")
         # Display sketchpad page and run set_selector at last before hiding splash to ensure knobs work fine
         self.show_modal("sketchpad")
         self.set_selector()        
@@ -3981,7 +3954,7 @@ class zynthian_gui(QObject):
         self.__long_task_count__ += 1
         self.doingLongTaskChanged.emit()
         if self.__long_task_count__ > 0:
-            recent_task_messages.put("command:show")
+            self.bootsplashFifo.send("command:show")
 
         QTimer.singleShot(1, cb)
 
@@ -3994,7 +3967,7 @@ class zynthian_gui(QObject):
             self.currentTaskMessage = ""
             self.longTaskEnded.emit()
             if self.loading == 0:
-                recent_task_messages.put("command:hide")
+                self.bootsplashFifo.send("command:hide")
 
     longTaskStarted = Signal()
     longTaskEnded = Signal()
@@ -4539,6 +4512,7 @@ class zynthian_gui(QObject):
             self.isBootingCompleteChanged.emit()
 
             if self.__booting_complete__:
+                self.init_cpu_status();
                 self.currentTaskMessage = ""
 
     isBootingCompleteChanged = Signal()
@@ -4596,7 +4570,7 @@ class zynthian_gui(QObject):
     def set_currentTaskMessage(self, value):
         if value != self.__current_task_message:
             self.__current_task_message = value
-            recent_task_messages.put(value)
+            self.bootsplashFifo.send(value)
             self.currentTaskMessageChanged.emit()
 
     currentTaskMessageChanged = Signal()

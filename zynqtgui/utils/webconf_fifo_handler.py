@@ -75,7 +75,6 @@ class webconf_fifo_handler(QObject):
         self.core_gui = parent
         self.core_gui.currentTaskMessageChanged.connect(self.handleCurrentTaskMessageChanged)
         self.core_gui.is_loading_changed.connect(self.handleIsLoadingChanged)
-        self.data_for_webconf = queue.SimpleQueue()
 
         if not Path("/tmp/webconf-writes-to-this-fifo").exists():
             os.mkfifo("/tmp/webconf-writes-to-this-fifo")
@@ -83,12 +82,10 @@ class webconf_fifo_handler(QObject):
         if not Path("/tmp/webconf-reads-from-this-fifo").exists():
             os.mkfifo("/tmp/webconf-reads-from-this-fifo")
 
-        self.fifo_reader_thread = Thread(target=self.fifo_reader, args=())
-        self.fifo_reader_thread.daemon = True # thread will exit with the program
-        self.fifo_reader_thread.start()
-        self.fifo_writer_thread = Thread(target=self.fifo_writer, args=())
-        self.fifo_writer_thread.daemon = True # thread will exit with the program
-        self.fifo_writer_thread.start()
+        self.fifoReader = Zynthbox.FifoHandler("/tmp/webconf-writes-to-this-fifo", Zynthbox.FifoHandler.ReadingDirection, self)
+        self.fifoReader.received.connect(self.handleInput)
+        self.fifoReader.start()
+        self.fifoWriter = Zynthbox.FifoHandler("/tmp/webconf-reads-from-this-fifo", Zynthbox.FifoHandler.WritingDirection, self)
 
         Zynthbox.MidiRouter.instance().cuiaEventHandled.connect(self.handleMidiRouterCuiaEventHandled)
         Zynthbox.SndLibrary.instance().sndFileAdded.connect(self.handleSndFileAdded)
@@ -116,7 +113,7 @@ class webconf_fifo_handler(QObject):
     #   @param data The string to send to Webconf
     @Slot(str)
     def send(self, data:str):
-        self.data_for_webconf.put(data)
+        self.fifoWriter.send(data)
 
     ### Handle the input as retrieved from Webconf
     # The layout of the string will depend on the specific type of command. The following
@@ -138,7 +135,8 @@ class webconf_fifo_handler(QObject):
     # This means that technically, /cuia//switch_stop//// would be valid, as it would be interpreted as cuia/switch_stop, but you should endeavour to avoid this kind of thing.
     #
     # @param inputData The raw data as received from Webconf (a single line of text)
-    def handle_input(self, inputData):
+    @Slot(str)
+    def handleInput(self, inputData):
         logging.error(f"Input retrieved from webconf fifo: {inputData}")
         splitData = list(filter(None, inputData.split("/"))) # Filter out any empty entries, as those aren't supposed to exist
         # On startup, webconf sends out a command to retrieve the current state, which we should then return
@@ -191,39 +189,3 @@ class webconf_fifo_handler(QObject):
     @Slot(str)
     def handleSndFileAdded(self, fileIdentifier):
         self.send(f"sound/added/{fileIdentifier}")
-
-    def fifo_reader(self):
-        input_fifo = None
-        while not self.core_gui.exit_flag:
-            # Do not refresh when booting is in progress
-            if self.core_gui.isBootingComplete:
-                try:
-                    if input_fifo is None:
-                        input_fifo = open("/tmp/webconf-writes-to-this-fifo", mode="r", encoding='utf8')
-
-                    data = ""
-                    while True:
-                        data = input_fifo.readline()[:-1].strip()
-                        if len(data) == 0:
-                            break
-                        else:
-                            self.handle_input(data)
-
-                except Exception as e:
-                    logging.error(f"Error while attempting to read from the webconf input fifo: {e}")
-            time.sleep(0.3)
-        if input_fifo is not None:
-            input_fifo.close()
-
-    def fifo_writer(self):
-        output_fifo = None
-        while not self.core_gui.exit_flag:
-            try:
-                if output_fifo is None:
-                    output_fifo = os.open("/tmp/webconf-reads-from-this-fifo", os.O_WRONLY)
-
-                data = self.data_for_webconf.get()
-                if len(data) > 0:
-                    os.write(output_fifo, f"{data}\n".encode())
-            except Exception as e:
-                logging.error(f"Error while attempting to write to the webconf output fifo: {e}")

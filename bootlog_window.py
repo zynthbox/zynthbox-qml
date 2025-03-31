@@ -3,11 +3,11 @@ import os
 import sys
 import time
 from pathlib import Path
-from threading import Thread
 from PySide2.QtCore import Property, QObject, Qt, Signal, Slot
 from PySide2.QtGui import QCursor, QGuiApplication, QPixmap
 from PySide2.QtQml import QQmlApplicationEngine
 
+import Zynthbox # Only use the most basic parts of this, as it will be uninitialised (in our case here, only FifoHelper)
 
 logging.basicConfig(format='%(levelname)s:%(module)s.%(funcName)s: %(message)s', stream=sys.stderr, level=logging.DEBUG)
 
@@ -22,46 +22,35 @@ class BootLogInterface(QObject):
 
         self.__bootCompleted = False
         self.exit_flag = False
+
         logging.error("Setting thread")
-        self.check_boot_log_thread = Thread(target=self.check_boot_log_timeout, args=())
-        self.check_boot_log_thread.daemon = True # thread will exit with the program
+        self.fifoReader = Zynthbox.FifoHandler("/tmp/bootlog.fifo", Zynthbox.FifoHandler.ReadingDirection, self)
+        self.fifoReader.received.connect(self.handleData)
         logging.error("Starting thread")
-        self.check_boot_log_thread.start()
+        self.fifoReader.start()
 
-    def check_boot_log_timeout(self):
-        while not self.exit_flag:
-            # Skip reading until bootlog.fifo file is found
-            if Path("/tmp/bootlog.fifo").exists():
-                if self.__boot_log_file is None:
-                    self.__boot_log_file = open("/tmp/bootlog.fifo", "r")
-
-
-                while True:
-                    data = self.__boot_log_file.readline()[:-1].strip()
-
-                    if len(data) == 0:
-                        break
-                    else:
-                        if data.startswith("command:"):
-                            if data == "command:exit":
-                                logging.debug("Received exit command. Cleaning up and exiting")
-                                self.bootLog = "Shutting down"
-                                self.exit_flag = True
-                                QGuiApplication.quit()
-                            elif data == "command:play-extro":
-                                logging.debug("Received play-extro command. Playing extro video")
-                                self.bootLog = ""
-                                self.playExtroAndHide.emit()
-                            elif data == "command:show":
-                                self.showBootlog.emit()
-                            elif data == "command:hide" and self.bootCompleted:
-                                self.bootLog = ""
-                                self.hideBootlog.emit()
-                        else:
-                            self.bootLog = data
-            time.sleep(0.1)
-        if self.__boot_log_file is not None:
-            self.__boot_log_file.close()
+    @Slot(None)
+    def handleData(self, data):
+        if len(data) == 0:
+            pass
+        else:
+            if data.startswith("command:"):
+                if data == "command:exit":
+                    logging.debug("Received exit command. Cleaning up and exiting")
+                    self.bootLog = "Shutting down"
+                    self.exit_flag = True
+                    QGuiApplication.quit()
+                elif data == "command:play-extro":
+                    logging.debug("Received play-extro command. Playing extro video")
+                    self.bootLog = ""
+                    self.playExtroAndHide.emit()
+                elif data == "command:show":
+                    self.showBootlog.emit()
+                elif data == "command:hide" and self.bootCompleted:
+                    self.bootLog = ""
+                    self.hideBootlog.emit()
+            else:
+                self.bootLog = data
 
     ### Property bootLog
     def get_bootLog(self):

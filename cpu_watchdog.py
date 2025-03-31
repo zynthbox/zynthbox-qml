@@ -71,6 +71,6 @@ if __name__ == "__main__":
             except Exception as e:
                 logging.error(e)
 
-        time.sleep(0.3)
+        time.sleep(1)
     if watchdog_fifo:
         watchdog_fifo.close()

@@ -1413,27 +1413,32 @@ class sketchpad_channel(QObject):
 
     @Slot()
     def removeSelectedFxFromChain(self):
-        def task():
-            if self.__chained_fx[self.__selected_fx_slot_row] is not None:
-                try:
-                    layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[self.__selected_fx_slot_row])
-                    self.zynqtgui.layer.remove_layer(layer_index)
-                    self.__chained_fx[self.__selected_fx_slot_row] = None
-                    self.__routingData__["fx"][self.__selected_fx_slot_row].clear()
+        self.removeFxFromChain(self.__selected_fx_slot_row)
 
-                    self.chainedFxChanged.emit()
-                    self.chainedFxNamesChanged.emit()
-        #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
-        #            self.zynqtgui.layer_effects.fx_layer = None
-        #            self.zynqtgui.layer_effects.fill_list()
-        #            self.zynqtgui.main_layers_view.fill_list()
-        #            self.zynqtgui.fixed_layers.fill_list()
-                except Exception as e:
-                    logging.exception(e)
+    @Slot(int)
+    def removeFxFromChain(self, fxSlotIndex):
+        if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+            def task():
+                if self.__chained_fx[fxSlotIndex] is not None:
+                    try:
+                        layer_index = self.zynqtgui.layer.layers.index(self.__chained_fx[fxSlotIndex])
+                        self.zynqtgui.layer.remove_layer(layer_index)
+                        self.__chained_fx[fxSlotIndex] = None
+                        self.__routingData__["fx"][fxSlotIndex].clear()
 
-                QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+                        self.chainedFxChanged.emit()
+                        self.chainedFxNamesChanged.emit()
+            #            self.zynqtgui.layer_effects.fx_layers_changed.emit()
+            #            self.zynqtgui.layer_effects.fx_layer = None
+            #            self.zynqtgui.layer_effects.fill_list()
+            #            self.zynqtgui.main_layers_view.fill_list()
+            #            self.zynqtgui.fixed_layers.fill_list()
+                    except Exception as e:
+                        logging.exception(e)
 
-        self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
+                    QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+
+            self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
 
     def updateChainedFxEngineData(self, position, layer):
         if layer is not None:
@@ -2650,6 +2655,28 @@ class sketchpad_channel(QObject):
                         self.__samples__[index].set_path(str(temporaryFile), should_copy=True)
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Loading samples")
+
+    @Slot(str, int, int)
+    def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int):
+        if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+            def task():
+                snapshot_obj = json.loads(snapshot)
+                if snapshotIndex < len(snapshot_obj):
+                for index, key in enumerate(snapshot_obj):
+                    filename = snapshot_obj[key]["filename"]
+                    # Clear out the existing sample, whether or not there's a new sample to go into that spot
+                    self.__samples__[slotIndex].clear()
+                    # If the filename is an empty string, nothing to load
+                    if len(filename) > 0:
+                        # Store the new sample in a temporary file
+                        with tempfile.TemporaryDirectory() as tmp:
+                            temporaryFile = Path(tmp) / filename
+                            with open(temporaryFile, "wb") as file:
+                                file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
+                            # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
+                            self.__samples__[slotIndex].set_path(str(temporaryFile), should_copy=True)
+                self.zynqtgui.end_long_task()
+            self.zynqtgui.do_long_task(task, "Loading sample from snapshot")
 
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):

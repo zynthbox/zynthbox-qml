@@ -118,7 +118,8 @@ class webconf_fifo_handler(QObject):
     ### Handle the input as retrieved from Webconf
     # The layout of the string will depend on the specific type of command. The following
     # is an attempt at fully documenting the intent of the acceptable input. The text would
-    # commonly be a /-separated string of commands and arguments.
+    # commonly be a /-separated string of commands and arguments. To include a / in a string,
+    # simply escape that slash (by writing \/). You can use this when passing in files
     #
     # cuia/cuia_command/track/slot/value
     #   this will call the given CUIA command with the parameters of the command set to the
@@ -130,6 +131,24 @@ class webconf_fifo_handler(QObject):
     #   cuia/ACTIVATE_TRACK/1/-1/0 (which activates track 1 (index 0))
     #   For commands which are singular (such as button presses), you don't have to pass track, slot, and value:
     #   cuia/switch_play (which will simulate pressing the play button)
+    # sounds
+    #   This section of commands will affect the sound library
+    #   sounds/process/absolute\/file\/path.snd will process the snd file /absolute/file/path.snd
+    #   sounds/process/absolute\/file\/path.snd/another\/absolute\/path.snd will process the two given snd files /absolute/file/path.snd and /another/absolute/path.snd
+    # sketchpad
+    #   This section of commands will affect the current sketchpad in various ways.
+    #   sketchpad/track/3/loadSound/absolute\/file\/path.snd would instruct track 4 (index 3) to perform "loadSound" on the file /absolute/file/path.snd
+    #   Track commands are:
+    #     loadSound: Will load the given sound onto the track. If the snd file doesn't exist, the command will be ignored
+    #     clearSlot: Will clear the data on the given slot and type. The format of the command is:
+    #       sketchpad/track/trackindex/clearSlot/slottype/slotindex
+    #       and the acceptable values for slottype are: synth, sample, fx, sketch
+    #     loadIntoSlot: Will load the given data into the given slot. Same format and slot types as clearSlot, but with an additional element for a file path and optional subelements for that file
+    #       sketchpad/track/trackindex/loadIntoSlot/slottype/slotindex/absolute\/file\/path\/to\/a\/file.wav
+    #       This is currently only useful for wave files
+    #       sketchpad/track/trackindex/loadIntoSlot/slottype/slotindex/absolute\/path.snd/slottype2/slotindex2
+    #         This command will load the embedded element defined by slottype2 and slotindex2 into the given slottype and slotindex on the given track
+    #         Note that the types must be compatible (which essentially means that they must match, unless you are loading a sketch from an snd file into a sample slot)
     #
     # NOTE: The separator should only exist between elements, and all elements must be filled, as any empty elements would be filtered out before handling
     # This means that technically, /cuia//switch_stop//// would be valid, as it would be interpreted as cuia/switch_stop, but you should endeavour to avoid this kind of thing.
@@ -138,7 +157,32 @@ class webconf_fifo_handler(QObject):
     @Slot(str)
     def handleInput(self, inputData):
         logging.error(f"Input retrieved from webconf fifo: {inputData}")
-        splitData = list(filter(None, inputData.split("/"))) # Filter out any empty entries, as those aren't supposed to exist
+        # Tokenizing step (that is, a new element will be started by a / (except when the previous character was a \)
+        def split_unescape(s, delim, escape='\\', unescape=True):
+            # Helpful escape-capable split function by Taha Jahangir: https://stackoverflow.com/a/21882672/232739
+            ret = []
+            current = []
+            itr = iter(s)
+            for ch in itr:
+                if ch == escape:
+                    try:
+                        # skip the next character; it has been escaped!
+                        if not unescape:
+                            current.append(escape)
+                        current.append(next(itr))
+                    except StopIteration:
+                        if unescape:
+                            current.append(escape)
+                elif ch == delim:
+                    # split! (add current to the list and reset it)
+                    ret.append(''.join(current))
+                    current = []
+                else:
+                    current.append(ch)
+            ret.append(''.join(current))
+            return ret
+        splitData = split_unescape(inputData, "/")
+        logging.error(f"The tokenized input data is {splitData}")
         # On startup, webconf sends out a command to retrieve the current state, which we should then return
         splitDataLength = len(splitData)
         if splitDataLength > 0:
@@ -160,8 +204,96 @@ class webconf_fifo_handler(QObject):
                         logging.error(f"Attempted to handle a cuia command which did not match the expected layout of either cuia/command or cuia/command/track/slot/value: {inputData}")
                     if command != "":
                         self.core_gui.callable_ui_action(command, [value], -1, track, slot)
-                case "":
-                    pass
+                case "sounds":
+                    if splitDataLength > 1:
+                        match splitData[1]:
+                            case "process":
+                                if splitDataLength > 2:
+                                    Zynthbox.SndLibrary.instance().processSounds(splitData[2:])
+                                else:
+                                    # Perhaps this should cause an "update everything" refresh type thing?
+                                    pass
+                            case "setCategory":
+                                pass
+                case "sketchpad":
+                    if splitDataLength > 2:
+                        match splitData[1]:
+                            case "track":
+                                if splitDataLength > 3:
+                                    trackIndex = splitData[2]
+                                    track = self.core_gui.sketchpad.song.channelsModel.getChannel(max(0, min(trackIndex, Zynthbox.Plugin.instance().sketchpadTrackCount())))
+                                    match splitData[3]:
+                                        case "loadSound":
+                                            if splitDataLength == 5:
+                                                sndFile = splitData[4]
+                                                # Load .snd file (if it's an snd file and, you know, exists and stuff!)
+                                                sound = Zynthbox.SndLibrary.instance().getSound(sndFile)
+                                                if sound is not None:
+                                                    def task():
+                                                        track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
+                                                        track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
+                                                        self.zynqtgui.end_long_task()
+                                                    self.core_gui.do_long_task(task, "Loading snd file")
+                                                else:
+                                                    logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")
+                                        case "clearSlot":
+                                            if splitDataLength == 6:
+                                                slotType = splitData[4]
+                                                slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                                match slotType:
+                                                    case "synth":
+                                                        if track.checkIfLayerExists(track.chainedSounds[slotIndex]):
+                                                            track.remove_and_unchain_sound(track.chainedSounds[slotIndex])
+                                                    case "sample":
+                                                        sampleClip = track.samples[slotIndex]
+                                                        sampleClip.clear()
+                                                    case "sketch":
+                                                        sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                                        sketchClip.clear()
+                                                    case "fx":
+                                                        track.removeFxFromChain(slotIndex)
+                                        case "loadIntoSlot":
+                                            if splitDataLength == 7:
+                                                slotType = splitData[4]
+                                                slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                                fileName = splitData[6]
+                                                match slotType:
+                                                    case "synth":
+                                                        pass
+                                                    case "sample":
+                                                        sampleClip = track.samples[slotIndex]
+                                                        sampleClip.path = fileName
+                                                        # sampleClip.enabled = True
+                                                    case "sketch":
+                                                        sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                                        sketchClip.path = fileName
+                                                        # sketchClip.enabled = True
+                                                    case "fx":
+                                                        pass
+                                            elif splitDataLength == 9:
+                                                # In this case we are pulling something out of an .snd or .sketch.wav, for inserting into some slot
+                                                slotType = splitData[4]
+                                                slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                                fileName = splitData[6]
+                                                originType = splitData[7]
+                                                originIndex = splitData[8]
+                                                sound = Zynthbox.SndLibrary.instance().getSound(sndFile)
+                                                if sound is not None:
+                                                    match slotType:
+                                                        case "synth":
+                                                            pass
+                                                        case "sample":
+                                                            # sampleClip = track.samples[slotIndex]
+                                                            # sampleClip.path = fileName
+                                                            # sampleClip.enabled = True
+                                                            pass
+                                                        case "sketch":
+                                                            # sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                                            # sketchClip.path = fileName
+                                                            # sketchClip.enabled = True
+                                                            pass
+                                                        case "fx":
+                                                            pass
 
     @Slot(str,int,int,int,int)
     def handleMidiRouterCuiaEventHandled(self, cuia, originId, track, slot, value):

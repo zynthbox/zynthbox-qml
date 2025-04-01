@@ -2662,19 +2662,21 @@ class sketchpad_channel(QObject):
             def task():
                 snapshot_obj = json.loads(snapshot)
                 if snapshotIndex < len(snapshot_obj):
-                for index, key in enumerate(snapshot_obj):
-                    filename = snapshot_obj[key]["filename"]
-                    # Clear out the existing sample, whether or not there's a new sample to go into that spot
-                    self.__samples__[slotIndex].clear()
-                    # If the filename is an empty string, nothing to load
-                    if len(filename) > 0:
-                        # Store the new sample in a temporary file
-                        with tempfile.TemporaryDirectory() as tmp:
-                            temporaryFile = Path(tmp) / filename
-                            with open(temporaryFile, "wb") as file:
-                                file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
-                            # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
-                            self.__samples__[slotIndex].set_path(str(temporaryFile), should_copy=True)
+                    for index, key in enumerate(snapshot_obj):
+                        if index == snapshotIndex: # key isn't just an index, so... let's do this thing
+                            filename = snapshot_obj[key]["filename"]
+                            # Clear out the existing sample, whether or not there's a new sample to go into that spot
+                            self.__samples__[slotIndex].clear()
+                            # If the filename is an empty string, nothing to load
+                            if len(filename) > 0:
+                                # Store the new sample in a temporary file
+                                with tempfile.TemporaryDirectory() as tmp:
+                                    temporaryFile = Path(tmp) / filename
+                                    with open(temporaryFile, "wb") as file:
+                                        file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
+                                    # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
+                                    self.__samples__[slotIndex].set_path(str(temporaryFile), should_copy=True)
+                            break
                 self.zynqtgui.end_long_task()
             self.zynqtgui.do_long_task(task, "Loading sample from snapshot")
 

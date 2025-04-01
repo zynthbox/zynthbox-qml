@@ -14,3 +14,9 @@ RemoveDeadEntries=true
 # - email (the author's email, will fall back to id if none is provided)
 # - nameandemail (the author's name with their email in a parenthesis after it, replacing the name with "unknown" if undefined, and the email with the id if undefined)
 AuthorSubdir=name
+# Entry subdir can be either of:
+# - none (default)
+# - id (the entry's ID)
+# - name (the entry's human-readable name)
+# - nameandid (the entry's human-readable name, then a period, and then the entry's ID)
+EntrySubdir=name

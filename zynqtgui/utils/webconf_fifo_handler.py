@@ -227,7 +227,7 @@ class webconf_fifo_handler(QObject):
                                             if splitDataLength == 5:
                                                 sndFile = splitData[4]
                                                 # Load .snd file (if it's an snd file and, you know, exists and stuff!)
-                                                sound = Zynthbox.SndLibrary.instance().getSound(sndFile)
+                                                sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
                                                 if sound is not None:
                                                     def task():
                                                         track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
@@ -277,7 +277,7 @@ class webconf_fifo_handler(QObject):
                                                 fileName = splitData[6]
                                                 originType = splitData[7]
                                                 originIndex = splitData[8]
-                                                sound = Zynthbox.SndLibrary.instance().getSound(sndFile)
+                                                sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
                                                 if sound is not None:
                                                     match slotType:
                                                         case "synth":

@@ -209,7 +209,8 @@ class webconf_fifo_handler(QObject):
                         match splitData[1]:
                             case "process":
                                 if splitDataLength > 2:
-                                    Zynthbox.SndLibrary.instance().processSounds(splitData[2:])
+                                    # The "absolute" paths actually lack the slash at the front, so fix that real quick...
+                                    Zynthbox.SndLibrary.instance().processSndFiles(["/" + entry for entry in splitData[2:]])
                                 else:
                                     # Perhaps this should cause an "update everything" refresh type thing?
                                     pass
@@ -225,7 +226,7 @@ class webconf_fifo_handler(QObject):
                                     match splitData[3]:
                                         case "loadSound":
                                             if splitDataLength == 5:
-                                                sndFile = splitData[4]
+                                                sndFile = "/" + splitData[4]
                                                 # Load .snd file (if it's an snd file and, you know, exists and stuff!)
                                                 sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
                                                 if sound is not None:
@@ -256,7 +257,7 @@ class webconf_fifo_handler(QObject):
                                             if splitDataLength == 7:
                                                 slotType = splitData[4]
                                                 slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
-                                                fileName = splitData[6]
+                                                fileName = "/" + splitData[6]
                                                 match slotType:
                                                     case "synth":
                                                         pass
@@ -274,7 +275,7 @@ class webconf_fifo_handler(QObject):
                                                 # In this case we are pulling something out of an .snd or .sketch.wav, for inserting into some slot
                                                 slotType = splitData[4]
                                                 slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
-                                                fileName = splitData[6]
+                                                fileName = "/" + splitData[6]
                                                 originType = splitData[7]
                                                 originIndex = splitData[8]
                                                 sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)

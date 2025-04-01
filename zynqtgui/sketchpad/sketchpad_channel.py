@@ -708,7 +708,12 @@ class sketchpad_channel(QObject):
                 "layers_snapshot": self.__layers_snapshot,
                 "sample_picking_style": self.__sample_picking_style__,
                 "keyzone_mode": self.__keyzone_mode__,
-                "routeThroughGlobalFX": self.route_through_global_fx}
+                "routeThroughGlobalFX": self.route_through_global_fx,
+                "synthSlotsData": self.synthSlotsData, # synthSlotsData is a list of strings. Just what we need
+                "sampleSlotsData": [Path(f.path if f.path is not None else "").name for f in self.sampleSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
+                "sketchSlotsData": [Path(f.path if f.path is not None else "").name for f in self.sketchSlotsData], # sampleSlotsData is a list of clips. Generate a list of names
+                "fxSlotsData": self.fxSlotsData, # fxSlotsData is a list of strings. Just what we need
+                "externalSlotsData": self.externalSlotsData} # externalSlotsData is a list of strings. Just what we need
 
     def deserialize(self, obj, load_autosave=True):
         logging.debug(f"channel_deserialize : {load_autosave}")
@@ -852,6 +857,10 @@ class sketchpad_channel(QObject):
                 self.set_routeThroughGlobalFX(obj["routeThroughGlobalFX"], True)
                 # Run autoconnect to update jack connections when routeThrouGlobalFX is set
                 self.zynqtgui.zynautoconnect()
+            if "synthSlotsData" not in obj or "sampleSlotsData" not in obj or "sketchSlotsData" not in obj or "fxSlotsData" not in obj or "externalSlotsData" not in obj:
+                # Sketchpad does not have slots data. Schedule autosave explicitly to save the updated sketchpad json
+                # TODO : Rmove this check after a considerable amount of time when supposedly all the old sketchpads are migrated
+                self.__song__.schedule_save()
         except Exception as e:
             logging.error(f"Error during channel deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)

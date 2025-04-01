@@ -1093,6 +1093,7 @@ Kirigami.AbstractApplicationWindow {
     Connections {
         target: zynqtgui.sketchpad
         onSelected_track_id_changed: selectedChannelThrottle.restart()
+        onSong_changed: selectedChannelThrottle.restart()
     }
     Connections {
         target: zynqtgui.sketchpad.song

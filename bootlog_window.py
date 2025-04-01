@@ -23,7 +23,9 @@ class BootLogInterface(QObject):
         self.__bootCompleted = False
         self.exit_flag = False
 
-        logging.error("Setting thread")
+        logging.error("Initialising bootlog reader")
+        if not os.path.exists("/tmp/bootlog.fifo"):
+            os.mkfifo("/tmp/bootlog.fifo")
         self.fifoReader = Zynthbox.FifoHandler("/tmp/bootlog.fifo", Zynthbox.FifoHandler.ReadingDirection, self)
         self.fifoReader.received.connect(self.handleData)
         logging.error("Starting thread")

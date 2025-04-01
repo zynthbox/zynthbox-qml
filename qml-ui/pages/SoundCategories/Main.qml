@@ -37,6 +37,13 @@ Zynthian.ScreenPage {
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
     /**
+      * This property will store which origin is currently selected.
+      * When updated, a call to SndLibrary will be made to filter the sounds by selected origin
+      * Accepted values : my-sounds, community-sounds, ""(Will display both my-sounds and community-sounds)
+      * Default : ""
+      */
+    property string selectedOrigin: ""
+    /**
       * This signal will be emitted when some other page wants to
       * open the sound saving dialog
       */
@@ -82,12 +89,15 @@ Zynthian.ScreenPage {
     onShowSaveSoundDialog: {
         saveSoundDialog.open()
     }
+    onSelectedOriginChanged: {
+        Zynthbox.SndLibrary.setOriginFilter(root.selectedOrigin)
+    }
     contextualActions: [
         Kirigami.Action {
             text: root.state !== "updateCategoryMode"
                     ? qsTr("Change Category")
                     : qsTr("Cancel")
-            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked && soundTypeComboBox.model[soundTypeComboBox.currentIndex] == "my-sounds") ||
+            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked && root.selectedOrigin == "my-sounds") ||
                      root.state === "updateCategoryMode"
             onTriggered: {
                 if (root.state == "displayMode") {
@@ -222,8 +232,7 @@ Zynthian.ScreenPage {
         onCurrent_screen_idChanged: {
             // Refresh sounds model on page open
             if (zynqtgui.current_screen_id === root.screenId) {
-                soundTypeComboBox.currentIndex = 0
-                Zynthbox.SndLibrary.setOriginFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
+                Zynthbox.SndLibrary.setOriginFilter(root.selectedOrigin)
 
                 if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
                     soundButtonGroup.checkedButton.checked = false
@@ -302,6 +311,7 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             category: modelData
+                            origin: root.selectedOrigin
                             checkable: root.state === "displayMode"
                             checked: modelData == "*" // `All` button is checked by default
                             highlighted: root.state === "displayMode" && checked
@@ -363,27 +373,46 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
                         Layout.alignment: Qt.AlignCenter
 
-                        QQC2.ComboBox {
-                            id: soundTypeComboBox
+                        QQC2.ButtonGroup {
+                            id: originTabsButtonGroup
+                        }
+
+                        QQC2.Button {
                             Layout.fillHeight: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                            model: ["my-sounds", "community-sounds"]
-                            onActivated: {
-                                Zynthbox.SndLibrary.setOriginFilter(model[index])
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                            checked: root.selectedOrigin == ""
+                            checkable: true
+                            QQC2.ButtonGroup.group: originTabsButtonGroup
+                            text: qsTr("All")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    root.selectedOrigin = ""
+                                }
                             }
-                            delegate: QQC2.ItemDelegate {
-                                id: itemDelegate
-                                width: parent.width
-                                text: soundTypeComboBox.textRole ? (Array.isArray(soundTypeComboBox.model) ? modelData[soundTypeComboBox.textRole] : model[soundTypeComboBox.textRole]) : modelData
-                                font.weight: soundTypeComboBox.currentIndex === index ? Font.DemiBold : Font.Normal
-                                highlighted: soundTypeComboBox.highlightedIndex === index
-                                hoverEnabled: soundTypeComboBox.hoverEnabled
-                                contentItem: QQC2.Label {
-                                    text: itemDelegate.text
-                                    font: itemDelegate.font
-                                    elide: QQC2.Label.ElideRight
-                                    verticalAlignment: QQC2.Label.AlignVCenter
-                                    horizontalAlignment: QQC2.Label.AlignHCenter
+                        }
+                        QQC2.Button {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                            checked: root.selectedOrigin == "my-sounds"
+                            checkable: true
+                            QQC2.ButtonGroup.group: originTabsButtonGroup
+                            text: qsTr("My Sounds")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    root.selectedOrigin = "my-sounds"
+                                }
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                            checked: root.selectedOrigin == "community-sounds"
+                            checkable: true
+                            QQC2.ButtonGroup.group: originTabsButtonGroup
+                            text: qsTr("Community Sounds")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    root.selectedOrigin = "community-sounds"
                                 }
                             }
                         }
@@ -392,7 +421,7 @@ Zynthian.ScreenPage {
                             Layout.fillHeight: true
                             Layout.preferredWidth: height
                             onClicked: {
-                                zynqtgui.sound_categories.processSndFiles(["/zynthian/zynthian-my-data/sounds/" + soundTypeComboBox.model[soundTypeComboBox.currentIndex]])
+                                zynqtgui.sound_categories.processSndFiles(["/zynthian/zynthian-my-data/sounds/" + root.selectedOrigin])
                             }
 
                             Kirigami.Icon {

@@ -31,6 +31,8 @@ QQC2.Button {
     id: control
     property string category: "*"
     readonly property QtObject categoryInfo: Zynthbox.SndLibrary.categories[category]
+    property string origin: ""
+
     background: Rectangle {
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -40,9 +42,11 @@ QQC2.Button {
     checkable: true
     text: "%1 (%2)"
             .arg(categoryInfo.name)
-            .arg(soundTypeComboBox.model[soundTypeComboBox.currentIndex] == "my-sounds"
+            .arg(control.origin == "my-sounds"
                     ? categoryInfo.myFileCount
-                    : soundTypeComboBox.model[soundTypeComboBox.currentIndex] == "community-sounds"
+                    : control.origin == "community-sounds"
                         ? categoryInfo.communityFileCount
-                        : 0)
+                        : control.origin == ""
+                            ? categoryInfo.myFileCount + categoryInfo.communityFileCount
+                            : 0)
 }

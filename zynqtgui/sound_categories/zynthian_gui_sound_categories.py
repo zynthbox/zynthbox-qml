@@ -130,6 +130,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             self.zynqtgui.do_long_task(task, "Loading snd file")
         self.zynqtgui.show_confirm("Loading sound will replace all synth, samples and fx in track. Do you really want to continue?", confirmLoadSound)
 
+    @Slot(QObject, QObject)
+    def forceLoadSoundOnTrack(self, sound: Zynthbox.SndFileInfo, track):
+        def task():
+            track.setChannelSamplesFromSnapshot(sound.synthFxSnapshot())
+            track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, f"Loading snd file onto track {track.name}:<br />{sound.name}")
+
     @Slot(None, result=str)
     def suggestedSoundFileName(self):
         channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)

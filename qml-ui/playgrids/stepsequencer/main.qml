@@ -309,6 +309,12 @@ Zynthian.BasePlayGrid {
                 if (_private.activePatternModel) {
                     _private.associatedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.sketchpadTrack);
                     _private.associatedChannelIndex =  _private.activePatternModel.sketchpadTrack;
+                    // When switching tracks, clear our whatever you're listening to, otherwise things end up very strange...
+                    component.noteListeningActivations = 0;
+                    component.noteListeningNotes = [];
+                    component.noteListeningVelocities = [];
+                    component.heardNotes = [];
+                    component.heardVelocities = [];
                     Qt.callLater(_private.updateUniqueCurrentRowNotes)
                 } else {
                     _private.updateChannel();

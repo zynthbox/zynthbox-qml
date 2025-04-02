@@ -433,6 +433,10 @@ Zynthian.ScreenPage {
         onSelectedChannelChanged: {
             if (applicationWindow().selectedChannel) {
                 zynqtgui.callable_ui_action_simple("SCREEN_EDIT_CONTEXTUAL");
+                // When switching tracks, clear our whatever you're listening to, otherwise things end up very strange...
+                component.noteListeningActivations = 0;
+                component.noteListeningNotes = [];
+                component.heardNotes = [];
             }
         }
     }

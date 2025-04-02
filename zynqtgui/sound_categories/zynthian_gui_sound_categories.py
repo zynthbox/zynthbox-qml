@@ -53,6 +53,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
             "5": "Strings/Pads",
             "6": "Guitar/Plucks",
             "99": "FX/Other",
+            "100": "Best Of"
         }
         self.filesDiscoveredThisTime = 0
         Zynthbox.SndLibrary.instance().sndFileAdded.connect(self.handleSndFileAdded)

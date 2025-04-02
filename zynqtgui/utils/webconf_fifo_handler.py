@@ -158,22 +158,38 @@ class webconf_fifo_handler(QObject):
     #   any cuia command (see the callable_ui_action function to see what is available... TODO Not really, need to list everything here, with requirements)
     # sounds
     #   process
-    #     requires params
-    #     params contains absolute paths to sound files that require processing
+    #     required: params
+    #     * params contains absolute paths to sound files that require processing
+    # sketchpad
+    #   new - creates a new sketchpad, optionally based on an existing one
+    #     optional: params
+    #     * if defined, params contains one entry, with an absolute path to the sketchpad json to base
+    #       the new sketchpad on
+    #   load - loads the given sketchpad as the new current sketchpad
+    #     required: params
+    #     * params contains one entry, with an absolute path to the sketchpad json to load
+    #   saveCopy - saves the sketchpad into a new folder named as given
+    #     required: params
+    #     * params contains one entry, with the name of the sketchpad
+    #     * to function as a "normal" save as function, once completed, call load on the new copy
+    #   saveVersion - creates a "snapshot" of the current state of the sketchpad
+    #     required: params
+    #     * params contains one entry, with the name of the version to be saved
     # track
     #   loadSound
-    #     requires trackIndex, and params
-    #     params contains one entry, with an absolute path to the sound file to load
+    #     required: trackIndex, and params
+    #     * params contains one entry, with an absolute path to the sound file to load
     #   clearSlot - clears what is set on the specified slot
-    #     requires track, slotType, slotIndex
+    #     required: track, slotType, slotIndex
     #   loadIntoSlot
-    #     requires track, slotType, slotIndex, and params. Optionally both of slotType2, and slotIndex2
-    #     params contains the absolute path of a single file
-    #     if slotType2 and slotIndex2 are both set, and params contains a snd file or sketch.wav, we will
+    #     required: track, slotType, slotIndex, and params
+    #     optional: slotType2, and slotIndex2
+    #     * params contains the absolute path of a single file
+    #     * if slotType2 and slotIndex2 are both set, and params contains a snd file or sketch.wav, we will
     #       load the data in that given slot in the file and set that on the specified slot. If the origin
     #       slot (that is, in the snd or sketch) is empty, the destination slot will be cleared.
-    #     if they are not set, we will attempt to load the given file into the specified slot
-    #     the type of the given file must (hopefully obviously) contain suitable data for the destination
+    #     * if they are not set, we will attempt to load the given file into the specified slot
+    #     * the type of the given file must (hopefully obviously) contain suitable data for the destination
     #
     # ### /-Separated Commands ###
     #
@@ -399,6 +415,54 @@ class webconf_fifo_handler(QObject):
                             logging.error(f"Missing params field for snd processing in {jsonData}")
                             jsonData["messageType"] = "error"
                             jsonData["description"] = "Missing params field for snd processing"
+            case "sketchpad":
+                match jsonData["command"]:
+                    case "new":
+                        def completionCallback():
+                            jsonData["messageType"] = "success"
+                            self.send(json.dumps(jsonData, separators=(',', ':')))
+                        if "params" in jsonData and len(jsonData["params"]) == 1:
+                            # If params does not point at an extant sketchpad file, we'll have to abort and report that back
+                            sketchpadTemplate = jsonData["params"][0]
+                            if os.path.exists(sketchpadTemplate):
+                                # Clear out temp sketchpad, replace it with what's pointed to in params, and finally load that newly created temp sketchpad
+                                self.core_gui.sketchpad.newSketchpad(base_sketchpad=sketchpadTemplate, force=True, cb=completionCallback)
+                            else:
+                                jsonData["messageType"] = "error"
+                                jsonData["description"] = "Attempted to create a new sketchpad based on an existing one, but the existing one does not exist on the device"
+                        elif "params" not in jsonData or len(jsonData["params"]) == 0:
+                            # Either there's no template defined, or there's no params at all - create a new, empty sketchpad
+                            self.core_gui.sketchpad.newSketchpad(force=True, cb=completionCallback)
+                        else:
+                            jsonData["messageType"] = "error"
+                            jsonData["description"] = "Incorrectly defined attempt to create a new sketchpad (must have either precisely one entry in params to clone, or none)"
+                    case "load":
+                        if "params" in jsonData and len(jsonData["params"]) == 1:
+                            sketchpadFile = jsonData["params"][0]
+                            if os.path.exists(sketchpadFile):
+                                # FIXME Do we *actually* want to load_autosave, or... have we picked a specific version to load? We have, haven't we?
+                                self.core_gui.sketchpad.loadSketchpad(sketchpad=sketchpadFile, load_autosave=True, cb=completionCallback)
+                            else:
+                                jsonData["messageType"] = "error"
+                                jsonData["description"] = "Attempted to load a sketchpad, but the file does not exist on the device"
+                        else:
+                            jsonData["messageType"] = "error"
+                            jsonData["description"] = "Missing or incorrect params field for loading a sketchpad (the list should contain a single file path)"
+                    case "saveCopy":
+                        if "params" in jsonData and len(jsonData["params"]) == 1:
+                            self.core_gui.sketchpad.saveCopy(jsonData["params"][0], cb=completionCallback)
+                            jsonData["messageType"] = "success"
+                        else:
+                            jsonData["messageType"] = "error"
+                            jsonData["description"] = "Missing or incorrect params field for saving a sketchpad (the list should contain a single string element, being the new name for the sketchpad)"
+                    case "saveVersion":
+                        if "params" in jsonData and len(jsonData["params"]) == 1:
+                            self.core_gui.sketchpad.song.name = jsonData["params"][0]
+                            self.core_gui.sketchpad.saveSketchpad(cb=completionCallback)
+                            jsonData["messageType"] = "success"
+                        else:
+                            jsonData["messageType"] = "error"
+                            jsonData["description"] = "Missing or incorrect params field for saving a sketchpad version (the list should contain a single string element, being the name for the new version)"
             case "track":
                 if "trackIndex" in jsonData:
                     track = self.core_gui.sketchpad.song.channelsModel.getChannel(max(0, min(int(jsonData["trackIndex"]), Zynthbox.Plugin.instance().sketchpadTrackCount())))

@@ -120,7 +120,7 @@ class webconf_fifo_handler(QObject):
     #
     # A command in compact JSON form must be a single line (as any other command), and must furthermore
     # begin with open curly braces "{" to signify the start of a json object in compact string form. If
-    # you send an ill-formed json string, it will simply be ignored.
+    # you send an ill-formed json string, it will simply be ignored (though feedback will be given).
     #
     # The format of the json commands will be (with added lines for ease of display, but you must make sure
     # to not send a json string with a newline in it):
@@ -139,6 +139,11 @@ class webconf_fifo_handler(QObject):
     #
     # Anything called an index is a number from 0 and up. For tracks, you have 10 tracks, meaning it can be
     # up to 9, and for slots, there are five slots of each type, meaning the index can be from 0 through 4.
+    #
+    # Upon completion of the handling of the command, you will be sent back the same data you sent, with the
+    # addition of the field "messageType", which will be either "success" or "error" according to the result.
+    # If the type is "error", there will also be a "description" field, which contains a human-readable
+    # description of the error.
     #
     # ### Command Categories and Identifiers ###
     #
@@ -226,8 +231,12 @@ class webconf_fifo_handler(QObject):
                         self.handleJsonInput(jsonData)
                     else:
                         logging.error("Incorrectly described command: there must be at least a category and command defined")
+                        jsonData["messageType"] = "error"
+                        jsonData["description"] = "Incorrectly described command: there must be at least a category and command defined"
+                        self.send(json.dumps(jsonData, separators=(',', ':')))
                 else:
                     logging.error(f"Failed to load json command from: {jsonData}")
+                    self.send(json.dumps({ "messageType": "error", "description": "Failed to load json command from given json string", "data": "\"inputData\"" }, separators=(',', ':')))
             else:
                 # Tokenizing step (that is, a new element will be started by a / (except when the previous character was a \)
                 def split_unescape(s, delim, escape='\\', unescape=True):
@@ -379,68 +388,90 @@ class webconf_fifo_handler(QObject):
         match jsonData["category"]:
             case "cuia":
                 self.core_gui.callable_ui_action(jsonData["command"].upper(), params, -1, trackIndex, slotIndex)
+                jsonData["messageType"] = "success"
             case "sounds":
                 match jsonData["command"]:
                     case "process":
                         if "params" in jsonData:
                             Zynthbox.SndLibrary.instance().processSndFiles(jsonData["params"])
+                            jsonData["messageType"] = "success"
                         else:
                             logging.error(f"Missing params field for snd processing in {jsonData}")
-                            self.send("{ messageType: \"error\", description: \"Missing params field for snd processing\" }")
+                            jsonData["messageType"] = "error"
+                            jsonData["description"] = "Missing params field for snd processing"
             case "track":
-                track = self.core_gui.sketchpad.song.channelsModel.getChannel(max(0, min(int(jsonData["trackIndex"]), Zynthbox.Plugin.instance().sketchpadTrackCount())))
-                match jsonData["command"]:
-                    case "loadSound":
-                        if len(params) > 0:
-                            sndFile = params[0]
-                            # Load .snd file (if it's an snd file and, you know, exists and stuff!)
-                            sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
-                            if sound is not None:
-                                def task():
-                                    track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
-                                    track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
-                                    self.zynqtgui.end_long_task()
-                                self.core_gui.do_long_task(task, f"Loading snd file<br />{sound.name}")
+                if "trackIndex" in jsonData:
+                    track = self.core_gui.sketchpad.song.channelsModel.getChannel(max(0, min(int(jsonData["trackIndex"]), Zynthbox.Plugin.instance().sketchpadTrackCount())))
+                    match jsonData["command"]:
+                        case "loadSound":
+                            if len(params) > 0:
+                                sndFile = params[0]
+                                # Load .snd file (if it's an snd file and, you know, exists and stuff!)
+                                sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
+                                if sound is not None:
+                                    def task():
+                                        track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
+                                        track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
+                                        jsonData["messageType"] = "success"
+                                        self.send(json.dumps(jsonData, separators=(',', ':')))
+                                        self.zynqtgui.end_long_task()
+                                    self.core_gui.do_long_task(task, f"Loading snd file<br />{sound.name}")
+                                else:
+                                    logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")
+                                    jsonData["messageType"] = "error"
+                                    jsonData["description"] = "Load Sound was asked to load an snd file that seems to not exist"
                             else:
-                                logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")
-                        else:
-                            logging.error("We were asked to load a sound, but not given a sound to load")
-                    case "clearSlot":
-                        if slotType != "" and slotIndex > -1:
-                            match slotType:
-                                case "synth":
-                                    if track.checkIfLayerExists(track.chainedSounds[slotIndex]):
-                                        track.remove_and_unchain_sound(track.chainedSounds[slotIndex])
-                                case "sample":
-                                    sampleClip = track.samples[slotIndex]
-                                    sampleClip.clear()
-                                case "sketch":
-                                    sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                    sketchClip.clear()
-                                case "fx":
-                                    track.removeFxFromChain(slotIndex)
-                    case "loadIntoSlot":
-                        if slotType != "" and slotIndex > -1:
-                            if slotType2 != "" and slotIndex2 > -1:
-                                # TODO Implement handling pulling things from an snd file and inserting that into a specific slot on the given track
-                                pass
-                            else:
+                                logging.error("We were asked to load a sound, but not given a sound to load")
+                                jsonData["messageType"] = "error"
+                                jsonData["description"] = "Load Sound was not given a sound to load"
+                        case "clearSlot":
+                            if slotType != "" and slotIndex > -1:
                                 match slotType:
                                     case "synth":
-                                        pass
+                                        if track.checkIfLayerExists(track.chainedSounds[slotIndex]):
+                                            track.remove_and_unchain_sound(track.chainedSounds[slotIndex])
                                     case "sample":
                                         sampleClip = track.samples[slotIndex]
-                                        sampleClip.path = fileName
-                                        # sampleClip.enabled = True
+                                        sampleClip.clear()
                                     case "sketch":
                                         sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                        sketchClip.path = fileName
-                                        # sketchClip.enabled = True
+                                        sketchClip.clear()
                                     case "fx":
-                                        pass
-                        else:
-                            logging.error(f"Asked to load a file into slot, but we lack instructions for what to load things into: {jsonData}")
-                            self.send("Missing instructions for which slot to load things into")
+                                        track.removeFxFromChain(slotIndex)
+                                jsonData["messageType"] = "success"
+                            else:
+                                jsonData["messageType"] = "error"
+                                jsonData["description"] = "Clear Slot command missing slot type and/or index"
+                        case "loadIntoSlot":
+                            if slotType != "" and slotIndex > -1:
+                                if slotType2 != "" and slotIndex2 > -1:
+                                    # TODO Implement handling pulling things from an snd file and inserting that into a specific slot on the given track
+                                    jsonData["messageType"] = "success"
+                                    pass
+                                else:
+                                    match slotType:
+                                        case "synth":
+                                            pass
+                                        case "sample":
+                                            sampleClip = track.samples[slotIndex]
+                                            sampleClip.path = fileName
+                                            # sampleClip.enabled = True
+                                        case "sketch":
+                                            sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                            sketchClip.path = fileName
+                                            # sketchClip.enabled = True
+                                        case "fx":
+                                            pass
+                                jsonData["messageType"] = "success"
+                            else:
+                                logging.error(f"Asked to load a file into slot, but we lack instructions for what to load things into: {jsonData}")
+                                jsonData["messageType"] = "error"
+                                jsonData["description"] = "Missing instructions for which slot to load things into"
+                else:
+                    jsonData["messageType"] = "error"
+                    jsonData["description"] = "Track command is missing a track index"
+        if "messageType" in jsonData:
+            self.send(json.dumps(jsonData, separators=(',', ':')))
 
     @Slot(str,int,int,int,int)
     def handleMidiRouterCuiaEventHandled(self, cuia, originId, track, slot, value):

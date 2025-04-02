@@ -128,7 +128,7 @@ class webconf_fifo_handler(QObject):
     #     "category": "the category of command",
     #     "command": "command identifier",
     #     /* Not required for all commands - required fields will be listed per command */
-    #     "track": trackIndex,
+    #     "trackIndex": trackIndex,
     #     "slotType": "slot type name, either synth, sample, sketch, or fx",
     #     "slotIndex": slotIndex,
     #     "slotType2": "slot type name, either synth, sample, sketch, or fx",
@@ -153,16 +153,18 @@ class webconf_fifo_handler(QObject):
     #     params contains absolute paths to sound files that require processing
     # track
     #   loadSound
-    #     requires track, slotType, slotIndex, and params
+    #     requires trackIndex, slotType, slotIndex, and params
     #     params contains one entry, with an absolute path to the sound file to load
     #   clearSlot - clears what is set on the specified slot
     #     requires track, slotType, slotIndex
     #   loadIntoSlot
     #     requires track, slotType, slotIndex, and params. Optionally both of slotType2, and slotIndex2
     #     params contains the absolute path of a single file
-    #     if slotType2 and slotIndex2 are both set, and params contains a snd file, we will load the data
-    #       in that given slot in the snd file and set that on the specified slot.
+    #     if slotType2 and slotIndex2 are both set, and params contains a snd file or sketch.wav, we will
+    #       load the data in that given slot in the file and set that on the specified slot. If the origin
+    #       slot (that is, in the snd or sketch) is empty, the destination slot will be cleared.
     #     if they are not set, we will attempt to load the given file into the specified slot
+    #     the type of the given file must (hopefully obviously) contain suitable data for the destination
     #
     # ### /-Separated Commands ###
     #
@@ -416,6 +418,7 @@ class webconf_fifo_handler(QObject):
                     case "loadIntoSlot":
                         if slotType != "" and slotIndex > -1:
                             if slotType2 != "" and slotIndex2 > -1:
+                                # TODO Implement handling pulling things from an snd file and inserting that into a specific slot on the given track
                                 pass
                             else:
                                 match slotType:

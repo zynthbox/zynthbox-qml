@@ -330,7 +330,7 @@ class webconf_fifo_handler(QObject):
                                                             def task():
                                                                 track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
                                                                 track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
-                                                                self.zynqtgui.end_long_task()
+                                                                self.core_gui.end_long_task()
                                                             self.core_gui.do_long_task(task, "Loading snd file")
                                                         else:
                                                             logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")
@@ -478,7 +478,7 @@ class webconf_fifo_handler(QObject):
                                         track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
                                         jsonData["messageType"] = "success"
                                         self.send(json.dumps(jsonData, separators=(',', ':')))
-                                        self.zynqtgui.end_long_task()
+                                        self.core_gui.end_long_task()
                                     self.core_gui.do_long_task(task, f"Loading snd file<br />{sound.name}")
                                 else:
                                     logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")

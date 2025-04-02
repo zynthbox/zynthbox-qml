@@ -438,7 +438,7 @@ Zynthian.ScreenPage {
     }
     Connections {
         target: Zynthbox.MidiRouter
-        enabled: component.isVisible
+        enabled: component.isVisible || component.noteListeningActivations > 0
         onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
             // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current track id", component.selectedChannel.id, "listening on port", listenToPort);
             if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === component.selectedChannel.id && size === 3) {

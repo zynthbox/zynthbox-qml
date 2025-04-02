@@ -614,7 +614,8 @@ Zynthian.BasePlayGrid {
     }
     Connections {
         target: Zynthbox.MidiRouter
-        enabled: component.isVisible
+        // If we are already listening, we need to keep listening even if the user switched away from the sequencer
+        enabled: component.isVisible || component.noteListeningActivations > 0
         onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
             // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.sketchpadTrack, "listening on port", listenToPort);
             if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === _private.activePatternModel.sketchpadTrack && size === 3) {

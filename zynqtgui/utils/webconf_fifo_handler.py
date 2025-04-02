@@ -124,6 +124,7 @@ class webconf_fifo_handler(QObject):
     #
     # The format of the json commands will be (with added lines for ease of display, but you must make sure
     # to not send a json string with a newline in it):
+    #
     # {
     #     "category": "the category of command",
     #     "command": "command identifier",
@@ -135,6 +136,9 @@ class webconf_fifo_handler(QObject):
     #     "slot2Index": slotIndex,
     #     "params": ["a", "list", "of", "arbitrary strings as supported", "by json", "but still no newlines"]
     # }
+    #
+    # Anything called an index is a number from 0 and up. For tracks, you have 10 tracks, meaning it can be
+    # up to 9, and for slots, there are five slots of each type, meaning the index can be from 0 through 4.
     #
     # ### Command Categories and Identifiers ###
     #
@@ -153,7 +157,7 @@ class webconf_fifo_handler(QObject):
     #     params contains absolute paths to sound files that require processing
     # track
     #   loadSound
-    #     requires trackIndex, slotType, slotIndex, and params
+    #     requires trackIndex, and params
     #     params contains one entry, with an absolute path to the sound file to load
     #   clearSlot - clears what is set on the specified slot
     #     requires track, slotType, slotIndex

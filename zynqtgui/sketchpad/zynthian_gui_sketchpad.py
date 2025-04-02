@@ -625,9 +625,11 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             confirmNewSketchpad()
 
     @Slot(None)
-    def saveSketchpad(self):
+    def saveSketchpad(self, cb=None):
         def task():
             self.__song__.save(autosave=False)
+            if cb is not None:
+                cb()
             QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.do_long_task(task, "Saving sketchpad")
@@ -687,11 +689,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.zynqtgui.do_long_task(task, f"Saving Sketchpad : {name}")
 
     @Slot(str)
-    def saveCopy(self, name):
+    def saveCopy(self, name, cb=None):
         def task():
             old_folder = self.__song__.sketchpad_folder
             shutil.copytree(old_folder, self.__sketchpad_basepath__ / name)
-
+            if cb is not None:
+                cb()
             QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
         self.zynqtgui.do_long_task(task, "Saving a copy of the sketchpad to {name}")

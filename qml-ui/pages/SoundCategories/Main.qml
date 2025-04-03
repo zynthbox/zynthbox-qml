@@ -37,6 +37,28 @@ Zynthian.ScreenPage {
 
     property QtObject selectedChannel: applicationWindow().selectedChannel
     /**
+      * A property to manage different states of the sounds page. The respective state will define how the sounds page will behave
+      * Accepted values : "displayMode", "saveMode" and "updateCategoryMode"
+      * Default : "displayMode" to display all the sounds from all categories and all origins
+      *
+      * displayMode : This state will be used to display snd files
+      * When selectedState is set to displayMode, display the snd files grid
+      * and clicking on category button will switch to that category
+
+      * saveMode : This state will be used to allow picking a category when saving a snd file
+      * When selectedState is set to saveMode, display a help text in place of snd files grid
+      * and clicking on category button will save the snd file to that category. "Best Of" button
+      * should be disabled when saving a sound.
+      * Irrevelant contextualActions should get disabled and "Save" button should allow cancelling when category is yet to be picked
+      *
+      * updateCategoryMode : This state will be used to allow updating a category of selected snd file
+      * When selectedState is set to updateCategoryMode, display a help text in place of snd files grid
+      * and clicking on category button will update the selected snd file's category to that category
+      * If when updating category, "Best Of" is clicked, add the sound to the "Best Of" category.
+      * Irrevelant contextualActions should get disabled and "Change Category" button should allow cancelling when category is yet to be picked
+      */
+    property string selectedState: "displayMode"
+    /**
       * This signal will be emitted when some other page wants to
       * open the sound saving dialog
       */
@@ -55,37 +77,6 @@ Zynthian.ScreenPage {
         }
     }
 
-    states: [
-        /**
-         * This mode will be used to display snd files
-         * When state is set to displayMode, display the snd files grid
-         * and clicking on category button will switch to that category
-         **/
-        State {
-            name: "displayMode"
-        },
-        /**
-         * This mode will be used to allow picking a category when saving a snd file
-         * When state is set to saveMode, display a help text in place of snd files grid
-         * and clicking on category button will save the snd file to that category
-         * Irrevelant contextualActions should get disabled and "Save" button should
-         * allow cancelling when category is yet to be picked
-         **/
-        State {
-            name: "saveMode"
-        },
-        /**
-         * This mode will be used to allow updating a category of selected snd file
-         * When state is set to updateCategoryMode, display a help text in place of snd files grid
-         * and clicking on category button will update the selected snd file's category to that category
-         * Irrevelant contextualActions should get disabled and "Move" button should
-         * allow cancelling when category is yet to be picked
-         **/
-        State {
-            name: "updateCategoryMode"
-        }
-    ]
-    state: "displayMode"
     title: qsTr("Sound Categories")
     screenId: "sound_categories"
     leftPadding: 8
@@ -97,40 +88,40 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: root.state !== "updateCategoryMode"
+            text: root.selectedState !== "updateCategoryMode"
                     ? Zynthbox.SndLibrary.categoryFilter == "100" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category == "100"
                       ? qsTr("Remove from Best Of")
                       : qsTr("Change Category")
                     : qsTr("Cancel")
-            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked) ||
-                     root.state === "updateCategoryMode"
+            enabled: (root.selectedState === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked) ||
+                     root.selectedState === "updateCategoryMode"
             onTriggered: {
-                if (root.state == "displayMode") {
+                if (root.selectedState == "displayMode") {
                     // If selected sound is in "Best Of", use this button to remove from "Best Of"
                     if (soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category == "100") {
                         Zynthbox.SndLibrary.removeFromBestOf(soundButtonGroup.checkedButton.soundObj)
                     } else {
-                        root.state = "updateCategoryMode"
+                        root.selectedState = "updateCategoryMode"
                     }
                 } else {
-                    root.state = "displayMode"
+                    root.selectedState = "displayMode"
                 }
             }
         },
         Kirigami.Action {
             // True when action acts as save button, false when acts as load button
             property bool isSaveBtn: soundButtonGroup.checkedButton == null || !soundButtonGroup.checkedButton.checked
-            enabled: root.state === "displayMode" || root.state === "saveMode"
+            enabled: root.selectedState === "displayMode" || root.selectedState === "saveMode"
             text: isSaveBtn
-                    ? root.state === "saveMode"
+                    ? root.selectedState === "saveMode"
                         ? qsTr("Cancel")
                         : qsTr("Save")
                     : qsTr("Load")
             onTriggered: {
                 if (isSaveBtn) {
-                    if (root.state === "saveMode") {
+                    if (root.selectedState === "saveMode") {
                         // Reset to displayMode when cancel button is pressed
-                        root.state = "displayMode"
+                        root.selectedState = "displayMode"
                     } else {
                         saveSoundDialog.open()
                     }
@@ -152,13 +143,13 @@ Zynthian.ScreenPage {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_LONG":
             {
-                switch (root.state) {
+                switch (root.selectedState) {
                     case "updateCategoryMode":
-                        root.state = "saveMode";
+                        root.selectedState = "saveMode";
                         result = true;
                         break;
                     case "saveMode":
-                        root.state = "displayMode";
+                        root.selectedState = "displayMode";
                         result = true;
                         break;
                     default:
@@ -170,7 +161,7 @@ Zynthian.ScreenPage {
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_LONG":
                 // For now, toggle whatever's the current item as selected... (when not in updateCategoryMode)
-                switch (root.state) {
+                switch (root.selectedState) {
                     case "updateCategoryMode":
                         break;
                     case "saveMode":
@@ -183,7 +174,7 @@ Zynthian.ScreenPage {
                 break;
             case "SELECT_UP":
                 // Select the next category up (when not in updateCategoryMode)
-                switch (root.state) {
+                switch (root.selectedState) {
                     case "updateCategoryMode":
                         break;
                     case "saveMode":
@@ -196,7 +187,7 @@ Zynthian.ScreenPage {
                 break;
             case "SELECT_DOWN":
                 // Select the next category down (when not in updateCategoryMode)
-                switch (root.state) {
+                switch (root.selectedState) {
                     case "updateCategoryMode":
                         break;
                     case "saveMode":
@@ -209,7 +200,7 @@ Zynthian.ScreenPage {
                 break;
             case "KNOB3_UP":
                 // Select the next item in the sounds list, and make it actually selected (when not in updateCategoryMode)
-                switch (root.state) {
+                switch (root.selectedState) {
                     case "updateCategoryMode":
                         break;
                     case "saveMode":
@@ -222,7 +213,7 @@ Zynthian.ScreenPage {
                 break;
             case "KNOB3_DOWN":
                 // Select the previous item in the sounds, and make it actually selected (when not in updateCategoryMode)
-                switch (root.state) {
+                switch (root.selectedState) {
                     case "updateCategoryMode":
                         break;
                     case "saveMode":
@@ -261,7 +252,7 @@ Zynthian.ScreenPage {
             fileCheckTimer.restart()
         }
         onAccepted: {
-            root.state = "saveMode"
+            root.selectedState = "saveMode"
         }
         onOpened: {
             saveSoundDialog.fileName = zynqtgui.sound_categories.suggestedSoundFileName()
@@ -316,21 +307,21 @@ Zynthian.ScreenPage {
                             checked: modelData == "*" // `All` button is checked by default
                             category: modelData
                             origin: Zynthbox.SndLibrary.originFilter
-                            highlighted: root.state === "displayMode" && Zynthbox.SndLibrary.categoryFilter === category
+                            highlighted: root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter === category
                             // `All` button should be disabled when in save mode or updateCategoryMode
                             // Also selected snd files current category button should be disabled when in updateCategoryMode
-                            enabled: root.state === "displayMode" ||
-                                     (root.state === "saveMode" && modelData != "*") ||
-                                     (root.state === "updateCategoryMode" && modelData != "*" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != modelData)
+                            enabled: root.selectedState === "displayMode" ||
+                                     (root.selectedState === "saveMode" && modelData != "*") ||
+                                     (root.selectedState === "updateCategoryMode" && modelData != "*" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != modelData)
                             onClicked: {
-                                if (root.state === "saveMode") {
+                                if (root.selectedState === "saveMode") {
                                     zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, modelData)
                                     // Reset to display mode after saving sound
-                                    root.state = "displayMode"
-                                } else if (root.state === "updateCategoryMode") {
+                                    root.selectedState = "displayMode"
+                                } else if (root.selectedState === "updateCategoryMode") {
                                     Zynthbox.SndLibrary.updateSndFileCategory(soundButtonGroup.checkedButton.soundObj, modelData)
-                                    root.state = "displayMode"
-                                } else if (root.state === "displayMode" && Zynthbox.SndLibrary.categoryFilter != category) {
+                                    root.selectedState = "displayMode"
+                                } else if (root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter != category) {
                                     Zynthbox.SndLibrary.categoryFilter = category
                                 }
                             }
@@ -348,7 +339,7 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: false
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
                     Layout.alignment: Qt.AlignCenter
-                    enabled: root.state === "displayMode"
+                    enabled: root.selectedState === "displayMode"
 
                     QQC2.ButtonGroup {
                         id: originTabsButtonGroup
@@ -425,12 +416,12 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
                         category: "100"
                         origin: Zynthbox.SndLibrary.originFilter
-                        checkable: root.state === "displayMode"
-                        highlighted: root.state === "displayMode" && Zynthbox.SndLibrary.categoryFilter === category
+                        checkable: root.selectedState === "displayMode"
+                        highlighted: root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter === category
                         // Also selected snd files current category button should be disabled when in updateCategoryMode
-                        enabled: root.state === "displayMode" ||
-                                 root.state !== "saveMode" || // When in save mode disable saving to best of category
-                                 (root.state === "updateCategoryMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != category)
+                        enabled: root.selectedState === "displayMode" ||
+                                 root.selectedState !== "saveMode" || // When in save mode disable saving to best of category
+                                 (root.selectedState === "updateCategoryMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != category)
                         onPressed: {
                             // Set the category which was selected before clicking on "Best Of" button.
                             if (Zynthbox.SndLibrary.categoryFilter != "100") {
@@ -438,12 +429,12 @@ Zynthian.ScreenPage {
                             }
                         }
                         onClicked: {
-                            if (root.state === "updateCategoryMode") {
+                            if (root.selectedState === "updateCategoryMode") {
                                 Zynthbox.SndLibrary.addToBestOf(soundButtonGroup.checkedButton.soundObj)
-                                root.state = "displayMode"
-                            } else if (root.state === "displayMode" && Zynthbox.SndLibrary.categoryFilter != category) {
+                                root.selectedState = "displayMode"
+                            } else if (root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter != category) {
                                 Zynthbox.SndLibrary.categoryFilter = category
-                            } else if (root.state === "displayMode" && Zynthbox.SndLibrary.categoryFilter == category) {
+                            } else if (root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter == category) {
                                 Zynthbox.SndLibrary.categoryFilter = checkedCategoryBefore
                             }
                         }
@@ -459,13 +450,13 @@ Zynthian.ScreenPage {
 
                     QQC2.Label {
                         anchors.centerIn: parent
-                        visible: root.state === "saveMode"
+                        visible: root.selectedState === "saveMode"
                         text: qsTr("Pick a category to save snd file to")
                     }
 
                     QQC2.Label {
                         anchors.centerIn: parent
-                        visible: root.state === "updateCategoryMode"
+                        visible: root.selectedState === "updateCategoryMode"
                         text: qsTr("Pick a category to update selected snd file's category")
                     }
 
@@ -475,7 +466,7 @@ Zynthian.ScreenPage {
                         property real spacing: Kirigami.Units.largeSpacing
 
                         anchors.fill: parent
-                        visible: root.state === "displayMode"
+                        visible: root.selectedState === "displayMode"
                         cellWidth: (width - spacing * (columns - 1)) / columns
                         cellHeight: Kirigami.Units.gridUnit * 4.5
                         clip: true

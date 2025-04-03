@@ -44,6 +44,13 @@ Zynthian.ScreenPage {
       */
     property string selectedOrigin: ""
     /**
+      * This property will store which category is currently selected.
+      * When updated, a call to SndLibrary will be made to filter the sounds by selected category
+      * Accepted values : Category value
+      * Default : "*"(All categories)
+      */
+    property string selectedCategory: "*"
+    /**
       * This signal will be emitted when some other page wants to
       * open the sound saving dialog
       */
@@ -92,16 +99,34 @@ Zynthian.ScreenPage {
     onSelectedOriginChanged: {
         Zynthbox.SndLibrary.setOriginFilter(root.selectedOrigin)
     }
+    onSelectedCategoryChanged: {
+        // If scrollview is not at top and category is set, UI seems to hang when sort calls are made
+        // Hence, scroll to top before swtiching category.
+        soundsGrid.contentY = 0;
+        Qt.callLater(Zynthbox.SndLibrary.setCategoryFilter, root.selectedCategory);
+        // Uncheck checked button from previous selected category
+        if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
+            soundButtonGroup.checkedButton.checked = false
+        }
+    }
+
     contextualActions: [
         Kirigami.Action {
             text: root.state !== "updateCategoryMode"
-                    ? qsTr("Change Category")
+                    ? root.selectedCategory == "100" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category == "100"
+                      ? qsTr("Remove from Best Of")
+                      : qsTr("Change Category")
                     : qsTr("Cancel")
-            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked && root.selectedOrigin == "my-sounds") ||
+            enabled: (root.state === "displayMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.checked) ||
                      root.state === "updateCategoryMode"
             onTriggered: {
                 if (root.state == "displayMode") {
-                    root.state = "updateCategoryMode"
+                    // If selected sound is in "Best Of", use this button to remove from "Best Of"
+                    if (soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category == "100") {
+                        Zynthbox.SndLibrary.removeFromBestOf(soundButtonGroup.checkedButton.soundObj)
+                    } else {
+                        root.state = "updateCategoryMode"
+                    }
                 } else {
                     root.state = "displayMode"
                 }
@@ -293,44 +318,25 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: 2
                 }
 
-                QQC2.ButtonGroup {
-                    id: categoryButtonGroup
-                    buttons: categoryButtons.children
-                }
-
                 ColumnLayout {
-                    id: categoryButtons
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.margins: spacing
                     spacing: content.spacing
                     Repeater {
-                        id: categoryButtonsRepeater
                         model: ["*", "4", "5", "3", "6", "2", "1", "99"]
                         delegate: CategoryButton {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            checked: modelData == "*" // `All` button is checked by default
                             category: modelData
                             origin: root.selectedOrigin
-                            checkable: root.state === "displayMode"
-                            checked: modelData == "*" // `All` button is checked by default
-                            highlighted: root.state === "displayMode" && checked
+                            highlighted: root.state === "displayMode" && root.selectedCategory === category
                             // `All` button should be disabled when in save mode or updateCategoryMode
                             // Also selected snd files current category button should be disabled when in updateCategoryMode
                             enabled: root.state === "displayMode" ||
                                      (root.state === "saveMode" && modelData != "*") ||
                                      (root.state === "updateCategoryMode" && modelData != "*" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != modelData)
-                            onCheckedChanged: {
-                                if (root.state === "displayMode" && checked) {
-                                    // If scrollview is not at top and category is set, UI seems to hang when sort calls are made
-                                    // Hence, scroll to top before swtiching category.
-                                    soundsGrid.contentY = 0;
-                                    Qt.callLater(Zynthbox.SndLibrary.setCategoryFilter, category);
-                                    if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
-                                        soundButtonGroup.checkedButton.checked = false
-                                    }
-                                }
-                            }
                             onClicked: {
                                 if (root.state === "saveMode") {
                                     zynqtgui.sound_categories.saveSound(saveSoundDialog.fileName, modelData)
@@ -339,6 +345,8 @@ Zynthian.ScreenPage {
                                 } else if (root.state === "updateCategoryMode") {
                                     Zynthbox.SndLibrary.updateSndFileCategory(soundButtonGroup.checkedButton.soundObj, modelData)
                                     root.state = "displayMode"
+                                } else if (root.state === "displayMode" && root.selectedCategory != category) {
+                                    root.selectedCategory = category
                                 }
                             }
                         }
@@ -346,95 +354,134 @@ Zynthian.ScreenPage {
                 }
             }
 
-            Item {
-                id: soundsDisplayContainer
+            ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                QQC2.Label {
-                    anchors.centerIn: parent
-                    visible: root.state === "saveMode"
-                    text: qsTr("Pick a category to save snd file to")
-                }
+                RowLayout {
+                    id: originTabsContainer
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                    Layout.alignment: Qt.AlignCenter
+                    enabled: root.state === "displayMode"
 
-                QQC2.Label {
-                    anchors.centerIn: parent
-                    visible: root.state === "updateCategoryMode"
-                    text: qsTr("Pick a category to update selected snd file's category")
-                }
+                    QQC2.ButtonGroup {
+                        id: originTabsButtonGroup
+                    }
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    visible: root.state === "displayMode"
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                        Layout.alignment: Qt.AlignCenter
-
-                        QQC2.ButtonGroup {
-                            id: originTabsButtonGroup
-                        }
-
-                        QQC2.Button {
-                            Layout.fillHeight: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-                            checked: root.selectedOrigin == ""
-                            checkable: true
-                            QQC2.ButtonGroup.group: originTabsButtonGroup
-                            text: qsTr("All")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    root.selectedOrigin = ""
-                                }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        checked: root.selectedOrigin == ""
+                        checkable: true
+                        QQC2.ButtonGroup.group: originTabsButtonGroup
+                        text: qsTr("All")
+                        onCheckedChanged: {
+                            if (checked) {
+                                root.selectedOrigin = ""
                             }
                         }
-                        QQC2.Button {
-                            Layout.fillHeight: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-                            checked: root.selectedOrigin == "my-sounds"
-                            checkable: true
-                            QQC2.ButtonGroup.group: originTabsButtonGroup
-                            text: qsTr("My Sounds")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    root.selectedOrigin = "my-sounds"
-                                }
+                    }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        checked: root.selectedOrigin == "my-sounds"
+                        checkable: true
+                        QQC2.ButtonGroup.group: originTabsButtonGroup
+                        text: qsTr("My Sounds")
+                        onCheckedChanged: {
+                            if (checked) {
+                                root.selectedOrigin = "my-sounds"
                             }
                         }
-                        QQC2.Button {
-                            Layout.fillHeight: true
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-                            checked: root.selectedOrigin == "community-sounds"
-                            checkable: true
-                            QQC2.ButtonGroup.group: originTabsButtonGroup
-                            text: qsTr("Community Sounds")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    root.selectedOrigin = "community-sounds"
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            Layout.fillHeight: true
-                            Layout.preferredWidth: height
-                            onClicked: {
-                                zynqtgui.sound_categories.processSndFiles(["/zynthian/zynthian-my-data/sounds/" + root.selectedOrigin])
-                            }
-
-                            Kirigami.Icon {
-                                anchors.fill: parent
-                                anchors.margins: 4
-                                source: Qt.resolvedUrl("../../../img/refresh.svg")
-                                color: "#ffffffff"
+                    }
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        checked: root.selectedOrigin == "community-sounds"
+                        checkable: true
+                        QQC2.ButtonGroup.group: originTabsButtonGroup
+                        text: qsTr("Community Sounds")
+                        onCheckedChanged: {
+                            if (checked) {
+                                root.selectedOrigin = "community-sounds"
                             }
                         }
                     }
 
-                    QQC2.ButtonGroup {
-                        id: soundButtonGroup
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: height
+                        onClicked: {
+                            zynqtgui.sound_categories.processSndFiles(["/zynthian/zynthian-my-data/sounds/" + root.selectedOrigin])
+                        }
+
+                        Kirigami.Icon {
+                            anchors.fill: parent
+                            anchors.margins: 4
+                            source: Qt.resolvedUrl("../../../img/refresh.svg")
+                            color: "#ffffffff"
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.preferredWidth: originTabsContainer.width
+                    Layout.minimumWidth: originTabsContainer.width
+                    Layout.maximumWidth: originTabsContainer.width
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                    Layout.alignment: Qt.AlignCenter
+
+                    CategoryButton {
+                        property string checkedCategoryBefore
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        category: "100"
+                        origin: root.selectedOrigin
+                        checkable: root.state === "displayMode"
+                        highlighted: root.state === "displayMode" && root.selectedCategory === category
+                        // Also selected snd files current category button should be disabled when in updateCategoryMode
+                        enabled: root.state === "displayMode" ||
+                                 root.state !== "saveMode" || // When in save mode disable saving to best of category
+                                 (root.state === "updateCategoryMode" && soundButtonGroup.checkedButton != null && soundButtonGroup.checkedButton.soundObj.category != category)
+                        onPressed: {
+                            // Set the category which was selected before clicking on "Best Of" button.
+                            if (root.selectedCategory != "100") {
+                                checkedCategoryBefore = root.selectedCategory
+                            }
+                        }
+                        onClicked: {
+                            if (root.state === "updateCategoryMode") {
+                                Zynthbox.SndLibrary.addToBestOf(soundButtonGroup.checkedButton.soundObj)
+                                root.state = "displayMode"
+                            } else if (root.state === "displayMode" && root.selectedCategory != category) {
+                                root.selectedCategory = category
+                            } else if (root.state === "displayMode" && root.selectedCategory == category) {
+                                root.selectedCategory = checkedCategoryBefore
+                            }
+                        }
+                    }
+                }
+                QQC2.ButtonGroup {
+                    id: soundButtonGroup
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    QQC2.Label {
+                        anchors.centerIn: parent
+                        visible: root.state === "saveMode"
+                        text: qsTr("Pick a category to save snd file to")
+                    }
+
+                    QQC2.Label {
+                        anchors.centerIn: parent
+                        visible: root.state === "updateCategoryMode"
+                        text: qsTr("Pick a category to update selected snd file's category")
                     }
 
                     GridView {
@@ -442,8 +489,8 @@ Zynthian.ScreenPage {
                         property int columns: 5
                         property real spacing: Kirigami.Units.largeSpacing
 
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        anchors.fill: parent
+                        visible: root.state === "displayMode"
                         cellWidth: (width - spacing * (columns - 1)) / columns
                         cellHeight: Kirigami.Units.gridUnit * 4.5
                         clip: true
@@ -478,6 +525,18 @@ Zynthian.ScreenPage {
                                         checked = false;
                                         toggled(); // emit the toggled signal manually, since we changed the checked value programmatically but it still originated as an user interaction.
                                     }
+                                }
+
+                                QQC2.Label {
+                                    anchors {
+                                        left: parent.left
+                                        top: parent.top
+                                        right: parent.right
+                                        margins: Kirigami.Units.smallSpacing
+                                    }
+                                    text: soundButton.soundObj.origin.split("-")[0]
+                                    horizontalAlignment: QQC2.Label.AlignHCenter
+                                    font.pointSize: 8
                                 }
 
                                 QQC2.Label {

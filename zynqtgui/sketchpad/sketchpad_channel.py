@@ -2714,8 +2714,54 @@ class sketchpad_channel(QObject):
             self.__sound_snapshot_changed = False
         return self.__sound_json_snapshot__
 
+    @Slot(str, str, int, int, result=None)
+    def setChannelSoundFromSnapshotSlot(self, snapshot, slotType, slotIndex:int, snapshotIndex:int):
+        if not (slotType == "synth" or slotType == "fx"):
+            return
+        if slotIndex < 0 or Zynthbox.Plugin.instance().sketchpadSlotCount() - 1 < slotIndex:
+            return
+        if snapshotIndex < 0 or Zynthbox.Plugin.instance().sketchpadSlotCount() - 1 < snapshotIndex:
+            return
+
+        def task():
+            snapshot_obj = json.loads(snapshot)
+            source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
+
+            def post_removal_task():
+                free_layers = self.getFreeLayers()
+                if slotType == "synth" and len(free_layers) == 0:
+                    logging.error(f"There are no more free channels, and we need at least one to load a synth into this slot")
+                else:
+                    # Populate new chained sounds and update channel
+                    limitedSnapshot = {"layers": []}
+                    for index, snapshotEntry in enumerate(snapshot_obj["layers"]):
+                        if snapshotEntry["slot_index"] == slotIndex:
+                            snapshotEntry["track_index"] = self.id
+                            if slotType == "synth":
+                                # Repopulate after removing current channel layers
+                                free_layers = self.getFreeLayers()
+                                new_chained_sounds = self.chained_sounds
+                                new_chained_sounds[slotIndex] = free_layers[0]
+                                snapshotEntry["midi_chan"] = free_layers[index]
+                            limitedSnapshot["layers"].append(snapshotEntry)
+                            break
+                    if len(limitedSnapshot["layers"]) > 0:
+                        self.zynqtgui.layer.load_channels_snapshot(limitedSnapshot)
+                        if slotType == "synth":
+                            self.chainedSounds = new_chained_sounds
+                        # Run autoconnect after completing loading sounds
+                        self.zynqtgui.zynautoconnect()
+                    else:
+                        logging.error(f"There is nothing to restore from the slot we were asked to restore from")
+                self.zynqtgui.end_long_task()
+            if self.chainedSounds[slotIndex] > -1:
+                self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task)
+            else:
+                post_removal_task()
+        self.zynqtgui.do_long_task(task, f"Loading {slotType} {snapshotIndex + 1} into slot {slotIndex + 1} on Track {self.name}")
+
     @Slot(str, result=None)
-    def setChannelSoundFromSnapshot(self, snapshot, slotIndex:int = -1, snapshotIndex:int = -1):
+    def setChannelSoundFromSnapshot(self, snapshot):
         def task():
             snapshot_obj = json.loads(snapshot)
             source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)
@@ -2796,7 +2842,7 @@ class sketchpad_channel(QObject):
                     # If there are no sounds in curent channel, immediately do post removal task
                     post_removal_task()
             self.zynqtgui.end_long_task()
-        self.zynqtgui.do_long_task(task, "Loading sound")
+        self.zynqtgui.do_long_task(task, f"Loading sound onto Track {self.name}")
 
     @Slot(str)
     def setCurlayerByType(self, type):

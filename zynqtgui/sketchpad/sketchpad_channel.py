@@ -2659,26 +2659,36 @@ class sketchpad_channel(QObject):
     @Slot(str, int, int)
     def setChannelSampleFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int):
         if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
-            def task():
-                snapshot_obj = json.loads(snapshot)
-                if snapshotIndex < len(snapshot_obj):
-                    for index, key in enumerate(snapshot_obj):
-                        if index == snapshotIndex: # key isn't just an index, so... let's do this thing
-                            filename = snapshot_obj[key]["filename"]
-                            # Clear out the existing sample, whether or not there's a new sample to go into that spot
-                            self.__samples__[slotIndex].clear()
-                            # If the filename is an empty string, nothing to load
-                            if len(filename) > 0:
-                                # Store the new sample in a temporary file
-                                with tempfile.TemporaryDirectory() as tmp:
-                                    temporaryFile = Path(tmp) / filename
-                                    with open(temporaryFile, "wb") as file:
-                                        file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
-                                    # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
-                                    self.__samples__[slotIndex].set_path(str(temporaryFile), should_copy=True)
-                            break
-                self.zynqtgui.end_long_task()
-            self.zynqtgui.do_long_task(task, "Loading sample from snapshot")
+            sampleClip = self.__samples__[slotIndex]
+            self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sampleClip)
+
+    @Slot(str, int, int)
+    def setSketchFromSnapshotSlot(self, snapshot: str, slotIndex:int, snapshotIndex:int):
+        if -1 < slotIndex and slotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount() and -1 < snapshotIndex and snapshotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+            sketch = self.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            self.setClipSourceFromSnapshotSlot(snapshot, snapshotIndex, sketch)
+
+    def setClipSourceFromSnapshotSlot(self, snapshot: str, snapshotIndex: int, clip):
+        def task():
+            snapshot_obj = json.loads(snapshot)
+            if snapshotIndex < len(snapshot_obj):
+                for index, key in enumerate(snapshot_obj):
+                    if index == snapshotIndex: # key isn't just an index, so... let's do this thing
+                        filename = snapshot_obj[key]["filename"]
+                        # Clear out the existing sample, whether or not there's a new sample to go into that spot
+                        clip.clear()
+                        # If the filename is an empty string, nothing to load
+                        if len(filename) > 0:
+                            # Store the new sample in a temporary file
+                            with tempfile.TemporaryDirectory() as tmp:
+                                temporaryFile = Path(tmp) / filename
+                                with open(temporaryFile, "wb") as file:
+                                    file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
+                                # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
+                                clip.set_path(str(temporaryFile), should_copy=True)
+                        break
+            self.zynqtgui.end_long_task()
+        self.zynqtgui.do_long_task(task, f"Loading sample data from snapshot into slot {clip.id} on Track {self.name}")
 
     @Slot(None, result=str)
     def getChannelSampleSnapshot(self):
@@ -2705,7 +2715,7 @@ class sketchpad_channel(QObject):
         return self.__sound_json_snapshot__
 
     @Slot(str, result=None)
-    def setChannelSoundFromSnapshot(self, snapshot):
+    def setChannelSoundFromSnapshot(self, snapshot, slotIndex:int = -1, snapshotIndex:int = -1):
         def task():
             snapshot_obj = json.loads(snapshot)
             source_channels = self.zynqtgui.layer.load_layer_channels_from_json(snapshot)

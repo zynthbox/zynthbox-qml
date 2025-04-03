@@ -327,11 +327,16 @@ class webconf_fifo_handler(QObject):
                                                         # Load .snd file (if it's an snd file and, you know, exists and stuff!)
                                                         sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
                                                         if sound is not None:
-                                                            def task():
-                                                                track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
-                                                                track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
-                                                                self.core_gui.end_long_task()
-                                                            self.core_gui.do_long_task(task, "Loading snd file")
+                                                            synthFxSnapshot = sound.synthFxSnapshot()
+                                                            sampleSnapshot = sound.sampleSnapshot()
+                                                            if synthFxSnapshot and sampleSnapshot:
+                                                                def task():
+                                                                    track.setChannelSoundFromSnapshot(synthFxSnapshot)
+                                                                    track.setChannelSamplesFromSnapshot(sampleSnapshot)
+                                                                    self.core_gui.end_long_task()
+                                                                self.core_gui.do_long_task(task, f"Loading snd file<br />{sound.name}")
+                                                            else:
+                                                                logging.error(f"We were asked to load an snd file which contains no snapshots: {sndFile}")
                                                         else:
                                                             logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")
                                                 case "clearSlot":
@@ -468,18 +473,25 @@ class webconf_fifo_handler(QObject):
                     track = self.core_gui.sketchpad.song.channelsModel.getChannel(max(0, min(int(jsonData["trackIndex"]), Zynthbox.Plugin.instance().sketchpadTrackCount())))
                     match jsonData["command"]:
                         case "loadSound":
-                            if len(params) > 0:
-                                sndFile = params[0]
+                            if "params" in jsonData and len(jsonData["params"]) == 1:
+                                sndFile = jsonData["params"][0]
                                 # Load .snd file (if it's an snd file and, you know, exists and stuff!)
                                 sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(sndFile)
                                 if sound is not None:
-                                    def task():
-                                        track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
-                                        track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
-                                        jsonData["messageType"] = "success"
-                                        self.send(json.dumps(jsonData, separators=(',', ':')))
-                                        self.core_gui.end_long_task()
-                                    self.core_gui.do_long_task(task, f"Loading snd file<br />{sound.name}")
+                                    synthFxSnapshot = sound.synthFxSnapshot()
+                                    sampleSnapshot = sound.sampleSnapshot()
+                                    if synthFxSnapshot and sampleSnapshot:
+                                        def task():
+                                            track.setChannelSoundFromSnapshot(synthFxSnapshot)
+                                            track.setChannelSamplesFromSnapshot(sampleSnapshot)
+                                            jsonData["messageType"] = "success"
+                                            self.send(json.dumps(jsonData, separators=(',', ':')))
+                                            self.core_gui.end_long_task()
+                                        self.core_gui.do_long_task(task, f"Loading snd file<br />{sound.name}")
+                                    else:
+                                        logging.error(f"We were asked to load an snd file that contains no snapshots: {sndFile}")
+                                        jsonData["messageType"] = "error"
+                                        jsonData["description"] = "Load Sound was asked to load an snd file that contains no snapshots"
                                 else:
                                     logging.error(f"We were asked to load an snd file that seems to not exist: {sndFile}")
                                     jsonData["messageType"] = "error"

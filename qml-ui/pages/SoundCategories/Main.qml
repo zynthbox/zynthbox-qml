@@ -322,6 +322,7 @@ Zynthian.ScreenPage {
                                     Zynthbox.SndLibrary.updateSndFileCategory(soundButtonGroup.checkedButton.soundObj, modelData)
                                     root.selectedState = "displayMode"
                                 } else if (root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter != category) {
+                                    root.resetGrid()
                                     Zynthbox.SndLibrary.categoryFilter = category
                                 }
                             }
@@ -433,8 +434,10 @@ Zynthian.ScreenPage {
                                 Zynthbox.SndLibrary.addToBestOf(soundButtonGroup.checkedButton.soundObj)
                                 root.selectedState = "displayMode"
                             } else if (root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter != category) {
+                                root.resetGrid()
                                 Zynthbox.SndLibrary.categoryFilter = category
                             } else if (root.selectedState === "displayMode" && Zynthbox.SndLibrary.categoryFilter == category) {
+                                root.resetGrid()
                                 Zynthbox.SndLibrary.categoryFilter = checkedCategoryBefore
                             }
                         }

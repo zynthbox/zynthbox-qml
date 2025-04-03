@@ -533,13 +533,13 @@ class webconf_fifo_handler(QObject):
                                                     def task():
                                                         match slotType2:
                                                             case "synth":
-                                                                track.setChannelSoundFromSnapshot(synthFxSnapshot, snapshotIndex=slotIndex2, slotIndex=slotIndex)
+                                                                track.setChannelSoundFromSnapshotSlot(synthFxSnapshot, slotType=slotType2, snapshotIndex=slotIndex2, slotIndex=slotIndex)
                                                             case "sample":
                                                                 track.setChannelSampleFromSnapshotSlot(sampleSnapshot, snapshotIndex=slotIndex2, slotIndex=slotIndex)
                                                             case "sketch":
                                                                 track.setSketchFromSnapshotSlot(sampleSnapshot, snapshotIndex=slotIndex2, slotIndex=slotIndex)
                                                             case "fx":
-                                                                pass
+                                                                track.setChannelSoundFromSnapshotSlot(synthFxSnapshot, slotType=slotType2, snapshotIndex=slotIndex2, slotIndex=slotIndex)
                                                         jsonData["messageType"] = "success"
                                                         self.send(json.dumps(jsonData, separators=(',', ':')))
                                                         self.core_gui.end_long_task()

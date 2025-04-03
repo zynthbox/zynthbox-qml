@@ -524,9 +524,34 @@ class webconf_fifo_handler(QObject):
                                     fileName = jsonData["params"][0]
                                     if os.path.exist(fileName):
                                         if slotType2 != "" and slotIndex2 > -1:
-                                            # TODO Implement handling pulling things from an snd file and inserting that into a specific slot on the given track
-                                            jsonData["messageType"] = "success"
-                                            pass
+                                            # Load .snd file (if it's an snd file and, you know, exists and stuff!)
+                                            sound = Zynthbox.SndLibrary.instance().sourceModel().getSound(fileName)
+                                            if sound is not None:
+                                                synthFxSnapshot = sound.synthFxSnapshot()
+                                                sampleSnapshot = sound.sampleSnapshot()
+                                                if ((slotType2 == "synth" or slotType2 == "fx") and synthFxSnapshot) or ((slotType2 == "sample" or slotType2 == "sketch") and sampleSnapshot):
+                                                    def task():
+                                                        match slotType2:
+                                                            case "synth":
+                                                                track.setChannelSoundFromSnapshot(synthFxSnapshot, snapshotIndex=slotIndex2, slotIndex=slotIndex)
+                                                            case "sample":
+                                                                track.setChannelSampleFromSnapshotSlot(sampleSnapshot, snapshotIndex=slotIndex2, slotIndex=slotIndex)
+                                                            case "sketch":
+                                                                track.setSketchFromSnapshotSlot(sampleSnapshot, snapshotIndex=slotIndex2, slotIndex=slotIndex)
+                                                            case "fx":
+                                                                pass
+                                                        jsonData["messageType"] = "success"
+                                                        self.send(json.dumps(jsonData, separators=(',', ':')))
+                                                        self.core_gui.end_long_task()
+                                                    self.core_gui.do_long_task(task, f"Loading {slotType2} {slot2Index + 1} from {fileName}<br />into {slotType} {slotIndex + 1} on Track {track.name}")
+                                                else:
+                                                    logging.error(f"We were asked to load a single slot entry from an snd file that contains no relevant snapshots: {sndFile}")
+                                                    jsonData["messageType"] = "error"
+                                                    jsonData["description"] = "Load Into Slot was asked to load from an snd file that contains no relevant snapshots"
+                                            else:
+                                                logging.error(f"We were asked to load a single slot entry from an snd file that seems to not exist: {sndFile}")
+                                                jsonData["messageType"] = "error"
+                                                jsonData["description"] = "Load Into Slot was asked to load from an snd file that seems to not exist"
                                         else:
                                             match slotType:
                                                 case "synth":

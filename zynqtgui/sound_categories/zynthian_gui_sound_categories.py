@@ -130,6 +130,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.zynqtgui):
     @Slot(QObject, QObject)
     def forceLoadSoundOnTrack(self, sound: Zynthbox.SndFileInfo, track):
         def task():
+            self.zynqtgui.show_modal("sketchpad")
             track.setChannelSoundFromSnapshot(sound.synthFxSnapshot())
             track.setChannelSamplesFromSnapshot(sound.sampleSnapshot())
             self.zynqtgui.end_long_task()

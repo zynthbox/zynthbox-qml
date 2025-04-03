@@ -175,6 +175,7 @@ class webconf_fifo_handler(QObject):
     #   saveVersion - creates a "snapshot" of the current state of the sketchpad
     #     required: params
     #     * params contains one entry, with the name of the version to be saved
+    #   save - does not exist as a function (this happens automatically when changes are done), but you will receive feedback any time the current sketchpad has been saved
     # track
     #   loadSound
     #     required: trackIndex, and params

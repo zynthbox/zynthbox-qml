@@ -737,6 +737,9 @@ class sketchpad_song(QObject):
         if self.__is_saving__ != newIsSaving:
             self.__is_saving__ = newIsSaving
             self.isSavingChanged.emit()
+            if newIsSaving == False:
+                isSavingFeedback = { "messageType": "success", "category": "sketchpad", "command": "save" }
+                self.zynqtgui.webconf.send(json.dumps(isSavingFeedback, separators=(',', ':')))
 
     isSavingChanged = Signal()
 

@@ -520,29 +520,40 @@ class webconf_fifo_handler(QObject):
                                 jsonData["description"] = "Clear Slot command missing slot type and/or index"
                         case "loadIntoSlot":
                             if slotType != "" and slotIndex > -1:
-                                if slotType2 != "" and slotIndex2 > -1:
-                                    # TODO Implement handling pulling things from an snd file and inserting that into a specific slot on the given track
-                                    jsonData["messageType"] = "success"
-                                    pass
+                                if "params" in jsonData and len(jsonData["params"]) == 1:
+                                    fileName = jsonData["params"][0]
+                                    if os.path.exist(fileName):
+                                        if slotType2 != "" and slotIndex2 > -1:
+                                            # TODO Implement handling pulling things from an snd file and inserting that into a specific slot on the given track
+                                            jsonData["messageType"] = "success"
+                                            pass
+                                        else:
+                                            match slotType:
+                                                case "synth":
+                                                    pass
+                                                case "sample":
+                                                    sampleClip = track.samples[slotIndex]
+                                                    sampleClip.path = fileName
+                                                    # sampleClip.enabled = True
+                                                case "sketch":
+                                                    sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                                    sketchClip.path = fileName
+                                                    # sketchClip.enabled = True
+                                                case "fx":
+                                                    pass
+                                        jsonData["messageType"] = "success"
+                                    else:
+                                        logging.error(f"Asked to load a file into a slot, but the file does not seem to exist: {jsonData}")
+                                        jsonData["messageType"] = "error"
+                                        jsonData["description"] = "Load Into Slot command was given a file to load which doesn't exist on the device"
                                 else:
-                                    match slotType:
-                                        case "synth":
-                                            pass
-                                        case "sample":
-                                            sampleClip = track.samples[slotIndex]
-                                            sampleClip.path = fileName
-                                            # sampleClip.enabled = True
-                                        case "sketch":
-                                            sketchClip = track.getClipsModelById(slotIndex).getClip(self.core_gui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                            sketchClip.path = fileName
-                                            # sketchClip.enabled = True
-                                        case "fx":
-                                            pass
-                                jsonData["messageType"] = "success"
+                                    logging.error(f"Asked to load a file into a slot, but we were not given a filename to load: {jsonData}")
+                                    jsonData["messageType"] = "error"
+                                    jsonData["description"] = "Load Into Slot command is missing instructions for what file to load"
                             else:
                                 logging.error(f"Asked to load a file into slot, but we lack instructions for what to load things into: {jsonData}")
                                 jsonData["messageType"] = "error"
-                                jsonData["description"] = "Missing instructions for which slot to load things into"
+                                jsonData["description"] = "Load Into Slot command is missing instructions for which slot to load things into"
                 else:
                     jsonData["messageType"] = "error"
                     jsonData["description"] = "Track command is missing a track index"

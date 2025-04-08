@@ -183,16 +183,18 @@ Zynthian.Popup {
     onOpened: {
         zynqtgui.recordingPopupActive = true
 
+        let currentTrack = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
         if (zynqtgui.sketchpad.isRecording === false) {
-            if (zynqtgui.current_screen_id === "playgrid" && applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.isSequencer) {
+            if (currentTrack.trackType !== "sample-loop" && zynqtgui.current_screen_id === "playgrid" && applicationWindow().playGrids.itemAt(Zynthbox.PlayGridManager.currentPlaygrids["playgrid"]).item.isSequencer) {
                 // If we're on the playgrid, and the current module is a sequencer, show the midi recorder
+                // but, also, only if we're not in sketch mode (at which point we should record the loop, not a pattern)
                 zynqtgui.sketchpad.recordingType = "midi";
             } else {
                 // Otherwise assume the audio recorder's what's wanted
                 zynqtgui.sketchpad.recordingType = "audio";
             }
             // If we're not already recording, take a snapshot of our current state, so we can keep that stable when changing settings
-            root.selectedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+            root.selectedChannel = currentTrack;
             root.selectedSlotIndex = root.selectedChannel.selectedSlot.value;
             root.selectedSlotType = root.selectedChannel.selectedSlot.className;
             root.selectedClip = root.selectedChannel.selectedClip;

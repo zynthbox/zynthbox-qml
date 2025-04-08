@@ -14,14 +14,14 @@ RowLayout {
       * slotType property. The main purpose of these properties are to use the existing logic to display slots data into same slots
       * but instead of the data depending on trackType, it is explicitly set by slotType
       *
-      * slotData values can be any of synthSlotsData, sampleSlotsData, sketchSlotsData, externalSlotsData or an arroy of 5 strings for slotType "text"
+      * slotData values can be any of synthSlotsData, sampleSlotsData, sketchSlotsData, externalSlotsData, fxSlotsData, sketchFxSlotsData or an array of 5 strings for slotType "text"
       */
     property var slotData: []
     /**
       * Type of data that needs to be displayed. It should be "synth" for synthSlotsData, "sample-trig" for sampleSlotsData
-      * "sample-loop" for sketchSlotsData, "external" for externalSlotsData. For displaying simple text in slot data use "text"
-      * as slot Type
-      * Allowed values : "synth", "sample-trig", "sample-loop", "external", "text"
+      * "sample-loop" for sketchSlotsData, "external" for externalSlotsData, "fx" for fxSlotsData "sketch-fx" for sketchFxSlotsData.
+      * For displaying simple text in slot data use "text" as slot Type
+      * Allowed values : "synth", "sample-trig", "sample-loop", "external", "text", "sketch-fx"
       */
     property string slotType
     property QtObject selectedChannel: null
@@ -64,6 +64,8 @@ RowLayout {
                     return "sample-loop";
                 case "TracksBar_fxslot":
                     return "fx";
+                case "TracksBar_sketchfxslot":
+                    return "sketch-fx";
                 case "TracksBar_externalslot":
                     return "external";
                 default:
@@ -80,6 +82,8 @@ RowLayout {
                     return "TracksBar_sketchslot";
                 case "fx":
                     return "TracksBar_fxslot";
+                case "sketch-fx":
+                    return "TracksBar_sketchfxslot";
                 case "external":
                     return "TracksBar_fxslot";
                 default:
@@ -111,23 +115,21 @@ RowLayout {
                     switch (control.slotType) {
                         case "synth":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
-                            root.selectedChannel.displayFx = false;
                             break;
                         case "sample-trig":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
-                            root.selectedChannel.displayFx = false;
                             break;
                         case "sample-loop":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
-                            root.selectedChannel.displayFx = false;
                             break;
                         case "external":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
-                            root.selectedChannel.displayFx = false;
                             break;
                         case "fx":
                             zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
-                            root.selectedChannel.displayFx = true;
+                            break;
+                        case "sketch-fx":
+                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchfxslot";
                             break;
                         case "text":
                             // Do nothing for text slots
@@ -141,8 +143,6 @@ RowLayout {
                     zynqtgui.sketchpad.lastSelectedObj.value = index;
                     zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate;
                     control.selectedChannel.selectedSlotRow = index;
-                    // zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                    // zynqtgui.bottomBarControlObj = control.selectedChannel.getClipsModelById(control.selectedChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                 } else {
                     if (control.slotType === "external") {
                         // If channel type is external, then it has 2 slots visible
@@ -172,6 +172,8 @@ RowLayout {
                     control.selectedChannel.setCurlayerByType("external")
                 } else if (control.slotType == "fx") {
                     control.selectedChannel.setCurlayerByType("fx")
+                } else if (control.slotType == "sketch-fx") {
+                    control.selectedChannel.setCurlayerByType("sketch-fx")
                 } else if (control.slotType == "text") {
                     // Do nothing for text slots
                 } else {
@@ -184,6 +186,7 @@ RowLayout {
                 property int midiChannel: control.selectedChannel.chainedSounds[index]
                 property QtObject synthPassthroughClient: Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] ? Zynthbox.Plugin.synthPassthroughClients[delegate.midiChannel] : null
                 property QtObject fxPassthroughClient: Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[control.selectedChannel.id][index] : null
+                property QtObject sketchFxPassthroughClient: Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id] ? Zynthbox.Plugin.sketchFxPassthroughClients[control.selectedChannel.id][index] : null
 
                 anchors.fill: parent
                 anchors.margins: 4
@@ -254,6 +257,19 @@ RowLayout {
                         visible: control.slotType === "fx" && control.slotData[index] != null && control.slotData[index].length > 0
                         color: Kirigami.Theme.highlightColor
                     }
+                    Rectangle {
+                        // dryWetMixAmount ranges from 0 to 2. Interpolate it to range 0 to 1 to be able to calculate width of progress bar
+                        width: delegate.sketchFxPassthroughClient && delegate.sketchFxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(delegate.sketchFxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        radius: 4
+                        opacity: 0.8
+                        visible: control.slotType === "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0
+                        color: Kirigami.Theme.highlightColor
+                    }
 
                     property int availableWidth: width - 6
                     Rectangle {
@@ -300,6 +316,8 @@ RowLayout {
                             return control.slotData[index]
                         } else if (control.slotType === "fx" && control.slotData[index] != null ) {
                             return control.slotData[index]
+                        } else if (control.slotType === "sketch-fx" && control.slotData[index] != null ) {
+                            return control.slotData[index]
                         } else if (control.slotType === "text" && control.slotData[index] != null ) {
                             return control.slotData[index]
                         } else {
@@ -338,6 +356,11 @@ RowLayout {
                             delegateMouseArea.dragHappened = true;
                             // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
                             control.selectedChannel.set_passthroughValue("fxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
+                        } else if (control.slotType == "sketch-fx" && control.slotData[index] != null && control.slotData[index].length > 0 && mouse.x - delegateMouseArea.initialMouseX != 0) {
+                            newVal = Zynthian.CommonUtils.clamp(mouse.x / delegate.width, 0, 1);
+                            delegateMouseArea.dragHappened = true;
+                            // dryWetMixAmount ranges from 0 to 2. Interpolate newVal to range from 0 to 1 to 0 to 2
+                            control.selectedChannel.set_passthroughValue("sketchFxPassthrough", index, "dryWetMixAmount", Zynthian.CommonUtils.interp(newVal, 0, 1, 0, 2));
                         }
                     }
                     onPressAndHold: {

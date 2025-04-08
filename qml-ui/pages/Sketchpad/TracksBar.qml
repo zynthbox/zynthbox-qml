@@ -211,27 +211,22 @@ Rectangle {
                 console.log("Unknown slot type: \"" + slotType + "\" - assuming synth")
             case "synth":
             case "TracksBar_synthslot":
-                root.selectedChannel.displayFx = false;
                 synthsRow.switchToSlot(slotIndex, true);
                 break;
             case "sample":
             case "TracksBar_sampleslot":
-                root.selectedChannel.displayFx = false;
                 samplesRow.switchToSlot(slotIndex, true);
                 break;
             case "sketch":
             case "TracksBar_sketchslot":
-                root.selectedChannel.displayFx = false;
                 sketchesRow.switchToSlot(slotIndex, true);
                 break;
             case "fx":
             case "TracksBar_fxslot":
-                root.selectedChannel.displayFx = true;
                 fxRow.switchToSlot(slotIndex, true);
                 break;
             case "external":
             case "TracksBar_externalslot":
-                root.selectedChannel.displayFx = false;
                 externalRow.switchToSlot(slotIndex, true);
                 break;
         }
@@ -274,9 +269,7 @@ Rectangle {
                 }
             } else if (switchIfEmpty) {
                 // Select the first and best option for the given TracksBar layout
-                if (root.selectedChannel.displayFx === true) {
-                    fxRow.switchToSlot(0, true);
-                } else if (root.selectedChannel.trackType === "synth") {
+                if (root.selectedChannel.trackType === "synth") {
                     synthsRow.switchToSlot(0, true);
                 } else if (root.selectedChannel.trackType === "sample-loop") {
                     sketchesRow.switchToSlot(0, true);
@@ -768,7 +761,7 @@ Rectangle {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checked: root.selectedChannel.trackType === "synth" && root.selectedChannel.displayFx === false
+                                checked: root.selectedChannel.trackType === "synth"
                                 text: qsTr("Sound")
                                 onClicked: {
                                     root.selectedChannel.trackType = "synth";
@@ -808,21 +801,10 @@ Rectangle {
                                 }
                             }
                             QQC2.Button {
-                                id: fxTabButton
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checked: root.selectedChannel.displayFx === true
-                                text: qsTr("Fx")
-                                onClicked: {
-                                    fxRow.switchToSlot(0, true);
-                                }
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
-                                Layout.fillHeight: true
-                                checked: root.selectedChannel.trackType === "sample-loop" && root.selectedChannel.displayFx === false
+                                checked: root.selectedChannel.trackType === "sample-loop"
                                 text: qsTr("Sketch")
                                 onClicked: {
                                     root.selectedChannel.trackType = "sample-loop";
@@ -833,7 +815,7 @@ Rectangle {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
-                                checked: root.selectedChannel.trackType === "external" && root.selectedChannel.displayFx === false
+                                checked: root.selectedChannel.trackType === "external"
                                 text: qsTr("External")
                                 onClicked: {
                                     root.selectedChannel.trackType = "external";
@@ -860,7 +842,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "synth"
+                                        visible: root.selectedChannel.trackType == "synth"
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
@@ -982,7 +964,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.synthSlotsData
                                 slotType: "synth"
-                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "synth"
+                                visible: root.selectedChannel.trackType == "synth"
                             }
 
                             TrackSlotsData {
@@ -992,7 +974,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.sampleSlotsData
                                 slotType: "sample-trig"
-                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "synth"
+                                visible: root.selectedChannel.trackType == "synth"
                             }
 
                             TrackSlotsData {
@@ -1002,7 +984,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.sketchSlotsData
                                 slotType: "sample-loop"
-                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "sample-loop"
+                                visible: root.selectedChannel.trackType == "sample-loop"
                             }
                             Item {
                                 // id: sketchesSpacer
@@ -1019,7 +1001,7 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.externalSlotsData
                                 slotType: "external"
-                                visible: root.selectedChannel.displayFx === false && root.selectedChannel.trackType == "external"
+                                visible: root.selectedChannel.trackType == "external"
                             }
                             Item {
                                 // id: externalSpacer
@@ -1036,7 +1018,16 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                                 slotData: root.selectedChannel.fxSlotsData
                                 slotType: "fx"
-                                visible: root.selectedChannel.displayFx === true
+                                visible: root.selectedChannel.trackType == "synth"
+                            }
+                            TrackSlotsData {
+                                id: sketchFxRow
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                slotData: root.selectedChannel.sketchFxSlotsData
+                                slotType: "sketch-fx"
+                                visible: root.selectedChannel.trackType == "sample-loop"
                             }
                             Item {
                                 // id: fxSpacer

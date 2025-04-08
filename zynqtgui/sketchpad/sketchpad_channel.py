@@ -293,6 +293,7 @@ class sketchpad_channel(QObject):
             keyzoneData.rootNoteChanged.connect(lambda idx=slotIndex, data=keyzoneData:self.handleChainedSoundsKeyzoneChanged(data, idx))
         self.chainedSoundsKeyzonesChanged.connect(self.__song__.schedule_save)
         self.__chained_fx = [None, None, None, None, None]
+        self.__chained_sketch_fx = [None, None, None, None, None]
         self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
         self.__samples__ = []
@@ -301,7 +302,6 @@ class sketchpad_channel(QObject):
         self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
         self.__color__ = self.zynqtgui.theme_chooser.trackColors[self.__id__]
         self.__selected_slot_obj = last_selected_obj_dto(self)
-        self.__displayFx = False
         self.__selected_slot_row__ = 0
         self.__selected_fx_slot_row = 0
         self.__selected_clip__ = 0
@@ -320,6 +320,7 @@ class sketchpad_channel(QObject):
         self.wetFx2AmountChanged.connect(self.handleWetFx2AmountChanged)
         self.synthPassthroughMixingChanged.connect(self.handleSynthPassthroughMixingChanged)
         self.fxPassthroughMixingChanged.connect(self.handleFxPassthroughMixingChanged)
+        self.sketchFxPassthroughMixingChanged.connect(self.handleSketchFxPassthroughMixingChanged)
         self.track_type_changed.connect(self.handleAudioTypeSettingsChanged)
         self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
         self.chainedFxChanged.connect(self.chainedFxChangedHandler, Qt.QueuedConnection)
@@ -444,6 +445,7 @@ class sketchpad_channel(QObject):
             synthPassthrough.dryAmountChanged.connect(lambda theClient=synthPassthrough:handlePassthroughClientDryAmountChanged(theClient))
         self.__trackPassthroughClients = []
         self.__fxPassthroughClients = []
+        self.__sketchFxPassthroughClients = []
         for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
             channelClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.__id__ * 5 + laneId]
             self.__trackPassthroughClients.insert(laneId, channelClient)
@@ -455,6 +457,11 @@ class sketchpad_channel(QObject):
             self.__fxPassthroughClients.insert(laneId, fxClient)
             fxClient.dryWetMixAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientDryWetMixAmountChanged(theClient))
             fxClient.panAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientPanAmountChanged(theClient))
+
+            sketchFxClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
+            self.__sketchFxPassthroughClients.insert(laneId, sketchFxClient)
+            sketchFxClient.dryWetMixAmountChanged.connect(lambda theClient=sketchFxClient:handlePassthroughClientDryWetMixAmountChanged(theClient))
+            sketchFxClient.panAmountChanged.connect(lambda theClient=sketchFxClient:handlePassthroughClientPanAmountChanged(theClient))
 
         # Connect to respective signals when any of the slot data changes
         self.slotsReordered.connect(self.sketchSlotsDataChanged.emit)
@@ -484,6 +491,11 @@ class sketchpad_channel(QObject):
             if clientIndex in self.__chained_fx:
                 laneId = self.__chained_fx.index(clientIndex)
                 self.set_passthroughValue("fxPassthrough", laneId, theSomething, theValue)
+        elif theSender in self.__sketchFxPassthroughClients:
+            clientIndex = self.__sketchFxPassthroughClients.index(theSender)
+            if clientIndex in self.__chained_sketch_fx:
+                laneId = self.__chained_sketch_fx.index(clientIndex)
+                self.set_passthroughValue("sketchFxPassthrough", laneId, theSomething, theValue)
 
     def handleChainedSoundsKeyzoneChanged(self, keyzoneData, slotIndex):
         Zynthbox.MidiRouter.instance().setZynthianSynthKeyzones(self.__chained_sounds__[slotIndex], keyzoneData.keyZoneStart, keyzoneData.keyZoneEnd, keyzoneData.rootNote)
@@ -538,6 +550,27 @@ class sketchpad_channel(QObject):
                         "dryWetMixAmount": -1,
                     })
             audioTypeValues["fxPassthrough"] = passthroughValues
+            # Sketch FX Passthrough defaults
+            passthroughValues = []
+            for i in range(0, 5):
+                if audioType in ["synth", "sample", "external"]:
+                    # For synth, default is to have 100% dry and 0% wet
+                    passthroughValues.append({
+                        "panAmount": self.__initial_pan__,
+                        "dryWetMixAmount": 0,
+                    })
+                elif audioType == "sketch":
+                    # For sketch, default is to have 100% dry and 100% wet mixed
+                    passthroughValues.append({
+                        "panAmount": self.__initial_pan__,
+                        "dryWetMixAmount": 1,
+                    })
+                else:
+                    passthroughValues.append({
+                        "panAmount": self.__initial_pan__,
+                        "dryWetMixAmount": -1,
+                    })
+            audioTypeValues["sketchFxPassthrough"] = passthroughValues
             mixingValues[audioType] = audioTypeValues
         return mixingValues
 
@@ -1475,6 +1508,88 @@ class sketchpad_channel(QObject):
     chainedFxNames = Property('QStringList', get_chainedFxNames, notify=chainedFxNamesChanged)
     ### END Property chainedFxNames
 
+    ### Property chainedSketchFx
+    def get_chainedSketchFx(self):
+        return self.__chained_sketch_fx
+
+    def set_chainedSketchFx(self, fx):
+        if fx != self.__chained_sketch_fx:
+            self.__chained_sketch_fx = fx
+            self.update_jack_port()
+            self.__sound_snapshot_changed = True
+            self.__song__.schedule_save()
+            self.chainedSketchFxChanged.emit()
+            self.chainedSketchFxNamesChanged.emit()
+
+    # Add or replace a fx layer at slot_row to fx chain
+    # If explicit slot_row is not set then selected slot row is used
+    def setSketchFxToChain(self, layer, slot_row=-1):
+        if slot_row == -1 and self.selectedSlot.className == "TracksBar_sketchfxslot":
+            slot_row == self.selectedSlot.value
+        else:
+            logging.error("Selected Slot is not a TracksBar_sketchfxslot. Cannot continue adding fx!")
+            return
+
+        if self.__chained_sketch_fx[slot_row] is not None:
+            self.zynqtgui.zynautoconnect_acquire_lock()
+            self.__chained_sketch_fx[slot_row].reset()
+            self.zynqtgui.zynautoconnect_release_lock()
+            self.zynqtgui.screens['engine'].stop_unused_engines()
+
+        self.__chained_sketch_fx[slot_row] = layer
+        self.__sound_snapshot_changed = True
+        self.chainedSketchFxChanged.emit()
+        self.chainedSketchFxNamesChanged.emit()
+
+    @Slot()
+    def removeSelectedSketchFxFromChain(self):
+        if self.selectedSlot.className == "TracksBar_sketchfxslot":
+           self.removeSketchFxFromChain(self.selectedSlot.value)
+        else:
+           logging.error("Selected Slot is not a TracksBar_sketchfxslot. Cannot continue removing fx!")
+           return
+
+    @Slot(int)
+    def removeSketchFxFromChain(self, fxSlotIndex):
+        if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
+            def task():
+                if self.__chained_sketch_fx[fxSlotIndex] is not None:
+                    try:
+                        layer_index = self.zynqtgui.layer.layers.index(self.__chained_sketch_fx[fxSlotIndex])
+                        self.zynqtgui.layer.remove_layer(layer_index)
+                        self.__chained_sketch_fx[fxSlotIndex] = None
+
+                        self.chainedSketchFxChanged.emit()
+                        self.chainedSketchFxNamesChanged.emit()
+                    except Exception as e:
+                        logging.exception(e)
+                    QTimer.singleShot(1, self.zynqtgui.end_long_task)
+            self.zynqtgui.do_long_task(task, f"Removing {self.chainedSketchFxNames[fxSlotIndex]} from slot {fxSlotIndex + 1} on Track {self.name}")
+
+    chainedSketchFxChanged = Signal()
+    chainedSketchFx = Property('QVariantList', get_chainedSketchFx, set_chainedSketchFx, notify=chainedSketchFxChanged)
+    ### END Property chainedSketchFx
+
+    ### Property chainedSketchFxNames
+    def get_chainedSketchFxNames(self):
+        names = []
+        for fx in self.chainedSketchFx:
+            try:
+                # Strip Jalv/Jucy prefix from name (if any)
+                engine_name = fx.engine.name.lstrip("Jalv/").lstrip("Jucy/")
+                if fx.preset_name is not None and fx.preset_name != "None" and fx.preset_name != "":
+                    names.append(f"{engine_name} > {fx.preset_name}")
+                else:
+                    names.append(engine_name)
+            except:
+                names.append("")
+        return names
+
+    chainedSketchFxNamesChanged = Signal()
+
+    chainedSketchFxNames = Property('QStringList', get_chainedSketchFxNames, notify=chainedSketchFxNamesChanged)
+    ### END Property chainedSketchFxNames
+
     ### BEGIN Property channelHasFx
     def get_channelHasFx(self):
         for fx in self.chainedFx:
@@ -1639,6 +1754,7 @@ class sketchpad_channel(QObject):
         self.wetFx2AmountChanged.emit()
         self.synthPassthroughMixingChanged.emit()
         self.fxPassthroughMixingChanged.emit()
+        self.sketchFxPassthroughMixingChanged.emit()
 
     trackTypeKey = Property(str, audioTypeKey, notify=track_type_changed)
     trackType = Property(str, get_track_type, set_track_type, notify=track_type_changed)
@@ -1868,17 +1984,6 @@ class sketchpad_channel(QObject):
     selectedSlot = Property(QObject, get_selectedSlot, constant=True)
     ### END Property selectedSlot
 
-    ### BEGIN Property displayFx
-    def get_displayFx(self):
-        return self.__displayFx
-    def set_displayFx(self, displayFx):
-        if self.__displayFx != displayFx:
-            self.__displayFx = displayFx
-            self.displayFxChanged.emit()
-    displayFxChanged = Signal()
-    displayFx = Property(bool, get_displayFx, set_displayFx, notify=displayFxChanged)
-    ### END Property displayFx
-
     ### Property selectedSlotRow
     def get_selectedSlotRow(self):
         return self.__selected_slot_row__
@@ -1922,6 +2027,8 @@ class sketchpad_channel(QObject):
         if self.chainedFx[self.__selected_fx_slot_row]:
             knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
+
+        # TODO : Implement sketchFx
 
     ### Property selectedFxSlotRow
     def get_selectedFxSlotRow(self):
@@ -2273,6 +2380,12 @@ class sketchpad_channel(QObject):
                 Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(laneIndex), np.interp(newValue, (0, 2), (0, 127)))
                 if self.zynqtgui.sketchpad.selectedTrackId == self.__id__ and self.__selected_fx_slot_row == laneIndex:
                     Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(newValue, (0, 2), (0, 127)))
+        elif passthroughKey == "sketchFxPassthrough":
+            self.sketchFxPassthroughMixingChanged.emit()
+            if valueType == "dryWetMixAmount":
+                Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SKETCH_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot(laneIndex), np.interp(newValue, (0, 2), (0, 127)))
+                if self.zynqtgui.sketchpad.selectedTrackId == self.__id__ and self.selectedSlot.value == laneIndex:
+                    Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SKETCH_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(newValue, (0, 2), (0, 127)))
 
     ### BEGIN synthPassthrough properties
     @Slot(None)
@@ -2385,6 +2498,64 @@ class sketchpad_channel(QObject):
     fxPassthrough3dryWetMix = Property(float, get_fxPassthrough3dryWetMix, notify=fxPassthroughMixingChanged)
     fxPassthrougg4pan =       Property(float, get_fxPassthrough4pan, notify=fxPassthroughMixingChanged)
     fxPassthrough4dryWetMix = Property(float, get_fxPassthrough4dryWetMix, notify=fxPassthroughMixingChanged)
+
+    @Slot(None)
+    def handleSketchFxPassthroughMixingChanged(self):
+        for laneId in range(0, 5):
+            fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
+            panAmount = self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"]
+            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
+            # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
+            fxPassthroughClient.setPanAmount(panAmount)
+            fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+            self.__song__.schedule_save()
+
+    @Slot(None)
+    def clearSketchFxPassthroughForEmtpySlots(self):
+        # Don't clear the values while loading (firstly we don't need to, we just loaded them,
+        # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
+        if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
+            shouldEmitChanged = False
+            defaultDryWetMixAmount = -1
+            if self.audioTypeKey() in ["synth", "sample", "external"]:
+                # For synth/sample/external, default is to have 100% dry and 0% wet
+                defaultDryWetMixAmount = 0
+            elif self.audioTypeKey() == "sketch":
+                 # For sketch, default is to have 100% dry and 100% wet mixed
+                defaultDryWetMixAmount = 1
+            for laneId in range(0, 5):
+                if self.__chained_fx[laneId] is None:
+                    if self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
+                        self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
+                        shouldEmitChanged = True
+                    if self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
+                        self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
+                        shouldEmitChanged = True
+            if shouldEmitChanged:
+                self.__song__.schedule_save()
+                self.sketchFxPassthroughMixingChanged.emit()
+
+    def get_sketchFxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][0]["panAmount"]
+    def get_sketchFxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][0]["dryWetMixAmount"]
+    def get_sketchFxPassthrough1pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][1]["panAmount"]
+    def get_sketchFxPassthrough1dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][1]["dryWetMixAmount"]
+    def get_sketchFxPassthrough2pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][2]["panAmount"]
+    def get_sketchFxPassthrough2dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][2]["dryWetMixAmount"]
+    def get_sketchFxPassthrough3pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][3]["panAmount"]
+    def get_sketchFxPassthrough3dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][3]["dryWetMixAmount"]
+    def get_sketchFxPassthrough4pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][4]["panAmount"]
+    def get_sketchFxPassthrough4dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][4]["dryWetMixAmount"]
+    sketchFxPassthroughMixingChanged = Signal()
+    sketchFxPassthrough0pan =       Property(float, get_sketchFxPassthrough0pan, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough0dryWetMix = Property(float, get_sketchFxPassthrough0dryWetMix, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough1pan =       Property(float, get_sketchFxPassthrough1pan, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough1dryWetMix = Property(float, get_sketchFxPassthrough1dryWetMix, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough2pan =       Property(float, get_sketchFxPassthrough2pan, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough2dryWetMix = Property(float, get_sketchFxPassthrough2dryWetMix, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough3pan =       Property(float, get_sketchFxPassthrough3pan, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough3dryWetMix = Property(float, get_sketchFxPassthrough3dryWetMix, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrougg4pan =       Property(float, get_sketchFxPassthrough4pan, notify=sketchFxPassthroughMixingChanged)
+    sketchFxPassthrough4dryWetMix = Property(float, get_sketchFxPassthrough4dryWetMix, notify=sketchFxPassthroughMixingChanged)
     ### END fxPassthrough properties
     ### END Passthrough properties
 
@@ -2507,6 +2678,12 @@ class sketchpad_channel(QObject):
         return self.chainedFxNames
     fxSlotsData = Property("QVariantList", get_fxSlotsData, notify=chainedFxNamesChanged)
     ### END Property fxSlotsData
+
+    ### BEGIN Property sketchFxSlotsData
+    def get_sketchFxSlotsData(self):
+        return self.chainedSketchFxNames
+    sketchFxSlotsData = Property("QVariantList", get_sketchFxSlotsData, notify=chainedSketchFxNamesChanged)
+    ### END Property sketchFxSlotsData
 
     ### BEGIN Property externalSlotsData
     def get_externalSlotsData(self):
@@ -2949,6 +3126,8 @@ class sketchpad_channel(QObject):
 
         # Update chainedFx
         self.set_chainedFx(newChainedFx)
+
+        # TODO : Implement sketchFx
 
     @Slot(int, int)
     def swapChainedFx(self, slot1, slot2):

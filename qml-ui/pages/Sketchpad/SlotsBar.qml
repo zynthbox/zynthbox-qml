@@ -224,25 +224,21 @@ Rectangle {
             // Clicked entry is fx
             console.log("handleItemClick : FX")
 
-//            var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedFxSlotRow]
-
             if (zynqtgui.backButtonPressed) {
-//                // Back is pressed. Clear Slot
+                // Back is pressed. Clear Slot
                 root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
-//                if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
-//                    zynqtgui.start_loading()
-//                    zynqtgui.fixed_layers.activate_index(chainedSound)
-//                    zynqtgui.layer_effects.fx_reset_confirmed()
-//                    zynqtgui.stop_loading()
-//                }
             } else {
                 fxSetupDialog.open()
-//                zynqtgui.fixed_layers.activate_index(chainedSound)
-//                zynqtgui.layer_options.show();
-//                var screenBack = zynqtgui.current_screen_id;
-//                zynqtgui.current_screen_id = "layer_effects";
-//                root.openBottomDrawerOnLoad = true;
-//                zynqtgui.forced_screen_back = screenBack;
+            }
+        } else if (type === "sketch-fx") {
+            // Clicked entry is sketch fx
+            console.log("handleItemClick : Sketch FX")
+
+            if (zynqtgui.backButtonPressed) {
+                // Back is pressed. Clear Slot
+                root.selectedSlotRowItem.channel.removeSelectedSketchFxFromChain()
+            } else {
+                fxSetupDialog.open()
             }
         } else if (samplesButton.checked || type === "sample-trig") {
             // Clicked entry is samples
@@ -1072,7 +1068,11 @@ Rectangle {
 
     Zynthian.ActionPickerPopup {
         id: fxSetupDialog
-        property var selectedFx: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot" ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value] : null
+        property var selectedFx: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot"
+                                    ? root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value]
+                                    : root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot"
+                                        ? root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value]
+                                        : null
 
         actions: [
             Kirigami.Action {
@@ -1105,27 +1105,43 @@ Rectangle {
                 text: "Equalizer..."
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    root.requestSlotEqualizer(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
+                    if (root.selectedChannel.selectedSlot.className == "TracksBar_fxslot") {
+                        root.requestSlotEqualizer(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
+                    } else if (root.selectedChannel.selectedSlot.className == "TracksBar_sketchfxslot") {
+                        // TODO : sketchFx
+                    }
                 }
             },
             Kirigami.Action {
                 text: qsTr("Swap with...")
                 onTriggered: {
-                    slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
+                    if (root.selectedChannel.selectedSlot.className == "TracksBar_fxslot") {
+                        slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
+                    } else if (root.selectedChannel.selectedSlot.className == "TracksBar_sketchfxslot") {
+                        // TODO : sketchFx
+                    }
                 }
             },
             Kirigami.Action {
                 text: "Set Input Overrides..."
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    slotInputPicker.pickSlotInputs(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
+                    if (root.selectedChannel.selectedSlot.className == "TracksBar_fxslot") {
+                        slotInputPicker.pickSlotInputs(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
+                    } else if (root.selectedChannel.selectedSlot.className == "TracksBar_sketchfxslot") {
+                        // TODO : sketchFx
+                    }
                 }
             },
             Kirigami.Action {
                 text: qsTr("Remove FX")
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
-                    root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
+                    if (root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+                        root.selectedSlotRowItem.channel.removeSelectedFxFromChain()
+                    } else if (root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+                        root.selectedSlotRowItem.channel.removeSelectedSketchFxFromChain()
+                    }
                 }
             }
         ]

@@ -1431,7 +1431,7 @@ class sketchpad_channel(QObject):
         if slot_row == -1:
             slot_row = self.__selected_fx_slot_row
 
-        if self.__chained_fx[slot_row] is not None:
+        if self.__chained_fx[slot_row] is not None:            
             self.zynqtgui.zynautoconnect_acquire_lock()
             self.__chained_fx[slot_row].reset()
             self.zynqtgui.zynautoconnect_release_lock()
@@ -1524,11 +1524,12 @@ class sketchpad_channel(QObject):
     # Add or replace a fx layer at slot_row to fx chain
     # If explicit slot_row is not set then selected slot row is used
     def setSketchFxToChain(self, layer, slot_row=-1):
-        if slot_row == -1 and self.selectedSlot.className == "TracksBar_sketchfxslot":
-            slot_row == self.selectedSlot.value
-        else:
-            logging.error("Selected Slot is not a TracksBar_sketchfxslot. Cannot continue adding fx!")
-            return
+        if slot_row == -1:
+            if self.selectedSlot.className == "TracksBar_sketchfxslot":
+                slot_row == self.selectedSlot.value
+            else:
+                logging.error(f"Selected Slot is not a TracksBar_sketchfxslot. Cannot continue adding fx! : slotType({self.selectedSlot.className}), value({self.selectedSlot.value})")
+                return
 
         if self.__chained_sketch_fx[slot_row] is not None:
             self.zynqtgui.zynautoconnect_acquire_lock()
@@ -1546,7 +1547,7 @@ class sketchpad_channel(QObject):
         if self.selectedSlot.className == "TracksBar_sketchfxslot":
            self.removeSketchFxFromChain(self.selectedSlot.value)
         else:
-           logging.error("Selected Slot is not a TracksBar_sketchfxslot. Cannot continue removing fx!")
+           logging.error(f"Selected Slot is not a TracksBar_sketchfxslot. Cannot continue removing fx! : slotType({self.selectedSlot.className}), value({self.selectedSlot.value})")
            return
 
     @Slot(int)
@@ -2028,7 +2029,7 @@ class sketchpad_channel(QObject):
             knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
-        # TODO : Implement sketchFx
+        # TODO : sketchFx
 
     ### Property selectedFxSlotRow
     def get_selectedFxSlotRow(self):
@@ -3031,6 +3032,8 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.set_curlayer(None)
         elif type == "fx":
             self.zynqtgui.set_curlayer(self.chainedFx[self.selectedFxSlotRow])
+        elif type == "sketch-fx":
+            self.zynqtgui.set_curlayer(self.chainedSketchFx[self.selectedSlot.value])
         elif type == "loop":
             self.zynqtgui.set_curlayer(None)
         elif type == "sample":
@@ -3127,7 +3130,7 @@ class sketchpad_channel(QObject):
         # Update chainedFx
         self.set_chainedFx(newChainedFx)
 
-        # TODO : Implement sketchFx
+        # TODO : sketchFx
 
     @Slot(int, int)
     def swapChainedFx(self, slot1, slot2):

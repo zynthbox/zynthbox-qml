@@ -472,8 +472,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
     def add_layer_midich(self, midich, select=True, engine=None):
         try:
             if engine is not None:
+                selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
                 zyngine = self.zynqtgui.screens['engine'].start_engine(engine)
-                slot_index = -1
                 if self.layer_index_replace_engine != None and len(self.layers) > self.index:
                     layer = self.root_layers[self.layer_index_replace_engine]
                     # The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted
@@ -491,23 +491,30 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     if not self.zynqtgui.screens['bank'].get_show_top_sounds():
                         self.zynqtgui.screens['bank'].select_action(0)
                 else:
-                    track_index = self.zynqtgui.sketchpad.selectedTrackId
-                    slot_index = self.zynqtgui.sketchpad.song.channelsModel.getChannel(track_index).selectedSlot.value
                     if zyngine.type=="Audio Effect":
                         midich = 15
-                    layer = zynthian_layer(zyngine, midich, self.zynqtgui, slot_index, track_index)
+
+                    layer = zynthian_layer(zyngine, midich, self.zynqtgui, selected_track.id, selected_track.selectedSlot.className, selected_track.selectedSlot.value)
 
                 self.zynqtgui.set_curlayer(layer, queue=False)
 
                 # Try to connect Audio Effects ...
                 if len(self.layers)>0 and layer.engine.type=="Audio Effect":
-                    channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index)
-                    if channel.chainedFx[channel.selectedFxSlotRow] is not None:
-                        old_layer = channel.chainedFx[channel.selectedFxSlotRow]
+                    if (selected_track.selectedSlot.className == "TracksBar_fxslot" and selected_track.chainedFx[selected_track.selectedSlot.value] is not None) or (selected_track.selectedSlot.className == "TracksBar_sketchfxslot" and selected_track.chainedSketchFx[selected_track.selectedSlot.value] is not None):
+                        if selected_track.selectedSlot.className == "TracksBar_fxslot":
+                            old_layer = selected_track.chainedFx[selected_track.selectedSlot.value]
+                        elif selected_track.selectedSlot.className == "TracksBar_sketchfxslot":
+                            old_layer = selected_track.chainedSketchFx[selected_track.selectedSlot.value]
+
                         old_layer_index = -1
                         if old_layer in self.layers:
                             old_layer_index = self.layers.index(old_layer)
-                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
+
+                        if selected_track.selectedSlot.className == "TracksBar_fxslot":
+                            selected_track.setFxToChain(layer, layer.slot_index)
+                        elif selected_track.selectedSlot.className == "TracksBar_sketchfxslot":
+                            selected_track.setSketchFxToChain(layer, layer.slot_index)
+
                         if old_layer_index >= 0:
                             # There is already a layer in slot which will get replaced. So replace that layer from self.layers with the current one
                             self.layers[old_layer_index] = layer
@@ -516,7 +523,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
                             self.layers.append(layer)
                     else:
                         # New fx layer. Add to self.layers
-                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer)
+                        if selected_track.selectedSlot.className == "TracksBar_fxslot":
+                            selected_track.setFxToChain(layer, layer.slot_index)
+                        elif selected_track.selectedSlot.className == "TracksBar_sketchfxslot":
+                            selected_track.setSketchFxToChain(layer, layer.slot_index)
                         self.layers.append(layer)
                 # Try to connect MIDI tools ...
                 elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
@@ -1379,13 +1389,23 @@ class zynthian_gui_layer(zynthian_gui_selector):
                     del(snapshot['layers'][i])
                 else:
                     layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
-                    slot_index = layer_snapshot['slot_index']
                     track_index = layer_snapshot['track_index']
+                    slot_index = layer_snapshot['slot_index']
                     engine=self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'], taskMessagePrefix="Loading Snapshot : ")
-                    layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, slot_index, track_index)
+                    if 'slot_type' in layer_snapshot:
+                        slot_type = layer_snapshot['slot_type']
+                    else:
+                        if engine.type == "Audio Effect":
+                            slot_type = "TracksBar_fxslot"
+                        else:
+                            slot_type = "TracksBar_synthslot"
+                    layer = zynthian_layer(engine,layer_snapshot['midi_chan'], self.zynqtgui, track_index, slot_type, slot_index)
                     self.layers.append(layer)
                     if engine.type == "Audio Effect":
-                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer, slot_index)
+                        if slot_type == "TracksBar_fxslot":
+                            self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setFxToChain(layer, slot_index)
+                        elif slot_type == "TracksBar_sketchfxslot":
+                            self.zynqtgui.sketchpad.song.channelsModel.getChannel(layer.track_index).setSketchFxToChain(layer, slot_index)
                 i += 1
 
             # Finally, stop all unused engines
@@ -1571,13 +1591,24 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(layer_data)
                 logging.debug(f"### Restoring engine : {layer_snapshot['engine_nick']}")
                 engine = self.zynqtgui.screens['engine'].start_engine(layer_snapshot['engine_nick'], "Loading Snapshot : ")
-                slot_index = layer_snapshot['slot_index']
                 track_index = layer_snapshot['track_index']
-                new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, slot_index, track_index)
+                if 'slot_type' in layer_snapshot:
+                    slot_type = layer_snapshot['slot_type']
+                else:
+                    if engine.type == "Audio Effect":
+                        slot_type = "TracksBar_fxslot"
+                    else:
+                        slot_type = "TracksBar_synthslot"
+                slot_index = layer_snapshot['slot_index']
+                new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, track_index, slot_type, slot_index)
                 new_layer.restore_snapshot_1(layer_snapshot)
                 new_layer.restore_snapshot_2(layer_snapshot)
                 if engine.type == "Audio Effect":
-                    self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setFxToChain(new_layer, slot_index)
+                    if slot_type == "TracksBar_fxslot":
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setFxToChain(new_layer, slot_index)
+                    elif slot_type == "TracksBar_sketchfxslot":
+                        self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setSketchFxToChain(new_layer, slot_index)
+
                 sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
                 for layer in sublayers:
                     layer.set_midi_chan(midi_chan)

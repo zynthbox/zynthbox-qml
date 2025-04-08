@@ -42,6 +42,9 @@ Zynthian.ScreenPage {
     bottomPadding: 5
     anchors.fill: parent
 
+    property QtObject sequence: zynqtgui.isBootingComplete ? Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName) : null
+    property QtObject pattern: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null
+
     cuiaCallback: function(cuia) {
         var returnValue = false;
 
@@ -76,6 +79,19 @@ Zynthian.ScreenPage {
     }
 
     contextualActions: [
+        Kirigami.Action {
+            text: enabled
+                ? component.pattern.enabled
+                    ? qsTr("Mute")
+                    : qsTr("Unmute")
+                : ""
+            enabled: component.pattern !== null
+            onTriggered: {
+                var associatedClip = applicationWindow().selectedChannel.getClipsModelById(component.pattern.clipIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
+                associatedClip.enabled = !component.pattern.enabled
+            }
+        },
         Kirigami.Action {
             id: placeholderAction
             text: children.length > 0 ? qsTr("%1 Actions").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ") : "       "
@@ -127,370 +143,367 @@ don't want to have to dig too far...
 
         ColumnLayout {
             id: controlsPanel
-            z: 1
+            z: 999
 
             Layout.preferredWidth: 80
             Layout.maximumWidth: Layout.preferredWidth
             Layout.fillHeight: true
             Layout.margins: 8
 
-            Zynthian.Dialog {
-                id: settingsDialog
-                visible: false
-                title: qsTr("%1 Settings").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ")
-                modal: true
-                width: component.width - Kirigami.Units.largeSpacing * 4
-                height: component.height - Kirigami.Units.largeSpacing * 4
-                x: Kirigami.Units.largeSpacing
-                y: Kirigami.Units.largeSpacing
-
-                header: ColumnLayout {
-                    Kirigami.Heading {
-                        Layout.fillWidth: true
-                        Layout.margins: Kirigami.Units.smallSpacing
-                        level: 2
-                        text: settingsDialog.title
+            Zynthian.PlayGridButton {
+                id: settingsButton
+                // Let's put our friend here on top of the things underneath (which would usually be stacked above)
+                z: 1000
+                Layout.minimumHeight: width * 0.6
+                Layout.maximumHeight: width * 0.6
+                icon.name: "application-menu"
+                // TODO Reenable this for properly we re-add the ability to have more plaground modules
+                visible: applicationWindow().playGrids.count > 2
+                Rectangle {
+                    id: slideDelegateIconMask
+                    anchors {
+                        fill: parent
+                        margins: Kirigami.Units.largeSpacing
                     }
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 1
-                        Layout.maximumHeight: 1
-                        opacity: 0.3
-                        color: Kirigami.Theme.textColor
-                    }
+                    radius: width / 2
+                    visible: false
                 }
-                footer: Zynthian.ActionBar {
-                    Layout.fillWidth: true
-                    currentPage: Item {
-                        property QtObject backAction: Kirigami.Action {
-                            text: "Back"
-                            onTriggered: {
-                                settingsDialog.visible = false;
-                            }
-                        }
-                        property list<QtObject> contextualActions
+                MouseArea {
+                    // A touch hacky, but we can't really depend on everybody telling us that we've lost focus, so... block out everything instead and demand taps
+                    x: 0; y: 0; height: component.height; width: component.width;
+                    visible: settingsPopup.visible
+                    onClicked: {
+                        settingsPopup.visible = false;
                     }
                 }
-
-                contentItem: Loader {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.settings ? playGridStack.currentPlayGridItem.settings : null
-                }
-            }
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.margins: 8
-                z: 999
-
-                Zynthian.PlayGridButton {
-                    id: settingsButton
-                    // Let's put our friend here on top of the things underneath (which would usually be stacked above)
-                    z: 1000
-                    Layout.minimumHeight: width * 0.6
-                    Layout.maximumHeight: width * 0.6
-                    icon.name: "application-menu"
-                    // TODO Reenable this for properly we re-add the ability to have more plaground modules
-                    visible: applicationWindow().playGrids.count > 2
-                    Rectangle {
-                        id: slideDelegateIconMask
+                Item {
+                    anchors {
+                        top: settingsPopup.top
+                        left: settingsPopup.right
+                        leftMargin: Kirigami.Units.largeSpacing
+                        bottom: settingsPopup.bottom
+                    }
+                    width: component.width - settingsPopup.width - settingsPopup.x - Kirigami.Units.largeSpacing * 4
+                    visible: settingsPopup.visible && gridSettingsPopup.item !== null
+                    Zynthian.Card {
+                        anchors.fill: parent
+                    }
+                    Loader {
+                        id: gridSettingsPopup
                         anchors {
                             fill: parent
-                            margins: Kirigami.Units.largeSpacing
+                            margins: Kirigami.Units.largeSpacing * 2
                         }
-                        radius: width / 2
-                        visible: false
+                        sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
                     }
-                    MouseArea {
-                        // A touch hacky, but we can't really depend on everybody telling us that we've lost focus, so... block out everything instead and demand taps
-                        x: 0; y: 0; height: component.height; width: component.width;
-                        visible: settingsPopup.visible
-                        onClicked: {
-                            settingsPopup.visible = false;
+                }
+                Zynthian.Dialog {
+                    id: settingsDialog
+                    visible: false
+                    title: qsTr("%1 Settings").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ")
+                    modal: true
+                    width: component.width - Kirigami.Units.largeSpacing * 4
+                    height: component.height - Kirigami.Units.largeSpacing * 4
+                    x: Kirigami.Units.largeSpacing
+                    y: Kirigami.Units.largeSpacing
+
+                    header: ColumnLayout {
+                        Kirigami.Heading {
+                            Layout.fillWidth: true
+                            Layout.margins: Kirigami.Units.smallSpacing
+                            level: 2
+                            text: settingsDialog.title
+                        }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: 1
+                            Layout.maximumHeight: 1
+                            opacity: 0.3
+                            color: Kirigami.Theme.textColor
                         }
                     }
-                    Item {
-                        anchors {
-                            top: settingsPopup.top
-                            left: settingsPopup.right
-                            leftMargin: Kirigami.Units.largeSpacing
-                            bottom: settingsPopup.bottom
-                        }
-                        width: component.width - settingsPopup.width - settingsPopup.x - Kirigami.Units.largeSpacing * 4
-                        visible: settingsPopup.visible && gridSettingsPopup.item !== null
-                        Zynthian.Card {
-                            anchors.fill: parent
-                        }
-                        Loader {
-                            id: gridSettingsPopup
-                            anchors {
-                                fill: parent
-                                margins: Kirigami.Units.largeSpacing * 2
+                    footer: Zynthian.ActionBar {
+                        Layout.fillWidth: true
+                        currentPage: Item {
+                            property QtObject backAction: Kirigami.Action {
+                                text: "Back"
+                                onTriggered: {
+                                    settingsDialog.visible = false;
+                                }
                             }
-                            sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
+                            property list<QtObject> contextualActions
+                        }
+                    }
+
+                    contentItem: Loader {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.settings ? playGridStack.currentPlayGridItem.settings : null
+                    }
+                }
+                Item {
+                    id: settingsPopup
+                    visible: false
+                    anchors {
+                        left: parent.right
+                        leftMargin: 8
+                        top: parent.top
+                        topMargin: -8
+                    }
+                    height: controlsPanel.height / 2
+                    width: component.width / 3
+                    Zynthian.Card {
+                        anchors.fill: parent
+                    }
+                    onVisibleChanged: {
+                        playGridSwitcher.visible = false;
+                    }
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: 0
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: settingsButton.width
+                            Layout.maximumHeight: settingsButton.width
+                            icon.name: "view-grid-symbolic"
+                            text: "Switch Playgrid"
+                            display: QQC2.AbstractButton.TextBesideIcon
+                            onClicked: {
+                                playGridSwitcher.visible = !playGridSwitcher.visible;
+                            }
+                            Kirigami.Icon {
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                    margins: Kirigami.Units.smallSpacing
+                                }
+                                width: height
+                                source: "arrow-right"
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: settingsButton.width
+                            Layout.maximumHeight: settingsButton.width
+                            icon.name: "view-fullscreen"
+                            text: "Toggle Full Screen"
+                            display: QQC2.AbstractButton.TextBesideIcon
+                            onClicked: {
+                                settingsPopup.visible = false;
+                                applicationWindow().controlsVisible = !applicationWindow().controlsVisible;
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: settingsButton.width
+                            Layout.maximumHeight: settingsButton.width
+                            icon.name: "get-hot-new-stuff"
+                            text: "Get More Playgrids..."
+                            display: QQC2.AbstractButton.TextBesideIcon
+                            onClicked: {
+                                settingsPopup.visible = false;
+                                zynqtgui.show_modal("playgrid_downloader");
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.minimumHeight: settingsButton.width
+                            Layout.maximumHeight: settingsButton.width
+                            icon.name: "configure"
+                            text: "More Settings..."
+                            display: QQC2.AbstractButton.TextBesideIcon
+                            onClicked: {
+                                settingsPopup.visible = false;
+                                settingsDialog.visible = true;
+                            }
                         }
                     }
                     Item {
-                        id: settingsPopup
+                        id: playGridSwitcher
                         visible: false
                         anchors {
                             left: parent.right
-                            leftMargin: 8
+                            leftMargin: -Kirigami.Units.largeSpacing
                             top: parent.top
-                            topMargin: -8
+                            topMargin:Kirigami.Units.largeSpacing
                         }
-                        height: controlsPanel.height / 2
+                        height: playGridSwitcherRepeater.count * settingsButton.width
                         width: component.width / 3
                         Zynthian.Card {
                             anchors.fill: parent
                         }
-                        onVisibleChanged: {
-                            playGridSwitcher.visible = false;
-                        }
                         ColumnLayout {
-                            anchors.fill: parent
+                            anchors.fill: parent;
                             spacing: 0
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.minimumHeight: settingsButton.width
-                                Layout.maximumHeight: settingsButton.width
-                                icon.name: "view-grid-symbolic"
-                                text: "Switch Playgrid"
-                                display: QQC2.AbstractButton.TextBesideIcon
-                                onClicked: {
-                                    playGridSwitcher.visible = !playGridSwitcher.visible;
-                                }
-                                Kirigami.Icon {
-                                    anchors {
-                                        top: parent.top
-                                        right: parent.right
-                                        bottom: parent.bottom
-                                        margins: Kirigami.Units.smallSpacing
-                                    }
-                                    width: height
-                                    source: "arrow-right"
-                                }
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.minimumHeight: settingsButton.width
-                                Layout.maximumHeight: settingsButton.width
-                                icon.name: "view-fullscreen"
-                                text: "Toggle Full Screen"
-                                display: QQC2.AbstractButton.TextBesideIcon
-                                onClicked: {
-                                    settingsPopup.visible = false;
-                                    applicationWindow().controlsVisible = !applicationWindow().controlsVisible;
-                                }
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.minimumHeight: settingsButton.width
-                                Layout.maximumHeight: settingsButton.width
-                                icon.name: "get-hot-new-stuff"
-                                text: "Get More Playgrids..."
-                                display: QQC2.AbstractButton.TextBesideIcon
-                                onClicked: {
-                                    settingsPopup.visible = false;
-                                    zynqtgui.show_modal("playgrid_downloader");
-                                }
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.minimumHeight: settingsButton.width
-                                Layout.maximumHeight: settingsButton.width
-                                icon.name: "configure"
-                                text: "More Settings..."
-                                display: QQC2.AbstractButton.TextBesideIcon
-                                onClicked: {
-                                    settingsPopup.visible = false;
-                                    settingsDialog.visible = true;
-                                }
-                            }
-                        }
-                        Item {
-                            id: playGridSwitcher
-                            visible: false
-                            anchors {
-                                left: parent.right
-                                leftMargin: -Kirigami.Units.largeSpacing
-                                top: parent.top
-                                topMargin:Kirigami.Units.largeSpacing
-                            }
-                            height: playGridSwitcherRepeater.count * settingsButton.width
-                            width: component.width / 3
-                            Zynthian.Card {
-                                anchors.fill: parent
-                            }
-                            ColumnLayout {
-                                anchors.fill: parent;
-                                spacing: 0
-                                Repeater {
-                                    id: playGridSwitcherRepeater
-                                    model: Zynthbox.PlayGridManager.playgrids
-                                    delegate: QQC2.Button {
-                                        Layout.fillWidth: true
-                                        Layout.minimumHeight: settingsButton.width
-                                        Layout.maximumHeight: settingsButton.width
-                                        property Item relevantPlaygrid: applicationWindow().playGrids.itemAt(index) ? applicationWindow().playGrids.itemAt(index).item : null
-                                        text: relevantPlaygrid ? relevantPlaygrid.name : ""
-                                        icon.name: relevantPlaygrid ? relevantPlaygrid.icon : "view-grid-symbolic"
-                                        display: QQC2.AbstractButton.TextBesideIcon
-                                        onClicked: {
-                                            settingsPopup.visible = false;
-                                            Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", index);
-                                        }
+                            Repeater {
+                                id: playGridSwitcherRepeater
+                                model: Zynthbox.PlayGridManager.playgrids
+                                delegate: QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: settingsButton.width
+                                    Layout.maximumHeight: settingsButton.width
+                                    property Item relevantPlaygrid: applicationWindow().playGrids.itemAt(index) ? applicationWindow().playGrids.itemAt(index).item : null
+                                    text: relevantPlaygrid ? relevantPlaygrid.name : ""
+                                    icon.name: relevantPlaygrid ? relevantPlaygrid.icon : "view-grid-symbolic"
+                                    display: QQC2.AbstractButton.TextBesideIcon
+                                    onClicked: {
+                                        settingsPopup.visible = false;
+                                        Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", index);
                                     }
                                 }
                             }
                         }
                     }
-                    Row {
-                        anchors {
-                            top: parent.top
-                            left: parent.right
-                            bottom: parent.bottom
-                        }
-                        width: applicationWindow().playGrids.count * settingsButton.width
-                        spacing: 0
-                        visible: settingsSlidePoint.pressed && settingsTouchArea.xChoice > 0
-                        Repeater {
-                            model: applicationWindow().playGrids.count
-                            delegate: Item {
-                                id: slideDelegate
-                                property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
-                                property var playGrid: applicationWindow().playGrids.itemAt(index).item
-                                property int labelRotation: 45
-                                width: settingsButton.width
-                                height: width
+                }
+                Row {
+                    anchors {
+                        top: parent.top
+                        left: parent.right
+                        bottom: parent.bottom
+                    }
+                    width: applicationWindow().playGrids.count * settingsButton.width
+                    spacing: 0
+                    visible: settingsSlidePoint.pressed && settingsTouchArea.xChoice > 0
+                    Repeater {
+                        model: applicationWindow().playGrids.count
+                        delegate: Item {
+                            id: slideDelegate
+                            property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
+                            property var playGrid: applicationWindow().playGrids.itemAt(index).item
+                            property int labelRotation: 45
+                            width: settingsButton.width
+                            height: width
+                            Rectangle {
+                                id: slideDelegateBackground
+                                anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.smallSpacing
+                                }
+                                radius: width / 2
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                border {
+                                    width: 1
+                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                }
+                                color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                            }
+                            Kirigami.Icon {
+                                anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.largeSpacing
+                                }
+                                source: playGrid.icon
+                                layer.enabled: true
+                                layer.effect: OpacityMask {
+                                    maskSource: slideDelegateIconMask
+                                }
+                            }
+                            Item {
+                                anchors {
+                                    left: parent.horizontalCenter
+                                    verticalCenter: parent.verticalCenter
+                                }
+                                width: parent.width / 2 + Kirigami.Units.smallSpacing
+                                transformOrigin: Item.Left
+                                rotation: slideDelegate.labelRotation
                                 Rectangle {
-                                    id: slideDelegateBackground
                                     anchors {
-                                        fill: parent
-                                        margins: Kirigami.Units.smallSpacing
+                                        fill: slideDelegateLabel
+                                        margins: -Kirigami.Units.smallSpacing
                                     }
-                                    radius: width / 2
-                                    Kirigami.Theme.inherit: false
-                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                    border {
-                                        width: 1
-                                        color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
-                                    }
-                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                    radius: height / 2
+                                    color: slideDelegateBackground.color
                                 }
-                                Kirigami.Icon {
+                                QQC2.Label {
+                                    id: slideDelegateLabel
                                     anchors {
-                                        fill: parent
-                                        margins: Kirigami.Units.largeSpacing
-                                    }
-                                    source: playGrid.icon
-                                    layer.enabled: true
-                                    layer.effect: OpacityMask {
-                                        maskSource: slideDelegateIconMask
-                                    }
-                                }
-                                Item {
-                                    anchors {
-                                        left: parent.horizontalCenter
                                         verticalCenter: parent.verticalCenter
+                                        left: parent.right
                                     }
-                                    width: parent.width / 2 + Kirigami.Units.smallSpacing
-                                    transformOrigin: Item.Left
-                                    rotation: slideDelegate.labelRotation
-                                    Rectangle {
-                                        anchors {
-                                            fill: slideDelegateLabel
-                                            margins: -Kirigami.Units.smallSpacing
-                                        }
-                                        radius: height / 2
-                                        color: slideDelegateBackground.color
-                                    }
-                                    QQC2.Label {
-                                        id: slideDelegateLabel
-                                        anchors {
-                                            verticalCenter: parent.verticalCenter
-                                            left: parent.right
-                                        }
-                                        text: slideDelegate.playGrid.name
-                                        color: slideDelegateBackground.border.color
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    function getYChoice() {
-                        var choice = 0;
-                        if (settingsSlidePoint.pressed) {
-                            choice = Math.floor(settingsSlidePoint.y / settingsButton.height);
-                        }
-                        return choice;
-                    }
-                    function getXChoice() {
-                        var choice = 0;
-                        if (settingsSlidePoint.pressed) {
-                            choice = Math.floor(settingsSlidePoint.x / settingsButton.width);
-                        }
-                        return choice;
-                    }
-                    MultiPointTouchArea {
-                        id: settingsTouchArea
-                        anchors.fill: parent
-                        touchPoints: [ TouchPoint { id: settingsSlidePoint; } ]
-                        property int xChoice
-                        property int yChoice
-                        onPressed: {
-                            if (settingsSlidePoint.pressed) {
-                                xChoice = settingsButton.getXChoice();
-                                yChoice = settingsButton.getYChoice();
-                                parent.focus = true;
-                                parent.down = true;
-                                if (sidebarLoader.item) {
-                                    // This looks odd - it steals focus from anything /inside/ the bar that has focus (such as a popup menu that might want hiding)
-                                    sidebarLoader.item.focus = true;
-                                }
-                            }
-                        }
-                        onUpdated: {
-                            if (settingsSlidePoint.pressed) {
-                                xChoice = settingsButton.getXChoice();
-                                yChoice = settingsButton.getYChoice();
-                            }
-                        }
-                        onReleased: {
-                            if (!settingsSlidePoint.pressed) {
-                                parent.down = false;
-                                if (xChoice === 0 && yChoice === 0) {
-                                    // Then it we just had a tap
-                                    settingsPopup.visible = !settingsPopup.visible
-                                } else if (xChoice === 0 && yChoice !== 0) {
-                                    switch (yChoice) {
-                                        case -1:
-                                            // Enable the swipey manipulation on the grids
-                                            break;
-                                        case -2:
-                                            // Disable the swipy manipulation on the grids
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                } else if (yChoice === 0 && xChoice !== 0) {
-                                    if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
-                                        Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", xChoice - 1);
-                                    }
+                                    text: slideDelegate.playGrid.name
+                                    color: slideDelegateBackground.border.color
                                 }
                             }
                         }
                     }
                 }
+                function getYChoice() {
+                    var choice = 0;
+                    if (settingsSlidePoint.pressed) {
+                        choice = Math.floor(settingsSlidePoint.y / settingsButton.height);
+                    }
+                    return choice;
+                }
+                function getXChoice() {
+                    var choice = 0;
+                    if (settingsSlidePoint.pressed) {
+                        choice = Math.floor(settingsSlidePoint.x / settingsButton.width);
+                    }
+                    return choice;
+                }
+                MultiPointTouchArea {
+                    id: settingsTouchArea
+                    anchors.fill: parent
+                    touchPoints: [ TouchPoint { id: settingsSlidePoint; } ]
+                    property int xChoice
+                    property int yChoice
+                    onPressed: {
+                        if (settingsSlidePoint.pressed) {
+                            xChoice = settingsButton.getXChoice();
+                            yChoice = settingsButton.getYChoice();
+                            parent.focus = true;
+                            parent.down = true;
+                            if (sidebarLoader.item) {
+                                // This looks odd - it steals focus from anything /inside/ the bar that has focus (such as a popup menu that might want hiding)
+                                sidebarLoader.item.focus = true;
+                            }
+                        }
+                    }
+                    onUpdated: {
+                        if (settingsSlidePoint.pressed) {
+                            xChoice = settingsButton.getXChoice();
+                            yChoice = settingsButton.getYChoice();
+                        }
+                    }
+                    onReleased: {
+                        if (!settingsSlidePoint.pressed) {
+                            parent.down = false;
+                            if (xChoice === 0 && yChoice === 0) {
+                                // Then it we just had a tap
+                                settingsPopup.visible = !settingsPopup.visible
+                            } else if (xChoice === 0 && yChoice !== 0) {
+                                switch (yChoice) {
+                                    case -1:
+                                        // Enable the swipey manipulation on the grids
+                                        break;
+                                    case -2:
+                                        // Disable the swipy manipulation on the grids
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else if (yChoice === 0 && xChoice !== 0) {
+                                if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && Zynthbox.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
+                                    Zynthbox.PlayGridManager.setCurrentPlaygrid("playgrid", xChoice - 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Kirigami.Separator {
+                visible: settingsButton.visible
+                Layout.fillWidth: true;
+                Layout.fillHeight: true;
+            }
 
-                Loader {
-                    id: sidebarLoader
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.sidebar ? playGridStack.currentPlayGridItem.sidebar : defaultSidebar
-                }
+            Loader {
+                id: sidebarLoader
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.sidebar ? playGridStack.currentPlayGridItem.sidebar : defaultSidebar
             }
         }
 

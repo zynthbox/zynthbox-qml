@@ -137,17 +137,19 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                     break;
                 case "SELECT_UP":
-                    if (zynqtgui.altButtonPressed || zynqtgui.modeButtonPressed) {
-                        _private.octaveUp();
-                    } else {
+                    if (zynqtgui.modeButtonPressed) {
                         _private.nextBar();
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                    } else {
+                        _private.octaveUp();
                     }
                     break;
                 case "SELECT_DOWN":
-                    if (zynqtgui.altButtonPressed || zynqtgui.modeButtonPressed) {
-                        _private.octaveDown();
-                    } else {
+                    if (zynqtgui.modeButtonPressed) {
                         _private.previousBar();
+                        zynqtgui.ignoreNextModeButtonPress = true;
+                    } else {
+                        _private.octaveDown();
                     }
                     break;
                 case "NAVIGATE_LEFT":
@@ -403,10 +405,9 @@ Zynthian.BasePlayGrid {
         }
 
         function octaveUp() {
-            let numberOfMoves = 1;
-            if (zynqtgui.modeButtonPressed) {
-                numberOfMoves = 3;
-                zynqtgui.ignoreNextModeButtonPress = true;
+            let numberOfMoves = 3;
+            if (zynqtgui.altButtonPressed) {
+                numberOfMoves = 1;
             }
             for (let moveNumber = 0; moveNumber < numberOfMoves; ++moveNumber) {
                 // Don't scroll past the end
@@ -418,10 +419,9 @@ Zynthian.BasePlayGrid {
             }
         }
         function octaveDown() {
-            let numberOfMoves = 1;
-            if (zynqtgui.modeButtonPressed) {
-                numberOfMoves = 3;
-                zynqtgui.ignoreNextModeButtonPress = true;
+            let numberOfMoves = 3;
+            if (zynqtgui.altButtonPressed) {
+                numberOfMoves = 1;
             }
             for (let moveNumber = 0; moveNumber < numberOfMoves; ++moveNumber) {
                 // Don't scroll past the end
@@ -2381,7 +2381,6 @@ Zynthian.BasePlayGrid {
             ColumnLayout {
                 id: sidebarRoot
                 anchors.fill: parent
-                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -2398,6 +2397,23 @@ Zynthian.BasePlayGrid {
                         : "(no\nsequ\nence)"
                     onClicked: {
                         component.showPatternsMenu();
+                    }
+                    Kirigami.Icon {
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                        }
+                        height: parent.width * 0.3
+                        width: height
+                        source: "player-volume"
+                        Rectangle {
+                            visible: _private.activePatternModel ? !_private.activePatternModel.enabled : false
+                            anchors.centerIn: parent
+                            rotation: 45
+                            width: parent.width
+                            height: Kirigami.Units.smallSpacing
+                            color: "red"
+                        }
                     }
                 }
 
@@ -2427,7 +2443,7 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     text: "Note:\n" + (component.heardNotes.length > 0
                         ? Zynthbox.Chords.symbol(component.heardNotes, _private.workingPatternModel.scaleKey, _private.workingPatternModel.pitchKey, _private.workingPatternModel.octaveKey, "\n—\n")
                         : "(all)")

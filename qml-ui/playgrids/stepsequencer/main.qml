@@ -309,14 +309,18 @@ Zynthian.BasePlayGrid {
             interval: 1;
             onTriggered: {
                 if (_private.activePatternModel) {
-                    _private.associatedChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.sketchpadTrack);
+                    let newChannel = zynqtgui.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.sketchpadTrack);
+                    if (_private.associatedChannel != newChannel) {
+                        // When switching tracks, clear our whatever you're listening to, otherwise things end up very strange...
+                        // But, only do that when actually *switching* channels, not just when doing other stuff...
+                        component.noteListeningActivations = 0;
+                        component.noteListeningNotes = [];
+                        component.noteListeningVelocities = [];
+                        component.heardNotes = [];
+                        component.heardVelocities = [];
+                    }
+                    _private.associatedChannel = newChannel;
                     _private.associatedChannelIndex =  _private.activePatternModel.sketchpadTrack;
-                    // When switching tracks, clear our whatever you're listening to, otherwise things end up very strange...
-                    component.noteListeningActivations = 0;
-                    component.noteListeningNotes = [];
-                    component.noteListeningVelocities = [];
-                    component.heardNotes = [];
-                    component.heardVelocities = [];
                     Qt.callLater(_private.updateUniqueCurrentRowNotes)
                 } else {
                     _private.updateChannel();

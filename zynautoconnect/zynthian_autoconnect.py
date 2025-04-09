@@ -619,6 +619,7 @@ def audio_autoconnect(force=False):
                 channel = song.channelsModel.getChannel(channelId)
                 channelAudioLevelsInputPorts = jclient.get_ports(f"AudioLevels:Channel{channelId + 1}-", is_audio=True, is_input=True)
                 laneHasInput = [False] * 5; # needs to be lane-bound, to ensure we don't disconnect just because we end up without a thing later
+                sketchLaneHasInput = [False] * 5; # needs to be lane-bound, to ensure we don't disconnect just because we end up without a thing later
                 if channel is not None:
                     channelSynthRoutingData = channel.synthRoutingData
                     channelFxRoutingData = channel.fxRoutingData
@@ -662,7 +663,7 @@ def audio_autoconnect(force=False):
                         loopSample = channel.clips[laneId].getClip(zynthian_gui_config.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                         if loopSample and loopSample.audioSource is not None:
                             # Connect sampler ports if there's a loop in the given slot
-                            if (laneHasInput[channelInputLanes[laneId]] == False): laneHasInput[channelInputLanes[laneId]] = True
+                            if (sketchLaneHasInput[channelInputLanes[laneId]] == False): sketchLaneHasInput[channelInputLanes[laneId]] = True
                             # logging.info(f"Connecting {samplerOutputPorts} to {sketchLaneInputs}")
                             for port in zip(samplerOutputPorts, sketchLaneInputs):
                                 # Make sure this is the only connection we've got
@@ -794,17 +795,17 @@ def audio_autoconnect(force=False):
                         portsToConnect = globalPlaybackInputPorts + channelAudioLevelsInputPorts
                         # In standard routing mode, any fx on the channel should result in routing to the first slot with an fx - if there are no fx in the track, route it to global out
                         if channel.trackRoutingStyle == "standard":
-                            for index, fxlayer in enumerate(channel.chainedFx):
+                            for index, fxlayer in enumerate(channel.chainedSketchFx):
                                 if fxlayer is not None:
                                     portsToConnect = jclient.get_ports(f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-sketch-input", is_audio=True, is_output=False, is_input=True)
                                     break
                         # In one-to-one mode, check if the matching fx slot for a sound slot has an effect in it, and if there is one, route to it - if there is not one, route it to global out
                         elif channel.trackRoutingStyle == "one-to-one":
-                            if channel.chainedFx[laneId] is not None:
+                            if channel.chainedSketchFx[laneId] is not None:
                                 portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId] + 1}:Channel{channelId + 1}-sketch-input", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(sketchLaneOutputs)):
                             # The order of the ports is uncommonly reversed here, to ensure we can use cycle() without causing trouble
-                            if laneHasInput[channelInputLanes[laneId]]:
+                            if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[1]), get_jack_port_name(port[0]))
                         # END Connect sketch lane to its relevant FX or GlobalPlayback input port (or disconnect if there's no audio input)
                         # BEGIN Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
@@ -835,22 +836,22 @@ def audio_autoconnect(force=False):
                         sketchLaneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
                         sketchLaneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
                         for port in zip(sketchLaneOutputsFx1, channelAudioLevelsInputPorts):
-                            if laneHasInput[channelInputLanes[laneId]]:
+                            if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                             else:
                                 zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(sketchLaneOutputsFx2, channelAudioLevelsInputPorts):
-                            if laneHasInput[channelInputLanes[laneId]]:
+                            if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                             else:
                                 zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(sketchLaneOutputsFx1, globalFx1InputPorts):
-                            if laneHasInput[channelInputLanes[laneId]]:
+                            if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                             else:
                                 zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(sketchLaneOutputsFx2, globalFx2InputPorts):
-                            if laneHasInput[channelInputLanes[laneId]]:
+                            if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                             else:
                                 zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -1004,6 +1005,155 @@ def audio_autoconnect(force=False):
                                             # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
                     ### END Connect TrackPassthrough to GlobalPlayback and AudioLevels via FX
+                    ### BEGIN Connect TrackPassthrough sketch ports to GlobalPlayback and AudioLevels via FX
+                    logging.debug(f"# Channel{channelId+1} sketch effects port connections :")
+
+                    # Create a list of lists of ports to be connected in order, dependent on routing style
+                    # For serial ("standard"): Single entry containing (Fx1, Fx2, Fx3, Fx4, Fx5, GlobalPlayback)
+                    # one-to-one: An entry per clip, entries contain the FXPassthrough lane for the equivalent clip, and GlobalPlayback. For example: (Fx1, GlobalPlayback), (Fx2, GlobalPlayback), (Fx3, GlobalPlayback)...
+                    # Only add an fx entry to the list if the slot is occupied (an fx entry consists of two clients: the fx passthrough, and the fx jack client itself)
+                    # Only add GlobalPlayback to the list if the list is not empty
+                    # Only add the individual list to the processing list if it is not empty
+                    # Further, if there are any overrides set on that slot, use those instead:
+                    #   - standard-routing:(left, right, both)
+                    #   - no-input (explicitly refuse audio input)
+                    #   - external:(left, right, both)
+                    #   - internal-master:(left, right, both)
+                    #   - sketchpadTrack:(trackindex):(dry0, dry1, dry2, dry3, dry4, ):(left,right,both)
+                    #   - fxSlot:(trackindex):(dry0, wet0, dry1, wet1, dry2, wet2, dry3, wet3, dry4, wet4):(left,right,both)
+                    # TODO Implement overrides
+                    process_list = []
+
+                    if channel.trackRoutingStyle == "standard":
+                        # The order should be FXPassthrough + FX layers in order -> global playback / Audio levels
+                        # If there are FX in chain, then there will be 2 clients per FX, i.e. one FX Passthrough and the actual FX client
+
+                        fx_client_names = []
+                        # Create a set of client names for each FX in channel
+                        # The FX Passthrough should be placed first and then the fx client name
+                        for index, fxlayer in enumerate(channel.chainedSketchFx):
+                            if fxlayer is not None:
+                                fx_client_names = fx_client_names + [f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-sketch-", fxlayer.get_jackname()]
+
+                        # Create final client names list, with the client names as it should be connected in order,
+                        # and only add that list to the process list if there are actually any effects in the list
+                        if len(fx_client_names) > 0:
+                            lane_client_names = fx_client_names + ["GlobalPlayback"]
+                            process_list.append(lane_client_names)
+                    elif channel.trackRoutingStyle == "one-to-one":
+                        for laneId in range(0, 5):
+                            fxlayer = channel.chainedSketchFx[laneId]
+                            if fxlayer is not None:
+                                lane_client_names = [f"FXPassthrough-lane{laneId + 1}:Channel{channel.id + 1}-sketch-", fxlayer.get_jackname(), "GlobalPlayback"]
+                                process_list.append(lane_client_names)
+
+                    # logging.info(f"# Output client names : {process_list}")
+
+                    # Disconnect any existing connections to and from from the fx layers audio ports
+                    for index, fxlayer in enumerate(channel.chainedSketchFx):
+                        if fxlayer is not None:
+                            fx_in_ports = jclient.get_ports(fxlayer.get_jackname(), is_audio=True)
+                            for fx_in_port in fx_in_ports:
+                                for connectedTo in zbjack.getAllConnections(get_jack_port_name(fx_in_port)):
+                                    zbjack.disconnectPorts(get_jack_port_name(fx_in_port), connectedTo)
+
+                    for output_client_names in process_list:
+                        # logging.info(f"## Processing list {output_client_names}")
+                        output_client_names_count = len(output_client_names)
+                        for (index, client_name) in enumerate(output_client_names):
+                            # logging.info(f"## Processing client : {client_name}")
+                            # The last client is global playback and consequently does not need to be processed
+                            # This will create a two scenarios based if FX clients are connected:
+                            #    Scenario 1 : There are no FX in channel
+                            #                 Then the final client list would be empty
+                            #    Scenario 2 : There is one or more FX Client
+                            #                 Then the final client list would be : [FXPassthrough-laneY:ChannelX -> FX](There will be a set of passthrough + fx for each fx client) -> GlobalPlayback
+                            # In any of the scenarios the last port, GlobalPlayback, does not need to be connected to anything else. Hence do not process GlobalPlayback
+                            # For all other clients, check if the client is an FXPassthrough.
+                            # If the client is not a FXPassthrough, then it means it can either be a TrackPassthrough or an FX. So connect it's output to the next client
+                            # If the client is an FXPassthrough then it means the next client is FX and the next to next client can either be another passthrough or GlobalPlayback (does not matter as the logic is same for both). In that case connect dry ports to next to next client and wet ports to the fx for dry/wet mix to actually work like it should
+                            # When connecting ports check if the port is getting connected to GlobalPlayback. If it is getting connected to GlobalPlayback then connect the same port to AudioLevels too of the channel being processed for the AudioLevel meter to work
+
+                            # The last client can either be an FX or the TrackPassthrough if there are no FX.
+                            # For both cases, it should be connected to AudioLevels and GlobalPlayback as it is the end node
+
+                            if index == output_client_names_count - 1:
+                                # The last port, GlobalPlayback, does not need to be connected to anything else. Hence do not process GlobalPlayback
+                                pass
+                            else:
+                                # If the client that is being processed is not the last client,
+                                # that means this client is either TrackPassthrough, or FXPassthrough or FX itself.
+
+                                # If the client that is being processed is a passthrough then connect the dryOutput to the
+                                # next to next client so that the dry output is passed on the the next in line FX or Global Playback
+
+                                # If the client that is being processed is TrackPassthrough or an FX then just connect it to the
+                                # next in line client
+
+                                if client_name.startswith("FXPassthrough"):
+                                    # Client being processed is an FXPassthrough client
+                                    # It means that the next client is FX and the next to next client can either be another passthrough or GlobalPlayback (does not matter as the logic is same for both).
+                                    # In that case connect dry ports to next to next client and wet ports to the fx for dry/wet mix to actually work like it should
+
+                                    # Connect this client to the next client in list
+                                    dry_out_ports = jclient.get_ports(client_name + "dryOut", is_audio=True, is_output=True)
+                                    wet_out_ports = jclient.get_ports(client_name + "wetOutFx1", is_audio=True, is_output=True)
+                                    next_in_ports = jclient.get_ports(output_client_names[index+1], is_audio=True, is_input=True)
+                                    next_next_in_ports = jclient.get_ports(output_client_names[index+2], is_audio=True, is_input=True)
+
+                                    # If input/output is mono, make to connect to stereo input/output.
+                                    if len(dry_out_ports) == 1:
+                                        dry_out_ports = [dry_out_ports[0], dry_out_ports[0]]
+                                    if len(wet_out_ports) == 1:
+                                        wet_out_ports = [wet_out_ports[0], wet_out_ports[0]]
+                                    if len(next_in_ports) == 1:
+                                        next_in_ports = [next_in_ports[0], next_in_ports[0]]
+                                    if len(next_next_in_ports) == 1:
+                                        next_next_in_ports = [next_next_in_ports[0], next_next_in_ports[0]]
+
+                                    # Connect dry ports to next to next client
+                                    for ports in zip(dry_out_ports, next_next_in_ports):
+                                        # logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                        zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
+                                    # Connect wet ports to FX client which is right next to this client in output_client_names
+                                    for ports in zip(wet_out_ports, next_in_ports):
+                                        # logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                        zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
+                                    # If next to next client is GlobalPlayback then connect the same port to AudioLevels too
+                                    if output_client_names[index+2] == "GlobalPlayback":
+                                        for ports in zip(dry_out_ports, channelAudioLevelsInputPorts):
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
+                                else:
+                                    # This client is not a FXPassthrough, and not the last client in the list, which means it will be an FX. So connect it's output to the next client
+
+                                    # Connect this client to the next client in list
+                                    next_client_name = output_client_names[index+1]
+                                    out_ports = jclient.get_ports(client_name, is_audio=True, is_output=True)
+                                    if len(out_ports) == 1:
+                                        # If output is mono, connect both input to same output.
+                                        out_ports = [out_ports[0], out_ports[0]]
+
+                                    if next_client_name == "GlobalPlayback":
+                                        # Next client is GlobalPlayback then connect the same port to both GlobalPlayback and AudioLevels
+                                        for ports in zip(out_ports, channelAudioLevelsInputPorts):
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
+                                        for ports in zip(out_ports, globalPlaybackInputPorts):
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
+                                    else:
+                                        # Next client is not GlobalPlayback. Connect the ports to next client
+                                        next_in_ports = jclient.get_ports(next_client_name, is_audio=True, is_input=True)
+
+                                        if len(next_in_ports) == 1:
+                                            # If input is mono, connect both output to same input.
+                                            next_in_ports = [next_in_ports[0], next_in_ports[0]]
+
+                                        for ports in zip(out_ports, next_in_ports):
+                                            # logging.info(f"Connecting {ports[0]} to {ports[1]}")
+                                            zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
+                    ### END Connect TrackPassthrough sketch ports to GlobalPlayback and AudioLevels via FX
                     ### BEGIN FX Engine Audio Routing Overrides
                     for laneId in range(0, 5):
                         slotRoutingData = channelFxRoutingData[laneId]

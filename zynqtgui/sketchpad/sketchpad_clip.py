@@ -636,11 +636,12 @@ class sketchpad_clip(QObject):
         self.__slices__ = 16
         self.__enabled__ = False
         self.channel = None
-        self.__lane__ = id
+        # Samples go on lanes 0 through 4, and Sketches go on lanes 5 through 9
+        self.__lane__ = id if is_channel_sample else id + 5
         self.__metadata = sketchpad_clip_metadata(self)
 
-        # Just in case, fix up the lane so it's something sensible (we have five lanes, so...)
-        if self.__lane__ < 0 or self.__lane__ > 4:
+        # Just in case, fix up the lane so it's something sensible. We have ten lanes (one for each slot of sample and sketch), so...
+        if self.__lane__ < 0 or self.__lane__ > 9:
             self.__lane__ = 0
 
         self.__autoStopTimer__ = QTimer()

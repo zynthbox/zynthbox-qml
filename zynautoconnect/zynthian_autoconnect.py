@@ -778,12 +778,12 @@ def audio_autoconnect(force=False):
                         if channel.trackRoutingStyle == "standard":
                             for index, fxlayer in enumerate(channel.chainedFx):
                                 if fxlayer is not None:
-                                    portsToConnect = jclient.get_ports(f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-input", is_audio=True, is_output=False, is_input=True)
+                                    portsToConnect = jclient.get_ports(f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-sound-input", is_audio=True, is_output=False, is_input=True)
                                     break
                         # In one-to-one mode, check if the matching fx slot for a sound slot has an effect in it, and if there is one, route to it - if there is not one, route it to global out
                         elif channel.trackRoutingStyle == "one-to-one":
                             if channel.chainedFx[laneId] is not None:
-                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId] + 1}:Channel{channelId + 1}-input", is_audio=True, is_output=False, is_input=True)
+                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId] + 1}:Channel{channelId + 1}-sound-input", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(laneOutputs)):
                             # The order of the ports is uncommonly reversed here, to ensure we can use cycle() without causing trouble
                             if laneHasInput[channelInputLanes[laneId]]:
@@ -796,12 +796,12 @@ def audio_autoconnect(force=False):
                         if channel.trackRoutingStyle == "standard":
                             for index, fxlayer in enumerate(channel.chainedFx):
                                 if fxlayer is not None:
-                                    portsToConnect = jclient.get_ports(f"FXPassthrough-sketch{index + 1}:Channel{channel.id + 1}-input", is_audio=True, is_output=False, is_input=True)
+                                    portsToConnect = jclient.get_ports(f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-sketch-input", is_audio=True, is_output=False, is_input=True)
                                     break
                         # In one-to-one mode, check if the matching fx slot for a sound slot has an effect in it, and if there is one, route to it - if there is not one, route it to global out
                         elif channel.trackRoutingStyle == "one-to-one":
                             if channel.chainedFx[laneId] is not None:
-                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-sketch{channelInputLanes[laneId] + 1}:Channel{channelId + 1}-input", is_audio=True, is_output=False, is_input=True)
+                                portsToConnect = jclient.get_ports(name_pattern=f"FXPassthrough-lane{channelInputLanes[laneId] + 1}:Channel{channelId + 1}-sketch-input", is_audio=True, is_output=False, is_input=True)
                         for port in zip(portsToConnect, cycle(sketchLaneOutputs)):
                             # The order of the ports is uncommonly reversed here, to ensure we can use cycle() without causing trouble
                             if laneHasInput[channelInputLanes[laneId]]:
@@ -883,7 +883,7 @@ def audio_autoconnect(force=False):
                         # The FX Passthrough should be placed first and then the fx client name
                         for index, fxlayer in enumerate(channel.chainedFx):
                             if fxlayer is not None:
-                                fx_client_names = fx_client_names + [f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-", fxlayer.get_jackname()]
+                                fx_client_names = fx_client_names + [f"FXPassthrough-lane{index + 1}:Channel{channel.id + 1}-sound-", fxlayer.get_jackname()]
 
                         # Create final client names list, with the client names as it should be connected in order,
                         # and only add that list to the process list if there are actually any effects in the list
@@ -894,7 +894,7 @@ def audio_autoconnect(force=False):
                         for laneId in range(0, 5):
                             fxlayer = channel.chainedFx[laneId]
                             if fxlayer is not None:
-                                lane_client_names = [f"FXPassthrough-lane{laneId + 1}:Channel{channel.id + 1}-", fxlayer.get_jackname(), "GlobalPlayback"]
+                                lane_client_names = [f"FXPassthrough-lane{laneId + 1}:Channel{channel.id + 1}-sound-", fxlayer.get_jackname(), "GlobalPlayback"]
                                 process_list.append(lane_client_names)
 
                     # logging.info(f"# Output client names : {process_list}")

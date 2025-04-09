@@ -442,16 +442,22 @@ class sketchpad_channel(QObject):
             self.__synthPassthroughClients.insert(channelIndex, synthPassthrough)
             synthPassthrough.panAmountChanged.connect(lambda theClient=synthPassthrough:handlePassthroughClientPanAmountChanged(theClient))
             synthPassthrough.dryAmountChanged.connect(lambda theClient=synthPassthrough:handlePassthroughClientDryAmountChanged(theClient))
-        self.__trackPassthroughClients = []
+        self.__trackPassthroughClients = [None] * 10
         self.__fxPassthroughClients = []
         self.__sketchFxPassthroughClients = []
         for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-            channelClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.__id__ * 5 + laneId]
-            self.__trackPassthroughClients.insert(laneId, channelClient)
+            channelClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.__id__, 0, laneId)
+            self.__trackPassthroughClients[laneId] = channelClient
             # Make the muted change handler a direct connection so playChannelSolo do not get updated while handling the muted state change
             channelClient.mutedChanged.connect(lambda theClient=channelClient:handlePassthroughClientMutedChanged(theClient), Qt.DirectConnection)
             # channelClient.wetFx1AmountChanged.connect(lambda theClient=channelClient:handlePassthroughClientWetFx1AmountChanged(theClient))
             # channelClient.wetFx2AmountChanged.connect(lambda theClient=channelClient:handlePassthroughClientWetFx2AmountChanged(theClient))
+            channelSketchClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.__id__, 1, laneId)
+            self.__trackPassthroughClients[laneId + 5] = channelSketchClient
+            # Make the muted change handler a direct connection so playChannelSolo do not get updated while handling the muted state change
+            channelSketchClient.mutedChanged.connect(lambda theClient=channelSketchClient:handlePassthroughClientMutedChanged(theClient), Qt.DirectConnection)
+            # channelSketchClient.wetFx1AmountChanged.connect(lambda theClient=channelSketchClient:handlePassthroughClientWetFx1AmountChanged(theClient))
+            # channelSketchClient.wetFx2AmountChanged.connect(lambda theClient=channelSketchClient:handlePassthroughClientWetFx2AmountChanged(theClient))
             fxClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
             self.__fxPassthroughClients.insert(laneId, fxClient)
             fxClient.dryWetMixAmountChanged.connect(lambda theClient=fxClient:handlePassthroughClientDryWetMixAmountChanged(theClient))
@@ -512,7 +518,7 @@ class sketchpad_channel(QObject):
             # Channel passthrough defaults
             # There are five lanes per channel
             passthroughValues = []
-            for i in range(0, 5):
+            for i in range(0, 10):
                 passthroughValues.append({
                     "panAmount": self.__initial_pan__,
                     "dryAmount": 1,
@@ -1640,8 +1646,9 @@ class sketchpad_channel(QObject):
         if self.__muted__ != muted:
             logging.debug(f"$$ Setting muted for Track {self.name} to : {muted}")
             self.__muted__ = muted
-            for laneId in range(0, 5):
-                Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId].setMuted(muted)
+            for slotType in range(0, 2):
+                for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId).setMuted(muted)
             self.mutedChanged.emit()
             Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_MUTED", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, (1 if self.__muted__ == True else 0))
 
@@ -2267,10 +2274,11 @@ class sketchpad_channel(QObject):
 
     @Slot(None)
     def handlePanChanged(self):
-        for laneId in range(0, 5):
-            # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
-            passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.setPanAmount(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"])
+        for slotType in range(0, 2):
+            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
+                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                passthroughClient.setPanAmount(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"])
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"], (-1, 1), (0, 127)))
 
     panChanged = Signal()
@@ -2295,12 +2303,13 @@ class sketchpad_channel(QObject):
     def handleDryAmountChanged(self):
         volume = self.__volume__.gain()
         # Calculate dry amount as per volume
-        for laneId in range(0, 5):
-            # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
-            passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            # dryAmount = self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"]
-            # logging.info(f"Changing channel dry amount for {self.__id__} lane {laneId} from {passthroughClient.dryAmount()} to {dryAmount}")
-            passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] * volume)
+        for slotType in range(0, 2):
+            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
+                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                # dryAmount = self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"]
+                # logging.info(f"Changing channel dry amount for {self.__id__} lane {laneId} from {passthroughClient.dryAmount()} to {dryAmount}")
+                passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] * volume)
 
     dryAmount = Property(float, get_dryAmount, set_dryAmount, notify=dryAmountChanged)
     ### END Property wetFx2Amount
@@ -2325,9 +2334,10 @@ class sketchpad_channel(QObject):
     def handleWetFx1AmountChanged(self):
         # Calculate wet amount as per volume
         volume = self.__volume__.gain()
-        for laneId in range(5):
-            passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
+        for slotType in range(0, 2):
+            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
@@ -2341,7 +2351,7 @@ class sketchpad_channel(QObject):
         if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"] != value or force_set is True:
             # Set same value to all lanes
             # TODO If we want to separate the channel passthrough settings for 1-to-1, we will need to individually set the amounts
-            for laneId in range(5):
+            for laneId in range(10):
                 self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] = value
                 self.wetFx2AmountChanged.emit()
                 if force_set is False:
@@ -2353,9 +2363,10 @@ class sketchpad_channel(QObject):
     def handleWetFx2AmountChanged(self):
         # Calculate wet amount as per volume
         volume = self.__volume__.gain()
-        for laneId in range(0, 5):
-            passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClients()[self.id * 5 + laneId]
-            passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
+        for slotType in range(0, 2):
+            for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
+                passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
     """
     Store wetFx2Amount for current channel as a property and set it to JackPassthrough when value changes

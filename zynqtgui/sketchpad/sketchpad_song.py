@@ -126,7 +126,9 @@ class sketchpad_song(QObject):
         for midiChannel in range(0, 16):
             connectPassthroughClientForSaving(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-            connectPassthroughClientForSaving(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex])
+            for slotType in range(0, 2):
+                for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    connectPassthroughClientForSaving(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 connectPassthroughClientForSaving(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
 
@@ -170,7 +172,9 @@ class sketchpad_song(QObject):
             # Clear all the passthrough clients to default state
             setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
             for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-                setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex])
+                for slotType in range(0, 2):
+                    for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                        setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
                 for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
             for midiChannel in range(0, 16):
@@ -225,8 +229,9 @@ class sketchpad_song(QObject):
             slotData = []
             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 slotData.append(serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex]))
+            track = self.channelsModel.getChannel(trackIndex)
             trackPassthroughClientsData.append({
-                    "trackPassthroughClient": serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex]),
+                    "trackPassthroughClient": serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, 1 if track.trackTypeKey == "sketch" else 0, 0)),
                     "fxPassthroughClients": slotData
                 })
         return {
@@ -415,12 +420,16 @@ class sketchpad_song(QObject):
                         setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
                     if "trackPassthroughClients" in sketchpad:
                         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-                            restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex], sketchpad["trackPassthroughClients"][trackIndex]["trackPassthroughClient"])
+                            for slotType in range(0, 2):
+                                for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                                    restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), sketchpad["trackPassthroughClients"][trackIndex]["trackPassthroughClient"])
                             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                 restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], sketchpad["trackPassthroughClients"][trackIndex]["fxPassthroughClients"][slotIndex])
                     else:
                         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-                            setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClients()[trackIndex])
+                            for slotType in range(0, 2):
+                                for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
                             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                 setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
                     if "synthPassthroughClients" in sketchpad:
@@ -701,14 +710,17 @@ class sketchpad_song(QObject):
             for channel_index in range(self.channelsModel.count):
                 channel = self.channelsModel.getChannel(channel_index)
                 if value == -1:
-                    for laneId in range(0, 5):
-                        Zynthbox.Plugin.instance().trackPassthroughClients()[channel.id * 5 + laneId].setMuted(channel.muted)
+                    for slotType in range(0, 2):
+                        for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                            Zynthbox.Plugin.instance().trackPassthroughClient(channel.id, slotType, laneId).setMuted(channel.muted)
                 elif value == channel.id:
-                    for laneId in range(0, 5):
-                        Zynthbox.Plugin.instance().trackPassthroughClients()[channel.id * 5 + laneId].setMuted(False)
+                    for slotType in range(0, 2):
+                        for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                            Zynthbox.Plugin.instance().trackPassthroughClient(channel.id, slotType, laneId).setMuted(False)
                 else:
-                    for laneId in range(0, 5):
-                        Zynthbox.Plugin.instance().trackPassthroughClients()[channel.id * 5 + laneId].setMuted(True)
+                    for slotType in range(0, 2):
+                        for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                            Zynthbox.Plugin.instance().trackPassthroughClient(channel.id, slotType, laneId).setMuted(True)
 
             if not valueUpdated:
                 self.__play_channel_solo = value

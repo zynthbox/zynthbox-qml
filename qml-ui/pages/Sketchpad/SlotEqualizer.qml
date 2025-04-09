@@ -185,7 +185,7 @@ Zynthian.DialogQuestion {
                                 : slotType === "global"
                                     ? Zynthbox.Plugin.globalPlaybackClient
                                     : slotType === "track"
-                                        ? Zynthbox.Plugin.trackPassthroughClients[selectedChannel.id]
+                                        ? Zynthbox.Plugin.trackPassthroughClient(selectedChannel.id, (selectedChannel.trackTypeKey === "sketch" ? 1 : 0), 0)
                                         : slotType === "synth"
                                             ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
                                             : slotType === "fx"

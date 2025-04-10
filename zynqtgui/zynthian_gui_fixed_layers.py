@@ -85,42 +85,45 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     self.list_data.append((str(i+1),i,"{}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""))))
                 else:
                     self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""), layer.preset_name)))
-                effects_label = ""
-                first = True
-                for sl in self.zynqtgui.screens['layer'].get_fxchain_layers(layer):
-                    sl0 = None
-                    bullet = ""
-                    if sl.is_parallel_audio_routed(sl0):
-                        bullet = " || "
-                    else:
-                        bullet = " -> "
-                    if not first:
-                        effects_label += bullet + sl.engine.get_path(sl).replace("JV/","")
-                    first = False
-                    sl0 = sl
-                first = True
-                for sl in self.zynqtgui.screens['layer'].get_midichain_layers(layer):
-                    sl0 = None
-                    bullet = ""
-                    if sl.is_parallel_midi_routed(sl0):
-                        bullet = " || "
-                    else:
-                        bullet = " -> "
-                    if not first:
-                        effects_label += bullet + sl.engine.get_path(sl).replace("JV/","") + "(m)"
-                    first = False
-                    sl0 = sl
-                metadata["effects_label"] = effects_label
+                # effects_label = ""
+                # first = True
+                # for sl in self.zynqtgui.screens['layer'].get_fxchain_layers(layer):
+                #     sl0 = None
+                #     bullet = ""
+                #     if sl.is_parallel_audio_routed(sl0):
+                #         bullet = " || "
+                #     else:
+                #         bullet = " -> "
+                #     if not first:
+                #         effects_label += bullet + sl.engine.get_path(sl).replace("JV/","")
+                #     first = False
+                #     sl0 = sl
+                # first = True
+                # for sl in self.zynqtgui.screens['layer'].get_midichain_layers(layer):
+                #     sl0 = None
+                #     bullet = ""
+                #     if sl.is_parallel_midi_routed(sl0):
+                #         bullet = " || "
+                #     else:
+                #         bullet = " -> "
+                #     if not first:
+                #         effects_label += bullet + sl.engine.get_path(sl).replace("JV/","") + "(m)"
+                #     first = False
+                #     sl0 = sl
+                # metadata["effects_label"] = effects_label
+                metadata["effects_label"] = ""
             else:
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""
 
             if -1 < i and i < 15:
-                metadata["midi_cloned"] = self.zynqtgui.screens['layer'].is_midi_cloned(i, i+1)
+                # metadata["midi_cloned"] = self.zynqtgui.screens['layer'].is_midi_cloned(i, i+1)
+                # metadata["midi_cloned_to"] = []
+                # for j in range(15):
+                #     if i != j and self.zynqtgui.screens['layer'].is_midi_cloned(i, j):
+                #         metadata["midi_cloned_to"].append(j)
+                metadata["midi_cloned"] = False
                 metadata["midi_cloned_to"] = []
-                for j in range(15):
-                    if i != j and self.zynqtgui.screens['layer'].is_midi_cloned(i, j):
-                        metadata["midi_cloned_to"].append(j)
                 metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
                 metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
                 metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)

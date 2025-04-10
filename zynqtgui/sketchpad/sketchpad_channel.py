@@ -506,14 +506,22 @@ class sketchpad_channel(QObject):
         Zynthbox.MidiRouter.instance().setZynthianSynthKeyzones(self.__chained_sounds__[slotIndex], keyzoneData.keyZoneStart, keyzoneData.keyZoneEnd, keyzoneData.rootNote)
         self.chainedSoundsKeyzonesChanged.emit()
 
+    # If we want to eventually change to having multiple versions
+    # again... this will letus do that without fundamentally
+    # changing anything again
+    def audioTypeSettingsKey(self):
+        return "synth"
+
     def defaultAudioTypeSettings(self):
+        # NOTE: This is old logic, but just keeping it around doesn't really hurt anything, if
+        # we do want to split the settings out again at some point...
         # A set of mixing values for each of the main audio types. The logic being that
         # if you e.g. bounce a thing, you've also recorded the effects, and then playing back
         # that resulting sketch immediately, you'd end up pumping it through the same fx
         # setup, which while it might occasionally be serendipitous in a sound design sense,
         # it would be highly unexpected, and we kind of want to avoid that.
         mixingValues = {}
-        for audioType in ["synth", "sample", "sketch", "external"]:
+        for audioType in ["synth"]:
             audioTypeValues = {}
             # Channel passthrough defaults
             # There are five lanes per channel
@@ -2004,8 +2012,8 @@ class sketchpad_channel(QObject):
         if self.audioTypeKey() == "synth":
             synthIndex = self.chainedSounds[self.selectedSlotRow]
             if synthIndex > -1:
-                knownGain = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
-                knownPan = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
+                knownGain = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][self.selectedSlotRow]["dryAmount"]
+                knownPan = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][self.selectedSlotRow]["panAmount"]
         elif self.audioTypeKey() == "sample":
             sample = self.samples[self.selectedSlotRow]
             if sample.audioSource:
@@ -2022,7 +2030,7 @@ class sketchpad_channel(QObject):
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_SLOT_PAN", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownPan, (-1, 1), (0, 127)))
         knownDryWetMixAmount = 0.0
         if self.chainedFx[self.__selected_fx_slot_row]:
-            knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
+            knownDryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][self.__selected_fx_slot_row]["dryWetMixAmount"]
         Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_FX_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track.CurrentTrack, Zynthbox.ZynthboxBasics.Slot.CurrentSlot, np.interp(knownDryWetMixAmount, (0, 2), (0, 127)))
 
         # TODO : sketchFx
@@ -2253,11 +2261,11 @@ class sketchpad_channel(QObject):
 
     ### BEGIN Property pan
     def get_pan(self):
-        return self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"]
+        return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["panAmount"]
 
     def set_pan(self, pan: float, force_set=False):
-        if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"] != pan or force_set is True:
-            self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"] = pan
+        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["panAmount"] != pan or force_set is True:
+            self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["panAmount"] = pan
             self.panChanged.emit()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -2268,8 +2276,8 @@ class sketchpad_channel(QObject):
             for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
                 passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                passthroughClient.setPanAmount(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"])
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["panAmount"], (-1, 1), (0, 127)))
+                passthroughClient.setPanAmount(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["panAmount"])
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_PAN", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["panAmount"], (-1, 1), (0, 127)))
 
     panChanged = Signal()
 
@@ -2278,11 +2286,11 @@ class sketchpad_channel(QObject):
 
     ### BEGIN Property dryAmount
     def get_dryAmount(self):
-        return self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"]
+        return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"]
 
     def set_dryAmount(self, value, force_set=False):
-        if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] != value or force_set is True:
-            self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] = value
+        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"] != value or force_set is True:
+            self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"] = value
             self.dryAmountChanged.emit()
             if force_set is False:
                 self.__song__.schedule_save()
@@ -2297,23 +2305,23 @@ class sketchpad_channel(QObject):
             for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 # TODO If we want to separate the channel passthrough settings for 1-to-1, the 0 below should be swapped for laneId, and we will need to individually set the amounts
                 passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                # dryAmount = self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"]
+                # dryAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"]
                 # logging.info(f"Changing channel dry amount for {self.__id__} lane {laneId} from {passthroughClient.dryAmount()} to {dryAmount}")
-                passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["dryAmount"] * volume)
+                passthroughClient.dryGainHandler().setGain(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["dryAmount"] * volume)
 
     dryAmount = Property(float, get_dryAmount, set_dryAmount, notify=dryAmountChanged)
     ### END Property wetFx2Amount
 
     ### BEGIN Property wetFx1Amount
     def get_wetFx1Amount(self):
-        return self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"]
+        return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx1Amount"]
 
     def set_wetFx1Amount(self, value, force_set=False):
-        if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"] != value or force_set is True:
+        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx1Amount"] != value or force_set is True:
             # Set same value to all lanes
             # TODO If we want to separate the channel passthrough settings for 1-to-1, we will need to individually set the amounts
             for laneId in range(5):
-                self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] = value
+                self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx1Amount"] = value
                 self.wetFx1AmountChanged.emit()
                 if force_set is False:
                     self.__song__.schedule_save()
@@ -2327,22 +2335,22 @@ class sketchpad_channel(QObject):
         for slotType in range(0, 2):
             for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
+                passthroughClient.wetFx1GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx1Amount"] * volume, (0, 100), (0, 1)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx1Amount"], (0, 1), (0, 127)))
 
     wetFx1Amount = Property(float, get_wetFx1Amount, set_wetFx1Amount, notify=wetFx1AmountChanged)
     ### END Property wetFx1Amount
 
     ### BEGIN Property wetFx2Amount
     def get_wetFx2Amount(self):
-        return self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"]
+        return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx2Amount"]
 
     def set_wetFx2Amount(self, value, force_set=False):
-        if self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"] != value or force_set is True:
+        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx2Amount"] != value or force_set is True:
             # Set same value to all lanes
             # TODO If we want to separate the channel passthrough settings for 1-to-1, we will need to individually set the amounts
             for laneId in range(10):
-                self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] = value
+                self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx2Amount"] = value
                 self.wetFx2AmountChanged.emit()
                 if force_set is False:
                     self.__song__.schedule_save()
@@ -2356,8 +2364,8 @@ class sketchpad_channel(QObject):
         for slotType in range(0, 2):
             for laneId in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 passthroughClient = Zynthbox.Plugin.instance().trackPassthroughClient(self.id, slotType, laneId)
-                passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
-        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
+                passthroughClient.wetFx2GainHandler().setGain(np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][laneId]["wetFx2Amount"] * volume, (0, 100), (0, 1)))
+        Zynthbox.MidiRouter.instance().cuiaEventFeedback("SET_TRACK_SEND1_AMOUNT", -1, Zynthbox.ZynthboxBasics.Track(self.__id__), Zynthbox.ZynthboxBasics.Slot.AnySlot, np.interp(self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["wetFx2Amount"], (0, 1), (0, 127)))
     """
     Store wetFx2Amount for current channel as a property and set it to JackPassthrough when value changes
     Stored value ranges from 0-100 and accepted range by setWetFx2Amount is 0-1
@@ -2368,7 +2376,7 @@ class sketchpad_channel(QObject):
     ### BEGIN Passthrough properties
     @Slot(str, int, str, float)
     def set_passthroughValue(self, passthroughKey:str, laneIndex:int, valueType:str, newValue:float):
-        self.__audioTypeSettings__[self.audioTypeKey()][passthroughKey][laneIndex][valueType] = newValue
+        self.__audioTypeSettings__[self.audioTypeSettingsKey()][passthroughKey][laneIndex][valueType] = newValue
         if passthroughKey == "synthPassthrough":
             self.synthPassthroughMixingChanged.emit()
             if valueType == "dryAmount":
@@ -2394,8 +2402,8 @@ class sketchpad_channel(QObject):
         for laneId in range(0, 5):
             if self.__chained_sounds__[laneId] > -1:
                 synthPassthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[self.__chained_sounds__[laneId]]
-                panAmount = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][laneId]["panAmount"]
-                dryAmount = self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][laneId]["dryAmount"]
+                panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][laneId]["panAmount"]
+                dryAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][laneId]["dryAmount"]
                 # logging.info(f"Changing pan/dry amounts for {self.__id__} lane {laneId} from {synthPassthroughClient.panAmount()} and {synthPassthroughClient.dryAmount()} from {panAmount} to {dryAmount}")
                 synthPassthroughClient.setPanAmount(panAmount)
                 synthPassthroughClient.dryGainHandler().setGain(dryAmount)
@@ -2410,24 +2418,24 @@ class sketchpad_channel(QObject):
             for laneId in range(0, 5):
                 if self.__chained_sounds__[laneId] == -1:
                     # If there is no synth in this, check to see if we've got anything set for the two values, and if so, reset them to defaults
-                    if self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] < 1:
-                        self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"] = self.__initial_pan__
-                        self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"] = 1
+                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"] < 1:
+                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"] = self.__initial_pan__
+                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"] = 1
                         self.__song__.schedule_save()
                         shouldEmitChanged = True
             if shouldEmitChanged:
                 self.synthPassthroughMixingChanged.emit()
 
-    def get_synthPassthrough0pan(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["panAmount"]
-    def get_synthPassthrough0dry(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][0]["dryAmount"]
-    def get_synthPassthrough1pan(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][1]["panAmount"]
-    def get_synthPassthrough1dry(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][1]["dryAmount"]
-    def get_synthPassthrough2pan(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][2]["panAmount"]
-    def get_synthPassthrough2dry(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][2]["dryAmount"]
-    def get_synthPassthrough3pan(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][3]["panAmount"]
-    def get_synthPassthrough3dry(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][3]["dryAmount"]
-    def get_synthPassthrough4pan(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][4]["panAmount"]
-    def get_synthPassthrough4dry(self): return self.__audioTypeSettings__[self.audioTypeKey()]["synthPassthrough"][4]["dryAmount"]
+    def get_synthPassthrough0pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"]
+    def get_synthPassthrough0dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"]
+    def get_synthPassthrough1pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][1]["panAmount"]
+    def get_synthPassthrough1dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][1]["dryAmount"]
+    def get_synthPassthrough2pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][2]["panAmount"]
+    def get_synthPassthrough2dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][2]["dryAmount"]
+    def get_synthPassthrough3pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][3]["panAmount"]
+    def get_synthPassthrough3dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][3]["dryAmount"]
+    def get_synthPassthrough4pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][4]["panAmount"]
+    def get_synthPassthrough4dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][4]["dryAmount"]
     synthPassthroughMixingChanged = Signal()
     synthPassthrough0pan = Property(float, get_synthPassthrough0pan, notify=synthPassthroughMixingChanged)
     synthPassthrough0dry = Property(float, get_synthPassthrough0dry, notify=synthPassthroughMixingChanged)
@@ -2446,8 +2454,8 @@ class sketchpad_channel(QObject):
     def handleFxPassthroughMixingChanged(self):
         for laneId in range(0, 5):
             fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][laneId]
-            panAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"]
-            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"]
+            panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"]
+            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"]
             # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
             fxPassthroughClient.setPanAmount(panAmount)
             fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
@@ -2463,26 +2471,26 @@ class sketchpad_channel(QObject):
             defaultDryWetMixAmount = 1
             for laneId in range(0, 5):
                 if self.__chained_fx[laneId] is None:
-                    if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
-                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
+                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
+                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
                         shouldEmitChanged = True
-                    if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
-                        self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
+                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
+                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
                         shouldEmitChanged = True
             if shouldEmitChanged:
                 self.__song__.schedule_save()
                 self.fxPassthroughMixingChanged.emit()
 
-    def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][0]["panAmount"]
-    def get_fxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][0]["dryWetMixAmount"]
-    def get_fxPassthrough1pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][1]["panAmount"]
-    def get_fxPassthrough1dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][1]["dryWetMixAmount"]
-    def get_fxPassthrough2pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][2]["panAmount"]
-    def get_fxPassthrough2dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][2]["dryWetMixAmount"]
-    def get_fxPassthrough3pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][3]["panAmount"]
-    def get_fxPassthrough3dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][3]["dryWetMixAmount"]
-    def get_fxPassthrough4pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][4]["panAmount"]
-    def get_fxPassthrough4dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][4]["dryWetMixAmount"]
+    def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["panAmount"]
+    def get_fxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["dryWetMixAmount"]
+    def get_fxPassthrough1pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][1]["panAmount"]
+    def get_fxPassthrough1dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][1]["dryWetMixAmount"]
+    def get_fxPassthrough2pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][2]["panAmount"]
+    def get_fxPassthrough2dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][2]["dryWetMixAmount"]
+    def get_fxPassthrough3pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][3]["panAmount"]
+    def get_fxPassthrough3dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][3]["dryWetMixAmount"]
+    def get_fxPassthrough4pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][4]["panAmount"]
+    def get_fxPassthrough4dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][4]["dryWetMixAmount"]
     fxPassthroughMixingChanged = Signal()
     fxPassthrough0pan =       Property(float, get_fxPassthrough0pan, notify=fxPassthroughMixingChanged)
     fxPassthrough0dryWetMix = Property(float, get_fxPassthrough0dryWetMix, notify=fxPassthroughMixingChanged)
@@ -2499,8 +2507,8 @@ class sketchpad_channel(QObject):
     def handleSketchFxPassthroughMixingChanged(self):
         for laneId in range(0, 5):
             fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
-            panAmount = self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"]
-            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
+            panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"]
+            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
             # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
             fxPassthroughClient.setPanAmount(panAmount)
             fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
@@ -2516,26 +2524,26 @@ class sketchpad_channel(QObject):
             defaultDryWetMixAmount = 1
             for laneId in range(0, 5):
                 if self.__chained_fx[laneId] is None:
-                    if self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
-                        self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
+                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
+                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
                         shouldEmitChanged = True
-                    if self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
-                        self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
+                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
+                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
                         shouldEmitChanged = True
             if shouldEmitChanged:
                 self.__song__.schedule_save()
                 self.sketchFxPassthroughMixingChanged.emit()
 
-    def get_sketchFxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][0]["panAmount"]
-    def get_sketchFxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][0]["dryWetMixAmount"]
-    def get_sketchFxPassthrough1pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][1]["panAmount"]
-    def get_sketchFxPassthrough1dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][1]["dryWetMixAmount"]
-    def get_sketchFxPassthrough2pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][2]["panAmount"]
-    def get_sketchFxPassthrough2dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][2]["dryWetMixAmount"]
-    def get_sketchFxPassthrough3pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][3]["panAmount"]
-    def get_sketchFxPassthrough3dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][3]["dryWetMixAmount"]
-    def get_sketchFxPassthrough4pan(self):       return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][4]["panAmount"]
-    def get_sketchFxPassthrough4dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][4]["dryWetMixAmount"]
+    def get_sketchFxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][0]["panAmount"]
+    def get_sketchFxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][0]["dryWetMixAmount"]
+    def get_sketchFxPassthrough1pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][1]["panAmount"]
+    def get_sketchFxPassthrough1dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][1]["dryWetMixAmount"]
+    def get_sketchFxPassthrough2pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][2]["panAmount"]
+    def get_sketchFxPassthrough2dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][2]["dryWetMixAmount"]
+    def get_sketchFxPassthrough3pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][3]["panAmount"]
+    def get_sketchFxPassthrough3dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][3]["dryWetMixAmount"]
+    def get_sketchFxPassthrough4pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][4]["panAmount"]
+    def get_sketchFxPassthrough4dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][4]["dryWetMixAmount"]
     sketchFxPassthroughMixingChanged = Signal()
     sketchFxPassthrough0pan =       Property(float, get_sketchFxPassthrough0pan, notify=sketchFxPassthroughMixingChanged)
     sketchFxPassthrough0dryWetMix = Property(float, get_sketchFxPassthrough0dryWetMix, notify=sketchFxPassthroughMixingChanged)

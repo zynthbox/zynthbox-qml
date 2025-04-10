@@ -286,6 +286,12 @@ Kirigami.AbstractApplicationWindow {
                         } else {
                             applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
                         }
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+                        if (root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value] != null) {
+                            zynqtgui.show_screen("control");
+                        } else {
+                            applicationWindow().showMessageDialog(qsTr("Cannot open edit page: Selected slot is empty"), 2000);
+                        }
                     } else {
                         if (root.selectedChannel.trackType.startsWith("sample-")) {
                             // If we are in any sample mode, switch whatever else is going on (as that page knows what to do about it)

@@ -811,16 +811,6 @@ def audio_autoconnect(force=False):
                         # BEGIN Connect TrackPassthrough wet ports to GlobalPlayback and AudioLevels via Global FX
                         laneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
                         laneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-lane{channelInputLanes[laneId] + 1}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
-                        for port in zip(laneOutputsFx1, channelAudioLevelsInputPorts):
-                            if laneHasInput[channelInputLanes[laneId]]:
-                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
-                            else:
-                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
-                        for port in zip(laneOutputsFx2, channelAudioLevelsInputPorts):
-                            if laneHasInput[channelInputLanes[laneId]]:
-                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
-                            else:
-                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(laneOutputsFx1, globalFx1InputPorts):
                             if laneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -835,16 +825,6 @@ def audio_autoconnect(force=False):
                         # BEGIN Connect TrackPassthrough sketch wet ports to GlobalPlayback and AudioLevels via Global FX
                         sketchLaneOutputsFx1 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx1", is_audio=True, is_output=True, is_input=False)
                         sketchLaneOutputsFx2 = jclient.get_ports(name_pattern=f"TrackPassthrough:Channel{channelId + 1}-sketch{channelInputLanes[laneId] + 1}-wetOutFx2", is_audio=True, is_output=True, is_input=False)
-                        for port in zip(sketchLaneOutputsFx1, channelAudioLevelsInputPorts):
-                            if sketchLaneHasInput[channelInputLanes[laneId]]:
-                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
-                            else:
-                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
-                        for port in zip(sketchLaneOutputsFx2, channelAudioLevelsInputPorts):
-                            if sketchLaneHasInput[channelInputLanes[laneId]]:
-                                zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
-                            else:
-                                zbjack.disconnectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
                         for port in zip(sketchLaneOutputsFx1, globalFx1InputPorts):
                             if sketchLaneHasInput[channelInputLanes[laneId]]:
                                 zbjack.connectPorts(get_jack_port_name(port[0]), get_jack_port_name(port[1]))
@@ -923,7 +903,6 @@ def audio_autoconnect(force=False):
                             # For all other clients, check if the client is an FXPassthrough.
                             # If the client is not a FXPassthrough, then it means it can either be a TrackPassthrough or an FX. So connect it's output to the next client
                             # If the client is an FXPassthrough then it means the next client is FX and the next to next client can either be another passthrough or AudioLevels (does not matter as the logic is same for both). In that case connect dry ports to next to next client and wet ports to the fx for dry/wet mix to actually work like it should
-                            # When connecting ports check if the port is getting connected to AudioLevels. If it is getting connected to AudioLevels then connect the same port to AudioLevels too of the channel being processed for the AudioLevel meter to work
 
                             # The last client can either be an FX or the TrackPassthrough if there are no FX.
                             # For both cases, it should be connected to AudioLevels and AudioLevels as it is the end node
@@ -970,7 +949,7 @@ def audio_autoconnect(force=False):
                                     for ports in zip(wet_out_ports, next_in_ports):
                                         # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                         zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
-                                    # If next to next client is AudioLevels then connect the same port to AudioLevels too
+                                    # If next to next client is AudioLevels then connect the dry output to AudioLevels too (or we end up without our dry signal)
                                     if output_client_names[index+2] == "AudioLevels":
                                         for ports in zip(dry_out_ports, channelAudioLevelsInputPorts):
                                             # logging.info(f"Connecting {ports[0]} to {ports[1]}")
@@ -986,7 +965,7 @@ def audio_autoconnect(force=False):
                                         out_ports = [out_ports[0], out_ports[0]]
 
                                     if next_client_name == "AudioLevels":
-                                        # Next client is AudioLevels then connect the same port to AudioLevels's input ports for this track
+                                        # Next client is AudioLevels, so connect this leaf output to AudioLevels' input ports for this track
                                         for ports in zip(out_ports, channelAudioLevelsInputPorts):
                                             # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
@@ -1069,7 +1048,6 @@ def audio_autoconnect(force=False):
                             # For all other clients, check if the client is an FXPassthrough.
                             # If the client is not a FXPassthrough, then it means it can either be a TrackPassthrough or an FX. So connect it's output to the next client
                             # If the client is an FXPassthrough then it means the next client is FX and the next to next client can either be another passthrough or AudioLevels (does not matter as the logic is same for both). In that case connect dry ports to next to next client and wet ports to the fx for dry/wet mix to actually work like it should
-                            # When connecting ports check if the port is getting connected to AudioLevels. If it is getting connected to AudioLevels then connect the same port to AudioLevels too of the channel being processed for the AudioLevel meter to work
 
                             # The last client can either be an FX or the TrackPassthrough if there are no FX.
                             # For both cases, it should be connected to AudioLevels as it is the end node
@@ -1116,7 +1094,7 @@ def audio_autoconnect(force=False):
                                     for ports in zip(wet_out_ports, next_in_ports):
                                         # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                         zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))
-                                    # If next to next client is AudioLevels then connect the same port to AudioLevels too
+                                    # If next to next client is AudioLevels then connect the dry output to AudioLevels too (or we end up without our dry signal)
                                     if output_client_names[index+2] == "AudioLevels":
                                         for ports in zip(dry_out_ports, channelAudioLevelsInputPorts):
                                             # logging.info(f"Connecting {ports[0]} to {ports[1]}")
@@ -1132,7 +1110,7 @@ def audio_autoconnect(force=False):
                                         out_ports = [out_ports[0], out_ports[0]]
 
                                     if next_client_name == "AudioLevels":
-                                        # Next client is AudioLevels then connect the same port to AudioLevels' input ports for this track
+                                        # Next client is AudioLevels, so connect this leaf output to AudioLevels' input ports for this track
                                         for ports in zip(out_ports, channelAudioLevelsInputPorts):
                                             # logging.info(f"Connecting {ports[0]} to {ports[1]}")
                                             zbjack.connectPorts(get_jack_port_name(ports[0]), get_jack_port_name(ports[1]))

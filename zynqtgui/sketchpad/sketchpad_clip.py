@@ -944,7 +944,8 @@ class sketchpad_clip(QObject):
             try: self.audioSource.disconnect(self)
             except: pass
 
-        self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{self.__filename__}"
+        cleanedUpFilename = self.__filename__.replace("&", "&amp;")
+        self.zynqtgui.currentTaskMessage = f"Loading Sketchpad : Loading Sample<br/>{cleanedUpFilename}"
         if self.__path__ is not None:
             self.audioSource = Zynthbox.ClipAudioSource(self.path, False, self)
             self.audioSource.rootSlice().lengthChanged.connect(self.sec_per_beat_changed.emit)

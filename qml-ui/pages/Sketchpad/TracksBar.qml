@@ -982,102 +982,81 @@ Rectangle {
                                 }
                             }
 
-                            Item {
+                            ColumnLayout {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                            }
+                                Layout.topMargin: Kirigami.Units.smallSpacing
+                                Layout.bottomMargin: Kirigami.Units.smallSpacing
 
-                            TrackSlotsData {
-                                id: synthsRow
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                slotData: root.selectedChannel.synthSlotsData
-                                slotType: "synth"
-                                visible: root.selectedChannel.trackType == "synth"
-                            }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
-                            TrackSlotsData {
-                                id: samplesRow
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                slotData: root.selectedChannel.sampleSlotsData
-                                slotType: "sample-trig"
-                                visible: root.selectedChannel.trackType == "synth"
-                            }
+                                    TrackSlotsData {
+                                        id: synthsRow
+                                        anchors.fill: parent
+                                        slotData: root.selectedChannel.synthSlotsData
+                                        slotType: "synth"
+                                        visible: root.selectedChannel.trackType == "synth"
+                                    }
+                                    TrackSlotsData {
+                                        id: sketchesRow
+                                        anchors.fill: parent
+                                        slotData: root.selectedChannel.sketchSlotsData
+                                        slotType: "sample-loop"
+                                        visible: root.selectedChannel.trackType == "sample-loop"
+                                    }
+                                    TrackSlotsData {
+                                        id: externalRow
+                                        anchors.fill: parent
+                                        slotData: root.selectedChannel.externalSlotsData
+                                        slotType: "external"
+                                        visible: root.selectedChannel.trackType == "external"
+                                    }
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
-                            TrackSlotsData {
-                                id: sketchesRow
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                slotData: root.selectedChannel.sketchSlotsData
-                                slotType: "sample-loop"
-                                visible: root.selectedChannel.trackType == "sample-loop"
-                            }
-                            Item {
-                                // id: sketchesSpacer
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                visible: sketchesRow.visible
-                            }
+                                    TrackSlotsData {
+                                        id: samplesRow
+                                        anchors.fill: parent
+                                        slotData: root.selectedChannel.sampleSlotsData
+                                        slotType: "sample-trig"
+                                        visible: root.selectedChannel.trackType == "synth"
+                                    }
+                                    TrackSlotsData {
+                                        id: sketchFxRow
+                                        anchors.fill: parent
+                                        slotData: root.selectedChannel.sketchFxSlotsData
+                                        slotType: "sketch-fx"
+                                        visible: root.selectedChannel.trackType == "sample-loop"
+                                    }
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
-                            TrackSlotsData {
-                                id: externalRow
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                slotData: root.selectedChannel.externalSlotsData
-                                slotType: "external"
-                                visible: root.selectedChannel.trackType == "external"
-                            }
-                            Item {
-                                // id: externalSpacer
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                visible: externalRow.visible
-                            }
-
-                            TrackSlotsData {
-                                id: fxRow
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                slotData: root.selectedChannel.fxSlotsData
-                                slotType: "fx"
-                                visible: root.selectedChannel.trackType == "synth"
-                            }
-                            TrackSlotsData {
-                                id: sketchFxRow
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                slotData: root.selectedChannel.sketchFxSlotsData
-                                slotType: "sketch-fx"
-                                visible: root.selectedChannel.trackType == "sample-loop"
-                            }
-                            Item {
-                                // id: fxSpacer
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                                visible: fxRow.visible
-                            }
-
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
+                                    TrackSlotsData {
+                                        id: fxRow
+                                        anchors.fill: parent
+                                        slotData: root.selectedChannel.fxSlotsData
+                                        slotType: "fx"
+                                        visible: root.selectedChannel.trackType == "synth"
+                                    }
+                                }
                             }
 
                             RowLayout {
                                 id: waveformContainer
-
                                 property bool showWaveform: false
-
                                 property QtObject clip: null
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                                spacing: Kirigami.Units.gridUnit / 2
+
                                 Timer {
                                     id: waveformThrottle
                                     interval: 1; repeat: false; running: false;
@@ -1110,11 +1089,6 @@ Rectangle {
                                     target: zynqtgui.sketchpad.song.scenesModel
                                     onSelected_sketchpad_song_index_changed: waveformThrottle.restart()
                                 }
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 4
-                                spacing: Kirigami.Units.gridUnit / 2
 
                                 // Take 3/5 th of available width
                                 ColumnLayout {

@@ -56,9 +56,15 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         self.list_data = []
         try:
             selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+            if selected_track.trackType == "synth":
+                fx = selected_track.chainedFx
+                fxNames = selected_track.chainedFxNames
+            elif selected_track.trackType == "sample-loop":
+                fx = selected_track.chainedSketchFx
+                fxNames = selected_track.chainedSketchFxNames
             for index in range(5):
-                self.list_data.append((str(index+1), index, f"{index+1} - {selected_track.chainedFxNames[index]}", selected_track.chainedFx[index]))
-            self.select(selected_track.selectedFxSlotRow)
+                self.list_data.append((str(index+1), index, f"{index+1} - {fxNames[index]}", fx[index]))
+            self.select(selected_track.selectedSlot.value)
         except:
             # fill_list might fail when sketchpad is yet to be loaded. Do nothing as it will fill list again when curlayer changes
             pass
@@ -72,8 +78,8 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         if i < 0 or i >= len(self.list_data):
             return
         selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-        selected_track.selectedFxSlotRow = i
-        selected_track.setCurlayerByType("fx")
+        selected_track.selectedSlot.value = i
+        selected_track.setCurlayerByType("sketch-fx")
         self.select(i)
         self.fill_list()
 
@@ -87,7 +93,7 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         return 'effect_preset'
 
     def set_select_path(self):
-        self.select_path = "FX"
+        self.select_path = "Sketch FX"
         if len(self.list_data) > 0:
             self.select_path_element = str(self.list_data[self.index][1] + 1)
         super().set_select_path()

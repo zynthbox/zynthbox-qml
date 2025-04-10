@@ -1118,7 +1118,7 @@ Rectangle {
                     if (root.selectedChannel.selectedSlot.className == "TracksBar_fxslot") {
                         slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
                     } else if (root.selectedChannel.selectedSlot.className == "TracksBar_sketchfxslot") {
-                        // TODO : sketchFx
+                        slotSwapperPopup.pickSlotToSwapWith(root.selectedChannel, "sketch-fx", root.selectedChannel.selectedSlot.value);
                     }
                 }
             },

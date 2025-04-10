@@ -1828,6 +1828,8 @@ class sketchpad_channel(QObject):
     synthRoutingData = Property('QVariantList', get_synthRoutingData, notify=synthRoutingDataChanged)
     ### END Property synthRoutingData
 
+    # TODO : sketchFX Implement sketchFxRoutingData
+
     ### BEGIN Property chainedSoundsKeyzones
     def get_chainedSoundsKeyzones(self):
         return self.__chained_sounds_keyzones__
@@ -3143,8 +3145,7 @@ class sketchpad_channel(QObject):
 
         # Update chainedFx
         self.set_chainedFx(newChainedFx)
-
-        # TODO : sketchFx
+        self.zynqtgui.zynautoconnect()
 
     @Slot(int, int)
     def swapChainedFx(self, slot1, slot2):
@@ -3155,6 +3156,43 @@ class sketchpad_channel(QObject):
         newOrder[slot1] = slot2
         newOrder[slot2] = slot1
         self.reorderChainedFx(newOrder)
+
+    @Slot("QVariantList")
+    def reorderChainedSketchFx(self, newOrder):
+        """
+        This method will reorder the chained FX engines as per the new index order provided in newOrder
+        """
+        # Form a new chainedFx as per newOrder
+        newChainedSketchFx = [self.__chained_sketch_fx[index] for index in newOrder]
+
+        # Update slot_index of all the zynthian_layer objects
+        for index, fx in enumerate(newChainedSketchFx):
+            if fx is not None:
+                fx.slot_index = index
+
+        # Swap the routing data : TODO sketchFx
+        # newRoutingData = [self.__routingData__["fx"][index] for index in newOrder]
+        # self.__routingData__["fx"] = newRoutingData
+
+        # Update fxPassthrough values in audioTypeSettings to retain correct values after re-ordering
+        newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
+        for audioType in newAudioTypeSettings:
+            newAudioTypeSettings[audioType]["sketchFxPassthrough"] = [newAudioTypeSettings[audioType]["sketchFxPassthrough"][index] for index in newOrder]
+        self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
+
+        # Update chainedFx
+        self.set_chainedSketchFx(newChainedSketchFx)
+        self.zynqtgui.zynautoconnect()
+
+    @Slot(int, int)
+    def swapChainedSketchFx(self, slot1, slot2):
+        """
+        Swap positions of two FX engines in chainedFx located at index slot1 and slot2
+        """
+        newOrder = [0, 1, 2, 3, 4]
+        newOrder[slot1] = slot2
+        newOrder[slot2] = slot1
+        self.reorderChainedSketchFx(newOrder)
 
     slotsReordered = Signal()
     className = Property(str, className, constant=True)

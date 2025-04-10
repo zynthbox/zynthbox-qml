@@ -93,6 +93,16 @@ Zynthian.DialogQuestion {
                     }
                 }
                 break;
+            case "sketch-fx":
+                for (let slotIndex = 0; slotIndex < 5; ++slotIndex) {
+                    let slotData = root.selectedChannel.chainedSketchFxNames[slotIndex];
+                    if (slotData === "") {
+                        newSlotTitles.push("(empty)");
+                    } else {
+                        newSlotTitles.push(slotData);
+                    }
+                }
+                break;
             default:
                 console.debug("Unknown slot type! Expected one of synth, sample, sketch, or fx, and got:", slotType);
                 break;
@@ -123,6 +133,9 @@ Zynthian.DialogQuestion {
                 break;
             case "fx":
                 _private.selectedChannel.swapChainedFx(_private.slotIndex, _private.swapWithSlotIndex);
+                break;
+            case "sketch-fx":
+                _private.selectedChannel.swapChainedSketchFx(_private.slotIndex, _private.swapWithSlotIndex);
                 break;
             default:
                 console.debug("Unknown slot type!");

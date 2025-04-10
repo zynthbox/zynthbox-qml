@@ -78,12 +78,45 @@ Zynthian.ScreenPage {
         return returnValue;
     }
 
+    Connections {
+        target: applicationWindow()
+        function onSelectedChannelChanged() {
+            for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
+                let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                if (clipActivator.nextBarState != newPlaystate) {
+                    clipActivator.nextBarState = newPlaystate;
+                }
+            }
+        }
+    }
+    Connections {
+        target: Zynthbox.PlayfieldManager
+        function onPlayfieldStateChanged(sketchpadSong, sketchpadTrack, clipIndex, position, newPlaystate) {
+            if (applicationWindow().selectedChannel) {
+                if (sketchpadTrack === applicationWindow().selectedChannel.id && sketchpadSong === zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex && position == Zynthbox.PlayfieldManager.NextBarPosition) {
+                    if (clipActivator.nextBarState != newPlaystate) {
+                        clipActivator.nextBarState = newPlaystate;
+                    }
+                }
+            }
+        }
+    }
     contextualActions: [
         Kirigami.Action {
+            id: clipActivator
+            property int nextBarState: Zynthbox.PlayfieldManager.StoppedState
             text: enabled
-                ? component.pattern.enabled
-                    ? qsTr("Mute")
-                    : qsTr("Unmute")
+                ? Zynthbox.SyncTimer.timerRunning
+                    ? component.pattern.isPlaying
+                        ? nextBarState == Zynthbox.PlayfieldManager.PlayingState
+                            ? qsTr("Deactivate") // Playback running, and next state is to be playing, so offer to deactivate
+                            : qsTr("Stop Deactivating") // Playback is running, next state is to not be playing, so offer to abort that deactivation
+                        : nextBarState == Zynthbox.PlayfieldManager.StoppedState
+                            ? qsTr("Activate") // Playback is not running, and next state is to stay stopped, so offer to activate
+                            : qsTr("Stop Activating") // Playback is not running, and next state is to be playing, so offer to abort that activation
+                    : component.pattern.enabled
+                        ? qsTr("Deactivate")
+                        : qsTr("Activate")
                 : ""
             enabled: component.pattern !== null
             onTriggered: {

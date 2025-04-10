@@ -311,7 +311,10 @@ class sketchpad_channel(QObject):
         self.__sound_json_snapshot__ = ""
         self.__sound_snapshot_changed = True
         self.route_through_global_fx = True
-        self.__channel_synth_ports = []
+        self.__channel_sound_recording_ports = {
+            0: [], # Left Channel
+            1: []  # Right Channel
+        }
         self.__audioTypeSettings__ = self.defaultAudioTypeSettings()
         self.volume_changed.connect(self.handleVolumeChanged)
         self.panChanged.connect(self.handlePanChanged)
@@ -956,36 +959,47 @@ class sketchpad_channel(QObject):
 
     def do_update_jack_port(self, run_in_thread=True):
         def task(zynqtgui, channel):
-            jack_basenames = []
+            synth_ports = {
+                0: [], # Left channel
+                1: []  # Right channel
+            }
 
-            channelHasEffects = False
-            for ch in channel.chainedSounds:
-                if ch >= 0 and channel.checkIfLayerExists(ch):
-                    layer = zynqtgui.screens['layer'].layer_midi_map[ch]
+            if self.trackRoutingStyle == "standard":
+                if self.channelHasFx:
+                    # If there is fx, only the last FXPassthrough's dry out and the last fx out needs to be recorded
+                    for index, fx in enumerate(self.chainedFx):
+                        if fx is not None:
+                            lastFxIndex = index
+                    fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lastFxIndex].engine.jackname, is_output=True, is_audio=True, is_physical=False)
+                    # If fx is mono, record both left and right channels from same output port
+                    if len(fxPorts) == 1:
+                        fxPorts.append(fxPorts[0])
+                    for channel in range(2):
+                        synth_ports[channel].append(f"FXPassthrough-lane{lastFxIndex}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
+                        synth_ports[channel].append(fxPorts[channel].name)
+                else:
+                    # If there is no fx, then TrackPassthrough dry signal needs to be recorded
+                    for channel in range(2):
+                        # All sounds are routed through lane 1 in standard mode
+                        synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane1-dryOut{'Left' if channel == 0 else 'Right'}")
+            elif self.trackRoutingStyle == "one-to-one":
+                for lane in range(1, 6):
+                    if self.chainedFx[lane] is None:
+                        # lane has no FX. Record lane dryOut
+                        for channel in range(2):
+                            synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane{lane}-dryOut{'Left' if channel == 0 else 'Right'}")
+                    else:
+                        # lane has FX. Connect FXPassthrough dryOut and fx out
+                        fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lane].engine.jackname, is_output=True, is_audio=True, is_physical=False)
+                        # If fx is mono, record both left and right channels from same output port
+                        if len(fxPorts) == 1:
+                            fxPorts.append(fxPorts[0])
+                        for channel in range(2):
+                            synth_ports[channel].append(f"FXPassthrough-lane{lane}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
+                            synth_ports[channel].append(fxPorts[channel].name)
 
-                    # Iterate over all connected layers (including fx layer) on midi channel `channel`
-                    for fxlayer in zynqtgui.screens['layer'].get_fxchain_layers(layer):
-                        try:
-                            jack_basenames.append(fxlayer.jackname.split(":")[0])
-
-                            # fxlayer can be a Midi synth, or an effect. Check if it is an effect
-                            if fxlayer.engine.type == "Audio Effect":
-                                channelHasEffects = True
-                        except Exception as e:
-                            logging.error(f"### update_jack_port Error : {str(e)}")
-
-            synth_ports = []
-
-            for port_name in jack_basenames:
-                port_names = []
-                ports = [x.name for x in sketchpad_channel.jclient.get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
-
-                for port in zip(ports, [f"AudioLevels:Channel{self.id + 1}-left_in", f"AudioLevels:Channel{self.id + 1}-right_in"]):
-                    port_names.append(port[0])
-
-                synth_ports.append(port_names)
-
-            self.set_channelSynthPorts(synth_ports)
+            logging.debug(f"channelSoundRecordingPorts : {synth_ports}")
+            self.set_channelSoundRecordingPorts(synth_ports)
 
         # Do the task in a thread only if run_in_thread is set to True
         # This will allow startup process to wait till all ports are updated before displaying splash screen
@@ -2235,19 +2249,19 @@ class sketchpad_channel(QObject):
     routeThroughGlobalFX = Property(bool, get_routeThroughGlobalFX, set_routeThroughGlobalFX, notify=routeThroughGlobalFXChanged)
     ### END Property routeThroughGlobalFX
 
-    ### Property channelSynthPorts
-    def get_channelSynthPorts(self):
-        return self.__channel_synth_ports
+    ### Property channelSoundRecordingPorts
+    def get_channelSoundRecordingPorts(self):
+        return self.__channel_sound_recording_ports
 
-    def set_channelSynthPorts(self, ports):
-        if self.__channel_synth_ports != ports:
-            self.__channel_synth_ports = ports
-            self.channelSynthPortsChanged.emit()
+    def set_channelSoundRecordingPorts(self, ports):
+        if self.__channel_sound_recording_ports != ports:
+            self.__channel_sound_recording_ports = ports
+            self.channelSoundRecordingPortsChanged.emit()
 
-    channelSynthPortsChanged = Signal()
+    channelSoundRecordingPortsChanged = Signal()
 
-    channelSynthPorts = Property('QVariantList', get_channelSynthPorts, notify=channelSynthPortsChanged)
-    ### END Property channelSynthPorts
+    channelSoundRecordingPorts = Property('QVariantList', get_channelSoundRecordingPorts, notify=channelSoundRecordingPortsChanged)
+    ### END Property channelSoundRecordingPorts
 
     ### Property channelHasSynth
     def get_channelHasSynth(self):

@@ -903,9 +903,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.__last_recording_type__ = "Internal"
 
                 if self.recordingSource == "internal-master":
-                    recording_ports = [("GlobalPlayback:dryOutLeft", "GlobalPlayback:dryOutRight")]
+                    recording_ports = {
+                        0: ["GlobalPlayback:dryOutLeft"],
+                        1: ["GlobalPlayback:dryOutRight"]
+                    }
                 elif  self.recordingSource == "internal-track":
-                    recording_ports = channel.channelSynthPorts
+                    recording_ports = channel.channelSoundRecordingPorts
                 else:
                     self.zynqtgui.showMessageDialog.emit("Invalid recording source", 3000)
                     return False
@@ -914,13 +917,20 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
                 if self.recordingChannel == "1":
                     self.__last_recording_type__ = "External (Mono Left)"
-                    recording_ports = [["system:capture_1"]]
+                    recording_ports = {
+                        0: ["system:capture_1"]
+                    }
                 elif self.recordingChannel == "2":
                     self.__last_recording_type__ = "External (Mono Right)"
-                    recording_ports = [["system:capture_2"]]
+                    recording_ports = {
+                        0: ["system:capture_2"]
+                    }
                 else:
                     self.__last_recording_type__ = "External (Stereo)"
-                    recording_ports = [["system:capture_1", "system:capture_2"]]
+                    recording_ports = {
+                        0: ["system:capture_1"],
+                        1: ["system:capture_2"]
+                    }
 
             logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
 
@@ -928,10 +938,10 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             Zynthbox.AudioLevels.instance().setRecordPortsFilenamePrefix(self.clip_to_record_path)
             Zynthbox.AudioLevels.instance().clearRecordPorts()
 
-            for ports in recording_ports:
-                for port in zip(ports, (0, 1)):
-                    logging.debug(f"Adding record port : {port}")
-                    Zynthbox.AudioLevels.instance().addRecordPort(port[0], port[1])
+            for channel in recording_ports:
+                for port in recording_ports[channel]:
+                    logging.debug(f"Adding record port : port({port}), channel({channel})")
+                    Zynthbox.AudioLevels.instance().addRecordPort(port, channel)
 
         self.isRecording = True
         return True

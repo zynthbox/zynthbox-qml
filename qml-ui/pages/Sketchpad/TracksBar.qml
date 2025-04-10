@@ -102,14 +102,14 @@ Rectangle {
                 break;
             case "TracksBar_sampleslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    synthsRow.switchToSlot(0, true);
+                    fxRow.switchToSlot(0, true);
                 } else {
                     samplesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             case "TracksBar_sketchslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    sketchesRow.switchToSlot(0, true);
+                    sketchFxRow.switchToSlot(0, true);
                 } else {
                     sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
@@ -123,9 +123,16 @@ Rectangle {
                 break;
             case "TracksBar_fxslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    fxRow.switchToSlot(0, true);
+                    synthsRow.switchToSlot(0, true);
                 } else {
                     fxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                }
+                break;
+            case "TracksBar_sketchfxslot":
+                if (root.selectedChannel.selectedSlot.value === 4) {
+                    sketchesRow.switchToSlot(0, true);
+                } else {
+                    sketchFxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
                 }
                 break;
             default:
@@ -299,7 +306,18 @@ Rectangle {
         }
         let slotHasContents = checkCurrent(true);
         if (slotHasContents === false) {
-            for (let slotIndex = 0; slotIndex < (Zynthbox.Plugin.sketchpadSlotCount * 2); ++slotIndex) {
+            // Define the total number of slots to test. This is really more of a "the number of slots to check" thing than a direct slot index
+            // root.pickNextSlot() will actually select the next slot based on what's currently selected
+            let numSlotsToTest = Zynthbox.Plugin.sketchpadSlotCount;
+            if (root.selectedChannel.trackType == "synth") {
+                // Track type Sound has 3 sets of 5 slots
+                numSlotsToTest = Zynthbox.Plugin.sketchpadSlotCount * 3;
+            } else if (root.selectedChannel.trackType == "sample-loop") {
+                // Track type Sound has 2 sets of 5 slots
+                numSlotsToTest = Zynthbox.Plugin.sketchpadSlotCount * 2;
+            }
+
+            for (let slotIndex = 0; slotIndex < numSlotsToTest; ++slotIndex) {
                 slotHasContents = checkCurrent(false);
                 if (slotHasContents) {
                     break;
@@ -312,6 +330,8 @@ Rectangle {
                     synthsRow.switchToSlot(initialSlotIndex, true);
                 } else if (initialSlotType === 1) {
                     fxRow.switchToSlot(initialSlotIndex, true);
+                } else if (initialSlotType === 2) {
+                    sketchFxRow.switchToSlot(initialSlotIndex, true);
                 }
             }
         }

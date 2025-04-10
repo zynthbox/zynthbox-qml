@@ -984,13 +984,13 @@ class sketchpad_channel(QObject):
                         synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane1-dryOut{'Left' if channel == 0 else 'Right'}")
             elif self.trackRoutingStyle == "one-to-one":
                 for lane in range(1, 6):
-                    if self.chainedFx[lane] is None:
+                    if self.chainedFx[lane - 1] is None:
                         # lane has no FX. Record lane dryOut
                         for channel in range(2):
                             synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane{lane}-dryOut{'Left' if channel == 0 else 'Right'}")
                     else:
                         # lane has FX. Connect FXPassthrough dryOut and fx out
-                        fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lane].engine.jackname, is_output=True, is_audio=True, is_physical=False)
+                        fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lane - 1].engine.jackname, is_output=True, is_audio=True, is_physical=False)
                         # If fx is mono, record both left and right channels from same output port
                         if len(fxPorts) == 1:
                             fxPorts.append(fxPorts[0])

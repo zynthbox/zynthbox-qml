@@ -175,6 +175,9 @@ class zynthian_gui_bank(zynthian_gui_selector):
     def next_action(self):
         return "preset"
 
+    def back_action(self):
+        return "sketchpad"
+
     def index_supports_immediate_activation(self, index=None):
         return True
 

@@ -414,7 +414,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         return "preset"
 
     def back_action(self):
-        return "bank"
+        return "sketchpad"
 
     def preselect_action(self):
         if self.index < 0 or self.index >= len(self.list_data):

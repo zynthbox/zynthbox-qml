@@ -267,6 +267,13 @@ Rectangle {
                 if (switchIfEmpty && (slotHasContents === false)) {
                     fxRow.switchToSlot(0, true);
                 }
+            }  else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+                if (root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value] != null) {
+                    slotHasContents = true;
+                }
+                if (switchIfEmpty && (slotHasContents === false)) {
+                    sketchFxRow.switchToSlot(0, true);
+                }
             } else if (switchIfEmpty) {
                 // Select the first and best option for the given TracksBar layout
                 if (root.selectedChannel.trackType === "synth") {
@@ -285,6 +292,9 @@ Rectangle {
             initialSlotIndex = root.selectedChannel.selectedSlot.value;
         } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
             initialSlotType = 1;
+            initialSlotIndex = root.selectedChannel.selectedSlot.value;
+        } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+            initialSlotType = 2;
             initialSlotIndex = root.selectedChannel.selectedSlot.value;
         }
         let slotHasContents = checkCurrent(true);

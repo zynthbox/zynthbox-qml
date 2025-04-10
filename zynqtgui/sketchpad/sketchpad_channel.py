@@ -1790,7 +1790,8 @@ class sketchpad_channel(QObject):
         if force_set or newRoutingStyle != self.__track_routing_style__:
             self.__track_routing_style__ = newRoutingStyle
             self.track_routing_style_changed.emit()
-            self.zynqtgui.zynautoconnect();
+            self.update_jack_port()
+            self.zynqtgui.zynautoconnect()
             if force_set == False:
                 self.__song__.schedule_save()
 

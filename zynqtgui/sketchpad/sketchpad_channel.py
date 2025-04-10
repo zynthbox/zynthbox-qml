@@ -537,17 +537,11 @@ class sketchpad_channel(QObject):
             # FX Passthrough defaults
             passthroughValues = []
             for i in range(0, 5):
-                if audioType in ["synth", "sample", "external"]:
-                    # For synth, default is to have 100% dry and 100% wet mixed
+                if audioType in ["synth", "sample", "sketch", "external"]:
+                    # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
                     passthroughValues.append({
                         "panAmount": self.__initial_pan__,
                         "dryWetMixAmount": 1,
-                    })
-                elif audioType == "sketch":
-                    # For sketch, default is to have 100% dry and 0% wet
-                    passthroughValues.append({
-                        "panAmount": self.__initial_pan__,
-                        "dryWetMixAmount": 0,
                     })
                 else:
                     passthroughValues.append({
@@ -558,14 +552,8 @@ class sketchpad_channel(QObject):
             # Sketch FX Passthrough defaults
             passthroughValues = []
             for i in range(0, 5):
-                if audioType in ["synth", "sample", "external"]:
-                    # For synth, default is to have 100% dry and 0% wet
-                    passthroughValues.append({
-                        "panAmount": self.__initial_pan__,
-                        "dryWetMixAmount": 0,
-                    })
-                elif audioType == "sketch":
-                    # For sketch, default is to have 100% dry and 100% wet mixed
+                if audioType in ["synth", "sample", "sketch", "external"]:
+                    # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
                     passthroughValues.append({
                         "panAmount": self.__initial_pan__,
                         "dryWetMixAmount": 1,
@@ -1436,7 +1424,7 @@ class sketchpad_channel(QObject):
         if slot_row == -1:
             slot_row = self.__selected_fx_slot_row
 
-        if self.__chained_fx[slot_row] is not None:            
+        if self.__chained_fx[slot_row] is not None:
             self.zynqtgui.zynautoconnect_acquire_lock()
             self.__chained_fx[slot_row].reset()
             self.zynqtgui.zynautoconnect_release_lock()
@@ -1446,6 +1434,7 @@ class sketchpad_channel(QObject):
         self.__chained_fx[slot_row] = layer
         self.updateChainedFxEngineData(slot_row, layer)
         self.__sound_snapshot_changed = True
+        self.update_jack_port()
         self.chainedFxChanged.emit()
         self.chainedFxNamesChanged.emit()
 
@@ -1542,6 +1531,7 @@ class sketchpad_channel(QObject):
             self.zynqtgui.zynautoconnect_release_lock()
             self.zynqtgui.screens['engine'].stop_unused_engines()
 
+        self.update_jack_port()
         self.__chained_sketch_fx[slot_row] = layer
         self.__sound_snapshot_changed = True
         self.chainedSketchFxChanged.emit()
@@ -2469,13 +2459,8 @@ class sketchpad_channel(QObject):
         # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
         if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
             shouldEmitChanged = False
-            defaultDryWetMixAmount = -1
-            if self.audioTypeKey() in ["synth", "sample", "external"]:
-                # For synth/sample/external, default is to have 100% dry and 100% wet mixed
-                defaultDryWetMixAmount = 1
-            elif self.audioTypeKey() == "sketch":
-                 # For sketch, default is to have 100% dry and 0% wet
-                defaultDryWetMixAmount = 0
+            # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
+            defaultDryWetMixAmount = 1
             for laneId in range(0, 5):
                 if self.__chained_fx[laneId] is None:
                     if self.__audioTypeSettings__[self.audioTypeKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
@@ -2527,13 +2512,8 @@ class sketchpad_channel(QObject):
         # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
         if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
             shouldEmitChanged = False
-            defaultDryWetMixAmount = -1
-            if self.audioTypeKey() in ["synth", "sample", "external"]:
-                # For synth/sample/external, default is to have 100% dry and 0% wet
-                defaultDryWetMixAmount = 0
-            elif self.audioTypeKey() == "sketch":
-                 # For sketch, default is to have 100% dry and 100% wet mixed
-                defaultDryWetMixAmount = 1
+            # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
+            defaultDryWetMixAmount = 1
             for laneId in range(0, 5):
                 if self.__chained_fx[laneId] is None:
                     if self.__audioTypeSettings__[self.audioTypeKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:

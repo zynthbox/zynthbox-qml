@@ -683,35 +683,41 @@ don't want to have to dig too far...
         onRemovedHardwareDevice: {
             applicationWindow().showPassiveNotification("Device removed: " + humanReadableName);
         }
-        onMidiMessage: {
-            if (port == Zynthbox.MidiRouter.HardwareInPassthroughPort && 191 < byte1 && byte1 < 208) {
-                let midiChannel = byte1 - 192;
-                let delta = byte2 - 64;
-                if (delta > 0) {
-                    let selectedChannel = applicationWindow().selectedChannel;
-                    while (delta > 0) {
-                        if (selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
-                            selectedChannel.selectNextSynthPreset(selectedChannel.selectedSlot.value);
-                        } else if (selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
-                            selectedChannel.selectNextFxPreset(selectedChannel.selectedSlot.value);
-                        }
-                        delta = delta - 1;
-                    }
-                    Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
-                } else if (delta < 0) {
-                    let selectedChannel = applicationWindow().selectedChannel;
-                    while (delta < 0) {
-                        if (selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
-                            selectedChannel.selectPreviousSynthPreset(selectedChannel.selectedSlot.value);
-                        } else if (selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
-                            selectedChannel.selectPreviousFxPreset(selectedChannel.selectedSlot.value);
-                        }
-                        delta = delta + 1;
-                    }
-                    Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
-                }
-            }
-        }
+        // TODO Revive this when there's a bit of spare time...
+        // We'll need to only feed stuff back to the same device the thing came from (so, hardwareDeviceId, get the device, and then explicitly post a midi message to that device, and only that device)
+        // onMidiMessage: {
+        //     if (port == Zynthbox.MidiRouter.HardwareInPassthroughPort && 191 < byte1 && byte1 < 208) {
+        //         let midiChannel = byte1 - 192;
+        //         let delta = byte2 - 64;
+        //         if (delta > 0) {
+        //             let selectedChannel = applicationWindow().selectedChannel;
+        //             while (delta > 0) {
+        //                 if (selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+        //                     selectedChannel.selectNextSynthPreset(selectedChannel.selectedSlot.value);
+        //                 } else if (selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+        //                     selectedChannel.selectNextFxPreset(selectedChannel.selectedSlot.value);
+        //                 } else if (selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+        //                     selectedChannel.selectNextSketchFxPreset(selectedChannel.selectedSlot.value);
+        //                 }
+        //                 delta = delta - 1;
+        //             }
+        //             Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
+        //         } else if (delta < 0) {
+        //             let selectedChannel = applicationWindow().selectedChannel;
+        //             while (delta < 0) {
+        //                 if (selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+        //                     selectedChannel.selectPreviousSynthPreset(selectedChannel.selectedSlot.value);
+        //                 } else if (selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+        //                     selectedChannel.selectPreviousFxPreset(selectedChannel.selectedSlot.value);
+        //                 } else if (selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+        //                     selectedChannel.selectPreviousSketchFxPreset(selectedChannel.selectedSlot.value);
+        //                 }
+        //                 delta = delta + 1;
+        //             }
+        //             Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
+        //         }
+        //     }
+        // }
     }
     Binding {
         target: Zynthbox.PlayGridManager

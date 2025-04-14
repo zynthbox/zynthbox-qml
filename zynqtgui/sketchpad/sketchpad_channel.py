@@ -2519,13 +2519,16 @@ class sketchpad_channel(QObject):
     @Slot(None)
     def handleSketchFxPassthroughMixingChanged(self):
         for laneId in range(0, 5):
-            fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
-            panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"]
-            dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
-            # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
-            fxPassthroughClient.setPanAmount(panAmount)
-            fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
-            self.__song__.schedule_save()
+            try:
+                fxPassthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][laneId]
+                panAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"]
+                dryWetMixAmount = self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"]
+                # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
+                fxPassthroughClient.setPanAmount(panAmount)
+                fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+                self.__song__.schedule_save()
+            except Exception as e:
+                logging.error(f"Error occured in handlingSketchFxPassthroughMixingChanged : str(e)")
 
     @Slot(None)
     def clearSketchFxPassthroughForEmtpySlots(self):
@@ -2536,13 +2539,16 @@ class sketchpad_channel(QObject):
             # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
             defaultDryWetMixAmount = 1
             for laneId in range(0, 5):
-                if self.__chained_fx[laneId] is None:
-                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
-                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
-                        shouldEmitChanged = True
-                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
-                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
-                        shouldEmitChanged = True
+                try:
+                    if self.__chained_fx[laneId] is None:
+                        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
+                            self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
+                            shouldEmitChanged = True
+                        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
+                            self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
+                            shouldEmitChanged = True
+                except Exception as e:
+                    logging.error(f"Error occured in clearSketchFxPassthroughForEmtpySlots : str(e)")
             if shouldEmitChanged:
                 self.__song__.schedule_save()
                 self.sketchFxPassthroughMixingChanged.emit()

@@ -32,6 +32,7 @@ import json
 import numpy as np
 import Zynthbox
 import jack
+import re
 
 from datetime import datetime
 from os.path import dirname, realpath
@@ -712,7 +713,12 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except:
                 pass
 
-            if sketchpad_path.parent.match("*/zynthian-my-data/sketchpads/community-sketchpads/*"):
+            # Prepare a regex to check if a sketchpad json is from community-sketchpads
+            community_sketchpads_regex = re.compile(".*/zynthian-my-data/sketchpads/community-sketchpads/.*")
+            # If the regex matches a string, it returns a re.Match object otherwise returns None
+            # We do not need the matched string but instead we just need to check if the string matched.
+            # If string matched the regex, it means the sketchpad is from community and hence ask to create a new sketchpad using the community one as a base
+            if community_sketchpads_regex.match(sketchpad) is not None:
                 def _cb():
                     # Connect all jack ports of respective channel after jack client initialization is done.
                     for i in range(0, self.__song__.channelsModel.count):

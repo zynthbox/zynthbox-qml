@@ -82,7 +82,7 @@ Zynthian.ScreenPage {
         target: applicationWindow()
         function onSelectedChannelChanged() {
             for (let clipIndex = 0; clipIndex < Zynthbox.Plugin.sketchpadSlotCount; ++clipIndex) {
-                let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, root.selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
+                let newPlaystate = Zynthbox.PlayfieldManager.clipPlaystate(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex, applicationWindow().selectedChannel.id, clipIndex, Zynthbox.PlayfieldManager.NextBarPosition);
                 if (clipActivator.nextBarState != newPlaystate) {
                     clipActivator.nextBarState = newPlaystate;
                 }

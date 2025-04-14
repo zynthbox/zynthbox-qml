@@ -167,21 +167,18 @@ Zynthian.Popup {
                                 _private.canBounce = true;
                             } else {
                                 _private.canBounce = false;
-                                _private.cannotBounceReason = qsTr("There are no synth engines on this track");
-                            }
-                        } else if (sketchpadTrack.trackType === "sample-trig") {
-                            let hasSound = false;
-                            for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
-                                if (sketchpadTrack.samples[sampleIndex].cppObjId > -1) {
-                                    hasSound = true;
-                                    break;
+                                for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
+                                    if (sketchpadTrack.samples[sampleIndex].cppObjId > -1) {
+                                        hasSound = true;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (hasSound) {
-                                _private.canBounce = true;
-                            } else {
-                                _private.canBounce = false;
-                                _private.cannotBounceReason = qsTr("There are no samples on this track, which is set to Sample mode.");
+                                if (hasSound) {
+                                    _private.canBounce = true;
+                                } else {
+                                    _private.canBounce = false;
+                                    _private.cannotBounceReason = qsTr("There are no sounds on this track for yout clips to play to.");
+                                }
                             }
                         } else if (sketchpadTrack.trackType === "sample-loop") {
                             _private.canBounce = false;
@@ -244,7 +241,7 @@ Zynthian.Popup {
                                             break;
                                         }
                                     }
-                                    if (soundIndication === "") {
+                                    if (soundIndication === "(unknown)") {
                                         for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
                                             var clip = sketchpadTrack.samples[sampleIndex];
                                             if (clip.cppObjId > -1) {
@@ -300,7 +297,7 @@ Zynthian.Popup {
                                             "trackType": sketchpadTrack.trackType,
                                             "recordingPrefix": recordingPrefix,
                                             "recordingSuffix": recordingSuffix,
-                                            "recordingFilename": ""
+                                            "recordingFilename": Zynthbox.AudioLevels.getTimestampedFilename(recordingPrefix, recordingSuffix)
                                         };
                                         _private.clipDetails.push(theDetails);
                                         previousStopRecordingPosition = theDetails["stopRecordingPosition"];
@@ -318,8 +315,6 @@ Zynthian.Popup {
                             }
                             Zynthbox.AudioLevels.setRecordGlobalPlayback(false);
                             Zynthbox.AudioLevels.setShouldRecordPorts(false);
-                            // Set up a bundle of timer commands to match all of the clips we are starting and stopping
-                            Zynthbox.SyncTimer.startTimerCommandBundle();
                             // Don't wait to schedule the start of recording into the future
                             // It used to be the case we needed to wait for playback to start and events being delivered for the first step, but that is no longer the case
                             // Leaving the variable here in case we need it later, and it causes no trouble, but if things just keep working as expected, it'd probably be
@@ -338,19 +333,28 @@ Zynthian.Popup {
                                 // Add the clip itself
                                 zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.insert_clip(clip, details["startPosition"] / Zynthbox.SyncTimer.getMultiplier(), details["stopPlaybackPosition"] / Zynthbox.SyncTimer.getMultiplier());
                                 // Now just make sure there's also a matching position to keep playing and then stop the recording
-                                zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.ensure_split(details["stopRecordingPosition"] / Zynthbox.SyncTimer.getMultiplier());
-                                details["recordingFilename"] = Zynthbox.AudioLevels.scheduleChannelRecorderStart(details["startPosition"] + waitForStart, details["sketchpadTrackId"], details["recordingPrefix"], details["recordingSuffix"]);
-                                Zynthbox.AudioLevels.scheduleChannelRecorderStop(details["stopRecordingPosition"] + waitForStart, details["sketchpadTrackId"]);
+                                let firstSegmentIndex = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.ensure_split(details["startPosition"] / Zynthbox.SyncTimer.getMultiplier()) + 1;
+                                let lastSegmentIndex = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.ensure_split(details["stopRecordingPosition"] / Zynthbox.SyncTimer.getMultiplier());
+                                // Pull out the two segments and plop commands into them...
+                                // For the first segment, start the recording at the same time as the first segment begins
+                                let firstSegment = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.get_segment(firstSegmentIndex);
+                                let startRecordingCommand = { "operation": 20, "parameter": 1, "parameter2": details["sketchpadTrackId"], "variantParameter": details["recordingFilename"] };
+                                firstSegment.addTimerCommandBefore(startRecordingCommand);
+                                // For the last segment, stop the recording and output stop-all-sounds on the track as that segment ends
+                                let lastSegment = zynqtgui.sketchpad.song.arrangementsModel.selectedArrangement.segmentsModel.get_segment(lastSegmentIndex);
+                                let stopRecordingCommand = { "operation": 21, "parameter": 1, "parameter2": details["sketchpadTrackId"] };
+                                lastSegment.addTimerCommandAfter(stopRecordingCommand);
                                 // Ensure we're outputting a stop-all-sounds message on the track as well, so we can be sure that there's no long tails sneaking into the next recording on that track
                                 for (let midichannel = 0; midichannel < 16; ++midichannel) {
-                                    Zynthbox.SyncTimer.scheduleTimerCommand(details["stopRecordingPosition"], 100, details["sketchpadTrackId"], 176 + midichannel, 120, undefined, -1);
+                                    // Post timer commands for all these at the end of the last segment
+                                    // Zynthbox.SyncTimer.scheduleTimerCommand(details["stopRecordingPosition"], 100, details["sketchpadTrackId"], 176 + midichannel, 120, undefined, -1);
+                                    let stopNotesMessage = { "operation": 100, "parameter": details["sketchpadTrackId"], "parameter2": 176 + midichannel, "parameter3": 120, "parameter4": 0 };
+                                    lastSegment.addTimerCommandAfter(stopNotesMessage);
                                 }
                                 console.log("Start", details["startPosition"], "stop playback", details["stopPlaybackPosition"], "stop recording", details["stopRecordingPosition"], "for file", details["recordingFilename"]);
                             }
                             // Schedule us to start playback one step back from the recordings (to allow playback to actually begin), in song mode, with no changes to start position and duration
                             Zynthbox.SyncTimer.scheduleStartPlayback(0, true, 0, 0)
-                            // Finally submit the timer command bundle, starting the bounce process
-                            Zynthbox.SyncTimer.endTimerCommandBundle();
                         } else {
                             console.log("Oh dear, there are no clips to bounce, so... no bouncing for you!");
                             // message box out that there's nothing to do like whaaaat?!

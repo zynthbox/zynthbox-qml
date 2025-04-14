@@ -323,6 +323,7 @@ class sketchpad_channel(QObject):
         self.fxPassthroughMixingChanged.connect(self.handleFxPassthroughMixingChanged)
         self.sketchFxPassthroughMixingChanged.connect(self.handleSketchFxPassthroughMixingChanged)
         self.track_type_changed.connect(self.handleAudioTypeSettingsChanged)
+        self.track_type_changed.connect(self.selectedClipNamesChanged.emit, Qt.QueuedConnection)
         self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
         self.chainedFxChanged.connect(self.chainedFxChangedHandler, Qt.QueuedConnection)
         self.zynaddsubfx_midi_output = None
@@ -2221,7 +2222,12 @@ class sketchpad_channel(QObject):
             clip = self.getClipsModelById(i).getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
 
             if clip.enabled:
-                clipNames.append(chr(i+65).lower())
+                if self.trackType == "sample-loop":
+                    # Show 1-5 for sketch mode
+                    clipNames.append(f"{i+1}")
+                else:
+                    # Show A-E for other modes
+                    clipNames.append(chr(i+65).lower())
             else:
                 clipNames.append("")
 

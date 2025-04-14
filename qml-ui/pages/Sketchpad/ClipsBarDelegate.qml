@@ -124,7 +124,9 @@ ColumnLayout {
                 }
             }
             QQC2.Label {
-                property string clipName: String.fromCharCode(clipDelegate.clipIndex+65)
+                property string clipName: root.channel.trackType == "sample-loop"
+                                            ? clipDelegate.clipIndex + 1
+                                            : String.fromCharCode(clipDelegate.clipIndex+65)
                 anchors.centerIn: parent
                 font.pointSize: 12
                 visible: ["sample-loop", "sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0

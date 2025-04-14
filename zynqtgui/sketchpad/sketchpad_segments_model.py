@@ -136,6 +136,33 @@ class sketchpad_segments_model(QAbstractListModel):
             self.__song.schedule_save()
         return newSegment
 
+    # Inserts a TimerCommand to be run at the given position (can be either in the segment prior, or the segment after the split)
+    # The function will first ensure the position exists, and then set the timer command to be run on the specific segment given
+    # The command is given as a dictionary with the TimerCommand values (the command itself will be constructed by SegmentHandler)
+    # {
+    #     "operation": integer value, like TimerCommand::Operation
+    #     "parameter": integer value,
+    #     "parameter2": integer value,
+    #     "parameter3": integer value,
+    #     "parameter4": integer value,
+    #     "bigParameter": a uint64 value,
+    #     "dataParameter": a void pointer value,
+    #     "variantParameter": a QVariant (as mentioned in the documentation for TimerCommand, this should be used extremely sparingly)
+    # }
+    @Slot(float, 'QVariant', bool)
+    def insertTimerCommandAtSplit(self, splitPosition, timerCommandDetails, afterSplit = False):
+        indexBeforeSplit = self.ensureSplit(splitPosition)
+        if afterSplit == True:
+            # If we are asking to add after the split, but the previous segment is the last in the list, then we need to ensure there's a segment after the split.
+            if indexBeforeSplit + 1 == len(self.__segments):
+                segmentToAddTimerCommandTo = self.new_segment();
+            else:
+                segmentToAddTimerCommandTo = self.get_segment(indexBeforeSplit + 1)
+            segmentToAddTimerCommandTo.addTimerCommandBefore(timerCommandDetails)
+        else:
+            segmentToAddTimerCommandTo = self.get_segment(indexBeforeSplit)
+            segmentToAddTimerCommandTo.addTimerCommandAfter(timerCommandDetails)
+
     # Ensure that a position given in beats exists (that is, that a segment exists which stops at that position)
     # The return value is the index of the position of the segment which stops at the given position
     # Note that if the given split position is 0 (that is, the start of the song), the returned index is -1
@@ -173,6 +200,9 @@ class sketchpad_segments_model(QAbstractListModel):
                     newSegment.clear_clips()
                     for clip in segment.clips.copy():
                         newSegment.addClip(clip)
+                    # Move the post-segment timer commands to the new segment and remove them from the old
+                    newSegment.timerCommandsAfter = segment.timerCommandsAfter
+                    segment.timerCommandsAfter = []
                     # Now adjust the existing segment so that the new segment ends up stopping where the old one used to, and the old one stops at our split position
                     oldSegmentLength = segmentLength - newSegmentLength
                     oldSegmentBarLength = math.floor(oldSegmentLength / 4)

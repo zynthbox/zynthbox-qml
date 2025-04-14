@@ -40,6 +40,8 @@ class sketchpad_segment(QObject):
         self.__tick_length = 0
         self.__clips = []
         self.__restartClips = []
+        self.__timerCommandDetailsBefore = []
+        self.__timerCommandDetailsAfter = []
 
         self.__segment_model = segment_model
         self.__segment_model.countChanged.connect(self.segmentIdChanged.emit)
@@ -75,6 +77,30 @@ class sketchpad_segment(QObject):
                     "col": clip.col,
                     "id": clip.id
                 } for clip in self.__restartClips
+            ],
+            "timerCommandDetailsBefore": [
+                {
+                    "operation": timerCommandDetails["operation"] if "operation" in timerCommandDetails else 0,
+                    "parameter": timerCommandDetails["parameter"] if "parameter" in timerCommandDetails else 0,
+                    "parameter2": timerCommandDetails["parameter2"] if "parameter2" in timerCommandDetails else 0,
+                    "parameter3": timerCommandDetails["parameter3"] if "parameter3" in timerCommandDetails else 0,
+                    "parameter4": timerCommandDetails["parameter4"] if "parameter4" in timerCommandDetails else 0,
+                    "bigParameter": timerCommandDetails["bigParameter"] if "bigParameter" in timerCommandDetails else 0,
+                    "dataParameter": timerCommandDetails["dataParameter"] if "dataParameter" in timerCommandDetails else 0,
+                    "variantParameter": timerCommandDetails["variantParameter"] if "variantParameter" in timerCommandDetails else None
+                } for timerCommandDetails in self.__timerCommandDetailsBefore
+            ],
+            "timerCommandDetailsAfter": [
+                {
+                    "operation": timerCommandDetails["operation"] if "operation" in timerCommandDetails else 0,
+                    "parameter": timerCommandDetails["parameter"] if "parameter" in timerCommandDetails else 0,
+                    "parameter2": timerCommandDetails["parameter2"] if "parameter2" in timerCommandDetails else 0,
+                    "parameter3": timerCommandDetails["parameter3"] if "parameter3" in timerCommandDetails else 0,
+                    "parameter4": timerCommandDetails["parameter4"] if "parameter4" in timerCommandDetails else 0,
+                    "bigParameter": timerCommandDetails["bigParameter"] if "bigParameter" in timerCommandDetails else 0,
+                    "dataParameter": timerCommandDetails["dataParameter"] if "dataParameter" in timerCommandDetails else 0,
+                    "variantParameter": timerCommandDetails["variantParameter"] if "variantParameter" in timerCommandDetails else None
+                } for timerCommandDetails in self.__timerCommandDetailsAfter
             ]
         }
 
@@ -102,6 +128,14 @@ class sketchpad_segment(QObject):
                     self.__restartClips.append(self.__song.getClipById(clip["row"], clip["col"], clip["part"]))
                 else:
                     self.__restartClips.append(self.__song.getClipById(clip["row"], clip["col"], clip["id"]))
+        self.__timerCommandDetailsBefore = []
+        if "timerCommandDetailsBefore" in obj:
+            for timerCommandDetails in obj["timerCommandDetailsBefore"]:
+                self.__timerCommandDetailsBefore.append({ "operation": timerCommandDetails["operation"], "parameter": timerCommandDetails["parameter"], "parameter2": timerCommandDetails["parameter2"], "parameter3": timerCommandDetails["parameter3"], "parameter4": timerCommandDetails["parameter4"], "bigParameter": timerCommandDetails["bigParameter"], "dataParameter": timerCommandDetails["dataParameter"], "variantParameter": timerCommandDetails["variantParameter"] })
+        self.__timerCommandDetailsAfter = []
+        if "timerCommandDetailsAfter" in obj:
+            for timerCommandDetails in obj["timerCommandDetailsAfter"]:
+                self.__timerCommandDetailsAfter.append({ "operation": timerCommandDetails["operation"], "parameter": timerCommandDetails["parameter"], "parameter2": timerCommandDetails["parameter2"], "parameter3": timerCommandDetails["parameter3"], "parameter4": timerCommandDetails["parameter4"], "bigParameter": timerCommandDetails["bigParameter"], "dataParameter": timerCommandDetails["dataParameter"], "variantParameter": timerCommandDetails["variantParameter"] })
 
     def clear_clips(self):
         for clip in self.clips.copy():
@@ -252,6 +286,60 @@ class sketchpad_segment(QObject):
     restartClipsChanged = Signal()
     restartClips = Property("QVariantList", get_restartClips, notify=restartClipsChanged)
     ### END Property restartClips
+
+    ### BEGIN Property timerCommandDetailsBefore
+    @Slot('QVariant')
+    def addTimerCommandBefore(self, timerCommandDetails):
+        self.__timerCommandDetailsBefore.append(timerCommandDetails.toVariant())
+        self.timerCommandDetailsBeforeChanged.emit()
+
+    @Slot(int, 'QVariant')
+    def replaceTimerCommandBefore(self, index, timerCommandDetails):
+        if -1 < index and index < len(self.__timerCommandDetailsBefore):
+            self.__timerCommandDetailsBefore[index] = timerCommandDetails.toVariant()
+            self.timerCommandDetailsBeforeChanged.emit()
+
+    @Slot(int)
+    def removeTimerCommandBefore(self, index):
+        if -1 < index and index < len(self.__timerCommandDetailsBefore):
+            self.__timerCommandDetailsBefore.pop(index)
+            self.timerCommandDetailsBeforeChanged.emit()
+
+    def get_timerCommandsDetailsBefore(self):
+        return self.__timerCommandDetailsBefore
+    def set_timerCommandsDetailsBefore(self, newDetails):
+        self.__timerCommandDetailsBefore = newDetails
+        self.timerCommandDetailsBeforeChanged.emit()
+    timerCommandDetailsBeforeChanged = Signal()
+    timerCommandDetailsBefore = Property("QVariantList", get_timerCommandsDetailsBefore, set_timerCommandsDetailsBefore, notify=timerCommandDetailsBeforeChanged)
+    ### END Property timerCommandDetailsBefore
+
+    ### BEGIN Property timerCommandDetailsAfter
+    @Slot('QVariant')
+    def addTimerCommandAfter(self, timerCommandDetails):
+        self.__timerCommandDetailsAfter.append(timerCommandDetails.toVariant())
+        self.timerCommandDetailsAfterChanged.emit()
+
+    @Slot(int, 'QVariant')
+    def replaceTimerCommandAfter(self, index, timerCommandDetails):
+        if -1 < index and index < len(self.__timerCommandDetailsAfter):
+            self.__timerCommandDetailsAfter[index] = timerCommandDetails.toVariant()
+            self.timerCommandDetailsAfterChanged.emit()
+
+    @Slot(int)
+    def removeTimerCommandAfter(self, index):
+        if -1 < index and index < len(self.__timerCommandDetailsAfter):
+            self.__timerCommandDetailsAfter.pop(index)
+            self.timerCommandDetailsAfterChanged.emit()
+
+    def get_timerCommandsDetailsAfter(self):
+        return self.__timerCommandDetailsAfter
+    def set_timerCommandsDetailsAfter(self, newDetails):
+        self.__timerCommandDetailsAfter = newDetails
+        self.timerCommandDetailsAfterChanged.emit()
+    timerCommandDetailsAfterChanged = Signal()
+    timerCommandDetailsAfter = Property("QVariantList", get_timerCommandsDetailsAfter, set_timerCommandsDetailsAfter, notify=timerCommandDetailsAfterChanged)
+    ### END Property timerCommandDetailsAfter
 
     @Slot(QObject, result=None)
     def addClip(self, clip):

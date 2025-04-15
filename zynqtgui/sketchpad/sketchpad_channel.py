@@ -53,6 +53,8 @@ class last_selected_obj_dto(QObject):
         self.__value = 0
         self.__component = None
 
+        self.classNameChanged.connect(self.isCopyableChanged.emit)
+
     @Slot()
     def reset(self):
         self.__className = None
@@ -114,6 +116,25 @@ class last_selected_obj_dto(QObject):
 
     component = Property(QObject, get_component, set_component, notify=componentChanged)
     ### END Property component
+
+    ### BEGIN Property isCopyable
+    def get_isCopyable(self):
+        return False
+
+    isCopyableChanged = Signal()
+
+    """
+    isCopyable property will return if the current selected object is copyable
+    If the object is copyable, copyFrom should implement copy logic of the type
+
+    isCopyable depends upon className and hence change should be notified when className changes
+    """
+    isCopyable = Property(bool, get_isCopyable, notify=isCopyableChanged)
+    ### END Property component
+
+    @Slot(QObject)
+    def copyFrom(self, sourceObject):
+        pass
 
 class external_mode_settings(QObject):
     def __init__(self, parent: QObject = None):

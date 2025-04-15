@@ -2955,6 +2955,8 @@ class sketchpad_channel(QObject):
                     else:
                         logging.error(f"There is nothing to restore from the slot we were asked to restore from")
                 self.zynqtgui.end_long_task()
+            # Reset preset view to show all presets
+            self.zynqtgui.preset.show_only_favorites = False
             if self.chainedSounds[slotIndex] > -1:
                 self.remove_and_unchain_sound(self.chainedSounds[slotIndex], post_removal_task)
             else:
@@ -3034,6 +3036,8 @@ class sketchpad_channel(QObject):
                         # Run autoconnect after completing loading sounds
                         self.zynqtgui.zynautoconnect()
 
+                # Reset preset view to show all presets
+                self.zynqtgui.preset.show_only_favorites = False
                 if len(used_layers) > 0:
                     # Remove all current sounds from channel
                     for i in used_layers:

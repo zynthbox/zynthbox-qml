@@ -113,10 +113,10 @@ class zynthian_gui_keybinding(QObject):
             "SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 
             "SCREEN_SKETCHPAD": { "modifier": 0, "keysym": "F1" },
-            "SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F2" },
-            "SCREEN_SONG_MANAGER": { "modifier": 0, "keysym": "F3" },
-            "SCREEN_LAYER": { "modifier": 0, "keysym": "F4" },
-            "SCREEN_EDIT_CONTEXTUAL": { "modifier": 0, "keysym": "F5" },
+            "SCREEN_LAYER": { "modifier": 0, "keysym": "F2" },
+            "SCREEN_EDIT_CONTEXTUAL": { "modifier": 0, "keysym": "F3" },
+            "SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F4" },
+            "SCREEN_SONG_MANAGER": { "modifier": 0, "keysym": "F5" },
 
             "SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
 

@@ -83,7 +83,8 @@ class webconf_fifo_handler(QObject):
         self.fifoReader.start()
         self.fifoWriter = Zynthbox.FifoHandler("/tmp/webconf-reads-from-this-fifo", Zynthbox.FifoHandler.WritingDirection, self)
 
-        Zynthbox.MidiRouter.instance().cuiaEventHandled.connect(self.handleMidiRouterCuiaEventHandled)
+        # This is going to be redundant anyway, so... disable it for now (also it's kind of noisy)
+        # Zynthbox.MidiRouter.instance().cuiaEventHandled.connect(self.handleMidiRouterCuiaEventHandled)
         Zynthbox.SndLibrary.instance().sndFileAdded.connect(self.handleSndFileAdded)
 
     ### Send the given string data to Webconf

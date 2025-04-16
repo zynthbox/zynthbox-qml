@@ -242,21 +242,21 @@ QQC2.AbstractButton {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 0.7
                 color: "#99888888"
 
-                QQC2.Label {
-                    id: synthName
-                    anchors.fill: parent
-                    elide: "ElideRight"
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    font.pointSize: 8
-                    visible: root.synthDetailsVisible &&
-                             synthName.text &&
-                             synthName.text.length > 0
-                    // text: channel.connectedSoundName.split(" > ")[0]
-                    text: root.channel.trackType === "synth"
-                              ? root.channel.connectedSoundName.split(" > ")[0]
-                              : ""
-                }
+                // QQC2.Label {
+                //     id: synthName
+                //     anchors.fill: parent
+                //     elide: "ElideRight"
+                //     horizontalAlignment: "AlignHCenter"
+                //     verticalAlignment: "AlignVCenter"
+                //     font.pointSize: 8
+                //     visible: root.synthDetailsVisible &&
+                //              synthName.text &&
+                //              synthName.text.length > 0
+                //     // text: channel.connectedSoundName.split(" > ")[0]
+                //     text: root.channel.trackType === "synth"
+                //               ? root.channel.connectedSoundName.split(" > ")[0]
+                //               : ""
+                // }
             }
         }
     }

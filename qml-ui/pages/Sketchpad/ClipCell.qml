@@ -84,61 +84,63 @@ QQC2.AbstractButton {
     }
 
     contentItem: Item {
-        // ColumnLayout {
-        //     anchors.fill: parent
-        //     anchors.topMargin: spacing
-        //     anchors.bottomMargin: spacing
-        //     anchors.leftMargin: 2
+        // QQC2.Label {
+        //     width: parent.width - 8
+        //     anchors.centerIn: parent
+        //     horizontalAlignment: "AlignHCenter"
+        //     elide: "ElideRight"
+        //     color: root.isInScene ? "#ffffff" : "#f44336" // Color text red when muted
+        //     text: root.channel.selectedClipNames.join("").toUpperCase()
+        //     font.pointSize: 16
 
-        //     Binding {
-        //         target: clipNamesRepeater
-        //         delayed: true
-        //         property: "model"
-        //         value: channel.selectedClipNames
-        //     }
-
-        //     Repeater {
-        //         id: clipNamesRepeater
-        //         delegate: RowLayout {
-        //             property QtObject clipPattern: root.sequence && channel ? root.sequence.getByClipId(channel.id, index) : null
-
-        //             Layout.fillWidth: true
-        //             Layout.fillHeight: true
-
-        //             Rectangle {
-        //                 Layout.fillWidth: true
-        //                 Layout.fillHeight: true
-        //                 color: modelData.length > 0
-        //                         ? Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, clipPattern.hasNotes ? 1 : 0.2)
-        //                         : "transparent"
-        //             }
-
-        //             QQC2.Label {
-        //                 Layout.fillWidth: false
-        //                 Layout.minimumWidth: 12
-        //                 Layout.fillHeight: true
-        //                 font.pointSize: 9
-        //                 text: modelData
-        //             }
-        //         }
+        //     layer.enabled: true
+        //     layer.effect: DropShadow {
+        //         verticalOffset: 0
+        //         color: "#80000000"
+        //         radius: 5
+        //         samples: 11
         //     }
         // }
 
-        QQC2.Label {
-            width: parent.width - 8
+        RowLayout {
+            id: activeItemsRow
+            property string highlightColor: "#ccaaff00" // green
+            property string inactiveColor: "#33ffffff"
             anchors.centerIn: parent
-            horizontalAlignment: "AlignHCenter"
-            elide: "ElideRight"
-            color: root.isInScene ? "#ffffff" : "#f44336" // Color text red when muted
-            text: root.channel.selectedClipNames.join("").toUpperCase()
-            font.pointSize: 16
+            spacing: 0
+            visible: ["synth", "sample-loop"].indexOf(root.channel.trackType) >= 0
 
-            layer.enabled: true
-            layer.effect: DropShadow {
-                verticalOffset: 0
-                color: "#80000000"
-                radius: 5
-                samples: 11
+            Repeater {
+                model: root.channel ? 5 : 0
+
+                QQC2.Label {
+                    property bool patternHasNotes: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.channel.id, index).hasNotes
+
+                    color: {
+                        let occupied = false
+                        if (root.channel.trackType == "synth" && patternHasNotes) {
+                            occupied = true
+                        } else if (root.channel.trackType == "sample-loop" && root.channel.occupiedSketchSlots[index]) {
+                            occupied = true
+                        }
+
+                        if (occupied) {
+                            return activeItemsRow.highlightColor
+                        } else {
+                            return activeItemsRow.inactiveColor
+                        }
+                    }
+                    text: {
+                        if (root.channel.trackType == "synth") {
+                            return String.fromCharCode(index + 65)
+                        } else if (root.channel.trackType == "sample-loop") {
+                            return index + 1
+                        }
+                    }
+
+                    font.pointSize: 12
+                    font.bold: true
+                }
             }
         }
     }

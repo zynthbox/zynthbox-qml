@@ -2770,6 +2770,41 @@ class sketchpad_channel(QObject):
     externalSlotsData = Property("QVariantList", get_externalSlotsData, notify=externalSlotsDataChanged)
     ### END Property externalSlotsData
 
+    ### BEGIN Property occupiedSynthSlots
+    def get_occupiedSynthSlots(self):
+        return [sound != "" for sound in self.chainedSoundsNames]
+
+    occupiedSynthSlots = Property("QVariantList", get_occupiedSynthSlots, notify=chainedSoundsNamesChanged)
+    ### END Property occupiedSynthSlots
+
+    ### BEGIN Property occupiedSampleSlots
+    def get_occupiedSampleSlots(self):
+        return [sample is not None and sample.path is not None and len(sample.path) > 0 for sample in self.samples]
+
+    occupiedSampleSlots = Property("QVariantList", get_occupiedSampleSlots, notify=samples_changed)
+    ### END Property occupiedSampleSlots
+
+    ### BEGIN Property occupiedSketchSlots
+    def get_occupiedSketchSlots(self):
+        occupied_slots = []
+        for clip_id in range(5):
+            clip = self.getClipsModelById(clip_id).getClip(self.zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+            if clip is not None and clip.path is not None and len(clip.path) > 0:
+                occupied_slots.append(True)
+            else:
+                occupied_slots.append(False)
+        return occupiedSlots
+
+    occupiedSketchSlots = Property("QVariantList", get_occupiedSketchSlots, notify=sketchSlotsDataChanged)
+    ### END Property occupiedSketchSlots
+
+    ### BEGIN Property occupiedFxSlots
+    def get_occupiedFxSlots(self):
+        return [fx != "" for fx in self.chainedFxNames]
+
+    occupiedFxSlots = Property("QVariantList", get_occupiedFxSlots, notify=chainedFxNamesChanged)
+    ### END Property occupiedFxSlots
+
     @Slot(int)
     def selectPreviousSynthPreset(self, slot_index):
         midi_channel = self.chainedSounds[slot_index]

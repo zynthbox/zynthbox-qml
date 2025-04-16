@@ -906,8 +906,10 @@ class sketchpad_channel(QObject):
                             self.__samples__[i].set_path(str(bank_dir / clip["path"]), False, load_autosave) # Do not copy file when restoring
                 self.samples_changed.emit()
             if "clips" in obj:
-                for clipId in range(0, 5):
+                for clipId, clip_model in enumerate(self.__clips_model__):
                     self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId, load_autosave)
+                    for clip in clip_model.__clips__:
+                        clip.path_changed.connect(self.sketchSlotsDataChanged.emit)
             if "selectedClip" in obj:
                 self.set_selected_clip(obj["selectedClip"], force_set=True)
             else:

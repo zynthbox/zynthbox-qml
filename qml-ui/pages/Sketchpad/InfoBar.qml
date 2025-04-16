@@ -58,8 +58,8 @@ RowLayout {
     property int selectedSoundSlot: zynqtgui.soundCombinatorActive
     ? root.selectedChannel.selectedSlotRow
     : root.selectedChannel.selectedSlotRow
-    property int selectedSoundSlotExists: clip.clipChannel.checkIfLayerExists(clip.clipChannel.chainedSounds[selectedSoundSlot])
-    property var soundInfo: clip ? clip.clipChannel.chainedSoundsInfo[infoBar.selectedSoundSlot] : []
+    property int selectedSoundSlotExists: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[selectedSoundSlot])
+    property var soundInfo: clip ? root.selectedChannel.chainedSoundsInfo[infoBar.selectedSoundSlot] : []
     
     spacing: Kirigami.Units.gridUnit    
     onClipChanged: updateSoundNameTimer.restart()
@@ -68,9 +68,9 @@ RowLayout {
         var layerIndex = -1;
         var count = 0;
         
-        if (infoBar.clip) {
-            for (var i in infoBar.clip.clipChannel.chainedSounds) {
-                if (infoBar.clip.clipChannel.chainedSounds[i] >= 0 && infoBar.clip.clipChannel.checkIfLayerExists(infoBar.clip.clipChannel.chainedSounds[i])) {
+        if (root.selectedChannel) {
+            for (var i in root.selectedChannel.chainedSounds) {
+                if (root.selectedChannel.chainedSounds[i] >= 0 && root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[i])) {
                     if (layerIndex < 0) {
                         layerIndex = i
                     }
@@ -81,14 +81,14 @@ RowLayout {
         
         layerLabel.layerIndex = layerIndex
         infoBar.topLayerIndex = layerIndex
-        infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipChannel.chainedSounds[layerIndex]
+        infoBar.topLayer = layerIndex == -1 ? -1 : root.selectedChannel.chainedSounds[layerIndex]
         layerLabel.layerCount = count
         //                        infoBar.selectedChannel = zynqtgui.soundCombinatorActive
-        //                                                    ? infoBar.clip.clipChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
-        //                                                    : infoBar.clip.clipChannel.connectedSound
+        //                                                    ? root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]
+        //                                                    : root.selectedChannel.connectedSound
 
-        if (infoBar.clip) {
-            infoBar.clip.clipChannel.updateChainedSoundsInfo()
+        if (root.selectedChannel) {
+            root.selectedChannel.updateChainedSoundsInfo()
         }
     }
 
@@ -114,7 +114,7 @@ RowLayout {
     }
     
     Connections {
-        target: infoBar.clip ? infoBar.clip.clipChannel : null
+        target: root.selectedChannel ? root.selectedChannel : null
         onChainedSoundsChanged: {
             updateSoundNameTimer.restart()
         }
@@ -133,7 +133,7 @@ RowLayout {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log(infoBar.selectedSoundSlot, infoBar.topLayer, JSON.stringify(infoBar.clip.clipChannel.chainedSoundsInfo, null, 2))
+                console.log(infoBar.selectedSoundSlot, infoBar.topLayer, JSON.stringify(root.selectedChannel.chainedSoundsInfo, null, 2))
             }
         }
     }
@@ -159,7 +159,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
+        visible: root.selectedChannel && root.selectedChannel.trackType === "synth"
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
@@ -174,7 +174,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
+        visible: root.selectedChannel && root.selectedChannel.trackType === "synth"
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
@@ -186,7 +186,7 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
+        visible: root.selectedChannel && root.selectedChannel.trackType === "synth"
         font.pointSize: 10
         text: visible
                 ? infoBar.selectedSoundSlotExists
@@ -198,17 +198,17 @@ RowLayout {
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "sample-loop"
+        visible: root.selectedChannel && root.selectedChannel.trackType === "sample-loop"
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynqtgui.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.filename && infoBar.clip.filename.length > 0 ? infoBar.clip.filename : "--") : ""
     }
     QQC2.Label {
-        property QtObject sample: infoBar.clip && infoBar.clip.clipChannel.samples[infoBar.clip.clipChannel.selectedSlotRow]
+        property QtObject sample: root.selectedChannel && root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
         Layout.fillWidth: false
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignVCenter
-        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "sample-trig"
+        visible: root.selectedChannel && root.selectedChannel.trackType === "sample-trig"
         font.pointSize: 10
         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
         text: zynqtgui.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.filename.length > 0 ? sample.filename : "--") : ""
@@ -227,7 +227,7 @@ RowLayout {
         Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
         Layout.alignment: Qt.AlignVCenter
         checkable: true
-        visible: clip.clipChannel.trackType == "sample-loop"
+        visible: root.selectedChannel.trackType == "sample-loop"
         checked: clip.enabled
         text: clip.enabled ? qsTr("Disable Clip") : qsTr("Enable Clip")
         onToggled: {
@@ -242,7 +242,7 @@ RowLayout {
         Layout.alignment: Qt.AlignVCenter
         icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
         checkable: true
-        visible: infoBar.clip && infoBar.clip.clipChannel.trackType === "synth"
+        visible: root.selectedChannel && root.selectedChannel.trackType === "synth"
         // Bind to current index to properly update when preset changed from other screen
         checked: zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
         onToggled: {

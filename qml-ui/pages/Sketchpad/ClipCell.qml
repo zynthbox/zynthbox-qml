@@ -114,13 +114,14 @@ QQC2.AbstractButton {
                 model: root.channel ? 5 : 0
 
                 QQC2.Label {
+                    property bool isClipEnabled: root.channel.getClipsModelById(index).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).enabled
                     property bool patternHasNotes: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.channel.id, index).hasNotes
 
                     color: {
                         let occupied = false
-                        if (root.channel.trackType == "synth" && patternHasNotes) {
+                        if (root.channel.trackType == "synth" && patternHasNotes && isClipEnabled) {
                             occupied = true
-                        } else if (root.channel.trackType == "sample-loop" && root.channel.occupiedSketchSlots[index]) {
+                        } else if (root.channel.trackType == "sample-loop" && root.channel.occupiedSketchSlots[index] && isClipEnabled) {
                             occupied = true
                         }
 

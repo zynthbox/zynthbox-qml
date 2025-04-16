@@ -148,6 +148,13 @@ class sketchpad_song(QObject):
                 # Set default audio type settings when creating new channel to reset passthroug clients to default values
                 channel.setAudioTypeSettings(channel.defaultAudioTypeSettings())
 
+                # Create 5 clips per channel
+                for clip_index in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    clipsModel = channel.getClipsModelById(clip_index)
+                    for song_index in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
+                        clip = sketchpad_clip(channel.id, song_index, clip_index, self, clipsModel)
+                        clipsModel.add_clip(clip)
+
             # Add first clip of track T1, T2 and T3 to current scene as default snapshot has preselected scenes only on T1, T2 and T3
             for trackIndex in range(3):
                 channel = self.__channels_model__.getChannel(trackIndex)

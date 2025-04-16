@@ -2805,6 +2805,13 @@ class sketchpad_channel(QObject):
     occupiedFxSlots = Property("QVariantList", get_occupiedFxSlots, notify=chainedFxNamesChanged)
     ### END Property occupiedFxSlots
 
+    ### BEGIN Property occupiedSketchFxSlots
+    def get_occupiedSketchFxSlots(self):
+        return [fx != "" for fx in self.chainedSketchFxNames]
+
+    occupiedSketchFxSlots = Property("QVariantList", get_occupiedSketchFxSlots, notify=chainedSketchFxNamesChanged)
+    ### END Property occupiedSketchFxSlots
+
     @Slot(int)
     def selectPreviousSynthPreset(self, slot_index):
         midi_channel = self.chainedSounds[slot_index]

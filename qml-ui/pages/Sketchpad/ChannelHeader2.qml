@@ -115,6 +115,7 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
+                        visible: root.channel.trackType == "synth"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedSynthSlots
@@ -138,6 +139,7 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
+                        visible: root.channel.trackType == "synth"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedSampleSlots
@@ -161,9 +163,58 @@ QQC2.AbstractButton {
                         Layout.preferredHeight: Kirigami.Units.smallSpacing
                         Layout.leftMargin: Kirigami.Units.largeSpacing
                         Layout.rightMargin: Kirigami.Units.largeSpacing
+                        visible: root.channel.trackType == "synth"
 
                         Repeater {
                             model: root.channel && root.channel.occupiedFxSlots
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                TrackHeaderSlotIndicator {
+                                    anchors.centerIn: parent
+                                    highlighted: modelData
+                                    width: parent.width
+                                    height: 2
+                                }
+                            }
+                        }
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.smallSpacing
+                        Layout.leftMargin: Kirigami.Units.largeSpacing
+                        Layout.rightMargin: Kirigami.Units.largeSpacing
+                        visible: root.channel.trackType == "sample-loop"
+
+                        Repeater {
+                            model: root.channel && root.channel.occupiedSketchSlots
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                TrackHeaderSlotIndicator {
+                                    anchors.centerIn: parent
+                                    highlighted: modelData
+                                    width: parent.width
+                                    height: 2
+                                }
+                            }
+                        }
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.smallSpacing
+                        Layout.leftMargin: Kirigami.Units.largeSpacing
+                        Layout.rightMargin: Kirigami.Units.largeSpacing
+                        visible: root.channel.trackType == "sample-loop"
+
+                        Repeater {
+                            model: root.channel && root.channel.occupiedSketchFxSlots
 
                             Item {
                                 Layout.fillWidth: true

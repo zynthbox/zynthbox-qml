@@ -94,7 +94,6 @@ QQC2.AbstractButton {
 
                 QQC2.Label {
                     id: subContents
-//                    anchors.top: contents.bottom
                     width: parent.width
                     visible: root.subText != null
                     horizontalAlignment: "AlignHCenter"
@@ -104,39 +103,114 @@ QQC2.AbstractButton {
                     font.pointSize: 8
                 }
 
-                Item {
-//                    anchors {
-//                        left: contents.right
-//                    }
+                ColumnLayout {
                     width: parent.width
-                    height: parent.height
-                    visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] == root.channel.id && root.synthDetailsVisible
+                    anchors.centerIn: parent
+                    Layout.alignment: Qt.AlignCenter
+                    spacing: Kirigami.Units.smallSpacing
 
-                    Image {
-                        id: synthImage
-                        visible: root.channel.trackType === "synth" &&
-                                 root.channel.occupiedSlotsCount > 0  &&
-                                 synthImage.status !== Image.Error
-                        anchors.fill: parent
-                        fillMode: Image.PreserveAspectCrop
-                        clip: true
-                        opacity: 0.7
-                        property string imageName: String(root.channel.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")
-                        source: imageName !== "" ? Qt.resolvedUrl("../../../img/synths/" + imageName  + ".png") : ""
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.smallSpacing
+                        Layout.leftMargin: Kirigami.Units.largeSpacing
+                        Layout.rightMargin: Kirigami.Units.largeSpacing
+
+                        Repeater {
+                            model: root.channel && root.channel.occupiedSynthSlots
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                TrackHeaderSlotIndicator {
+                                    anchors.centerIn: parent
+                                    highlighted: modelData
+                                    width: parent.width
+                                    height: 2
+                                }
+                            }
+                        }
                     }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.smallSpacing
+                        Layout.leftMargin: Kirigami.Units.largeSpacing
+                        Layout.rightMargin: Kirigami.Units.largeSpacing
 
-                    Image {
-                        visible: (root.channel.trackType === "synth" && synthImage.status === Image.Error && root.channel.occupiedSlotsCount > 0) ||
-                                 root.channel.trackType === "sample-loop"
-                        anchors.fill: parent
-                        fillMode: Image.PreserveAspectCrop
-                        horizontalAlignment: Image.AlignHCenter
-                        verticalAlignment: Image.AlignVCenter
-                        clip: true
-                        opacity: 0.5
-                        source: Qt.resolvedUrl("../../../img/synths/zynth-default.png")
+                        Repeater {
+                            model: root.channel && root.channel.occupiedSampleSlots
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                TrackHeaderSlotIndicator {
+                                    anchors.centerIn: parent
+                                    highlighted: modelData
+                                    width: parent.width
+                                    height: 2
+                                }
+                            }
+                        }
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.smallSpacing
+                        Layout.leftMargin: Kirigami.Units.largeSpacing
+                        Layout.rightMargin: Kirigami.Units.largeSpacing
+
+                        Repeater {
+                            model: root.channel && root.channel.occupiedFxSlots
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                TrackHeaderSlotIndicator {
+                                    anchors.centerIn: parent
+                                    highlighted: modelData
+                                    width: parent.width
+                                    height: 2
+                                }
+                            }
+                        }
                     }
                 }
+
+                // Hide synth image as this area will now be used to display sounds overview
+                // Item {
+                //     width: parent.width
+                //     height: parent.height
+                //     visible: Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] == root.channel.id && root.synthDetailsVisible
+
+                //     Image {
+                //         id: synthImage
+                //         visible: root.channel.trackType === "synth" &&
+                //                  root.channel.occupiedSlotsCount > 0  &&
+                //                  synthImage.status !== Image.Error
+                //         anchors.fill: parent
+                //         fillMode: Image.PreserveAspectCrop
+                //         clip: true
+                //         opacity: 0.7
+                //         property string imageName: String(root.channel.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")
+                //         source: imageName !== "" ? Qt.resolvedUrl("../../../img/synths/" + imageName  + ".png") : ""
+                //     }
+
+                //     Image {
+                //         visible: (root.channel.trackType === "synth" && synthImage.status === Image.Error && root.channel.occupiedSlotsCount > 0) ||
+                //                  root.channel.trackType === "sample-loop"
+                //         anchors.fill: parent
+                //         fillMode: Image.PreserveAspectCrop
+                //         horizontalAlignment: Image.AlignHCenter
+                //         verticalAlignment: Image.AlignVCenter
+                //         clip: true
+                //         opacity: 0.5
+                //         source: Qt.resolvedUrl("../../../img/synths/zynth-default.png")
+                //     }
+                // }
 
                 Item {
                     anchors.fill: parent
@@ -146,30 +220,6 @@ QQC2.AbstractButton {
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         text: "↪ T%1".arg(Zynthbox.MidiRouter.sketchpadTrackTargetTracks[root.channel.id] + 1)
-                    }
-                }
-
-                Rectangle {
-                    height: Kirigami.Units.gridUnit * 0.7
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    color: "#99888888"
-                    visible: root.synthDetailsVisible &&
-                             synthName.text &&
-                             synthName.text.length > 0
-
-                    QQC2.Label {
-                        id: synthName
-                        anchors.fill: parent
-                        elide: "ElideRight"
-                        horizontalAlignment: "AlignHCenter"
-                        verticalAlignment: "AlignVCenter"
-                        font.pointSize: 8
-                        // text: channel.connectedSoundName.split(" > ")[0]
-                        text: root.channel.trackType === "synth"
-                                  ? root.channel.connectedSoundName.split(" > ")[0]
-                                  : ""
                     }
                 }
 
@@ -183,6 +233,29 @@ QQC2.AbstractButton {
                     color: Kirigami.Theme.textColor
                     visible: root.channel.trackType === "external"
                     text: root.channel.externalMidiChannel > -1 ? root.channel.externalMidiChannel + 1 : root.channel.id + 1
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 0.7
+                color: "#99888888"
+
+                QQC2.Label {
+                    id: synthName
+                    anchors.fill: parent
+                    elide: "ElideRight"
+                    horizontalAlignment: "AlignHCenter"
+                    verticalAlignment: "AlignVCenter"
+                    font.pointSize: 8
+                    visible: root.synthDetailsVisible &&
+                             synthName.text &&
+                             synthName.text.length > 0
+                    // text: channel.connectedSoundName.split(" > ")[0]
+                    text: root.channel.trackType === "synth"
+                              ? root.channel.connectedSoundName.split(" > ")[0]
+                              : ""
                 }
             }
         }

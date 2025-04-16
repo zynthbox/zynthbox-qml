@@ -201,7 +201,7 @@ Zynthian.ScreenPage {
         if (slot === -1) {
             slot = root.selectedChannel.selectedSlotRow
         }
-        var clip = root.selectedChannel.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
+        var clip = root.selectedChannel.getClipsModelById(slot).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
         let clipCppObj = Zynthbox.PlayGridManager.getClipById(clip.cppObjId);
         function valueSetter(value) {
             if (clip != null && !clip.isEmpty) {
@@ -506,11 +506,11 @@ Zynthian.ScreenPage {
                             }
                             returnValue = true;
                         } else if (root.selectedChannel && root.selectedChannel.trackType === "sample-loop") {
-                            let clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
+                            let clip = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
                             // when loop and slot is active, goto wave editor or show popup when empty
                             if (clip && !clip.isEmpty) {
                                 zynqtgui.bottomBarControlType = "bottombar-controltype-pattern";
-                                zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex);
+                                zynqtgui.bottomBarControlObj = root.selectedChannel.clipsModel.getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                 bottomStack.slotsBar.bottomBarButton.checked = true;
                                 bottomStack.bottomBar.waveEditorAction.trigger();
                             } else {
@@ -965,7 +965,7 @@ Zynthian.ScreenPage {
 
                         highlightOnFocus: false
                         highlighted: root.showOccupiedSlotsHeader
-//                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedArrangementpadSongIndex + 1)
+//                        text: qsTr("Track T%1").arg(root.song.scenesModel.selectedSketchpadSongIndex + 1)
                         text: root.showOccupiedSlotsHeader
                                 ? qsTr("Inputs")
                                 : qsTr("Track State")
@@ -1070,7 +1070,7 @@ Zynthian.ScreenPage {
 //                                    color: Kirigami.Theme.backgroundColor
 //                                    highlightOnFocus: false
 //                                    highlighted: root.displayTrackButtons
-//                                                    ? root.song.scenesModel.selectedArrangementpadSongIndex === index
+//                                                    ? root.song.scenesModel.selectedSketchpadSongIndex === index
 //                                                    : ""
 
 //                                    text: root.displayTrackButtons
@@ -1085,7 +1085,7 @@ Zynthian.ScreenPage {
 //                                                value: index,
 //                                                component: trackHeaderDelegate
 //                                            }
-//                                            root.song.scenesModel.selectedArrangementpadSongIndex = index
+//                                            root.song.scenesModel.selectedSketchpadSongIndex = index
 //                                        }
 //                                    }
 //                                }
@@ -1493,7 +1493,7 @@ Zynthian.ScreenPage {
 
                                 // Check if source and destination are same
                                 if (root.copySourceObj.className === "sketchpad_clip" &&
-                                    root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex) &&
+                                    root.copySourceObj.value !== root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) &&
                                     zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_clip") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_channel" &&
@@ -1501,7 +1501,7 @@ Zynthian.ScreenPage {
                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_channel") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_track" &&
-                                           root.copySourceObj.value !== root.song.scenesModel.selectedArrangementpadSongIndex &&
+                                           root.copySourceObj.value !== root.song.scenesModel.selectedSketchpadSongIndex &&
                                            zynqtgui.sketchpad.lastSelectedObj.className === "sketchpad_track") {
                                     return true
                                 } else if (root.copySourceObj.className === "sketchpad_clips" &&
@@ -1540,7 +1540,7 @@ Zynthian.ScreenPage {
                         onPressed: {
                             if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clip") {
                                 var sourceClip = root.copySourceObj.value
-                                var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex)
+                                var destClip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
 
                                 // Copy Clip
                                 destClip.copyFrom(sourceClip)
@@ -1576,7 +1576,7 @@ Zynthian.ScreenPage {
                                 zynqtgui.start_loading()
 
                                 // Copy Track
-                                root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedArrangementpadSongIndex)
+                                root.song.scenesModel.copyTrack(root.copySourceObj.value, root.song.scenesModel.selectedSketchpadSongIndex)
 
                                 for (var i=0; i<root.song.channelsModel.count; i++) {
                                     var channel = root.song.channelsModel.getChannel(i)

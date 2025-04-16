@@ -259,7 +259,7 @@ Zynthian.Popup {
                                     }
                                 } else if (sketchpadTrack.trackType === "sample-loop") {
                                     for (var loopIndex = 0; loopIndex < Zynthbox.Plugin.sketchpadSlotCount; ++loopIndex) {
-                                        var clip = sketchpadTrack.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedArrangementpadSongIndex);
+                                        var clip = sketchpadTrack.getClipsModelById(loopIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
                                         if (clip.cppObjId > -1) {
                                             // We pick the name of whatever the first loop is here, just so we've got one
                                             soundIndication = clip.path.split("/").pop();

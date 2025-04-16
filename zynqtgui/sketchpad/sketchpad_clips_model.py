@@ -23,6 +23,7 @@
 #
 # ******************************************************************************
 import logging
+import Zynthbox
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt, Property, Signal, Slot, QObject
 
 from .sketchpad_clip import sketchpad_clip
@@ -46,6 +47,9 @@ class sketchpad_clips_model(QAbstractListModel):
         if self.__channel__ is not None:
             self.__channel__.keyZoneModeChanged.connect(self.updateSamplesFromChannel)
             self.__channel__.track_type_changed.connect(self.updateSamplesFromChannel)
+        for song_index in range(Zynthbox.Plugin.instance().sketchpadSongCount()):
+            clip = sketchpad_clip(self.__channel__.id, song_index, clipIndex, song, self)
+            self.add_clip(clip)
 
     def serialize(self):
         data = []
@@ -55,22 +59,9 @@ class sketchpad_clips_model(QAbstractListModel):
 
     def deserialize(self, arr, clip_index, load_autosave=True):
         logging.debug(f"clips_model_deserialize : {load_autosave}")
-        self.__clips__ = []
-        if not isinstance(arr, list):
-            for i in range(2):
-                clip = sketchpad_clip(self.__channel__.id, i, clip_index, self.__song__, self)
-                self.add_clip(clip)
-            raise Exception("Invalid json format for clips")
-
-        if len(arr) == 0:
-            for i in range(2):
-                clip = sketchpad_clip(self.__channel__.id, i, clip_index, self.__song__, self)
-                self.add_clip(clip)
-            return
         for i, c in enumerate(arr):
-            clip = sketchpad_clip(self.__channel__.id, i, clip_index, self.__song__, self)
+            clip = self.__clips__[i]
             clip.deserialize(c, load_autosave)
-            self.add_clip(clip)
 
     def data(self, index, role=None):
         if not index.isValid():

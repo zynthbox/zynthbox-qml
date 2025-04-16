@@ -2793,7 +2793,7 @@ class sketchpad_channel(QObject):
                 occupied_slots.append(True)
             else:
                 occupied_slots.append(False)
-        return occupiedSlots
+        return occupied_slots
 
     occupiedSketchSlots = Property("QVariantList", get_occupiedSketchSlots, notify=sketchSlotsDataChanged)
     ### END Property occupiedSketchSlots

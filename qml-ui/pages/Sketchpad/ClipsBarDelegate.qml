@@ -128,14 +128,14 @@ ColumnLayout {
                 font.pointSize: 12
                 visible: ["sample-trig", "synth", "external"].indexOf(root.channel.trackType) >= 0
                 color: Qt.rgba(255, 255, 255, clipDelegate.pattern && clipDelegate.pattern.hasNotes ? 1 : 0.3)
-                text: clipDelegate.clipIndex + 1
+                text: String.fromCharCode(clipDelegate.clipIndex + 65)
             }
             QQC2.Label {
                 anchors.centerIn: parent
                 font.pointSize: 12
                 visible: ["sample-loop"].indexOf(root.channel.trackType) >= 0
                 color: Qt.rgba(255, 255, 255, clipDelegate.clipHasWav ? 1 : 0.3)
-                text: String.fromCharCode(clipDelegate.clipIndex + 65)
+                text: clipDelegate.clipIndex + 1
             }
             QQC2.Label {
                 anchors.fill: parent

@@ -75,10 +75,10 @@ Zynthian.ScreenPage {
             result = true;
             break;
         case "NAVIGATE_LEFT":
-            root.pluginFormat = "LV2";
+            // root.pluginFormat = "LV2";
             break;
         case "NAVIGATE_RIGHT":
-            root.pluginFormat = "VST3";
+            // root.pluginFormat = "VST3";
             break;
         case "KNOB3_TOUCHED":
         case "KNOB3_RELEASED":
@@ -171,16 +171,16 @@ Zynthian.ScreenPage {
                     root.pluginFormat = "LV2"
                 }
             }
-            QQC2.Button {
-                Layout.fillWidth: true
-                implicitWidth: 1
-                checked: root.pluginFormat == "VST3"
-                autoExclusive: true
-                text: qsTr("VST3 Plugins")
-                onClicked: {
-                    root.pluginFormat = "VST3"
-                }
-            }
+            // QQC2.Button {
+            //     Layout.fillWidth: true
+            //     implicitWidth: 1
+            //     checked: root.pluginFormat == "VST3"
+            //     autoExclusive: true
+            //     text: qsTr("VST3 Plugins")
+            //     onClicked: {
+            //         root.pluginFormat = "VST3"
+            //     }
+            // }
         }
         Zynthian.Card {
             Layout.fillWidth: true

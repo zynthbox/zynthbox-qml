@@ -69,18 +69,18 @@ Zynthian.ScreenPage {
             result = true;
             break;
         case "NAVIGATE_LEFT":
-            if (zynqtgui.engine.pluginFormat === "") { // "" === Other
-                zynqtgui.engine.pluginFormat = "VST3";
-            } else {
+            // if (zynqtgui.engine.pluginFormat === "") { // "" === Other
+            //     zynqtgui.engine.pluginFormat = "VST3";
+            // } else {
                 zynqtgui.engine.pluginFormat = "LV2";
-            }
+            // }
             break;
         case "NAVIGATE_RIGHT":
-            if (zynqtgui.engine.pluginFormat === "LV2") {
-                zynqtgui.engine.pluginFormat = "VST3";
-            } else {
+            // if (zynqtgui.engine.pluginFormat === "LV2") {
+            //     zynqtgui.engine.pluginFormat = "VST3";
+            // } else {
                 zynqtgui.engine.pluginFormat = ""; // "" === Other
-            }
+            // }
             break;
         case "KNOB3_TOUCHED":
         case "KNOB3_RELEASED":
@@ -140,16 +140,16 @@ Zynthian.ScreenPage {
                     zynqtgui.engine.pluginFormat = "LV2"
                 }
             }
-            QQC2.Button {
-                Layout.fillWidth: true
-                implicitWidth: 1
-                checked: zynqtgui.engine.pluginFormat == "VST3"
-                autoExclusive: true
-                text: qsTr("VST3 Instruments")
-                onClicked: {
-                    zynqtgui.engine.pluginFormat = "VST3"
-                }
-            }
+            // QQC2.Button {
+            //     Layout.fillWidth: true
+            //     implicitWidth: 1
+            //     checked: zynqtgui.engine.pluginFormat == "VST3"
+            //     autoExclusive: true
+            //     text: qsTr("VST3 Instruments")
+            //     onClicked: {
+            //         zynqtgui.engine.pluginFormat = "VST3"
+            //     }
+            // }
             QQC2.Button {
                 Layout.fillWidth: true
                 implicitWidth: 1

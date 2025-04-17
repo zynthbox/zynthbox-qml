@@ -104,7 +104,7 @@ QQC2.AbstractButton {
 
         RowLayout {
             id: activeItemsRow
-            property string highlightColor: "#ccaaff00" // green
+            property string highlightColor: "#ffffffff" // green "#ccaaff00"
             property string inactiveColor: "#33ffffff"
             anchors.centerIn: parent
             spacing: 0

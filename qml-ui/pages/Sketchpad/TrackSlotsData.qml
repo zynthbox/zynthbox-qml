@@ -1,6 +1,6 @@
-import QtQuick 2.10
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.4 as QQC2
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -110,6 +110,8 @@ RowLayout {
         horizontalAlignment: Qt.AlignRight
         verticalAlignment: Qt.AlignVCenter
         visible: control.showSlotTypeLabel
+        font.bold: true
+        font.pointSize: 11
         text: {
             if (control.slotTypeLabel == "") {
                 switch (control.slotType) {

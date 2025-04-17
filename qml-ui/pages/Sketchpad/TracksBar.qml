@@ -997,6 +997,7 @@ Rectangle {
                                         anchors.fill: parent
                                         slotData: root.selectedChannel.synthSlotsData
                                         slotType: "synth"
+                                        showSlotTypeLabel: true
                                         visible: root.selectedChannel.trackType == "synth"
                                     }
                                     TrackSlotsData {
@@ -1004,12 +1005,13 @@ Rectangle {
                                         anchors.fill: parent
                                         slotData: root.selectedChannel.sketchSlotsData
                                         slotType: "sample-loop"
+                                        showSlotTypeLabel: true
                                         visible: root.selectedChannel.trackType == "sample-loop"
                                     }
                                     TrackSlotsData {
                                         id: externalRow
                                         anchors.fill: parent
-                                        slotData: root.selectedChannel.externalSlotsData
+                                        slotData: root.selecedChannel.externalSlotsData
                                         slotType: "external"
                                         visible: root.selectedChannel.trackType == "external"
                                     }
@@ -1023,6 +1025,7 @@ Rectangle {
                                         anchors.fill: parent
                                         slotData: root.selectedChannel.sampleSlotsData
                                         slotType: "sample-trig"
+                                        showSlotTypeLabel: true
                                         visible: root.selectedChannel.trackType == "synth"
                                     }
                                     TrackSlotsData {
@@ -1030,6 +1033,7 @@ Rectangle {
                                         anchors.fill: parent
                                         slotData: root.selectedChannel.sketchFxSlotsData
                                         slotType: "sketch-fx"
+                                        showSlotTypeLabel: true
                                         visible: root.selectedChannel.trackType == "sample-loop"
                                     }
                                 }
@@ -1042,6 +1046,7 @@ Rectangle {
                                         anchors.fill: parent
                                         slotData: root.selectedChannel.fxSlotsData
                                         slotType: "fx"
+                                        showSlotTypeLabel: true
                                         visible: root.selectedChannel.trackType == "synth"
                                     }
                                 }

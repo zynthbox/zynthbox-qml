@@ -24,6 +24,17 @@ RowLayout {
       * Allowed values : "synth", "sample-trig", "sample-loop", "external", "text", "sketch-fx"
       */
     property string slotType
+    /**
+      * When set to true, it will display the slotTypeLabel before the slots
+      * If slotTypeLabel is not defined it will generate a label based on slot type
+      * Default : false
+      */
+    property bool showSlotTypeLabel: false
+    /**
+      * slotTypeLabel will be displayed before the slots when showSlotTypeLabel is set to true
+      * If slotTypeLabel is not set, a label will be generated based on trackType
+      */
+    property string slotTypeLabel: ""
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -88,6 +99,37 @@ RowLayout {
                     return "TracksBar_fxslot";
                 default:
                     return "unknown-slotType:%1".arg(slotType);
+            }
+        }
+    }
+
+    QQC2.Label {
+        Layout.fillWidth: false
+        Layout.fillHeight: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+        horizontalAlignment: Qt.AlignRight
+        verticalAlignment: Qt.AlignVCenter
+        visible: control.showSlotTypeLabel
+        text: {
+            if (control.slotTypeLabel == "") {
+                switch (control.slotType) {
+                    case "synth":
+                        return qsTr("Synths :")
+                    case "sample-trig":
+                        return qsTr("Samples :")
+                    case "sample-loop":
+                        return qsTr("Sketches :")
+                    case "external":
+                        return qsTr("External :")
+                    case "fx":
+                        return qsTr("FX :")
+                    case "sketch-fx":
+                        return qsTr("FX :")
+                    case "text":
+                        return qsTr("")
+                }
+            } else {
+                return control.slotTypeLabel
             }
         }
     }

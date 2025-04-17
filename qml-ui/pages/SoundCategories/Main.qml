@@ -567,64 +567,43 @@ Zynthian.ScreenPage {
                 Layout.preferredHeight: 2
             }
 
-            RowLayout {
+            Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
-                QQC2.Label {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                    horizontalAlignment: Qt.AlignRight
-                    verticalAlignment: Qt.AlignVCenter
-                    text: qsTr("Synth :")
-                }
-                Sketchpad.TrackSlotsData {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                    slotData: soundDetails.displaySelectedSoundData
-                                ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
-                                : root.selectedChannel.synthSlotsData
-                    slotType: soundDetails.displaySelectedSoundData
-                                ? "text"
-                                : "synth"
-                }
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                slotData: soundDetails.displaySelectedSoundData
+                            ? soundButtonGroup.checkedButton.soundObj.synthSlotsData
+                            : root.selectedChannel.synthSlotsData
+                slotType: soundDetails.displaySelectedSoundData
+                            ? "text"
+                            : "synth"
+                showSlotTypeLabel: true
+                slotTypeLabel: "Synths :"
             }
 
-            RowLayout {
+            Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
-                QQC2.Label {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                    horizontalAlignment: Qt.AlignRight
-                    verticalAlignment: Qt.AlignVCenter
-                    text: qsTr("Samples :")
-                }
-                Sketchpad.TrackSlotsData {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                    slotData: soundDetails.displaySelectedSoundData
-                                ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
-                                : root.selectedChannel.sampleSlotsData
-                    slotType: soundDetails.displaySelectedSoundData
-                                ? "text"
-                                : "sample-trig"
-                }
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                slotData: soundDetails.displaySelectedSoundData
+                            ? soundButtonGroup.checkedButton.soundObj.sampleSlotsData
+                            : root.selectedChannel.sampleSlotsData
+                slotType: soundDetails.displaySelectedSoundData
+                            ? "text"
+                            : "sample-trig"
+                showSlotTypeLabel: true
+                slotTypeLabel: "Samples :"
             }
 
-            RowLayout {
+            Sketchpad.TrackSlotsData {
                 Layout.fillWidth: true
-                QQC2.Label {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                    horizontalAlignment: Qt.AlignRight
-                    verticalAlignment: Qt.AlignVCenter
-                    text: qsTr("Fx :")
-                }
-                Sketchpad.TrackSlotsData {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                    slotData: soundDetails.displaySelectedSoundData
-                                ? soundButtonGroup.checkedButton.soundObj.fxSlotsData
-                                : root.selectedChannel.fxSlotsData
-                    slotType: soundDetails.displaySelectedSoundData
-                                ? "text"
-                                : "fx"
-                }
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                slotData: soundDetails.displaySelectedSoundData
+                            ? soundButtonGroup.checkedButton.soundObj.fxSlotsData
+                            : root.selectedChannel.fxSlotsData
+                slotType: soundDetails.displaySelectedSoundData
+                            ? "text"
+                            : "fx"
+                showSlotTypeLabel: true
+                slotTypeLabel: "FX :"
             }
         }
     }

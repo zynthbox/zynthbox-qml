@@ -77,7 +77,6 @@
         "./qml-ui/pages/Sketchpad/ExternalAudioSourcePicker.qml",
         "./qml-ui/pages/Sketchpad/ExternalMidiChannelPicker.qml",
         "./qml-ui/pages/Sketchpad/FXBar.qml",
-        "./qml-ui/pages/Sketchpad/InfoBar.qml",
         "./qml-ui/pages/Sketchpad/Main.qml",
         "./qml-ui/pages/Sketchpad/TracksBar.qml",
         "./qml-ui/pages/Sketchpad/MixerBar.qml",

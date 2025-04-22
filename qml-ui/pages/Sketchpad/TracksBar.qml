@@ -1070,8 +1070,7 @@ Rectangle {
                                             ? root.selectedChannel.selectedSlot.component.clip
                                             : null
                                         // We show the waveform container for all track types except external
-                                        waveformContainer.showWaveform = root.selectedChannel.trackType === "sample-loop" ||
-                                                                         root.selectedChannel.trackType === "synth"
+                                        waveformContainer.showWaveform = ["TracksBar_sampleslot", "TracksBar_sketchslot"].indexOf(root.selectedChannel.selectedSlot.className) >= 0
                                     }
                                 }
                                 Connections {
@@ -1116,11 +1115,135 @@ Rectangle {
                                         border.width: 1
                                         border.color: "#ff999999"
                                         radius: 4
-                                        opacity: waveformContainer.showWaveform ? 1 : 0
+
+                                        RowLayout {
+                                            id: infoBar
+                                            property var clip: null
+                                            property int selectedSoundSlot: zynqtgui.selectedSlot.value
+                                            property int selectedSoundSlotExists: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[selectedSoundSlot])
+                                            property var soundInfo: clip ? root.selectedChannel.chainedSoundsInfo[infoBar.selectedSoundSlot] : []
+                                            function updateInfoBar() {
+                                                if (root.selectedChannel) {
+                                                    root.selectedChannel.updateChainedSoundsInfo()
+                                                }
+                                            }
+
+                                            anchors.fill: parent
+                                            anchors.margins: Kirigami.Units.largeSpacing
+                                            spacing: Kirigami.Units.largeSpacing
+                                            visible: !waveformContainer.showWaveform
+                                            onClipChanged: updateSoundNameTimer.restart()
+                                            Component.onCompleted: {
+                                                clipThrottle.restart();
+                                            }
+
+                                            Timer {
+                                                id: clipThrottle
+                                                interval: 1; running: false; repeat: false;
+                                                onTriggered: {
+                                                    infoBar.clip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                                                }
+                                            }
+                                            Connections {
+                                                target: zynqtgui.sketchpad
+                                                onSelected_track_id_changed: {
+                                                    updateSoundNameTimer.restart()
+                                                    clipThrottle.restart()
+                                                }
+                                            }
+                                            Connections {
+                                                target: zynqtgui.sketchpad.song.scenesModel
+                                                onSelected_sketchpad_song_index_changed: clipThrottle.restart()
+                                            }
+                                            Timer {
+                                                id: updateSoundNameTimer
+                                                repeat: false
+                                                interval: 10
+                                                onTriggered: infoBar.updateInfoBar()
+                                            }
+                                            Connections {
+                                                target: zynqtgui.fixed_layers
+                                                onList_updated: {
+                                                    updateSoundNameTimer.restart()
+                                                }
+                                            }
+                                            Connections {
+                                                target: zynqtgui.bank
+                                                onList_updated: {
+                                                    updateSoundNameTimer.restart()
+                                                }
+                                            }
+                                            Connections {
+                                                target: root.selectedChannel ? root.selectedChannel : null
+                                                onChainedSoundsChanged: {
+                                                    updateSoundNameTimer.restart()
+                                                }
+                                                onSelectedSlotRowChanged: {
+                                                    updateSoundNameTimer.restart()
+                                                }
+                                            }
+
+                                            ColumnLayout {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+
+                                                QQC2.Label {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    Layout.alignment: Qt.AlignVCenter
+                                                    font.pointSize: 10
+                                                    text: infoBar.selectedSoundSlotExists
+                                                            ? qsTr("Synth: %1").arg(infoBar.soundInfo.synthName)
+                                                            : qsTr("Synth: --")
+                                                }
+                                                QQC2.Label {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    Layout.alignment: Qt.AlignVCenter
+                                                    font.pointSize: 10
+                                                    text: infoBar.selectedSoundSlotExists
+                                                            ? qsTr("Bank: %1").arg(infoBar.soundInfo.bankName)
+                                                            : qsTr("Bank: --")
+                                                }
+                                                QQC2.Label {
+                                                    Layout.fillWidth: true
+                                                    Layout.fillHeight: true
+                                                    Layout.alignment: Qt.AlignVCenter
+                                                    font.pointSize: 10
+                                                    text: infoBar.selectedSoundSlotExists
+                                                            ? qsTr("Preset (%2/%3): %1")
+                                                                .arg(infoBar.soundInfo.presetName)
+                                                                .arg(infoBar.soundInfo.presetIndex+1)
+                                                                .arg(infoBar.soundInfo.presetLength)
+                                                            : qsTr("Preset: --")
+                                                }
+                                            }
+
+                                            ColumnLayout {
+                                                Layout.fillWidth: false
+                                                Layout.fillHeight: true
+
+                                                QQC2.Button {
+                                                    Layout.fillWidth: false
+                                                    Layout.fillHeight: false
+                                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                                                    Layout.alignment: Qt.AlignVCenter
+                                                    text: qsTr("Favorite")
+                                                    icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                                                    checkable: false
+                                                    // Bind to current index to properly update when preset changed from other screen
+                                                    checked: zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
+                                                    onClicked: {
+                                                        zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
+                                                    }
+                                                }
+                                            }
+                                        }
 
                                         Zynthbox.WaveFormItem {
                                             id: waveformItem
                                             anchors.fill: parent
+                                            opacity: waveformContainer.showWaveform ? 1 : 0
                                             color: Kirigami.Theme.textColor
                                             source: progressDots.cppClipObject ? "clip:/%1".arg(progressDots.cppClipObject.id) : ""
                                             visible: waveformContainer.clip && !waveformContainer.clip.isEmpty
@@ -1262,6 +1385,7 @@ Rectangle {
 
                                         MouseArea {
                                             anchors.fill: parent
+                                            enabled: waveformContainer.showWaveform
                                             onClicked: {
 
                                                 // Show waveform on click as well as longclick instead of opening picker dialog

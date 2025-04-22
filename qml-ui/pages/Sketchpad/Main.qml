@@ -1695,14 +1695,6 @@ Zynthian.ScreenPage {
                 //     Layout.fillHeight: true
                 // }
             }
-
-            InfoBar {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.leftMargin: Kirigami.Units.gridUnit * 0.5
-                Layout.rightMargin: Kirigami.Units.gridUnit * 0.5
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-            }
         }
     }
 }

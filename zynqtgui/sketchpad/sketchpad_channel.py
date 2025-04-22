@@ -2834,6 +2834,7 @@ class sketchpad_channel(QObject):
                         self.zynqtgui.fixed_layers.volumeControllers[midi_channel].value = prev_volume
                     except Exception: pass
 
+                self.zynqtgui.preset.select(layer.preset_index)
                 self.zynqtgui.layer.emit_layer_preset_changed(layer)
                 self.zynqtgui.screens['control'].show()
                 self.zynqtgui.layer.fill_list()
@@ -2861,6 +2862,7 @@ class sketchpad_channel(QObject):
                         self.zynqtgui.fixed_layers.volumeControllers[midi_channel].value = prev_volume
                     except Exception: pass
 
+                self.zynqtgui.preset.select(layer.preset_index)
                 self.zynqtgui.layer.emit_layer_preset_changed(layer)
                 self.zynqtgui.screens['control'].show()
                 self.zynqtgui.layer.fill_list()
@@ -2874,6 +2876,7 @@ class sketchpad_channel(QObject):
 
         if layer is not None and layer.preset_index > 0:
             layer.set_preset(layer.preset_index - 1)
+            self.zynqtgui.preset.select(layer.preset_index)
             self.zynqtgui.layer.emit_layer_preset_changed(layer)
             self.zynqtgui.screens['control'].show()
             self.zynqtgui.layer.fill_list()
@@ -2886,6 +2889,7 @@ class sketchpad_channel(QObject):
 
         if layer is not None and layer.preset_index < len(layer.preset_list) - 1:
             layer.set_preset(layer.preset_index + 1)
+            self.zynqtgui.preset.select(layer.preset_index)
             self.zynqtgui.layer.emit_layer_preset_changed(layer)
             self.zynqtgui.screens['control'].show()
             self.zynqtgui.layer.fill_list()

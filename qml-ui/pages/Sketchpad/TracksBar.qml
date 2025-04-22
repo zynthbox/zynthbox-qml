@@ -1119,7 +1119,7 @@ Rectangle {
                                         RowLayout {
                                             id: infoBar
                                             property var clip: null
-                                            property int selectedSoundSlot: zynqtgui.selectedSlot.value
+                                            property int selectedSoundSlot: root.selectedChannel.selectedSlot.value
                                             property int selectedSoundSlotExists: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[selectedSoundSlot])
                                             property var soundInfo: clip ? root.selectedChannel.chainedSoundsInfo[infoBar.selectedSoundSlot] : []
                                             function updateInfoBar() {
@@ -1186,6 +1186,7 @@ Rectangle {
                                             ColumnLayout {
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
+                                                enabled: infoBar.selectedSoundSlotExists
 
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
@@ -1210,6 +1211,7 @@ Rectangle {
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 10
+
                                                     text: infoBar.selectedSoundSlotExists
                                                             ? qsTr("Preset (%2/%3): %1")
                                                                 .arg(infoBar.soundInfo.presetName)
@@ -1230,11 +1232,16 @@ Rectangle {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     text: qsTr("Favorite")
                                                     icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                                                    enabled: infoBar.selectedSoundSlotExists
                                                     checkable: false
                                                     // Bind to current index to properly update when preset changed from other screen
-                                                    checked: zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
+                                                    checked: infoBar.selectedSoundSlotExists
+                                                                ? zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
+                                                                : false
                                                     onClicked: {
-                                                        zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
+                                                        if (infoBar.selectedSoundSlotExists) {
+                                                            zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
+                                                        }
                                                     }
                                                 }
                                             }

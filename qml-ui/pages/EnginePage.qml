@@ -72,15 +72,19 @@ Zynthian.ScreenPage {
             // if (zynqtgui.engine.pluginFormat === "") { // "" === Other
             //     zynqtgui.engine.pluginFormat = "VST3";
             // } else {
-                zynqtgui.engine.pluginFormat = "LV2";
+            //     zynqtgui.engine.pluginFormat = "LV2";
             // }
+            view.moveCurrentIndexLeft();
+            result = true;
             break;
         case "NAVIGATE_RIGHT":
             // if (zynqtgui.engine.pluginFormat === "LV2") {
             //     zynqtgui.engine.pluginFormat = "VST3";
             // } else {
-                zynqtgui.engine.pluginFormat = ""; // "" === Other
+            //     zynqtgui.engine.pluginFormat = ""; // "" === Other
             // }
+            view.moveCurrentIndexRight();
+            result = true;
             break;
         case "KNOB3_TOUCHED":
         case "KNOB3_RELEASED":
@@ -125,42 +129,42 @@ Zynthian.ScreenPage {
     ColumnLayout {
         anchors.fill: parent
 
-        RowLayout {
-            id: tabbarLayout
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        // RowLayout {
+        //     id: tabbarLayout
+        //     Layout.fillWidth: true
+        //     Layout.fillHeight: true
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                implicitWidth: 1
-                checked: zynqtgui.engine.pluginFormat == "LV2"
-                autoExclusive: true
-                text: qsTr("LV2 Instruments")
-                onClicked: {
-                    zynqtgui.engine.pluginFormat = "LV2"
-                }
-            }
-            // QQC2.Button {
-            //     Layout.fillWidth: true
-            //     implicitWidth: 1
-            //     checked: zynqtgui.engine.pluginFormat == "VST3"
-            //     autoExclusive: true
-            //     text: qsTr("VST3 Instruments")
-            //     onClicked: {
-            //         zynqtgui.engine.pluginFormat = "VST3"
-            //     }
-            // }
-            QQC2.Button {
-                Layout.fillWidth: true
-                implicitWidth: 1
-                checked: zynqtgui.engine.pluginFormat == ""
-                autoExclusive: true
-                text: qsTr("Other Synths")
-                onClicked: {
-                    zynqtgui.engine.pluginFormat = ""
-                }
-            }
-        }
+        //     QQC2.Button {
+        //         Layout.fillWidth: true
+        //         implicitWidth: 1
+        //         checked: zynqtgui.engine.pluginFormat == "LV2"
+        //         autoExclusive: true
+        //         text: qsTr("LV2 Instruments")
+        //         onClicked: {
+        //             zynqtgui.engine.pluginFormat = "LV2"
+        //         }
+        //     }
+        //     // QQC2.Button {
+        //     //     Layout.fillWidth: true
+        //     //     implicitWidth: 1
+        //     //     checked: zynqtgui.engine.pluginFormat == "VST3"
+        //     //     autoExclusive: true
+        //     //     text: qsTr("VST3 Instruments")
+        //     //     onClicked: {
+        //     //         zynqtgui.engine.pluginFormat = "VST3"
+        //     //     }
+        //     // }
+        //     QQC2.Button {
+        //         Layout.fillWidth: true
+        //         implicitWidth: 1
+        //         checked: zynqtgui.engine.pluginFormat == ""
+        //         autoExclusive: true
+        //         text: qsTr("Other Synths")
+        //         onClicked: {
+        //             zynqtgui.engine.pluginFormat = ""
+        //         }
+        //     }
+        // }
         Zynthian.Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -277,21 +281,6 @@ Zynthian.ScreenPage {
                                         opacity: 0.4
                                     }
                                 }
-
-                                Kirigami.Heading {
-                                    anchors {
-                                        left: parent.left
-                                        right: parent.right
-                                        bottom: parent.bottom
-                                        bottomMargin: Kirigami.Units.gridUnit
-                                    }
-
-                                    text: model.metadata && model.metadata.description ? model.metadata.description : ""
-                                    elide: "ElideRight"
-                                    font.pointSize: 8
-                                    visible: view.currentIndex === index
-                                    horizontalAlignment: "AlignHCenter"
-                                }
                             }
                             ColumnLayout {
                                 Layout.fillWidth: true
@@ -299,12 +288,21 @@ Zynthian.ScreenPage {
                                 Layout.leftMargin: Kirigami.Units.gridUnit
                                 Layout.rightMargin: Kirigami.Units.gridUnit
 
-                                Kirigami.Heading {
+                                QQC2.Label {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
-                                    text: model.display
-                                    level: 2
+                                    text: "%1 (%2)".arg(model.display).arg(model.metadata.pluginFormat)
+                                    font.pointSize: 12
+                                    horizontalAlignment: "AlignHCenter"
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                                    text: model.metadata && model.metadata.description ? model.metadata.description : ""
+                                    font.pointSize: 10
+                                    opacity: 0.7
                                     horizontalAlignment: "AlignHCenter"
                                 }
                             }

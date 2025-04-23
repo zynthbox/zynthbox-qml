@@ -2157,7 +2157,7 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_VOLUME":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.gainHandler.setGainAbsolute(np.interp(param[0], (0, 127), (0, 1)))
+            theTrack.gainHandler.setGainAbsolute(np.interp(params[0], (0, 127), (0, 1)))
             sendCuiaEventFeedback = False
         elif cuia == "SET_CLIP_CURRENT":
             shouldEmitClipOnly = True
@@ -2182,15 +2182,15 @@ class zynthian_gui(QObject):
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_PAN":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.pan = np.interp(param[0], (0, 127), (-1, 1))
+            theTrack.pan = np.interp(params[0], (0, 127), (-1, 1))
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_SEND1_AMOUNT":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.wetFx1Amount = np.interp(param[0], (0, 127), (0, 1))
+            theTrack.wetFx1Amount = np.interp(params[0], (0, 127), (0, 1))
             sendCuiaEventFeedback = False
         elif cuia == "SET_TRACK_SEND2_AMOUNT":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)
-            theTrack.wetFx2Amount = np.interp(param[0], (0, 127), (0, 1))
+            theTrack.wetFx2Amount = np.interp(params[0], (0, 127), (0, 1))
             sendCuiaEventFeedback = False
         elif cuia == "SET_CLIP_ACTIVE_STATE":
             theTrack = self.sketchpad.song.channelsModel.getChannel(track)

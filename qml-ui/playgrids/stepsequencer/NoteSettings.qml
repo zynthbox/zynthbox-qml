@@ -153,6 +153,9 @@ ColumnLayout {
     property string stepDurationName: component.patternModel
         ? "%1 (auto)".arg(component.patternModel.stepLengthName(component.patternModel.stepLength))
         : ""
+    property string defaultDurationName: component.patternModel
+        ? "%1 (default)".arg(component.patternModel.stepLengthName(component.patternModel.defaultNoteDuration))
+        : ""
 
     readonly property int parameterPageCount: 3
     property int currenParameterPageIndex: 0
@@ -676,28 +679,29 @@ ColumnLayout {
                     paramValueSuffix: "/128"
                     paramDefault: undefined
                     paramInterpretedDefault: component.stepDuration
-                    paramMin: 0
+                    paramMin: -1
                     paramMax: 1024
                     scrollWidth: 128
-                    paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, /*384,*/ 512, /*640, 768, 896,*/ 1024]
+                    paramList: [-1, 0, 1, 2, 4, 8, 16, 32, 64, 128, 256, /*384,*/ 512, /*640, 768, 896,*/ 1024]
                     paramNames: {
-                        0: component.stepDurationName,
-                        1: "1/128",
-                        2: "1/64",
-                        4: "1/32",
-                        8: "1/16",
-                        16: "1/8",
-                        32: "1/4",
-                        64: "1/2",
-                        96: "3/4",
-                        128: "1",
-                        256: "2",
-                        384: "3",
-                        512: "4",
-                        640: "5",
-                        768: "6",
-                        896: "7",
-                        1024: "8"
+                        "-1": component.defaultDurationName,
+                        "0": component.stepDurationName,
+                        "1": "1/128",
+                        "2": "1/64",
+                        "4": "1/32",
+                        "8": "1/16",
+                        "16": "1/8",
+                        "32": "1/4",
+                        "64": "1/2",
+                        "96": "3/4",
+                        "128": "1",
+                        "256": "2",
+                        "384": "3",
+                        "512": "4",
+                        "640": "5",
+                        "768": "6",
+                        "896": "7",
+                        "1024": "8"
                     }
                     knobId: 1
                     currentlySelected: subnoteDelegate.isCurrent

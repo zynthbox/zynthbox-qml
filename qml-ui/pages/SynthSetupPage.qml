@@ -654,6 +654,10 @@ Zynthian.ScreenPage {
                         checked: zynqtgui.preset.show_only_favorites
                         onClicked: {
                             zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                            if (!zynqtgui.preset.show_only_favorites) {
+                                bankView.forceViewPosition()
+                                presetView.forceViewPosition()
+                            }
                         }
                     }
                 }
@@ -773,6 +777,10 @@ Zynthian.ScreenPage {
                     checked: zynqtgui.preset.show_only_favorites
                     onClicked: {
                         zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
+                        if (!zynqtgui.preset.show_only_favorites) {
+                            bankView.forceViewPosition()
+                            presetView.forceViewPosition()
+                        }
                     }
                 }
             }

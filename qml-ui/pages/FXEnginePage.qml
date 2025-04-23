@@ -76,9 +76,11 @@ Zynthian.ScreenPage {
             break;
         case "NAVIGATE_LEFT":
             // root.pluginFormat = "LV2";
+            view.moveCurrentIndexLeft();
             break;
         case "NAVIGATE_RIGHT":
             // root.pluginFormat = "VST3";
+            view.moveCurrentIndexRight();
             break;
         case "KNOB3_TOUCHED":
         case "KNOB3_RELEASED":
@@ -156,32 +158,32 @@ Zynthian.ScreenPage {
     ColumnLayout {
         anchors.fill: parent
 
-        RowLayout {
-            id: tabbarLayout
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        // RowLayout {
+        //     id: tabbarLayout
+        //     Layout.fillWidth: true
+        //     Layout.fillHeight: true
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                implicitWidth: 1
-                checked: root.pluginFormat == "LV2"
-                autoExclusive: true
-                text: qsTr("LV2 Plugins")
-                onClicked: {
-                    root.pluginFormat = "LV2"
-                }
-            }
-            // QQC2.Button {
-            //     Layout.fillWidth: true
-            //     implicitWidth: 1
-            //     checked: root.pluginFormat == "VST3"
-            //     autoExclusive: true
-            //     text: qsTr("VST3 Plugins")
-            //     onClicked: {
-            //         root.pluginFormat = "VST3"
-            //     }
-            // }
-        }
+        //     QQC2.Button {
+        //         Layout.fillWidth: true
+        //         implicitWidth: 1
+        //         checked: root.pluginFormat == "LV2"
+        //         autoExclusive: true
+        //         text: qsTr("LV2 Plugins")
+        //         onClicked: {
+        //             root.pluginFormat = "LV2"
+        //         }
+        //     }
+        //     // QQC2.Button {
+        //     //     Layout.fillWidth: true
+        //     //     implicitWidth: 1
+        //     //     checked: root.pluginFormat == "VST3"
+        //     //     autoExclusive: true
+        //     //     text: qsTr("VST3 Plugins")
+        //     //     onClicked: {
+        //     //         root.pluginFormat = "VST3"
+        //     //     }
+        //     // }
+        // }
         Zynthian.Card {
             Layout.fillWidth: true
             Layout.fillHeight: true

@@ -370,7 +370,6 @@ class sketchpad_channel(QObject):
         self.__chained_sounds_info_updater = QTimer()
         self.__chained_sounds_info_updater.setInterval(1)
         self.__chained_sounds_info_updater.setSingleShot(True)
-        self.__chained_sounds_info_updater.timeout.connect(self.chainedSoundsInfoChanged.emit)
 
         self.__synthRoutingDataUpdaterThrottle__ = QTimer()
         self.__synthRoutingDataUpdaterThrottle__.setInterval(1)
@@ -649,7 +648,6 @@ class sketchpad_channel(QObject):
         self.occupiedSlotsChanged.emit()
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
-        self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
         self.chainedFxNamesChanged.emit()
         self.chainedSoundsAcceptedChannelsChanged.emit()
@@ -663,7 +661,6 @@ class sketchpad_channel(QObject):
     def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
-        self.chainedSoundsInfoChanged.emit()
         self.chainedSoundsNamesChanged.emit()
         self.chainedFxNamesChanged.emit()
         self.updateSynthRoutingData()
@@ -1983,53 +1980,6 @@ class sketchpad_channel(QObject):
     sceneClip = Property(QObject, get_scene_clip, notify=scene_clip_changed)
     ### END Property sceneClip
 
-    ### Property chainedSoundsInfo
-    def get_chainedSoundsInfo(self):
-        info = []
-
-        try:
-            for sound in self.chainedSounds:
-                if sound >= 0 and self.checkIfLayerExists(sound):
-                    layer = self.zynqtgui.layer.layer_midi_map[sound]
-                    info.append({
-                        'presetIndex': layer.preset_index,
-                        'presetLength': len(layer.preset_list),
-                        'bankName': layer.bank_name,
-                        'synthName': layer.engine.name,
-                        'presetName': layer.preset_name
-                    })
-                else:
-                    info.append({
-                        'presetIndex': 0,
-                        'presetLength': 0,
-                        'bankName': '',
-                        'synthName': '',
-                        'presetName': ''
-                    })
-        except Exception as e:
-            logging.error(f"Error getting sound info : {str(e)}")
-            traceback.print_exception()
-
-            info.append({
-                'presetIndex': 0,
-                'presetLength': 0,
-                'bankName': '',
-                'synthName': '',
-                'presetName': ''
-            })
-
-        return info
-
-    @Slot(None)
-    def updateChainedSoundsInfo(self):
-        QMetaObject.invokeMethod(self.__chained_sounds_info_updater, "start", Qt.QueuedConnection)
-
-    chainedSoundsInfoChanged = Signal()
-
-    chainedSoundsInfo = Property('QVariantList', get_chainedSoundsInfo, notify=chainedSoundsInfoChanged)
-
-    ### END Property chained_sounds_presets
-
     ### BEGIN Property selectedSlot
     def get_selectedSlot(self):
         return self.__selected_slot_obj
@@ -2839,7 +2789,6 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.screens['control'].show()
                 self.zynqtgui.layer.fill_list()
                 self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
-                self.chainedSoundsInfoChanged.emit()
                 self.chainedSoundsNamesChanged.emit()
 
     @Slot(int)
@@ -2867,7 +2816,6 @@ class sketchpad_channel(QObject):
                 self.zynqtgui.screens['control'].show()
                 self.zynqtgui.layer.fill_list()
                 self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
-                self.chainedSoundsInfoChanged.emit()
                 self.chainedSoundsNamesChanged.emit()
 
     @Slot(int)

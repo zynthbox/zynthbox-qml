@@ -109,7 +109,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     def stop(self):
         try:
             self.proc.sendLine("quit")
-            self.proc.waitForOutput("\ncheers!")
+            self.proc.waitForOutput("cheers!")
         except:
             super().stop()
 

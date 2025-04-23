@@ -2296,8 +2296,14 @@ class zynthian_gui(QObject):
                         self.__test_wave_clip.deleteLater()
                         self.__test_wave_clip = None
                 if self.__test_wave_clip is None:
-                    self.__test_wave_clip = Zynthbox.ClipAudioSource(str(testWaveFile), -1, 0, False, False, self)
-                    self.__test_wave_clip.setLaneAffinity(1)
+                    if testWaveFile:
+                        if Path(str(testWaveFile)).exists():
+                            self.__test_wave_clip = Zynthbox.ClipAudioSource(str(testWaveFile), -1, 0, False, False, self)
+                            self.__test_wave_clip.setLaneAffinity(1)
+                        else:
+                            logging.error(f"Could not play the wave file '{str(testWaveFile)}' as it does not exist")
+                    else:
+                        logging.error(f"Could not play a file that is just an empty string")
             # Allow calling the function again without passing an explicit filename to the function
             if self.__test_wave_clip is not None:
                 self.__test_wave_clip.play(False)

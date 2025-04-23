@@ -293,11 +293,14 @@ class webconf_fifo_handler(QObject):
                             value = 0
                             if splitDataLength == 5:
                                 command = splitData[1].upper()
-                                track = max(-1, min(splitData[2], Zynthbox.Plugin.instance().sketchpadTrackCount()))
-                                slot = max(-1, min(splitData[3], Zynthbox.Plugin.instance().sketchpadSlotCount()))
-                                value = max(0, min(splitData[4], 127))
+                                track = max(-1, min(int(splitData[2]), Zynthbox.Plugin.instance().sketchpadTrackCount()))
+                                slot = max(-1, min(int(splitData[3]), Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                value = max(0, min(int(splitData[4]), 127))
                             elif len(splitData) == 2:
                                 command = splitData[1].upper()
+                            elif len(splitData) == 3:
+                                command = splitData[1].upper()
+                                value = splitData[2]
                             else:
                                 # This should really not happen (you either pass the command only, or you pass all the parameters, no in-between)
                                 logging.error(f"Attempted to handle a cuia command which did not match the expected layout of either cuia/command or cuia/command/track/slot/value: {inputData}")
@@ -344,7 +347,7 @@ class webconf_fifo_handler(QObject):
                                                 case "clearSlot":
                                                     if splitDataLength == 6:
                                                         slotType = splitData[4]
-                                                        slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                                        slotIndex = max(0, min(int(splitData[5]), Zynthbox.Plugin.instance().sketchpadSlotCount()))
                                                         match slotType:
                                                             case "synth":
                                                                 if track.checkIfLayerExists(track.chainedSounds[slotIndex]):
@@ -360,7 +363,7 @@ class webconf_fifo_handler(QObject):
                                                 case "loadIntoSlot":
                                                     if splitDataLength == 7:
                                                         slotType = splitData[4]
-                                                        slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                                        slotIndex = max(0, min(int(splitData[5]), Zynthbox.Plugin.instance().sketchpadSlotCount()))
                                                         fileName = "/" + splitData[6]
                                                         match slotType:
                                                             case "synth":
@@ -378,7 +381,7 @@ class webconf_fifo_handler(QObject):
                                                     elif splitDataLength == 9:
                                                         # In this case we are pulling something out of an .snd or .sketch.wav, for inserting into some slot
                                                         slotType = splitData[4]
-                                                        slotIndex = max(0, min(splitData[5], Zynthbox.Plugin.instance().sketchpadSlotCount()))
+                                                        slotIndex = max(0, min(int(splitData[5]), Zynthbox.Plugin.instance().sketchpadSlotCount()))
                                                         fileName = "/" + splitData[6]
                                                         originType = splitData[7]
                                                         originIndex = splitData[8]
@@ -402,11 +405,11 @@ class webconf_fifo_handler(QObject):
 
     ### The specific handler for json data, which must already be sanitised and contain at least a category and command
     def handleJsonInput(self, jsonData):
-        trackIndex = max(0, min(jsonData["trackIndex"], Zynthbox.Plugin.instance().sketchpadTrackCount())) if "trackIndex" in jsonData else -1
+        trackIndex = max(0, min(int(jsonData["trackIndex"]), Zynthbox.Plugin.instance().sketchpadTrackCount())) if "trackIndex" in jsonData else -1
         slotType = jsonData["slotType"] if "slotType" in jsonData else ""
-        slotIndex = max(0, min(jsonData["slotIndex"], Zynthbox.Plugin.instance().sketchpadSlotCount())) if "slotIndex" in jsonData else -1
+        slotIndex = max(0, min(int(jsonData["slotIndex"]), Zynthbox.Plugin.instance().sketchpadSlotCount())) if "slotIndex" in jsonData else -1
         slotType2 = jsonData["slotType2"] if "slotType2" in jsonData else ""
-        slotIndex2 = max(0, min(jsonData["slotIndex2"], Zynthbox.Plugin.instance().sketchpadSlotCount())) if "slotIndex2" in jsonData else -1
+        slotIndex2 = max(0, min(int(jsonData["slotIndex2"]), Zynthbox.Plugin.instance().sketchpadSlotCount())) if "slotIndex2" in jsonData else -1
         params = jsonData["params"][0] if "params" in jsonData else [-1]
         match jsonData["category"]:
             case "cuia":

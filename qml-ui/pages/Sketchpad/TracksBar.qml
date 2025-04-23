@@ -1118,106 +1118,56 @@ Rectangle {
 
                                         RowLayout {
                                             id: infoBar
-                                            property var clip: null
-                                            property int selectedSoundSlot: root.selectedChannel.selectedSlot.value
-                                            property int selectedSoundSlotExists: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[selectedSoundSlot])
-                                            property var soundInfo: clip ? root.selectedChannel.chainedSoundsInfo[infoBar.selectedSoundSlot] : []
-                                            function updateInfoBar() {
-                                                if (root.selectedChannel) {
-                                                    root.selectedChannel.updateChainedSoundsInfo()
+                                            property QtObject zynthianLayer: {
+                                                let layer = null;
+                                                let selectedSlot = root.selectedChannel.selectedSlot.value
+                                                switch (root.selectedChannel.selectedSlot.className) {
+                                                    case "TracksBar_synthslot":
+                                                        let midiChannel = root.selectedChannel.chainedSounds[selectedSlot];
+                                                        if (midiChannel >= 0 && root.selectedChannel.checkIfLayerExists(midiChannel)) {
+                                                            layer = zynqtgui.layer.get_layer_by_midi_channel(midiChannel)
+                                                        }
+                                                        break;
+                                                    case "TracksBar_fxslot":
+                                                        layer = root.selectedChannel.chainedFx[selectedSlot];
+                                                        break;
+                                                    case "TracksBar_sketchfxslot":
+                                                        layer = root.selectedChannel.chainedSketchFx[selectedSlot];
+                                                        break;
                                                 }
+                                                return layer;
                                             }
 
                                             anchors.fill: parent
                                             anchors.margins: Kirigami.Units.largeSpacing
                                             spacing: Kirigami.Units.largeSpacing
                                             visible: !waveformContainer.showWaveform
-                                            onClipChanged: updateSoundNameTimer.restart()
-                                            Component.onCompleted: {
-                                                clipThrottle.restart();
-                                            }
-
-                                            Timer {
-                                                id: clipThrottle
-                                                interval: 1; running: false; repeat: false;
-                                                onTriggered: {
-                                                    infoBar.clip = root.song.getClip(zynqtgui.sketchpad.selectedTrackId, zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                                                }
-                                            }
-                                            Connections {
-                                                target: zynqtgui.sketchpad
-                                                onSelected_track_id_changed: {
-                                                    updateSoundNameTimer.restart()
-                                                    clipThrottle.restart()
-                                                }
-                                            }
-                                            Connections {
-                                                target: zynqtgui.sketchpad.song.scenesModel
-                                                onSelected_sketchpad_song_index_changed: clipThrottle.restart()
-                                            }
-                                            Timer {
-                                                id: updateSoundNameTimer
-                                                repeat: false
-                                                interval: 10
-                                                onTriggered: infoBar.updateInfoBar()
-                                            }
-                                            Connections {
-                                                target: zynqtgui.fixed_layers
-                                                onList_updated: {
-                                                    updateSoundNameTimer.restart()
-                                                }
-                                            }
-                                            Connections {
-                                                target: zynqtgui.bank
-                                                onList_updated: {
-                                                    updateSoundNameTimer.restart()
-                                                }
-                                            }
-                                            Connections {
-                                                target: root.selectedChannel ? root.selectedChannel : null
-                                                onChainedSoundsChanged: {
-                                                    updateSoundNameTimer.restart()
-                                                }
-                                                onSelectedSlotRowChanged: {
-                                                    updateSoundNameTimer.restart()
-                                                }
-                                            }
 
                                             ColumnLayout {
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
-                                                enabled: infoBar.selectedSoundSlotExists
+                                                enabled: infoBar.zynthianLayer != null
 
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 10
-                                                    text: infoBar.selectedSoundSlotExists
-                                                            ? qsTr("Synth: %1").arg(infoBar.soundInfo.synthName)
-                                                            : qsTr("Synth: --")
+                                                    text: qsTr(" Synth : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.synth : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 10
-                                                    text: infoBar.selectedSoundSlotExists
-                                                            ? qsTr("Bank: %1").arg(infoBar.soundInfo.bankName)
-                                                            : qsTr("Bank: --")
+                                                    text: qsTr("  Bank : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.bank : "--")
                                                 }
                                                 QQC2.Label {
                                                     Layout.fillWidth: true
                                                     Layout.fillHeight: true
                                                     Layout.alignment: Qt.AlignVCenter
                                                     font.pointSize: 10
-
-                                                    text: infoBar.selectedSoundSlotExists
-                                                            ? qsTr("Preset (%2/%3): %1")
-                                                                .arg(infoBar.soundInfo.presetName)
-                                                                .arg(infoBar.soundInfo.presetIndex+1)
-                                                                .arg(infoBar.soundInfo.presetLength)
-                                                            : qsTr("Preset: --")
+                                                    text: qsTr("Preset : %1").arg(infoBar.zynthianLayer != null ? infoBar.zynthianLayer.soundInfo.preset : "--")
                                                 }
                                             }
 
@@ -1232,14 +1182,14 @@ Rectangle {
                                                     Layout.alignment: Qt.AlignVCenter
                                                     text: qsTr("Favorite")
                                                     icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
-                                                    enabled: infoBar.selectedSoundSlotExists
+                                                    enabled: infoBar.zynthianLayer != null
                                                     checkable: false
                                                     // Bind to current index to properly update when preset changed from other screen
-                                                    checked: infoBar.selectedSoundSlotExists
-                                                                ? zynqtgui.preset.current_index && zynqtgui.preset.current_is_favorite
+                                                    checked: infoBar.zynthianLayer != null
+                                                                ? zynqtgui.preset.current_index >= 0 && zynqtgui.preset.current_is_favorite
                                                                 : false
                                                     onClicked: {
-                                                        if (infoBar.selectedSoundSlotExists) {
+                                                        if (infoBar.zynthianLayer != null) {
                                                             zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite
                                                         }
                                                     }

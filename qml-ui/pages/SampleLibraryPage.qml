@@ -216,7 +216,14 @@ Zynthian.ScreenPage {
                 returnValue = true;
                 break;
             case "NAVIGATE_RIGHT":
-                _private.selectedColumn = Math.min(_private.maxColumn, _private.selectedColumn + 1);
+                if (_private.selectedColumn == 2) {
+                    // Then we just kind of... use this as a "play" button style thing for testing samples (toggle the preview playback for whatever is currently selected)
+                    if (filesListView.currentIndex > -1) {
+                        filesListView.currentItem.doPreview();
+                    }
+                } else {
+                    _private.selectedColumn = Math.min(_private.maxColumn, _private.selectedColumn + 1);
+                }
                 returnValue = true;
                 break;
         }
@@ -225,12 +232,15 @@ Zynthian.ScreenPage {
 
     QtObject {
         id: _private
-        property int selectedColumn: 0
+        property int selectedColumn: 1
         readonly property int maxColumn: 2
         property QtObject filePropertiesHelper: Helpers.FilePropertiesHelper {
             filePath: "/zynthian/zynthian-my-data"
         }
     }
+    // TODO When switching to the sample library page:
+    // - If there is nothing in the selected slot, select the middle column
+    // - If there is something in the selected slot, select the right-hand column, select the path for the currently selected sample in the centre column, and select that sample in the right hand column
     Zynthian.ActionPickerPopup {
         id: sampleSlotAssigner
         objectName: ""
@@ -431,7 +441,7 @@ Zynthian.ScreenPage {
                                             id: mainLabel
                                             Layout.fillWidth: true
                                             text: "%1 - %2".arg(model.index + 1).arg(clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : qsTr("Empty Slot"))
-                                            elide: Text.ElideRight
+                                            elide: Text.ElideMiddle
                                         }
                                     }
                                     Rectangle {
@@ -545,6 +555,9 @@ Zynthian.ScreenPage {
                         text: modelData.subpath
                         readonly property string folder: modelData.path
                         onClicked: {
+                            if (_private.selectedColumn != 1) {
+                                _private.selectedColumn = 1;
+                            }
                             folderListView.currentIndex = model.index;
                         }
                         contentItem: RowLayout {
@@ -582,6 +595,7 @@ Zynthian.ScreenPage {
                         fill: parent
                         margins: Kirigami.Units.smallSpacing
                     }
+                    clip: true
                     model: FolderListModel {
                         id: folderModel
                         caseSensitive: false
@@ -601,11 +615,33 @@ Zynthian.ScreenPage {
                         }
                     }
                     delegate: Zynthian.BasicDelegate {
-                        id: folderDelegate
+                        id: fileDelegate
                         width: ListView.view.width
                         height: Kirigami.Units.iconSizes.large
                         text: model.fileName
+                        readonly property bool previewIsPlayingForThisEntry: (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying && _private.filePropertiesHelper.filePath == model.filePath) ? true : false
+                        function doPreview() {
+                            if (fileDelegate.previewIsPlayingForThisEntry) {
+                                _private.filePropertiesHelper.stopPreview();
+                            } else {
+                                if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
+                                    // In this case it's playing for something else, so we need to stop that first before we switch to playing for us...
+                                    _private.filePropertiesHelper.stopPreview();
+                                }
+                                if (_private.selectedColumn != 2) {
+                                    _private.selectedColumn = 2;
+                                }
+                                if (filesListView.currentIndex != model.index) {
+                                    filesListView.currentIndex = model.index;
+                                }
+                                _private.filePropertiesHelper.filePath = model.filePath;
+                                _private.filePropertiesHelper.playPreview();
+                            }
+                        }
                         onClicked: {
+                            if (_private.selectedColumn != 2) {
+                                _private.selectedColumn = 2;
+                            }
                             if (filesListView.currentIndex != model.index) {
                                 filesListView.currentIndex = model.index;
                             } else {
@@ -634,7 +670,11 @@ Zynthian.ScreenPage {
                                 QQC2.Label {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    text: folderDelegate.text
+                                    text: fileDelegate.text
+                                    fontSizeMode: Text.Fit
+                                    minimumPointSize: 5
+                                    wrapMode: Text.Wrap
+                                    maximumLineCount: 3
                                     elide: Text.ElideRight
                                 }
                                 Item {
@@ -646,17 +686,12 @@ Zynthian.ScreenPage {
                                             fill: parent
                                             margins: Kirigami.Units.smallSpacing
                                         }
-                                        source: _private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying ? "media-playback-stop" : "media-playback-start"
+                                        source: fileDelegate.previewIsPlayingForThisEntry ? "media-playback-stop" : "media-playback-start"
                                     }
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            if (_private.filePropertiesHelper.previewClip && _private.filePropertiesHelper.previewClip.isPlaying) {
-                                                _private.filePropertiesHelper.stopPreview();
-                                            } else {
-                                                _private.filePropertiesHelper.filePath = model.filePath;
-                                                _private.filePropertiesHelper.playPreview();
-                                            }
+                                            fileDelegate.doPreview();
                                         }
                                     }
                                 }
@@ -671,7 +706,7 @@ Zynthian.ScreenPage {
                                         left: parent.left
                                         bottom: parent.bottom
                                     }
-                                    width: _private.filePropertiesHelper.previewClip ? parent.width * (_private.filePropertiesHelper.previewClip.position) : 0
+                                    width: fileDelegate.previewIsPlayingForThisEntry ? parent.width * (_private.filePropertiesHelper.previewClip.position) : 0
                                     color: Kirigami.Theme.textColor
                                 }
                             }

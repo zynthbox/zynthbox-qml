@@ -31,7 +31,7 @@ class file_properties_helper(QObject):
 
     ### Property filePath
     def get_file_path(self):
-        return self.file_path
+        return str(self.file_path)
     def set_file_path(self, path):
         newPath = Path(path)
         if self.file_path != newPath:
@@ -264,7 +264,7 @@ class file_properties_helper(QObject):
                     self.preview_clip.deleteLater()
                     self.preview_clip = None
             if self.preview_clip is None:
-                self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), -1, False, False, self)
+                self.preview_clip = Zynthbox.ClipAudioSource(str(self.file_path), -1, 0, False, False, self)
                 self.preview_clip.setLaneAffinity(1)
                 self.preview_clip_changed.emit()
 

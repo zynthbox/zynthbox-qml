@@ -2014,6 +2014,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
         if index >= 0:
             self.layerPresetChanged.emit(index)
 
+    @Slot(int, result=QObject)
+    def get_layer_by_midi_channel(self, midi_channel):
+        return self.layer_midi_map[midi_channel]
+
     engine_nick_changed = Signal()
     page_after_layer_creation_changed = Signal()
 

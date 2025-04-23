@@ -285,7 +285,7 @@ class webconf_fifo_handler(QObject):
                 # On startup, webconf sends out a command to retrieve the current state, which we should then return
                 splitDataLength = len(splitData)
                 if splitDataLength > 0:
-                    match splitData[0]:
+                    match splitData[0].lower():
                         case "cuia":
                             command = ""
                             track = -1
@@ -410,7 +410,7 @@ class webconf_fifo_handler(QObject):
         slotIndex = max(0, min(int(jsonData["slotIndex"]), Zynthbox.Plugin.instance().sketchpadSlotCount())) if "slotIndex" in jsonData else -1
         slotType2 = jsonData["slotType2"] if "slotType2" in jsonData else ""
         slotIndex2 = max(0, min(int(jsonData["slotIndex2"]), Zynthbox.Plugin.instance().sketchpadSlotCount())) if "slotIndex2" in jsonData else -1
-        match jsonData["category"]:
+        match jsonData["category"].lower():
             case "cuia":
                 params = jsonData["params"][0] if "params" in jsonData else [-1]
                 self.core_gui.callable_ui_action(jsonData["command"].upper(), [params], -1, trackIndex, slotIndex)

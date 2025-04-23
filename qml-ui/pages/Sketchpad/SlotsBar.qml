@@ -805,7 +805,7 @@ Rectangle {
             if (pickWhat === "sketch" || pickWhat === "save-location") {
                 loopPickerDialog.folderModel.folder = loopPickerDialog.saveMode ? "/zynthian/zynthian-my-data/sketches/my-sketches" :  "/zynthian/zynthian-my-data/sketches";
                 loopPickerDialog.folderModel.nameFilters = ["*.sketch.wav"];
-                loopPickerDialog.thingToPick = qsTr("Sketch");
+                loopPickerDialog.thingToPick = qsTr("Loop");
             } else if (pickWhat === "sample") {
                 loopPickerDialog.folderModel.folder = loopPickerDialog.saveMode ? "/zynthian/zynthian-my-data/samples/my-samples" : "/zynthian/zynthian-my-data/samples";
                 loopPickerDialog.folderModel.nameFilters = ["*.wav"];
@@ -907,7 +907,7 @@ Rectangle {
                 }
             },
             QQC2.Action {
-                text: qsTr("Pick Sketch...")
+                text: qsTr("Pick Loop...")
                 onTriggered: {
                     loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "sketch");
                 }

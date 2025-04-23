@@ -792,7 +792,7 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checked: root.selectedChannel.trackType === "synth"
-                                text: qsTr("Sound")
+                                text: qsTr("Sketch")
                                 onClicked: {
                                     root.selectedChannel.trackType = "synth";
                                     synthsRow.switchToSlot(0, true);
@@ -835,7 +835,7 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 7
                                 Layout.fillHeight: true
                                 checked: root.selectedChannel.trackType === "sample-loop"
-                                text: qsTr("Sketch")
+                                text: qsTr("Loop")
                                 onClicked: {
                                     root.selectedChannel.trackType = "sample-loop";
                                     sketchesRow.switchToSlot(0, true);

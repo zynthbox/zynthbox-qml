@@ -668,7 +668,7 @@ Zynthian.Dialog {
                             } else if (filePath.endsWith(".sketchpad.json")) {
                                 description = qsTr("Saved Version");
                             } else if (filePath.endsWith(".sketch.wav")) {
-                                description = qsTr("Sketch");
+                                description = qsTr("Loop");
                             } else if (filePath.endsWith(".wav")) {
                                 description = qsTr("Sample");
                             }

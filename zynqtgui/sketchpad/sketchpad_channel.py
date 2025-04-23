@@ -1869,9 +1869,9 @@ class sketchpad_channel(QObject):
     ### BEGIN Property channelTypeDisplayName
     def get_channelTypeDisplayName(self):
         if self.__track_type__ == "synth":
-            return "Sound"
-        elif self.__track_type__ == "sample-loop":
             return "Sketch"
+        elif self.__track_type__ == "sample-loop":
+            return "Loop"
         elif self.__track_type__.startswith("sample"):
             return "Sample"
         elif self.__track_type__ == "external":

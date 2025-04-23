@@ -108,7 +108,7 @@ QQC2.AbstractButton {
             property string inactiveColor: "#33ffffff"
             anchors.centerIn: parent
             spacing: 0
-            visible: ["synth", "sample-loop"].indexOf(root.channel.trackType) >= 0
+            visible: ["synth", "sample-loop", "external"].indexOf(root.channel.trackType) >= 0
 
             Repeater {
                 model: root.channel ? 5 : 0
@@ -118,24 +118,26 @@ QQC2.AbstractButton {
                     property bool patternHasNotes: Zynthbox.PlayGridManager.getSequenceModel(zynqtgui.sketchpad.song.scenesModel.selectedSequenceName).getByClipId(root.channel.id, index).hasNotes
 
                     color: {
-                        let occupied = false
-                        if (root.channel.trackType == "synth" && patternHasNotes && isClipEnabled) {
-                            occupied = true
+                        let occupied = false;
+                        if (["synth", "external"].indexOf(root.channel.trackType) >= 0 && patternHasNotes && isClipEnabled) {
+                            occupied = true;
                         } else if (root.channel.trackType == "sample-loop" && root.channel.occupiedSketchSlots[index] && isClipEnabled) {
-                            occupied = true
+                            occupied = true;
                         }
 
                         if (occupied) {
-                            return activeItemsRow.highlightColor
+                            return activeItemsRow.highlightColor;
                         } else {
-                            return activeItemsRow.inactiveColor
+                            return activeItemsRow.inactiveColor;
                         }
                     }
                     text: {
-                        if (root.channel.trackType == "synth") {
-                            return String.fromCharCode(index + 65)
+                        if (["synth", "external"].indexOf(root.channel.trackType) >= 0) {
+                            return String.fromCharCode(index + 65);
                         } else if (root.channel.trackType == "sample-loop") {
-                            return index + 1
+                            return index + 1;
+                        } else {
+                            return "";
                         }
                     }
 

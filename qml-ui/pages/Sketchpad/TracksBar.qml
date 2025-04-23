@@ -1011,7 +1011,7 @@ Rectangle {
                                     TrackSlotsData {
                                         id: externalRow
                                         anchors.fill: parent
-                                        slotData: root.selecedChannel.externalSlotsData
+                                        slotData: root.selectedChannel.externalSlotsData
                                         slotType: "external"
                                         visible: root.selectedChannel.trackType == "external"
                                     }

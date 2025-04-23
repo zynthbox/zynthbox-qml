@@ -144,7 +144,7 @@ RowLayout {
             id: slotDelegate
             property bool highlighted: control.selectedChannel.selectedSlotRow === index
             property int slotIndex: index
-            property bool isSketchpadClip: control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
+            property bool isSketchpadClip: control.slotData && control.slotData[index] != null && control.slotData[index].hasOwnProperty("className") && control.slotData[index].className == "sketchpad_clip"
             property QtObject clip: isSketchpadClip ? control.slotData[index] : null
             property QtObject cppClipObject: isSketchpadClip ? Zynthbox.PlayGridManager.getClipById(control.slotData[index].cppObjId) : null
 
@@ -237,7 +237,7 @@ RowLayout {
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 color: Kirigami.Theme.backgroundColor
-                border.color: control.slotType === "sample-loop" && control.slotData[index].enabled ? Kirigami.Theme.highlightColor :"#ff999999"
+                border.color: control.slotType === "sample-loop" && control.slotData[index] && control.slotData[index].enabled ? Kirigami.Theme.highlightColor : "#ff999999"
                 border.width: 2
                 radius: 4
                 // For external mode the first three slots are visible
@@ -352,18 +352,22 @@ RowLayout {
                     }
                     horizontalAlignment: Text.AlignLeft
                     text: {
-                        if (control.slotType === "synth" && control.slotData[index] != null) {
-                            return control.slotData[index]
-                        } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop") && control.slotData[index] && control.slotData[index].path) {
-                            return control.slotData[index].path.split("/").pop()
-                        } else if (control.slotType === "external" && index < 3) {
-                            return control.slotData[index]
-                        } else if (control.slotType === "fx" && control.slotData[index] != null ) {
-                            return control.slotData[index]
-                        } else if (control.slotType === "sketch-fx" && control.slotData[index] != null ) {
-                            return control.slotData[index]
-                        } else if (control.slotType === "text" && control.slotData[index] != null ) {
-                            return control.slotData[index]
+                        if (control.slotData) {
+                            if (control.slotType === "synth" && control.slotData[index] != null) {
+                                return control.slotData[index]
+                            } else if ((control.slotType === "sample-trig" || control.slotType === "sample-loop") && control.slotData[index] && control.slotData[index].path) {
+                                return control.slotData[index].path.split("/").pop()
+                            } else if (control.slotType === "external" && index < 3) {
+                                return control.slotData[index]
+                            } else if (control.slotType === "fx" && control.slotData[index] != null ) {
+                                return control.slotData[index]
+                            } else if (control.slotType === "sketch-fx" && control.slotData[index] != null ) {
+                                return control.slotData[index]
+                            } else if (control.slotType === "text" && control.slotData[index] != null ) {
+                                return control.slotData[index]
+                            } else {
+                                return ""
+                            }
                         } else {
                             return ""
                         }

@@ -949,7 +949,7 @@ class sketchpad_clip(QObject):
         if self.__path__ is not None:
             sketchpadTrack = -1 if self.clipChannel is None else self.clipChannel.id
             registerForPolyphonicPlayback = True if self.is_channel_sample else False
-            self.audioSource = Zynthbox.ClipAudioSource(self.path, sketchpadTrack, registerForPolyphonicPlayback, False, self)
+            self.audioSource = Zynthbox.ClipAudioSource(self.path, sketchpadTrack, self.id, registerForPolyphonicPlayback, False, self)
             self.audioSource.rootSlice().lengthChanged.connect(self.sec_per_beat_changed.emit)
             self.audioSource.isPlayingChanged.connect(self.is_playing_changed.emit)
             self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)

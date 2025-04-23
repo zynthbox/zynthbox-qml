@@ -30,8 +30,9 @@ from collections import OrderedDict
 
 # Zynthian specific modules
 from zyncoder import *
+from PySide2.QtCore import QObject, Signal, Property
 
-class zynthian_layer:
+class zynthian_layer(QObject):
 
     # ---------------------------------------------------------------------------
     # Initialization
@@ -39,6 +40,7 @@ class zynthian_layer:
 
 
     def __init__(self, engine, midi_chan, zynqtgui=None, track_index=-1, slot_type="", slot_index=-1):
+        super(zynthian_layer, self).__init__(zynqtgui)
         self.zynqtgui = zynqtgui
         self.engine = engine
         self.midi_chan = midi_chan
@@ -96,6 +98,12 @@ class zynthian_layer:
                     # Retried 5 times but failed. Force restart the entire application
                     self.zynqtgui.exit(102)
 
+        self.engineChanged.connect(self.soundInfoChanged.emit)
+        self.bankChanged.connect(self.soundInfoChanged.emit)
+        self.bankCountChanged.connect(self.soundInfoChanged.emit)
+        self.presetChanged.connect(self.soundInfoChanged.emit)
+        self.presetCountChanged.connect(self.soundInfoChanged.emit)
+
         self.refresh_controllers()
 
 
@@ -130,6 +138,44 @@ class zynthian_layer:
         self.engine = engine
         self.engine.add_layer(self)
         self.refresh_controllers()
+        self.engine_changed.emit()
+
+    def get_engine_name(self):
+        if self.engine is not None:
+            return self.engine.name
+        else:
+            return ""
+
+    engineChanged = Signal()
+    engineName = Property(str, get_engine_name, notify=engineChanged)
+
+    def get_soundInfo(self):
+        result = {
+            "synth": "--",
+            "bank": "--",
+            "preset": "--"
+        }
+
+        result["synth"] = f"{self.engineName}"
+        if self.bankCount > 0:
+            result["bank"] = f"({self.bankIndex + 1}/{self.bankCount}) {'--' if len(self.bankName) == 0 else self.bankName}"
+        if self.presetCount > 0:
+            result["preset"] = f"({self.presetIndex + 1}/{self.presetCount}) {'--' if len(self.presetName) == 0 else self.presetName}"
+
+        return result
+
+    soundInfoChanged = Signal()
+
+    """
+    soundInfo property will contain an object as follows :
+    {
+        "synth": "<synth details string>",
+        "bank": "<bank details string>",
+        "preset": "<preset details string>"
+    }
+    This is meant to display the layer details
+    """
+    soundInfo = Property("QVariant", get_soundInfo, notify=soundInfoChanged)
 
     # ---------------------------------------------------------------------------
     # MIDI chan Management
@@ -169,6 +215,7 @@ class zynthian_layer:
         # Explicitly call get_preset_favs to generate preset fav list. Otherwise *BOOM*
         self.engine.get_preset_favs(self)
         self.bank_list = self.bank_list_cache.copy()
+        self.bankCountChanged.emit()
         # logging.debug("BANK LIST => \n%s" % str(self.bank_list))
 
 
@@ -176,6 +223,7 @@ class zynthian_layer:
         self.bank_index=0
         self.bank_name=None
         self.bank_info=None
+        self.bankChanged.emit()
 
 
     def set_bank(self, i, set_engine=True):
@@ -191,6 +239,7 @@ class zynthian_layer:
                 self.reset_preset()
                 return self.engine.set_bank(self, self.bank_info)
 
+            self.bankChanged.emit()
             return True
         return False
 
@@ -215,10 +264,17 @@ class zynthian_layer:
     def get_bank_name(self):
         return self.bank_name
 
-
     def get_bank_index(self):
         return self.bank_index
 
+    def get_bank_count(self):
+        return len(self.bank_list)
+
+    bankChanged = Signal()
+    bankCountChanged = Signal()
+    bankName = Property(str, get_bank_name, notify=bankChanged)
+    bankIndex = Property(int, get_bank_index, notify=bankChanged)
+    bankCount = Property(int, get_bank_count, notify=bankCountChanged)
 
     # ---------------------------------------------------------------------------
     # Presest Management
@@ -250,6 +306,7 @@ class zynthian_layer:
             return
 
         self.preset_list = preset_list
+        self.presetCountChanged.emit()
         # logging.debug("PRESET LIST => \n%s" % str(self.preset_list))
 
 
@@ -258,6 +315,7 @@ class zynthian_layer:
         self.preset_index=0
         self.preset_name=None
         self.preset_info=None
+        self.presetChanged.emit()
 
 
     def set_preset(self, i, set_engine=True, force_immediate=False):
@@ -301,6 +359,7 @@ class zynthian_layer:
                 #self.load_ctrl_config()
                 return self.engine.set_preset(self, self.preset_info,force_immediate=force_immediate)
 
+            self.presetChanged.emit()
             return True
         return False
 
@@ -376,6 +435,14 @@ class zynthian_layer:
         else:
             self.show_fav_presets = False
 
+    def get_preset_count(self):
+        return len(self.preset_list)
+
+    presetCountChanged = Signal()
+    presetChanged = Signal()
+    presetName = Property(str, get_preset_name, notify=presetChanged)
+    presetIndex = Property(int, get_preset_index, notify=presetChanged)
+    presetCount = Property(int, get_preset_count, notify=presetCountChanged)
 
     # ---------------------------------------------------------------------------
     # Controllers Management

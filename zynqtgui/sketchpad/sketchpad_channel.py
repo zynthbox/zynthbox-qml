@@ -316,7 +316,8 @@ class sketchpad_channel(QObject):
         self.zynqtgui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
         self.__samples__ = []
-        self.__sample_picking_style__ = "same-or-first"
+        self.__sample_picking_style__ = "all"
+        self.__trustExternalDeviceChannels__ = False
         self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
         self.__color__ = self.zynqtgui.theme_chooser.trackColors[self.__id__]
@@ -771,6 +772,7 @@ class sketchpad_channel(QObject):
                 "samples": samplesObj,
                 "layers_snapshot": self.__layers_snapshot,
                 "sample_picking_style": self.__sample_picking_style__,
+                "trustExternalDeviceChannels": self.__trustExternalDeviceChannels__,
                 "keyzone_mode": self.__keyzone_mode__,
                 "routeThroughGlobalFX": self.route_through_global_fx,
                 "synthSlotsData": self.synthSlotsData, # synthSlotsData is a list of strings. Just what we need
@@ -916,6 +918,10 @@ class sketchpad_channel(QObject):
                 self.sound_data_changed.emit()
             if "sample_picking_style" in obj:
                 self.set_samplePickingStyle(obj["sample_picking_style"])
+            if "trustExternalDeviceChannels" in obj:
+                self.set_trustExternalDeviceChannels(obj["trustExternalDeviceChannels"])
+            else:
+                self.set_trustExternalDeviceChannels(False)
             if "keyzone_mode" in obj:
                 self.__keyzone_mode__ = obj["keyzone_mode"]
                 self.keyZoneModeChanged.emit();
@@ -1896,8 +1902,7 @@ class sketchpad_channel(QObject):
     ### END Property samples
 
     ### BEGIN Property samplePickingStyle
-    # Possible values: "same-or-first", "same", "first", "all"
-    # same-or-first will pick the sample which matches the current pattern's slot number, or whatever is the first sample with a matching keyZone setup
+    # Possible values: "same", "first", "all"
     # first will always pick the sample which current pattern's slot number (unless explicitly rejected by the keyZone setup)
     # first will always pick whatever is the first sample with a matching keyZone
     # all will pick all samples which match the keyZone
@@ -1907,7 +1912,10 @@ class sketchpad_channel(QObject):
     @Slot(str)
     def set_samplePickingStyle(self, sample_picking):
         if self.__sample_picking_style__ != sample_picking:
-            self.__sample_picking_style__ = sample_picking
+            if sample_picking == "same-or-first": # Our old default
+                self.__sample_picking_style__ = "all"
+            else:
+                self.__sample_picking_style__ = sample_picking
             self.samplePickingStyleChanged.emit()
             self.__song__.schedule_save()
 
@@ -1915,6 +1923,20 @@ class sketchpad_channel(QObject):
 
     samplePickingStyle = Property(str, get_samplePickingStyle, set_samplePickingStyle, notify=samplePickingStyleChanged)
     ### END Property samplePickingStyle
+
+    ### BEGIN Property trustExternalDeviceChannels
+    def get_trustExternalDeviceChannels(self):
+        return self.__trustExternalDeviceChannels__
+    @Slot(bool)
+    def set_trustExternalDeviceChannels(self, newValue):
+        if self.__trustExternalDeviceChannels__ != newValue:
+            self.__trustExternalDeviceChannels__ = newValue
+            self.trustExternalDeviceChannelsChanged.emit()
+            self.__song__.schedule_save()
+            Zynthbox.MidiRouter.instance().setSketchpadTrackTrustExternalInputChannel(Zynthbox.ZynthboxBasics.Track(self.id), newValue)
+    trustExternalDeviceChannelsChanged = Signal()
+    trustExternalDeviceChannels = Property(bool, get_trustExternalDeviceChannels, set_trustExternalDeviceChannels, notify=trustExternalDeviceChannelsChanged)
+    ### END Property trustExternalDeviceChannels
 
     ### Property keyzoneMode
     # Possible values : "manual", "all-full", "split-full", "split-narrow"

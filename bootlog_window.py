@@ -17,7 +17,7 @@ class BootLogInterface(QObject):
         super().__init__(parent)
 
         logging.error("Starting bootlog display")
-        self.__boot_log = ""
+        self.__boot_log = "Initializing"
         self.__boot_log_file = None
 
         self.__bootCompleted = False

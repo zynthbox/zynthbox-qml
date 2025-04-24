@@ -70,7 +70,7 @@ QQC2.ScrollView {
 
     Component.onCompleted: {
         if (zynqtgui.current_screen_id === root.screenId) {
-            view.forceActiveFocus();
+            view.forceActiveFocus(true);
         }
         root.selector.autoActivateIndexOnChange = Qt.binding(function() {
             return root.autoActivateIndexOnChange

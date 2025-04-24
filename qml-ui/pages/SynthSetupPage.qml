@@ -414,6 +414,18 @@ Zynthian.ScreenPage {
             zynqtgui.current_screen_id = screenId;
         }
     }
+    Connections {
+        id: pageChangeHandler
+        target: zynqtgui
+        onCurrent_screen_idChanged: handlePageChange(zynqtgui.current_screen_id)
+
+        function handlePageChange(page) {
+            if (root.screenIds.includes(zynqtgui.current_screen_id)) {
+                bankView.forceViewPosition(true)
+                presetView.forceViewPosition(true)
+            }
+        }
+    }
 
     contentItem: RowLayout {
         id: layout
@@ -678,7 +690,7 @@ Zynthian.ScreenPage {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector                        
-                        // Show highlight frame only if current preset name matches selected one
+                        // Show highlight frame only if current bank name matches selected one
                         background.visible: model.display == zynqtgui.curLayer.bankName
                         onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                         onItemActivated: bankView.itemActivated(screenId, index)

@@ -67,8 +67,8 @@ Zynthian.ActionPickerPopup {
         QQC2.Label {
             width: parent.width
             height: parent.height
-            horizontalAlignment: "AlignHCenter"
-            verticalAlignment: "AlignVCenter"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
             text: qsTr("No free slots remaining")
             font.italic: true
         }

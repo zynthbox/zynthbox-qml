@@ -302,10 +302,10 @@ Zynthian.ScreenPage {
                                     }
 
                                     text: model.metadata && model.metadata.description ? model.metadata.description : ""
-                                    elide: "ElideRight"
+                                    elide: Text.ElideRight
                                     font.pointSize: 8
                                     visible: view.currentIndex === index
-                                    horizontalAlignment: "AlignHCenter"
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                             }
                             ColumnLayout {
@@ -320,7 +320,7 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: model.display
                                     level: 2
-                                    horizontalAlignment: "AlignHCenter"
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                             }
                         }

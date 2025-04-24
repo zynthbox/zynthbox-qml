@@ -528,8 +528,8 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                horizontalAlignment: "AlignHCenter"
-                verticalAlignment: "AlignVCenter"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
                 text: segmentDetails.selectedSegment != null ? segmentDetails.selectedSegment.name : ""
                 level: 2
             }
@@ -548,24 +548,24 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: false
                     Layout.preferredWidth: Kirigami.Units.gridUnit
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: qsTr("Bar")
                 }
                 QQC2.Label {
                     Layout.fillWidth: false
                     Layout.fillHeight: false
                     Layout.preferredWidth: Kirigami.Units.gridUnit / 10
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: "/"
                 }
                 QQC2.Label {
                     Layout.fillWidth: true
                     Layout.fillHeight: false
                     Layout.preferredWidth: Kirigami.Units.gridUnit
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: qsTr("Beat")
                 }
             }
@@ -580,8 +580,8 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     inputMethodHints: Qt.ImhDigitsOnly
                     activeFocusOnTab: false
                     text: segmentDetails.selectedSegment != null ? segmentDetails.selectedSegment.barLength : ""
@@ -596,8 +596,8 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit / 10
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: "/"
                 }
                 QQC2.TextField {
@@ -605,8 +605,8 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     inputMethodHints: Qt.ImhDigitsOnly
                     activeFocusOnTab: false
                     text: segmentDetails.selectedSegment != null ? segmentDetails.selectedSegment.beatLength : ""

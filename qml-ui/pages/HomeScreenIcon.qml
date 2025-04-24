@@ -38,9 +38,9 @@ Rectangle {
                 right: parent.right
                 margins: Kirigami.Units.smallSpacing
             }
-            horizontalAlignment: "AlignHCenter"
-            verticalAlignment: "AlignVCenter"
-            elide: "ElideRight"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
             text: "Layers"
             font.pointSize: 12
         }

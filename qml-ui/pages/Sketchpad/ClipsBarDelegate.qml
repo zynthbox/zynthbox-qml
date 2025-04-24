@@ -177,8 +177,8 @@ ColumnLayout {
 
                     anchors.centerIn: parent
                     width: parent.width - 4
-                    elide: "ElideRight"
-                    horizontalAlignment: "AlignHCenter"
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
                     font.pointSize: 8
                     text: root.visible ? clipDelegate.clip.path.split("/").pop() : ""
                 }

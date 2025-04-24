@@ -87,8 +87,8 @@ QQC2.AbstractButton {
         // QQC2.Label {
         //     width: parent.width - 8
         //     anchors.centerIn: parent
-        //     horizontalAlignment: "AlignHCenter"
-        //     elide: "ElideRight"
+        //     horizontalAlignment: Text.AlignHCenter
+        //     elide: Text.ElideRight
         //     color: root.isInScene ? "#ffffff" : "#f44336" // Color text red when muted
         //     text: root.channel.selectedClipNames.join("").toUpperCase()
         //     font.pointSize: 16

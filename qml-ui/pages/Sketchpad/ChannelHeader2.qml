@@ -64,8 +64,8 @@ QQC2.AbstractButton {
                 id: contents
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                horizontalAlignment: "AlignHCenter"
-                elide: "ElideRight"
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
                 text: root.text
                 font.pointSize: 8
             }
@@ -81,8 +81,8 @@ QQC2.AbstractButton {
                 QQC2.Label {
                     width: parent.width
                     anchors.centerIn: parent
-                    horizontalAlignment: "AlignHCenter"
-                    elide: "ElideRight"
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
                     font.pointSize: 8
                     text: subSubText
                 }
@@ -96,9 +96,9 @@ QQC2.AbstractButton {
                     id: subContents
                     width: parent.width
                     visible: root.subText != null
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    elide: "ElideRight"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    elide: Text.ElideRight
                     text: root.subText ? root.subText : ""
                     font.pointSize: 8
                 }
@@ -278,8 +278,8 @@ QQC2.AbstractButton {
                     id: midiChannelLabel
                     width: parent.width
                     height: parent.height
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     font.pointSize: Kirigami.Units.gridUnit
                     color: Kirigami.Theme.textColor
                     visible: root.channel.trackType === "external"
@@ -296,9 +296,9 @@ QQC2.AbstractButton {
                 // QQC2.Label {
                 //     id: synthName
                 //     anchors.fill: parent
-                //     elide: "ElideRight"
-                //     horizontalAlignment: "AlignHCenter"
-                //     verticalAlignment: "AlignVCenter"
+                //     elide: Text.ElideRight
+                //     horizontalAlignment: Text.AlignHCenter
+                //     verticalAlignment: Text.AlignVCenter
                 //     font.pointSize: 8
                 //     visible: root.synthDetailsVisible &&
                 //              synthName.text &&

@@ -915,8 +915,8 @@ Zynthian.ScreenPage {
 
                             anchors.centerIn: parent
                             width: parent.width - 4
-                            elide: "ElideRight"
-                            horizontalAlignment: "AlignHCenter"
+                            elide: Text.ElideLeft
+                            horizontalAlignment: Text.AlignHCenter
                             font.pointSize: 8
                             text: clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : ""
                         }

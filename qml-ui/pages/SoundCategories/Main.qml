@@ -553,9 +553,9 @@ Zynthian.ScreenPage {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Layout.leftMargin: Kirigami.Units.gridUnit
                 Layout.rightMargin: Kirigami.Units.gridUnit
-                horizontalAlignment: Qt.AlignLeft
-                verticalAlignment: Qt.AlignVCenter
-                elide: "ElideRight"
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
                 font.pointSize: 16
                 text: soundDetails.displaySelectedSoundData
                         ? soundButtonGroup.checkedButton.soundObj.name

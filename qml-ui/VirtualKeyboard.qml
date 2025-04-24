@@ -101,8 +101,8 @@ Item {
                 id: textfield
                 Layout.fillWidth: true
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                horizontalAlignment: "AlignHCenter"
-                verticalAlignment: "AlignVCenter"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
                 selectByMouse: true
                 inputMethodHints: root.focusedTextField ? root.focusedTextField.inputMethodHints : 0
                 onTextChanged: {

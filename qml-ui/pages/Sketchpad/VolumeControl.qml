@@ -255,8 +255,8 @@ Rectangle {
             id: footerLabel
             Layout.alignment: Qt.AlignCenter
             Layout.maximumWidth: parent.width
-            horizontalAlignment: "AlignHCenter"
-            elide: "ElideRight"
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
             visible: text && text.length>0
         }
     }

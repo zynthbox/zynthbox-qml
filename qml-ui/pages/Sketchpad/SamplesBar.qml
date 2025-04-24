@@ -111,7 +111,7 @@ Zynthian.Card {
                                     ? controlObj.samples[index].path.split("/").pop()
                                     : ""
 
-                            elide: "ElideRight"
+                            elide: Text.ElideRight
                         }
 
                         MouseArea {

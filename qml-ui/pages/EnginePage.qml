@@ -294,7 +294,7 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: "%1 (%2)".arg(model.display).arg(model.metadata.pluginFormat)
                                     font.pointSize: 12
-                                    horizontalAlignment: "AlignHCenter"
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                                 QQC2.Label {
                                     Layout.fillWidth: true
@@ -303,7 +303,7 @@ Zynthian.ScreenPage {
                                     text: model.metadata && model.metadata.description ? model.metadata.description : ""
                                     font.pointSize: 10
                                     opacity: 0.7
-                                    horizontalAlignment: "AlignHCenter"
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                             }
                         }

@@ -585,7 +585,7 @@ Rectangle {
                                                         rightMargin: 10
                                                     }
                                                     font.pointSize: 10
-                                                    elide: "ElideRight"
+                                                    elide: Text.ElideRight
                                                     text: parent.text
                                                 }
                                             }

@@ -247,7 +247,7 @@ Rectangle {
         //                                            anchors.leftMargin: Kirigami.Units.gridUnit*0.5
         //                                            anchors.rightMargin: Kirigami.Units.gridUnit*0.5
                                                     anchors.verticalCenter: parent.verticalCenter
-                                                    elide: "ElideRight"
+                                                    elide: Text.ElideRight
 
                                                     font.pointSize: 8
 
@@ -328,8 +328,8 @@ Rectangle {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: false
                                             Layout.margins: 4
-                                            horizontalAlignment: "AlignHCenter"
-                                            elide: "ElideRight"
+                                            horizontalAlignment: Text.AlignHCenter
+                                            elide: Text.ElideRight
                                             text: model.channel.name
 
                                             MouseArea {

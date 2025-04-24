@@ -628,7 +628,13 @@ Zynthian.BasePlayGrid {
         enabled: component.isVisible || component.noteListeningActivations > 0
         onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
             // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current pattern's channel index", _private.activePatternModel.sketchpadTrack, "listening on port", listenToPort);
-            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === _private.activePatternModel.sketchpadTrack && size === 3) {
+            let targetTrack = Zynthbox.MidiRouter.sketchpadTrackTargetTrack(_private.activePatternModel.sketchpadTrack);
+            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort)
+                && (targetTrack == _private.activePatternModel.sketchpadTrack
+                    ? sketchpadTrack == _private.activePatternModel.sketchpadTrack
+                    : sketchpadTrack == targetTrack
+                )
+                && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = true;
                     // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
@@ -646,7 +652,7 @@ Zynthian.BasePlayGrid {
                         // Count up one tick for a note on message
                         component.noteListeningActivations = component.noteListeningActivations + 1;
                         // Create a new note based on the new thing that just arrived, but only if it's an on note
-                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, sketchpadTrack);
+                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, _private.activePatternModel.sketchpadTrack);
                         var existingIndex = component.noteListeningNotes.indexOf(newNote);
                         if (existingIndex > -1) {
                             component.noteListeningNotes.splice(existingIndex, 1);

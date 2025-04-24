@@ -190,10 +190,10 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
 
     def set_preset(self, layer, preset, preload=False, force_immediate=False):
-        try:
+        if preset[3] in self.soundfont_index:
             sfi = self.soundfont_index[preset[3]]
-        except:
-            if layer.set_bank_by_id(preset[3]):
+        else:
+            if layer.set_bank_by_id(preset[3]) and preset[3] in self.soundfont_index:
                 sfi = self.soundfont_index[preset[3]]
             else:
                 return False

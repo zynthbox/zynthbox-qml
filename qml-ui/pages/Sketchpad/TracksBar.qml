@@ -1136,6 +1136,9 @@ Rectangle {
                                                         layer = root.selectedChannel.chainedSketchFx[selectedSlot];
                                                         break;
                                                 }
+                                                if (layer == undefined) {
+                                                    layer = null;
+                                                }
                                                 return layer;
                                             }
 

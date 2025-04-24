@@ -43,7 +43,7 @@ Zynthian.ScreenPage {
      * @param midiChannel The layer midi channel whose volume needs to be updated
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
      */
-    function updateSynthVolume(midiChannel, sign) {        
+    function updateSynthVolume(midiChannel, sign) {
         var synthName = ""
         var synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel]
         try {
@@ -691,7 +691,19 @@ Zynthian.ScreenPage {
                         screenId: bankView.screenId
                         selector: bankView.selector
                         // Show highlight frame only if current bank name matches selected one
-                        background.visible: zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
+                        // background.visible: zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
+                        background.visible: {
+                            if (zynqtgui.preset.show_only_favorites) {
+                                // When showing favorites, bind to current_index as well as bankName
+                                // This ensures the selected frame is correctly updated.
+                                // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
+                                return zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
+                            } else {
+                                // When not showing favorites, bind to current_index and check if delegate's index is the same
+                                // This will result in faster displaying highlighted frame when changed
+                                return zynqtgui.bank.current_index == index
+                            }
+                        }
                         onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                         onItemActivated: bankView.itemActivated(screenId, index)
                         onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
@@ -820,7 +832,18 @@ Zynthian.ScreenPage {
                     screenId: presetView.screenId
                     selector: presetView.selector
                     // Show highlight frame only if current preset name matches selected one
-                    background.visible: zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.presetName
+                    background.visible: {
+                        if (zynqtgui.preset.show_only_favorites) {
+                            // When showing favorites, bind to current_index as well as presetName
+                            // This ensures the selected frame is correctly updated.
+                            // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
+                            return zynqtgui.preset.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.presetName
+                        } else {
+                            // When not showing favorites, bind to current_index and check if delegate's index is the same
+                            // This will result in faster displaying highlighted frame when changed
+                            return zynqtgui.preset.current_index == index
+                        }
+                    }
                     onCurrentScreenIdRequested: presetView.currentScreenIdRequested(screenId)
                     onItemActivated: presetView.itemActivated(screenId, index)
                     onItemActivatedSecondary: presetView.itemActivatedSecondary(screenId, index)

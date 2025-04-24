@@ -458,6 +458,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
             self.show_only_favorites_changed.emit()
             if self.zynqtgui.curlayer.get_preset_name():
                 self.zynqtgui.curlayer.set_preset_by_name(self.zynqtgui.curlayer.get_preset_name())
+                self.select(self.zynqtgui.curlayer.presetIndex)
 
 
     def disable_show_fav_presets(self):
@@ -468,6 +469,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
             self.show_only_favorites_changed.emit()
             if self.zynqtgui.curlayer.get_preset_name():
                 self.zynqtgui.curlayer.set_preset_by_name(self.zynqtgui.curlayer.get_preset_name())
+                self.select(self.zynqtgui.curlayer.presetIndex)
 
     @Slot()
     def toggle_show_fav_presets(self):

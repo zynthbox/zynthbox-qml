@@ -445,7 +445,13 @@ Zynthian.ScreenPage {
         enabled: component.isVisible || component.noteListeningActivations > 0
         onMidiMessage: function(port, size, byte1, byte2, byte3, sketchpadTrack, fromInternal) {
             // console.log("Midi message of size", size, "received on port", port, "with bytes", byte1, byte2, byte3, "from track", sketchpadTrack, fromInternal, "current track id", component.selectedChannel.id, "listening on port", listenToPort);
-            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort) && sketchpadTrack === component.selectedChannel.id && size === 3) {
+            let targetTrack = Zynthbox.MidiRouter.sketchpadTrackTargetTrack(component.selectedChannel.id);
+            if ((port == Zynthbox.MidiRouter.HardwareInPassthroughPort || port == Zynthbox.MidiRouter.InternalControllerPassthroughPort)
+                && (targetTrack == component.selectedChannel.id
+                    ? sketchpadTrack == component.selectedChannel.id
+                    : sketchpadTrack == targetTrack
+                )
+                && size === 3) {
                 if (127 < byte1 && byte1 < 160) {
                     let setOn = true;
                     // By convention, an "off" note can be either a midi off message, or an on message with a velocity of 0
@@ -461,7 +467,7 @@ Zynthian.ScreenPage {
                         // Count up one tick for a note on message
                         component.noteListeningActivations = component.noteListeningActivations + 1;
                         // Create a new note based on the new thing that just arrived, but only if it's an on note
-                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, sketchpadTrack);
+                        var newNote = Zynthbox.PlayGridManager.getNote(midiNote, component.selectedChannel.id);
                         var existingIndex = component.noteListeningNotes.indexOf(newNote);
                         if (existingIndex > -1) {
                             component.noteListeningNotes.splice(existingIndex, 1);

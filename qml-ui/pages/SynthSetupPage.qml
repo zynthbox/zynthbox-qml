@@ -654,10 +654,8 @@ Zynthian.ScreenPage {
                         checked: zynqtgui.preset.show_only_favorites
                         onClicked: {
                             zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
-                            if (!zynqtgui.preset.show_only_favorites) {
-                                bankView.forceViewPosition()
-                                presetView.forceViewPosition()
-                            }
+                            bankView.forceViewPosition()
+                            presetView.forceViewPosition()
                         }
                     }
                 }
@@ -679,8 +677,9 @@ Zynthian.ScreenPage {
                     delegate: Zynthian.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
-                        selector: bankView.selector
-                        highlighted: zynqtgui.current_screen_id === bankView.screenId
+                        selector: bankView.selector                        
+                        // Show highlight frame only if current preset name matches selected one
+                        background.visible: model.display == zynqtgui.curLayer.bankName
                         onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                         onItemActivated: bankView.itemActivated(screenId, index)
                         onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
@@ -777,10 +776,8 @@ Zynthian.ScreenPage {
                     checked: zynqtgui.preset.show_only_favorites
                     onClicked: {
                         zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
-                        if (!zynqtgui.preset.show_only_favorites) {
-                            bankView.forceViewPosition()
-                            presetView.forceViewPosition()
-                        }
+                        bankView.forceViewPosition()
+                        presetView.forceViewPosition()
                     }
                 }
             }
@@ -806,6 +803,16 @@ Zynthian.ScreenPage {
                 }
                 Component.onCompleted: {
                     presetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
+                }
+                delegate: Zynthian.SelectorDelegate {
+                    screenId: presetView.screenId
+                    selector: presetView.selector
+                    // Show highlight frame only if current preset name matches selected one
+                    background.visible: model.display == zynqtgui.curLayer.presetName
+                    onCurrentScreenIdRequested: presetView.currentScreenIdRequested(screenId)
+                    onItemActivated: presetView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: presetView.itemActivatedSecondary(screenId, index)
+                    onIconClicked: presetView.iconClicked(screenId, index)
                 }
             }
         }

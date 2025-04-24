@@ -1101,11 +1101,12 @@ Rectangle {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 3
 
                                     QQC2.Label {
-                                        Layout.fillWidth: false
+                                        Layout.fillWidth: true
                                         Layout.fillHeight: false
                                         font.pointSize: 9
                                         opacity: waveformContainer.showWaveform ? 1 : 0
                                         text: waveformContainer.clip ? qsTr("Wave : %1").arg(waveformContainer.clip.filename) : ""
+                                        elide: Text.ElideMiddle
                                     }
 
                                     Rectangle {

@@ -372,7 +372,7 @@ RowLayout {
                             return ""
                         }
                     }
-                    elide: "ElideRight"
+                    elide: control.slotType === "sample-trig" ? Text.ElideLeft : Text.ElideRight
                 }
 
                 MouseArea {

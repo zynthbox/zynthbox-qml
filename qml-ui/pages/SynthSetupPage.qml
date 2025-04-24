@@ -689,9 +689,9 @@ Zynthian.ScreenPage {
                     delegate: Zynthian.SelectorDelegate {
                         text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
-                        selector: bankView.selector                        
+                        selector: bankView.selector
                         // Show highlight frame only if current bank name matches selected one
-                        background.visible: model.display == zynqtgui.curLayer.bankName
+                        background.visible: zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
                         onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                         onItemActivated: bankView.itemActivated(screenId, index)
                         onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
@@ -820,7 +820,7 @@ Zynthian.ScreenPage {
                     screenId: presetView.screenId
                     selector: presetView.selector
                     // Show highlight frame only if current preset name matches selected one
-                    background.visible: model.display == zynqtgui.curLayer.presetName
+                    background.visible: zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.presetName
                     onCurrentScreenIdRequested: presetView.currentScreenIdRequested(screenId)
                     onItemActivated: presetView.itemActivated(screenId, index)
                     onItemActivatedSecondary: presetView.itemActivatedSecondary(screenId, index)

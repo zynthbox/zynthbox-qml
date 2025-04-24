@@ -1593,6 +1593,7 @@ class zynthian_gui(QObject):
                 self.screens['main_layers_view'].set_start_midi_chan(math.floor(midi_chan / 5) * 5)
         self.active_midi_channel_changed.emit()
         self.screens["main_layers_view"].sync_index_from_curlayer()
+        self.curLayerChanged.emit()
         self.curlayerEngineNameChanged.emit()
         self.curlayerPresetNameChanged.emit()
         self.curlayerIsFXChanged.emit()
@@ -4749,6 +4750,15 @@ class zynthian_gui(QObject):
 
     curlayerIsFX = Property(bool, get_curlayerIsFX, notify=curlayerIsFXChanged)
     ### END Property curlayerIsFX
+
+    ### Property curLayer
+    def get_curLayer(self):
+        return self.curlayer
+
+    curLayerChanged = Signal()
+
+    curLayer = Property(QObject, get_curLayer, notify=curLayerChanged)
+    ### END Property curLayer
 
     ### BEGIN Property doingLongTask
     def get_doingLongTask(self):

@@ -654,8 +654,8 @@ Zynthian.ScreenPage {
                         checked: zynqtgui.preset.show_only_favorites
                         onClicked: {
                             zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
-                            bankView.forceViewPosition()
-                            presetView.forceViewPosition()
+                            bankView.forceViewPosition(true)
+                            presetView.forceViewPosition(true)
                         }
                     }
                 }
@@ -776,8 +776,8 @@ Zynthian.ScreenPage {
                     checked: zynqtgui.preset.show_only_favorites
                     onClicked: {
                         zynqtgui.preset.show_only_favorites = !zynqtgui.preset.show_only_favorites
-                        bankView.forceViewPosition()
-                        presetView.forceViewPosition()
+                        bankView.forceViewPosition(true)
+                        presetView.forceViewPosition(true)
                     }
                 }
             }

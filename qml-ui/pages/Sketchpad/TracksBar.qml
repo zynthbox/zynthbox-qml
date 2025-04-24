@@ -47,17 +47,28 @@ Rectangle {
             if (root.song && root.song.isLoading == false) {
                 root.selectedChannel = applicationWindow().selectedChannel;
                 if (root.selectedChannel) {
-                    // Disable automagic slot selection when track changes
-                    // if (zynqtgui.sketchpad.lastSelectedObj.className == null && root.selectedChannel.selectedSlot.component === null && zynqtgui.isBootingComplete) {
-                    //     root.pickFirstAndBestSlot();
-                    // }
+                    if (zynqtgui.isBootingComplete) {
+                        if (root.selectedChannel.selectedSlot.component === null) {
+                            // We really only want to set the selected slot, not the other
+                            // bits (the rest isn't important until we touch something),
+                            // so make sure to ask pickFirstAndBestSlot to only set the
+                            // selected slot, and not the last selected object
+                            root.pickFirstAndBestSlot(true);
+                            // console.log("Selected channel throttle has done the thing");
+                        }
+                    } else {
+                        selectedChannelThrottle.restart();
+                        // Warning: very loud, this one
+                        // console.log("Selected channel throttle time, not done booting up...");
+                    }
                 } else {
                     selectedChannelThrottle.restart();
+                    // console.log("Selected channel throttle time, don't yet have a selected channel...");
                 }
             } else {
                 selectedChannelThrottle.restart();
+                // console.log("Selected channel throttle time, don't have a song yet, or the song is still loading...");
             }
-            console.log("Selected channel throttle time, let's goooo...");
         }
     }
     Connections {
@@ -91,48 +102,48 @@ Rectangle {
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
-    function pickNextSlot() {
+    function pickNextSlot(onlySelectSlot=false) {
         switch (root.selectedChannel.selectedSlot.className) {
             case "TracksBar_synthslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    samplesRow.switchToSlot(0, true);
+                    samplesRow.switchToSlot(0, true, onlySelectSlot);
                 } else {
-                    synthsRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    synthsRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true, onlySelectSlot);
                 }
                 break;
             case "TracksBar_sampleslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    fxRow.switchToSlot(0, true);
+                    fxRow.switchToSlot(0, true, onlySelectSlot);
                 } else {
-                    samplesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    samplesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true, onlySelectSlot);
                 }
                 break;
             case "TracksBar_sketchslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    sketchFxRow.switchToSlot(0, true);
+                    sketchFxRow.switchToSlot(0, true, onlySelectSlot);
                 } else {
-                    sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    sketchesRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true, onlySelectSlot);
                 }
                 break;
             case "TracksBar_externalslot":
                 if (root.selectedChannel.selectedSlot.value === 2) {
-                    externalRow.switchToSlot(0, true);
+                    externalRow.switchToSlot(0, true, onlySelectSlot);
                 } else {
-                    externalRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    externalRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true, onlySelectSlot);
                 }
                 break;
             case "TracksBar_fxslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    synthsRow.switchToSlot(0, true);
+                    synthsRow.switchToSlot(0, true, onlySelectSlot);
                 } else {
-                    fxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    fxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true, onlySelectSlot);
                 }
                 break;
             case "TracksBar_sketchfxslot":
                 if (root.selectedChannel.selectedSlot.value === 4) {
-                    sketchesRow.switchToSlot(0, true);
+                    sketchesRow.switchToSlot(0, true, onlySelectSlot);
                 } else {
-                    sketchFxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true);
+                    sketchFxRow.switchToSlot(root.selectedChannel.selectedSlot.value + 1, true, onlySelectSlot);
                 }
                 break;
             default:
@@ -212,29 +223,29 @@ Rectangle {
                 break;
         }
     }
-    function switchToSlot(slotType, slotIndex) {
+    function switchToSlot(slotType, slotIndex, onlySelectSlot=false) {
         switch(slotType) {
             default:
                 console.log("Unknown slot type: \"" + slotType + "\" - assuming synth")
             case "synth":
             case "TracksBar_synthslot":
-                synthsRow.switchToSlot(slotIndex, true);
+                synthsRow.switchToSlot(slotIndex, true, onlySelectSlot);
                 break;
             case "sample":
             case "TracksBar_sampleslot":
-                samplesRow.switchToSlot(slotIndex, true);
+                samplesRow.switchToSlot(slotIndex, true, onlySelectSlot);
                 break;
             case "sketch":
             case "TracksBar_sketchslot":
-                sketchesRow.switchToSlot(slotIndex, true);
+                sketchesRow.switchToSlot(slotIndex, true, onlySelectSlot);
                 break;
             case "fx":
             case "TracksBar_fxslot":
-                fxRow.switchToSlot(slotIndex, true);
+                fxRow.switchToSlot(slotIndex, true, onlySelectSlot);
                 break;
             case "external":
             case "TracksBar_externalslot":
-                externalRow.switchToSlot(slotIndex, true);
+                externalRow.switchToSlot(slotIndex, true, onlySelectSlot);
                 break;
         }
     }
@@ -244,51 +255,51 @@ Rectangle {
     // the first slot in the given type (either sound or fx slot).
     // We will then start from that position, and simply rotate through until we either have a slot
     // selected with something in it, or we have gone through all the slots and found nothing of use.
-    function pickFirstAndBestSlot() {
+    function pickFirstAndBestSlot(onlySelectSlot=false) {
         function checkCurrent(switchIfEmpty) {
             let slotHasContents = false;
             if (root.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                 slotHasContents = root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value]);
                 if (switchIfEmpty && slotHasContents === false) {
-                    synthsRow.switchToSlot(0, true);
+                    synthsRow.switchToSlot(0, true, onlySelectSlot);
                 }
             } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sampleslot") {
                 slotHasContents = root.selectedChannel.sampleSlotsData[root.selectedChannel.selectedSlot.value].cppObjId > -1;
                 if (switchIfEmpty && slotHasContents === false) {
-                    samplesRow.switchToSlot(0, true);
+                    samplesRow.switchToSlot(0, true, onlySelectSlot);
                 }
             } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot") {
                 slotHasContents = root.selectedChannel.sketchSlotsData[root.selectedChannel.selectedSlot.value].cppObjId > -1;
                 if (switchIfEmpty && slotHasContents === false) {
-                    sketchesRow.switchToSlot(0, true);
+                    sketchesRow.switchToSlot(0, true, onlySelectSlot);
                 }
             } else if (root.selectedChannel.selectedSlot.className === "TracksBar_externalslot") {
                 slotHasContents = (root.selectedChannel.externalSlotsData[root.selectedChannel.selectedSlot.value] !== undefined);
                 if (switchIfEmpty && slotHasContents === false) {
-                    externalRow.switchToSlot(0, true);
+                    externalRow.switchToSlot(0, true, onlySelectSlot);
                 }
             } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
                 if (root.selectedChannel.chainedFx[root.selectedChannel.selectedSlot.value] != null) {
                     slotHasContents = true;
                 }
                 if (switchIfEmpty && (slotHasContents === false)) {
-                    fxRow.switchToSlot(0, true);
+                    fxRow.switchToSlot(0, true, onlySelectSlot);
                 }
             }  else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
                 if (root.selectedChannel.chainedSketchFx[root.selectedChannel.selectedSlot.value] != null) {
                     slotHasContents = true;
                 }
                 if (switchIfEmpty && (slotHasContents === false)) {
-                    sketchFxRow.switchToSlot(0, true);
+                    sketchFxRow.switchToSlot(0, true, onlySelectSlot);
                 }
             } else if (switchIfEmpty) {
                 // Select the first and best option for the given TracksBar layout
                 if (root.selectedChannel.trackType === "synth") {
-                    synthsRow.switchToSlot(0, true);
+                    synthsRow.switchToSlot(0, true, onlySelectSlot);
                 } else if (root.selectedChannel.trackType === "sample-loop") {
-                    sketchesRow.switchToSlot(0, true);
+                    sketchesRow.switchToSlot(0, true, onlySelectSlot);
                 } else if (root.selectedChannel.trackType === "external") {
-                    externalRow.switchToSlot(0, true);
+                    externalRow.switchToSlot(0, true, onlySelectSlot);
                 }
             }
             return slotHasContents;
@@ -322,16 +333,16 @@ Rectangle {
                 if (slotHasContents) {
                     break;
                 }
-                root.pickNextSlot();
+                root.pickNextSlot(onlySelectSlot);
             }
             // If we have reached this point and still have nothing selected, make sure we select the whatever was previously selected (or default to the first sound slot)
             if (slotHasContents === false) {
                 if (initialSlotType === 0) {
-                    synthsRow.switchToSlot(initialSlotIndex, true);
+                    synthsRow.switchToSlot(initialSlotIndex, true, onlySelectSlot);
                 } else if (initialSlotType === 1) {
-                    fxRow.switchToSlot(initialSlotIndex, true);
+                    fxRow.switchToSlot(initialSlotIndex, true, onlySelectSlot);
                 } else if (initialSlotType === 2) {
-                    sketchFxRow.switchToSlot(initialSlotIndex, true);
+                    sketchFxRow.switchToSlot(initialSlotIndex, true, onlySelectSlot);
                 }
             }
         }

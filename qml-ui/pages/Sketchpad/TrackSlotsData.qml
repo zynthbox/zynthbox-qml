@@ -54,11 +54,11 @@ RowLayout {
     /**
       * Emulate a click to slot at specified index
       */
-    function switchToSlot(index, onlyFocus=false) {
+    function switchToSlot(index, onlyFocus=false, onlySelectSlot=false) {
         // This function may conceivably (and does, or this wouldn't be here) be called during incubation, so let's just... not cause errors
         let slotItem = slotRepeater.itemAt(index);
         if (slotItem) {
-            slotItem.switchToThisSlot(onlyFocus);
+            slotItem.switchToThisSlot(onlyFocus, onlySelectSlot);
         }
     }
 
@@ -154,74 +154,76 @@ RowLayout {
             color: "transparent"
             radius: 4
 
-            function switchToThisSlot(onlyFocus=false) {
-                if (zynqtgui.sketchpad.lastSelectedObj.component != slotDelegate || onlyFocus) {
-                    switch (control.slotType) {
-                        case "synth":
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
-                            break;
-                        case "sample-trig":
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
-                            break;
-                        case "sample-loop":
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
-                            break;
-                        case "external":
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
-                            break;
-                        case "fx":
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
-                            break;
-                        case "sketch-fx":
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchfxslot";
-                            break;
-                        case "text":
-                            // Do nothing for text slots
-                            break;
-                        default:
-                            console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
-                            zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
-                            root.selectedChannel.displayFx = false;
-                            break;
-                    }
-                    zynqtgui.sketchpad.lastSelectedObj.value = index;
-                    zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate;
-                    control.selectedChannel.selectedSlotRow = index;
-                } else {
-                    if (control.slotType === "external") {
-                        // If channel type is external, then it has 2 slots visible
-                        // and the respective selectedSlotRow is already selected. Hence directly handle item click
-                        if (!onlyFocus) {
-                            bottomStack.slotsBar.handleItemClick(control.slotType)
+            function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
+                root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate);
+                if (onlySelectSlot == false) {
+                    if (zynqtgui.sketchpad.lastSelectedObj.component != slotDelegate || onlyFocus) {
+                        switch (control.slotType) {
+                            case "synth":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                                break;
+                            case "sample-trig":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sampleslot";
+                                break;
+                            case "sample-loop":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchslot";
+                                break;
+                            case "external":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_externalslot";
+                                break;
+                            case "fx":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_fxslot";
+                                break;
+                            case "sketch-fx":
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_sketchfxslot";
+                                break;
+                            case "text":
+                                // Do nothing for text slots
+                                break;
+                            default:
+                                console.log("Unknown slot type, assuming synth, will likely break something! The unknown slot type is:", control.slotType);
+                                zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
+                                root.selectedChannel.displayFx = false;
+                                break;
                         }
+                        zynqtgui.sketchpad.lastSelectedObj.value = index;
+                        zynqtgui.sketchpad.lastSelectedObj.component = slotDelegate;
+                        control.selectedChannel.selectedSlotRow = index;
                     } else {
-                        // Handle item click only if not dragged
-                        if (!delegateMouseArea.dragHappened && !onlyFocus) {
-                            bottomStack.slotsBar.handleItemClick(control.slotType)
+                        if (control.slotType === "external") {
+                            // If channel type is external, then it has 2 slots visible
+                            // and the respective selectedSlotRow is already selected. Hence directly handle item click
+                            if (!onlyFocus) {
+                                bottomStack.slotsBar.handleItemClick(control.slotType)
+                            }
+                        } else {
+                            // Handle item click only if not dragged
+                            if (!delegateMouseArea.dragHappened && !onlyFocus) {
+                                bottomStack.slotsBar.handleItemClick(control.slotType)
+                            }
                         }
                     }
-                }
-                root.selectedChannel.selectedSlot.setTo(zynqtgui.sketchpad.lastSelectedObj.className, index, slotDelegate);
-                // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
-                root.selectedChannel.selectedSlotRow = index;
-                root.selectedChannel.selectedFxSlotRow = index;
+                    // FIXME This needs refactoring away... everything should be using the selectedSlot logic instead
+                    root.selectedChannel.selectedSlotRow = index;
+                    root.selectedChannel.selectedFxSlotRow = index;
 
-                if (control.slotType == "synth") {
-                    control.selectedChannel.setCurlayerByType("synth")
-                } else if (control.slotType == "sample-trig") {
-                    control.selectedChannel.setCurlayerByType("sample")
-                } else if (control.slotType == "sample-loop") {
-                    control.selectedChannel.setCurlayerByType("loop")
-                } else if (control.slotType == "external") {
-                    control.selectedChannel.setCurlayerByType("external")
-                } else if (control.slotType == "fx") {
-                    control.selectedChannel.setCurlayerByType("fx")
-                } else if (control.slotType == "sketch-fx") {
-                    control.selectedChannel.setCurlayerByType("sketch-fx")
-                } else if (control.slotType == "text") {
-                    // Do nothing for text slots
-                } else {
-                    control.selectedChannel.setCurlayerByType("")
+                    if (control.slotType == "synth") {
+                        control.selectedChannel.setCurlayerByType("synth")
+                    } else if (control.slotType == "sample-trig") {
+                        control.selectedChannel.setCurlayerByType("sample")
+                    } else if (control.slotType == "sample-loop") {
+                        control.selectedChannel.setCurlayerByType("loop")
+                    } else if (control.slotType == "external") {
+                        control.selectedChannel.setCurlayerByType("external")
+                    } else if (control.slotType == "fx") {
+                        control.selectedChannel.setCurlayerByType("fx")
+                    } else if (control.slotType == "sketch-fx") {
+                        control.selectedChannel.setCurlayerByType("sketch-fx")
+                    } else if (control.slotType == "text") {
+                        // Do nothing for text slots
+                    } else {
+                        control.selectedChannel.setCurlayerByType("")
+                    }
                 }
             }
 

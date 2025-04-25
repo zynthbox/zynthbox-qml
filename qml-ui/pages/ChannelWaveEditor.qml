@@ -888,6 +888,7 @@ Zynthian.ScreenPage {
                                                         ? Zynthbox.PlayGridManager.getClipById(clipDelegate.clip.cppObjId)
                                                         : null
                     property bool clipHasWav: clipDelegate.clip && !clipDelegate.isEmpty
+                    onCppClipObjectChanged: dotFetcher.restart();
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -897,13 +898,68 @@ Zynthian.ScreenPage {
                         width: 1
                     }
                     Zynthbox.WaveFormItem {
+                        id: waveformItem
                         anchors.fill: parent
                         color: Kirigami.Theme.textColor
                         source: clipDelegate.cppClipObject ? "clip:/%1".arg(clipDelegate.cppClipObject.id) : ""
                         start: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds : 0
                         end: clipDelegate.cppClipObject ? clipDelegate.cppClipObject.selectedSliceObject.startPositionSeconds + clipDelegate.cppClipObject.selectedSliceObject.lengthSeconds : 0
+                        readonly property real relativeStart: waveformItem.start / waveformItem.length
+                        readonly property real relativeEnd: waveformItem.end / waveformItem.length
 
                         visible: clipDelegate.clipHasWav
+                        // Progress line
+                        Rectangle {
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                            }
+                            visible: component.isVisible && component.selectedChannel.trackType === "sample-loop" && clipDelegate.cppClipObject && clipDelegate.cppClipObject.isPlaying
+                            color: Kirigami.Theme.highlightColor
+                            width: Kirigami.Units.smallSpacing
+                            x: visible ? Zynthian.CommonUtils.fitInWindow(clipDelegate.cppClipObject.position, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width : 0
+                        }
+
+                        // SamplerSynth progress dots
+                        Timer {
+                            id: dotFetcher
+                            interval: 1; repeat: false; running: false;
+                            onTriggered: {
+                                progressDots.playbackPositions = component.visible && component.selectedChannel.trackType === "synth" && clipDelegate.cppClipObject
+                                    ? clipDelegate.cppClipObject.playbackPositions
+                                    : null
+                            }
+                        }
+                        Connections {
+                            target: component
+                            onIsVisibleChanged: dotFetcher.restart();
+                        }
+                        Connections {
+                            target: component.selectedChannel
+                            onTrack_type_changed: dotFetcher.restart();
+                        }
+                        Repeater {
+                            id: progressDots
+                            model: Zynthbox.Plugin.clipMaximumPositionCount
+                            property QtObject playbackPositions: null
+                            delegate: Item {
+                                property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                                visible: progressEntry && progressEntry.id > -1
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    rotation: 45
+                                    color: Kirigami.Theme.highlightColor
+                                    width: Kirigami.Units.largeSpacing
+                                    height:  Kirigami.Units.largeSpacing
+                                    scale: progressEntry ? 0.5 + progressEntry.gain : 1
+                                }
+                                anchors {
+                                    top: parent.verticalCenter
+                                    topMargin: progressEntry ? progressEntry.pan * (parent.height / 2) : 0
+                                }
+                                x: visible ? Math.floor(Zynthian.CommonUtils.fitInWindow(progressEntry.progress, waveformItem.relativeStart, waveformItem.relativeEnd) * parent.width) : 0
+                            }
+                        }
                     }
                     Item {
                         id: detailsLabelContainer
@@ -941,7 +997,7 @@ Zynthian.ScreenPage {
                             height: 2
                             color: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions && clipDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
                             opacity: width > 1 ? 0.8 : 0
-                            width: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions ? Math.min(detailsLabelContainer.availableWidth, clipDelegate.cppClipObject.playbackPositions.peakGainLeft * detailsLabelContainer.availableWidth) : 0
+                            width: component.isVisible && clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions ? Math.min(detailsLabelContainer.availableWidth, clipDelegate.cppClipObject.playbackPositions.peakGainLeft * detailsLabelContainer.availableWidth) : 0
                         }
                         Rectangle {
                             anchors {
@@ -952,7 +1008,7 @@ Zynthian.ScreenPage {
                             height: 2
                             color: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions && clipDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
                             opacity: width > 1 ? 0.8 : 0
-                            width: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions ? Math.min(detailsLabelContainer.availableWidth, clipDelegate.cppClipObject.playbackPositions.peakGainRight * detailsLabelContainer.availableWidth) : 0
+                            width: component.isVisible && clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions ? Math.min(detailsLabelContainer.availableWidth, clipDelegate.cppClipObject.playbackPositions.peakGainRight * detailsLabelContainer.availableWidth) : 0
                         }
                     }
                     MouseArea {

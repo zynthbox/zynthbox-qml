@@ -423,6 +423,8 @@ Zynthian.ScreenPage {
             if (root.screenIds.includes(zynqtgui.current_screen_id)) {
                 bankView.forceViewPosition(true)
                 presetView.forceViewPosition(true)
+            } else {
+                zynqtgui.preset.show_only_favorites = false
             }
         }
     }

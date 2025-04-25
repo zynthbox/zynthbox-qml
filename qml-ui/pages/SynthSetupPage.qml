@@ -693,16 +693,17 @@ Zynthian.ScreenPage {
                         // Show highlight frame only if current bank name matches selected one
                         // background.visible: zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
                         background.visible: {
-                            if (zynqtgui.preset.show_only_favorites) {
-                                // When showing favorites, bind to current_index as well as bankName
-                                // This ensures the selected frame is correctly updated.
-                                // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
-                                return zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
-                            } else {
-                                // When not showing favorites, bind to current_index and check if delegate's index is the same
-                                // This will result in faster displaying highlighted frame when changed
-                                return zynqtgui.bank.current_index == index
-                            }
+                            // Bind to current_index as well as bankName. This ensures the selected frame is correctly updated.
+                            // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
+                            // It also ignores the case when selecting a preset to be a favorite but not switching to it
+                            return zynqtgui.bank.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.bankName
+
+                            // if (zynqtgui.preset.show_only_favorites) {
+                            // } else {
+                            //     // When not showing favorites, bind to current_index and check if delegate's index is the same
+                            //     // This will result in faster displaying highlighted frame when changed
+                            //     return zynqtgui.bank.current_index == index
+                            // }
                         }
                         onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                         onItemActivated: bankView.itemActivated(screenId, index)
@@ -818,12 +819,11 @@ Zynthian.ScreenPage {
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                 onIconClicked: {
-                    if (presetView.selector.current_index != index) {
-                        presetView.selector.current_index = index;
-                        presetView.selector.activate_index(index);
-                    }
-                    zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
-                    zynqtgui.current_screen_id = "preset";
+                    // if (presetView.selector.current_index != index) {
+                    //     presetView.selector.current_index = index;
+                    //     presetView.selector.activate_index(index);
+                    // }
+                    // zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
                 }
                 Component.onCompleted: {
                     presetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
@@ -833,21 +833,28 @@ Zynthian.ScreenPage {
                     selector: presetView.selector
                     // Show highlight frame only if current preset name matches selected one
                     background.visible: {
-                        if (zynqtgui.preset.show_only_favorites) {
-                            // When showing favorites, bind to current_index as well as presetName
-                            // This ensures the selected frame is correctly updated.
-                            // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
-                            return zynqtgui.preset.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.presetName
-                        } else {
-                            // When not showing favorites, bind to current_index and check if delegate's index is the same
-                            // This will result in faster displaying highlighted frame when changed
-                            return zynqtgui.preset.current_index == index
-                        }
+                        // When showing favorites, bind to current_index as well as presetName. This ensures the selected frame is correctly updated.
+                        // Do not use index to check when showing favorites as it ignores the case where current index might not be the selected preset since the list got filtered
+                        // It also ignores the case when selecting a preset to be a favorite but not switching to it
+                        return zynqtgui.preset.current_index >= 0 && zynqtgui.curLayer != null && model.display == zynqtgui.curLayer.presetName
+
+                        // if (zynqtgui.preset.show_only_favorites) {
+
+                        // } else {
+                        //     // When not showing favorites, bind to current_index and check if delegate's index is the same
+                        //     // This will result in faster displaying highlighted frame when changed
+                        //     return zynqtgui.preset.current_index == index
+                        // }
                     }
                     onCurrentScreenIdRequested: presetView.currentScreenIdRequested(screenId)
                     onItemActivated: presetView.itemActivated(screenId, index)
                     onItemActivatedSecondary: presetView.itemActivatedSecondary(screenId, index)
-                    onIconClicked: presetView.iconClicked(screenId, index)
+                    onIconClicked: {
+                        zynqtgui.preset.setFavorite(index, !model.metadata.is_favorite)
+                        zynqtgui.current_screen_id = "preset";
+
+                        presetView.iconClicked(screenId, index)
+                    }
                 }
             }
         }

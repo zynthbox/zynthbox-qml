@@ -88,8 +88,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
             for item in self.zynqtgui.curlayer.preset_list:
                 self.list_data.append(item)
-                self.list_metadata.append({"icon": "starred-symbolic" if self.zynqtgui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
-                                "show_numbers": True})
+                self.list_metadata.append({"icon": "starred-symbolic" if self.zynqtgui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic", "show_numbers": True, "is_favorite": self.zynqtgui.curlayer.engine.is_preset_fav(item)})
         else:
             self.reload_top_sounds()
             if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
@@ -262,6 +261,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
         return self.zynqtgui.curlayer.engine.is_preset_fav(self.zynqtgui.curlayer.preset_list[self.index])
 
     def set_current_is_favorite(self, new_fav_state: bool):
+        self.setFavorite(self.index, new_fav_state)
+
+    @Slot(int, bool)
+    def setFavorite(self, index, new_fav_state):
         fav_owner_engine = None
         fav_bank_name = None
         if self.__top_sounds_engine == None:
@@ -274,13 +277,13 @@ class zynthian_gui_preset(zynthian_gui_selector):
                     break
         # if we are operating on an active engine, we can just use its internal api
         if fav_owner_engine != None:
-            preset_id = str(self.list_data[self.index][0])
+            preset_id = str(self.list_data[index][0])
             # Find the bank name we might have to restore
             if preset_id in self.zynqtgui.curlayer.engine.preset_favs:
                 fav_bank_name = self.zynqtgui.curlayer.engine.preset_favs[preset_id][0][2]
 
-            if fav_owner_engine.is_preset_fav(self.list_data[self.index]) != new_fav_state:
-                fav_owner_engine.toggle_preset_fav(fav_owner_engine.layers[0], self.list_data[self.index])
+            if fav_owner_engine.is_preset_fav(self.list_data[index]) != new_fav_state:
+                fav_owner_engine.toggle_preset_fav(fav_owner_engine.layers[0], self.list_data[index])
 
         # otherwise we need to manipulate the json file ourselves, support only fav *removal* for now
         # TODO: support also adding a fav?
@@ -308,8 +311,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
                         continue
                     if len(parsed[entry][1]) < 3:
                         continue
-                    if (parsed[entry][0][2] == self.__top_sounds[self.__top_sounds_engine][self.index]["bank"]
-                        and parsed[entry][1][2] == self.__top_sounds[self.__top_sounds_engine][self.index]["preset"]):
+                    if (parsed[entry][0][2] == self.__top_sounds[self.__top_sounds_engine][index]["bank"]
+                        and parsed[entry][1][2] == self.__top_sounds[self.__top_sounds_engine][index]["preset"]):
                         del parsed[entry]
                         break
 
@@ -324,15 +327,16 @@ class zynthian_gui_preset(zynthian_gui_selector):
         self.zynqtgui.screens['bank'].fill_list()
         self.zynqtgui.screens['bank'].show()
 
-        #if we were showing only favorites and removed the current one, select another
-        if not new_fav_state and self.zynqtgui.curlayer != None and (self.zynqtgui.curlayer.show_fav_presets or self.__top_sounds_engine != None):
-            if len(self.list_data) > 0:
-                self.select_action(max(0, self.index - 1))
-            else:
-                self.zynqtgui.screens['bank'].select_action(0)
+        # #if we were showing only favorites and removed the current one, select another
+        # if not new_fav_state and self.zynqtgui.curlayer != None and (self.zynqtgui.curlayer.show_fav_presets or self.__top_sounds_engine != None):
+        #     if len(self.list_data) > 0:
+        #         self.select_action(max(0, index - 1))
+        #     else:
+        #         self.zynqtgui.screens['bank'].select_action(0)
 
         self.show()
-        self.current_is_favorite_changed.emit()
+        if index == self.index:
+            self.current_is_favorite_changed.emit()
 
 
     def sync_current_bank(self):

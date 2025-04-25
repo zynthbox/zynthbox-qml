@@ -905,26 +905,54 @@ Zynthian.ScreenPage {
 
                         visible: clipDelegate.clipHasWav
                     }
-                    Rectangle {
-                        height: 16
+                    Item {
+                        id: detailsLabelContainer
+                        visible: detailsLabel.text && detailsLabel.text.trim().length > 0
                         anchors {
                             left: parent.left
                             top: parent.top
                             right: parent.right
                             margins: 1
                         }
-                        color: "#99888888"
-                        visible: detailsLabel.text && detailsLabel.text.trim().length > 0
+                        height: 16
+                        Rectangle {
+                            anchors.fill: parent
+                            opacity: 0.8
+                            color: "grey"
+                        }
 
                         QQC2.Label {
                             id: detailsLabel
-
-                            anchors.centerIn: parent
-                            width: parent.width - 4
+                            anchors {
+                                fill: parent
+                                rightMargin: 4
+                            }
                             elide: Text.ElideLeft
                             horizontalAlignment: Text.AlignHCenter
                             font.pointSize: 8
                             text: clipDelegate.clipHasWav ? clipDelegate.clip.path.split("/").pop() : ""
+                        }
+                        property int availableWidth: width
+                        Rectangle {
+                            anchors {
+                                top: parent.top
+                                left: parent.left
+                            }
+                            height: 2
+                            color: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions && clipDelegate.cppClipObject.playbackPositions.peakGainLeft > 1 ? "red" : "white"
+                            opacity: width > 1 ? 0.8 : 0
+                            width: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions ? Math.min(detailsLabelContainer.availableWidth, clipDelegate.cppClipObject.playbackPositions.peakGainLeft * detailsLabelContainer.availableWidth) : 0
+                        }
+                        Rectangle {
+                            anchors {
+                                left: parent.left
+                                bottom: parent.bottom
+                                // bottomMargin: -1 // Because anchoring is weird and we want it to skirt the bottom of the blue bubbles...
+                            }
+                            height: 2
+                            color: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions && clipDelegate.cppClipObject.playbackPositions.peakGainRight > 1 ? "red" : "white"
+                            opacity: width > 1 ? 0.8 : 0
+                            width: clipDelegate.cppClipObject && clipDelegate.cppClipObject.playbackPositions ? Math.min(detailsLabelContainer.availableWidth, clipDelegate.cppClipObject.playbackPositions.peakGainRight * detailsLabelContainer.availableWidth) : 0
                         }
                     }
                     MouseArea {

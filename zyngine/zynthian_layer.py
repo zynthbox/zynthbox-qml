@@ -328,9 +328,6 @@ class zynthian_layer(QObject):
 
     def set_preset(self, i, set_engine=True, force_immediate=False):
         if i < len(self.preset_list):
-            import traceback
-            traceback.print_stack()
-
             last_preset_index=self.preset_index
             last_preset_name=self.preset_name
             

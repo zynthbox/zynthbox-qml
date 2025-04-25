@@ -156,11 +156,19 @@ class zynthian_layer(QObject):
             "preset": "--"
         }
 
-        result["synth"] = f"{self.engineName}"
-        if self.bankCount > 0:
-            result["bank"] = f"({self.bankIndex + 1}/{self.bankCount}) {'--' if len(self.bankName) == 0 else self.bankName}"
-        if self.presetCount > 0:
-            result["preset"] = f"({self.presetIndex + 1}/{self.presetCount}) {'--' if len(self.presetName) == 0 else self.presetName}"
+        try:
+            result["synth"] = f"{self.engineName}"
+        except: pass
+
+        try:
+            if self.bankCount > 0:
+                result["bank"] = f"({self.bankIndex + 1}/{self.bankCount}) {'--' if len(self.bankName) == 0 else self.bankName}"
+        except: pass
+
+        try:
+            if self.presetCount > 0:
+                result["preset"] = f"({self.presetIndex + 1}/{self.presetCount}) {'--' if len(self.presetName) == 0 else self.presetName}"
+        except: pass
 
         return result
 
@@ -320,6 +328,9 @@ class zynthian_layer(QObject):
 
     def set_preset(self, i, set_engine=True, force_immediate=False):
         if i < len(self.preset_list):
+            import traceback
+            traceback.print_stack()
+
             last_preset_index=self.preset_index
             last_preset_name=self.preset_name
             

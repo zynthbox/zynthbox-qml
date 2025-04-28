@@ -841,13 +841,13 @@ Rectangle {
                     console.log("It does not, append it");
                     copyTo = copyTo + "." + originalSuffix;
                 }
-                if (loopPickerDialog.theClip.copyTo(copyTo)) {
-                    console.log("Successfully copied the clip with path name", loopPickerDialog.theClip.path, "to ", copyTo)
+                if (loopPickerDialog.theClip.exportToFile(copyTo)) {
+                    console.log("Successfully exported the clip with path name", loopPickerDialog.theClip.path, "to ", copyTo)
                 } else {
-                    console.log("Failed to copy the clip with path name", loopPickerDialog.theClip.path, "to", copyTo)
+                    console.log("Failed to export the clip with path name", loopPickerDialog.theClip.path, "to", copyTo)
                 }
             } else {
-                loopPickerDialog.theClip.path = loopPickerDialog.selectedFile.filePath;
+                loopPickerDialog.theClip.importFromFile(loopPickerDialog.selectedFile.filePath);
                 loopPickerDialog.theClip.enabled = true;
             }
         }

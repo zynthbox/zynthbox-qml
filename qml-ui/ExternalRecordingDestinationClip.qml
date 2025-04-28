@@ -92,7 +92,7 @@ ColumnLayout {
             Zynthbox.AudioLevels.shouldRecordPorts = false;
             Zynthbox.AudioLevels.stopRecording();
         }
-        component.recordingSample.set_path(component.recordingFilename, false);
+        component.recordingSample.importFromFile(component.recordingFilename);
         component.recordingSample = null;
     }
     property QtObject selectedSample: channelsList.currentItem && channelsList.currentItem.selectedSample ? channelsList.currentItem.selectedSample : null

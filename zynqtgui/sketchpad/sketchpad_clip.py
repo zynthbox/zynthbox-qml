@@ -106,6 +106,7 @@ class sketchpad_clip_metadata(QObject):
         self.writeTimer.setSingleShot(True)
         self.writeTimer.timeout.connect(self.write)
 
+        self.__originalPath = ""
         # Sound metadata
         self.__audioType = None
         self.__audioTypeSettings = None
@@ -116,6 +117,7 @@ class sketchpad_clip_metadata(QObject):
         self.__samples = None
         self.__soundSnapshot = None
 
+    def get_originalPath(self): return self.__originalPath
     def get_audioType(self): return self.__audioType
     def get_audioTypeSettings(self): return self.__audioTypeSettings
     def get_midiRecording(self): return self.__midiRecording
@@ -125,54 +127,60 @@ class sketchpad_clip_metadata(QObject):
     def get_samples(self): return self.__samples
     def get_soundSnapshot(self): return self.__soundSnapshot
 
+    def set_originalPath(self, value):
+        if self.__originalPath != value:
+            self.__originalPath = value
+            self.originalPathChanged.emit()
+            self.scheduleSave()
+
     def set_audioType(self, value, write=True, force=False):
         if value != self.__audioType or force:
             self.__audioType = value
             self.audioTypeChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_audioTypeSettings(self, value, write=True, force=False):
         if value != self.__audioTypeSettings or force:
             self.__audioTypeSettings = value
             self.audioTypeSettingsChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_midiRecording(self, value, write=True, force=False):
         if value != self.__midiRecording or force:
             self.__midiRecording = value
             self.midiRecordingChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_patternJson(self, value, write=True, force=False):
         if value != self.__patternJson or force:
             self.__patternJson = value
             self.patternJsonChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_routingStyle(self, value, write=True, force=False):
         if value != self.__routingStyle or force:
             self.__routingStyle = value
             self.routingStyleChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_samplePickingStyle(self, value, write=True, force=False):
         if value != self.__samplePickingStyle or force:
             self.__samplePickingStyle = value
             self.samplePickingStyleChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_samples(self, value, write=True, force=False):
         if value != self.__samples or force:
             self.__samples = value
             self.samplesChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
     def set_soundSnapshot(self, value, write=True, force=False):
         if value != self.__soundSnapshot or force:
             self.__soundSnapshot = value
             self.soundSnapshotChanged.emit()
             if write:
-                self.scheduleWrite()
+                self.scheduleSave()
 
     def set_timeStretchStyle(self, value, sliceIndex):
         if self.clip.audioSource is not None:
@@ -230,6 +238,7 @@ class sketchpad_clip_metadata(QObject):
                     logging.error(f"Failed to restore (and so restoring to defaults) the equaliser/compressor settings for {self.clip} from the data: {value}")
                     setEqualiserAndCompressorDefaults(self.clip.audioSource)
 
+    originalPathChanged = Signal()
     audioTypeChanged = Signal()
     audioTypeSettingsChanged = Signal()
     midiRecordingChanged = Signal()
@@ -239,6 +248,7 @@ class sketchpad_clip_metadata(QObject):
     samplesChanged = Signal()
     soundSnapshotChanged = Signal()
 
+    originalPath = Property(str, get_originalPath, set_originalPath, notify=originalPathChanged)
     audioType = Property(str, get_audioType, set_audioType, notify=audioTypeChanged)
     audioTypeSettings = Property(str, get_audioTypeSettings, set_audioTypeSettings, notify=audioTypeSettingsChanged)
     midiRecording = Property(str, get_midiRecording, set_midiRecording, notify=midiRecordingChanged)
@@ -262,71 +272,71 @@ class sketchpad_clip_metadata(QObject):
     def hook(self):
         if self.clip.audioSource:
             def connectEqualiserAndCompressorForSaving(equaliserCompressorObject):
-                equaliserCompressorObject.equaliserEnabledChanged.connect(self.scheduleWrite)
+                equaliserCompressorObject.equaliserEnabledChanged.connect(self.scheduleSave)
                 for filterObject in equaliserCompressorObject.equaliserSettings():
-                    filterObject.filterTypeChanged.connect(self.scheduleWrite)
-                    filterObject.frequencyChanged.connect(self.scheduleWrite)
-                    filterObject.qualityChanged.connect(self.scheduleWrite)
-                    filterObject.soloedChanged.connect(self.scheduleWrite)
-                    filterObject.gainChanged.connect(self.scheduleWrite)
-                    filterObject.activeChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorEnabledChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSidechannelLeftChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSidechannelRightChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSettings().thresholdChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSettings().makeUpGainChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSettings().kneeWidthChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSettings().releaseChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSettings().attackChanged.connect(self.scheduleWrite)
-                equaliserCompressorObject.compressorSettings().ratioChanged.connect(self.scheduleWrite)
+                    filterObject.filterTypeChanged.connect(self.scheduleSave)
+                    filterObject.frequencyChanged.connect(self.scheduleSave)
+                    filterObject.qualityChanged.connect(self.scheduleSave)
+                    filterObject.soloedChanged.connect(self.scheduleSave)
+                    filterObject.gainChanged.connect(self.scheduleSave)
+                    filterObject.activeChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorEnabledChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSidechannelLeftChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSidechannelRightChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSettings().thresholdChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSettings().makeUpGainChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSettings().kneeWidthChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSettings().releaseChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSettings().attackChanged.connect(self.scheduleSave)
+                equaliserCompressorObject.compressorSettings().ratioChanged.connect(self.scheduleSave)
             connectEqualiserAndCompressorForSaving(self.clip.audioSource)
-            self.clip.audioSource.bpmChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.autoSynchroniseSpeedRatioChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.speedRatioChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.sliceCountChanged.connect(self.scheduleWrite)
-            self.clip.audioSource.slicesContiguousChanged.connect(self.scheduleWrite)
+            self.clip.audioSource.bpmChanged.connect(self.scheduleSave)
+            self.clip.audioSource.autoSynchroniseSpeedRatioChanged.connect(self.scheduleSave)
+            self.clip.audioSource.speedRatioChanged.connect(self.scheduleSave)
+            self.clip.audioSource.sliceCountChanged.connect(self.scheduleSave)
+            self.clip.audioSource.slicesContiguousChanged.connect(self.scheduleSave)
             def connectSliceForSaving(sliceSettingsObject):
-                sliceSettingsObject.subvoiceCountChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.subvoiceCountChanged.connect(self.scheduleSave)
                 for subvoiceSettingsObject in sliceSettingsObject.subvoiceSettings():
-                    subvoiceSettingsObject.panChanged.connect(self.scheduleWrite)
-                    subvoiceSettingsObject.pitchChanged.connect(self.scheduleWrite)
-                    subvoiceSettingsObject.gainChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.gainHandler().gainChanged.connect(self.scheduleWrite)
+                    subvoiceSettingsObject.panChanged.connect(self.scheduleSave)
+                    subvoiceSettingsObject.pitchChanged.connect(self.scheduleSave)
+                    subvoiceSettingsObject.gainChanged.connect(self.scheduleSave)
+                sliceSettingsObject.gainHandler().gainChanged.connect(self.scheduleSave)
                 sliceSettingsObject.gainHandler().gainChanged.connect(self.handleGainChanged)
-                sliceSettingsObject.playbackStyleChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.timeStretchStyleChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.pitchChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.startPositionChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.snapLengthToBeatChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.lengthChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.loopDeltaChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.loopDelta2Changed.connect(self.scheduleWrite)
-                sliceSettingsObject.loopCrossfadeAmountChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.loopStartCrossfadeDirectionChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.stopCrossfadeDirectionChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.rootNoteChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.keyZoneStartChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.keyZoneEndChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.velocityMinimumChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.velocityMaximumChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.panChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.adsrParametersChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPositionChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainSprayChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainScanChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainIntervalChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainIntervalAdditionalChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainSizeChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainSizeAdditionalChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPanMinimumChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPanMaximumChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPitchMinimum1Changed.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPitchMaximum1Changed.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPitchMinimum2Changed.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPitchMaximum2Changed.connect(self.scheduleWrite)
-                sliceSettingsObject.grainPitchPriorityChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainSustainChanged.connect(self.scheduleWrite)
-                sliceSettingsObject.grainTiltChanged.connect(self.scheduleWrite)
+                sliceSettingsObject.playbackStyleChanged.connect(self.scheduleSave)
+                sliceSettingsObject.timeStretchStyleChanged.connect(self.scheduleSave)
+                sliceSettingsObject.pitchChanged.connect(self.scheduleSave)
+                sliceSettingsObject.startPositionChanged.connect(self.scheduleSave)
+                sliceSettingsObject.snapLengthToBeatChanged.connect(self.scheduleSave)
+                sliceSettingsObject.lengthChanged.connect(self.scheduleSave)
+                sliceSettingsObject.loopDeltaChanged.connect(self.scheduleSave)
+                sliceSettingsObject.loopDelta2Changed.connect(self.scheduleSave)
+                sliceSettingsObject.loopCrossfadeAmountChanged.connect(self.scheduleSave)
+                sliceSettingsObject.loopStartCrossfadeDirectionChanged.connect(self.scheduleSave)
+                sliceSettingsObject.stopCrossfadeDirectionChanged.connect(self.scheduleSave)
+                sliceSettingsObject.rootNoteChanged.connect(self.scheduleSave)
+                sliceSettingsObject.keyZoneStartChanged.connect(self.scheduleSave)
+                sliceSettingsObject.keyZoneEndChanged.connect(self.scheduleSave)
+                sliceSettingsObject.velocityMinimumChanged.connect(self.scheduleSave)
+                sliceSettingsObject.velocityMaximumChanged.connect(self.scheduleSave)
+                sliceSettingsObject.panChanged.connect(self.scheduleSave)
+                sliceSettingsObject.adsrParametersChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainPositionChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainSprayChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainScanChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainIntervalChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainIntervalAdditionalChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainSizeChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainSizeAdditionalChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainPanMinimumChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainPanMaximumChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainPitchMinimum1Changed.connect(self.scheduleSave)
+                sliceSettingsObject.grainPitchMaximum1Changed.connect(self.scheduleSave)
+                sliceSettingsObject.grainPitchMinimum2Changed.connect(self.scheduleSave)
+                sliceSettingsObject.grainPitchMaximum2Changed.connect(self.scheduleSave)
+                sliceSettingsObject.grainPitchPriorityChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainSustainChanged.connect(self.scheduleSave)
+                sliceSettingsObject.grainTiltChanged.connect(self.scheduleSave)
                 sliceSettingsObject.panChanged.connect(self.handlePanChanged)
             connectSliceForSaving(self.clip.audioSource.rootSlice())
             for sliceObject in self.clip.audioSource.sliceSettings():
@@ -360,6 +370,7 @@ class sketchpad_clip_metadata(QObject):
     def read(self, load_autosave=True):
         self.__isReading = True
         if not self.clip.isEmpty:
+            audioMetadata = None
             try:
                 file = taglib.File(self.clip.path)
                 if load_autosave and "AUTOSAVE" in file.tags:
@@ -367,237 +378,243 @@ class sketchpad_clip_metadata(QObject):
                     self.__audioMetadata = json.loads(file.tags["AUTOSAVE"][0])
                 else:
                     logging.debug(f"Clip metadata reading {self.clip} : NOT autosave")
-                    self.__audioMetadata = file.tags
+                audioMetadata = file.tags
                 file.close()
             except Exception as e:
-                self.__audioMetadata = None
                 logging.error(f"Error reading metadata from sketch {self.clip.path} : {str(e)}")
 
-            # TODO Probably have some fault safety here, in case there's bunk metadata?
-            if self.clip.audioSource is not None:
-                # The clip's non-playback metadata (essentially unbouncing support data)
-                self.set_audioType(str(self.getMetadataProperty("ZYNTHBOX_TRACK_TYPE", None)), write=False, force=True)
-                self.set_audioTypeSettings(str(self.getMetadataProperty("ZYNTHBOX_TRACK_AUDIOTYPESETTINGS", None)), write=False, force=True)
-                self.set_midiRecording(str(self.getMetadataProperty("ZYNTHBOX_MIDI_RECORDING", None)), write=False, force=True)
-                self.set_patternJson(str(self.getMetadataProperty("ZYNTHBOX_PATTERN_JSON", None)), write=False, force=True)
-                self.set_routingStyle(str(self.getMetadataProperty("ZYNTHBOX_ROUTING_STYLE", None)), write=False, force=True)
-                self.set_samplePickingStyle(str(self.getMetadataProperty("ZYNTHBOX_SAMPLE_PICKING_STYLE", None)), write=False, force=True)
-                self.set_samples(str(self.getMetadataProperty("ZYNTHBOX_SAMPLES", None)), write=False, force=True)
-                self.set_soundSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SNAPSHOT", None)), write=False, force=True)
-                # The clip's playback related settings
-                self.clip.audioSource.setBpm(float(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())))
-                self.clip.audioSource.setSpeedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)))
-                self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
-                self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
-                self.clip.audioSource.stringToSlices(str(self.getMetadataProperty("ZYNTHBOX_SLICE_SETTINGS", "")))
-                # The slice related settings (for the root slice)
-                self.clip.audioSource.rootSlice().setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
-                self.clip.audioSource.rootSlice().setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
-                self.clip.audioSource.rootSlice().setKeyZoneStart(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_START", 0)))
-                self.clip.audioSource.rootSlice().setKeyZoneEnd(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_END", 127)))
-                self.clip.audioSource.rootSlice().setVelocityMinimum(int(self.getMetadataProperty("ZYNTHBOX_VELOCITY_MINIMUM", 1)))
-                self.clip.audioSource.rootSlice().setVelocityMaximum(int(self.getMetadataProperty("ZYNTHBOX_VELOCITY_MAXIMUM", 127)))
-                self.clip.audioSource.rootSlice().setADSRAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)))
-                self.clip.audioSource.rootSlice().setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
-                self.clip.audioSource.rootSlice().setADSRSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)))
-                self.clip.audioSource.rootSlice().setADSRRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)))
-                self.clip.audioSource.rootSlice().gainHandler().setGainAbsolute(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)))
-                self.clip.audioSource.rootSlice().setGrainInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
-                self.clip.audioSource.rootSlice().setGrainIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
-                self.clip.audioSource.rootSlice().setGrainPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
-                self.clip.audioSource.rootSlice().setGrainPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)))
-                self.clip.audioSource.rootSlice().setGrainPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)))
-                self.clip.audioSource.rootSlice().setGrainPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)))
-                self.clip.audioSource.rootSlice().setGrainPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)))
-                self.clip.audioSource.rootSlice().setGrainPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)))
-                self.clip.audioSource.rootSlice().setGrainPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)))
-                self.clip.audioSource.rootSlice().setGrainPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
-                self.clip.audioSource.rootSlice().setGrainScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
-                self.clip.audioSource.rootSlice().setGrainSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)))
-                self.clip.audioSource.rootSlice().setGrainSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)))
-                self.clip.audioSource.rootSlice().setGrainSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
-                self.clip.audioSource.rootSlice().setGrainSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
-                self.clip.audioSource.rootSlice().setGrainTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
-                self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")), -1)
-                self.clip.audioSource.rootSlice().setPitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)))
-                self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "LoopingPlaybackStyle")), -1)
-                self.clip.audioSource.rootSlice().setLoopCrossfadeAmount(float(self.getMetadataProperty("ZYNTHBOX_LOOP_CROSSFADE_AMOUNT", 0)))
-                self.set_loopStartCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
-                self.set_stopCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_STOP_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
-                self.clip.audioSource.rootSlice().setSnapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true")
-                self.clip.audioSource.rootSlice().setSubvoiceCount(int(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_COUNT", 0)))
-                rootSliceSubvoices = str(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_SETTINGS", ""))
-                if len(rootSliceSubvoices) > 0:
-                    try:
-                        sliceValues = json.loads(rootSliceSubvoices)
-                        for index, subvoiceValues in enumerate(sliceValues):
-                            self.clip.audioSource.rootSlice().subvoiceSettings()[index].setPan(subvoiceValues["pan"])
-                            self.clip.audioSource.rootSlice().subvoiceSettings()[index].setPitch(subvoiceValues["pitch"])
-                            self.clip.audioSource.rootSlice().subvoiceSettings()[index].setGain(subvoiceValues["gain"])
-                    except Exception as e:
-                        logging.error(f"Got us an error unwrapping the voices: {str(e)}\nFrom the stored string:{rootSliceSubvoices}")
-                else:
-                    logging.error("No subvoices, apparently...")
-                # Some fallbackery that we can likely remove at some point (or also perhaps get rid of entirely when we switch to using the industry version of slice and loop definitions...)
-                startPositionSamples = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION_SAMPLES", -1))
-                if startPositionSamples == -1:
-                    self.clip.audioSource.rootSlice().setStartPositionSeconds(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)))
-                else:
-                    self.clip.audioSource.rootSlice().setStartPositionSamples(startPositionSamples)
-                lengthSamples = float(self.getMetadataProperty("ZYNTHBOX_LENGTH_SAMPLES", -1))
-                if lengthSamples == -1:
-                    self.clip.audioSource.rootSlice().setLengthBeats(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)))
-                else:
-                    self.clip.audioSource.rootSlice().setLengthSamples(lengthSamples)
-                loopDeltaSamples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA_SAMPLES", -1))
-                if loopDeltaSamples == -1:
-                    self.clip.audioSource.rootSlice().setLoopDeltaSeconds(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)))
-                else:
-                    self.clip.audioSource.rootSlice().setLoopDeltaSamples(loopDeltaSamples)
-                loopDelta2Samples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2_SAMPLES", -1))
-                if loopDelta2Samples == -1:
-                    self.clip.audioSource.rootSlice().setLoopDelta2Seconds(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)))
-                else:
-                    self.clip.audioSource.rootSlice().setLoopDelta2Samples(loopDelta2Samples)
+            self.deserialize(audioMetadata)
         self.__isReading = False
 
     @Slot()
     def writeMetadataWithoutSoundData(self):
-        self.write(writeSoundMetadata=False)
+        if self.clip.audioSource is None:
+            logging.error("Attempted to write metadata for a clip, but we do not have a clip for which to write that data")
+        else:
+            self.write(writeSoundMetadata=False, path=self.clip.path)
 
     @Slot()
     def writeMetadataWithSoundData(self):
-        self.write(writeSoundMetadata=True)
+        if self.clip.audioSource is None:
+            logging.error("Attempted to write metadata with sound data for a clip, but we do not have a clip for which to write that data")
+        else:
+            self.write(writeSoundMetadata=True, path=self.clip.path)
 
-    def write(self, writeSoundMetadata=False, isAutosave=True):
-        if self.__isReading == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
-            if not self.clip.isEmpty:
-                tags = {}
-                if writeSoundMetadata:
-                    # When writing sound metadata, first set updated values to the respective properties and then write
-                    self.set_audioType(self.clip.channel.trackType, write=False, force=True)
-                    self.set_audioTypeSettings(self.clip.channel.getAudioTypeSettings(), write=False, force=True)
-                    # TODO : Metadata Check if midi recording is correct or not
-                    if self.clip.zynqtgui.sketchpad.lastRecordingMidi == "":
-                        # If there is no midi recording (that is, if this was not a live-recorded bit of audio), then save the clip's pattern data and ensure the midi recording meta is empty
-                        self.set_midiRecording("", write=False, force=True)
-                        sequenceObject = Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
-                        patternObject = sequenceObject.getByClipId(self.clip.channel.id, self.clip.id)
-                        self.set_patternJson(patternObject.toJson(), write=False, force=True)
-                    else:
-                        # If there is a midi recording, store that, and ensure the pattern json is empty
-                        self.set_midiRecording(self.clip.zynqtgui.sketchpad.lastRecordingMidi, write=False, force=True)
-                        self.set_patternJson("", write=False, force=True)
-                    self.set_routingStyle(self.clip.channel.trackRoutingStyle, write=False, force=True)
-                    self.set_samplePickingStyle(self.clip.channel.samplePickingStyle, write=False, force=True)
-                    self.set_samples(self.clip.channel.getChannelSampleSnapshot(), write=False, force=True)
-                    self.set_soundSnapshot(self.clip.channel.getChannelSoundSnapshot(), write=False, force=True)
+    def write(self, writeSoundMetadata=False, path=None):
+        if path is None:
+            logging.error("Attempted to write metadata for a clip, without being given a path - that is not how we do things any longer!")
+        else:
+            if self.__isReading == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
+                if not self.clip.isEmpty:
+                    tags = self.serialize()
+                    if writeSoundMetadata:
+                        # When writing sound metadata, first set updated values to the respective properties and then write
+                        self.set_audioType(self.clip.channel.trackType, write=False, force=True)
+                        self.set_audioTypeSettings(self.clip.channel.getAudioTypeSettings(), write=False, force=True)
+                        # TODO : Metadata Check if midi recording is correct or not
+                        if self.clip.zynqtgui.sketchpad.lastRecordingMidi == "":
+                            # If there is no midi recording (that is, if this was not a live-recorded bit of audio), then save the clip's pattern data and ensure the midi recording meta is empty
+                            self.set_midiRecording("", write=False, force=True)
+                            sequenceObject = Zynthbox.PlayGridManager.instance().getSequenceModel(self.clip.zynqtgui.sketchpad.song.scenesModel.selectedSequenceName)
+                            patternObject = sequenceObject.getByClipId(self.clip.channel.id, self.clip.id)
+                            self.set_patternJson(patternObject.toJson(), write=False, force=True)
+                        else:
+                            # If there is a midi recording, store that, and ensure the pattern json is empty
+                            self.set_midiRecording(self.clip.zynqtgui.sketchpad.lastRecordingMidi, write=False, force=True)
+                            self.set_patternJson("", write=False, force=True)
+                        self.set_routingStyle(self.clip.channel.trackRoutingStyle, write=False, force=True)
+                        self.set_samplePickingStyle(self.clip.channel.samplePickingStyle, write=False, force=True)
+                        self.set_samples(self.clip.channel.getChannelSampleSnapshot(), write=False, force=True)
+                        self.set_soundSnapshot(self.clip.channel.getChannelSoundSnapshot(), write=False, force=True)
 
-                    tags["ZYNTHBOX_TRACK_TYPE"] = [str(self.__audioType)]
-                    tags["ZYNTHBOX_TRACK_AUDIOTYPESETTINGS"] = [str(self.__audioTypeSettings)]
-                    tags["ZYNTHBOX_MIDI_RECORDING"] = [str(self.__midiRecording)]
-                    tags["ZYNTHBOX_PATTERN_JSON"] = [str(self.__patternJson)]
-                    tags["ZYNTHBOX_ROUTING_STYLE"] = [str(self.__routingStyle)]
-                    tags["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = [str(self.__samplePickingStyle)]
-                    tags["ZYNTHBOX_SAMPLES"] = [str(self.__samples)]
-                    tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.__soundSnapshot)]
-                if self.clip.audioSource:
-                    tags["ZYNTHBOX_BPM"] = [str(self.clip.audioSource.bpm())]
-                    tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
-                    tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
-                    tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializeEqualiserAndCompressorSettings(self.clip.audioSource)))]
-                    tags["ZYNTHBOX_SLICE_SETTINGS"] = [self.clip.audioSource.slicesToString()]
-                    # Root slice settings
-                    tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootSlice().rootNote())]
-                    tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.rootSlice().keyZoneStart())]
-                    tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.rootSlice().keyZoneEnd())]
-                    tags["ZYNTHBOX_VELOCITY_MINIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMinimum())]
-                    tags["ZYNTHBOX_VELOCITY_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMaximum())]
-                    tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.rootSlice().pan())]
-                    tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.rootSlice().gainHandler().gainAbsolute())]
-                    tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.rootSlice().adsrAttack())]
-                    tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.clip.audioSource.rootSlice().adsrDecay())]
-                    tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.clip.audioSource.rootSlice().adsrRelease())]
-                    tags["ZYNTHBOX_ADSR_SUSTAIN"] = [str(self.clip.audioSource.rootSlice().adsrSustain())]
-                    tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.clip.audioSource.rootSlice().grainInterval())]
-                    tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.clip.audioSource.rootSlice().grainIntervalAdditional())]
-                    tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().grainPanMaximum())]
-                    tags["ZYNTHBOX_GRAINERATOR_PAN_MINIMUM"] = [str(self.clip.audioSource.rootSlice().grainPanMinimum())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1"] = [str(self.clip.audioSource.rootSlice().grainPitchMaximum1())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2"] = [str(self.clip.audioSource.rootSlice().grainPitchMaximum2())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1"] = [str(self.clip.audioSource.rootSlice().grainPitchMinimum1())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2"] = [str(self.clip.audioSource.rootSlice().grainPitchMinimum2())]
-                    tags["ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY"] = [str(self.clip.audioSource.rootSlice().grainPitchPriority())]
-                    tags["ZYNTHBOX_GRAINERATOR_POSITION"] = [str(self.clip.audioSource.rootSlice().grainPosition())]
-                    tags["ZYNTHBOX_GRAINERATOR_SCAN"] = [str(self.clip.audioSource.rootSlice().grainScan())]
-                    tags["ZYNTHBOX_GRAINERATOR_SIZE"] = [str(self.clip.audioSource.rootSlice().grainSize())]
-                    tags["ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL"] = [str(self.clip.audioSource.rootSlice().grainSizeAdditional())]
-                    tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.clip.audioSource.rootSlice().grainSpray())]
-                    tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.clip.audioSource.rootSlice().grainSustain())]
-                    tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.clip.audioSource.rootSlice().grainTilt())]
-                    tags["ZYNTHBOX_STARTPOSITION_SAMPLES"] = [str(self.clip.audioSource.rootSlice().startPositionSamples())]
-                    tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.clip.audioSource.rootSlice().snapLengthToBeat())]
-                    tags["ZYNTHBOX_LENGTH_SAMPLES"] = [str(self.clip.audioSource.rootSlice().lengthSamples())]
-                    tags["ZYNTHBOX_LOOPDELTA_SAMPLES"] = [str(self.clip.audioSource.rootSlice().loopDeltaSamples())]
-                    tags["ZYNTHBOX_LOOPDELTA2_SAMPLES"] = [str(self.clip.audioSource.rootSlice().loopDelta2Samples())]
-                    tags["ZYNTHBOX_LOOP_CROSSFADE_AMOUNT"] = [str(self.clip.audioSource.rootSlice().loopCrossfadeAmount())]
-                    tags["ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.rootSlice().loopStartCrossfadeDirection()).split(".")[-1]]
-                    tags["ZYNTHBOX_STOP_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.rootSlice().stopCrossfadeDirection()).split(".")[-1]]
-                    tags["ZYNTHBOX_PITCH"] = [str(self.clip.audioSource.rootSlice().pitch())]
-                    tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.clip.audioSource.rootSlice().playbackStyle()).split(".")[-1]]
-                    tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.clip.audioSource.rootSlice().timeStretchStyle()).split(".")[-1]]
-                    tags["ZYNTHBOX_SUBVOICE_COUNT"] = [str(self.clip.audioSource.rootSlice().subvoiceCount())]
-                    rootSliceSubvoices = []
-                    for subvoiceSettingsObject in self.clip.audioSource.rootSlice().subvoiceSettings():
-                        rootSliceSubvoices.append({
-                            "pan": subvoiceSettingsObject.pan(),
-                            "pitch": subvoiceSettingsObject.pitch(),
-                            "gain": subvoiceSettingsObject.gain()
-                        })
-                    tags["ZYNTHBOX_SUBVOICE_SETTINGS"] = [str(json.dumps(rootSliceSubvoices))]
-
-                try:
-                    file = taglib.File(self.clip.path)
-                    if isAutosave and not self.clip.__song__.isTemp:
-                        logging.debug(f"Clip metadata writing {self.clip} : autosave")
-                        file.tags["AUTOSAVE"] = [str(json.dumps(tags))]
-                    else:
-                        logging.debug(f"Clip metadata writing {self.clip} : NOT autosave")
-                        for key, value in tags.items():
-                            file.tags[key] = value
-                    file.save()
-                except Exception as e:
-                    logging.exception(f"Error writing metadata : {str(e)}")
-                    logging.info("Trying to create a new file without metadata")
+                        tags["ZYNTHBOX_TRACK_TYPE"] = [str(self.__audioType)]
+                        tags["ZYNTHBOX_TRACK_AUDIOTYPESETTINGS"] = [str(self.__audioTypeSettings)]
+                        tags["ZYNTHBOX_MIDI_RECORDING"] = [str(self.__midiRecording)]
+                        tags["ZYNTHBOX_PATTERN_JSON"] = [str(self.__patternJson)]
+                        tags["ZYNTHBOX_ROUTING_STYLE"] = [str(self.__routingStyle)]
+                        tags["ZYNTHBOX_SAMPLE_PICKING_STYLE"] = [str(self.__samplePickingStyle)]
+                        tags["ZYNTHBOX_SAMPLES"] = [str(self.__samples)]
+                        tags["ZYNTHBOX_SOUND_SNAPSHOT"] = [str(self.__soundSnapshot)]
 
                     try:
-                        with tempfile.TemporaryDirectory() as tmp:
-                            logging.info("Creating new temp file without metadata")
-                            logging.debug(f"ffmpeg -i {self.clip.path} -codec copy {Path(tmp) / 'output.wav'}")
-                            check_output(f"ffmpeg -i {self.clip.path} -codec copy {Path(tmp) / 'output.wav'}", shell=True)
+                        file = taglib.File(path)
+                        for key, value in tags.items():
+                            file.tags[key] = value
+                        file.save()
+                    except Exception as e:
+                        logging.exception(f"Error writing metadata : {str(e)}")
+                        logging.info("Trying to create a new file without metadata")
 
-                            logging.info("Replacing old file")
-                            logging.debug(f"mv {Path(tmp) / 'output.wav'} {self.clip.path}")
-                            check_output(f"mv {Path(tmp) / 'output.wav'} {self.clip.path}", shell=True)
+                        try:
+                            with tempfile.TemporaryDirectory() as tmp:
+                                logging.info("Creating new temp file without metadata")
+                                logging.debug(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.wav'}")
+                                check_output(f"ffmpeg -i {path} -codec copy {Path(tmp) / 'output.wav'}", shell=True)
 
-                            file = taglib.File(self.clip.path)
-                            if isAutosave:
-                                logging.debug("Clip metadata writing : autosave")
-                                file.tags["AUTOSAVE"] = [str(json.dumps(tags))]
-                            else:
-                                logging.debug("Clip metadata writing : NOT autosave")
+                                logging.info("Replacing old file")
+                                logging.debug(f"mv {Path(tmp) / 'output.wav'} {path}")
+                                check_output(f"mv {Path(tmp) / 'output.wav'} {path}", shell=True)
+
+                                file = taglib.File(path)
                                 for key, value in tags.items():
                                     file.tags[key] = value
-                            file.save()
-                    except Exception as e:
-                        logging.error(f"Error creating new file and writing metadata : {str(e)}")
-            self.__isWriting = False
+                                file.save()
+                        except Exception as e:
+                            logging.error(f"Error creating new file and writing metadata : {str(e)}")
+                self.__isWriting = False
 
-    def scheduleWrite(self):
-        if self.__isReading == False and self.__isWriting == False and self.clip.__song__.isLoading == False and self.clip.__song__.isSaving == False:
-            self.__isWriting = True
-            # Do not explicitly make a call to write as song save will be saving metadata as required
-            self.clip.__song__.schedule_save()
+    def serialize(self):
+        tags = {}
+        if self.clip.audioSource:
+            if len(self.__originalPath) > 0:
+                tags["ZYNTHBOX_ORIGINAL_PATH"] = [str(self.__originalPath)]
+            tags["ZYNTHBOX_BPM"] = [str(self.clip.audioSource.bpm())]
+            tags["ZYNTHBOX_SPEED_RATIO"] = [str(self.clip.audioSource.speedRatio())]
+            tags["ZYNTHBOX_SYNC_SPEED_TO_BPM"] = [str(self.clip.audioSource.autoSynchroniseSpeedRatio())]
+            tags["ZYNTHBOX_EQUALISER_SETTINGS"] = [str(json.dumps(serializeEqualiserAndCompressorSettings(self.clip.audioSource)))]
+            tags["ZYNTHBOX_SLICE_SETTINGS"] = [self.clip.audioSource.slicesToString()]
+            # Root slice settings
+            tags["ZYNTHBOX_ROOT_NOTE"] = [str(self.clip.audioSource.rootSlice().rootNote())]
+            tags["ZYNTHBOX_KEYZONE_START"] = [str(self.clip.audioSource.rootSlice().keyZoneStart())]
+            tags["ZYNTHBOX_KEYZONE_END"] = [str(self.clip.audioSource.rootSlice().keyZoneEnd())]
+            tags["ZYNTHBOX_VELOCITY_MINIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMinimum())]
+            tags["ZYNTHBOX_VELOCITY_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().velocityMaximum())]
+            tags["ZYNTHBOX_PAN"] = [str(self.clip.audioSource.rootSlice().pan())]
+            tags["ZYNTHBOX_GAIN"] = [str(self.clip.audioSource.rootSlice().gainHandler().gainAbsolute())]
+            tags["ZYNTHBOX_ADSR_ATTACK"] = [str(self.clip.audioSource.rootSlice().adsrAttack())]
+            tags["ZYNTHBOX_ADSR_DECAY"] = [str(self.clip.audioSource.rootSlice().adsrDecay())]
+            tags["ZYNTHBOX_ADSR_RELEASE"] = [str(self.clip.audioSource.rootSlice().adsrRelease())]
+            tags["ZYNTHBOX_ADSR_SUSTAIN"] = [str(self.clip.audioSource.rootSlice().adsrSustain())]
+            tags["ZYNTHBOX_GRAINERATOR_INTERVAL"] = [str(self.clip.audioSource.rootSlice().grainInterval())]
+            tags["ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL"] = [str(self.clip.audioSource.rootSlice().grainIntervalAdditional())]
+            tags["ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM"] = [str(self.clip.audioSource.rootSlice().grainPanMaximum())]
+            tags["ZYNTHBOX_GRAINERATOR_PAN_MINIMUM"] = [str(self.clip.audioSource.rootSlice().grainPanMinimum())]
+            tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1"] = [str(self.clip.audioSource.rootSlice().grainPitchMaximum1())]
+            tags["ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2"] = [str(self.clip.audioSource.rootSlice().grainPitchMaximum2())]
+            tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1"] = [str(self.clip.audioSource.rootSlice().grainPitchMinimum1())]
+            tags["ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2"] = [str(self.clip.audioSource.rootSlice().grainPitchMinimum2())]
+            tags["ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY"] = [str(self.clip.audioSource.rootSlice().grainPitchPriority())]
+            tags["ZYNTHBOX_GRAINERATOR_POSITION"] = [str(self.clip.audioSource.rootSlice().grainPosition())]
+            tags["ZYNTHBOX_GRAINERATOR_SCAN"] = [str(self.clip.audioSource.rootSlice().grainScan())]
+            tags["ZYNTHBOX_GRAINERATOR_SIZE"] = [str(self.clip.audioSource.rootSlice().grainSize())]
+            tags["ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL"] = [str(self.clip.audioSource.rootSlice().grainSizeAdditional())]
+            tags["ZYNTHBOX_GRAINERATOR_SPRAY"] = [str(self.clip.audioSource.rootSlice().grainSpray())]
+            tags["ZYNTHBOX_GRAINERATOR_SUSTAIN"] = [str(self.clip.audioSource.rootSlice().grainSustain())]
+            tags["ZYNTHBOX_GRAINERATOR_TILT"] = [str(self.clip.audioSource.rootSlice().grainTilt())]
+            tags["ZYNTHBOX_STARTPOSITION_SAMPLES"] = [str(self.clip.audioSource.rootSlice().startPositionSamples())]
+            tags["ZYNTHBOX_SNAP_LENGTH_TO_BEAT"] = [str(self.clip.audioSource.rootSlice().snapLengthToBeat())]
+            tags["ZYNTHBOX_LENGTH_SAMPLES"] = [str(self.clip.audioSource.rootSlice().lengthSamples())]
+            tags["ZYNTHBOX_LOOPDELTA_SAMPLES"] = [str(self.clip.audioSource.rootSlice().loopDeltaSamples())]
+            tags["ZYNTHBOX_LOOPDELTA2_SAMPLES"] = [str(self.clip.audioSource.rootSlice().loopDelta2Samples())]
+            tags["ZYNTHBOX_LOOP_CROSSFADE_AMOUNT"] = [str(self.clip.audioSource.rootSlice().loopCrossfadeAmount())]
+            tags["ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.rootSlice().loopStartCrossfadeDirection()).split(".")[-1]]
+            tags["ZYNTHBOX_STOP_CROSSFADE_DIRECTION"] = [str(self.clip.audioSource.rootSlice().stopCrossfadeDirection()).split(".")[-1]]
+            tags["ZYNTHBOX_PITCH"] = [str(self.clip.audioSource.rootSlice().pitch())]
+            tags["ZYNTHBOX_PLAYBACK_STYLE"] = [str(self.clip.audioSource.rootSlice().playbackStyle()).split(".")[-1]]
+            tags["ZYNTHBOX_TIMESTRETCHSTYLE"] = [str(self.clip.audioSource.rootSlice().timeStretchStyle()).split(".")[-1]]
+            tags["ZYNTHBOX_SUBVOICE_COUNT"] = [str(self.clip.audioSource.rootSlice().subvoiceCount())]
+            rootSliceSubvoices = []
+            for subvoiceSettingsObject in self.clip.audioSource.rootSlice().subvoiceSettings():
+                rootSliceSubvoices.append({
+                    "pan": subvoiceSettingsObject.pan(),
+                    "pitch": subvoiceSettingsObject.pitch(),
+                    "gain": subvoiceSettingsObject.gain()
+                })
+            tags["ZYNTHBOX_SUBVOICE_SETTINGS"] = [str(json.dumps(rootSliceSubvoices))]
+        return tags
+
+    def deserialize(self, obj):
+        self.__audioMetadata = obj
+        # TODO Probably have some fault safety here, in case there's bunk metadata?
+        if self.clip.audioSource is not None:
+            self.set_originalPath(str(self.getMetadataProperty("ZYNTHBOX_ORIGINAL_PATH", "")))
+            # The clip's non-playback metadata (essentially unbouncing support data)
+            self.set_audioType(str(self.getMetadataProperty("ZYNTHBOX_TRACK_TYPE", None)), write=False, force=True)
+            self.set_audioTypeSettings(str(self.getMetadataProperty("ZYNTHBOX_TRACK_AUDIOTYPESETTINGS", None)), write=False, force=True)
+            self.set_midiRecording(str(self.getMetadataProperty("ZYNTHBOX_MIDI_RECORDING", None)), write=False, force=True)
+            self.set_patternJson(str(self.getMetadataProperty("ZYNTHBOX_PATTERN_JSON", None)), write=False, force=True)
+            self.set_routingStyle(str(self.getMetadataProperty("ZYNTHBOX_ROUTING_STYLE", None)), write=False, force=True)
+            self.set_samplePickingStyle(str(self.getMetadataProperty("ZYNTHBOX_SAMPLE_PICKING_STYLE", None)), write=False, force=True)
+            self.set_samples(str(self.getMetadataProperty("ZYNTHBOX_SAMPLES", None)), write=False, force=True)
+            self.set_soundSnapshot(str(self.getMetadataProperty("ZYNTHBOX_SOUND_SNAPSHOT", None)), write=False, force=True)
+            # The clip's playback related settings
+            self.clip.audioSource.setBpm(float(self.getMetadataProperty("ZYNTHBOX_BPM", Zynthbox.SyncTimer.instance().getBpm())))
+            self.clip.audioSource.setSpeedRatio(float(self.getMetadataProperty("ZYNTHBOX_SPEED_RATIO", self.clip.initialSpeedRatio)))
+            self.clip.audioSource.setAutoSynchroniseSpeedRatio(str(self.getMetadataProperty("ZYNTHBOX_SYNC_SPEED_TO_BPM", True)).lower() == "true")
+            self.set_equaliserSettings(str(self.getMetadataProperty("ZYNTHBOX_EQUALISER_SETTINGS", "")))
+            self.clip.audioSource.stringToSlices(str(self.getMetadataProperty("ZYNTHBOX_SLICE_SETTINGS", "")))
+            # The slice related settings (for the root slice)
+            self.clip.audioSource.rootSlice().setPan(float(self.getMetadataProperty("ZYNTHBOX_PAN", 0)))
+            self.clip.audioSource.rootSlice().setRootNote(int(self.getMetadataProperty("ZYNTHBOX_ROOT_NOTE", 60)))
+            self.clip.audioSource.rootSlice().setKeyZoneStart(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_START", 0)))
+            self.clip.audioSource.rootSlice().setKeyZoneEnd(int(self.getMetadataProperty("ZYNTHBOX_KEYZONE_END", 127)))
+            self.clip.audioSource.rootSlice().setVelocityMinimum(int(self.getMetadataProperty("ZYNTHBOX_VELOCITY_MINIMUM", 1)))
+            self.clip.audioSource.rootSlice().setVelocityMaximum(int(self.getMetadataProperty("ZYNTHBOX_VELOCITY_MAXIMUM", 127)))
+            self.clip.audioSource.rootSlice().setADSRAttack(float(self.getMetadataProperty("ZYNTHBOX_ADSR_ATTACK", 0)))
+            self.clip.audioSource.rootSlice().setADSRDecay(float(self.getMetadataProperty("ZYNTHBOX_ADSR_DECAY", 0)))
+            self.clip.audioSource.rootSlice().setADSRSustain(float(self.getMetadataProperty("ZYNTHBOX_ADSR_SUSTAIN", 1)))
+            self.clip.audioSource.rootSlice().setADSRRelease(float(self.getMetadataProperty("ZYNTHBOX_ADSR_RELEASE", 0.05)))
+            self.clip.audioSource.rootSlice().gainHandler().setGainAbsolute(float(self.getMetadataProperty("ZYNTHBOX_GAIN", self.clip.initialGain)))
+            self.clip.audioSource.rootSlice().setGrainInterval(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL", 10)))
+            self.clip.audioSource.rootSlice().setGrainIntervalAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_INTERVAL_ADDITIONAL", 10)))
+            self.clip.audioSource.rootSlice().setGrainPanMaximum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MAXIMUM", 1)))
+            self.clip.audioSource.rootSlice().setGrainPanMinimum(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PAN_MINIMUM", -1)))
+            self.clip.audioSource.rootSlice().setGrainPitchMaximum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM1", 1.0)))
+            self.clip.audioSource.rootSlice().setGrainPitchMaximum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MAXIMUM2", 1.0)))
+            self.clip.audioSource.rootSlice().setGrainPitchMinimum1(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM1", 1.0)))
+            self.clip.audioSource.rootSlice().setGrainPitchMinimum2(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_MINIMUM2", 1.0)))
+            self.clip.audioSource.rootSlice().setGrainPitchPriority(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_PITCH_PRIORITY", 0.5)))
+            self.clip.audioSource.rootSlice().setGrainPosition(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_POSITION", 0)))
+            self.clip.audioSource.rootSlice().setGrainScan(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SCAN", 0)))
+            self.clip.audioSource.rootSlice().setGrainSize(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE", 100)))
+            self.clip.audioSource.rootSlice().setGrainSizeAdditional(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SIZE_ADDITIONAL", 50)))
+            self.clip.audioSource.rootSlice().setGrainSpray(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SPRAY", 1)))
+            self.clip.audioSource.rootSlice().setGrainSustain(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_SUSTAIN", 0.3)))
+            self.clip.audioSource.rootSlice().setGrainTilt(float(self.getMetadataProperty("ZYNTHBOX_GRAINERATOR_TILT", 0.5)))
+            self.set_timeStretchStyle(str(self.getMetadataProperty("ZYNTHBOX_TIMESTRETCHSTYLE", "")), -1)
+            self.clip.audioSource.rootSlice().setPitch(float(self.getMetadataProperty("ZYNTHBOX_PITCH", self.clip.initialPitch)))
+            self.set_playbackStyle(str(self.getMetadataProperty("ZYNTHBOX_PLAYBACK_STYLE", "LoopingPlaybackStyle")), -1)
+            self.clip.audioSource.rootSlice().setLoopCrossfadeAmount(float(self.getMetadataProperty("ZYNTHBOX_LOOP_CROSSFADE_AMOUNT", 0)))
+            self.set_loopStartCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_LOOP_START_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
+            self.set_stopCrossfadeDirection(self.getMetadataProperty("ZYNTHBOX_STOP_CROSSFADE_DIRECTION", "CrossfadeOutie"), -1)
+            self.clip.audioSource.rootSlice().setSnapLengthToBeat(str(self.getMetadataProperty("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", True)).lower() == "true")
+            self.clip.audioSource.rootSlice().setSubvoiceCount(int(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_COUNT", 0)))
+            rootSliceSubvoices = str(self.getMetadataProperty("ZYNTHBOX_SUBVOICE_SETTINGS", ""))
+            if len(rootSliceSubvoices) > 0:
+                try:
+                    sliceValues = json.loads(rootSliceSubvoices)
+                    for index, subvoiceValues in enumerate(sliceValues):
+                        self.clip.audioSource.rootSlice().subvoiceSettings()[index].setPan(subvoiceValues["pan"])
+                        self.clip.audioSource.rootSlice().subvoiceSettings()[index].setPitch(subvoiceValues["pitch"])
+                        self.clip.audioSource.rootSlice().subvoiceSettings()[index].setGain(subvoiceValues["gain"])
+                except Exception as e:
+                    logging.error(f"Got us an error unwrapping the voices: {str(e)}\nFrom the stored string:{rootSliceSubvoices}")
+            else:
+                logging.error("No subvoices, apparently...")
+            # Some fallbackery that we can likely remove at some point (or also perhaps get rid of entirely when we switch to using the industry version of slice and loop definitions...)
+            startPositionSamples = float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION_SAMPLES", -1))
+            if startPositionSamples == -1:
+                self.clip.audioSource.rootSlice().setStartPositionSeconds(float(self.getMetadataProperty("ZYNTHBOX_STARTPOSITION", self.clip.initialStartPosition)))
+            else:
+                self.clip.audioSource.rootSlice().setStartPositionSamples(startPositionSamples)
+            lengthSamples = float(self.getMetadataProperty("ZYNTHBOX_LENGTH_SAMPLES", -1))
+            if lengthSamples == -1:
+                self.clip.audioSource.rootSlice().setLengthBeats(float(self.getMetadataProperty("ZYNTHBOX_LENGTH", self.clip.initialLength)))
+            else:
+                self.clip.audioSource.rootSlice().setLengthSamples(lengthSamples)
+            loopDeltaSamples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA_SAMPLES", -1))
+            if loopDeltaSamples == -1:
+                self.clip.audioSource.rootSlice().setLoopDeltaSeconds(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA", 0.0)))
+            else:
+                self.clip.audioSource.rootSlice().setLoopDeltaSamples(loopDeltaSamples)
+            loopDelta2Samples = float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2_SAMPLES", -1))
+            if loopDelta2Samples == -1:
+                self.clip.audioSource.rootSlice().setLoopDelta2Seconds(float(self.getMetadataProperty("ZYNTHBOX_LOOPDELTA2", 0.0)))
+            else:
+                self.clip.audioSource.rootSlice().setLoopDelta2Samples(loopDelta2Samples)
+
+    def scheduleSave(self):
+        self.clip.__song__.schedule_save()
 
     def clear(self):
         # Channel settings for the clip (stored in metadata when bouncing, but not settable from the UI)
@@ -745,23 +762,32 @@ class sketchpad_clip(QObject):
     def serialize(self):
         return {
             "path": self.__path__,
-            "enabled": self.__enabled__
+            "enabled": self.__enabled__,
+            "metadata": self.__metadata.serialize()
         }
 
-    def deserialize(self, obj, load_autosave=True):
-        logging.debug(f"clip_deserialize : {load_autosave}")
+    def deserialize(self, obj):
+        logging.debug(f"clip_deserialize")
         try:
             if "path" in obj:
                 if obj["path"] is None:
                     self.__path__ = None
                 else:
                     if self.is_channel_sample:
-                        self.set_path(str(self.bank_path / obj["path"]), False, load_autosave)
+                        self.set_path(str(self.bank_path / obj["path"]), False)
                     else:
-                        self.set_path(str(self.wav_path / obj["path"]), False, load_autosave)
+                        self.set_path(str(self.wav_path / obj["path"]), False)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
                 self.set_enabled(self.__enabled__, True)
+            # NOTE This must happen after the path has been set (to avoid problems with the metadata fetching fallback)
+            if "metadata" in obj:
+                self.__metadata.deserialize(obj["metadata"])
+            else:
+                self.__metadata.clear()
+                # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
+                if self.audioSource is not None:
+                    self.__metadata.read()
         except Exception as e:
             logging.error(f"Error during clip deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
@@ -905,14 +931,45 @@ class sketchpad_clip(QObject):
             else:
                 return str(self.wav_path / self.__path__)
 
+    # Arg path: the original path of the wave file
+    # This is essentially equivalent to calling set_path with should_copy and
+    # read_metadata both set to True, but will also set the path being imported
+    # on the originalPath metadata field
+    @Slot(str)
+    def importFromFile(self, path):
+        self.set_path(path, should_copy=True, read_metadata=True)
+        self.__metadata.set_originalPath(path)
+        # TODO Handling duplicates: We may very well want to eventually hold only one copy of a wave asset on disk
+        # and then reference-count its users, so that we can remove it from the sketchpad when all users have gone.
+        # This, however, will need tracking globally, otherwise we end up unable to track when it's being used by
+        # other versions of the same sketchpad, and we don't want to remove it from disk until all users have gone.
+
+    # Arg path: Where you want to store a copy of the slot data, with the metadata stored into the file
+    @Slot(str, result=bool)
+    def exportToFile(self, path):
+        result = False
+        if len(self.__path__) > 0:
+            if self.copyTo(path):
+                # We don't write sound metadata here, because if it is there, we want it to remain unaltered, rather
+                # than updating it with whatever we have in the track this is attached to, and if it is not there, we
+                # don't want to add it in. And this function will leave it alone if it's already there.
+                self.metadata.write(writeSoundMetadata=False, path=path)
+            else:
+                logging.error(f"Failed to create a copy of the clip {self.__path__} to {path}")
+        else:
+            logging.error(f"Failed to export to file, as we do not in fact have a file to export (the path is empty)")
+        return result
+
     # Arg path : Set path of the wav to clip
     # Arg should_copy : Controls where the selected clip should be copied under a unique name when setting.
     #                   should_copy should be set to False when restoring to avoid copying the same clip under
     #                   a different name. Otherwise when path is set from UI, it makes sure to always create a new file
     #                   when first selecting a wav for a clip.
+    #                   If we copy, we also store the original path into the metadata for the slot
+    # Arg read_metadata : Whether or not to read the metadata from the original file
     @Slot(str,bool)
-    def set_path(self, path, should_copy=True, load_autosave=True):
-        logging.debug(f"{path}, {should_copy}, {load_autosave}")
+    def set_path(self, path, should_copy=True, read_metadata=False):
+        logging.debug(f"Load {path}, should copy: {should_copy}, read metadata: {read_metadata}")
         if path is not None:
             new_filename = ""
             selected_path = Path(path)
@@ -958,7 +1015,8 @@ class sketchpad_clip(QObject):
             self.audioSource = None
 
         # read() will read all the available metadata and populate default values if not available
-        self.__metadata.read(load_autosave)
+        if read_metadata:
+            self.__metadata.read()
         self.__metadata.hook()
         self.__progress__ = 0.0
 

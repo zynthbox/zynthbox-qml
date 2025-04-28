@@ -435,7 +435,7 @@ Rectangle {
             nameFilters: ["*.wav"]
         }
         onAccepted: {
-            zynqtgui.bottomBarControlObj.path = pickerDialog.selectedFile.filePath
+            zynqtgui.bottomBarControlObj.importFromFile(pickerDialog.selectedFile.filePath)
         }
     }
 }

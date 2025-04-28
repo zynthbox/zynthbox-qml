@@ -326,15 +326,6 @@ class sketchpad_song(QObject):
                     os.remove(bank_dir / 'sample-bank.json')
                 if bank_dir.exists() and len(os.listdir(bank_dir)) == 0:
                     os.removedirs(bank_dir)
-                # Write sample metadata
-                for sample in track.samples:
-                    sample.metadata.write(isAutosave=autosave)
-                # Write clip metadata
-                for clip_index in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                    clips_model = track.getClipsModelById(clip_index)
-                    for song_index in range(clips_model.count):
-                        clip = clips_model.getClip(song_index)
-                        clip.metadata.write(isAutosave=autosave)
 
     @Slot(None)
     def schedule_save(self):

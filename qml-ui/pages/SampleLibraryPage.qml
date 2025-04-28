@@ -261,7 +261,7 @@ Zynthian.ScreenPage {
                     : ""
                 onTriggered: {
                     if (component.selectedChannel.trackType === "sample-loop") {
-                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
                     } else {
                         component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
                     }
@@ -276,7 +276,7 @@ Zynthian.ScreenPage {
                     : ""
                 onTriggered: {
                     if (component.selectedChannel.trackType === "sample-loop") {
-                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
                     } else {
                         component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
                     }
@@ -291,7 +291,7 @@ Zynthian.ScreenPage {
                     : ""
                 onTriggered: {
                     if (component.selectedChannel.trackType === "sample-loop") {
-                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
                     } else {
                         component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
                     }
@@ -306,7 +306,7 @@ Zynthian.ScreenPage {
                     : ""
                 onTriggered: {
                     if (component.selectedChannel.trackType === "sample-loop") {
-                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
                     } else {
                         component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
                     }
@@ -321,7 +321,7 @@ Zynthian.ScreenPage {
                     : ""
                 onTriggered: {
                     if (component.selectedChannel.trackType === "sample-loop") {
-                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).path = sampleSlotAssigner.pathName;
+                        component.selectedChannel.getClipsModelById(slotIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex).importFromFile(sampleSlotAssigner.pathName);
                     } else {
                         component.selectedChannel.set_sample(sampleSlotAssigner.pathName, slotIndex);
                     }
@@ -427,9 +427,12 @@ Zynthian.ScreenPage {
                                             }
                                         } else {
                                             if (component.selectedChannel.trackType === "sample-loop") {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index);
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", model.index, false);
                                             } else {
-                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index);
+                                                pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index, false);
+                                            }
+                                            if (clipDelegate.clip.metadata.originalPath != "") {
+                                                filesListView.selectFile(clipDelegate.clip.metadata.originalPath);
                                             }
                                         }
                                     }
@@ -596,6 +599,43 @@ Zynthian.ScreenPage {
                         margins: Kirigami.Units.smallSpacing
                     }
                     clip: true
+                    function selectFile(theFile) {
+                        let pathSplit = theFile.lastIndexOf("/");
+                        let path = theFile.slice(0, pathSplit);
+                        let filename = theFile.slice(pathSplit + 1);
+                        // Select the folder in the middle column, if it exists
+                        for (let index = 0; index < folderListView.model.length; ++index) {
+                            if (folderListView.model[index].path == path) {
+                                folderListView.currentIndex = index;
+                                break;
+                            }
+                        }
+                        // Force set the folder to the new path, and then start the timer for re-selecting
+                        // Yes, i realise we *could* wait for the signal to fire, but if it fires too rapidly,
+                        // we would miss it, and this is safer... not that i like it all that much
+                        folderModel.folder = path;
+                        selectFileAfterLoadingTimer.selectThisFile = Qt.resolvedUrl(theFile);
+                        selectFileAfterLoadingTimer.start();
+                    }
+                    Timer {
+                        id: selectFileAfterLoadingTimer
+                        property string selectThisFile: ""
+                        interval: 50; repeat: true; running: false;
+                        onTriggered: {
+                            if (selectThisFile === "") {
+                                selectFileAfterLoadingTimer.stop();
+                            } else if (folderModel.status == FolderListModel.Ready) {
+                                selectFileAfterLoadingTimer.stop();
+                                // Now the data's loaded, select the file in the right hand column, if it exists
+                                let indexOfFile = folderModel.indexOf(selectFileAfterLoadingTimer.selectThisFile);
+                                if (indexOfFile > -1) {
+                                    // Select the right-hand column if the file did exist, otherwise just leave the middle column selected
+                                    _private.selectedColumn = 2;
+                                    filesListView.currentIndex = indexOfFile;
+                                }
+                            }
+                        }
+                    }
                     model: FolderListModel {
                         id: folderModel
                         caseSensitive: false

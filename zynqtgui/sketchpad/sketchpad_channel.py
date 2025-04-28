@@ -742,8 +742,7 @@ class sketchpad_channel(QObject):
         samplesObj = []
         for sample in self.__samples__:
             if sample.path is not None and len(sample.path) > 0:
-                sample.metadata.scheduleWrite()
-                samplesObj.append({"path": Path(sample.path).name})
+                samplesObj.append(sample.serialize())
             else:
                 samplesObj.append(None)
 
@@ -902,11 +901,11 @@ class sketchpad_channel(QObject):
                         self.__samples__[i].clear()
                     else:
                         if (bank_dir / clip["path"]).exists():
-                            self.__samples__[i].set_path(str(bank_dir / clip["path"]), False, load_autosave) # Do not copy file when restoring
+                            self.__samples__[i].deserialize(clip)
                 self.samples_changed.emit()
             if "clips" in obj:
                 for clipId, clip_model in enumerate(self.__clips_model__):
-                    self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId, load_autosave)
+                    self.__clips_model__[clipId].deserialize(obj["clips"][clipId], clipId)
                     for clip in clip_model.__clips__:
                         clip.path_changed.connect(self.sketchSlotsDataChanged.emit)
             if "selectedClip" in obj:
@@ -1892,9 +1891,7 @@ class sketchpad_channel(QObject):
 
     @Slot(str, int, result=None)
     def set_sample(self, path, index):
-        self.__samples__[index].set_path(path)
-        self.samples_changed.emit()
-        self.__song__.schedule_save()
+        self.__samples__[index].importFromFile(path)
 
     samples_changed = Signal()
 

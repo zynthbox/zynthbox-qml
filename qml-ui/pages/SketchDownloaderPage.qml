@@ -42,7 +42,7 @@ Zynthian.NewStuffPage {
                 for (let fileIndex = 0; fileIndex < 5; ++fileIndex) {
                     if (currentChannel.trackType === "sample-loop") {
                         var clip = currentChannel.getClipsModelById(fileIndex).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                        clip.path = installedFiles[fileIndex];
+                        clip.importFromFile(installedFiles[fileIndex]);
                         clip.enabled = true
                     } else {
                         currentChannel.set_sample(installedFiles[fileIndex], fileIndex);
@@ -51,7 +51,7 @@ Zynthian.NewStuffPage {
             } else {
                 if (currentChannel.trackType === "sample-loop") {
                     var clip = currentChannel.getClipsModelById(currentChannel.selectedSlotRow).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
-                    clip.path = installedFiles[0];
+                    clip.path(installedFiles[0]);
                     clip.enabled = true
                 } else {
                     currentChannel.set_sample(installedFiles[0], currentChannel.selectedSlotRow);

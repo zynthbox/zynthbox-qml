@@ -3094,7 +3094,7 @@ class sketchpad_channel(QObject):
             else:
                 self.zynqtgui.set_curlayer(None)
         elif type == "fx":
-            self.zynqtgui.set_curlayer(self.chainedFx[self.selectedFxSlotRow])
+            self.zynqtgui.set_curlayer(self.chainedFx[self.selectedSlot.value])
         elif type == "sketch-fx":
             self.zynqtgui.set_curlayer(self.chainedSketchFx[self.selectedSlot.value])
         elif type == "loop":

@@ -1090,7 +1090,11 @@ Rectangle {
                 visible: fxSetupDialog.selectedFx != null
                 onTriggered: {
                     zynqtgui.forced_screen_back = "sketchpad"
-                    zynqtgui.current_screen_id = "effect_preset"
+                    if (root.selectedChannel.selectedSlot.className == "TracksBar_fxslot") {
+                        zynqtgui.current_screen_id = "effect_preset";
+                    } else if (root.selectedChannel.selectedSlot.className == "TracksBar_sketchfxslot") {
+                        zynqtgui.current_screen_id = "sketch_effect_preset";
+                    }
                     zynqtgui.layer.page_after_layer_creation = "sketchpad"
                 }
             },

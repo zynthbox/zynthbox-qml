@@ -56,10 +56,10 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         self.list_data = []
         try:
             selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
-            if selected_track.trackType == "synth":
+            if selected_track.selectedSlot.className == "TracksBar_fxslot":
                 fx = selected_track.chainedFx
                 fxNames = selected_track.chainedFxNames
-            elif selected_track.trackType == "sample-loop":
+            elif selected_track.selectedSlot.className == "TracksBar_sketchfxslot":
                 fx = selected_track.chainedSketchFx
                 fxNames = selected_track.chainedSketchFxNames
             for index in range(5):
@@ -79,7 +79,10 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
             return
         selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         selected_track.selectedSlot.value = i
-        selected_track.setCurlayerByType("sketch-fx")
+        if selected_track.selectedSlot.className == "TracksBar_fxslot":
+            selected_track.setCurlayerByType("fx")
+        elif selected_track.selectedSlot.className == "TracksBar_sketchfxslot":
+            selected_track.setCurlayerByType("sketch-fx")
         self.select(i)
         self.fill_list()
 
@@ -90,7 +93,11 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         return 'sketchpad'
 
     def next_action(self):
-        return 'effect_preset'
+        selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+        if selected_track.selectedSlot.className == "TracksBar_fxslot":
+            return 'effect_preset'
+        elif selected_track.selectedSlot.className == "TracksBar_sketchfxslot":
+            return 'sketch_effect_preset'
 
     def set_select_path(self):
         self.select_path = "Sketch FX"

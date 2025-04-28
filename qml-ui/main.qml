@@ -254,9 +254,14 @@ Kirigami.AbstractApplicationWindow {
                         if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                             // Then we are selecting samples and sketches, show the sample library
                             zynqtgui.show_screen("sample_library");
-                        } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot" || root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+                        } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
                             // Then it's an fx slot and we should show that particular type of preset selector
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", root.selectedChannel.selectedSlot.value);
                             zynqtgui.show_screen("effect_preset");
+                        } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+                            // Then it's an sketchfx slot and we should show that particular type of preset selector
+                            pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch-fx", root.selectedChannel.selectedSlot.value);
+                            zynqtgui.show_screen("sketch_effect_preset");
                         } else {
                             zynqtgui.show_screen("preset");
                         }
@@ -1271,11 +1276,19 @@ Kirigami.AbstractApplicationWindow {
                 }
             },
             QQC2.Action {
-                text: qsTr("Show FX Slots")
+                text: qsTr("Show Sketch FX Slots")
                 enabled: zynqtgui.current_screen_id !== "effect_preset"
                 onTriggered: {
                     pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", 0);
                     zynqtgui.show_screen("effect_preset");
+                }
+            },
+            QQC2.Action {
+                text: qsTr("Show Loop FX Slots")
+                enabled: zynqtgui.current_screen_id !== "sketch_effect_preset"
+                onTriggered: {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch-fx", 0);
+                    zynqtgui.show_screen("sketch_effect_preset");
                 }
             }
         ]

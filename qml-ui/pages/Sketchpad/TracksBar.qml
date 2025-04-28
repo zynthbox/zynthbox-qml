@@ -188,6 +188,13 @@ Rectangle {
                     fxRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
                 }
                 break;
+            case "TracksBar_sketchfxslot":
+                if (root.selectedChannel.selectedSlot.value === 0) {
+                    sketchFxRow.switchToSlot(4, true);
+                } else {
+                    sketchFxRow.switchToSlot(root.selectedChannel.selectedSlot.value - 1, true);
+                }
+                break;
             default:
                 console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
                 break;
@@ -213,6 +220,10 @@ Rectangle {
             case "fx":
             case "TracksBar_fxslot":
                 fxRow.switchToSlot(slotIndex);
+                break;
+            case "sketch-fx":
+            case "TracksBar_sketchfxslot":
+                sketchFxRow.switchToSlot(slotIndex);
                 break;
             case "external":
             case "TracksBar_externalslot":
@@ -242,6 +253,10 @@ Rectangle {
             case "fx":
             case "TracksBar_fxslot":
                 fxRow.switchToSlot(slotIndex, true, onlySelectSlot);
+                break;
+            case "sketch-fx":
+            case "TracksBar_sketchfxslot":
+                sketchFxRow.switchToSlot(slotIndex, true, onlySelectSlot);
                 break;
             case "external":
             case "TracksBar_externalslot":

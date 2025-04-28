@@ -1186,6 +1186,11 @@ class zynthian_gui(QObject):
         # Since the same data is displayed in both the pages we need to be able to differentiate it so that PageManager can know which container page to open
         self.screens["effect_preset"] = self.screens["preset"]
 
+        # sketch_effect_preset is the same instance as preset screen
+        # This is done to be able to differentiate if the preset page is open from SynthSetupPage or FXSetupPage
+        # Since the same data is displayed in both the pages we need to be able to differentiate it so that PageManager can know which container page to open
+        self.screens["sketch_effect_preset"] = self.screens["preset"]
+
         self.screens["control"] = zynthian_gui_control(self)
         self.screens["control_downloader"] = zynthian_gui_newstuff(self)
         self.screens["fx_control_downloader"] = self.screens["control_downloader"]
@@ -3840,6 +3845,9 @@ class zynthian_gui(QObject):
     def get_effect_preset(self):
         return self.screens["effect_preset"]
 
+    def get_sketch_effect_preset(self):
+        return self.screens["sketch_effect_preset"]
+
     def get_control(self):
         return self.screens["control"]
 
@@ -4905,6 +4913,7 @@ class zynthian_gui(QObject):
     bank = Property(QObject, get_bank, constant=True)
     preset = Property(QObject, get_preset, constant=True)
     effect_preset = Property(QObject, get_effect_preset, constant=True)
+    sketch_effect_preset = Property(QObject, get_sketch_effect_preset, constant=True)
     control = Property(QObject, get_control, constant=True)
     channel = Property(QObject, get_channel, constant=True)
     channel_external_setup = Property(QObject, get_channel_external_setup, constant=True)

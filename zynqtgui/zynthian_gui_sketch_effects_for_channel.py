@@ -3,9 +3,9 @@
 #******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 # 
-# Zynthian GUI FX selector class
+# Zynthian GUI Sketch FX selector class
 # 
-# Copyright (C) 2024 Anupam Basak <anupam.basak27@gmail.com>
+# Copyright (C) 2025 Anupam Basak <anupam.basak27@gmail.com>
 #
 #******************************************************************************
 # 
@@ -44,12 +44,12 @@ from .zynthian_gui_multi_controller import MultiController
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_effects_for_channel(zynthian_gui_selector):
+class zynthian_gui_sketch_effects_for_channel(zynthian_gui_selector):
     """
-    A Selector class to display FX List on FXSetupPage
+    A Selector class to display Sketch FX List on FXSetupPage
     """
     def __init__(self, parent = None):
-        super(zynthian_gui_effects_for_channel, self).__init__('FX', parent)
+        super(zynthian_gui_sketch_effects_for_channel, self).__init__('Sketch FX', parent)
 
     @Slot()
     def fill_list(self):
@@ -57,7 +57,7 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         try:
             selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
             for index in range(5):
-                self.list_data.append((str(index+1), index, f"{index+1} - {selected_track.chainedFxNames[index]}", selected_track.chainedFx[index]))
+                self.list_data.append((str(index+1), index, f"{index+1} - {selected_track.chainedSketchFxNames[index]}", selected_track.chainedSketchFx[index]))
             self.select(selected_track.selectedSlot.value)
         except:
             # fill_list might fail when sketchpad is yet to be loaded. Do nothing as it will fill list again when curlayer changes
@@ -73,7 +73,7 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
             return
         selected_track = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
         selected_track.selectedSlot.value = i
-        selected_track.setCurlayerByType("fx")
+        selected_track.setCurlayerByType("sketch-fx")
         self.select(i)
         self.fill_list()
 
@@ -84,10 +84,10 @@ class zynthian_gui_effects_for_channel(zynthian_gui_selector):
         return 'sketchpad'
 
     def next_action(self):
-        return 'effect_preset'
+        return 'sketch_effect_preset'
 
     def set_select_path(self):
-        self.select_path = "FX"
+        self.select_path = "Sketch FX"
         if len(self.list_data) > 0:
             self.select_path_element = str(self.list_data[self.index][1] + 1)
         super().set_select_path()

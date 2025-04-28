@@ -64,31 +64,51 @@ class zynthian_gui_preset(zynthian_gui_selector):
         self.__list_metadata_cache = {}
         self.show()
 
+    """
+    Return appripriate curlayer as per opened effect screen
+    """
+    def get_curlayer(self):
+        if self.zynqtgui.current_screen_id in ["effects_for_channel", "effect_preset"]:
+            return self.zynqtgui.effects_for_channel.list_data[self.zynqtgui.effects_for_channel.current_index][3]
+        elif self.zynqtgui.current_screen_id in ["sketch_effects_for_channel", "sketch_effect_preset"]:
+            return self.zynqtgui.sketch_effects_for_channel.list_data[self.zynqtgui.sketch_effects_for_channel.current_index][3]
+        else:
+            return self.zynqtgui.curlayer
 
+    @Slot()
     def fill_list(self):
         self.list_data = []
         self.list_metadata = []
+        selected_channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
         if not self.zynqtgui.isBootingComplete:
             # Do not fill list if startup is not complete
             super().fill_list()
             return
 
-        # Do not try to fill list for None layer
-        if not self.zynqtgui.curlayer:
-            logging.debug("Can't fill preset list for None layer!")
+        # Do not try to fill list for None layer or layer which is not in view (for example, do not display synth presets when FXSetupPage is open)
+        if (
+            self.get_curlayer() is None
+            or selected_channel is None
+            or (
+                self.zynqtgui.current_screen_id in ["effects_for_channel", "effect_preset"] and self.get_curlayer() not in selected_channel.chainedFx
+            )
+            or (
+                self.zynqtgui.current_screen_id in ["sketch_effects_for_channel", "sketch_effect_preset"] and self.get_curlayer() not in selected_channel.chainedSketchFx
+            )
+        ):
             super().fill_list()
             return
 
         if self.__top_sounds_engine is None:
-            self.zynqtgui.curlayer.load_preset_list()
-            if not self.zynqtgui.curlayer.preset_list:
+            self.get_curlayer().load_preset_list()
+            if not self.get_curlayer().preset_list:
                 self.set_select_path()
-                self.zynqtgui.curlayer.load_preset_list()
+                self.get_curlayer().load_preset_list()
 
-            for item in self.zynqtgui.curlayer.preset_list:
+            for item in self.get_curlayer().preset_list:
                 self.list_data.append(item)
-                self.list_metadata.append({"icon": "starred-symbolic" if self.zynqtgui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic", "show_numbers": True, "is_favorite": self.zynqtgui.curlayer.engine.is_preset_fav(item)})
+                self.list_metadata.append({"icon": "starred-symbolic" if self.get_curlayer().engine.is_preset_fav(item) else "non-starred-symbolic", "show_numbers": True, "is_favorite": self.get_curlayer().engine.is_preset_fav(item)})
         else:
             self.reload_top_sounds()
             if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
@@ -104,19 +124,19 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
     def show(self, show_fav_presets=None):
-        if not self.zynqtgui.curlayer:
+        if not self.get_curlayer():
             logging.debug("Can't show preset list for None layer!")
             return
 
         if self.__top_sounds_engine != None:
             for i, item in enumerate(self.list_data):
-                if item[2] == self.zynqtgui.curlayer.preset_name:
+                if item[2] == self.get_curlayer().preset_name:
                     self.select(i)
                     break
         else:
-            self.select(self.zynqtgui.curlayer.get_preset_index())
-        if self.zynqtgui.curlayer.get_preset_name() is None:
-            self.zynqtgui.curlayer.set_preset(self.zynqtgui.curlayer.get_preset_index())
+            self.select(self.get_curlayer().get_preset_index())
+        if self.get_curlayer().get_preset_name() is None:
+            self.get_curlayer().set_preset(self.get_curlayer().get_preset_index())
 
         self.show_only_favorites_changed.emit()
         self.set_select_path()
@@ -133,9 +153,9 @@ class zynthian_gui_preset(zynthian_gui_selector):
         engine_created = False
         if self.__top_sounds_engine != None:
             sound = self.__top_sounds[self.__top_sounds_engine][min(i, len(self.__top_sounds[self.__top_sounds_engine]) - 1)]
-            layer = self.zynqtgui.curlayer
+            layer = self.get_curlayer()
             old_audio_out = None
-            if self.zynqtgui.curlayer == None:
+            if self.get_curlayer() == None:
                 self.zynqtgui.start_loading()
                 engine_created = True
                 engine = self.zynqtgui.screens['engine'].start_engine(sound['engine'])
@@ -150,27 +170,27 @@ class zynthian_gui_preset(zynthian_gui_selector):
                 self.zynqtgui.zynautoconnect_audio()
                 self.zynqtgui.screens['layer'].add_midichannel_to_channel(midi_chan, self.zynqtgui.screens["layers_for_channel"].index)
             else:
-                if self.zynqtgui.curlayer.preset_name == sound["preset"] and self.zynqtgui.curlayer.bank_name == sound["bank"]:
+                if self.get_curlayer().preset_name == sound["preset"] and self.get_curlayer().bank_name == sound["bank"]:
                     self.__select_in_progess = False
                     return
 
                 self.zynqtgui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zynqtgui.start_loading() curlayer is changed??
                 old_audio_out = layer.get_audio_out()
 
-                if self.zynqtgui.curlayer.engine.nickname != sound["engine"]:
+                if self.get_curlayer().engine.nickname != sound["engine"]:
                     self.zynqtgui.start_loading()
                     engine_created = True
-                    midi_chan = self.zynqtgui.curlayer.midi_chan
+                    midi_chan = self.get_curlayer().midi_chan
                     index_to_replace = self.zynqtgui.screens['layer'].root_layers.index(layer)
                     self.zynqtgui.screens['layer'].replace_layer_index = index_to_replace
                     self.zynqtgui.screens['layer'].layer_chain_parallel = False
                     self.zynqtgui.screens['layer'].layer_index_replace_engine = index_to_replace
                     self.zynqtgui.screens['layer'].add_layer_engine(sound['engine'], midi_chan, True)
-                    layer = self.zynqtgui.curlayer
+                    layer = self.get_curlayer()
                 else:
                     #Workaround: make sure that layer is really selected or we risk to replace the old one
                     for i, candidate in enumerate(self.zynqtgui.screens['layer'].root_layers):
-                        if candidate == self.zynqtgui.curlayer:
+                        if candidate == self.get_curlayer():
                             self.zynqtgui.screens['layer'].select_action(i)
                             break
 
@@ -215,10 +235,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
             except Exception as e:
                 logging.debug(f"Error resetting volume : {str(e)}")
 
-            self.zynqtgui.curlayer.set_preset(i)
-            self.zynqtgui.layer.emit_layer_preset_changed(self.zynqtgui.curlayer)
-            self.zynqtgui.bank.select(self.zynqtgui.curlayer.bankIndex)
-            self.zynqtgui.preset.select(self.zynqtgui.curlayer.presetIndex)
+            self.get_curlayer().set_preset(i)
+            self.zynqtgui.layer.emit_layer_preset_changed(self.get_curlayer())
+            self.zynqtgui.bank.select(self.get_curlayer().bankIndex)
+            self.zynqtgui.preset.select(self.get_curlayer().presetIndex)
 
             if selected_channel is not None and prev_volume is not None:
                 try:
@@ -250,15 +270,15 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
     def get_current_is_favorite(self):
-        if self.zynqtgui.curlayer == None:
+        if self.get_curlayer() == None:
             return False
         if self.index < 0 or self.index >= len(self.list_data):
             return False
         if self.__top_sounds_engine != None:
             return True  # We can assume all topsounds are always favorite
-        if self.index >= len(self.zynqtgui.curlayer.preset_list):
+        if self.index >= len(self.get_curlayer().preset_list):
             return False
-        return self.zynqtgui.curlayer.engine.is_preset_fav(self.zynqtgui.curlayer.preset_list[self.index])
+        return self.get_curlayer().engine.is_preset_fav(self.get_curlayer().preset_list[self.index])
 
     def set_current_is_favorite(self, new_fav_state: bool):
         self.setFavorite(self.index, new_fav_state)
@@ -268,7 +288,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         fav_owner_engine = None
         fav_bank_name = None
         if self.__top_sounds_engine == None:
-            fav_owner_engine = self.zynqtgui.curlayer.engine
+            fav_owner_engine = self.get_curlayer().engine
         else:
             for eng in self.zynqtgui.screens['engine'].zyngines:
                 candidate_engine = self.zynqtgui.screens['engine'].zyngines[eng]
@@ -279,8 +299,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
         if fav_owner_engine != None:
             preset_id = str(self.list_data[index][0])
             # Find the bank name we might have to restore
-            if preset_id in self.zynqtgui.curlayer.engine.preset_favs:
-                fav_bank_name = self.zynqtgui.curlayer.engine.preset_favs[preset_id][0][2]
+            if preset_id in self.get_curlayer().engine.preset_favs:
+                fav_bank_name = self.get_curlayer().engine.preset_favs[preset_id][0][2]
 
             if fav_owner_engine.is_preset_fav(self.list_data[index]) != new_fav_state:
                 fav_owner_engine.toggle_preset_fav(fav_owner_engine.layers[0], self.list_data[index])
@@ -328,7 +348,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         self.zynqtgui.screens['bank'].show()
 
         # #if we were showing only favorites and removed the current one, select another
-        # if not new_fav_state and self.zynqtgui.curlayer != None and (self.zynqtgui.curlayer.show_fav_presets or self.__top_sounds_engine != None):
+        # if not new_fav_state and self.get_curlayer() != None and (self.get_curlayer().show_fav_presets or self.__top_sounds_engine != None):
         #     if len(self.list_data) > 0:
         #         self.select_action(max(0, index - 1))
         #     else:
@@ -340,11 +360,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
     def sync_current_bank(self):
-        if self.zynqtgui.curlayer == None:
+        if self.get_curlayer() == None:
             return
-        self.zynqtgui.screens['bank'].select(self.zynqtgui.curlayer.bank_index)
+        self.zynqtgui.screens['bank'].select(self.get_curlayer().bank_index)
         self.zynqtgui.screens['preset'].fill_list()
-        self.zynqtgui.screens['preset'].select(self.zynqtgui.curlayer.preset_index)
+        self.zynqtgui.screens['preset'].select(self.get_curlayer().preset_index)
 
 
     def reload_top_sounds(self):
@@ -400,8 +420,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
     def get_engine_name(self):
         engine_name = ""
         try:
-            if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.engine is not None:
-                engine_fullname = self.zynqtgui.curlayer.engine.name
+            if self.get_curlayer() is not None and self.get_curlayer().engine is not None:
+                engine_fullname = self.get_curlayer().engine.name
                 # Some engine names have the pattern "XXXX/YYYYY" where YYYYY is the engine name
                 # Other engines have their name stored directly
                 if "/" in engine_fullname:
@@ -414,7 +434,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
         return engine_name
 
     def index_supports_immediate_activation(self, index=None):
-        return self.__top_sounds_engine == None or (self.zynqtgui.curlayer != None and self.zynqtgui.curlayer.engine.nickname == self.__top_sounds_engine)
+        return self.__top_sounds_engine == None or (self.get_curlayer() != None and self.get_curlayer().engine.nickname == self.__top_sounds_engine)
 
     def next_action(self): #DON't go to edit or effect
         return "preset"
@@ -426,23 +446,23 @@ class zynthian_gui_preset(zynthian_gui_selector):
         if self.index < 0 or self.index >= len(self.list_data):
             return False
         if self.__top_sounds_engine == None:
-            return self.zynqtgui.curlayer.preload_preset(self.index)
+            return self.get_curlayer().preload_preset(self.index)
         else:
             mapped_index = -1
-            for i in range(len(self.zynqtgui.curlayer.preset_list)):
-                name_i=self.zynqtgui.curlayer.preset_list[i][2]
+            for i in range(len(self.get_curlayer().preset_list)):
+                name_i=self.get_curlayer().preset_list[i][2]
                 try:
                     if name_i[0] == '*':
                         name_i = name_i[1:]
                     if preset_name == name_i:
-                        return self.zynqtgui.curlayer.preload_preset(i)
+                        return self.get_curlayer().preload_preset(i)
                 except:
                     return False
 
 
 
     def restore_preset(self):
-        return self.zynqtgui.curlayer.restore_preset()
+        return self.get_curlayer().restore_preset()
 
     def set_show_only_favorites(self, show):
         if show:
@@ -451,48 +471,48 @@ class zynthian_gui_preset(zynthian_gui_selector):
             self.disable_show_fav_presets()
 
     def get_show_only_favorites(self):
-        if self.zynqtgui.curlayer is not None:
-            return self.zynqtgui.curlayer.show_fav_presets
+        if self.get_curlayer() is not None:
+            return self.get_curlayer().show_fav_presets
         else:
             return False
 
     def enable_show_fav_presets(self):
-        if self.zynqtgui.curlayer is not None and not self.zynqtgui.curlayer.show_fav_presets:
-            self.zynqtgui.curlayer.show_fav_presets = True
+        if self.get_curlayer() is not None and not self.get_curlayer().show_fav_presets:
+            self.get_curlayer().show_fav_presets = True
             self.set_select_path()
             self.fill_list()
             self.show_only_favorites_changed.emit()
-            if self.zynqtgui.curlayer.get_preset_name():
-                self.zynqtgui.curlayer.set_preset_by_name(self.zynqtgui.curlayer.get_preset_name())
-                self.select(self.zynqtgui.curlayer.presetIndex)
+            if self.get_curlayer().get_preset_name():
+                self.get_curlayer().set_preset_by_name(self.get_curlayer().get_preset_name())
+                self.select(self.get_curlayer().presetIndex)
 
 
     def disable_show_fav_presets(self):
-        if self.zynqtgui.curlayer is not None and self.zynqtgui.curlayer.show_fav_presets:
-            self.zynqtgui.curlayer.show_fav_presets = False
+        if self.get_curlayer() is not None and self.get_curlayer().show_fav_presets:
+            self.get_curlayer().show_fav_presets = False
             self.set_select_path()
             self.fill_list()
             self.show_only_favorites_changed.emit()
-            if self.zynqtgui.curlayer.get_preset_name():
-                self.zynqtgui.curlayer.set_preset_by_name(self.zynqtgui.curlayer.get_preset_name())
-                self.select(self.zynqtgui.curlayer.presetIndex)
+            if self.get_curlayer().get_preset_name():
+                self.get_curlayer().set_preset_by_name(self.get_curlayer().get_preset_name())
+                self.select(self.get_curlayer().presetIndex)
 
     @Slot()
     def toggle_show_fav_presets(self):
-        if self.zynqtgui.curlayer.show_fav_presets:
+        if self.get_curlayer().show_fav_presets:
             self.disable_show_fav_presets()
         else:
             self.enable_show_fav_presets()
 
 
     def set_select_path(self):
-        if self.zynqtgui.curlayer:
-            if self.zynqtgui.curlayer.show_fav_presets:
-                self.select_path = (self.zynqtgui.curlayer.get_basepath() + " > Favorites")
-                self.select_path_element = self.zynqtgui.curlayer.preset_name
+        if self.get_curlayer():
+            if self.get_curlayer().show_fav_presets:
+                self.select_path = (self.get_curlayer().get_basepath() + " > Favorites")
+                self.select_path_element = self.get_curlayer().preset_name
             else:
-                self.select_path = self.zynqtgui.curlayer.get_bankpath()
-                self.select_path_element = self.zynqtgui.curlayer.preset_name
+                self.select_path = self.get_curlayer().get_bankpath()
+                self.select_path_element = self.get_curlayer().preset_name
         else:
             self.select_path_element = "Presets"
         super().set_select_path()

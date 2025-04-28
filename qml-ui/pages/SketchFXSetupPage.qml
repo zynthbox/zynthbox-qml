@@ -2,9 +2,10 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Main Class and Program for Zynthian GUI
+Sketch FX page
 
 Copyright (C) 2021 Marco Martin <mart@kde.org>
+Copyright (C) 2025 Anupam Basak <anupam.basak27@gmail.com>
 
 ******************************************************************************
 
@@ -32,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    property var screenIds: ["effects_for_channel", "effect_preset"]
+    property var screenIds: ["sketch_effects_for_channel", "sketch_effect_preset"]
     property QtObject selectedChannel: null
     Timer {
         id: selectedChannelThrottle
@@ -41,7 +42,7 @@ Zynthian.ScreenPage {
             root.selectedChannel = applicationWindow().selectedChannel;
             // When current screen is opened and track changes, make sure to update curlayer and implicitly all lists
             if (root.screenIds.includes(zynqtgui.current_screen_id)) {
-                applicationWindow().pageStack.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", root.selectedChannel.selectedSlot.value);
+                applicationWindow().pageStack.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch-fx", root.selectedChannel.selectedSlot.value);
             }
         }
     }
@@ -76,7 +77,7 @@ Zynthian.ScreenPage {
         // Call cuiaCallback of current selectorView
         var selectorCuiaReturnVal = false
         switch(zynqtgui.current_screen_id) {
-            case "effect_preset":
+            case "sketch_effect_preset":
                 selectorCuiaReturnVal = effectPresetView.cuiaCallback(cuia)
                 break
         }
@@ -121,7 +122,7 @@ Zynthian.ScreenPage {
                 Layout.preferredHeight: favToggleButton.height
                 contentItem: Kirigami.Heading {
                     level: 2
-                    text: qsTr("Track %1 Sketch FX").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                    text: qsTr("Track %1 Loop FX").arg(zynqtgui.sketchpad.selectedTrackId+1)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
@@ -144,7 +145,7 @@ Zynthian.ScreenPage {
                         fixedEffectsView.selector.current_index = index;
                         fixedEffectsView.selector.activate_index(index);
                     }
-                    zynqtgui.current_screen_id = "effects_for_channel";
+                    zynqtgui.current_screen_id = "sketch_effects_for_channel";
                 }
                 Component.onCompleted: {
                     fixedEffectsView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })
@@ -245,7 +246,7 @@ Zynthian.ScreenPage {
                         effectPresetView.selector.activate_index(index);
                     }
                     zynqtgui.preset.current_is_favorite = !zynqtgui.preset.current_is_favorite;
-                    zynqtgui.current_screen_id = "effect_preset";
+                    zynqtgui.current_screen_id = "sketch_effect_preset";
                 }
                 Component.onCompleted: {
                     effectPresetView.background.highlighted = Qt.binding(function() { return zynqtgui.current_screen_id === screenId })

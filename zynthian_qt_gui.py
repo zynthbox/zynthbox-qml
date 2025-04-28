@@ -102,6 +102,7 @@ from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
 from zynqtgui.zynthian_gui_fixed_layers import zynthian_gui_fixed_layers
 from zynqtgui.zynthian_gui_effects_for_channel import zynthian_gui_effects_for_channel
+from zynqtgui.zynthian_gui_sketch_effects_for_channel import zynthian_gui_sketch_effects_for_channel
 from zynqtgui.zynthian_gui_layers_for_channel import zynthian_gui_layers_for_channel
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
@@ -342,6 +343,7 @@ class zynthian_gui(QObject):
         "layer",
         "fixed_layers",
         "effects_for_channel",
+        "sketch_effects_for_channel",
         "layers_for_channel",
         "main_layers_view",
         "bank",
@@ -1237,6 +1239,7 @@ class zynthian_gui(QObject):
         self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
 
         self.screens["effects_for_channel"] = zynthian_gui_effects_for_channel(self)
+        self.screens["sketch_effects_for_channel"] = zynthian_gui_sketch_effects_for_channel(self)
 
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -1577,8 +1580,8 @@ class zynthian_gui(QObject):
             self.add_screen_to_show_queue(self.screens["bank"], False, True)
             self.add_screen_to_show_queue(self.screens["preset"], False, True)
             self.add_screen_to_show_queue(self.screens["control"], False, True)
-            if self.curlayer is not None and self.curlayer.engine.type == "Audio Effect":
-                self.add_screen_to_show_queue(self.screens["effects_for_channel"], False, True)
+            self.add_screen_to_show_queue(self.screens["effects_for_channel"], False, True)
+            self.add_screen_to_show_queue(self.screens["sketch_effects_for_channel"], False, True)
         else:
             self.curlayer.refresh_controllers()
             self.screens["bank"].fill_list()
@@ -1587,9 +1590,10 @@ class zynthian_gui(QObject):
             self.screens["bank"].show()
             self.screens["preset"].show()
             self.screens["control"].show()
-            if self.curlayer is not None and self.curlayer.engine.type == "Audio Effect":
-                self.screens["effects_for_channel"].fill_list()
-                self.screens["effects_for_channel"].show()
+            self.screens["effects_for_channel"].fill_list()
+            self.screens["effects_for_channel"].show()
+            self.screens["sketch_effects_for_channel"].fill_list()
+            self.screens["sketch_effects_for_channel"].show()
         self.control.selectedColumn = 0
         if self.curlayer:
             self.screens["midi_key_range"].config(self.curlayer.midi_chan)
@@ -3788,6 +3792,9 @@ class zynthian_gui(QObject):
     def get_effects_for_channel(self):
         return self.screens["effects_for_channel"]
 
+    def get_sketch_effects_for_channel(self):
+        return self.screens["sketch_effects_for_channel"]
+
     def get_layers_for_channel(self):
         return self.screens["layers_for_channel"]
 
@@ -4890,6 +4897,7 @@ class zynthian_gui(QObject):
     layer = Property(QObject, get_layer, constant=True)
     fixed_layers = Property(QObject, get_fixed_layers, constant=True)
     effects_for_channel = Property(QObject, get_effects_for_channel, constant=True)
+    sketch_effects_for_channel = Property(QObject, get_sketch_effects_for_channel, constant=True)
     layers_for_channel = Property(QObject, get_layers_for_channel, constant=True)
     main_layers_view = Property(QObject, get_main_layers_view, constant=True)
     layer_options = Property(QObject, get_layer_options, constant=True)

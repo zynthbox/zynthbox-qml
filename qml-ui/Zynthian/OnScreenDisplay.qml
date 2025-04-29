@@ -99,6 +99,7 @@ Zynthian.Popup {
                 Layout.fillHeight: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideMiddle
                 text: zynqtgui.osd.description
             }
             RowLayout {

@@ -79,12 +79,13 @@ class zynthian_gui_preset(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
         self.list_metadata = []
-        selected_channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
         if not self.zynqtgui.isBootingComplete:
             # Do not fill list if startup is not complete
             super().fill_list()
             return
+
+        selected_channel = self.zynqtgui.sketchpad.song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
 
         # Do not try to fill list for None layer or layer which is not in view (for example, do not display synth presets when FXSetupPage is open)
         if (

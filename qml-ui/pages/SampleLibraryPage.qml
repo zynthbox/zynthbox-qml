@@ -352,17 +352,22 @@ Zynthian.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
             }
-            Kirigami.Heading {
+            QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 5
-                level: 2
                 visible: component.selectedChannel && component.selectedChannel.trackType === "sample-loop"
-                text: component.selectedChannel
-                    ? qsTr("Track %1 Sketches").arg(zynqtgui.sketchpad.selectedTrackId+1)
-                    : ""
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
+                onClicked: {
+                    applicationWindow().libraryTypePicker.open();
+                }
+                contentItem: Kirigami.Heading {
+                    level: 2
+                    text: component.selectedChannel
+                        ? qsTr("Track %1 Sketches").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        : ""
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
             }
             Kirigami.Heading {
                 Layout.fillWidth: true

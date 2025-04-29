@@ -1268,7 +1268,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             },
             QQC2.Action {
-                text: qsTr("Show Sample Slots")
+                text: qsTr("Show %1 Slots").arg(root.selectedChannel.trackType === "sample-loop" ? "Loop" : "Sample")
                 enabled: zynqtgui.current_screen_id !== "sample_library"
                 onTriggered: {
                     pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", 0);

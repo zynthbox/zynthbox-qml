@@ -363,7 +363,7 @@ Zynthian.ScreenPage {
                 contentItem: Kirigami.Heading {
                     level: 2
                     text: component.selectedChannel
-                        ? qsTr("Track %1 Sketches").arg(zynqtgui.sketchpad.selectedTrackId+1)
+                        ? qsTr("Track %1 Loops").arg(zynqtgui.sketchpad.selectedTrackId+1)
                         : ""
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View

@@ -63,6 +63,41 @@ Zynthian.ScreenPage {
         selectedChannelThrottle.restart()
     }
 
+    property bool focusSampleNextTimeWeAreVisible: false
+    onSelectedChannelChanged: {
+        if (component.isVisible == false) {
+            component.focusSampleNextTimeWeAreVisible = true;
+        }
+    }
+    Connections {
+        target: component.selectedChannel ? component.selectedChannel.selectedSlot : null
+        enabled: component.isVisible == false
+        onValueChanged: {
+            component.focusSampleNextTimeWeAreVisible = true;
+        }
+    }
+    onIsVisibleChanged: {
+        if (component.focusSampleNextTimeWeAreVisible) {
+            component.focusSampleNextTimeWeAreVisible = false;
+            if (component.selectedChannel) {
+                let selectedClip = component.selectedChannel.trackType === "sample-loop"
+                    ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                    : component.selectedChannel.samples[component.selectedChannel.selectedSlot.value]
+                if (selectedClip.path == "") {
+                    // - If there is nothing in the selected slot, select the middle column
+                    _private.selectedColumn = 1;
+                } else {
+                    // - If there is something in the selected slot, select the right-hand column, select the path for the currently selected sample in the centre column, and select that sample in the right hand column
+                    _private.selectedColumn = 2;
+                    // This check probably could be removed at some point, but for now we'll have a bunch of slots filled where there isn't an original path set
+                    if (selectedClip.metadata.originalPath !== "") {
+                        filesListView.selectFile(selectedClip.metadata.originalPath);
+                    }
+                }
+            }
+        }
+    }
+
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: zynqtgui.current_screen_id = "sketchpad"
@@ -238,9 +273,6 @@ Zynthian.ScreenPage {
             filePath: "/zynthian/zynthian-my-data"
         }
     }
-    // TODO When switching to the sample library page:
-    // - If there is nothing in the selected slot, select the middle column
-    // - If there is something in the selected slot, select the right-hand column, select the path for the currently selected sample in the centre column, and select that sample in the right hand column
     Zynthian.ActionPickerPopup {
         id: sampleSlotAssigner
         objectName: ""
@@ -604,6 +636,8 @@ Zynthian.ScreenPage {
                         margins: Kirigami.Units.smallSpacing
                     }
                     clip: true
+                    highlightMoveDuration: 0
+                    highlightMoveVelocity: 0
                     function selectFile(theFile) {
                         let pathSplit = theFile.lastIndexOf("/");
                         let path = theFile.slice(0, pathSplit);
@@ -637,6 +671,7 @@ Zynthian.ScreenPage {
                                     // Select the right-hand column if the file did exist, otherwise just leave the middle column selected
                                     _private.selectedColumn = 2;
                                     filesListView.currentIndex = indexOfFile;
+                                    filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center)
                                 }
                             }
                         }

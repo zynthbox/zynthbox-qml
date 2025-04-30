@@ -91,7 +91,7 @@ Zynthian.ScreenPage {
                     _private.selectedColumn = 2;
                     // This check probably could be removed at some point, but for now we'll have a bunch of slots filled where there isn't an original path set
                     if (selectedClip.metadata.originalPath !== "") {
-                        filesListView.selectFile(selectedClip.metadata.originalPath);
+                        filesListView.selectFile(selectedClip.metadata.originalPath, true);
                     }
                 }
             }
@@ -217,6 +217,12 @@ Zynthian.ScreenPage {
                         } else {
                             pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.min(Zynthbox.Plugin.sketchpadSlotCount - 1, component.selectedChannel.selectedSlot.value + 1));
                         }
+                        let selectedClip = component.selectedChannel.trackType === "sample-loop"
+                            ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                            : component.selectedChannel.samples[component.selectedChannel.selectedSlot.value]
+                        if (selectedClip.metadata.originalPath !== "") {
+                            filesListView.selectFile(selectedClip.metadata.originalPath, false);
+                        }
                         break;
                     case 1:
                         folderListView.currentIndex = Math.min(folderListView.count - 1, folderListView.currentIndex + 1);
@@ -235,6 +241,12 @@ Zynthian.ScreenPage {
                             pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch", Math.max(0, component.selectedChannel.selectedSlot.value - 1));
                         } else {
                             pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", Math.max(0, component.selectedChannel.selectedSlot.value - 1));
+                        }
+                        let selectedClip = component.selectedChannel.trackType === "sample-loop"
+                            ? component.selectedChannel.getClipsModelById(component.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex)
+                            : component.selectedChannel.samples[component.selectedChannel.selectedSlot.value]
+                        if (selectedClip.metadata.originalPath !== "") {
+                            filesListView.selectFile(selectedClip.metadata.originalPath, false);
                         }
                         break;
                     case 1:
@@ -469,7 +481,7 @@ Zynthian.ScreenPage {
                                                 pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sample", model.index, false);
                                             }
                                             if (clipDelegate.clip.metadata.originalPath != "") {
-                                                filesListView.selectFile(clipDelegate.clip.metadata.originalPath);
+                                                filesListView.selectFile(clipDelegate.clip.metadata.originalPath, false);
                                             }
                                         }
                                     }
@@ -638,7 +650,7 @@ Zynthian.ScreenPage {
                     clip: true
                     highlightMoveDuration: 0
                     highlightMoveVelocity: 0
-                    function selectFile(theFile) {
+                    function selectFile(theFile, changeColumn) {
                         let pathSplit = theFile.lastIndexOf("/");
                         let path = theFile.slice(0, pathSplit);
                         let filename = theFile.slice(pathSplit + 1);
@@ -654,11 +666,13 @@ Zynthian.ScreenPage {
                         // we would miss it, and this is safer... not that i like it all that much
                         folderModel.folder = path;
                         selectFileAfterLoadingTimer.selectThisFile = Qt.resolvedUrl(theFile);
+                        selectFileAfterLoadingTimer.changeColumn = changeColumn;
                         selectFileAfterLoadingTimer.start();
                     }
                     Timer {
                         id: selectFileAfterLoadingTimer
                         property string selectThisFile: ""
+                        property bool changeColumn: false
                         interval: 50; repeat: true; running: false;
                         onTriggered: {
                             if (selectThisFile === "") {
@@ -669,7 +683,9 @@ Zynthian.ScreenPage {
                                 let indexOfFile = folderModel.indexOf(selectFileAfterLoadingTimer.selectThisFile);
                                 if (indexOfFile > -1) {
                                     // Select the right-hand column if the file did exist, otherwise just leave the middle column selected
-                                    _private.selectedColumn = 2;
+                                    if (selectFileAfterLoadingTimer.changeColumn) {
+                                        _private.selectedColumn = 2;
+                                    }
                                     filesListView.currentIndex = indexOfFile;
                                     filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center)
                                 }

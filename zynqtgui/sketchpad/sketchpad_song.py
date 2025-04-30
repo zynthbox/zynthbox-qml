@@ -67,6 +67,32 @@ def setPassthroughClientDefaults(passthroughClient):
     for filterObject in passthroughClient.equaliserSettings():
         filterObject.setDefaults()
     passthroughClient.compressorSettings().setDefaults()
+def serializePassthroughData(passthroughClient):
+    equaliserSettingsData = []
+    for client in passthroughClient.equaliserSettings():
+        equaliserSettingsData.append({
+            "filterType": client.filterType().name.decode().split(".")[-1],
+            "frequency": client.frequency(),
+            "quality": client.quality(),
+            "soloed": client.soloed(),
+            "gain": client.gain(),
+            "active": client.active()
+        })
+    return {
+        "equaliserSettings": equaliserSettingsData,
+        "equaliserEnabled": passthroughClient.equaliserEnabled(),
+        "compressorEnabled": passthroughClient.compressorEnabled(),
+        "compressorSidechannelLeft": passthroughClient.compressorSidechannelLeft(),
+        "compressorSidechannelRight": passthroughClient.compressorSidechannelRight(),
+        "compressorSettings": {
+            "thresholdDB": passthroughClient.compressorSettings().thresholdDB(),
+            "makeUpGainDB": passthroughClient.compressorSettings().makeUpGainDB(),
+            "kneeWidthDB": passthroughClient.compressorSettings().kneeWidthDB(),
+            "release": passthroughClient.compressorSettings().release(),
+            "attack": passthroughClient.compressorSettings().attack(),
+            "ratio": passthroughClient.compressorSettings().ratio()
+        }
+    }
 
 class sketchpad_song(QObject):
     __instance__ = None
@@ -178,6 +204,7 @@ class sketchpad_song(QObject):
                         setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
                 for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                     setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
+                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
             for midiChannel in range(0, 16):
                 setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
 
@@ -196,44 +223,21 @@ class sketchpad_song(QObject):
         self.__to_be_deleted__ = True
 
     def serialize(self):
-        def serializePassthroughData(passthroughClient):
-            equaliserSettingsData = []
-            for client in passthroughClient.equaliserSettings():
-                equaliserSettingsData.append({
-                    "filterType": client.filterType().name.decode().split(".")[-1],
-                    "frequency": client.frequency(),
-                    "quality": client.quality(),
-                    "soloed": client.soloed(),
-                    "gain": client.gain(),
-                    "active": client.active()
-                })
-            return {
-                "equaliserSettings": equaliserSettingsData,
-                "equaliserEnabled": passthroughClient.equaliserEnabled(),
-                "compressorEnabled": passthroughClient.compressorEnabled(),
-                "compressorSidechannelLeft": passthroughClient.compressorSidechannelLeft(),
-                "compressorSidechannelRight": passthroughClient.compressorSidechannelRight(),
-                "compressorSettings": {
-                    "thresholdDB": passthroughClient.compressorSettings().thresholdDB(),
-                    "makeUpGainDB": passthroughClient.compressorSettings().makeUpGainDB(),
-                    "kneeWidthDB": passthroughClient.compressorSettings().kneeWidthDB(),
-                    "release": passthroughClient.compressorSettings().release(),
-                    "attack": passthroughClient.compressorSettings().attack(),
-                    "ratio": passthroughClient.compressorSettings().ratio()
-                }
-            }
         synthPassthroughClientsData = []
         for midiChannel in range(0, 16):
             synthPassthroughClientsData.append(serializePassthroughData(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel]))
         trackPassthroughClientsData = []
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
             slotData = []
+            sketchSlotData = []
             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 slotData.append(serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex]))
+                sketchSlotData.append(serializePassthroughData(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex]))
             track = self.channelsModel.getChannel(trackIndex)
             trackPassthroughClientsData.append({
                     "trackPassthroughClient": serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, 1 if track.trackTypeKey == "sketch" else 0, 0)),
-                    "fxPassthroughClients": slotData
+                    "fxPassthroughClients": slotData,
+                    "sketchFxPassthroughClients": sketchSlotData
                 })
         return {
             "name": self.__name__,
@@ -417,6 +421,10 @@ class sketchpad_song(QObject):
                                     restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), sketchpad["trackPassthroughClients"][trackIndex]["trackPassthroughClient"])
                             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                 restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], sketchpad["trackPassthroughClients"][trackIndex]["fxPassthroughClients"][slotIndex])
+                                if "sketchFxPassthroughClients" in sketchpad["trackPassthroughClients"][trackIndex]:
+                                    restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], sketchpad["trackPassthroughClients"][trackIndex]["sketchFxPassthroughClients"][slotIndex])
+                                else:
+                                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
                     else:
                         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                             for slotType in range(0, 2):
@@ -424,6 +432,7 @@ class sketchpad_song(QObject):
                                     setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
                             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                 setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
+                                setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
                     if "synthPassthroughClients" in sketchpad:
                         for midiChannel in range(0, 16):
                             restorePassthroughClientData(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel], sketchpad["synthPassthroughClients"][midiChannel])

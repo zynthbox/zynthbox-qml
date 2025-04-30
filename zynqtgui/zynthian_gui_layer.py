@@ -43,6 +43,9 @@ from . import zynthian_gui_config
 from . import zynthian_gui_selector
 from zyngine import zynthian_layer
 
+import Zynthbox
+from .sketchpad import sketchpad_song
+
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer
 
 #------------------------------------------------------------------------------
@@ -1296,8 +1299,22 @@ class zynthian_gui_layer(zynthian_gui_selector):
             for layer in self.layers:
                 if track is None or (track is not None and layer.track_index == track.id):
                     layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_name_to_id(layer.get_snapshot())
+                    # Add the slot mixer and equalizer settings into the snapshot
+                    mixer_settings = {}
+                    equalizer_settings = {}
+                    if layer_snapshot["slot_type"] == "TracksBar_synthslot":
+                        synthPassthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[layer_snapshot["midi_chan"]]
+                        mixer_settings["panAmount"] = synthPassthroughClient.panAmount()
+                        mixer_settings["dryAmount"] = synthPassthroughClient.dryGainHandler().gain()
+                        equalizer_settings = sketchpad_song.serializePassthroughData(Zynthbox.Plugin.instance().synthPassthroughClients()[layer_snapshot["midi_chan"]])
+                    else:
+                        fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[track.id][layer_snapshot['slot_index']]
+                        mixer_settings["panAmount"] = fxPassthroughClient.panAmount()
+                        mixer_settings["dryWetMixAmount"] = fxPassthroughClient.dryWetMixAmount()
+                        equalizer_settings = sketchpad_song.serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[track.id][layer_snapshot['slot_index']])
+                    layer_snapshot["mixer_settings"] = mixer_settings
+                    layer_snapshot["equalizer_settings"] = equalizer_settings
                     snapshot['layers'].append(layer_snapshot)
-
 
             if zynthian_gui_config.snapshot_mixer_settings and self.amixer_layer:
                 snapshot['layers'].append(self.amixer_layer.get_snapshot())
@@ -1608,6 +1625,47 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setFxToChain(new_layer, slot_index)
                     elif slot_type == "TracksBar_sketchfxslot":
                         self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setSketchFxToChain(new_layer, slot_index)
+
+                # Restore the mixer and equalizer settings for the slot
+                if "mixer_settings" in layer_snapshot:
+                    dataChunk = layer_snapshot["mixer_settings"]
+                    if slot_type == "TracksBar_synthslot":
+                        synthPassthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[midi_chan]
+                        panAmount = dataChunk["panAmount"]
+                        dryAmount = dataChunk["dryAmount"]
+                        synthPassthroughClient.setPanAmount(panAmount)
+                        synthPassthroughClient.dryGainHandler().setGain(dryAmount)
+                    else:
+                        fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[track_index][slot_index]
+                        panAmount = dataChunk["panAmount"]
+                        dryWetMixAmount = dataChunk["dryWetMixAmount"]
+                        fxPassthroughClient.setPanAmount(panAmount)
+                        fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+                else:
+                    # Reset to defaults, as there were no mixer settings stored for this slot (can happen if we attempt to load a snapshot from zynthian, or an old snapshot from us)
+                    if slot_type == "TracksBar_synthslot":
+                        synthPassthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[midi_chan]
+                        panAmount = 0
+                        dryAmount = 1
+                        synthPassthroughClient.setPanAmount(panAmount)
+                        synthPassthroughClient.dryGainHandler().setGain(dryAmount)
+                    else:
+                        fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[track_index][slot_index]
+                        panAmount = 0
+                        dryWetMixAmount = 1
+                        fxPassthroughClient.setPanAmount(panAmount)
+                        fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
+                if "equalizer_settings" in layer_snapshot:
+                    if slot_type == "TracksBar_synthslot":
+                        sketchpad_song.restorePassthroughClientData(Zynthbox.Plugin.instance().synthPassthroughClients()[midi_chan], layer_snapshot["equalizer_settings"])
+                    else:
+                        sketchpad_song.restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[track_index][slot_index], layer_snapshot["equalizer_settings"])
+                else:
+                    # Reset to defaults, as there were no equalizer settings stored for this slot (can happen if we attempt to load a snapshot from zynthian, or an old snapshot from us)
+                    if slot_type == "TracksBar_synthslot":
+                        sketchpad_song.setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midi_chan])
+                    else:
+                        sketchpad_song.setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[track_index][slot_index])
 
                 sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
                 for layer in sublayers:

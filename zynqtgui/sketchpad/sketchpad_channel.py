@@ -2280,6 +2280,9 @@ class sketchpad_channel(QObject):
     channelHasSynth = Property(bool, get_channelHasSynth, notify=chained_sounds_changed)
     ### END Property channelHasSynth
 
+    def get_audioTypeSettings(self):
+        return self.__audioTypeSettings__
+
     ### BEGIN Property pan
     def get_pan(self):
         return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["trackPassthrough"][0]["panAmount"]

@@ -2893,6 +2893,14 @@ class sketchpad_channel(QObject):
                             file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
                         # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
                         self.__samples__[index].set_path(str(temporaryFile), should_copy=True)
+                        # Restore the metadata, if it's been saved to the snapshot (otherwise load it from disk)
+                        if "metadata" in snapshot_obj[key]:
+                            self.__samples__[index].__metadata.deserialize(snapshot_obj[key]["metadata"])
+                        else:
+                            self.__samples__[index].__metadata.clear()
+                            # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
+                            if self.__samples__[index].audioSource is not None:
+                                self.__samples__[index].__metadata.read()
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Loading samples")
 
@@ -2926,6 +2934,15 @@ class sketchpad_channel(QObject):
                                     file.write(base64.b64decode(snapshot_obj[key]["sampledata"]))
                                 # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
                                 clip.set_path(str(temporaryFile), should_copy=True)
+                                # Restore the metadata, if it's been saved to the snapshot (otherwise load it from disk)
+                                clip.__metadata.clear()
+                                if "metadata" in snapshot_obj[key]:
+                                    if len(snapshot_obj[key]["metadata"]) > 0:
+                                        self.__samples__[index].__metadata.deserialize(snapshot_obj[key]["metadata"])
+                                else:
+                                    # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
+                                    if clip.audioSource is not None:
+                                        clip.__metadata.read()
                         break
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, f"Loading sample data from snapshot into slot {clip.id} on Track {self.name}")
@@ -2937,10 +2954,12 @@ class sketchpad_channel(QObject):
             sample = self.__samples__[index]
             thisSample = {
                 "filename": "",
+                "metadata": "",
                 "sampledata": ""
                 }
             if sample is not None and sample.path is not None and len(sample.path) > 0:
                 thisSample["filename"] = sample.filename
+                thisSample["metadata"] = sample.metadata.serialize()
                 with open(sample.path, "rb") as file:
                     thisSample["sampledata"] = base64.b64encode(file.read()).decode("utf-8")
             encodedSampleData[index] = thisSample

@@ -152,12 +152,17 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     def load_bank(self, bank_fpath, unload_unused_sf=True):
         if bank_fpath in self.soundfont_index:
             return True
-        elif self.load_soundfont(bank_fpath):
-            if unload_unused_sf:
-                self.unload_unused_soundfonts()
-            self.set_all_presets()
-            return True
         else:
+            max_retries = 5
+            while max_retries > 0:
+                logging.debug(f"Loading bank retries left : {max_retries}")
+                if self.load_soundfont(bank_fpath):
+                    if unload_unused_sf:
+                        self.unload_unused_soundfonts()
+                    self.set_all_presets()
+                    return True
+                else:
+                    max_retries -= 1
             return False
 
     # ---------------------------------------------------------------------------

@@ -130,6 +130,18 @@ class sketchpad_song(QObject):
         # self.__initial_name__ = name # To be used while storing cache details when name changes
         self.__to_be_deleted__ = False
 
+        # Clear all the passthrough clients to default state
+        setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
+        for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
+            for slotType in range(0, 2):
+                for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
+            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
+                setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
+        for midiChannel in range(0, 16):
+            setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
+
         def connectPassthroughClientForSaving(passthroughClient):
             passthroughClient.equaliserEnabledChanged.connect(self.schedule_save)
             for filterObject in passthroughClient.equaliserSettings():
@@ -196,18 +208,6 @@ class sketchpad_song(QObject):
 
                 self.__arrangements_model__.add_arrangement(arrangement_index, arrangement)
 
-            # Clear all the passthrough clients to default state
-            setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
-            for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-                for slotType in range(0, 2):
-                    for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                        setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
-                for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
-                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
-            for midiChannel in range(0, 16):
-                setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
-
         # Save updated bpm value when it changes
         Zynthbox.SyncTimer.instance().bpmChanged.connect(self.setTrackBpmFromCurrent)
 
@@ -223,22 +223,18 @@ class sketchpad_song(QObject):
         self.__to_be_deleted__ = True
 
     def serialize(self):
-        synthPassthroughClientsData = []
-        for midiChannel in range(0, 16):
-            synthPassthroughClientsData.append(serializePassthroughData(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel]))
         trackPassthroughClientsData = []
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-            slotData = []
-            sketchSlotData = []
-            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                slotData.append(serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex]))
-                sketchSlotData.append(serializePassthroughData(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex]))
             track = self.channelsModel.getChannel(trackIndex)
-            trackPassthroughClientsData.append({
-                    "trackPassthroughClient": serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, 1 if track.trackTypeKey == "sketch" else 0, 0)),
-                    "fxPassthroughClients": slotData,
-                    "sketchFxPassthroughClients": sketchSlotData
-                })
+            slotTypesData = []
+            for slotType in range(0, 2):
+                laneData = []
+                # For the future - if we eventually want to add in lane-independent equalisers here, simply comment this back in, and the loading will work
+                # for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                    # laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex)))
+                laneData.append(serializePassthroughData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, 0)))
+                slotTypesData.append(laneData)
+            trackPassthroughClientsData.append(slotTypesData)
         return {
             "name": self.__name__,
             "bpm": self.__bpm__,
@@ -249,8 +245,7 @@ class sketchpad_song(QObject):
             "scenes": self.__scenes_model__.serialize(),
             "arrangements": self.__arrangements_model__.serialize(),
             "globalPlaybackClient": serializePassthroughData(Zynthbox.Plugin.instance().globalPlaybackClient()),
-            "trackPassthroughClients": trackPassthroughClientsData,
-            "synthPassthroughClients": synthPassthroughClientsData
+            "trackPassthroughClients": trackPassthroughClientsData
         }
 
     def save(self, autosave=True, save_empty=False):
@@ -412,33 +407,21 @@ class sketchpad_song(QObject):
 
                     if "globalPlaybackClient" in sketchpad:
                         restorePassthroughClientData(Zynthbox.Plugin.instance().globalPlaybackClient(), sketchpad["globalPlaybackClient"])
-                    else:
-                        setPassthroughClientDefaults(Zynthbox.Plugin.instance().globalPlaybackClient())
                     if "trackPassthroughClients" in sketchpad:
                         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
                             for slotType in range(0, 2):
                                 for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                                    restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), sketchpad["trackPassthroughClients"][trackIndex]["trackPassthroughClient"])
-                            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                                restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], sketchpad["trackPassthroughClients"][trackIndex]["fxPassthroughClients"][slotIndex])
-                                if "sketchFxPassthroughClients" in sketchpad["trackPassthroughClients"][trackIndex]:
-                                    restorePassthroughClientData(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], sketchpad["trackPassthroughClients"][trackIndex]["sketchFxPassthroughClients"][slotIndex])
-                                else:
-                                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
-                    else:
-                        for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
-                            for slotType in range(0, 2):
-                                for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                                    setPassthroughClientDefaults(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
-                            for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                                setPassthroughClientDefaults(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
-                                setPassthroughClientDefaults(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex])
-                    if "synthPassthroughClients" in sketchpad:
-                        for midiChannel in range(0, 16):
-                            restorePassthroughClientData(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel], sketchpad["synthPassthroughClients"][midiChannel])
-                    else:
-                        for midiChannel in range(0, 16):
-                            setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
+                                    laneIndexForEntry = laneIndex
+                                    # See serialize() - this is done to ensure we can later on simply re-add the rest of the lane entries if we want, without having to change anything here
+                                    if len(sketchpad["trackPassthroughClients"][trackIndex][slotType]) == 1:
+                                        laneIndexForEntry = 0
+                                    if "trackPassthroughClient" in sketchpad["trackPassthroughClients"][trackIndex]:
+                                        # This is a fallback for older sketchpads, which didn't store the individual slot type clients
+                                        restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), sketchpad["trackPassthroughClients"][trackIndex]["trackPassthroughClient"])
+                                    elif slotType < len(sketchpad["trackPassthroughClients"][trackIndex]) and laneIndexForEntry < len(sketchpad["trackPassthroughClients"][trackIndex][slotType]):
+                                        restorePassthroughClientData(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), sketchpad["trackPassthroughClients"][trackIndex][slotType][laneIndexForEntry])
+                                    else:
+                                        logging.error(f"Failed to fetch either trackPassthroughClient or the fallback from the trackPassthroughClients entry in the sketchpad - something isn't right with this. The object data was:\n{sketchpad['trackPassthroughClients'][trackIndex]}")
 
                     # Load sequence model for this version explicitly after restoring sketchpad if it is not a temp sketchpad and not an autosave version
                     if not self.isTemp and not load_autosave:

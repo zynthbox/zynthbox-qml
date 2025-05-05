@@ -146,19 +146,22 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
 
     def set_bank(self, layer, bank):
-        return self.load_bank(bank[0])
+        return self.load_bank(bank)
 
 
-    def load_bank(self, bank_fpath, unload_unused_sf=True):
-        if bank_fpath in self.soundfont_index:
+    def load_bank(self, bank, unload_unused_sf=True):
+        if bank[0] in self.soundfont_index:
             return True
         else:
             max_retries = 5
             while max_retries > 0:
                 logging.debug(f"Loading bank retries left : {max_retries}")
-                if self.load_soundfont(bank_fpath):
+                if self.load_soundfont(bank[0]):
                     if unload_unused_sf:
                         self.unload_unused_soundfonts()
+                    # Explicitly call get_preset_list to pre-populate preset list when loading a bank
+                    # Without this explicit call, setting preset while restoring sound fails to set the preset
+                    self.get_preset_list(bank)
                     self.set_all_presets()
                     return True
                 else:
@@ -176,7 +179,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         try:
             sfi = self.soundfont_index[bank[0]]
         except:
-            sfi = self.load_bank(bank[0], False)
+            sfi = self.load_bank(bank, False)
 
         if sfi:
             output=self.proc_cmd("inst {}".format(sfi), wait_for_output=True)

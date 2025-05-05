@@ -1308,10 +1308,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
                         mixer_settings["dryAmount"] = synthPassthroughClient.dryGainHandler().gain()
                         equalizer_settings = sketchpad_song.serializePassthroughData(Zynthbox.Plugin.instance().synthPassthroughClients()[layer_snapshot["midi_chan"]])
                     else:
-                        fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[track.id][layer_snapshot['slot_index']]
+                        fxPassthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[layer.track_index][layer_snapshot['slot_index']]
                         mixer_settings["panAmount"] = fxPassthroughClient.panAmount()
                         mixer_settings["dryWetMixAmount"] = fxPassthroughClient.dryWetMixAmount()
-                        equalizer_settings = sketchpad_song.serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[track.id][layer_snapshot['slot_index']])
+                        equalizer_settings = sketchpad_song.serializePassthroughData(Zynthbox.Plugin.instance().fxPassthroughClients()[layer.track_index][layer_snapshot['slot_index']])
                     layer_snapshot["mixer_settings"] = mixer_settings
                     layer_snapshot["equalizer_settings"] = equalizer_settings
                     snapshot['layers'].append(layer_snapshot)

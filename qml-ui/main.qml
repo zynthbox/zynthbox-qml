@@ -723,27 +723,16 @@ Kirigami.AbstractApplicationWindow {
                     zynqtgui.current_modal_screen_id = 'sketchpad'
                 }
             }
-
-            ColumnLayout {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.leftMargin: Kirigami.Units.largeSpacing*1.5
-                spacing: 0
-
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    font.pointSize: 10
-                    text: zynqtgui.sketchpad.song.name
-                }
-
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    font.pointSize: 10
-                    visible: zynqtgui.sketchpad.song.hasUnsavedChanges
-                    text: "(*)"
-                }
+            QQC2.Label {
+                anchors.fill: parent
+                anchors.margins: Kirigami.Units.largeSpacing
+                horizontalAlignment: QQC2.Label.AlignHCenter
+                verticalAlignment: QQC2.Label.AlignVCenter
+                elide: QQC2.Label.ElideMiddle
+                wrapMode: QQC2.Label.WrapAnywhere
+                font.pointSize: 10
+                text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
             }
-
 
             Zynthian.Menu {
                 id: tracksMenu

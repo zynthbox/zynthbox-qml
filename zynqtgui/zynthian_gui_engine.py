@@ -35,9 +35,9 @@ from functools import cmp_to_key
 # Zynthian specific modules
 import zynautoconnect
 from zyngine import *
-from zyngine.zynthian_engine_pianoteq import *
+# from zyngine.zynthian_engine_pianoteq import *
 from zyngine.zynthian_engine_jalv import *
-from zyngine.zynthian_engine_jucy import *
+# from zyngine.zynthian_engine_jucy import *
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
@@ -82,17 +82,20 @@ class zynthian_gui_engine(zynthian_gui_selector):
             ["AE", ("Aeolus", "Pipe Organ Emulator", "MIDI Synth", "Instrument", zynthian_engine_aeolus, True, "Other")],
         ])
 
-        if check_pianoteq_binary():
-            pianoteq_title="v{}.{} {}{}".format(
-                PIANOTEQ_VERSION[0],
-                PIANOTEQ_VERSION[1],
-                PIANOTEQ_PRODUCT,
-                " (Demo)" if PIANOTEQ_TRIAL else "")
-            cls.engine_info['PT'] = (PIANOTEQ_NAME, pianoteq_title, "MIDI Synth", None, zynthian_engine_pianoteq, True, "Other")
+        # if check_pianoteq_binary():
+        #     pianoteq_title="v{}.{} {}{}".format(
+        #         PIANOTEQ_VERSION[0],
+        #         PIANOTEQ_VERSION[1],
+        #         PIANOTEQ_PRODUCT,
+        #         " (Demo)" if PIANOTEQ_TRIAL else "")
+        #     cls.engine_info['PT'] = (PIANOTEQ_NAME, pianoteq_title, "MIDI Synth", None, zynthian_engine_pianoteq, True, "Other")
         
         for plugin_name, plugin_info in get_jalv_plugins().items():
             eng = 'JV/{}'.format(plugin_name)
             cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jalv, plugin_info['ENABLED'], "LV2")
+
+        # Sort the engine details by name (case insensitive)
+        cls.engine_info = OrderedDict(sorted(cls.engine_info.items(), key=lambda e: e[1][0].lower()))
 
         # for plugin_name, plugin_info in get_jucy_plugins().items():
         #     eng = 'JY/{}'.format(plugin_name)

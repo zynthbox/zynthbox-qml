@@ -413,7 +413,7 @@ class sketchpad_song(QObject):
                                 for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                                     laneIndexForEntry = laneIndex
                                     # See serialize() - this is done to ensure we can later on simply re-add the rest of the lane entries if we want, without having to change anything here
-                                    if len(sketchpad["trackPassthroughClients"][trackIndex][slotType]) == 1:
+                                    if isinstance(sketchpad["trackPassthroughClients"][trackIndex], dict) == False and slotType < len(sketchpad["trackPassthroughClients"][trackIndex]) and len(sketchpad["trackPassthroughClients"][trackIndex][slotType]) == 1:
                                         laneIndexForEntry = 0
                                     if "trackPassthroughClient" in sketchpad["trackPassthroughClients"][trackIndex]:
                                         # This is a fallback for older sketchpads, which didn't store the individual slot type clients

@@ -130,7 +130,10 @@ def runCallbacksAfterMidiAutoconnect():
                 break
             else:
                 callback = postMidiConnectCallbacks.get()
-                callback()
+                if callable(callback):
+                    callback()
+                else:
+                    logging.error(f"We have been asked to perform a callback which is not callable: {callback}")
 
 # This will be done immediately prior to attempting to perform the enqueued callbacks
 # If we are asked to redo the autoconnect, we will do precisely that (recursively,
@@ -153,7 +156,10 @@ def runCallbacksAfterAudioAutoconnect():
                 break
             else:
                 callback = postAudioConnectCallbacks.get()
-                callback()
+                if callable(callback):
+                    callback()
+                else:
+                    logging.error(f"We have been asked to perform a callback which is not callable: {callback}")
 
 #------------------------------------------------------------------------------
 

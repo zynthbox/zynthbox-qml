@@ -32,6 +32,7 @@ from time import sleep
 from threading  import Thread, Lock
 from collections import OrderedDict
 from itertools import cycle
+from queue import SimpleQueue
 
 from PySide2.QtCore import QTimer
 import Zynthbox
@@ -78,6 +79,81 @@ xrun_counter_timer = QTimer()
 xrun_counter_timer.setInterval(10000)
 xrun_counter_timer.setSingleShot(False)
 xrun_counter_timer.timeout.connect(xrun_counter_timer_timeout)
+
+#------------------------------------------------------------------------------
+# Post-autoconnect callback queues (for running commands after the next successful autoconnect runs)
+#------------------------------------------------------------------------------
+
+redoAutoconnectMidi = False
+postMidiConnectCallbacks = SimpleQueue()
+redoAutoconnectAudio = False
+postAudioConnectCallbacks = SimpleQueue()
+
+# Pass a callback to be run after autoconnecting midi next time and schedules a run of the midi autoconnect
+# Calling this will abort the current autoconnect run if one is ongoing, and ask for another run
+def callAfterMidiAutoconnect(callback):
+    global postMidiConnectCallbacks
+    global redoAutoconnectMidi
+    redoAutoconnectMidi = True
+    force_next_autoconnect = True
+    postMidiConnectCallbacks.put(callback)
+
+# Pass a callback to be run after autoconnecting audio next time and schedules a run of the audio autoconnect
+# If one is ongoing, autoconnect will check first and ensure that it re-runs before attempting
+# to run the callbacks, to try and ensure that all connections are completed first
+def callAfterMidiAutoconnect(callback):
+    global postAudioConnectCallbacks
+    global redoAutoconnectAudio
+    global force_next_autoconnect
+    redoAutoconnectAudio = True
+    force_next_autoconnect = True
+    postAudioConnectCallbacks.put(callback)
+
+# This will be done immediately prior to attempting to perform the enqueued callbacks
+# If we are asked to redo the autoconnect, we will do precisely that (recursively,
+# just for simplicity's sake)
+def runCallbacksAfterMidiAutoconnect():
+    global postMidiConnectCallbacks
+    global redoAutoconnectMidi
+    if redoAutoconnectMidi:
+        # If we should redo the autoconnect, do so immediately
+        redoAutoconnectMidi = False
+        midi_autoconnect(force=True)
+    else:
+        # Otherwise run the callbacks
+        while postMidiConnectCallbacks.empty() == False:
+            if redoAutoconnectMidi:
+                # In case we have been called in the middle of doing things here...
+                # let's make sure we restart so the connections are completed first
+                redoAutoconnectMidi = False
+                midi_autoconnect(force=True)
+                break
+            else:
+                callback = postMidiConnectCallbacks.get()
+                callback()
+
+# This will be done immediately prior to attempting to perform the enqueued callbacks
+# If we are asked to redo the autoconnect, we will do precisely that (recursively,
+# just for simplicity's sake)
+def runCallbacksAfterAudioAutoconnect():
+    global postAudioConnectCallbacks
+    global redoAutoconnectAudio
+    if redoAutoconnectAudio:
+        # If we should redo the autoconnect, do so immediately
+        redoAutoconnectAudio = False
+        audio_autoconnect(force=True)
+    else:
+        # Otherwise run the callbacks
+        while postAudioConnectCallbacks.empty() == False:
+            if redoAutoconnectAudio:
+                # In case we have been called in the middle of doing things here...
+                # let's make sure we restart so the connections are completed first
+                redoAutoconnectAudio = False
+                audio_autoconnect(force=True)
+                break
+            else:
+                callback = postAudioConnectCallbacks.get()
+                callback()
 
 #------------------------------------------------------------------------------
 
@@ -466,6 +542,9 @@ def midi_autoconnect(force=False):
 
     #Release Mutex Lock
     release_lock()
+
+    # Now we're done, test to see whether we've got any callbacks that need running
+    runCallbacksAfterMidiAutoconnect()
 
 def audio_autoconnect(force=False):
     global force_next_autoconnect
@@ -1332,6 +1411,9 @@ def audio_autoconnect(force=False):
 
     #Release Mutex Lock
     release_lock()
+
+    # Now we're done, test to see whether we've got any callbacks that need running
+    runCallbacksAfterMidiAutoconnect()
 
 
 def audio_disconnect_sysout():

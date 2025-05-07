@@ -36,10 +36,11 @@ class zynthian_zcmidi:
     prg_selected=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
     def __init__(self):
+        self.midiRouter=Zynthbox.MidiRouter.instance()
         self.syncTimer=Zynthbox.SyncTimer.instance()
 
     def set_midi_control(self, chan, ctrl, val):
-        self.syncTimer.sendMidiMessageImmediately(3, 176 + chan, ctrl, val, Zynthbox.SyncTimer.instance().masterSketchpadTrack())
+        self.midiRouter.sendMidiMessageToZynthianSynth(chan, 3, 176, ctrl, val)
 
     def set_midi_bank_msb(self, chan, msb):
         logging.debug("Set MIDI CH " + str(chan) + ", Bank MSB: " + str(msb))
@@ -60,7 +61,7 @@ class zynthian_zcmidi:
     def set_midi_prg(self, chan, prg):
         logging.debug("Set MIDI CH " + str(chan) + ", Program: " + str(prg))
         self.prg_selected[chan]=prg
-        self.syncTimer.sendMidiMessageImmediately(2, 192 + chan, prg, 0, Zynthbox.SyncTimer.instance().masterSketchpadTrack())
+        self.midiRouter.sendMidiMessageToZynthianSynth(chan, 2, 192, prg, 0)
 
     def get_midi_prg(self, chan):
         return self.prg_selected[chan]
@@ -72,7 +73,7 @@ class zynthian_zcmidi:
         self.prg_selected[chan]=prg
         self.set_midi_control(chan,0,msb)
         self.set_midi_control(chan,32,lsb)
-        self.syncTimer.sendMidiMessageImmediately(2, 192 + chan, prg, 0, Zynthbox.SyncTimer.instance().masterSketchpadTrack())
+        self.midiRouter.sendMidiMessageToZynthianSynth(chan, 2, 192, prg, 0)
 
     def get_midi_preset(self, chan):
         return [self.bank_msb_selected[chan],self.bank_lsb_selected[chan],self.prg_selected[chan]]

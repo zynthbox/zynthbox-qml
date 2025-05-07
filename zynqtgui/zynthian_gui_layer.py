@@ -36,7 +36,9 @@ import json
 from collections import OrderedDict
 from json import JSONEncoder, JSONDecoder
 from pathlib import Path
+from functools import partial
 
+import zynautoconnect
 # Zynthian specific modules
 from zyncoder import *
 from . import zynthian_gui_config
@@ -1447,10 +1449,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 self.zynqtgui.currentTaskMessage = "Loading Snapshot : Resetting midi routing"
                 self.reset_midi_routing()
 
-            #Autoconnect MIDI
-            self.zynqtgui.currentTaskMessage = "Loading Snapshot : Connect midi ports"
-            self.zynqtgui.zynautoconnect_midi(True)
-
             #Set extended config
             if 'extended_config' in snapshot:
                 self.set_extended_config(snapshot['extended_config'])
@@ -1469,6 +1467,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 self.zynqtgui.currentTaskMessage = "Loading Snapshot : Restoring controller status"
                 layer_snapshot = self.zynqtgui.zynthbox_plugins_helper.update_layer_snapshot_plugin_id_to_name(lss)
                 self.layers[i].restore_snapshot_2(layer_snapshot)
+                # use partial to capture the variables that needs to be accessed by the lambda
+                zynautoconnect.callAfterMidiAutoconnect(partial(lambda layer: layer.send_ctrl_midi_cc(), self.layers[i]))
                 i += 1
 
             #Set Audio Routing
@@ -1488,8 +1488,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 self.reset_audio_routing()
 
             #Autoconnect Audio
-            self.zynqtgui.currentTaskMessage = "Loading Snapshot : Connect synth/audio ports"
+            self.zynqtgui.currentTaskMessage = "Loading Snapshot : Connect synth/fx/sample ports"
             self.zynqtgui.zynautoconnect_audio()
+            self.zynqtgui.zynautoconnect_midi()
 
             # Restore ALSA Mixer settings
             if self.amixer_layer and 'amixer_layer' in snapshot:
@@ -1625,6 +1626,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
                 new_layer = zynthian_layer(engine, midi_chan, self.zynqtgui, track_index, slot_type, slot_index)
                 new_layer.restore_snapshot_1(layer_snapshot)
                 new_layer.restore_snapshot_2(layer_snapshot)
+                # use partial to capture the variables that needs to be accessed by the lambda
+                zynautoconnect.callAfterMidiAutoconnect(partial(lambda layer: layer.send_ctrl_midi_cc(), new_layer))
                 if engine.type == "Audio Effect":
                     if slot_type == "TracksBar_fxslot":
                         self.zynqtgui.sketchpad.song.channelsModel.getChannel(new_layer.track_index).setFxToChain(new_layer, slot_index)

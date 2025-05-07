@@ -181,7 +181,9 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         except:
             sfi = self.load_bank(bank, False)
 
-        if sfi:
+        max_retries = 5
+        while sfi and max_retries > 0:
+            logging.debug(f"Trying to load preset list : Retries left {max_retries}")
             output=self.proc_cmd("inst {}".format(sfi), wait_for_output=True)
             for f in output.split("\n"):
                 try:
@@ -193,6 +195,11 @@ class zynthian_engine_fluidsynth(zynthian_engine):
                     preset_list.append([bank[0] + '/' + f.strip(),[bank_msb,bank_lsb,prg],title,bank[0]])
                 except:
                     pass
+            if len(preset_list) == 0:
+                # Failed to load preset list. Retry
+                max_retries -= 1
+            else:
+                break
 
         return preset_list
 

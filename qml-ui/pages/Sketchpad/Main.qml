@@ -318,6 +318,158 @@ Zynthian.ScreenPage {
         valueSetter(controller.value + sign * controller.step_size)
     }
     /**
+     * Update layer filter cutoff for selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelFxLayerCutoff(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlot.value
+        }
+        var synthName = root.selectedChannel.chainedFxNames[slot].split('>')[0]
+        var midiChannel = root.selectedChannel.chainedFx[slot]
+        var controller = root.selectedChannel.fxFilterCutoffControllers[slot]
+
+        function valueSetter(value) {
+            if (controller != null && controller.controlsCount > 0) {
+                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                applicationWindow().showOsd({
+                    parameterName: "layer_fx_filter_cutoff",
+                    description: qsTr("%1 Filter Cutoff").arg(synthName),
+                    start: controller.value_min,
+                    stop: controller.value_max,
+                    step: controller.step_size,
+                    defaultValue: null,
+                    currentValue: controller.value,
+                    startLabel: qsTr("%1").arg(controller.value_min),
+                    stopLabel: qsTr("%1").arg(controller.value_max),
+                    valueLabel: qsTr("%1").arg(controller.value),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: false,
+                    showVisualZero: false
+                })
+            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
+                applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Cutoff controller").arg(synthName), 2000)
+            }
+        }
+
+        valueSetter(controller.value + sign * controller.step_size)
+    }
+    /**
+     * Update layer filter resonance for selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelFxLayerResonance(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlot.value
+        }
+        var synthName = root.selectedChannel.chainedFxNames[slot].split('>')[0]
+        var midiChannel = root.selectedChannel.chainedFx[slot]
+        var controller = root.selectedChannel.fxFilterResonanceControllers[slot]
+
+        function valueSetter(value) {
+            if (controller != null && controller.controlsCount > 0) {
+                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                applicationWindow().showOsd({
+                    parameterName: "layer_fx_filter_resonance",
+                    description: qsTr("%1 Filter Resonance").arg(synthName),
+                    start: controller.value_min,
+                    stop: controller.value_max,
+                    step: controller.step_size,
+                    defaultValue: null,
+                    currentValue: controller.value,
+                    startLabel: qsTr("%1").arg(controller.value_min),
+                    stopLabel: qsTr("%1").arg(controller.value_max),
+                    valueLabel: qsTr("%1").arg(controller.value),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: false,
+                    showVisualZero: false
+                })
+            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
+                applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Resonance controller").arg(synthName), 2000)
+            }
+        }
+
+        valueSetter(controller.value + sign * controller.step_size)
+    }
+    /**
+     * Update layer filter cutoff for selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelSketchFxLayerCutoff(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlot.value
+        }
+        var synthName = root.selectedChannel.chainedSketchFxNames[slot].split('>')[0]
+        var midiChannel = root.selectedChannel.chainedSketchFx[slot]
+        var controller = root.selectedChannel.sketchFxFilterCutoffControllers[slot]
+
+        function valueSetter(value) {
+            if (controller != null && controller.controlsCount > 0) {
+                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                applicationWindow().showOsd({
+                    parameterName: "layer_fx_filter_cutoff",
+                    description: qsTr("%1 Filter Cutoff").arg(synthName),
+                    start: controller.value_min,
+                    stop: controller.value_max,
+                    step: controller.step_size,
+                    defaultValue: null,
+                    currentValue: controller.value,
+                    startLabel: qsTr("%1").arg(controller.value_min),
+                    stopLabel: qsTr("%1").arg(controller.value_max),
+                    valueLabel: qsTr("%1").arg(controller.value),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: false,
+                    showVisualZero: false
+                })
+            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
+                applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Cutoff controller").arg(synthName), 2000)
+            }
+        }
+
+        valueSetter(controller.value + sign * controller.step_size)
+    }
+    /**
+     * Update layer filter resonance for selected channel
+     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
+     */
+    function updateSelectedChannelSketchFxLayerResonance(sign, slot=-1) {
+        if (slot === -1) {
+            slot = root.selectedChannel.selectedSlot.value
+        }
+        var synthName = root.selectedChannel.chainedSketchFxNames[slot].split('>')[0]
+        var midiChannel = root.selectedChannel.chainedSketchFx[slot]
+        var controller = root.selectedChannel.sketchFxFilterResonanceControllers[slot]
+
+        function valueSetter(value) {
+            if (controller != null && controller.controlsCount > 0) {
+                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
+                applicationWindow().showOsd({
+                    parameterName: "layer_fx_filter_resonance",
+                    description: qsTr("%1 Filter Resonance").arg(synthName),
+                    start: controller.value_min,
+                    stop: controller.value_max,
+                    step: controller.step_size,
+                    defaultValue: null,
+                    currentValue: controller.value,
+                    startLabel: qsTr("%1").arg(controller.value_min),
+                    stopLabel: qsTr("%1").arg(controller.value_max),
+                    valueLabel: qsTr("%1").arg(controller.value),
+                    setValueFunction: valueSetter,
+                    showValueLabel: true,
+                    showResetToDefault: false,
+                    showVisualZero: false
+                })
+            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
+                applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Resonance controller").arg(synthName), 2000)
+            }
+        }
+
+        valueSetter(controller.value + sign * controller.step_size)
+    }
+    /**
      * Update clip gain
      * @param clip The clip whose gain needs to be updated
      * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size

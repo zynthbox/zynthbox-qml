@@ -348,6 +348,7 @@ class sketchpad_channel(QObject):
         self.track_type_changed.connect(self.selectedClipNamesChanged.emit, Qt.QueuedConnection)
         self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
         self.chainedFxChanged.connect(self.chainedFxChangedHandler, Qt.QueuedConnection)
+        self.chainedSketchFxChanged.connect(self.chainedSketchFxChangedHandler, Qt.QueuedConnection)
         self.zynaddsubfx_midi_output = None
         self.zynaddsubfx_midi_input = None
         self.zynaddubfx_heuristic_connect_timer = QTimer(self)
@@ -357,6 +358,10 @@ class sketchpad_channel(QObject):
 
         self.__filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
         self.__filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__fx_filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__fx_filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__sketchfx_filter_cutoff_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
+        self.__sketchfx_filter_resonance_controllers = [MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self), MultiController(parent=self)]
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -446,6 +451,8 @@ class sketchpad_channel(QObject):
         self.zynqtgui.layer.snapshotLoaded.connect(self.snapshotLoadedHandler)
         # Update filter controllers when booting is complete
         self.zynqtgui.isBootingCompleteChanged.connect(self.update_filter_controllers)
+        self.zynqtgui.isBootingCompleteChanged.connect(self.update_fx_filter_controllers)
+        self.zynqtgui.isBootingCompleteChanged.connect(self.update_sketchfx_filter_controllers)
 
         def handlePassthroughClientDryAmountChanged(theSender):
             self.handlePassthroughClientSomethingChanged(theSender, "dryAmount", theSender.dryAmount())
@@ -658,6 +665,13 @@ class sketchpad_channel(QObject):
         self.clearFxPassthroughForEmtpySlots()
         self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
         self.chainedFxNamesChanged.emit()
+        self.update_fx_filter_controllers()
+
+    def chainedSketchFxChangedHandler(self):
+        # self.clearFxPassthroughForEmtpySlots()
+        self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
+        self.chainedSketchFxNamesChanged.emit()
+        self.update_sketchfx_filter_controllers()
 
     def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()
@@ -712,6 +726,62 @@ class sketchpad_channel(QObject):
 
         self.filterCutoffControllersChanged.emit()
         self.filterResonanceControllersChanged.emit()
+
+    def update_fx_filter_controllers(self):
+        for index, layer in enumerate(self.chainedFx):
+            self.__fx_filter_cutoff_controllers[index].clear_controls()
+            self.__fx_filter_resonance_controllers[index].clear_controls()
+            if layer is not None:
+                synth_controllers_dict = layer.controllers_dict
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
+                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                elif "cutoff" in synth_controllers_dict:
+                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
+                elif "filter_cutoff" in synth_controllers_dict:
+                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
+                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                elif "resonance" in synth_controllers_dict:
+                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
+                elif "filter_resonance" in synth_controllers_dict:
+                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
+
+        self.fxFilterCutoffControllersChanged.emit()
+        self.fxFilterResonanceControllersChanged.emit()
+
+    def update_sketchfx_filter_controllers(self):
+        for index, layer in enumerate(self.chainedSketchFx):
+            self.__sketchfx_filter_cutoff_controllers[index].clear_controls()
+            self.__sketchfx_filter_resonance_controllers[index].clear_controls()
+            if layer is not None:
+                synth_controllers_dict = layer.controllers_dict
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
+                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                elif "cutoff" in synth_controllers_dict:
+                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
+                elif "filter_cutoff" in synth_controllers_dict:
+                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
+
+                if layer.engine.nickname in self.__engine_config and \
+                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
+                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
+                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                elif "resonance" in synth_controllers_dict:
+                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
+                elif "filter_resonance" in synth_controllers_dict:
+                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["filter_resonance"])
+
+        self.sketchFxFilterCutoffControllersChanged.emit()
+        self.sketchFxFilterResonanceControllersChanged.emit()
 
     def className(self):
         return "sketchpad_channel"
@@ -2632,6 +2702,42 @@ class sketchpad_channel(QObject):
 
     filterResonanceControllers = Property("QVariantList", get_filterResonanceControllers, notify=filterResonanceControllersChanged)
     ### End property filterResonanceControllers
+
+    ### Begin property fxFilterCutoffControllers
+    def get_fxFilterCutoffControllers(self):
+        return self.__fx_filter_cutoff_controllers
+
+    fxFilterCutoffControllersChanged = Signal()
+
+    fxFilterCutoffControllers = Property("QVariantList", get_fxFilterCutoffControllers, notify=fxFilterCutoffControllersChanged)
+    ### End property fxFilterCutoffControllers
+
+    ### Begin property fxFilterResonanceControllers
+    def get_fxFilterResonanceControllers(self):
+        return self.__fx_filter_resonance_controllers
+
+    fxFilterResonanceControllersChanged = Signal()
+
+    fxFilterResonanceControllers = Property("QVariantList", get_fxFilterResonanceControllers, notify=fxFilterResonanceControllersChanged)
+    ### End property fxFilterResonanceControllers
+
+    ### Begin property sketchFxFilterCutoffControllers
+    def get_sketchFxFilterCutoffControllers(self):
+        return self.__sketchfx_filter_cutoff_controllers
+
+    sketchFxFilterCutoffControllersChanged = Signal()
+
+    sketchFxFilterCutoffControllers = Property("QVariantList", get_sketchFxFilterCutoffControllers, notify=sketchFxFilterCutoffControllersChanged)
+    ### End property sketchFxFilterCutoffControllers
+
+    ### Begin property sketchFxFilterResonanceControllers
+    def get_sketchFxFilterResonanceControllers(self):
+        return self.__sketchfx_filter_resonance_controllers
+
+    sketchFxFilterResonanceControllersChanged = Signal()
+
+    sketchFxFilterResonanceControllers = Property("QVariantList", get_sketchFxFilterResonanceControllers, notify=sketchFxFilterResonanceControllersChanged)
+    ### End property sketchFxFilterResonanceControllers
 
     ### Begin property chainedSoundsAcceptedChannels
     """

@@ -526,7 +526,10 @@ Rectangle {
                         case "TracksBar_externalslot":
                             break;
                         case "TracksBar_fxslot":
-                            // Do nothing
+                            pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(0, root.selectedChannel.selectedSlot.value)
+                            break;
+                        case "TracksBar_sketchfxslot":
+                            pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerCutoff(0, root.selectedChannel.selectedSlot.value)
                             break;
                         default:
                             console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
@@ -566,6 +569,10 @@ Rectangle {
                     case "TracksBar_externalslot":
                         break;
                     case "TracksBar_fxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(1, root.selectedChannel.selectedSlot.value)
+                        break;
+                    case "TracksBar_sketchfxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerCutoff(1, root.selectedChannel.selectedSlot.value)
                         break;
                     default:
                         console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
@@ -586,6 +593,10 @@ Rectangle {
                     case "TracksBar_externalslot":
                         break;
                     case "TracksBar_fxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
+                        break;
+                    case "TracksBar_sketchfxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     default:
                         console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
@@ -607,6 +618,10 @@ Rectangle {
                         case "TracksBar_externalslot":
                             break;
                         case "TracksBar_fxslot":
+                            pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(0, root.selectedChannel.selectedSlot.value)
+                            break;
+                        case "TracksBar_sketchfxslot":
+                            pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerResonance(0, root.selectedChannel.selectedSlot.value)
                             break;
                         default:
                             console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
@@ -646,6 +661,10 @@ Rectangle {
                     case "TracksBar_externalslot":
                         break;
                     case "TracksBar_fxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(1, root.selectedChannel.selectedSlot.value)
+                        break;
+                    case "TracksBar_sketchfxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerResonance(1, root.selectedChannel.selectedSlot.value)
                         break;
                     default:
                         console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);
@@ -666,6 +685,10 @@ Rectangle {
                     case "TracksBar_externalslot":
                         break;
                     case "TracksBar_fxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(-1, root.selectedChannel.selectedSlot.value)
+                        break;
+                    case "TracksBar_sketchfxslot":
+                        pageManager.getPage("sketchpad").updateSelectedChannelSketchFxLayerResonance(-1, root.selectedChannel.selectedSlot.value)
                         break;
                     default:
                         console.log("Unknown slot type", root.selectedChannel.selectedSlot.className);

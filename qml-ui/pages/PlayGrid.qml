@@ -678,7 +678,7 @@ don't want to have to dig too far...
         onAddedHardwareDevice: {
             applicationWindow().showPassiveNotification("Device connected: " + humanReadableName);
             // Once a new device has been added, reset the bank position to center
-            Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
+            // Zynthbox.SyncTimer.sendProgramChangeImmediately(Zynthbox.MidiRouter.masterChannel, 64);
         }
         onRemovedHardwareDevice: {
             applicationWindow().showPassiveNotification("Device removed: " + humanReadableName);

@@ -138,7 +138,7 @@ class zynthian_layer(QObject):
         self.engine = engine
         self.engine.add_layer(self)
         self.refresh_controllers()
-        self.engine_changed.emit()
+        self.engineChanged.emit()
 
     def get_engine_name(self):
         if self.engine is not None:

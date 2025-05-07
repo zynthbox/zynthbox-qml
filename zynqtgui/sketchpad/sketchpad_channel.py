@@ -346,7 +346,6 @@ class sketchpad_channel(QObject):
         self.sketchFxPassthroughMixingChanged.connect(self.handleSketchFxPassthroughMixingChanged)
         self.track_type_changed.connect(self.handleAudioTypeSettingsChanged)
         self.track_type_changed.connect(self.selectedClipNamesChanged.emit, Qt.QueuedConnection)
-        self.chained_sounds_changed.connect(self.clearSynthPassthroughForEmptySlots, Qt.QueuedConnection)
         self.chainedFxChanged.connect(self.chainedFxChangedHandler, Qt.QueuedConnection)
         self.chainedSketchFxChanged.connect(self.chainedSketchFxChangedHandler, Qt.QueuedConnection)
         self.zynaddsubfx_midi_output = None
@@ -662,7 +661,6 @@ class sketchpad_channel(QObject):
         self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
 
     def chainedFxChangedHandler(self):
-        self.clearFxPassthroughForEmtpySlots()
         self.zynqtgui.snapshot.schedule_save_last_state_snapshot()
         self.chainedFxNamesChanged.emit()
         self.update_fx_filter_controllers()
@@ -1451,6 +1449,10 @@ class sketchpad_channel(QObject):
             layer_to_delete = self.zynqtgui.layer.layer_midi_map[chan]
             self.zynqtgui.layer.remove_root_layer(self.zynqtgui.layer.root_layers.index(layer_to_delete))
             self.select_correct_layer()
+            # Ensure we clear the passthrough (or it'll retain its value)
+            passthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[chan]
+            passthroughClient.setPanAmount(self.__initial_pan__)
+            passthroughClient.setDryAmount(1)
             self.__song__.schedule_save()
             self.chained_sounds_changed.emit()
             if cb is not None:
@@ -1578,6 +1580,10 @@ class sketchpad_channel(QObject):
                         self.zynqtgui.layer.remove_layer(layer_index)
                         self.__chained_fx[fxSlotIndex] = None
                         self.__routingData__["fx"][fxSlotIndex].clear()
+                        # Ensure we clear the passthrough (or it'll retain its value)
+                        passthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][fxSlotIndex]
+                        passthroughClient.setPanAmount(self.__initial_pan__)
+                        passthroughClient.setDryWetMixAmount(1)
 
                         self.chainedFxChanged.emit()
                         self.chainedFxNamesChanged.emit()
@@ -1680,6 +1686,10 @@ class sketchpad_channel(QObject):
                         layer_index = self.zynqtgui.layer.layers.index(self.__chained_sketch_fx[fxSlotIndex])
                         self.zynqtgui.layer.remove_layer(layer_index)
                         self.__chained_sketch_fx[fxSlotIndex] = None
+                        # Ensure we clear the passthrough (or it'll retain its value)
+                        passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
+                        passthroughClient.setPanAmount(self.__initial_pan__)
+                        passthroughClient.setDryWetMixAmount(1)
 
                         self.chainedSketchFxChanged.emit()
                         self.chainedSketchFxNamesChanged.emit()
@@ -2493,23 +2503,6 @@ class sketchpad_channel(QObject):
                 synthPassthroughClient.dryGainHandler().setGain(dryAmount)
                 self.__song__.schedule_save()
 
-    @Slot(None)
-    def clearSynthPassthroughForEmptySlots(self):
-        # Don't clear the values while loading (firstly we don't need to, we just loaded them,
-        # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
-        if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
-            shouldEmitChanged = False
-            for laneId in range(0, 5):
-                if self.__chained_sounds__[laneId] == -1:
-                    # If there is no synth in this, check to see if we've got anything set for the two values, and if so, reset them to defaults
-                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"] != self.__initial_pan__ or self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"] < 1:
-                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"] = self.__initial_pan__
-                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"] = 1
-                        self.__song__.schedule_save()
-                        shouldEmitChanged = True
-            if shouldEmitChanged:
-                self.synthPassthroughMixingChanged.emit()
-
     def get_synthPassthrough0pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"]
     def get_synthPassthrough0dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"]
     def get_synthPassthrough1pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][1]["panAmount"]
@@ -2544,26 +2537,6 @@ class sketchpad_channel(QObject):
             fxPassthroughClient.setPanAmount(panAmount)
             fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
             self.__song__.schedule_save()
-
-    @Slot(None)
-    def clearFxPassthroughForEmtpySlots(self):
-        # Don't clear the values while loading (firstly we don't need to, we just loaded them,
-        # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
-        if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
-            shouldEmitChanged = False
-            # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
-            defaultDryWetMixAmount = 1
-            for laneId in range(0, 5):
-                if self.__chained_fx[laneId] is None:
-                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
-                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
-                        shouldEmitChanged = True
-                    if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
-                        self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
-                        shouldEmitChanged = True
-            if shouldEmitChanged:
-                self.__song__.schedule_save()
-                self.fxPassthroughMixingChanged.emit()
 
     def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["panAmount"]
     def get_fxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["dryWetMixAmount"]
@@ -2600,29 +2573,6 @@ class sketchpad_channel(QObject):
                 self.__song__.schedule_save()
             except Exception as e:
                 logging.error(f"Error occured in handlingSketchFxPassthroughMixingChanged : str(e)")
-
-    @Slot(None)
-    def clearSketchFxPassthroughForEmtpySlots(self):
-        # Don't clear the values while loading (firstly we don't need to, we just loaded them,
-        # and secondly we do this for each slot in order, so anything but the first slot ends up cleared)
-        if self.__song__.isLoading == False and self.zynqtgui.screens["snapshot"].isLoading == 0:
-            shouldEmitChanged = False
-            # Since we have separate lanes for sound and sketch slots, default is to have 100% dry and 100% wet mixed for all modes
-            defaultDryWetMixAmount = 1
-            for laneId in range(0, 5):
-                try:
-                    if self.__chained_fx[laneId] is None:
-                        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] != self.__initial_pan__:
-                            self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["panAmount"] = self.__initial_pan__
-                            shouldEmitChanged = True
-                        if self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] != defaultDryWetMixAmount:
-                            self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][laneId]["dryWetMixAmount"] = defaultDryWetMixAmount
-                            shouldEmitChanged = True
-                except Exception as e:
-                    logging.error(f"Error occured in clearSketchFxPassthroughForEmtpySlots : str(e)")
-            if shouldEmitChanged:
-                self.__song__.schedule_save()
-                self.sketchFxPassthroughMixingChanged.emit()
 
     def get_sketchFxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][0]["panAmount"]
     def get_sketchFxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["sketchFxPassthrough"][0]["dryWetMixAmount"]

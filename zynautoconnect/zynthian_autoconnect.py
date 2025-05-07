@@ -94,6 +94,7 @@ postAudioConnectCallbacks = SimpleQueue()
 def callAfterMidiAutoconnect(callback):
     global postMidiConnectCallbacks
     global redoAutoconnectMidi
+    global force_next_autoconnect
     redoAutoconnectMidi = True
     force_next_autoconnect = True
     postMidiConnectCallbacks.put(callback)
@@ -101,7 +102,7 @@ def callAfterMidiAutoconnect(callback):
 # Pass a callback to be run after autoconnecting audio next time and schedules a run of the audio autoconnect
 # If one is ongoing, autoconnect will check first and ensure that it re-runs before attempting
 # to run the callbacks, to try and ensure that all connections are completed first
-def callAfterMidiAutoconnect(callback):
+def callAfterAudioAutoconnect(callback):
     global postAudioConnectCallbacks
     global redoAutoconnectAudio
     global force_next_autoconnect

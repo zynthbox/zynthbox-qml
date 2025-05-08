@@ -38,123 +38,6 @@ Zynthian.ScreenPage {
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynqtgui.current_screen_id) >= 0
     property QtObject selectedChannel: zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId)
-    /**
-     * Update volume of synth
-     * @param midiChannel The layer midi channel whose volume needs to be updated
-     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
-     */
-    function updateSynthVolume(midiChannel, sign) {
-        var synthName = ""
-        var synthPassthroughClient = Zynthbox.Plugin.synthPassthroughClients[midiChannel]
-        try {
-            synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
-        } catch(e) {}
-        chainedSounds = root.selectedChannel.chainedSounds;
-        var slot = -1;
-        for (let i = 0; i < 5; ++i) {
-            if (chainedSounds[i] = midiChannel) {
-                slot = i;
-                break;
-            }
-        }
-
-        function valueSetter(value) {
-            if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
-                root.selectedChannel.set_passthroughValue("synthPassthrough", slot, "dryAmount", Zynthian.CommonUtils.clamp(value, 0, 1));
-                applicationWindow().showOsd({
-                    parameterName: "layer_volume",
-                    description: qsTr("%1 Volume").arg(synthName),
-                    start: 0,
-                    stop: 1,
-                    step: 0.01,
-                    defaultValue: null,
-                    currentValue: synthPassthroughClient.dryAmount,
-                    startLabel: "0",
-                    stopLabel: "1",
-                    valueLabel: qsTr("%1").arg(synthPassthroughClient.dryAmount.toFixed(2)),
-                    setValueFunction: valueSetter,
-                    showValueLabel: true,
-                    showResetToDefault: false,
-                    showVisualZero: false
-                })
-            }
-        }
-        valueSetter(synthPassthroughClient.dryAmount + sign * 0.01)
-    }
-    /**
-     * Update filter cutoff
-     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
-     */
-    function updateChannelCutoff(midichannel, sign) {
-        var synthName = ""
-        var controller = root.selectedChannel.filterCutoffControllers[root.selectedChannel.selectedSlotRow]
-        try {
-            synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
-        } catch(e) {}
-
-        function valueSetter(value) {
-            if (controller != null && controller.controlsCount > 0) {
-                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
-                applicationWindow().showOsd({
-                    parameterName: "layer_filter_cutoff",
-                    description: qsTr("%1 Filter Cutoff").arg(synthName),
-                    start: controller.value_min,
-                    stop: controller.value_max,
-                    step: controller.step_size,
-                    defaultValue: null,
-                    currentValue: controller.value,
-                    startLabel: qsTr("%1").arg(controller.value_min),
-                    stopLabel: qsTr("%1").arg(controller.value_max),
-                    valueLabel: qsTr("%1").arg(controller.value),
-                    setValueFunction: valueSetter,
-                    showValueLabel: true,
-                    showResetToDefault: false,
-                    showVisualZero: false
-                })
-            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
-                applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Cutoff controller").arg(synthName), 2000)
-            }
-        }
-
-        valueSetter(controller.value + sign * controller.step_size)
-    }
-    /**
-     * Update filter resonance
-     * @param sign Sign to determine if value should be incremented / decremented. Pass +1 to increment and -1 to decrement value by controller's step size
-     */
-    function updateChannelResonance(midiChannel, sign) {
-        var synthName = ""
-        var controller = root.selectedChannel.filterResonanceControllers[root.selectedChannel.selectedSlotRow]
-        try {
-            synthName = root.selectedChannel.getLayerNameByMidiChannel(midiChannel).split('>')[0]
-        } catch(e) {}
-
-        function valueSetter(value) {
-            if (controller != null && controller.controlsCount > 0) {
-                controller.value = Zynthian.CommonUtils.clamp(value, controller.value_min, controller.value_max)
-                applicationWindow().showOsd({
-                    parameterName: "layer_filter_resonance",
-                    description: qsTr("%1 Filter Resonance").arg(synthName),
-                    start: controller.value_min,
-                    stop: controller.value_max,
-                    step: controller.step_size,
-                    defaultValue: null,
-                    currentValue: controller.value,
-                    startLabel: qsTr("%1").arg(controller.value_min),
-                    stopLabel: qsTr("%1").arg(controller.value_max),
-                    valueLabel: qsTr("%1").arg(controller.value),
-                    setValueFunction: valueSetter,
-                    showValueLabel: true,
-                    showResetToDefault: false,
-                    showVisualZero: false
-                })
-            } else if (root.selectedChannel.checkIfLayerExists(midiChannel)) {
-                applicationWindow().showMessageDialog(qsTr("%1 does not have Filter Resonance controller").arg(synthName), 2000)
-            }
-        }
-
-        valueSetter(controller.value + sign * controller.step_size)
-    }
 
     onSelectedChannelChanged: {
         layerChangeThrottle.restart();
@@ -373,23 +256,34 @@ Zynthian.ScreenPage {
                     zynqtgui.current_screen_id = "layers_for_channel";
                     zynqtgui.go_back();
                     return true;
+                case "KNOB0_TOUCHED":
+                    if (!applicationWindow().osd.opened) {
+                        pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], 0)
+                    }
+                    return true;
                 case "KNOB0_UP":
-                    root.updateSynthVolume(midiChannel, 1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], 1)
                     return true;
                 case "KNOB0_DOWN":
-                    root.updateSynthVolume(midiChannel, -1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], -1)
+                    return true;
+                case "KNOB1_TOUCHED":
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "KNOB1_UP":
-                    root.updateChannelCutoff(midiChannel, 1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "KNOB1_DOWN":
-                    root.updateChannelCutoff(midiChannel, -1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
+                    return true;
+                case "KNOB2_TOUCHED":
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "KNOB2_UP":
-                    root.updateChannelResonance(midiChannel, 1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "KNOB2_DOWN":
-                    root.updateChannelResonance(midiChannel, -1)
+                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "SCREEN_EDIT_CONTEXTUAL":
                     if (zynqtgui.fixed_layers.current_index_valid) {
@@ -629,7 +523,7 @@ Zynthian.ScreenPage {
                             }
                         }
                         Rectangle {
-                            Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryAmount
+                            Layout.preferredWidth: parent.width * Zynthbox.Plugin.synthPassthroughClients[model.metadata.midi_channel].dryGainHandler.gainAbsolute
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                             visible: root.selectedChannel.checkIfLayerExists(model.metadata.midi_channel)
                             color: Kirigami.Theme.highlightColor

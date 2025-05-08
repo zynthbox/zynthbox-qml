@@ -1061,47 +1061,53 @@ class sketchpad_channel(QObject):
 
     def do_update_jack_port(self, run_in_thread=True):
         def task(zynqtgui, channel):
-            synth_ports = {
-                0: [], # Left channel
-                1: []  # Right channel
-            }
+            try:
+                synth_ports = {
+                    0: [], # Left channel
+                    1: []  # Right channel
+                }
 
-            if self.trackRoutingStyle == "standard":
-                if self.channelHasFx:
-                    # If there is fx, only the last FXPassthrough's dry out and the last fx out needs to be recorded
-                    for index, fx in enumerate(self.chainedFx):
-                        if fx is not None:
-                            lastFxIndex = index
-                    fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lastFxIndex].engine.jackname, is_output=True, is_audio=True, is_physical=False)
-                    # If fx is mono, record both left and right channels from same output port
-                    if len(fxPorts) == 1:
-                        fxPorts.append(fxPorts[0])
-                    for channel in range(2):
-                        synth_ports[channel].append(f"FXPassthrough-lane{lastFxIndex}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
-                        synth_ports[channel].append(fxPorts[channel].name)
-                else:
-                    # If there is no fx, then TrackPassthrough dry signal needs to be recorded
-                    for channel in range(2):
-                        # All sounds are routed through lane 1 in standard mode
-                        synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane1-dryOut{'Left' if channel == 0 else 'Right'}")
-            elif self.trackRoutingStyle == "one-to-one":
-                for lane in range(1, 6):
-                    if self.chainedFx[lane - 1] is None:
-                        # lane has no FX. Record lane dryOut
-                        for channel in range(2):
-                            synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane{lane}-dryOut{'Left' if channel == 0 else 'Right'}")
-                    else:
-                        # lane has FX. Connect FXPassthrough dryOut and fx out
-                        fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lane - 1].engine.jackname, is_output=True, is_audio=True, is_physical=False)
+                if self.trackRoutingStyle == "standard":
+                    if self.channelHasFx:
+                        # If there is fx, only the last FXPassthrough's dry out and the last fx out needs to be recorded
+                        for index, fx in enumerate(self.chainedFx):
+                            if fx is not None:
+                                lastFxIndex = index
+                        fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lastFxIndex].engine.jackname, is_output=True, is_audio=True, is_physical=False)
                         # If fx is mono, record both left and right channels from same output port
                         if len(fxPorts) == 1:
                             fxPorts.append(fxPorts[0])
                         for channel in range(2):
-                            synth_ports[channel].append(f"FXPassthrough-lane{lane}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
+                            synth_ports[channel].append(f"FXPassthrough-lane{lastFxIndex}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
                             synth_ports[channel].append(fxPorts[channel].name)
+                    else:
+                        # If there is no fx, then TrackPassthrough dry signal needs to be recorded
+                        for channel in range(2):
+                            # All sounds are routed through lane 1 in standard mode
+                            synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane1-dryOut{'Left' if channel == 0 else 'Right'}")
+                elif self.trackRoutingStyle == "one-to-one":
+                    for lane in range(1, 6):
+                        if self.chainedFx[lane - 1] is None:
+                            # lane has no FX. Record lane dryOut
+                            for channel in range(2):
+                                synth_ports[channel].append(f"TrackPassthrough:Channel{self.id + 1}-lane{lane}-dryOut{'Left' if channel == 0 else 'Right'}")
+                        else:
+                            # lane has FX. Connect FXPassthrough dryOut and fx out
+                            fxPorts = sketchpad_channel.jclient.get_ports(name_pattern=self.chainedFx[lane - 1].engine.jackname, is_output=True, is_audio=True, is_physical=False)
+                            # If fx is mono, record both left and right channels from same output port
+                            if len(fxPorts) == 1:
+                                fxPorts.append(fxPorts[0])
+                            for channel in range(2):
+                                synth_ports[channel].append(f"FXPassthrough-lane{lane}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
+                                synth_ports[channel].append(fxPorts[channel].name)
 
-            logging.debug(f"channelSoundRecordingPorts : {synth_ports}")
-            self.set_channelSoundRecordingPorts(synth_ports)
+                logging.debug(f"channelSoundRecordingPorts : {synth_ports}")
+                self.set_channelSoundRecordingPorts(synth_ports)
+            except Exception as e:
+                # If jack port update fails, queue it for another run in the future
+                logging.exception(f"Error trying to update jack port for channel {self.name} : str({e})")
+                QMetaObject.invokeMethod(self.update_jack_port_timer, "start", Qt.QueuedConnection)
+
 
         # Do the task in a thread only if run_in_thread is set to True
         # This will allow startup process to wait till all ports are updated before displaying splash screen

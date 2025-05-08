@@ -885,7 +885,7 @@ Rectangle {
         property QtObject sketch: root.selectedChannel && root.selectedChannel.selectedSlot.className === "TracksBar_sketchslot" ? root.selectedChannel.getClipsModelById(root.selectedChannel.selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex) : null
         actions: [
             QQC2.Action {
-                text: qsTr("Save A Copy...")
+                text: qsTr("Save To Archive...")
                 enabled: sketchPickerPopup.sketch && sketchPickerPopup.sketch.cppObjId !== -1
                 onTriggered: {
                     loopPickerDialog.pickLoopForClip(sketchPickerPopup.sketch, "save-location");
@@ -954,7 +954,7 @@ Rectangle {
         rows: 3
         actions: [
             QQC2.Action {
-                text: qsTr("Save A Copy...")
+                text: qsTr("Save To Archive...")
                 enabled: samplePickerPopup.sketch ? samplePickerPopup.sketch.cppObjId !== -1 : false
                 onTriggered: {
                     samplePickerDialog.pickSampleForSlot(root.selectedChannel.selectedSlot.value, "save-location");

@@ -456,6 +456,9 @@ Rectangle {
                                 interval: 1; running: false; repeat: false;
                                 onTriggered: {
                                     channelDelegate.highlighted = (index === zynqtgui.sketchpad.selectedTrackId);
+                                    if (channelDelegate.highlighted) {
+                                        root.selectedSlotRowItem = channelDelegate;
+                                    }
                                 }
                             }
                             Connections {
@@ -467,9 +470,18 @@ Rectangle {
                                 target: zynqtgui
                                 onIsBootingCompleteChanged: channelHighlightedThrottle.restart()
                             }
+                            // And once the song has completed loading
+                            Connections {
+                                target: zynqtgui.sketchpad.song
+                                onIsLoadingChanged: channelHighlightedThrottle.restart()
+                            }
+                            // And once the component is completed (which happens when loading sketchpads)
+                            Component.onCompleted: {
+                                channelHighlightedThrottle.restart();
+                            }
     //                            property int selectedRow: 0
                             property int channelIndex: index
-                            property QtObject channel: zynqtgui.sketchpad.song.channelsModel.getChannel(index)
+                            property QtObject channel: model.channel
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -479,7 +491,7 @@ Rectangle {
 
                             onHighlightedChanged: {
                                 if (highlighted) {
-                                    root.selectedSlotRowItem = channelDelegate
+                                    root.selectedSlotRowItem = channelDelegate;
                                 }
                             }
 

@@ -235,6 +235,7 @@ class zynthian_layer(QObject):
 
 
     def set_bank(self, i, set_engine=True):
+        returnVal = False
         if i < len(self.bank_list):
             last_bank_index=self.bank_index
             last_bank_name=self.bank_name
@@ -242,14 +243,16 @@ class zynthian_layer(QObject):
             self.bank_name=self.bank_list[i][2]
             self.bank_info=copy.deepcopy(self.bank_list[i])
             logging.info("Bank Selected: %s (%d)" % (self.bank_name,i))
-
             if set_engine and (last_bank_index!=i or not last_bank_name):
                 self.reset_preset()
-                return self.engine.set_bank(self, self.bank_info)
-
+                returnVal = self.engine.set_bank(self, self.bank_info)
+                if returnVal:
+                    # TODO : Make sure to not call fill_list when preset is not in view
+                    self.zynqtgui.preset.fill_list()
+            else:
+                returnVal = True
             self.bankChanged.emit()
-            return True
-        return False
+        return returnVal
 
 
     #TODO Optimize search!!

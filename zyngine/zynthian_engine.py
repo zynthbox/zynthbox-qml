@@ -302,7 +302,7 @@ class zynthian_engine(zynthian_basic_engine):
     # ---------------------------------------------------------------------------
 
     @staticmethod
-    def get_filelist(dpath, fext):
+    def get_filelist(dpath, fext, sort=True):
         res=[]
         if isinstance(dpath, str): dpath=[('_', dpath)]
         fext='.'+fext
@@ -312,7 +312,11 @@ class zynthian_engine(zynthian_basic_engine):
             dp=dpd[1]
             dn=dpd[0]
             try:
-                for f in sorted(os.listdir(dp)):
+                if sort:
+                    files = sorted(os.listdir(dp))
+                else:
+                    files = os.listdir(dp)
+                for f in files:
                     if not f.startswith('.') and isfile(join(dp,f)) and f[-xlen:].lower()==fext:
                         title=str.replace(f[:-xlen], '_', ' ')
                         if dn!='_': title=dn+'/'+title

@@ -142,7 +142,8 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # ---------------------------------------------------------------------------
 
     def get_bank_list(self, layer=None):
-        return self.get_filelist(self.soundfont_dirs,"sf2") + self.get_filelist(self.soundfont_dirs,"sf3")
+        # Sort files after getting both sf2 and sf3 lists
+        return sorted(self.get_filelist(self.soundfont_dirs, "sf2", sort=False) + self.get_filelist(self.soundfont_dirs, "sf3", sort=False), key=lambda e: e[0].casefold())
 
 
     def set_bank(self, layer, bank):

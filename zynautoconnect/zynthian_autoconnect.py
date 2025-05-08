@@ -553,6 +553,9 @@ def midi_autoconnect(force=False):
     # Now we're done, test to see whether we've got any callbacks that need running
     runCallbacksAfterMidiAutoconnect()
 
+    # Autoconnect ran fine. Reset force flag
+    force_next_autoconnect = False
+
 def audio_autoconnect(force=False):
     global force_next_autoconnect
 
@@ -834,8 +837,18 @@ def audio_autoconnect(force=False):
                                 # END Synth Inputs
                                 # BEGIN Synth Outputs
                                 engineOutPorts = jclient.get_ports(layer.jackname, is_output=True, is_input=False, is_audio=True)
-                                # If this engine is mono, make sure we hook the output to both of the synth passthrough's inputs
-                                if len(engineOutPorts) < 2:
+                                if len(engineOutPorts) == 0:
+                                    # If engine has no ports, it is very likely that autoconnect is running earlier than expected and engine has not started yet
+                                    # In that case, return and schedule autoconnect again
+                                    logging.info(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Engine has no ports : layer({layer}), engine({layer.engine.name}), engine_jackname({layer.jackname}), engine_out_ports({engineOutPorts})")
+                                    # Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+                                    # Logic below the return statement will be eventually evaluated when called again after the timeout
+                                    force_next_autoconnect = True;
+                                    zbjack.clear()
+                                    release_lock()
+                                    return
+                                elif len(engineOutPorts) == 1:
+                                    # If this engine is mono, make sure we hook the output to both of the synth passthrough's inputs
                                     engineOutPorts.append(engineOutPorts[0])
                                 # If the engine is connected to system_playback, disconnect it from there, just to be on the safe side
                                 engineIsConnectedToSystem = False
@@ -1422,6 +1435,9 @@ def audio_autoconnect(force=False):
     # Now we're done, test to see whether we've got any callbacks that need running
     runCallbacksAfterMidiAutoconnect()
 
+    # Autoconnect ran fine. Reset force flag
+    force_next_autoconnect = False
+
 
 def audio_disconnect_sysout():
     sysout_ports=jclient.get_ports("system", is_input=True, is_audio=True)
@@ -1470,7 +1486,6 @@ def autoconnect(force=False):
 
     midi_autoconnect(force)
     audio_autoconnect(force)
-    force_next_autoconnect = False
 
 
 def autoconnect_thread():

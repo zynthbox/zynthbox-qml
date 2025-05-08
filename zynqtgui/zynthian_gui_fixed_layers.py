@@ -84,7 +84,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                 if layer.preset_name is None:
                     self.list_data.append((str(i+1),i,"{}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""))))
                 else:
-                    self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""), layer.preset_name)))
+                    self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", "").replace("Jucy/", ""), layer.preset_name)))                    
+                metadata["layer"] = layer
+
                 # effects_label = ""
                 # first = True
                 # for sl in self.zynqtgui.screens['layer'].get_fxchain_layers(layer):
@@ -115,6 +117,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""
+                metadata["layer"] = None
 
             if -1 < i and i < 15:
                 # metadata["midi_cloned"] = self.zynqtgui.screens['layer'].is_midi_cloned(i, i+1)

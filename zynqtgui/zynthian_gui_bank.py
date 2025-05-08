@@ -72,7 +72,8 @@ class zynthian_gui_bank(zynthian_gui_selector):
             elif self.zynqtgui.current_screen_id in ["sketch_effects_for_channel", "sketch_effect_preset"]:
                 return self.zynqtgui.sketch_effects_for_channel.list_data[self.zynqtgui.sketch_effects_for_channel.current_index][3]
             else:
-                return self.zynqtgui.layers_for_channel.list_metadata[self.zynqtgui.layers_for_channel.current_index]["layer"]
+                # return self.zynqtgui.layers_for_channel.list_metadata[self.zynqtgui.layers_for_channel.current_index]["layer"]
+                return self.zynqtgui.curlayer
         except:
             # In case any of the above dependent properties are unavailable and causes reference errors, return None.
             return None

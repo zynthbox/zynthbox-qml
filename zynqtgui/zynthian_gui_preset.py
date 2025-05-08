@@ -74,7 +74,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
             elif self.zynqtgui.current_screen_id in ["sketch_effects_for_channel", "sketch_effect_preset"]:
                 return self.zynqtgui.sketch_effects_for_channel.list_data[self.zynqtgui.sketch_effects_for_channel.current_index][3]
             else:
-                return self.zynqtgui.layers_for_channel.list_metadata[self.zynqtgui.layers_for_channel.current_index]["layer"]
+                # return self.zynqtgui.layers_for_channel.list_metadata[self.zynqtgui.layers_for_channel.current_index]["layer"]
+                return self.zynqtgui.curlayer
         except:
             # In case any of the above dependent properties are unavailable and causes reference errors, return None.
             return None
@@ -109,7 +110,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
             self.get_curlayer().load_preset_list()
             if not self.get_curlayer().preset_list:
                 self.set_select_path()
-                self.get_curlayer().load_preset_list()
+                self.get_curlayer().load_preset_list(force=True)
 
             for item in self.get_curlayer().preset_list:
                 self.list_data.append(item)

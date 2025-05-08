@@ -488,7 +488,7 @@ Zynthian.ScreenPage {
                     height: layersView.view.height/5
                     onClicked: {
                         if (!zynqtgui.fixed_layers.current_index_valid) {
-                            layerSetupDialog.open();
+                            // layerSetupDialog.open();
                             delegate.selector.activate_index(index);
                         }
                     }

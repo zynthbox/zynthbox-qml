@@ -68,12 +68,16 @@ class zynthian_gui_preset(zynthian_gui_selector):
     Return appripriate curlayer as per opened effect screen
     """
     def get_curlayer(self):
-        if self.zynqtgui.current_screen_id in ["effects_for_channel", "effect_preset"]:
-            return self.zynqtgui.effects_for_channel.list_data[self.zynqtgui.effects_for_channel.current_index][3]
-        elif self.zynqtgui.current_screen_id in ["sketch_effects_for_channel", "sketch_effect_preset"]:
-            return self.zynqtgui.sketch_effects_for_channel.list_data[self.zynqtgui.sketch_effects_for_channel.current_index][3]
-        else:
-            return self.zynqtgui.curlayer
+        try:
+            if self.zynqtgui.current_screen_id in ["effects_for_channel", "effect_preset"]:
+                return self.zynqtgui.effects_for_channel.list_data[self.zynqtgui.effects_for_channel.current_index][3]
+            elif self.zynqtgui.current_screen_id in ["sketch_effects_for_channel", "sketch_effect_preset"]:
+                return self.zynqtgui.sketch_effects_for_channel.list_data[self.zynqtgui.sketch_effects_for_channel.current_index][3]
+            else:
+                return self.zynqtgui.layers_for_channel.list_metadata[self.zynqtgui.layers_for_channel.current_index]["layer"]
+        except:
+            # In case any of the above dependent properties are unavailable and causes reference errors, return None.
+            return None
 
     @Slot()
     def fill_list(self):

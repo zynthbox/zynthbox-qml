@@ -1577,7 +1577,7 @@ class sketchpad_channel(QObject):
         self.removeFxFromChain(self.__selected_fx_slot_row)
 
     @Slot(int)
-    def removeFxFromChain(self, fxSlotIndex):
+    def removeFxFromChain(self, fxSlotIndex, showLoadingScreen=True):
         if -1 < fxSlotIndex and fxSlotIndex < Zynthbox.Plugin.instance().sketchpadSlotCount():
             def task():
                 if self.__chained_fx[fxSlotIndex] is not None:
@@ -1601,9 +1601,13 @@ class sketchpad_channel(QObject):
                     except Exception as e:
                         logging.exception(e)
 
-                    QTimer.singleShot(1000, self.zynqtgui.end_long_task)
+                    if showLoadingScreen:
+                        QTimer.singleShot(1000, self.zynqtgui.end_long_task)
 
-            self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
+            if showLoadingScreen:
+                self.zynqtgui.do_long_task(task, f"Removing {self.chainedFxNames[self.selectedFxSlotRow]} from slot {self.selectedFxSlotRow + 1} on Track {self.name}")
+            else:
+                task()
 
     def updateChainedFxEngineData(self, position, layer):
         if layer is not None:
@@ -3125,6 +3129,10 @@ class sketchpad_channel(QObject):
                     if cb_counter > 0:
                         return
                     else:
+                        # Remove all fx
+                        for i in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                            self.removeFxFromChain(i, showLoadingScreen=False)
+
                         # Repopulate after removing current channel layers
                         free_layers = self.getFreeLayers()
                         # Populate new chained sounds and update channel

@@ -29,6 +29,7 @@ import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import io.zynthbox.components 1.0 as Zynthbox
 
 Zynthian.ScreenPage {
     id: root
@@ -96,6 +97,39 @@ Zynthian.ScreenPage {
                     newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
                     zynqtgui.current_screen_id = root.screenIds[newIndex];
                     return true;
+                case "KNOB0_TOUCHED":
+                    if (!applicationWindow().osd.opened) {
+                        pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(0, root.selectedChannel.selectedSlot.value)
+                    }
+                    return true;
+                case "KNOB0_UP":
+                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(1, root.selectedChannel.selectedSlot.value)
+                    return true;
+                case "KNOB0_DOWN":
+                    pageManager.getPage("sketchpad").updateSelectedFxLayerVolume(-1, root.selectedChannel.selectedSlot.value)
+                    return true;
+                case "KNOB1_TOUCHED":
+                    if (!applicationWindow().osd.opened) {
+                        pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(0, root.selectedChannel.selectedSlot.value)
+                    }
+                    return true;
+                case "KNOB1_UP":
+                    pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(1, root.selectedChannel.selectedSlot.value)
+                    return true;
+                case "KNOB1_DOWN":
+                    pageManager.getPage("sketchpad").updateSelectedChannelFxLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
+                    return true;
+                case "KNOB2_TOUCHED":
+                    if (!applicationWindow().osd.opened) {
+                        pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(0, root.selectedChannel.selectedSlot.value)
+                    }
+                    return true;
+                case "KNOB2_UP":
+                    pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(1, root.selectedChannel.selectedSlot.value)
+                    return true;
+                case "KNOB2_DOWN":
+                    pageManager.getPage("sketchpad").updateSelectedChannelFxLayerResonance(-1, root.selectedChannel.selectedSlot.value)
+                    return true;
                 case "SWITCH_BACK_SHORT":
                 case "SWITCH_BACK_BOLD":
                     zynqtgui.go_back();
@@ -136,7 +170,10 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 screenId: root.screenIds[0]
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivated: {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                    root.itemActivated(screenId, index)
+                }
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                 autoActivateIndexOnChange: true
                 onIconClicked: {
@@ -178,6 +215,14 @@ Zynthian.ScreenPage {
                                 }
                                 elide: Text.ElideRight
                             }
+                        }                        
+                        Rectangle {
+                            property QtObject fxPassthroughClient: Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id] ? Zynthbox.Plugin.fxPassthroughClients[root.selectedChannel.id][index] : null
+                            Layout.preferredWidth: fxPassthroughClient && fxPassthroughClient.dryWetMixAmount >= 0 ? parent.width * Zynthian.CommonUtils.interp(fxPassthroughClient.dryWetMixAmount, 0, 2, 0, 1) : 0
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
+                            visible: fxPassthroughClient != null && root.selectedChannel != null && root.selectedChannel.chainedFx[index] != null
+                            color: Kirigami.Theme.highlightColor
+                            opacity: 0.7
                         }
                     }
                 }

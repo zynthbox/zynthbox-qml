@@ -259,6 +259,9 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
             self.zynqtgui.screens['control'].show()
             self.zynqtgui.screens['layer'].fill_list()
+
+            if self.zynqtgui.current_screen_id in ["effects_for_channel", "effect_preset"]:
+                self.zynqtgui.effects_for_channel.fill_list()
         else:
             # We selected i as current index so we can assume we're working on the current index
             self.__select_in_progess = False

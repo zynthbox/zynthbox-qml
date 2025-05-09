@@ -77,6 +77,9 @@ Zynthian.ScreenPage {
         // Call cuiaCallback of current selectorView
         var selectorCuiaReturnVal = false
         switch(zynqtgui.current_screen_id) {
+            case "effects_for_channel":
+                selectorCuiaReturnVal = fixedEffectsView.cuiaCallback(cuia)
+                break;
             case "effect_preset":
                 selectorCuiaReturnVal = effectPresetView.cuiaCallback(cuia)
                 break
@@ -172,6 +175,9 @@ Zynthian.ScreenPage {
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: {
                     pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", index);
+                    if (zynqtgui.current_screen_id != "effects_for_channel") {
+                        zynqtgui.current_screen_id = "effects_for_channel";
+                    }
                     root.itemActivated(screenId, index)
                 }
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -281,7 +287,12 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 screenId: root.screenIds[1]
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivated: {
+                    if (zynqtgui.current_screen_id != "effect_preset") {
+                        zynqtgui.current_screen_id = "effect_preset";
+                    }
+                    root.itemActivated(screenId, index)
+                }
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                 autoActivateIndexOnChange: true
                 onIconClicked: {

@@ -361,7 +361,10 @@ Zynthian.ScreenPage {
                 autoActivateIndexOnChange: true
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivated: {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("synth", index);
+                    root.itemActivated(screenId, index)
+                }
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
 
                 Component.onCompleted: {

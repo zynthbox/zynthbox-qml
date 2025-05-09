@@ -116,17 +116,22 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
         return True
 
     def sync_index_from_curlayer(self):
-        midi_chan = -1
-        if self.zynqtgui.curlayer:
-            midi_chan = self.zynqtgui.curlayer.midi_chan
-        else:
-            midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
+        # midi_chan = -1
+        # if self.zynqtgui.curlayer:
+        #     midi_chan = self.zynqtgui.curlayer.midi_chan
+        # else:
+        #     midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
 
-        for i, item in enumerate(self.list_data):
-            logging.debug("sync_index_from_curlayer of layers_for_channel {} {}".format(midi_chan, item[1]))
-            if midi_chan == item[1]:
-                self.current_index = i
-                return
+        # for i, item in enumerate(self.list_data):
+        #     logging.debug("sync_index_from_curlayer of layers_for_channel {} {}".format(midi_chan, item[1]))
+        #     if midi_chan == item[1]:
+        #         self.current_index = i
+        #         return
+        song = self.zynqtgui.screens['sketchpad'].song
+        if song is not None:
+            selected_channel = song.channelsModel.getChannel(self.zynqtgui.sketchpad.selectedTrackId)
+            if selected_channel.selectedSlot.className == "TracksBar_synthslot":
+                self.current_index = selected_channel.selectedSlot.value
 
     def update_channel_sounds(self):
         self.fill_list()

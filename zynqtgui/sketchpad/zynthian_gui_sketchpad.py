@@ -602,6 +602,8 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
             # Update volume controls
             self.zynqtgui.fixed_layers.fill_list()
+            # Reset last selected item
+            self.lastSelectedObj.reset()
 
             if cb is not None:
                 cb()
@@ -769,6 +771,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                 self.zynqtgui.fixed_layers.fill_list()
                 self.selectedTrackId = 0
                 self.song_changed.emit()
+
+                # Reset last selected item
+                self.lastSelectedObj.reset()
 
                 # Connect all jack ports of respective channel after jack client initialization is done.
                 for i in range(0, self.__song__.channelsModel.count):

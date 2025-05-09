@@ -106,27 +106,32 @@ class zynthian_gui_preset(zynthian_gui_selector):
             super().fill_list()
             return
 
-        if self.__top_sounds_engine is None:
-            self.get_curlayer().load_preset_list()
-            if not self.get_curlayer().preset_list:
-                self.set_select_path()
-                self.get_curlayer().load_preset_list(force=True)
+        try:
+            if self.__top_sounds_engine is None:
+                self.get_curlayer().load_preset_list()
+                if not self.get_curlayer().preset_list:
+                    self.set_select_path()
+                    self.get_curlayer().load_preset_list(force=True)
 
-            for item in self.get_curlayer().preset_list:
-                self.list_data.append(item)
-                self.list_metadata.append({"icon": "starred-symbolic" if self.get_curlayer().engine.is_preset_fav(item) else "non-starred-symbolic", "show_numbers": True, "is_favorite": self.get_curlayer().engine.is_preset_fav(item)})
-        else:
-            self.reload_top_sounds()
-            if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
-                if isinstance(self.__top_sounds[self.__top_sounds_engine], list):
-                    for sound in self.__top_sounds[self.__top_sounds_engine]:
-                        if isinstance(sound, dict):
-                            self.list_data.append(sound["list_item"])
-                            self.list_metadata.append({"icon": "starred-symbolic", "show_numbers": True})
+                for item in self.get_curlayer().preset_list:
+                    self.list_data.append(item)
+                    self.list_metadata.append({"icon": "starred-symbolic" if self.get_curlayer().engine.is_preset_fav(item) else "non-starred-symbolic", "show_numbers": True, "is_favorite": self.get_curlayer().engine.is_preset_fav(item)})
+            else:
+                self.reload_top_sounds()
+                if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
+                    if isinstance(self.__top_sounds[self.__top_sounds_engine], list):
+                        for sound in self.__top_sounds[self.__top_sounds_engine]:
+                            if isinstance(sound, dict):
+                                self.list_data.append(sound["list_item"])
+                                self.list_metadata.append({"icon": "starred-symbolic", "show_numbers": True})
 
-        super().fill_list()
-        self.set_select_path()
-        self.engine_name_changed.emit()
+            super().fill_list()
+            self.set_select_path()
+            self.engine_name_changed.emit()
+        except:
+            self.list_data = []
+            self.list_metadata = []
+            super().fill_list()
 
 
     def show(self, show_fav_presets=None):

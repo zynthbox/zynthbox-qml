@@ -268,7 +268,9 @@ Zynthian.ScreenPage {
                     pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], -1)
                     return true;
                 case "KNOB1_TOUCHED":
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, root.selectedChannel.selectedSlot.value)
+                    if (!applicationWindow().osd.opened) {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, root.selectedChannel.selectedSlot.value)
+                    }
                     return true;
                 case "KNOB1_UP":
                     pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, root.selectedChannel.selectedSlot.value)
@@ -277,7 +279,9 @@ Zynthian.ScreenPage {
                     pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
                     return true;
                 case "KNOB2_TOUCHED":
-                    pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, root.selectedChannel.selectedSlot.value)
+                    if (!applicationWindow().osd.opened) {
+                        pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, root.selectedChannel.selectedSlot.value)
+                    }
                     return true;
                 case "KNOB2_UP":
                     pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, root.selectedChannel.selectedSlot.value)

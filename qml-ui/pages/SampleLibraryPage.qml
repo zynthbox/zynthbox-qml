@@ -158,54 +158,69 @@ Zynthian.ScreenPage {
                 returnValue = true;
                 break;
             case "KNOB0_TOUCHED":
-                switch (_private.selectedColumn) {
-                    case 0:
-                        if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
-                        } else {
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
-                        }
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        break;
+                if (component.selectedChannel.trackType === "sample-loop") {
+                    pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
+                } else {
+                    pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
                 }
+                // switch (_private.selectedColumn) {
+                //     case 0:
+                //         if (component.selectedChannel.trackType === "sample-loop") {
+                //             pageManager.getPage("sketchpad").updateSelectedSketchGain(0, component.selectedChannel.selectedSlot.value);
+                //         } else {
+                //             pageManager.getPage("sketchpad").updateSelectedSampleGain(0, component.selectedChannel.selectedSlot.value);
+                //         }
+                //         break;
+                //     case 1:
+                //         break;
+                //     case 2:
+                //         break;
+                // }
                 returnValue = true;
                 break;
             case "KNOB0_RELEASED":
                 returnValue = true;
                 break;
             case "KNOB0_UP":
-                switch (_private.selectedColumn) {
-                    case 0:
-                        if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
-                        } else {
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
-                        }
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        break;
+                if (component.selectedChannel.trackType === "sample-loop") {
+                    pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
+                } else {
+                    pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
                 }
+                // switch (_private.selectedColumn) {
+                //     case 0:
+                //         if (component.selectedChannel.trackType === "sample-loop") {
+                //             pageManager.getPage("sketchpad").updateSelectedSketchGain(1, component.selectedChannel.selectedSlot.value);
+                //         } else {
+                //             pageManager.getPage("sketchpad").updateSelectedSampleGain(1, component.selectedChannel.selectedSlot.value);
+                //         }
+                //         break;
+                //     case 1:
+                //         break;
+                //     case 2:
+                //         break;
+                // }
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                switch (_private.selectedColumn) {
-                    case 0:
-                        if (component.selectedChannel.trackType === "sample-loop") {
-                            pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
-                        } else {
-                            pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
-                        }
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        break;
+                if (component.selectedChannel.trackType === "sample-loop") {
+                    pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
+                } else {
+                    pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
                 }
+                // switch (_private.selectedColumn) {
+                //     case 0:
+                //         if (component.selectedChannel.trackType === "sample-loop") {
+                //             pageManager.getPage("sketchpad").updateSelectedSketchGain(-1, component.selectedChannel.selectedSlot.value);
+                //         } else {
+                //             pageManager.getPage("sketchpad").updateSelectedSampleGain(-1, component.selectedChannel.selectedSlot.value);
+                //         }
+                //         break;
+                //     case 1:
+                //         break;
+                //     case 2:
+                //         break;
+                // }
                 returnValue = true;
                 break;
             case "SELECT_DOWN":

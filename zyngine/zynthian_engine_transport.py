@@ -50,7 +50,10 @@ class zynthian_engine_transport(zynthian_basic_engine):
 
     def stop(self):
         try:
-            self.proc.sendLine("quit")
+            transaction = self.proc.send("quit")
+            while self.proc.state() != Zynthbox.ProcessWrapper.ProcessState.NotRunningState:
+                QCoreApplication.instance().processEvents()
+            transaction.release()
             # PROCESSWRAPPER TODO : Check how to wait fo EOF
             # self.proc.waitForOutput(pexpect.EOF)
         except Exception as e:

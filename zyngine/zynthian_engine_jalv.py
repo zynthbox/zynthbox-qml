@@ -194,15 +194,17 @@ class zynthian_engine_jalv(zynthian_engine):
                 self.command = ("jalv -n {} {}".format(self.jackname, self.plugin_url))
 
             self.command_prompt = "\n> "
+            self.proc.setCommandPrompt(self.command_prompt)
             self.start()
 
             # Run presets command explicitly after starting otherwise loading a preset does not work
-            self.proc.sendLine("presets")
-            if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
-                # logging.debug(f"--- presets command output BEGIN\n{self.proc.awaitedOutput()}\n--- presets command output END")
-                pass
-            else:
-                logging.error("An error occurred while waiting for the function to return")
+            transaction = self.proc.call("presets")
+            # logging.debug(f"--- presets command output BEGIN\n{transaction.standardOutput()}\n--- presets command output END")
+            transaction.release()
+            # if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
+                # pass
+            # else:
+                # logging.error("An error occurred while waiting for the function to return")
 
             # Set static MIDI Controllers from hardcoded plugin info
             try:

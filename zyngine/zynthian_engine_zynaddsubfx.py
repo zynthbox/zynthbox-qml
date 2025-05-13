@@ -131,6 +131,7 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
             self.command = "zynaddsubfx -r {} -b {} -O jack-multi -I jack -P {} -a -U".format(self.sr, self.bs, self.osc_target_port)
 
         self.command_prompt = "\n\\[INFO] Main Loop..."
+        self.proc.setCommandPrompt("\n\\")
 
         self.osc_paths_data = []
         self.current_slot_zctrl = None

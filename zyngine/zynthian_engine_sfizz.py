@@ -88,7 +88,8 @@ class zynthian_engine_sfizz(zynthian_engine):
         self.sfzpath = None
 
         self.command = "sfizz_jack --client_name '{}' --preload_size {} --num_voices {}".format(self.jackname, self.preload_size, self.num_voices, self.sfzpath)
-        self.command_prompt = "> "
+        self.command_prompt = "\n> "
+        self.proc.setCommandPrompt(self.command_prompt)
 
         self.reset()
         self.start()
@@ -99,8 +100,10 @@ class zynthian_engine_sfizz(zynthian_engine):
 
     def stop(self):
         try:
-            self.proc.sendLine("quit")
-            self.proc.waitForOutput("Closing...")
+            transaction = self.proc.send("quit")
+            while transaction.standardOutput().contains("Closing...") == False:
+                QCoreApplication.instance().processEvents()
+            transaction.release()
         except:
             super().stop()
 

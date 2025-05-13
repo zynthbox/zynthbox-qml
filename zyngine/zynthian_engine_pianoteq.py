@@ -387,6 +387,7 @@ class zynthian_engine_pianoteq(zynthian_engine):
                 self.base_command = PIANOTEQ_BINARY + " --headless"
             else:
                 self.base_command = PIANOTEQ_BINARY + " --headless --multicore max"
+        self.proc.setCommandPrompt(self.command_prompt)
 
         # Create & fix Pianoteq config
         if not os.path.isfile(PIANOTEQ_CONFIG_FILE):

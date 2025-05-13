@@ -91,6 +91,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
         self.command = f"fluidsynth -a jack -m jack -g 1 -o midi.jack.id='{self.jackname}' -o audio.jack.id='{self.jackname}' {self.fs_options}"
         self.command_prompt = "\n> "
+        self.proc.setCommandPrompt(self.command_prompt)
 
         self.start()
         self.reset()
@@ -108,8 +109,12 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def stop(self):
         try:
-            self.proc.sendLine("quit")
-            self.proc.waitForOutput("cheers!")
+            transaction = self.proc.send("quit")
+            while transaction.standardOutput().contains("cheers!") == False:
+                QCoreApplication.instance().processEvents()
+            transaction.release()
+            # self.proc.sendLine("quit")
+            # self.proc.waitForOutput("cheers!")
         except:
             super().stop()
 

@@ -198,6 +198,7 @@ class zynthian_engine_setbfree(zynthian_engine):
             self.command = "setBfree -p \"{}\" -c \"{}\"".format(self.presets_fpath, self.config_autogen_fpath)
 
         self.command_prompt = "\nAll systems go."
+        self.proc.setCommandPrompt(self.command_prompt)
 
         self.reset()
 

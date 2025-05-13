@@ -32,7 +32,7 @@ import Zynthbox
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
-from PySide2.QtCore import Property, QObject, Signal, Slot
+from PySide2.QtCore import Property, QObject, Signal, Slot, QCoreApplication
 
 from . import zynthian_controller
 
@@ -59,6 +59,7 @@ class zynthian_basic_engine(QObject):
         super(zynthian_basic_engine, self).__init__(zynqtgui)
         self.name = name
         self.proc = Zynthbox.ProcessWrapper(self)
+        self.proc.setCommandPrompt(prompt)
         self.proc.stateChanged.connect(self.handleStateChanged)
         self.command = command
         self.command_env = os.environ.copy()
@@ -87,14 +88,12 @@ class zynthian_basic_engine(QObject):
         if not self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             logging.info(f"Starting Engine {self.name}")
             logging.debug(f"Engine start command : {self.command}")
-            self.proc.start(command, command_args, self.command_env)
+            startTransaction = self.proc.start(command, command_args, self.command_env)
             if self.command_prompt:
-                if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
-                    # logging.debug(f"--- Engine Start Output BEGIN\n{self.proc.awaitedOutput()}\n--- Engine Start Output END")
-                    pass
-                else:
-                    logging.error("An error occurred while waiting for the function to return")
-
+                while startTransaction.state() != Zynthbox.ProcessWrapperTransaction.TransactionState.CompletedState:
+                    QCoreApplication.instance().processEvents()
+                # logging.debug(f"--- Engine Start Output BEGIN\n{startTransaction.standardOutput()}\n--- Engine Start Output END")
+            startTransaction.release()
 
     def stop(self):
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
@@ -104,30 +103,35 @@ class zynthian_basic_engine(QObject):
             except Exception as err:
                 logging.error("Can't stop engine {} => {}".format(self.name, err))
 
-    def proc_get_output(self):
-        if self.command_prompt:
-            output = ""
-            if self.proc.waitForOutput(self.command_prompt) == Zynthbox.ProcessWrapper.WaitForOutputResult.WaitForOutputSuccess:
-                output = self.proc.awaitedOutput()
-            else:
-                logging.error("An error occurred while waiting for the function to return")
-            return output
-        else:
-            logging.warning("Command Prompt is not defined!")
-            return None
-
+    # This will call a function on the process, and if wait_for_output is set also return
+    # the output of that function (after waiting for it to complete). If wait_for_output
+    # is False, it will return an empty string immediately, and just expect the call to do
+    # what it's supposed to.
+    # NOTE This function will also return an empty string when wait_for_output is set to True but the call fails for whatever reason
     def proc_cmd(self, cmd:str, wait_for_output=False):
-        if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
-            out = ""
-            try:
-                # logging.debug("proc command: "+cmd)
-                self.proc.sendLine(cmd)
-                if wait_for_output:
-                    out = self.proc_get_output()
-                    # logging.debug(f"--- proc_cmd Output BEGIN\n{out}--- proc_cmd Output END")
-            except Exception as err:
-                logging.error("Can't exec engine command: {} => {}".format(cmd, err))
-            return out
+        out = ""
+        if self.proc is not None and self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
+            logging.error(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
+            if wait_for_output:
+                transaction = self.proc.call(cmd)
+                out = transaction.standardOutput()
+                transaction.release()
+            else:
+                transaction = self.proc.send(cmd)
+                transaction.release()
+        return out
+
+    # This will return the transaction rather than the transaction's output, which can
+    # be used to manually ensure order-of-events (by testing the transaction IDs against
+    # each other), for example for situations where you might require some output from a
+    # function to always be the most recent (which, let's be honest, is likely to be the
+    # common case).
+    # NOTE Remember to release the returned transaction when it is no longer needed
+    def proc_transact(self, cmd:str, wait_for_output=False):
+        if wait_for_output:
+            return self.proc.call(cmd)
+        else:
+            return self.proc.send(cmd)
 
 #------------------------------------------------------------------------------
 # Synth Engine Base Class

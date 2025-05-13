@@ -187,6 +187,7 @@ class zynthian_engine_aeolus(zynthian_engine):
         else:
             self.command_prompt = "\nAeolus>"
             self.command = f"aeolus -t -N {self.jackname}"
+        self.proc.setCommandPrompt(self.command_prompt)
 
         self.get_current_config()
 

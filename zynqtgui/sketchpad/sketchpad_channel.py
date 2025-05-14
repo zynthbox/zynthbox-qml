@@ -2961,12 +2961,12 @@ class sketchpad_channel(QObject):
                         self.__samples__[index].set_path(str(temporaryFile), should_copy=True)
                         # Restore the metadata, if it's been saved to the snapshot (otherwise load it from disk)
                         if "metadata" in snapshot_obj[key]:
-                            self.__samples__[index].__metadata.deserialize(snapshot_obj[key]["metadata"])
+                            self.__samples__[index].metadata.deserialize(snapshot_obj[key]["metadata"])
                         else:
-                            self.__samples__[index].__metadata.clear()
+                            self.__samples__[index].metadata.clear()
                             # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
                             if self.__samples__[index].audioSource is not None:
-                                self.__samples__[index].__metadata.read()
+                                self.__samples__[index].metadata.read()
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, "Loading samples")
 
@@ -3001,14 +3001,14 @@ class sketchpad_channel(QObject):
                                 # Now set this slot's path to that, and should_copy is True by default, but let's be explicit so we can make sure it keeps working
                                 clip.set_path(str(temporaryFile), should_copy=True)
                                 # Restore the metadata, if it's been saved to the snapshot (otherwise load it from disk)
-                                clip.__metadata.clear()
+                                clip.metadata.clear()
                                 if "metadata" in snapshot_obj[key]:
                                     if len(snapshot_obj[key]["metadata"]) > 0:
-                                        self.__samples__[index].__metadata.deserialize(snapshot_obj[key]["metadata"])
+                                        self.__samples__[index].metadata.deserialize(snapshot_obj[key]["metadata"])
                                 else:
                                     # If the metadata doesn't exist in the object passed to us, read it out of the file itself, if that exists
                                     if clip.audioSource is not None:
-                                        clip.__metadata.read()
+                                        clip.metadata.read()
                         break
             self.zynqtgui.end_long_task()
         self.zynqtgui.do_long_task(task, f"Loading sample data from snapshot into slot {clip.id} on Track {self.name}")

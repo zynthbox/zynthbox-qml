@@ -1183,7 +1183,7 @@ class sketchpad_clip(QObject):
         self.clear()
         self.set_path(clip.path, True, True)
         # Using the serialisation logic here which, while simply copying the properties directly would be faster, this is consistent
-        self.__metadata.deserialize(clip.__metadata.serialize())
+        self.__metadata.deserialize(clip.metadata.serialize())
         self.enabled = clip.enabled
 
     @Slot()

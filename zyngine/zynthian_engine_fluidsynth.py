@@ -109,12 +109,8 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def stop(self):
         try:
-            transaction = self.proc.send("quit")
-            while transaction.standardOutput().contains("cheers!") == False:
-                QCoreApplication.instance().processEvents()
+            transaction = self.proc.call("quit", "cheers!")
             transaction.release()
-            # self.proc.sendLine("quit")
-            # self.proc.waitForOutput("cheers!")
         except:
             super().stop()
 

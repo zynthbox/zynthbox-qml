@@ -100,9 +100,7 @@ class zynthian_engine_sfizz(zynthian_engine):
 
     def stop(self):
         try:
-            transaction = self.proc.send("quit")
-            while transaction.standardOutput().contains("Closing...") == False:
-                QCoreApplication.instance().processEvents()
+            transaction = self.proc.call("quit", "Closing...")
             transaction.release()
         except:
             super().stop()

@@ -130,14 +130,16 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
         else:
             self.command = "zynaddsubfx -r {} -b {} -O jack-multi -I jack -P {} -a -U".format(self.sr, self.bs, self.osc_target_port)
 
-        self.command_prompt = "\n\\[INFO] Main Loop..."
-        self.proc.setCommandPrompt("\n\\")
+        self.command_prompt = "\n[INFO] Main Loop..."
 
         self.osc_paths_data = []
         self.current_slot_zctrl = None
         self.slot_zctrls = {}
 
+        # For startup, we want to look for the "command prompt" and its carriage return and newline, and then once we have that, reset it to just a newline
+        self.proc.setCommandPrompt(self.command_prompt + "\r\n")
         self.start()
+        self.proc.setCommandPrompt("\n")
         self.osc_init()
         self.reset()
         

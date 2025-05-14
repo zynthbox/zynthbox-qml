@@ -111,7 +111,7 @@ class zynthian_basic_engine(QObject):
     def proc_cmd(self, cmd:str, wait_for_output=False):
         out = ""
         if self.proc is not None and self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
-            logging.error(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
+            logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
             if wait_for_output:
                 transaction = self.proc.call(cmd)
                 out = transaction.standardOutput()

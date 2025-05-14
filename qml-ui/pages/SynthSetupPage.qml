@@ -58,13 +58,13 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Load Sound")
             onTriggered: {
-                zynqtgui.show_modal("sound_categories")
+                zynqtgui.show_screen("sound_categories")
             }
         },
         Kirigami.Action {
             text: "Save Sound"
             onTriggered: {
-                zynqtgui.show_modal("sound_categories")
+                zynqtgui.show_screen("sound_categories")
                 applicationWindow().pageStack.getPage("sound_categories").showSaveSoundDialog()
             }
         },
@@ -223,7 +223,8 @@ Zynthian.ScreenPage {
             switch (cuia) {
                 case "SCREEN_LAYER":
                 case "SCREEN_PRESET":
-                    zynqtgui.preset.toggle_show_fav_presets();
+                    // Switch to Sounds page when library page is open and F2 is pressed again
+                    zynqtgui.show_screen("sound_categories")
                     return true;
                 case "SWITCH_SELECT_SHORT":
                     if (zynqtgui.current_screen_id == "layers_for_channel" && !zynqtgui.fixed_layers.current_index_valid) {

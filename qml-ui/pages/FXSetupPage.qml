@@ -58,7 +58,7 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Load Sound")
             onTriggered: {
-                zynqtgui.show_modal("sound_categories")
+                zynqtgui.show_screen("sound_categories")
             }
         },
         Kirigami.Action {
@@ -99,6 +99,11 @@ Zynthian.ScreenPage {
             var newIndex
 
             switch (cuia) {
+                case "SCREEN_LAYER":
+                case "SCREEN_PRESET":
+                    // Switch to Sounds page when library page is open and F2 is pressed again
+                    zynqtgui.show_screen("sound_categories")
+                    return true;
                 case "NAVIGATE_LEFT":
                     newIndex = Math.max(0, currentScreenIndex - 1);
                     zynqtgui.current_screen_id = root.screenIds[newIndex];

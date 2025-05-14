@@ -106,7 +106,7 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Load Sound")
             onTriggered: {
-                zynqtgui.show_modal("sound_categories")
+                zynqtgui.show_screen("sound_categories")
             }
         },
         Kirigami.Action {
@@ -135,6 +135,12 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         let returnValue = false;
         switch (cuia) {
+            case "SCREEN_LAYER":
+            case "SCREEN_PRESET":
+                // Switch to Sounds page when library page is open and F2 is pressed again
+                zynqtgui.show_screen("sound_categories")
+                returnValue = true;
+                break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
                 switch (_private.selectedColumn) {

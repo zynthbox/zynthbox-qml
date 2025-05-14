@@ -250,7 +250,7 @@ Kirigami.AbstractApplicationWindow {
                     break;
                 case "SCREEN_LAYER":
                 case "SCREEN_PRESET":
-                    if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
+                    if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset", "effects_for_channel", "effect_preset", "sketch_effects_for_channel", "sketch_effect_preset", "sample_library"].includes(zynqtgui.current_screen_id) === false) {
                         pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot()
                         if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                             // Then we are selecting samples and sketches, show the sample library

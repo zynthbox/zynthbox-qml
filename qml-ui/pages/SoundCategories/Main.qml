@@ -140,6 +140,28 @@ Zynthian.ScreenPage {
         // TODO: Refactor some of the various selection logic in the views below to use currentIndex and currentItem instead of doing manual item checking...
         let result = false;
         switch (cuia) {
+            case "SCREEN_LAYER":
+            case "SCREEN_PRESET":
+                // Switch to Library page when sound page is open and F2 is pressed again
+                if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
+                    pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot()
+                    if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
+                        // Then we are selecting samples and sketches, show the sample library
+                        zynqtgui.show_screen("sample_library");
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_fxslot") {
+                        // Then it's an fx slot and we should show that particular type of preset selector
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("fx", root.selectedChannel.selectedSlot.value);
+                        zynqtgui.show_screen("effect_preset");
+                    } else if (root.selectedChannel.selectedSlot.className === "TracksBar_sketchfxslot") {
+                        // Then it's an sketchfx slot and we should show that particular type of preset selector
+                        pageManager.getPage("sketchpad").bottomStack.tracksBar.switchToSlot("sketch-fx", root.selectedChannel.selectedSlot.value);
+                        zynqtgui.show_screen("sketch_effect_preset");
+                    } else {
+                        zynqtgui.show_screen("preset");
+                    }
+                    result = true;
+                }
+                return true;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_LONG":
             {

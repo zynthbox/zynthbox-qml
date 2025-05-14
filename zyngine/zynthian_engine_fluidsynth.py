@@ -178,22 +178,29 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         logging.info("Getting Preset List for {}".format(bank[2]))
         preset_list=[]
 
-        try:
-            sfi = self.soundfont_index[bank[0]]
-        except:
-            sfi = self.load_bank(bank, False)
-
         max_retries = 5
+
+        if bank[0] in self.soundfont_index:
+            sfi = self.soundfont_index[bank[0]]
+        else:
+            if self.load_bank(bank, False) and bank[0] in self.soundfont_index:
+                sfi = self.soundfont_index[bank[0]]
+            else:
+                logging.error(f"Big problem, we could not load the bank for {bank[2]} and will have to return an empty list")
+                max_retries = 0
+
         while sfi and max_retries > 0:
             logging.debug(f"Trying to load preset list : Retries left {max_retries}")
-            output=self.proc_cmd("inst {}".format(sfi), wait_for_output=True)
+            output=self.proc_cmd(f"inst {sfi}", wait_for_output=True)
             for f in output.split("\n"):
                 try:
                     prg=int(f[4:7])
                     bank_msb=int(f[0:3])
                     bank_lsb=int(bank_msb/128)
                     bank_msb=bank_msb%128
-                    title=str.replace(f[8:-1], '_', ' ')
+                    # Only strip on the right hand side (left might be deliberate, for categorization
+                    # use and whatnot, but right hand side is just padding)
+                    title=str.replace(f[8:].rstrip(), '_', ' ')
                     preset_list.append([bank[0] + '/' + f.strip(),[bank_msb,bank_lsb,prg],title,bank[0]])
                 except:
                     pass

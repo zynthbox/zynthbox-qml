@@ -344,11 +344,13 @@ class zynthian_controller(QObject):
                 # This needs to go to controllers only, so how do we do that... new function on midirouter for explicitly sending feedback to controllers maybe?
                 try:
                     if self.midi_learn_cc:
-                        Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_learn_chan, self.midi_learn_cc, mval)
+                        # Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_learn_chan, self.midi_learn_cc, mval)
+                        self.engine.zynqtgui.zynmidi.set_midi_control(self.midi_learn_chan, self.midi_learn_cc, mval)
                         # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_learn_chan,self.midi_learn_cc,mval)
                         logging.error("Controller feedback '{}' (learn) => CH{}, CC{}, Val={}".format(self.symbol,self.midi_learn_chan,self.midi_learn_cc,mval))
                     elif self.midi_cc:
-                        Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_chan, self.midi_cc, mval)
+                        # Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_chan, self.midi_cc, mval)
+                        self.engine.zynqtgui.zynmidi.set_midi_control(self.midi_chan, self.midi_cc, mval)
                         # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_chan,self.midi_cc,mval)
                         #logging.debug("Controller feedback '{}' => CH{}, CC{}, Val={}".format(self.symbol,self.midi_chan,self.midi_cc,mval))
 

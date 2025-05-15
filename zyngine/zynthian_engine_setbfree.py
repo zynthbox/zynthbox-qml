@@ -197,9 +197,10 @@ class zynthian_engine_setbfree(zynthian_engine):
         else:
             self.command = "setBfree -p \"{}\" -c \"{}\"".format(self.presets_fpath, self.config_autogen_fpath)
 
-        self.command_prompt = "\nAll systems go."
+        self.command_prompt = "\nAll systems go. press CTRL-C, or send SIGINT or SIGHUP to terminate\n"
         self.proc.setCommandPrompt(self.command_prompt)
 
+        self.start()
         self.reset()
 
 

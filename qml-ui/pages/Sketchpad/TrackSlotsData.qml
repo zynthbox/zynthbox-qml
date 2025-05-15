@@ -96,7 +96,7 @@ RowLayout {
                 case "sketch-fx":
                     return "TracksBar_sketchfxslot";
                 case "external":
-                    return "TracksBar_fxslot";
+                    return "TracksBar_externalslot";
                 default:
                     return "unknown-slotType:%1".arg(slotType);
             }

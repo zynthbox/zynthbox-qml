@@ -112,7 +112,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def stop(self):
         try:
-            transaction = self.proc.call("quit", "cheers!")
+            transaction = self.proc.call("quit", "cheers!\r\n")
             transaction.release()
         except:
             super().stop()

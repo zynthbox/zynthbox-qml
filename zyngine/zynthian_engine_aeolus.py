@@ -185,7 +185,7 @@ class zynthian_engine_aeolus(zynthian_engine):
             self.command_prompt = None
             self.command = f"aeolus -N {self.jackname}"
         else:
-            self.command_prompt = "\nAeolus>"
+            self.command_prompt = "\nAeolus> "
             self.command = f"aeolus -t -N {self.jackname}"
         self.proc.setCommandPrompt(self.command_prompt)
 
@@ -195,6 +195,7 @@ class zynthian_engine_aeolus(zynthian_engine):
         self.generate_ctrl_list()
 
         self.tuning_temp = None
+        self.start()
         self.reset()
 
 

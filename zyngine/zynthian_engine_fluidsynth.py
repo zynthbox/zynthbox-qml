@@ -111,11 +111,15 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # ---------------------------------------------------------------------------
 
     def stop(self):
-        try:
-            transaction = self.proc.call("quit", "cheers!\r\n")
-            transaction.release()
-        except:
-            super().stop()
+        # FIXME : `quit` call is not returning and hence stop gets stuck.
+        #         For the time being call super().stop() to kill the process.
+        # try:
+        #     transaction = self.proc.call("quit", "cheers!\r\n")
+        #     transaction.release()
+        # except:
+        #     super().stop()
+
+        super().stop()
 
     # ---------------------------------------------------------------------------
     # Layer Management

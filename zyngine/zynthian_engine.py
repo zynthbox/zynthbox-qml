@@ -89,10 +89,10 @@ class zynthian_basic_engine(QObject):
             logging.info(f"Starting Engine {self.name}")
             logging.debug(f"Engine start command : {self.command}")
             startTransaction = self.proc.start(command, command_args, self.command_env)
+            # logging.error(f"Waiting for start command to complete...")
             if self.command_prompt:
-                while startTransaction.state() != Zynthbox.ProcessWrapperTransaction.TransactionState.CompletedState:
-                    QCoreApplication.instance().processEvents()
-                # logging.debug(f"--- Engine Start Output BEGIN\n{startTransaction.standardOutput()}\n--- Engine Start Output END")
+                startTransaction.waitForState()
+                # logging.error(f"--- Engine Start Output BEGIN\n{startTransaction.standardOutput()}\n--- Engine Start Output END")
             startTransaction.release()
 
     def stop(self):

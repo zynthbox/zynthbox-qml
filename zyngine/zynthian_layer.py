@@ -292,7 +292,7 @@ class zynthian_layer(QObject):
     # ---------------------------------------------------------------------------
 
 
-    def load_preset_list(self, force=True):
+    def load_preset_list(self, force=False):
         preset_list = []
 
         if self.show_fav_presets:
@@ -307,10 +307,9 @@ class zynthian_layer(QObject):
                 # Too much file IO causes jackd thread to be not scheduled which causes XRUNS which in turn causes glitchiness during playback
                 # Instead of reading files every run, cache the list data.
                 # Since preset data of a synth should not change while the application is running, it should be fairly safe to cache the data
-                # if bank_name not in self.preset_list_cache or force:
-                #     self.preset_list_cache[bank_name] = self.engine.get_preset_list(self.bank_info)
-                # preset_list = preset_list + self.preset_list_cache[bank_name].copy()
-                preset_list = preset_list + self.engine.get_preset_list(self.bank_info)
+                if bank_name not in self.preset_list_cache or force:
+                    self.preset_list_cache[bank_name] = self.engine.get_preset_list(self.bank_info)
+                preset_list = preset_list + self.preset_list_cache[bank_name].copy()
             except Exception as e:
                 logging.exception(f"Error generating preset list : {str(e)}")
 

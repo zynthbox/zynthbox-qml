@@ -161,9 +161,6 @@ class zynthian_engine_fluidsynth(zynthian_engine):
                 if self.load_soundfont(bank[0]):
                     if unload_unused_sf:
                         self.unload_unused_soundfonts()
-                    # Explicitly call get_preset_list to pre-populate preset list when loading a bank
-                    # Without this explicit call, setting preset while restoring sound fails to set the preset
-                    self.get_preset_list(bank)
                     self.set_all_presets()
                     return True
                 else:

@@ -3164,6 +3164,9 @@ class sketchpad_channel(QObject):
                         # Run autoconnect after completing loading sounds
                         self.zynqtgui.zynautoconnect()
 
+                        # Update curlayer by selected slot type
+                        self.setCurlayerByType(self.selectedSlot.className)
+
                 # Reset preset view to show all presets
                 self.zynqtgui.preset.show_only_favorites = False
                 if len(used_layers) > 0:
@@ -3179,21 +3182,21 @@ class sketchpad_channel(QObject):
 
     @Slot(str)
     def setCurlayerByType(self, type):
-        if type == "synth":
+        if type == "synth" or type == "TracksBar_synthslot":
             sound = self.chainedSounds[self.__selected_slot_row__]
             if sound >= 0 and self.checkIfLayerExists(sound):
                 self.zynqtgui.set_curlayer(self.zynqtgui.layer.layer_midi_map[sound])
             else:
                 self.zynqtgui.set_curlayer(None)
-        elif type == "fx":
+        elif type == "fx" or type == "TracksBar_fxslot":
             self.zynqtgui.set_curlayer(self.chainedFx[self.selectedSlot.value])
-        elif type == "sketch-fx":
+        elif type == "sketch-fx" or type == "TracksBar_sketchfxslot":
             self.zynqtgui.set_curlayer(self.chainedSketchFx[self.selectedSlot.value])
-        elif type == "loop":
+        elif type == "loop" or type == "sample-loop" or type == "TracksBar_sketchslot":
             self.zynqtgui.set_curlayer(None)
-        elif type == "sample":
+        elif type == "sample" or type == "sample-trig" or type == "TracksBar_sampleslot":
             self.zynqtgui.set_curlayer(None)
-        elif type == "external":
+        elif type == "external" or type == "TracksBar_externalslot":
             self.zynqtgui.set_curlayer(None)
         else:
             self.zynqtgui.set_curlayer(None)

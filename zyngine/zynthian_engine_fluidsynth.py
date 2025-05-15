@@ -83,6 +83,8 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
     def __init__(self, zynqtgui=None):
         super().__init__(zynqtgui)
+        self.__most_recent_preset_transaction__ = None
+
         self.name = "FluidSynth"
         self.nickname = "FS"
         self.jackname = self.get_next_jackname("fluidsynth")
@@ -92,6 +94,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         self.command = f"fluidsynth -a jack -m jack -g 1 -o midi.jack.id='{self.jackname}' -o audio.jack.id='{self.jackname}' {self.fs_options}"
         self.command_prompt = "\n> "
         self.proc.setCommandPrompt(self.command_prompt)
+
 
         self.start()
         self.reset()
@@ -188,7 +191,19 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
         while sfi and max_retries > 0:
             logging.debug(f"Trying to load preset list : Retries left {max_retries}")
-            output=self.proc_cmd(f"inst {sfi}", wait_for_output=True)
+            transaction = self.proc.call(f"inst {sfi}")
+            if self.__most_recent_preset_transaction__ and self.__most_recent_preset_transaction__.command() == transaction.command() and transaction.transactionId() < self.__most_recent_preset_transaction__.transactionId():
+                # If we have a previous transaction for presets for this bank, and that one is newer than the one we just got given, use that instead
+                # logging.error(f"Using previously returned transaction with id {self.__most_recent_preset_transaction__.transactionId()} instead of {transaction.transactionId()}")
+                transaction.release()
+                transaction = self.__most_recent_preset_transaction__
+            else:
+                # Otherwise the one we just got given is newer (or exists), and becomes our most recent transaction
+                if self.__most_recent_preset_transaction__:
+                    self.__most_recent_preset_transaction__.release()
+                self.__most_recent_preset_transaction__ = transaction
+            output = transaction.standardOutput()
+            # output=self.proc_cmd(f"inst {sfi}", wait_for_output=True)
             for f in output.split("\n"):
                 try:
                     prg=int(f[4:7])

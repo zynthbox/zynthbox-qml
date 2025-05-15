@@ -99,11 +99,15 @@ class zynthian_engine_sfizz(zynthian_engine):
     # ---------------------------------------------------------------------------
 
     def stop(self):
-        try:
-            transaction = self.proc.call("quit", "Closing...")
-            transaction.release()
-        except:
-            super().stop()
+        # FIXME : `quit` call is not returning and hence stop gets stuck.
+        #         For the time being call super().stop() to kill the process.
+        # try:
+        #     transaction = self.proc.call("quit", "Closing...\r\n")
+        #     transaction.release()
+        # except:
+        #     super().stop()
+
+        super().stop()
 
     # ---------------------------------------------------------------------------
     # Bank Management

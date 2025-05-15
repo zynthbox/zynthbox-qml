@@ -325,32 +325,29 @@ class zynthian_controller(QObject):
                 # Send value using engine method...
                 self.engine.send_controller_value(self)
             except:
-                if force_sending:
-                    try:
-                        # Send value using OSC/MIDI ...
-                        if self.osc_path:
-                            liblo.send(self.engine.osc_target,self.osc_path, self.get_ctrl_osc_val())
-                            # logging.debug("Sending OSC controller '{}' value => {}".format(self.symbol, val))
+                try:
+                    # Send value using OSC/MIDI ...
+                    if self.osc_path:
+                        liblo.send(self.engine.osc_target,self.osc_path, self.get_ctrl_osc_val())
+                        # logging.debug("Sending OSC controller '{}' value => {}".format(self.symbol, val))
 
-                        elif self.midi_cc:
-                            Zynthbox.MidiRouter.instance().sendMidiMessageToZynthianSynth(self.midi_chan, 3, 176, self.midi_cc, mval)
-                            # logging.debug("Sending MIDI controller '{}' value => {} ({})".format(self.symbol, val, mval))
+                    elif self.midi_cc:
+                        Zynthbox.MidiRouter.instance().sendMidiMessageToZynthianSynth(self.midi_chan, 3, 176, self.midi_cc, mval)
+                        # logging.debug("Sending MIDI controller '{}' value => {} ({})".format(self.symbol, val, mval))
 
-                    except Exception as e:
-                        logging.error("Can't send controller '{}' value: {} => {}".format(self.symbol, val, e))
+                except Exception as e:
+                    logging.error("Can't send controller '{}' value: {} => {}".format(self.symbol, val, e))
 
             if update_controllers:
                 # Send feedback to MIDI controllers
                 # This needs to go to controllers only, so how do we do that... new function on midirouter for explicitly sending feedback to controllers maybe?
                 try:
                     if self.midi_learn_cc:
-                        # Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_learn_chan, self.midi_learn_cc, mval)
-                        self.engine.zynqtgui.zynmidi.set_midi_control(self.midi_learn_chan, self.midi_learn_cc, mval)
+                        Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_learn_chan, self.midi_learn_cc, mval)
                         # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_learn_chan,self.midi_learn_cc,mval)
                         logging.error("Controller feedback '{}' (learn) => CH{}, CC{}, Val={}".format(self.symbol,self.midi_learn_chan,self.midi_learn_cc,mval))
                     elif self.midi_cc:
-                        # Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_chan, self.midi_cc, mval)
-                        self.engine.zynqtgui.zynmidi.set_midi_control(self.midi_chan, self.midi_cc, mval)
+                        Zynthbox.MidiRouter.instance().sendMidiMessageToControllers(3, 176 + self.midi_chan, self.midi_cc, mval)
                         # zyncoder.lib_zyncoder.ctrlfb_send_ccontrol_change(self.midi_chan,self.midi_cc,mval)
                         #logging.debug("Controller feedback '{}' => CH{}, CC{}, Val={}".format(self.symbol,self.midi_chan,self.midi_cc,mval))
 

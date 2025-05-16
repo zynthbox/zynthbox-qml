@@ -33,13 +33,30 @@ import Zynthian 1.0 as Zynthian
 import io.zynthbox.components 1.0 as Zynthbox
 Zynthian.DialogQuestion {
     id: component
-    width: Kirigami.Units.gridUnit * 50
-    height: Kirigami.Units.gridUnit * 20
+    x: 0
+    y: 0
+    width: applicationWindow().width
+    height: applicationWindow().height
     property QtObject selectedChannel: null
 
     title: selectedChannel ? qsTr("Set up keyzones on Track %1").arg(selectedChannel.name) : ""
     acceptText: qsTr("Back")
     rejectText: ""
+
+    onOpenedChanged: {
+        if (component.opened) {
+            // In the wildly unlikely case we've not got a channel set yet, fix that
+            if (component.selectedChannel == null) {
+                zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId);
+            }
+            // If the selected slot is not either a synth or sample slot, fix that
+            if (["TracksBar_synthslot", "TracksBar_sampleslot"].includes(component.selectedChannel.selectedSlot.className) == false) {
+                let tracksBar = pageManager.getPage("sketchpad").bottomStack.tracksBar;
+                tracksBar.switchToSlot("synth", 0, true);
+                tracksBar.pickFirstAndBestSlot(true);
+            }
+        }
+    }
 
     property var cuiaCallback: function(cuia) {
         let returnValue = true;
@@ -47,7 +64,7 @@ Zynthian.DialogQuestion {
         switch (cuia) {
             case "KNOB0_UP":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.trackType === "synth") {
+                    if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -58,7 +75,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB0_DOWN":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.trackType === "synth") {
+                    if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -69,7 +86,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB1_UP":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.trackType === "synth") {
+                    if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -80,7 +97,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB1_DOWN":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.trackType === "synth") {
+                    if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -91,7 +108,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB2_UP":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.trackType === "synth") {
+                    if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -102,7 +119,7 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB2_DOWN":
                 if (component.selectedChannel && -1 < component.selectedChannel.selectedSlotRow && component.selectedChannel.selectedSlotRow < 5) {
-                    if (component.selectedChannel.trackType === "synth") {
+                    if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
                         component.selectedChannel.keyZoneMode = "manual";
@@ -113,11 +130,35 @@ Zynthian.DialogQuestion {
                 break;
             case "KNOB3_UP":
             case "NAVIGATE_RIGHT":
-                component.selectedChannel.selectedSlotRow = Math.min(component.selectedChannel.selectedSlotRow + 1, 4);
+                // Move between synth and sample slots (so just rotate between those two, not others)
+                if (component.selectedChannel) {
+                    let tracksBar = pageManager.getPage("sketchpad").bottomStack.tracksBar;
+                    if (component.selectedChannel.selectedSlot.value === 4) {
+                        if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+                            tracksBar.switchToSlot("sample", 0, true);
+                        } else {
+                            tracksBar.switchToSlot("synth", 0, true);
+                        }
+                    } else {
+                        tracksBar.pickNextSlot(true);
+                    }
+                }
                 break;
             case "KNOB3_DOWN":
             case "NAVIGATE_LEFT":
-                component.selectedChannel.selectedSlotRow = Math.max(component.selectedChannel.selectedSlotRow - 1, 0);
+                // Move between synth and sample slots (so just rotate between those two, not others)
+                if (component.selectedChannel) {
+                    let tracksBar = pageManager.getPage("sketchpad").bottomStack.tracksBar;
+                    if (component.selectedChannel.selectedSlot.value === 0) {
+                        if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
+                            tracksBar.switchToSlot("sample", 4, true);
+                        } else {
+                            tracksBar.switchToSlot("synth", 4, true);
+                        }
+                    } else {
+                        tracksBar.pickPreviousSlot(true);
+                    }
+                }
                 break;
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
@@ -161,7 +202,7 @@ Zynthian.DialogQuestion {
                 }
             }
             // QQC2.Button {
-            //     visible: component.selectedChannel.trackType === "synth"
+            //     visible: component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
             //     text: "Split Evenly"
             //     onClicked: {
             //          This should split the space evenly between the slots, but also... this will likely work a bit weirdly for more than two slots, which would usually be more a case of layering + splitting, and we can't reasonably guess at that... but maybe we don't care?
@@ -172,14 +213,14 @@ Zynthian.DialogQuestion {
                 QQC2.Button {
                     property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
                     property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
+                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.trackType === "synth" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
+                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
                     enabled: clipObj !== null
                     text: (index === 0 ? "Disable slot " : "") + (index + 1)
                     onClicked: {
-                        if (component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
+                        if (component.selectedChannel.slotType.className === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
                             component.selectedChannel.keyZoneMode = "manual";
                         }
                         keyZoneContainer.keyZoneStart = -1;
@@ -194,10 +235,10 @@ Zynthian.DialogQuestion {
                 QQC2.Button {
                     property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
                     property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
+                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
                         ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
                         : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.trackType === "synth" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
+                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
                     enabled: clipObj !== null
                     text: (index === 0 ? "Assign full width to slot " : "") + (index + 1)
                     onClicked: {
@@ -258,170 +299,191 @@ Zynthian.DialogQuestion {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.topMargin: Math.floor(((parent.height / 6) - 5) / 2)
-            property double positioningHelp: width / 100
+            // property double positioningHelp: width / 100
             Repeater {
-                model: 5
-                delegate: Item {
-                    id: sampleKeyzoneDelegate
-                    property var channelSample: component.selectedChannel ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
-                    property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.trackType === "synth"
-                        ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
-                        : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    property QtObject keyZoneContainer: component.selectedChannel
-                        ? component.selectedChannel.trackType === "synth"
-                            ? (clipObj === undefined ? null : clipObj)
-                            : (clipObj === null || clipObj.selectedSliceObject === undefined ? null : clipObj.selectedSliceObject)
-                        : null
-                    height: parent.height;
-                    width: 1
-                    property bool isCurrent: component.selectedChannel ? component.selectedChannel.selectedSlotRow === index : false
-                    z: isCurrent ? 99 : 0
-                    property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-                    property Item pianoKeyItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.keyZoneStart) : null
-                    property Item pianoKeyEndItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.keyZoneEnd) : null
-                    property Item pianoRootNoteItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.rootNote) : null
-                    x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : (pianoKeysRepeater.itemAt(0) ? -Math.floor(pianoKeysRepeater.itemAt(0).width / 2) : 0)
-                    opacity: clipObj ? 1 : 0.3
-                    QQC2.Label {
-                        id: sampleLabel
-                        anchors {
-                            bottom: sampleHandle.verticalCenter
-                            bottomMargin: 1
-                            left: sampleHandle.right
-                            leftMargin: 1
-                        }
-                        text: "Slot " + (index + 1)
-                        width: paintedWidth
-                        height: paintedHeight
-                        font.pixelSize: Math.floor((parent.height / 6) - 5)
-                    }
-                    Rectangle {
-                        id: sampleHandle
-                        anchors {
-                            top: parent.top
-                            topMargin: index * (parent.height / 6)
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        height: Kirigami.Units.largeSpacing * 2
-                        width: height
-                        radius: height / 2
-                        color: Kirigami.Theme.backgroundColor
-                        border {
-                            width: 2
-                            color: sampleKeyzoneDelegate.lineColor
-                        }
-                    }
-                    Rectangle {
-                        anchors {
-                            top: sampleHandle.bottom;
-                            bottom: parent.bottom;
-                            horizontalCenter: sampleHandle.horizontalCenter
-                        }
-                        width: 2
-                        color: sampleKeyzoneDelegate.lineColor
-                    }
-                    Rectangle {
-                        id: sampleEndHandle
-                        anchors {
-                            top: parent.top
-                            topMargin: index * (parent.height / 6)
-                        }
-                        x: pianoKeyItem && pianoKeyEndItem ? pianoKeyEndItem.x - pianoKeyItem.x - Kirigami.Units.largeSpacing : sampleHandle.x
-                        height: Kirigami.Units.largeSpacing * 2
-                        width: height
-                        radius: height / 2
-                        color: Kirigami.Theme.backgroundColor
-                        border {
-                            width: 2
-                            color: sampleKeyzoneDelegate.lineColor
-                        }
-                    }
-                    Rectangle {
-                        anchors {
-                            top: sampleEndHandle.bottom
-                            bottom: parent.bottom
-                            horizontalCenter: sampleEndHandle.horizontalCenter
-                        }
-                        width: 2
-                        color: sampleKeyzoneDelegate.lineColor
-                    }
-                    Rectangle {
-                        anchors {
-                            top: sampleHandle.verticalCenter
-                            left: sampleHandle.right
-                            right: sampleEndHandle.left
-                        }
-                        height: 2
-                        color: sampleKeyzoneDelegate.lineColor
-                    }
-                    Row {
-                        anchors {
-                            top: sampleHandle.verticalCenter
-                            topMargin: 3
-                            left: sampleHandle.right
-                        }
-                        spacing: 0
-                        Timer {
-                            id: dotFetcher
-                            interval: 1; running: false; repeat: false;
-                            onTriggered: {
-                                progressDots.playbackPositions = component.visible && sampleKeyzoneDelegate.clipObj
-                                    ? sampleKeyzoneDelegate.clipObj.playbackPositions
-                                    : null
-                            }
-                        }
-                        Connections {
-                            target: component
-                            onVisibleChanged: dotFetcher.restart()
-                        }
-                        Connections {
-                            target: sampleKeyzoneDelegate
-                            onClipObjChanged: dotFetcher.restart()
-                        }
-                        Repeater {
-                            id: progressDots
-                            model: Zynthbox.Plugin.clipMaximumPositionCount
-                            property QtObject playbackPositions: null
-                            delegate: Item {
-                                property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
-                                visible: progressEntry && progressEntry.id > -1
-                                height: 5
-                                width: 5
-                                Rectangle {
-                                    anchors.centerIn: parent
-                                    rotation: 45
-                                    height: 4
-                                    width: 4
-                                    color: sampleKeyzoneDelegate.lineColor
-                                    scale: progressEntry ? 0.5 + progressEntry.gain : 1
-                                }
-                            }
-                        }
-                    }
-                    Item {
-                        anchors {
-                            bottom: parent.bottom
-                            bottomMargin: Kirigami.Units.largeSpacing
-                        }
-                        height: 1
+                id: slotTypeRepeater
+                // This is the number of slots we're displaying, plus one for spacing (so the root note display has somewhere to live)
+                readonly property int totalDisplayRowCount: 11
+                model: 2
+                Repeater {
+                    id: slotRepeater
+                    readonly property string slotType: index === 0 ? "TracksBar_synthslot" : "TracksBar_sampleslot"
+                    readonly property int slotTypeIndex: index
+                    model: 5
+                    delegate: Item {
+                        id: sampleKeyzoneDelegate
+                        property var channelSample: component.selectedChannel && slotRepeater.slotType === "TracksBar_sampleslot" ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
+                        property int engineMidiChannel: component.selectedChannel && slotRepeater.slotType === "TracksBar_synthslot" ? component.selectedChannel.chainedSounds[index] : -1
+                        property QtObject clipObj: component.selectedChannel && slotRepeater.slotType === "TracksBar_synthslot"
+                            ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
+                            : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
+                        property QtObject keyZoneContainer: component.selectedChannel
+                            ? slotRepeater.slotType === "TracksBar_synthslot"
+                                ? (clipObj === undefined ? null : clipObj)
+                                : (clipObj === null || clipObj.selectedSliceObject === undefined ? null : clipObj.selectedSliceObject)
+                            : null
+                        readonly property int combinedIndex: (slotRepeater.slotTypeIndex * 5) + index;
+                        height: parent.height;
                         width: 1
-                        x: pianoKeyItem && pianoRootNoteItem ? pianoRootNoteItem.x - pianoKeyItem.x : sampleHandle.x
-                        visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.keyZoneContainer && sampleKeyzoneDelegate.keyZoneContainer.rootNote > -1 && sampleKeyzoneDelegate.keyZoneContainer.rootNote < 128
-                        Rectangle {
+                        property bool isCurrent: component.selectedChannel ? component.selectedChannel.selectedSlot.className === slotRepeater.slotType && component.selectedChannel.selectedSlot.value === index : false
+                        z: isCurrent ? 99 : 0
+                        property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                        property Item pianoKeyItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.keyZoneStart) : null
+                        property Item pianoKeyEndItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.keyZoneEnd) : null
+                        property Item pianoRootNoteItem: keyZoneContainer ? pianoKeysRepeater.itemAt(keyZoneContainer.rootNote) : null
+                        x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : 0 //(pianoKeysRepeater.itemAt(0) ? -Math.floor(pianoKeysRepeater.itemAt(0).width / 2) : 0)
+                        opacity: clipObj ? 1 : 0.3
+                        QQC2.Label {
+                            id: sampleLabel
                             anchors {
-                                topMargin: -height
-                                centerIn: parent
+                                bottom: sampleHandle.verticalCenter
+                                bottomMargin: 1
+                                left: sampleHandle.right
+                                leftMargin: 1
                             }
-                            color: sampleKeyzoneDelegate.lineColor
+                            text: slotRepeater.slotType === "TracksBar_synthslot" ? "Synth " + (index + 1) : "Sample " + (index + 1)
+                            width: paintedWidth
+                            height: paintedHeight
+                            font.pixelSize: Math.floor((parent.height / slotTypeRepeater.totalDisplayRowCount) - 10)
+                        }
+                        Rectangle {
+                            id: sampleHandle
+                            anchors {
+                                top: parent.top
+                                topMargin: sampleKeyzoneDelegate.combinedIndex * (parent.height / slotTypeRepeater.totalDisplayRowCount)
+                                horizontalCenter: parent.horizontalCenter
+                            }
                             height: Kirigami.Units.largeSpacing * 2
                             width: height
                             radius: height / 2
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                font.pixelSize: Kirigami.Units.largeSpacing
-                                color: Kirigami.Theme.highlightedTextColor
-                                text: "C4"
+                            color: Kirigami.Theme.backgroundColor
+                            border {
+                                width: 2
+                                color: sampleKeyzoneDelegate.lineColor
+                            }
+                        }
+                        Rectangle {
+                            anchors {
+                                top: sampleHandle.bottom;
+                                bottom: parent.bottom;
+                                horizontalCenter: sampleHandle.horizontalCenter
+                            }
+                            width: 2
+                            color: sampleKeyzoneDelegate.lineColor
+                        }
+                        Rectangle {
+                            id: sampleEndHandle
+                            anchors {
+                                top: parent.top
+                                topMargin: sampleKeyzoneDelegate.combinedIndex * (parent.height / slotTypeRepeater.totalDisplayRowCount)
+                            }
+                            x: pianoKeyEndItem ? (pianoKeyEndItem.x - sampleKeyzoneDelegate.x) + (pianoKeyEndItem.width / 2) : sampleHandle.x
+                            height: Kirigami.Units.largeSpacing * 2
+                            width: height
+                            radius: height / 2
+                            color: Kirigami.Theme.backgroundColor
+                            border {
+                                width: 2
+                                color: sampleKeyzoneDelegate.lineColor
+                            }
+                        }
+                        Rectangle {
+                            anchors {
+                                top: sampleEndHandle.bottom
+                                bottom: parent.bottom
+                                horizontalCenter: sampleEndHandle.horizontalCenter
+                            }
+                            width: 2
+                            color: sampleKeyzoneDelegate.lineColor
+                        }
+                        Rectangle {
+                            anchors {
+                                top: sampleHandle.verticalCenter
+                                left: sampleHandle.right
+                                right: sampleEndHandle.left
+                            }
+                            height: 2
+                            color: sampleKeyzoneDelegate.lineColor
+                        }
+                        Row {
+                            anchors {
+                                top: sampleHandle.verticalCenter
+                                topMargin: 3
+                                left: sampleHandle.right
+                            }
+                            spacing: 0
+                            Timer {
+                                id: dotFetcher
+                                interval: 1; running: false; repeat: false;
+                                onTriggered: {
+                                    progressDots.playbackPositions = component.visible && sampleKeyzoneDelegate.clipObj && sampleKeyzoneDelegate.clipObj.playbackPositions !== undefined
+                                        ? sampleKeyzoneDelegate.clipObj.playbackPositions
+                                        : null
+                                }
+                            }
+                            Connections {
+                                target: component
+                                onVisibleChanged: dotFetcher.restart()
+                            }
+                            Connections {
+                                target: sampleKeyzoneDelegate
+                                onClipObjChanged: dotFetcher.restart()
+                            }
+                            Repeater {
+                                id: progressDots
+                                model: Zynthbox.Plugin.clipMaximumPositionCount
+                                property QtObject playbackPositions: null
+                                delegate: Item {
+                                    property QtObject progressEntry: progressDots.playbackPositions ? progressDots.playbackPositions.positions[model.index] : null
+                                    visible: progressEntry && progressEntry.id > -1
+                                    height: 5
+                                    width: 5
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        rotation: 45
+                                        height: 4
+                                        width: 4
+                                        color: sampleKeyzoneDelegate.lineColor
+                                        scale: progressEntry ? 0.5 + progressEntry.gain : 1
+                                    }
+                                }
+                            }
+                        }
+                        Item {
+                            anchors {
+                                bottom: parent.bottom
+                                bottomMargin: Kirigami.Units.largeSpacing
+                            }
+                            height: 1
+                            width: 1
+                            x: pianoRootNoteItem ? (pianoRootNoteItem.x - sampleKeyzoneDelegate.x) + (pianoRootNoteItem.width / 2) : sampleHandle.x
+                            visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.keyZoneContainer && sampleKeyzoneDelegate.keyZoneContainer.rootNote > -1 && sampleKeyzoneDelegate.keyZoneContainer.rootNote < 128
+                            Rectangle {
+                                anchors {
+                                    topMargin: -height
+                                    centerIn: parent
+                                }
+                                color: sampleKeyzoneDelegate.lineColor
+                                height: Kirigami.Units.largeSpacing * 2
+                                width: 2
+                                QQC2.Label {
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        bottom: parent.top
+                                    }
+                                    font.pixelSize: Kirigami.Units.largeSpacing
+                                    color: Kirigami.Theme.textColor
+                                    text: "Root Note"
+                                    Rectangle {
+                                        anchors {
+                                            horizontalCenter: parent.horizontalCenter
+                                            top: parent.bottom
+                                        }
+                                        width: parent.paintedWidth
+                                        height: 2
+                                        color: sampleKeyzoneDelegate.lineColor
+                                    }
+                                }
                             }
                         }
                     }

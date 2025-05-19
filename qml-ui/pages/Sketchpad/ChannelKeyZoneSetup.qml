@@ -35,8 +35,10 @@ Zynthian.DialogQuestion {
     id: component
     x: 0
     y: 0
-    width: applicationWindow().width
-    height: applicationWindow().height
+    width: applicationWindow().width + thisIsCheating
+    height: applicationWindow().height + thisIsCheating
+    property int thisIsCheating: 0
+    readonly property QtObject song: zynqtgui.sketchpad.song
     property QtObject selectedChannel: null
 
     title: selectedChannel ? qsTr("Set up keyzones on Track %1").arg(selectedChannel.name) : ""
@@ -67,10 +69,10 @@ Zynthian.DialogQuestion {
                     if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
-                        component.selectedChannel.keyZoneMode = "manual";
                         clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneStart = Math.min(clipObj.keyZoneStart + 1, 127);
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
                 break;
             case "KNOB0_DOWN":
@@ -78,10 +80,10 @@ Zynthian.DialogQuestion {
                     if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
-                        component.selectedChannel.keyZoneMode = "manual";
                         clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneStart = Math.max(clipObj.keyZoneStart - 1, -1);
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
                 break;
             case "KNOB1_UP":
@@ -89,10 +91,10 @@ Zynthian.DialogQuestion {
                     if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
-                        component.selectedChannel.keyZoneMode = "manual";
                         clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneEnd = Math.min(clipObj.keyZoneEnd + 1, 127);
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
                 break;
             case "KNOB1_DOWN":
@@ -100,10 +102,10 @@ Zynthian.DialogQuestion {
                     if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
-                        component.selectedChannel.keyZoneMode = "manual";
                         clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.keyZoneEnd = Math.max(clipObj.keyZoneEnd - 1, -1);
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
                 break;
             case "KNOB2_UP":
@@ -111,10 +113,10 @@ Zynthian.DialogQuestion {
                     if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
-                        component.selectedChannel.keyZoneMode = "manual";
                         clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.rootNote = Math.min(clipObj.rootNote + 1, 127);
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
                 break;
             case "KNOB2_DOWN":
@@ -122,10 +124,10 @@ Zynthian.DialogQuestion {
                     if (component.selectedChannel.selectedSlot.className === "TracksBar_synthslot") {
                         clipObj = component.selectedChannel.chainedSoundsKeyzones[component.selectedChannel.selectedSlotRow];
                     } else {
-                        component.selectedChannel.keyZoneMode = "manual";
                         clipObj = Zynthbox.PlayGridManager.getClipById(component.selectedChannel.samples[component.selectedChannel.selectedSlotRow].cppObjId).selectedSliceObject;
                     }
                     clipObj.rootNote = Math.max(clipObj.rootNote - 1, 0);
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
                 break;
             case "KNOB3_UP":
@@ -142,6 +144,8 @@ Zynthian.DialogQuestion {
                     } else {
                         tracksBar.pickNextSlot(true);
                     }
+                    component.thisIsCheating = 1;
+                    component.thisIsCheating = 0;
                 }
                 break;
             case "KNOB3_DOWN":
@@ -158,6 +162,8 @@ Zynthian.DialogQuestion {
                     } else {
                         tracksBar.pickPreviousSlot(true);
                     }
+                    component.thisIsCheating = 1;
+                    component.thisIsCheating = 0;
                 }
                 break;
             case "SWITCH_BACK_SHORT":
@@ -170,102 +176,108 @@ Zynthian.DialogQuestion {
     }
 
     contentItem: ColumnLayout {
-        Timer {
-            id: keyZoneSetupSelectedChannelThrottle
-            interval: 1; running: false; repeat: false;
-            onTriggered: {
-                component.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null;
-            }
-        }
-        Connections {
-            target: zynqtgui.sketchpad
-            onSelected_track_id_changed: keyZoneSetupSelectedChannelThrottle.restart()
-        }
+        Layout.fillHeight: true
+        Layout.fillWidth: true
         spacing: 0
         RowLayout {
+            id: currentSlotControls
             Layout.fillWidth: true
+            property int index: component.selectedChannel ? component.selectedChannel.selectedSlot.value : 0
+            property var channelSample: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_sampleslot" ? component.selectedChannel.samples && component.selectedChannel.samples[index] : null
+            property int engineMidiChannel: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot" ? component.selectedChannel.chainedSounds[index] : -1
+            property QtObject clipObj: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
+                ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
+                : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
+            property QtObject keyZoneContainer: component.selectedChannel
+                ? component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
+                    ? (clipObj === undefined ? null : clipObj)
+                    : (clipObj === null || clipObj.selectedSliceObject === undefined ? null : clipObj.selectedSliceObject)
+                : null
             Item {
                 Layout.fillWidth: true
+                Timer {
+                    id: keyZoneSetupSelectedChannelThrottle
+                    interval: 1; running: false; repeat: false;
+                    onTriggered: {
+                        component.selectedChannel = zynqtgui.sketchpad.song ? zynqtgui.sketchpad.song.channelsModel.getChannel(zynqtgui.sketchpad.selectedTrackId) : null;
+                    }
+                }
+                Connections {
+                    target: applicationWindow()
+                    onSelectedChannelChanged: keyZoneSetupSelectedChannelThrottle.restart()
+                }
+                Component.onCompleted: {
+                    keyZoneSetupSelectedChannelThrottle.restart()
+                }
+                Connections {
+                    target: component.song
+                    onIsLoadingChanged: {
+                        if (component.song.isLoading == false) {
+                            keyZoneSetupSelectedChannelThrottle.restart();
+                        }
+                    }
+                }
+                Connections {
+                    target: component
+                    onSongChanged: {
+                        keyZoneSetupSelectedChannelThrottle.restart();
+                    }
+                }
             }
             QQC2.Label {
-                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
-                text: "Manual"
-                Rectangle {
-                    visible: component.selectedChannel && component.selectedChannel.keyZoneMode == "manual";
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
-                    height: 2
-                    color: Kirigami.Theme.highlightColor
+                text: component.selectedChannel
+                    ? component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
+                        ? "Synth %1".arg(currentSlotControls.index + 1)
+                        : "Sample %1".arg(currentSlotControls.index + 1)
+                    : ""
+            }
+            QQC2.Button {
+                enabled: currentSlotControls.keyZoneContainer !== null
+                text: "Disable"
+                onClicked: {
+                    currentSlotControls.keyZoneContainer.keyZoneStart = -1;
+                    currentSlotControls.keyZoneContainer.keyZoneEnd = -1;
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
             }
-            // QQC2.Button {
-            //     visible: component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
-            //     text: "Split Evenly"
-            //     onClicked: {
-            //          This should split the space evenly between the slots, but also... this will likely work a bit weirdly for more than two slots, which would usually be more a case of layering + splitting, and we can't reasonably guess at that... but maybe we don't care?
-            //     }
-            // }
-            Repeater {
-                model: 5
-                QQC2.Button {
-                    property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
-                    property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
-                        ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
-                        : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
-                    enabled: clipObj !== null
-                    text: (index === 0 ? "Disable slot " : "") + (index + 1)
-                    onClicked: {
-                        if (component.selectedChannel.slotType.className === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
-                            component.selectedChannel.keyZoneMode = "manual";
-                        }
-                        keyZoneContainer.keyZoneStart = -1;
-                        keyZoneContainer.keyZoneEnd = -1;
-                        keyZoneContainer.rootNote = -1;
-                        component.selectedChannel.selectedSlotRow = index;
-                    }
+            QQC2.Button {
+                enabled: currentSlotControls.keyZoneContainer !== null
+                text: "Assign Full Width"
+                onClicked: {
+                    currentSlotControls.keyZoneContainer.keyZoneStart = 0;
+                    currentSlotControls.keyZoneContainer.keyZoneEnd = 127;
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
             }
-            Repeater {
-                model: 5
-                QQC2.Button {
-                    property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
-                    property int engineMidiChannel: component.selectedChannel ? component.selectedChannel.chainedSounds[index] : -1
-                    property QtObject clipObj: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
-                        ? engineMidiChannel > -1 && component.selectedChannel.checkIfLayerExists(engineMidiChannel) ? component.selectedChannel.chainedSoundsKeyzones[index] : null
-                        : channelSample ? Zynthbox.PlayGridManager.getClipById(channelSample.cppObjId) : null
-                    property QtObject keyZoneContainer: component.selectedChannel && component.selectedChannel.selectedSlot.className === "TracksBar_synthslot" ? clipObj : (clipObj === null ? null : clipObj.selectedSliceObject)
-                    enabled: clipObj !== null
-                    text: (index === 0 ? "Assign full width to slot " : "") + (index + 1)
-                    onClicked: {
-                        if (component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop") {
-                            component.selectedChannel.keyZoneMode = "manual";
-                        }
-                        keyZoneContainer.keyZoneStart = 0;
-                        keyZoneContainer.keyZoneEnd = 127;
-                        keyZoneContainer.rootNote = 60;
-                        component.selectedChannel.selectedSlotRow = index;
-                    }
+            QQC2.Button {
+                enabled: currentSlotControls.keyZoneContainer !== null
+                text: "Assign To Lower Split"
+                onClicked: {
+                    currentSlotControls.keyZoneContainer.keyZoneStart = 0;
+                    currentSlotControls.keyZoneContainer.keyZoneEnd = 60;
+                    component.selectedChannel.keyZoneMode = "manual";
+                }
+            }
+            QQC2.Button {
+                enabled: currentSlotControls.keyZoneContainer !== null
+                text: "Assign To Upper Split"
+                onClicked: {
+                    currentSlotControls.keyZoneContainer.keyZoneStart = 61;
+                    currentSlotControls.keyZoneContainer.keyZoneEnd = 127;
+                    component.selectedChannel.keyZoneMode = "manual";
                 }
             }
             Rectangle {
-                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
                 Layout.margins: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.disabledTextColor
             }
             QQC2.Label {
-                text: "Auto"
-                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
+                text: "All:"
             }
             QQC2.Button {
-                text: "All Full"
-                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
+                text: "Set To Full"
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "all-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -275,7 +287,6 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 text: "Split Full"
-                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -285,11 +296,19 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 text: "Split Narrow"
-                visible: component.selectedChannel ? component.selectedChannel.trackType === "sample-trig" || component.selectedChannel.trackType === "sample-loop" : false
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-narrow";
                 onClicked: {
                     if (component.selectedChannel) {
                         component.selectedChannel.keyZoneMode = "split-narrow";
+                    }
+                }
+            }
+            QQC2.Button {
+                text: "Manual"
+                checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "manual";
+                onClicked: {
+                    if (component.selectedChannel) {
+                        component.selectedChannel.keyZoneMode = "manual";
                     }
                 }
             }
@@ -356,10 +375,16 @@ Zynthian.DialogQuestion {
                             height: Kirigami.Units.largeSpacing * 2
                             width: height
                             radius: height / 2
-                            color: Kirigami.Theme.backgroundColor
+                            color: sampleKeyzoneDelegate.isCurrent ? sampleKeyzoneDelegate.lineColor : Kirigami.Theme.backgroundColor
                             border {
                                 width: 2
                                 color: sampleKeyzoneDelegate.lineColor
+                            }
+                            QQC2.Label {
+                                anchors.centerIn: parent
+                                font.pixelSize: parent.height * 0.5
+                                color: sampleKeyzoneDelegate.isCurrent ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                text: sampleKeyzoneDelegate.keyZoneContainer ? Zynthbox.KeyScales.midiNoteName(sampleKeyzoneDelegate.keyZoneContainer.keyZoneStart) : ""
                             }
                         }
                         Rectangle {
@@ -377,14 +402,20 @@ Zynthian.DialogQuestion {
                                 top: parent.top
                                 topMargin: sampleKeyzoneDelegate.combinedIndex * (parent.height / slotTypeRepeater.totalDisplayRowCount)
                             }
-                            x: pianoKeyEndItem ? (pianoKeyEndItem.x - sampleKeyzoneDelegate.x) + (pianoKeyEndItem.width / 2) : sampleHandle.x
+                            x: pianoKeyEndItem ? (pianoKeyEndItem.x - sampleKeyzoneDelegate.x) + (pianoKeyEndItem.isSharpKey ? -(sampleEndHandle.width / 2) : 0) : sampleHandle.x
                             height: Kirigami.Units.largeSpacing * 2
                             width: height
                             radius: height / 2
-                            color: Kirigami.Theme.backgroundColor
+                            color: sampleKeyzoneDelegate.isCurrent ? sampleKeyzoneDelegate.lineColor : Kirigami.Theme.backgroundColor
                             border {
                                 width: 2
                                 color: sampleKeyzoneDelegate.lineColor
+                            }
+                            QQC2.Label {
+                                anchors.centerIn: parent
+                                font.pixelSize: parent.height * 0.5
+                                color: sampleKeyzoneDelegate.isCurrent ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                text: sampleKeyzoneDelegate.keyZoneContainer ? Zynthbox.KeyScales.midiNoteName(sampleKeyzoneDelegate.keyZoneContainer.keyZoneEnd) : ""
                             }
                         }
                         Rectangle {
@@ -473,7 +504,7 @@ Zynthian.DialogQuestion {
                                     }
                                     font.pixelSize: Kirigami.Units.largeSpacing
                                     color: Kirigami.Theme.textColor
-                                    text: "Root Note"
+                                    text: "Root Note: %1".arg(visible ? Zynthbox.KeyScales.midiNoteName(sampleKeyzoneDelegate.keyZoneContainer.rootNote) : "")
                                     Rectangle {
                                         anchors {
                                             horizontalCenter: parent.horizontalCenter

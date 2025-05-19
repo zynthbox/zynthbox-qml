@@ -84,9 +84,9 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
         ['portamento',['portamento on/off','portamento time','portamento up/down','portamento thresh']],
         ['modulation',['modulation','modulation amplitude','modulation depth','modulation exp']],
         ['resonance',['resonance center','res.center depth','resonance bandwidth','res.bw depth']],
-        ['bandwidth',['volume','bandwidth','bandwidth depth','bandwidth exp']],
-        ['velocity',['volume','panning','velocity sens.','velocity offs.']],
-        ['depth',['volume','panning depth','filter.cutoff depth','filter.Q depth']]
+        ['bandwidth',['bandwidth','bandwidth depth','bandwidth exp']],
+        ['velocity',['panning','velocity sens.','velocity offs.']],
+        ['depth',['panning depth','filter.cutoff depth','filter.Q depth']]
     ]
 
     #----------------------------------------------------------------------------

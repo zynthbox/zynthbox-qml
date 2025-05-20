@@ -795,7 +795,7 @@ Rectangle {
                     console.log("It does not, append it");
                     copyTo = copyTo + "." + originalSuffix;
                 }
-                if (clipToSave.copyTo(copyTo)) {
+                if (clipToSave.exportToFile(copyTo)) {
                     console.log("Successfully copied the clip with path name", clipToSave.path, "to ", copyTo)
                 } else {
                     console.log("Failed to copy the clip with path name", clipToSave.path, "to", copyTo)

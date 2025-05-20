@@ -500,6 +500,13 @@ class sketchpad_channel(QObject):
             sketchFxClient.dryWetMixAmountChanged.connect(lambda theClient=sketchFxClient:handlePassthroughClientDryWetMixAmountChanged(theClient))
             sketchFxClient.panAmountChanged.connect(lambda theClient=sketchFxClient:handlePassthroughClientPanAmountChanged(theClient))
 
+        # Make sure our track's various mixer values are as they are supposed to be, before we potentially load any from disk
+        self.set_muted(False)
+        self.gainHandler.setGainDb(0)
+        self.set_wetFx1Amount(0)
+        self.set_wetFx2Amount(0)
+        self.set_pan(0)
+
         # Connect to respective signals when any of the slot data changes
         self.slotsReordered.connect(self.sketchSlotsDataChanged.emit)
         self.externalAudioSourceChanged.connect(self.externalSlotsDataChanged.emit)

@@ -276,6 +276,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
             - A zynthian_gui_controller value changes
             - A multi controller value changes
             - When preset is changed by gui_sketchpad
+            - When any slot mixerbus/eq value changes
         """
         # HACK to use a timer from another thread
         if self.isLoading == 0 and self.zynqtgui.sketchpad is not None and self.zynqtgui.sketchpad.song is not None and not self.zynqtgui.sketchpad.song.isLoading and self.zynqtgui.isBootingComplete:

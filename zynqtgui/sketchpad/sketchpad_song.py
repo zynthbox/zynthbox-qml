@@ -142,33 +142,34 @@ class sketchpad_song(QObject):
         for midiChannel in range(0, 16):
             setPassthroughClientDefaults(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
 
-        def connectPassthroughClientForSaving(passthroughClient):
-            passthroughClient.equaliserEnabledChanged.connect(self.schedule_save)
+        def connectPassthroughClientForSaving(passthroughClient, connectWhat):
+            passthroughClient.equaliserEnabledChanged.connect(connectWhat)
             for filterObject in passthroughClient.equaliserSettings():
-                filterObject.filterTypeChanged.connect(self.schedule_save)
-                filterObject.frequencyChanged.connect(self.schedule_save)
-                filterObject.qualityChanged.connect(self.schedule_save)
-                filterObject.soloedChanged.connect(self.schedule_save)
-                filterObject.gainChanged.connect(self.schedule_save)
-                filterObject.activeChanged.connect(self.schedule_save)
-            passthroughClient.compressorEnabledChanged.connect(self.schedule_save)
-            passthroughClient.compressorSidechannelLeftChanged.connect(self.schedule_save)
-            passthroughClient.compressorSidechannelRightChanged.connect(self.schedule_save)
-            passthroughClient.compressorSettings().thresholdChanged.connect(self.schedule_save)
-            passthroughClient.compressorSettings().makeUpGainChanged.connect(self.schedule_save)
-            passthroughClient.compressorSettings().kneeWidthChanged.connect(self.schedule_save)
-            passthroughClient.compressorSettings().releaseChanged.connect(self.schedule_save)
-            passthroughClient.compressorSettings().attackChanged.connect(self.schedule_save)
-            passthroughClient.compressorSettings().ratioChanged.connect(self.schedule_save)
-        connectPassthroughClientForSaving(Zynthbox.Plugin.instance().globalPlaybackClient())
+                filterObject.filterTypeChanged.connect(connectWhat)
+                filterObject.frequencyChanged.connect(connectWhat)
+                filterObject.qualityChanged.connect(connectWhat)
+                filterObject.soloedChanged.connect(connectWhat)
+                filterObject.gainChanged.connect(connectWhat)
+                filterObject.activeChanged.connect(connectWhat)
+            passthroughClient.compressorEnabledChanged.connect(connectWhat)
+            passthroughClient.compressorSidechannelLeftChanged.connect(connectWhat)
+            passthroughClient.compressorSidechannelRightChanged.connect(connectWhat)
+            passthroughClient.compressorSettings().thresholdChanged.connect(connectWhat)
+            passthroughClient.compressorSettings().makeUpGainChanged.connect(connectWhat)
+            passthroughClient.compressorSettings().kneeWidthChanged.connect(connectWhat)
+            passthroughClient.compressorSettings().releaseChanged.connect(connectWhat)
+            passthroughClient.compressorSettings().attackChanged.connect(connectWhat)
+            passthroughClient.compressorSettings().ratioChanged.connect(connectWhat)
+        connectPassthroughClientForSaving(Zynthbox.Plugin.instance().globalPlaybackClient(), self.schedule_save)
         for midiChannel in range(0, 16):
-            connectPassthroughClientForSaving(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel])
+            connectPassthroughClientForSaving(Zynthbox.Plugin.instance().synthPassthroughClients()[midiChannel], self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot)
         for trackIndex in range(0, Zynthbox.Plugin.instance().sketchpadTrackCount()):
             for slotType in range(0, 2):
                 for laneIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                    connectPassthroughClientForSaving(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex))
+                    connectPassthroughClientForSaving(Zynthbox.Plugin.instance().trackPassthroughClient(trackIndex, slotType, laneIndex), self.schedule_save)
             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
-                connectPassthroughClientForSaving(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex])
+                connectPassthroughClientForSaving(Zynthbox.Plugin.instance().fxPassthroughClients()[trackIndex][slotIndex], self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot)
+                connectPassthroughClientForSaving(Zynthbox.Plugin.instance().sketchFxPassthroughClients()[trackIndex][slotIndex], self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot)
 
         if not self.restore(load_autosave):
             # Creating new temp sketchpad. So set hasUnsavedChanges to True

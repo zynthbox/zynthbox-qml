@@ -1457,8 +1457,10 @@ class sketchpad_channel(QObject):
             self.select_correct_layer()
             # Ensure we clear the passthrough (or it'll retain its value)
             passthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[chan]
+            sketchpad_song.setPassthroughClientDefaults(passthroughClient)
             passthroughClient.setPanAmount(self.__initial_pan__)
             passthroughClient.setDryAmount(1)
+            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
             self.__song__.schedule_save()
             self.chained_sounds_changed.emit()
             if cb is not None:
@@ -1588,8 +1590,10 @@ class sketchpad_channel(QObject):
                         self.__routingData__["fx"][fxSlotIndex].clear()
                         # Ensure we clear the passthrough (or it'll retain its value)
                         passthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][fxSlotIndex]
+                        sketchpad_song.setPassthroughClientDefaults(passthroughClient)
                         passthroughClient.setPanAmount(self.__initial_pan__)
                         passthroughClient.setDryWetMixAmount(1)
+                        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
                         self.chainedFxChanged.emit()
                         self.chainedFxNamesChanged.emit()
@@ -1698,8 +1702,10 @@ class sketchpad_channel(QObject):
                         self.__chained_sketch_fx[fxSlotIndex] = None
                         # Ensure we clear the passthrough (or it'll retain its value)
                         passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
+                        sketchpad_song.setPassthroughClientDefaults(passthroughClient)
                         passthroughClient.setPanAmount(self.__initial_pan__)
                         passthroughClient.setDryWetMixAmount(1)
+                        self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
                         self.chainedSketchFxChanged.emit()
                         self.chainedSketchFxNamesChanged.emit()
@@ -2511,7 +2517,7 @@ class sketchpad_channel(QObject):
                 # logging.info(f"Changing pan/dry amounts for {self.__id__} lane {laneId} from {synthPassthroughClient.panAmount()} and {synthPassthroughClient.dryAmount()} from {panAmount} to {dryAmount}")
                 synthPassthroughClient.setPanAmount(panAmount)
                 synthPassthroughClient.dryGainHandler().setGain(dryAmount)
-                self.__song__.schedule_save()
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
     def get_synthPassthrough0pan(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["panAmount"]
     def get_synthPassthrough0dry(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["synthPassthrough"][0]["dryAmount"]
@@ -2546,7 +2552,7 @@ class sketchpad_channel(QObject):
             # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
             fxPassthroughClient.setPanAmount(panAmount)
             fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
-            self.__song__.schedule_save()
+            self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
 
     def get_fxPassthrough0pan(self):       return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["panAmount"]
     def get_fxPassthrough0dryWetMix(self): return self.__audioTypeSettings__[self.audioTypeSettingsKey()]["fxPassthrough"][0]["dryWetMixAmount"]
@@ -2580,7 +2586,7 @@ class sketchpad_channel(QObject):
                 # logging.info(f"Changing fx pan/wetdrymix amounts for {self.__id__} lane {laneId} from {fxPassthroughClient.panAmount()} and {fxPassthroughClient.dryWetMixAmount()} to {panAmount} and {dryWetMixAmount}")
                 fxPassthroughClient.setPanAmount(panAmount)
                 fxPassthroughClient.setDryWetMixAmount(dryWetMixAmount)
-                self.__song__.schedule_save()
+                self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
             except Exception as e:
                 logging.error(f"Error occured in handlingSketchFxPassthroughMixingChanged : str(e)")
 

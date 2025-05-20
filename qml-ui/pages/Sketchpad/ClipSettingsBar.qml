@@ -202,7 +202,7 @@ ColumnLayout {
         Zynthian.SketchpadDial {
             id: pitchDial
             text: qsTr("Pitch") + "\n"
-            controlObj: root.clipAudioSource
+            controlObj: root.clipAudioSource ? root.clipAudioSource.selectedSliceObject : null
             controlProperty: "pitch"
             fixedPointTrail: 2
             Layout.fillWidth: true

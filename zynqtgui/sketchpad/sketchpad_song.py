@@ -220,6 +220,9 @@ class sketchpad_song(QObject):
         self.__is_loading__ = False
         self.isLoadingChanged.emit()
 
+    def clearPassthroughClient(self, passthroughClient):
+        setPassthroughClientDefaults(passthroughClient)
+
     def to_be_deleted(self):
         self.__to_be_deleted__ = True
 

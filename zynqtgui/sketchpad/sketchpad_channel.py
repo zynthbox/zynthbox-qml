@@ -1457,7 +1457,7 @@ class sketchpad_channel(QObject):
             self.select_correct_layer()
             # Ensure we clear the passthrough (or it'll retain its value)
             passthroughClient = Zynthbox.Plugin.instance().synthPassthroughClients()[chan]
-            sketchpad_song.setPassthroughClientDefaults(passthroughClient)
+            self.__song__.clearPassthroughClient(passthroughClient)
             passthroughClient.setPanAmount(self.__initial_pan__)
             passthroughClient.setDryAmount(1)
             self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
@@ -1590,7 +1590,7 @@ class sketchpad_channel(QObject):
                         self.__routingData__["fx"][fxSlotIndex].clear()
                         # Ensure we clear the passthrough (or it'll retain its value)
                         passthroughClient = Zynthbox.Plugin.instance().fxPassthroughClients()[self.__id__][fxSlotIndex]
-                        sketchpad_song.setPassthroughClientDefaults(passthroughClient)
+                        self.__song__.clearPassthroughClient(passthroughClient)
                         passthroughClient.setPanAmount(self.__initial_pan__)
                         passthroughClient.setDryWetMixAmount(1)
                         self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()
@@ -1702,7 +1702,7 @@ class sketchpad_channel(QObject):
                         self.__chained_sketch_fx[fxSlotIndex] = None
                         # Ensure we clear the passthrough (or it'll retain its value)
                         passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
-                        sketchpad_song.setPassthroughClientDefaults(passthroughClient)
+                        self.__song__.clearPassthroughClient(passthroughClient)
                         passthroughClient.setPanAmount(self.__initial_pan__)
                         passthroughClient.setDryWetMixAmount(1)
                         self.zynqtgui.screens['snapshot'].schedule_save_last_state_snapshot()

@@ -729,9 +729,12 @@ Kirigami.AbstractApplicationWindow {
                 anchors.margins: Kirigami.Units.largeSpacing
                 horizontalAlignment: QQC2.Label.AlignHCenter
                 verticalAlignment: QQC2.Label.AlignVCenter
-                elide: QQC2.Label.ElideMiddle
+                elide: Text.ElideMiddle
                 wrapMode: QQC2.Label.WrapAnywhere
                 font.pointSize: 10
+                minimumPointSize: 5
+                fontSizeMode: Text.Fit
+                maximumLineCount: 3
                 text: qsTr("%1 %2").arg(zynqtgui.sketchpad.song.name).arg(zynqtgui.sketchpad.song.hasUnsavedChanges ? "(*)" : "")
             }
 

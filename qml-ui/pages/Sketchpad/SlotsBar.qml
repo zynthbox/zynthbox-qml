@@ -1124,7 +1124,7 @@ Rectangle {
                     if (root.selectedChannel.selectedSlot.className == "TracksBar_fxslot") {
                         root.requestSlotEqualizer(root.selectedChannel, "fx", root.selectedChannel.selectedSlot.value);
                     } else if (root.selectedChannel.selectedSlot.className == "TracksBar_sketchfxslot") {
-                        // TODO : sketchFx
+                        root.requestSlotEqualizer(root.selectedChannel, "sketchfx", root.selectedChannel.selectedSlot.value);
                     }
                 }
             },

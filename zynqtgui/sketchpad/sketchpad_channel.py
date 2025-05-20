@@ -405,10 +405,11 @@ class sketchpad_channel(QObject):
         self.__track_type__ = "synth"
         self.__track_routing_style__ = "standard"
         self.__routingData__ = {
+            "sketchfx": [],
             "fx": [],
             "synth": []
             }
-        for routingDataCategory in ["fx", "synth"]:
+        for routingDataCategory in ["sketchfx", "fx", "synth"]:
             for slotIndex in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
                 newRoutingData = sketchpad_engineRoutingData(self)
                 newRoutingData.routingDataChanged.connect(self.__song__.schedule_save)
@@ -825,6 +826,7 @@ class sketchpad_channel(QObject):
                 "trackRoutingStyle": self.__track_routing_style__,
                 "fxRoutingData": [entry.serialize() for entry in self.__routingData__["fx"]],
                 "synthRoutingData": [entry.serialize() for entry in self.__routingData__["synth"]],
+                "sketchFxRoutingData": [entry.serialize() for entry in self.__routingData__["sketchfx"]],
                 "synthKeyzoneData": [entry.serialize() for entry in self.__chained_sounds_keyzones__],
                 "targetTrack": int(Zynthbox.MidiRouter.instance().sketchpadTrackTargetTracks()[self.__id__]),
                 "externalMidiChannel" : self.__externalSettings__.midiChannel,
@@ -897,6 +899,13 @@ class sketchpad_channel(QObject):
             else:
                 self.set_track_routing_style("standard", True)
 
+            if "sketchFxRoutingData" in obj:
+                for slotIndex, routingData in enumerate(obj["sketchFxRoutingData"]):
+                    if slotIndex > 4:
+                        logging.error("Error during deserialization: sketchFxRoutingData has too many entries")
+                        break
+                    self.__routingData__["sketchfx"][slotIndex].deserialize(routingData)
+            self.sketchFxRoutingDataChanged.emit()
             if "fxRoutingData" in obj:
                 for slotIndex, routingData in enumerate(obj["fxRoutingData"]):
                     if slotIndex > 4:
@@ -1655,6 +1664,8 @@ class sketchpad_channel(QObject):
     def set_chainedSketchFx(self, fx):
         if fx != self.__chained_sketch_fx:
             self.__chained_sketch_fx = fx
+            for slot_index, layer in enumerate(fx):
+                self.updateChainedSketchFxEngineData(slot_index, layer)
             self.update_jack_port()
             self.__sound_snapshot_changed = True
             self.__song__.schedule_save()
@@ -1676,9 +1687,11 @@ class sketchpad_channel(QObject):
             self.__chained_sketch_fx[slot_row].reset()
             self.zynqtgui.zynautoconnect_release_lock()
             self.zynqtgui.screens['engine'].stop_unused_engines()
+            self.__routingData__["sketchfx"][slot_row].clear()
 
         self.update_jack_port()
         self.__chained_sketch_fx[slot_row] = layer
+        self.updateChainedSketchFxEngineData(slot_row, layer)
         self.__sound_snapshot_changed = True
         self.chainedSketchFxChanged.emit()
         self.chainedSketchFxNamesChanged.emit()
@@ -1700,6 +1713,7 @@ class sketchpad_channel(QObject):
                         layer_index = self.zynqtgui.layer.layers.index(self.__chained_sketch_fx[fxSlotIndex])
                         self.zynqtgui.layer.remove_layer(layer_index)
                         self.__chained_sketch_fx[fxSlotIndex] = None
+                        self.__routingData__["sketchfx"][slot_row].clear()
                         # Ensure we clear the passthrough (or it'll retain its value)
                         passthroughClient = Zynthbox.Plugin.instance().sketchFxPassthroughClients()[self.__id__][fxSlotIndex]
                         self.__song__.clearPassthroughClient(passthroughClient)
@@ -1713,6 +1727,17 @@ class sketchpad_channel(QObject):
                         logging.exception(e)
                     QTimer.singleShot(1, self.zynqtgui.end_long_task)
             self.zynqtgui.do_long_task(task, f"Removing {self.chainedSketchFxNames[fxSlotIndex]} from slot {fxSlotIndex + 1} on Track {self.name}")
+
+    def updateChainedSketchFxEngineData(self, position, layer):
+        if layer is not None:
+            dataContainer = self.__routingData__["sketchfx"][position]
+            dataContainer.name = self.chainedSketchFxNames[position]
+            audioInPorts = self.jclient.get_ports(layer.jackname, is_audio=True, is_input=True)
+            for port in audioInPorts:
+                dataContainer.addAudioInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
+            midiInPorts = self.jclient.get_ports(layer.jackname, is_midi=True, is_input=True)
+            for port in midiInPorts:
+                dataContainer.addMidiInPort(dataContainer.humanReadablePortName(port.shortname), port.name)
 
     chainedSketchFxChanged = Signal()
     chainedSketchFx = Property('QVariantList', get_chainedSketchFx, set_chainedSketchFx, notify=chainedSketchFxChanged)
@@ -1935,6 +1960,15 @@ class sketchpad_channel(QObject):
         return "Unknown"
     trackRoutingStyleName = Property(str, get_track_routing_style_name, notify=track_routing_style_changed)
     ### END Property trackRoutingStyle
+
+    ### BEGIN Property sketchFxRoutingData
+    def get_sketchFxRoutingData(self):
+        return self.__routingData__["sketchfx"]
+
+    sketchFxRoutingDataChanged = Signal()
+
+    sketchFxRoutingData = Property('QVariantList', get_sketchFxRoutingData, notify=sketchFxRoutingDataChanged)
+    ### END Property sketchFxRoutingData
 
     ### BEGIN Property fxRoutingData
     def get_fxRoutingData(self):

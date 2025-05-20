@@ -175,7 +175,9 @@ Zynthian.DialogQuestion {
                             ? selectedChannel.synthRoutingData[slotIndex]
                             : slotType === "fx"
                                 ? selectedChannel.fxRoutingData[slotIndex]
-                                : null
+                                : slotType === "sketchfx"
+                                    ? selectedChannel.sketchFxRoutingData[slotIndex]
+                                    : null
                     property QtObject slotPassthroughClient: slotType === ""
                         ? null
                         : slotType === "sketch"
@@ -190,7 +192,9 @@ Zynthian.DialogQuestion {
                                             ? Zynthbox.Plugin.synthPassthroughClients[selectedChannel.chainedSounds[slotIndex]]
                                             : slotType === "fx"
                                                 ? Zynthbox.Plugin.fxPassthroughClients[selectedChannel.id][slotIndex]
-                                                : null
+                                                : slotType === "sketchfx"
+                                                    ? Zynthbox.Plugin.sketchFxPassthroughClients[selectedChannel.id][slotIndex]
+                                                    : null
                     function getCurrent() {
                         let currentObject = null;
                         if (_private.slotPassthroughClient.compressorSettings.selected === true) {

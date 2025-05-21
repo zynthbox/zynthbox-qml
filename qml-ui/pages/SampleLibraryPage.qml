@@ -244,9 +244,11 @@ Zynthian.ScreenPage {
                         break;
                     case 1:
                         folderListView.currentIndex = Math.min(folderListView.count - 1, folderListView.currentIndex + 1);
+                        folderListView.positionViewAtIndex(folderListView.currentIndex, ListView.Center);
                         break;
                     case 2:
                         filesListView.currentIndex = Math.min(filesListView.count - 1, filesListView.currentIndex + 1);
+                        filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center);
                         break;
                 }
                 returnValue = true;
@@ -269,9 +271,11 @@ Zynthian.ScreenPage {
                         break;
                     case 1:
                         folderListView.currentIndex = Math.max(0, folderListView.currentIndex - 1);
+                        folderListView.positionViewAtIndex(folderListView.currentIndex, ListView.Center);
                         break;
                     case 2:
                         filesListView.currentIndex = Math.max(0, filesListView.currentIndex - 1);
+                        filesListView.positionViewAtIndex(filesListView.currentIndex, ListView.Center);
                         break;
                 }
                 returnValue = true;

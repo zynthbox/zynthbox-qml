@@ -249,12 +249,13 @@ Zynthian.DialogQuestion {
                     component.selectedChannel.keyZoneMode = "manual";
                 }
             }
+            // TODO We probably want to use the track's split point here... because that'd be kind of nice ;)
             QQC2.Button {
                 enabled: currentSlotControls.keyZoneContainer !== null
                 text: "Assign To Lower Split"
                 onClicked: {
                     currentSlotControls.keyZoneContainer.keyZoneStart = 0;
-                    currentSlotControls.keyZoneContainer.keyZoneEnd = 60;
+                    currentSlotControls.keyZoneContainer.keyZoneEnd = 59;
                     component.selectedChannel.keyZoneMode = "manual";
                 }
             }
@@ -262,7 +263,7 @@ Zynthian.DialogQuestion {
                 enabled: currentSlotControls.keyZoneContainer !== null
                 text: "Assign To Upper Split"
                 onClicked: {
-                    currentSlotControls.keyZoneContainer.keyZoneStart = 61;
+                    currentSlotControls.keyZoneContainer.keyZoneStart = 60;
                     currentSlotControls.keyZoneContainer.keyZoneEnd = 127;
                     component.selectedChannel.keyZoneMode = "manual";
                 }

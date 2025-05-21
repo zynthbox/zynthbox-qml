@@ -507,6 +507,11 @@ class sketchpad_channel(QObject):
         self.set_wetFx2Amount(0)
         self.set_pan(0)
 
+        # Update the keyzone data when the things that it depends on change
+        self.keyZoneModeChanged.connect(self.updateKeyZones)
+        self.samples_changed.connect(self.updateKeyZones) # Since this is emitted when each sample's path changes as well, just hook in here
+        self.chained_sounds_changed.connect(self.updateKeyZones)
+
         # Connect to respective signals when any of the slot data changes
         self.slotsReordered.connect(self.sketchSlotsDataChanged.emit)
         self.externalAudioSourceChanged.connect(self.externalSlotsDataChanged.emit)
@@ -2078,6 +2083,67 @@ class sketchpad_channel(QObject):
     # all-full will set all samples to full width, c4 at 60
     # split-full will spread samples across the note range, in the order 4, 2, 1, 3, 5, starting at note 0, 24 for each, with c4 on the 12th note inside the sample's range
     # split-narrow will set the samples to play only on the white keys from note 60 and up, with that note as root
+    # 2-low-3-high will set the slots to be split at the 2 first slots playing from 0 through c4, and the 3 last slots playing from c#4 and up, with no transposition
+
+    @Slot()
+    def updateKeyZones(self):
+        # This should be called whenever one of the things it depends on changes:
+        # - keyzoneMode
+        # - synth engines (chained_sounds)
+        # - sample setup (samples)
+        slotSettings = None
+        if self.__keyzone_mode__ == "all-full":
+            slotSettings = [
+                [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0],
+                [0, 127, 0]
+            ]
+        elif self.__keyzone_mode__ == "split-full":
+            # auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
+            # root key transpose in semtitones: +48, +24 ,0 , -24, -48
+            slotSettings = [
+                [48, 71, 0],   # slot 1
+                [24, 47, -24], # slot 2
+                [72, 95, 24],  # slot 3
+                [0, 23, -48],  # slot 4
+                [96, 119, 48]  # slot 5
+            ]
+        elif self.__keyzone_mode__ == "split-narrow":
+            # Narrow split puts the samples on the keys C4, D4, E4, F4, G4, and plays them as C4 on those notes
+            slotSettings = [
+                [60, 60, 0], # slot 1
+                [62, 62, 2], # slot 2
+                [64, 64, 4], # slot 3
+                [65, 65, 5], # slot 4
+                [67, 67, 7]  # slot 5
+            ]
+        # TODO We probably want to ensure that we use the track's split point here, instead of a hardcoded one... ;)
+        elif self.__keyzone_mode__ == "2-low-3-high":
+            slotSettings = [
+                [0, 59, 0],
+                [0, 59, 0],
+                [60, 127, 0],
+                [60, 127, 0],
+                [60, 127, 0]
+            ]
+
+        if slotSettings is not None:
+            for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                # Synth slots
+                keyzoneData = self.__chained_sounds_keyzones__[i]
+                keyzoneData.keyZoneStart = slotSettings[i][0]
+                keyzoneData.keyZoneEnd = slotSettings[i][1]
+                keyzoneData.rootNote = 60 + slotSettings[i][2]
+                # Sample slots
+                sample = self.__samples__[i]
+                clip = Zynthbox.PlayGridManager.instance().getClipById(sample.cppObjId)
+                if clip:
+                    clip.rootSlice.keyZoneStart = slotSettings[i][0]
+                    clip.rootSlice.keyZoneEnd = slotSettings[i][1]
+                    clip.rootSlice.rootNote = 60 + slotSettings[i][2]
+
     def get_keyZoneMode(self):
         return self.__keyzone_mode__
 
@@ -3249,18 +3315,19 @@ class sketchpad_channel(QObject):
             self.zynqtgui.set_curlayer(None)
 
     @Slot("QVariantList", str)
-    def reorderSlots(self, newOrder, trackType = None):
+    def reorderSlots(self, newOrder, slotType = None):
         """
-        This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon trackType
+        This method will reorder the synth/sketch/sample slots as per the new index order provided in newOrder depending upon slotType
         """
         # TODO : Use selectedSketchpadSongIndex instead of hardcoding it to 0 after renaming it to something that does not interfere with the name track
-        _trackType = trackType
-        if _trackType is None:
-            _trackType = self.trackType
-        if _trackType == "synth":
+        _slotType = slotType
+        if _slotType is None:
+            _slotType = self.trackType
+        if _slotType == "synth":
             # Reorder synths
             # Form a new chainedSounds as per newOrder
             newChainedSounds = [self.__chained_sounds__[index] for index in newOrder]
+            newKeyZoneData = [self.__chained_sounds_keyzones__[index] for index in newOrder]
 
             # Update slot_index of all the zynthian_layer objects
             for index, midiChannel in enumerate(newChainedSounds):
@@ -3270,9 +3337,15 @@ class sketchpad_channel(QObject):
 
             self.set_chained_sounds(newChainedSounds, updateRoutingData=False)
 
+            # If we've got a manual keyzone setup, ensure we're moving the things around there as well
+            if self.__keyzone_mode__ == "manual":
+                self.__chained_sounds_keyzones__ = newKeyZoneData
+                for slotIndex, keyzoneData in enumerate(self.__chained_sounds_keyzones__):
+                    self. handleChainedSoundsKeyzoneChanged(keyzoneData, slotIndex)
+
             newRoutingData = [self.__routingData__["synth"][index] for index in newOrder]
             self.__routingData__["synth"] = newRoutingData
-        elif _trackType == "sample-loop":
+        elif _slotType == "sample-loop":
             # Reorder sketches
             old_order_clips = [self.getClipsModelById(index).getClip(0) for index in range(5)]
             for index, clip in enumerate(old_order_clips):
@@ -3281,7 +3354,7 @@ class sketchpad_channel(QObject):
                     clip.id = newOrder[index]
                     clip.set_lane(clip.id)
             self.__song__.schedule_save()
-        elif _trackType == "sample-trig":
+        elif _slotType == "sample-trig":
             # Reorder samples
             new_order_samples = [self.samples[index] for index in newOrder]
             for index, sample in enumerate(new_order_samples):
@@ -3292,23 +3365,23 @@ class sketchpad_channel(QObject):
 
         # Update trackPassthrough values in audioTypeSettings to retain correct values after re-ordering
         newAudioTypeSettings = json.loads(self.getAudioTypeSettings())
-        newAudioTypeSettings[self.audioTypeKey(_trackType)]["trackPassthrough"] = [newAudioTypeSettings[self.audioTypeKey(_trackType)]["trackPassthrough"][index] for index in newOrder]
+        newAudioTypeSettings[self.audioTypeKey("synth")]["trackPassthrough"] = [newAudioTypeSettings[self.audioTypeKey("synth")]["trackPassthrough"][index] for index in newOrder]
         self.setAudioTypeSettings(json.dumps(newAudioTypeSettings))
 
         self.slotsReordered.emit()
 
     @Slot(int, int, str)
-    def swapSlots(self, slot1, slot2, trackType = None):
+    def swapSlots(self, slot1, slot2, slotType = None):
         """
-        Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon trackType
+        Swap positions of two synth/sketch/sample slots at index slot1 and slot2 depending upon slotType
         """
-        _trackType = trackType
-        if _trackType is None:
-            _trackType = self.trackType
+        _slotType = slotType
+        if _slotType is None:
+            _slotType = self.trackType
         newOrder = [0, 1, 2, 3, 4]
         newOrder[slot1] = slot2
         newOrder[slot2] = slot1
-        self.reorderSlots(newOrder, _trackType)
+        self.reorderSlots(newOrder, _slotType)
 
     @Slot("QVariantList")
     def reorderChainedFx(self, newOrder):

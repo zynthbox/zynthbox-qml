@@ -227,13 +227,13 @@ Zynthian.DialogQuestion {
             QQC2.Label {
                 text: component.selectedChannel
                     ? component.selectedChannel.selectedSlot.className === "TracksBar_synthslot"
-                        ? "Synth %1".arg(currentSlotControls.index + 1)
-                        : "Sample %1".arg(currentSlotControls.index + 1)
+                        ? "Set Synth %1 To:".arg(currentSlotControls.index + 1)
+                        : "Set Sample %1 To:".arg(currentSlotControls.index + 1)
                     : ""
             }
             QQC2.Button {
                 enabled: currentSlotControls.keyZoneContainer !== null
-                text: "Disable"
+                text: "Disabled"
                 onClicked: {
                     currentSlotControls.keyZoneContainer.keyZoneStart = -1;
                     currentSlotControls.keyZoneContainer.keyZoneEnd = -1;
@@ -242,7 +242,7 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 enabled: currentSlotControls.keyZoneContainer !== null
-                text: "Assign Full Width"
+                text: "Full Width"
                 onClicked: {
                     currentSlotControls.keyZoneContainer.keyZoneStart = 0;
                     currentSlotControls.keyZoneContainer.keyZoneEnd = 127;
@@ -252,7 +252,7 @@ Zynthian.DialogQuestion {
             // TODO We probably want to use the track's split point here... because that'd be kind of nice ;)
             QQC2.Button {
                 enabled: currentSlotControls.keyZoneContainer !== null
-                text: "Assign To Lower Split"
+                text: "Lower Split"
                 onClicked: {
                     currentSlotControls.keyZoneContainer.keyZoneStart = 0;
                     currentSlotControls.keyZoneContainer.keyZoneEnd = 59;
@@ -261,7 +261,7 @@ Zynthian.DialogQuestion {
             }
             QQC2.Button {
                 enabled: currentSlotControls.keyZoneContainer !== null
-                text: "Assign To Upper Split"
+                text: "Upper Split"
                 onClicked: {
                     currentSlotControls.keyZoneContainer.keyZoneStart = 60;
                     currentSlotControls.keyZoneContainer.keyZoneEnd = 127;
@@ -275,10 +275,10 @@ Zynthian.DialogQuestion {
                 color: Kirigami.Theme.disabledTextColor
             }
             QQC2.Label {
-                text: "All:"
+                text: "Auto:"
             }
             QQC2.Button {
-                text: "Set To Full"
+                text: "All Full"
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "all-full";
                 onClicked: {
                     if (component.selectedChannel) {
@@ -305,7 +305,16 @@ Zynthian.DialogQuestion {
                 }
             }
             QQC2.Button {
-                text: "Manual"
+                text: "2+3 Split"
+                checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "2-low-3-high";
+                onClicked: {
+                    if (component.selectedChannel) {
+                        component.selectedChannel.keyZoneMode = "2-low-3-high";
+                    }
+                }
+            }
+            QQC2.Button {
+                text: "Auto Off"
                 checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "manual";
                 onClicked: {
                     if (component.selectedChannel) {

@@ -155,9 +155,10 @@ RowLayout {
             radius: 4
 
             function switchToThisSlot(onlyFocus=false, onlySelectSlot=false) {
+                let wasAlreadySelected = (root.selectedChannel.selectedSlot.className === _private.className && root.selectedChannel.selectedSlot.value === index) ? true : false;
                 root.selectedChannel.selectedSlot.setTo(_private.className, index, slotDelegate);
                 if (onlySelectSlot == false) {
-                    if (zynqtgui.sketchpad.lastSelectedObj.component != slotDelegate || onlyFocus) {
+                    if (wasAlreadySelected == false || onlyFocus) {
                         switch (control.slotType) {
                             case "synth":
                                 zynqtgui.sketchpad.lastSelectedObj.className = "TracksBar_synthslot";
@@ -247,13 +248,14 @@ RowLayout {
                 enabled: (control.slotType !== "external") || (control.slotType === "external" && (index === 0 || index === 1 || index === 2))
                 opacity: enabled ? 1 : 0
                 visible: enabled
+                readonly property bool isSelectedSlot: control.selectedChannel.selectedSlot.className === _private.className && control.selectedChannel.selectedSlot.value === slotDelegate.slotIndex
 
                 Rectangle {
                     anchors {
                         fill: parent
                         margins: -4
                     }
-                    opacity: root.selectedChannel.selectedSlot.component === slotDelegate ? 0.8 : 0
+                    opacity: delegate.isSelectedSlot ? 0.8 : 0
                     color: "transparent"
                     border {
                         width: 2

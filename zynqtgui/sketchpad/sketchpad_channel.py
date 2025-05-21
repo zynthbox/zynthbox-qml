@@ -49,7 +49,7 @@ from ..zynthian_gui_multi_controller import MultiController
 class last_selected_obj_dto(QObject):
     def __init__(self, parent=None):
         super(last_selected_obj_dto, self).__init__(parent)
-        self.__className = None
+        self.__className = "TracksBar_synthslot"
         self.__value = 0
         self.__component = None
 
@@ -1021,9 +1021,52 @@ class sketchpad_channel(QObject):
                 # Sketchpad does not have slots data. Schedule autosave explicitly to save the updated sketchpad json
                 # TODO : Rmove this check after a considerable amount of time when supposedly all the old sketchpads are migrated
                 self.__song__.schedule_save()
+            # Finally, make sure our selected slot value makes some decent amount of sense
+            self.selectFirstAndBestSlot()
         except Exception as e:
             logging.error(f"Error during channel deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
+
+    def selectFirstAndBestSlot(self):
+        pickedASlot = False
+        if self.trackType == "synth" or self.trackType == "sample-trig":
+            for slotIndex, chainedSound in enumerate(self.__chained_sounds__):
+                if chainedSound > -1:
+                    self.__selected_slot_obj.setTo("TracksBar_synthslot", slotIndex, None)
+                    pickedASlot = True
+                    break
+            if pickedASlot == False:
+                for slotIndex, sample in enumerate(self.__samples__):
+                    if sample.path is not None and len(sample.path) > 0:
+                        self.__selected_slot_obj.setTo("TracksBar_sampleslot", slotIndex, None)
+                        pickedASlot = True
+                        break
+            if pickedASlot == False:
+                for slotIndex, fx in enumerate(self.__chained_fx):
+                    if fx is not None:
+                        self.__selected_slot_obj.setTo("TracksBar_fxslot", slotIndex, None)
+                        pickedASlot = True
+                        break
+            if pickedASlot == False:
+                self.__selected_slot_obj.setTo("TracksBar_synthslot", 0, None)
+        elif self.trackType == "sample-loop":
+            for slotIndex in range(Zynthbox.Plugin.instance().sketchpadSlotCount()):
+                clips_model = self.getClipsModelById(slotIndex)
+                clip = clips_model.getClip(self.__song__.scenesModel.selectedSketchpadSongIndex)
+                if clip.path is not None and len(clip.path) > 0:
+                    self.__selected_slot_obj.setTo("TracksBar_sketchslot", slotIndex, None)
+                    pickedASlot = True
+                    break
+            if pickedASlot == False:
+                for slotIndex, fx in enumerate(self.__chained_sketch_fx):
+                    if fx is not None:
+                        self.__selected_slot_obj.setTo("TracksBar_sketchfxslot", slotIndex, None)
+                        pickedASlot = True
+                        break
+            if pickedASlot == False:
+                self.__selected_slot_obj.setTo("TracksBar_sketchslot", 0, None)
+        elif self.trackType == "external":
+            self.__selected_slot_obj.setTo("TracksBar_externalslot", 0, None)
 
     def set_layers_snapshot(self, snapshot):
         self.__layers_snapshot = snapshot
@@ -1907,6 +1950,8 @@ class sketchpad_channel(QObject):
                     if clip is not None:
                         clip.enabled_changed.emit(clip.col, clip.id)
             if force_set == False:
+                # If we are *not* being forced, we have switched from the UI, and need to select a reasonable slot, and also save
+                self.selectFirstAndBestSlot()
                 self.__song__.schedule_save()
             self.update_jack_port()
             self.zynaddubfx_heuristic_connect_timer.start()

@@ -46,25 +46,6 @@ Rectangle {
         onTriggered: {
             if (root.song && root.song.isLoading == false) {
                 root.selectedChannel = applicationWindow().selectedChannel;
-                if (root.selectedChannel) {
-                    if (zynqtgui.isBootingComplete) {
-                        if (root.selectedChannel.selectedSlot.component === null) {
-                            // We really only want to set the selected slot, not the other
-                            // bits (the rest isn't important until we touch something),
-                            // so make sure to ask pickFirstAndBestSlot to only set the
-                            // selected slot, and not the last selected object
-                            root.pickFirstAndBestSlot(true);
-                            // console.log("Selected channel throttle has done the thing");
-                        }
-                    } else {
-                        selectedChannelThrottle.restart();
-                        // Warning: very loud, this one
-                        // console.log("Selected channel throttle time, not done booting up...");
-                    }
-                } else {
-                    selectedChannelThrottle.restart();
-                    // console.log("Selected channel throttle time, don't yet have a selected channel...");
-                }
             } else {
                 selectedChannelThrottle.restart();
                 // console.log("Selected channel throttle time, don't have a song yet, or the song is still loading...");
@@ -378,7 +359,6 @@ Rectangle {
 
             case "SELECT_UP":
                 if (zynqtgui.altButtonPressed) {
-                    root.pickFirstAndBestSlot();
                     switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
                             root.selectedChannel.selectPreviousSynthPreset(root.selectedChannel.selectedSlot.value);
@@ -402,7 +382,6 @@ Rectangle {
 
             case "SELECT_DOWN":
                 if (zynqtgui.altButtonPressed) {
-                    root.pickFirstAndBestSlot();
                     switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
                             root.selectedChannel.selectNextSynthPreset(root.selectedChannel.selectedSlot.value);
@@ -425,7 +404,6 @@ Rectangle {
                 break;
             case "KNOB0_TOUCHED":
                 if (!applicationWindow().osd.opened) {
-                    root.pickFirstAndBestSlot();
                     switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
                             pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], 0)
@@ -467,7 +445,6 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB0_UP":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], 1)
@@ -490,7 +467,6 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB0_DOWN":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         pageManager.getPage("sketchpad").updateSelectedChannelLayerVolume(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlot.value], -1)
@@ -514,7 +490,6 @@ Rectangle {
                 break;
             case "KNOB1_TOUCHED":
                 if (!applicationWindow().osd.opened) {
-                    root.pickFirstAndBestSlot();
                     switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
                             pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(0, root.selectedChannel.selectedSlot.value)
@@ -557,7 +532,6 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB1_UP":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(1, root.selectedChannel.selectedSlot.value)
@@ -581,7 +555,6 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB1_DOWN":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerCutoff(-1, root.selectedChannel.selectedSlot.value)
@@ -606,7 +579,6 @@ Rectangle {
                 break;
             case "KNOB2_TOUCHED":
                 if (!applicationWindow().osd.opened) {
-                    root.pickFirstAndBestSlot();
                     switch (root.selectedChannel.selectedSlot.className) {
                         case "TracksBar_synthslot":
                             pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(0, root.selectedChannel.selectedSlot.value)
@@ -649,7 +621,6 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB2_UP":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(1, root.selectedChannel.selectedSlot.value)
@@ -673,7 +644,6 @@ Rectangle {
                 returnValue = true;
                 break;
             case "KNOB2_DOWN":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         pageManager.getPage("sketchpad").updateSelectedChannelSlotLayerResonance(-1, root.selectedChannel.selectedSlot.value)
@@ -724,7 +694,6 @@ Rectangle {
                 break;
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
-                root.pickFirstAndBestSlot();
                 switch (root.selectedChannel.selectedSlot.className) {
                     case "TracksBar_synthslot":
                         bottomStack.slotsBar.handleItemClick("synth")
@@ -1115,10 +1084,15 @@ Rectangle {
                                     id: waveformThrottle
                                     interval: 1; repeat: false; running: false;
                                     onTriggered: {
-                                        waveformContainer.clip = root.selectedChannel.selectedSlot.component && root.selectedChannel.selectedSlot.component.clip && root.selectedChannel.selectedSlot.component.clip.hasOwnProperty("className") && root.selectedChannel.selectedSlot.component.clip.className == "sketchpad_clip"
-                                            ? root.selectedChannel.selectedSlot.component.clip
-                                            : null
-                                        // We show the waveform container for all track types except external
+                                        let selectedSlot = root.selectedChannel.selectedSlot;
+                                        if (selectedSlot.className === "TracksBar_sampleslot") {
+                                            waveformContainer.clip = root.selectedChannel.samples[selectedSlot.value];
+                                        } else if (selectedSlot.className === "TracksBar_sketchslot") {
+                                            waveformContainer.clip = root.selectedChannel.getClipsModelById(selectedSlot.value).getClip(zynqtgui.sketchpad.song.scenesModel.selectedSketchpadSongIndex);
+                                        } else {
+                                            waveformContainer.clip = null;
+                                        }
+                                        // We show the waveform container for all selected slots where there is a sample associated
                                         waveformContainer.showWaveform = ["TracksBar_sampleslot", "TracksBar_sketchslot"].indexOf(root.selectedChannel.selectedSlot.className) >= 0
                                     }
                                 }

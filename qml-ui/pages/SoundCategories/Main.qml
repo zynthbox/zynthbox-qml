@@ -144,7 +144,6 @@ Zynthian.ScreenPage {
             case "SCREEN_PRESET":
                 // Switch to Library page when sound page is open and F2 is pressed again
                 if (["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset","sample_library"].includes(zynqtgui.current_screen_id) === false) {
-                    pageManager.getPage("sketchpad").bottomStack.tracksBar.pickFirstAndBestSlot()
                     if (["TracksBar_sampleslot", "TracksBar_sketchslot"].includes(root.selectedChannel.selectedSlot.className)) {
                         // Then we are selecting samples and sketches, show the sample library
                         zynqtgui.show_screen("sample_library");

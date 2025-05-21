@@ -2185,9 +2185,9 @@ class sketchpad_channel(QObject):
                 sample = self.__samples__[i]
                 clip = Zynthbox.PlayGridManager.instance().getClipById(sample.cppObjId)
                 if clip:
-                    clip.rootSlice.keyZoneStart = slotSettings[i][0]
-                    clip.rootSlice.keyZoneEnd = slotSettings[i][1]
-                    clip.rootSlice.rootNote = 60 + slotSettings[i][2]
+                    clip.rootSlice().setKeyZoneStart(slotSettings[i][0])
+                    clip.rootSlice().setKeyZoneEnd(slotSettings[i][1])
+                    clip.rootSlice().setRootNote(60 + slotSettings[i][2])
 
     def get_keyZoneMode(self):
         return self.__keyzone_mode__

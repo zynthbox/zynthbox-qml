@@ -396,6 +396,18 @@ Zynthian.DialogQuestion {
                                 color: sampleKeyzoneDelegate.isCurrent ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                                 text: sampleKeyzoneDelegate.keyZoneContainer ? Zynthbox.KeyScales.midiNoteName(sampleKeyzoneDelegate.keyZoneContainer.keyZoneStart) : ""
                             }
+                            MouseArea {
+                                enabled: sampleKeyzoneDelegate.isCurrent
+                                anchors {
+                                    fill: parent
+                                    margins: -Kirigami.Units.largeSpacing
+                                }
+                                onClicked: {
+                                    applicationWindow().pickNote(sampleKeyzoneDelegate.keyZoneContainer.keyZoneStart, function(newNote) {
+                                        sampleKeyzoneDelegate.keyZoneContainer.keyZoneStart = newNote;
+                                    });
+                                }
+                            }
                         }
                         Rectangle {
                             anchors {
@@ -426,6 +438,18 @@ Zynthian.DialogQuestion {
                                 font.pixelSize: parent.height * 0.5
                                 color: sampleKeyzoneDelegate.isCurrent ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                                 text: sampleKeyzoneDelegate.keyZoneContainer ? Zynthbox.KeyScales.midiNoteName(sampleKeyzoneDelegate.keyZoneContainer.keyZoneEnd) : ""
+                            }
+                            MouseArea {
+                                enabled: sampleKeyzoneDelegate.isCurrent
+                                anchors {
+                                    fill: parent
+                                    margins: -Kirigami.Units.largeSpacing
+                                }
+                                onClicked: {
+                                    applicationWindow().pickNote(sampleKeyzoneDelegate.keyZoneContainer.keyZoneEnd, function(newNote) {
+                                        sampleKeyzoneDelegate.keyZoneContainer.keyZoneEnd = newNote;
+                                    });
+                                }
                             }
                         }
                         Rectangle {
@@ -523,6 +547,18 @@ Zynthian.DialogQuestion {
                                         width: parent.paintedWidth
                                         height: 2
                                         color: sampleKeyzoneDelegate.lineColor
+                                    }
+                                    MouseArea {
+                                        enabled: sampleKeyzoneDelegate.isCurrent
+                                        anchors {
+                                            fill: parent
+                                            margins: -Kirigami.Units.largeSpacing
+                                        }
+                                        onClicked: {
+                                            applicationWindow().pickNote(sampleKeyzoneDelegate.keyZoneContainer.rootNote, function(newNote) {
+                                                sampleKeyzoneDelegate.keyZoneContainer.rootNote = newNote;
+                                            });
+                                        }
                                     }
                                 }
                             }

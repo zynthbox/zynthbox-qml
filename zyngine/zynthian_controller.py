@@ -135,6 +135,11 @@ class zynthian_controller(QObject):
                     for i in range(n):
                         self.ticks.append(self.value_min+i*self.value_max/n)
 
+            # If we have two labels, and they are on/off, then this is a toggle
+            if len(self.labels) == 2:
+                if self.labels[0].lower() in ["on","off"] and self.labels[0].lower() in ["on","off"]:
+                    self.is_toggle = True
+
             #Calculate min, max
             if self.ticks[0]<=self.ticks[-1]:
                 self.value_min = self.ticks[0]

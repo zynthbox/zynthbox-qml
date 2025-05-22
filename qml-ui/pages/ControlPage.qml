@@ -59,8 +59,12 @@ Zynthian.ScreenPage {
      */
     function updateControllerValue(controller, sign) {
         if (controller != null) {
-            var stepSize = controller.step_size === 0 ? 1 : controller.step_size
-            controller.value = Zynthian.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
+            if (controller.value_type === "bool") {
+                controller.value = sign > 0 ? controller.max_value : controller.value0;
+            } else {
+                let stepSize = controller.step_size === 0 ? 1 : controller.step_size
+                controller.value = Zynthian.CommonUtils.clamp(controller.value + sign * stepSize, controller.value0, controller.max_value)
+            }
         }
     }
 

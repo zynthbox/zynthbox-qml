@@ -35,7 +35,6 @@ from collections import OrderedDict
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from . import zynthian_controller
-from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #--------------------------------------------------------------------------------
 # Basic Engine Class: Spawn a proccess & manage IPC communication using pexpect
@@ -165,7 +164,7 @@ class zynthian_engine(zynthian_basic_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+    def __init__(self, plugin_info, zynqtgui=None):
         super().__init__(zynqtgui=zynqtgui)
 
         self.plugin_info = plugin_info

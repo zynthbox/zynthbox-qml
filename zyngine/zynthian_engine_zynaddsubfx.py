@@ -31,7 +31,6 @@ from time import sleep
 from os.path import isfile, join
 from subprocess import check_output
 from . import zynthian_engine
-from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # ZynAddSubFX Engine Class
@@ -104,7 +103,7 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+    def __init__(self, plugin_info, zynqtgui=None):
         super().__init__(plugin_info, zynqtgui)
         self.name = "ZynAddSubFX"
         self.nickname = "ZY"

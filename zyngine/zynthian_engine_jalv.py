@@ -35,7 +35,6 @@ from subprocess import check_output, STDOUT
 from . import zynthian_lv2
 from . import zynthian_engine
 from . import zynthian_controller
-from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # Jalv Engine Class
@@ -131,7 +130,7 @@ class zynthian_engine_jalv(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None, dryrun=False):
+    def __init__(self, plugin_info, zynqtgui=None, dryrun=False):
         super().__init__(plugin_info, zynqtgui)
 
         self.type = plugin_info.type

@@ -27,14 +27,9 @@ import re
 import glob
 import logging
 import shutil
-from time import sleep
-from os.path import isfile, isdir
 from subprocess import check_output
-from collections import OrderedDict
 
 from . import zynthian_engine
-from . import zynthian_controller
-from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # Sfizz Engine Class
@@ -78,7 +73,7 @@ class zynthian_engine_sfizz(zynthian_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+    def __init__(self, plugin_info, zynqtgui=None):
         super().__init__(plugin_info, zynqtgui)
         self.name = "Sfizz"
         self.nickname = "SF"

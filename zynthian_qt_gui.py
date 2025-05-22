@@ -1155,6 +1155,9 @@ class zynthian_gui(QObject):
         # Create Core UI Screens
         self.currentTaskMessage = "Creating Core Control Objects"
 
+        # Instantiate Plugin helper before anything else as this will be used by some of the screens below
+        self.__zynthbox_plugins_helper = zynthbox_plugins_helper(self)
+
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
@@ -1259,9 +1262,6 @@ class zynthian_gui(QObject):
         self.screens["song_manager"] = zynthian_gui_song_manager(self)
         self.screens["led_config"] = zynthian_gui_led_config(self)
         self.screens["bluetooth_config"] = zynthian_gui_bluetooth_config(self)
-
-        # Instantiate Plugin helper
-        self.__zynthbox_plugins_helper = zynthbox_plugins_helper(self)
 
         # Add the OSD handler
         self.__osd = zynthian_osd(self)

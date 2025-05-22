@@ -30,14 +30,11 @@ import logging
 import subprocess
 from time import sleep
 from collections import OrderedDict
-from functools import cmp_to_key
 
 # Zynthian specific modules
 import zynautoconnect
 from zyngine import *
-# from zyngine.zynthian_engine_pianoteq import *
 from zyngine.zynthian_engine_jalv import zynthian_engine_jalv
-# from zyngine.zynthian_engine_jucy import *
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
@@ -61,13 +58,8 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 # @initializator
 class zynthian_gui_engine(zynthian_gui_selector):
-
-    # single_layer_engines = ["BF", "MD", "PT", "PD", "CS"]
-    # check_channels_engines = []
-
     # @classmethod
     # def init_engine_info(cls):
-
     #     cls.engine_info=OrderedDict([
     #         # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>)],
     #         # ['PD', ("PureData", "PureData - Visual Programming", "Special", None, zynthian_engine_puredata, True, "")],
@@ -82,45 +74,52 @@ class zynthian_gui_engine(zynthian_gui_selector):
     #         # ["AE", ("Aeolus", "Pipe Organ Emulator", "MIDI Synth", "Instrument", zynthian_engine_aeolus, True, "Other")],
     #     ])
 
-    #     # if check_pianoteq_binary():
-    #     #     pianoteq_title="v{}.{} {}{}".format(
-    #     #         PIANOTEQ_VERSION[0],
-    #     #         PIANOTEQ_VERSION[1],
-    #     #         PIANOTEQ_PRODUCT,
-    #     #         " (Demo)" if PIANOTEQ_TRIAL else "")
-    #     #     cls.engine_info['PT'] = (PIANOTEQ_NAME, pianoteq_title, "MIDI Synth", None, zynthian_engine_pianoteq, True, "Other")
-        
-    #     # for plugin_name, plugin_info in get_jalv_plugins().items():
-    #     #     eng = 'JV/{}'.format(plugin_name)
-    #     #     cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jalv, plugin_info['ENABLED'], "LV2")
-
-    #     # Sort the engine details by name (case insensitive)
-    #     cls.engine_info = OrderedDict(sorted(cls.engine_info.items(), key=lambda e: e[1][0].lower()))
-
-    #     # for plugin_name, plugin_info in get_jucy_plugins().items():
-    #     #     eng = 'JY/{}'.format(plugin_name)
-    #     #     cls.engine_info[eng] = (plugin_name, plugin_name, plugin_info['TYPE'], plugin_info.get('CLASS', None), zynthian_engine_jucy, plugin_info['ENABLED'], "VST3")
-
-
     def __init__(self, parent = None):
         super(zynthian_gui_engine, self).__init__('Engine', parent)
         self.reset_index = True
         self.zyngine_counter = 0
         self.zyngines = OrderedDict()
+
         self.only_categories = False
         self.single_category = None
         # A variable to filter which type of plugin to list
         self.plugin_format = "LV2"
-
-        # Load engine config
-        try:
-            with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
-                self.__engine_config__ = json.load(f)
-        except Exception as e:
-            logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
-            self.__engine_config__ = {}
-
         self.set_engine_type("MIDI Synth")
+
+        engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other")}
+        zynthian_engine_jalv.plugins_dict = {}
+        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
+            try:
+                if plugin.format.lower() == "lv2":
+                    eng = 'JV/{}'.format(plugin.name)
+                    engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format)
+                    zynthian_engine_jalv.plugins_dict[plugin.name] = {
+                        "TYPE": plugin.type,
+                        "URL": plugin.url
+                    }
+                elif plugin.format.lower() == "other":
+                    if plugin.engineType == "aeolus":
+                        eng = "AE"
+                    elif plugin.engineType == "fluidsynth":
+                        eng = "FS"
+                    elif plugin.engineType == "setbfree":
+                        eng = "BF"
+                    elif plugin.engineType == "sfizz":
+                        eng = "SF"
+                    elif plugin.engineType == "zynaddsubfx":
+                        eng = "ZY"
+                    else:
+                        eng = ""
+
+                    if eng != "":
+                        engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format)
+                    else:
+                        logging.error(f"Unknown classname {plugin.engineType} found in plugin {plugin.name}")
+            except Exception as e:
+                logging.error(f"Error while trying to parse plugin details : {str(e)}")
+
+        # Sort the engine details by name (case insensitive)
+        self.engine_info = OrderedDict(sorted(engine_info.items(), key=lambda e: e[1][0].lower()))
 
     def set_midi_channel(self, chan):
         self.midi_chan = chan
@@ -173,6 +172,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
         #             result[cat] = OrderedDict()
         #         result[cat][eng] = info
         # return result
+        pass
 
 
     def fill_list(self):
@@ -301,8 +301,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
             if setTaskMessage:
                 self.zynqtgui.currentTaskMessage = f"{taskMessagePrefix}Starting engine {eng}"
 
-            # TODO
-            # info=self.engine_info[eng]
+            info=self.engine_info[eng]
             zynthian_engine_class=info[4]
             if eng[0:3]=="JV/":
                 eng="JV/{}".format(self.zyngine_counter)
@@ -351,8 +350,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
                 del self.zyngines[eng]
 
 
-    # def get_engine_info(self, eng):
-    #     return self.engine_info[eng]
+    def get_engine_info(self, eng):
+        return self.engine_info[eng]
 
     def get_shown_category(self):
         return self.single_category

@@ -45,6 +45,10 @@ Item {
         if (!root.controller.ctrl) {
             return "int";
         }
+        if (root.controller.ctrl.value_type === "bool") {
+            // Seems a little weird, however... saves us doing the checks further down
+            return "bool";
+        }
         if (root.controller.ctrl.value_type === "int" && root.controller.ctrl.max_value - root.controller.ctrl.value0 === 1) {
             return "bool";
         }

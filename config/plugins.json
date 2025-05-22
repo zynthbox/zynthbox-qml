@@ -535,13 +535,22 @@
       "zynthboxVersionAdded": "1"
     },
     "ZBP_5050": {
-      "name": "Drum Machines",
-      "format": "SFZ",
+      "name": "FluidR3Mono_GM",
+      "format": "SF3",
+      "path": "/zynthian/zynthian-data/soundfonts/sf2/FluidR3Mono_GM.sf3",
+      "sha256sum": "cfcd66d89e8386823400eca64934b14fbea7bf48ba1f00d21189af1262794ec2",
       "zynthboxVersionAdded": "1"
     },
     "ZBP_5051": {
+      "name": "Drum Machines",
+      "format": "SFZ",
+      "path": "/zynthian/zynthian-data/soundfonts/sfz/Drum Machines",
+      "zynthboxVersionAdded": "1"
+    },
+    "ZBP_5052": {
       "name": "Synths",
       "format": "SFZ",
+      "path": "/zynthian/zynthian-data/soundfonts/sfz/Synths",
       "zynthboxVersionAdded": "1"
     }
   },

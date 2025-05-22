@@ -140,7 +140,7 @@ if __name__ == '__main__':
         "DX7 Wurlitzer",
         "Expressive Acoustic Guitar",
         "Fazioli Grand",
-        "FluidR3Mono_GM.sf3",
+        "FluidR3Mono_GM",
         "FM Modulator",
         "FM Piano",
         "Full Grands",
@@ -229,6 +229,7 @@ if __name__ == '__main__':
             'ENGINE_TYPE': 'jalv'
         }
 
+    # TODO : Also add sf3 to list
     for file in Path("/zynthian/zynthian-data/soundfonts/sf2/").glob("*.sf2"):
         name = file.name.replace(".sf2", "")
         all_plugins_and_engines[name] = {
@@ -300,6 +301,7 @@ if __name__ == '__main__':
     print(f"Generated config for {len(plugins['soundfont'].keys())} soundfont plugins")
     print(f"Generated config for {len(plugins['audioFx'].keys())} audioFx plugins")
 
+    # TODO : Do not remove existing plugins json data to keep engine overrides
     with open(Path(__file__).parent / "plugins.json", "w") as f:
         sort_plugins_by_id = lambda k: int(k[0].split("_")[1])
         output = {

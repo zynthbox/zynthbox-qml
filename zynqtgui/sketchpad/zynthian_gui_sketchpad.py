@@ -673,7 +673,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
             except Exception as e:
                 logging.error(e)
 
-            self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / name) + "/", name, self, load_autosave=False)
+            self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / name) + "/", name, self, load_autosave=False, clear_passthroughs=False)
 
             # FX layers gets added to channel fx slots during snapshot loading
             # Since snapshot is not loaded when creating a sketchpad from temp, add FX layers to channels explicitly here

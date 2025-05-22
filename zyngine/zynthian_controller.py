@@ -137,7 +137,7 @@ class zynthian_controller(QObject):
 
             # If we have two labels, and they are on/off, then this is a toggle
             if len(self.labels) == 2:
-                if self.labels[0].lower() in ["on","off"] and self.labels[0].lower() in ["on","off"]:
+                if self.labels[0].lower() in ["on","off"] and self.labels[1].lower() in ["on","off"]:
                     self.is_toggle = True
 
             #Calculate min, max

@@ -178,24 +178,29 @@ if __name__ == '__main__':
     ]
     other_synths = [
         {
-            "plugin_name": "Aeolus",
-            "path": "/usr/bin/aeolus"
+            "name": "Aeolus",
+            "path": "/usr/bin/aeolus",
+            "engineType": "aeolus"
         },
         {
-            "plugin_name": "FluidSynth",
-            "path": "/usr/bin/fluidsynth"
+            "name": "FluidSynth",
+            "path": "/usr/bin/fluidsynth",
+            "engineType": "fluidsynth"
         },
         {
-            "plugin_name": "setBfree",
-            "path": "/usr/bin/setBfree"
+            "name": "setBfree",
+            "path": "/usr/bin/setBfree",
+            "engineType": "setbfree"
         },
         {
-            "plugin_name": "Sfizz",
-            "path": "/usr/bin/sfizz_jack"
+            "name": "Sfizz",
+            "path": "/usr/bin/sfizz_jack",
+            "engineType": "sfizz"
         },
         {
-            "plugin_name": "ZynAddSubFX",
-            "path": "/usr/bin/zynaddsubfx"
+            "name": "ZynAddSubFX",
+            "path": "/usr/bin/zynaddsubfx",
+            "engineType": "zynaddsubfx"
         }
     ]
 
@@ -220,7 +225,8 @@ if __name__ == '__main__':
             # 'ENABLED': is_plugin_enabled(name),
             # 'UI': is_plugin_ui(plugin),
             'BUNDLE_URI': str(plugin.get_bundle_uri()),
-            'PLUGIN_TYPE': 'LV2'
+            'PLUGIN_TYPE': 'LV2',
+            'ENGINE_TYPE': 'jalv'
         }
 
     for file in Path("/zynthian/zynthian-data/soundfonts/sf2/").glob("*.sf2"):
@@ -238,9 +244,10 @@ if __name__ == '__main__':
         }
 
     for synth in other_synths:
-        all_plugins_and_engines[synth["plugin_name"]] = {
+        all_plugins_and_engines[synth["name"]] = {
             "PATH": synth["path"],
-            'PLUGIN_TYPE': "Other"
+            'PLUGIN_TYPE': "Other",
+            'ENGINE_TYPE': synth["engineType"]
         }
 
     for plugin_name in all_plugins_and_engines.keys():
@@ -265,27 +272,29 @@ if __name__ == '__main__':
         if not plugin_id == "":
             print(f"  Generating config for {plugin_name}")
             plugins[plugin_class][plugin_id] = {}
-            plugins[plugin_class][plugin_id]["plugin_name"] = plugin_name
-            plugins[plugin_class][plugin_id]["plugin_type"] = all_plugins_and_engines[plugin_name]["PLUGIN_TYPE"] # Store the type of plugin : lv2/sf2/sfz etc
-            if plugins[plugin_class][plugin_id]["plugin_type"].lower() == "lv2":
+            plugins[plugin_class][plugin_id]["name"] = plugin_name
+            plugins[plugin_class][plugin_id]["format"] = all_plugins_and_engines[plugin_name]["PLUGIN_TYPE"] # Store the type of plugin : lv2/sf2/sfz etc
+            if plugins[plugin_class][plugin_id]["format"].lower() == "lv2":
                 # Considering all synth and audioFx are lv2 plugins, add it's identifier URL to plugins json
                 plugins[plugin_class][plugin_id]["url"] = all_plugins_and_engines[plugin_name]["URL"]
                 if plugin_class == "audioFx":
                     # Considering all fx are lv2 plugins, add it's category to plugins json
                     plugins[plugin_class][plugin_id]["category"] = all_plugins_and_engines[plugin_name]['CLASS']
                 plugins[plugin_class][plugin_id]["path"] = all_plugins_and_engines[plugin_name]['BUNDLE_URI'].replace("file://", "")
-                plugins[plugin_class][plugin_id]["plugin_version"] = ""
-            elif plugins[plugin_class][plugin_id]["plugin_type"].lower() == "sf2":
+                plugins[plugin_class][plugin_id]["version"] = ""
+                plugins[plugin_class][plugin_id]["engineType"] = all_plugins_and_engines[plugin_name]['ENGINE_TYPE']
+            elif plugins[plugin_class][plugin_id]["format"].lower() == "sf2":
                 plugins[plugin_class][plugin_id]["path"] = all_plugins_and_engines[plugin_name]['PATH']
                 print(f"  Hashing file : {plugins[plugin_class][plugin_id]['path']}")
                 h256 = sha256()
                 with open(plugins[plugin_class][plugin_id]["path"], "rb") as f:
                     h256.update(f.read())
                 plugins[plugin_class][plugin_id]["sha256sum"] = h256.hexdigest()
-            elif plugins[plugin_class][plugin_id]["plugin_type"].lower() == "other":
+            elif plugins[plugin_class][plugin_id]["format"].lower() == "other":
                 plugins[plugin_class][plugin_id]["path"] = all_plugins_and_engines[plugin_name]['PATH']
-                plugins[plugin_class][plugin_id]["plugin_version"] = ""
-            plugins[plugin_class][plugin_id]["zynthbox_version_added"] = "1"
+                plugins[plugin_class][plugin_id]["version"] = ""
+                plugins[plugin_class][plugin_id]["engineType"] = all_plugins_and_engines[plugin_name]['ENGINE_TYPE']
+            plugins[plugin_class][plugin_id]["zynthboxVersionAdded"] = "1"
 
     print(f"Generated config for {len(plugins['synth'].keys())} synth plugins")
     print(f"Generated config for {len(plugins['soundfont'].keys())} soundfont plugins")

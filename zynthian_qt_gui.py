@@ -4976,7 +4976,7 @@ def exit_handler(signo, stack_frame):
     elif signo == signal.SIGQUIT:
         exit_code = 102
     elif signo == signal.SIGTERM:
-        exit_code = 101
+        exit_code = 102
 
     zynqtgui.exit(exit_code)
 

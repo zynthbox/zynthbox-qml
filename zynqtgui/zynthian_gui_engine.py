@@ -77,8 +77,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
                 if eng != "":
                     engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format, plugin)
-                else:
-                    logging.error(f"Unknown classname {plugin.engineType} found in plugin {plugin.name}")
             except Exception as e:
                 logging.error(f"Error while trying to parse plugin details : {str(e)}")
 

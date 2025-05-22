@@ -735,10 +735,11 @@ class zynthian_gui(QObject):
         screen_to_show = (screen, select_first_action, fill_list, show_screen, set_select_path)
 
         if screen_to_show not in self.show_screens_queue:
-            logging.debug(f"Screen {screen} not in list. Appending")
+            # logging.debug(f"Screen {screen} not in list. Appending")
             self.show_screens_queue.append(screen_to_show)
         else:
-            logging.debug(f"Screen {screen} already added to list. Not appending")
+            # logging.debug(f"Screen {screen} already added to list. Not appending")
+            pass
 
         self.show_screens_queue_timer.start()
 
@@ -760,17 +761,17 @@ class zynthian_gui(QObject):
                     QGuiApplication.instance().processEvents()
 
                 if show_screen:
-                    logging.debug(f"Showing screen : {screen}")
+                    # logging.debug(f"Showing screen : {screen}")
                     screen.show()
                     QGuiApplication.instance().processEvents()
 
                 if set_select_path:
-                    logging.debug(f"Setting select path for screen : {screen}")
+                    # logging.debug(f"Setting select path for screen : {screen}")
                     screen.set_select_path()
                     QGuiApplication.instance().processEvents()
 
                 if select_first_action:
-                    logging.debug(f"Selection first action for screen : {screen}")
+                    # logging.debug(f"Selection first action for screen : {screen}")
                     screen.select_action(0)
                     QGuiApplication.instance().processEvents()
         except Exception as e: logging.exception(f"Error processing screen : {e}")

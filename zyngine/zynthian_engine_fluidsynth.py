@@ -30,6 +30,7 @@ import logging
 from subprocess import check_output
 from . import zynthian_engine
 from . import zynthian_controller
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # FluidSynth Engine Class
@@ -81,8 +82,8 @@ class zynthian_engine_fluidsynth(zynthian_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, zynqtgui=None):
-        super().__init__(zynqtgui)
+    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+        super().__init__(plugin_info, zynqtgui)
         self.__most_recent_preset_transaction__ = None
 
         self.name = "FluidSynth"

@@ -34,6 +34,7 @@ from collections import OrderedDict
 
 from . import zynthian_engine
 from . import zynthian_controller
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # Sfizz Engine Class
@@ -77,8 +78,8 @@ class zynthian_engine_sfizz(zynthian_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, zynqtgui=None):
-        super().__init__(zynqtgui)
+    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+        super().__init__(plugin_info, zynqtgui)
         self.name = "Sfizz"
         self.nickname = "SF"
         self.jackname = self.get_next_jackname("sfizz")

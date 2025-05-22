@@ -384,14 +384,6 @@ class sketchpad_channel(QObject):
         self.zynqtgui.layer.layerPresetChanged.connect(self.layerPresetChangedHandler)
         self.zynqtgui.layer.layer_created.connect(self.layerCreatedHandler)
 
-        # Load engine config
-        try:
-            with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
-                self.__engine_config = json.load(f)
-        except Exception as e:
-            logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
-            self.__engine_config = {}
-
         # Create 5 clip objects for 5 samples per channel
         for i in range(0, Zynthbox.Plugin.instance().sketchpadSlotCount()):
             newSample = sketchpad_clip(self.id, i, i, self.__song__, self, True)
@@ -717,19 +709,15 @@ class sketchpad_channel(QObject):
                 layer = self.zynqtgui.layer.layer_midi_map[midi_channel]
                 synth_controllers_dict = layer.controllers_dict
 
-                if layer.engine.nickname in self.__engine_config and \
-                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
-                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                if layer.engine.plugin_info.cutoffControl != "" and layer.engine.plugin_info.cutoffControl in synth_controllers_dict:
+                    self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.plugin_info.cutoffControl])
                 elif "cutoff" in synth_controllers_dict:
                     self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
                 elif "filter_cutoff" in synth_controllers_dict:
                     self.__filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                if layer.engine.nickname in self.__engine_config and \
-                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
-                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                if layer.engine.plugin_info.resonanceControl != "" and layer.engine.plugin_info.resonanceControl in synth_controllers_dict:
+                    self.__filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.plugin_info.resonanceControl])
                 elif "resonance" in synth_controllers_dict:
                     self.__filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
                 elif "filter_resonance" in synth_controllers_dict:
@@ -745,19 +733,15 @@ class sketchpad_channel(QObject):
             if layer is not None:
                 synth_controllers_dict = layer.controllers_dict
 
-                if layer.engine.nickname in self.__engine_config and \
-                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
-                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                if layer.engine.plugin_info.cutoffControl != "" and layer.engine.plugin_info.cutoffControl in synth_controllers_dict:
+                    self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.plugin_info.cutoffControl])
                 elif "cutoff" in synth_controllers_dict:
                     self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
                 elif "filter_cutoff" in synth_controllers_dict:
                     self.__fx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                if layer.engine.nickname in self.__engine_config and \
-                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
-                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                if layer.engine.plugin_info.resonanceControl != "" and layer.engine.plugin_info.resonanceControl in synth_controllers_dict:
+                    self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.plugin_info.resonanceControl])
                 elif "resonance" in synth_controllers_dict:
                     self.__fx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
                 elif "filter_resonance" in synth_controllers_dict:
@@ -773,19 +757,15 @@ class sketchpad_channel(QObject):
             if layer is not None:
                 synth_controllers_dict = layer.controllers_dict
 
-                if layer.engine.nickname in self.__engine_config and \
-                        "cutoffControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["cutoffControl"] in synth_controllers_dict:
-                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["cutoffControl"]])
+                if layer.engine.plugin_info.cutoffControl != "" and layer.engine.plugin_info.cutoffControl in synth_controllers_dict:
+                    self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict[layer.engine.plugin_info.cutoffControl])
                 elif "cutoff" in synth_controllers_dict:
                     self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["cutoff"])
                 elif "filter_cutoff" in synth_controllers_dict:
                     self.__sketchfx_filter_cutoff_controllers[index].add_control(synth_controllers_dict["filter_cutoff"])
 
-                if layer.engine.nickname in self.__engine_config and \
-                        "resonanceControl" in self.__engine_config[layer.engine.nickname] and \
-                        self.__engine_config[layer.engine.nickname]["resonanceControl"] in synth_controllers_dict:
-                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[self.__engine_config[layer.engine.nickname]["resonanceControl"]])
+                if layer.engine.plugin_info.resonanceControl != "" and layer.engine.plugin_info.resonanceControl in synth_controllers_dict:
+                    self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict[layer.engine.plugin_info.resonanceControl])
                 elif "resonance" in synth_controllers_dict:
                     self.__sketchfx_filter_resonance_controllers[index].add_control(synth_controllers_dict["resonance"])
                 elif "filter_resonance" in synth_controllers_dict:
@@ -1165,7 +1145,7 @@ class sketchpad_channel(QObject):
                                 synth_ports[channel].append(f"FXPassthrough-lane{lane}:Channel{self.id + 1}-sound-dryOut{'Left' if channel == 0 else 'Right'}")
                                 synth_ports[channel].append(fxPorts[channel].name)
 
-                logging.debug(f"channelSoundRecordingPorts : {synth_ports}")
+                # logging.debug(f"channelSoundRecordingPorts : {synth_ports}")
                 self.set_channelSoundRecordingPorts(synth_ports)
             except Exception as e:
                 # If jack port update fails, queue it for another run in the future

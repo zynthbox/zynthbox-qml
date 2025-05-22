@@ -69,7 +69,7 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.zynqtgui):
                     self.audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
                     break
         soundcard_name = self.audio_device
-        self.zynthian_mixer = zyngine.zynthian_engine_mixer()
+        self.zynthian_mixer = zyngine.zynthian_engine_mixer(None)
 
         #if self.audio_device == "Headphones":
             #self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=["Headphone", "PCM"])

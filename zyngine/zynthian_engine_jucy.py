@@ -25,35 +25,24 @@
 import logging
 import re
 import Jucy
-import os
-import json
 from collections import OrderedDict
-from pathlib import Path
 from PySide2.QtCore import QTimer
 
 from . import zynthian_engine
 from . import zynthian_controller
-from . import zynthian_vst3
-
-
-def get_jucy_plugins():
-    if zynthian_engine_jucy.plugins_dict is None:
-        zynthian_engine_jucy.plugins_dict = zynthian_vst3.get_plugins()
-    return zynthian_engine_jucy.plugins_dict
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 
 class zynthian_engine_jucy(zynthian_engine):
-    plugins_dict = None
+    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+        super().__init__(plugin_info, zynqtgui)
 
-    def __init__(self, plugin_name, plugin_type, zynqtgui=None):
-        super().__init__(zynqtgui)
-
-        self.type = plugin_type
-        self.name = "Jucy/" + plugin_name
-        self.nickname = "JY/" + plugin_name
-        self.plugin_name = plugin_name
+        self.type = plugin_info.type
+        self.name = "Jucy/" + plugin_info.name
+        self.nickname = "JY/" + plugin_info.name
+        self.plugin_name = plugin_info.name
         # # TODO : Populate plugins dict
-        self.plugin_url = self.plugins_dict[plugin_name]['URL']
+        self.plugin_url = plugin_info.url
         self.jackname = self.get_jucy_jackname()
         self.jucy_pluginhost = Jucy.VST3PluginHost(self.plugin_url, self.jackname, self)
         self._ctrl_screens = []

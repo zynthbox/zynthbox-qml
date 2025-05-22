@@ -7,7 +7,9 @@
       "path": "/usr/lib/lv2/calf.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "volumeControls": ["master"],
+      "resonanceControl": "res"
     },
     "ZBP_1001": {
       "name": "Nekobi",
@@ -52,7 +54,8 @@
       "path": "/zynthian/zynthian-plugins/lv2/Red_Zeppelin_5.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "volumeControls": ["level"]
     },
     "ZBP_1006": {
       "name": "padthv1",
@@ -79,7 +82,11 @@
       "path": "/usr/lib/lv2/synthv1.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "volumeControls": ["OUT1_VOLUME", "OUT2_VOLUME"],
+      "cutoffControl": "DCF1_CUTOFF",
+      "resonanceControl": "DCF1_RESO",
+      "description": "An old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx"
     },
     "ZBP_1009": {
       "name": "Helm",

@@ -32,9 +32,10 @@ import Zynthbox
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
-from PySide2.QtCore import Property, QObject, Signal, Slot, QCoreApplication
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from . import zynthian_controller
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #--------------------------------------------------------------------------------
 # Basic Engine Class: Spawn a proccess & manage IPC communication using pexpect
@@ -111,7 +112,7 @@ class zynthian_basic_engine(QObject):
     def proc_cmd(self, cmd:str, wait_for_output=False):
         out = ""
         if self.proc is not None and self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
-            logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
+            # logging.debug(f"{self.name} proc command: {cmd} - blocking? {wait_for_output}")
             if wait_for_output:
                 transaction = self.proc.call(cmd)
                 out = transaction.standardOutput()
@@ -164,11 +165,11 @@ class zynthian_engine(zynthian_basic_engine):
     # Initialization
     # ---------------------------------------------------------------------------
 
-    def __init__(self, zynqtgui=None):
+    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
         super().__init__(zynqtgui=zynqtgui)
 
+        self.plugin_info = plugin_info
         self.zynqtgui=zynqtgui
-
         self.type = "MIDI Synth"
         self.nickname = ""
         self.jackname = ""

@@ -35,14 +35,7 @@ from subprocess import check_output, STDOUT
 from . import zynthian_lv2
 from . import zynthian_engine
 from . import zynthian_controller
-
-#------------------------------------------------------------------------------
-# Module methods
-#------------------------------------------------------------------------------
-
-def get_jalv_plugins():
-    zynthian_engine_jalv.plugins_dict = zynthian_lv2.get_plugins()
-    return zynthian_engine_jalv.plugins_dict
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # Jalv Engine Class
@@ -50,32 +43,6 @@ def get_jalv_plugins():
 
 class zynthian_engine_jalv(zynthian_engine):
 
-    #------------------------------------------------------------------------------
-    # Plugin List (this list is used ONLY if no config file is found)
-    #------------------------------------------------------------------------------
-
-    plugins_dict = OrderedDict([
-        ("Dexed", {'TYPE': "MIDI Synth",'URL': "https://github.com/dcoredump/dexed.lv2"}),
-        ("Helm", {'TYPE': "MIDI Synth",'URL': "http://tytel.org/helm"}),
-        ("MDA ePiano", {'TYPE': "MIDI Synth",'URL': "http://moddevices.com/plugins/mda/EPiano"}),
-        ("MDA Piano", {'TYPE': "MIDI Synth",'URL': "http://moddevices.com/plugins/mda/Piano"}),
-        ("MDA JX10", {'TYPE': "MIDI Synth",'URL': "http://moddevices.com/plugins/mda/JX10"}),
-        ("MDA DX10", {'TYPE': "MIDI Synth",'URL': "http://moddevices.com/plugins/mda/DX10"}),
-        ("Obxd", {'TYPE': "MIDI Synth",'URL': "https://obxd.wordpress.com"}),
-        ("SynthV1", {'TYPE': "MIDI Synth",'URL': "http://synthv1.sourceforge.net/lv2"}),
-        ("Noize Mak3r", {'TYPE': "MIDI Synth",'URL': "http://kunz.corrupt.ch/products/tal-noisemaker"}),
-        ("Triceratops", {'TYPE': "MIDI Synth",'URL': "http://nickbailey.co.nr/triceratops"}),
-        ("Raffo MiniMoog", {'TYPE': "MIDI Synth",'URL': "http://example.org/raffo"})
-    ])
-
-    broken_ui = [
-            'http://calf.sourceforge.net/plugins/Monosynth',
-            'http://calf.sourceforge.net/plugins/Organ',
-            'http://nickbailey.co.nr/triceratops',
-            'http://code.google.com/p/amsynth/amsynth'
-        ]
-    if "Raspberry Pi 4" not in os.environ.get('RBPI_VERSION'):
-        broken_ui.append('http://tytel.org/helm')
 
     #------------------------------------------------------------------------------
     # Native formats configuration (used by zynapi_install, preset converter, etc.)
@@ -164,24 +131,24 @@ class zynthian_engine_jalv(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, plugin_name, plugin_type, zynqtgui=None, dryrun=False):
-        super().__init__(zynqtgui)
+    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None, dryrun=False):
+        super().__init__(plugin_info, zynqtgui)
 
-        self.type = plugin_type
-        self.name = "Jalv/" + plugin_name
-        self.nickname = "JV/" + plugin_name
-        self.plugin_name = plugin_name
-        self.plugin_url = self.plugins_dict[plugin_name]['URL']
+        self.type = plugin_info.type
+        self.name = "Jalv/" + plugin_info.name
+        self.nickname = "JV/" + plugin_info.name
+        self.plugin_name = plugin_info.name
+        self.plugin_url = plugin_info.url
         self.jackname = self.get_jalv_jackname()
 
         self.ui = False
-        if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
-            self.ui = self.plugins_dict[plugin_name]['UI']
+        # if self.plugin_url not in self.broken_ui and 'UI' in self.plugins_dict[plugin_name]:
+        #     self.ui = self.plugins_dict[plugin_name]['UI']
 
-        if plugin_type=="MIDI Tool":
+        if plugin_info.type=="MIDI Tool":
             self.options['midi_route'] = True
             self.options['audio_route'] = False
-        elif plugin_type=="Audio Effect":
+        elif plugin_info.type=="Audio Effect":
             self.options['audio_capture'] = True
             self.options['note_range'] = False
 
@@ -219,7 +186,7 @@ class zynthian_engine_jalv(zynthian_engine):
             self.generate_ctrl_screens(self.lv2_zctrl_dict)
 
         # Get bank & presets info
-        self.preset_info = zynthian_lv2.get_plugin_presets(plugin_name)
+        self.preset_info = zynthian_lv2.get_plugin_presets(self.plugin_name)
 
         self.bank_list = []
         for bank_label, info in self.preset_info.items():

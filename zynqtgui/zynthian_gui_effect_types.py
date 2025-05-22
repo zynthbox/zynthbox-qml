@@ -78,7 +78,7 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 
 
     def select_action(self, i, t='S'):
-        if i is not None and self.list_data[i][0]:
+        if i is not None and i in self.list_data and self.list_data[i][0]:
             self.zynqtgui.screens[self.effect_chooser_screen].single_category = self.list_data[i][0]
             self.zynqtgui.screens[self.effect_chooser_screen].show()
             #If first column is not pointing to a layer, preselect slot 0 of effect_chooser_screen

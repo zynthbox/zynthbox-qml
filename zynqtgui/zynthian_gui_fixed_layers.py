@@ -62,14 +62,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__mixer_timer.setSingleShot(True)
         self.__mixer_timer.timeout.connect(self.update_mixers)
 
-        # Load engine config
-        try:
-            with open("/zynthian/zynthbox-qml/config/engine_config.json", "r") as f:
-                self.__engine_config = json.load(f)
-        except Exception as e:
-            logging.error(f"Error loading engine config from /zynthian/zynthbox-qml/config/engine_config.json : {str(e)}")
-            self.__engine_config = {}
-
         self.show()
 
 
@@ -159,9 +151,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
                 # Check if engine config contains list of custom volume controllers and use them
                 # Otherwise check for default volume controllers
-                if layer.engine.nickname in self.__engine_config and \
-                        "volumeControls" in self.__engine_config[layer.engine.nickname]:
-                    volume_controls = self.__engine_config[layer.engine.nickname]["volumeControls"]
+                if len(layer.engine.plugin_info.volumeControls) > 0:
+                    volume_controls = layer.engine.plugin_info.volumeControls
                     for ctrl in volume_controls:
                         if ctrl in synth_controllers_dict:
                             self.__volume_controllers[i - self.__start_midi_chan].add_control(synth_controllers_dict[ctrl])

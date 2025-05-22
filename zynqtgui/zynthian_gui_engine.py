@@ -23,103 +23,73 @@
 # 
 #******************************************************************************
 
-import os
-import re
-import sys
 import logging
-import subprocess
 from time import sleep
 from collections import OrderedDict
+from functools import cmp_to_key
 
 # Zynthian specific modules
-import zynautoconnect
 from zyngine import *
 from zyngine.zynthian_engine_jalv import zynthian_engine_jalv
-from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import Signal, Property
 
 #------------------------------------------------------------------------------
 # Zynthian Engine Selection GUI Class
 #------------------------------------------------------------------------------
 
-# def initializator(cls):
-#     cls.init_engine_info()
-#     return cls
 
-# def customSort(item1, item2):
-#     if item1[2].upper() > item2[2].upper():
-#         return 1
-#     elif item1[2].upper() == item2[2].upper():
-#         return 0
-#     else:
-#         return -1
+def customSort(item1, item2):
+    if item1[2].upper() > item2[2].upper():
+        return 1
+    elif item1[2].upper() == item2[2].upper():
+        return 0
+    else:
+        return -1
 
-# @initializator
 class zynthian_gui_engine(zynthian_gui_selector):
-    # @classmethod
-    # def init_engine_info(cls):
-    #     cls.engine_info=OrderedDict([
-    #         # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>)],
-    #         # ['PD', ("PureData", "PureData - Visual Programming", "Special", None, zynthian_engine_puredata, True, "")],
-    #         # ['CS', ("CSound", "CSound Audio Language", "Special", None, zynthian_engine_csound, False, "")],
-    #         # ['MD', ("MOD-UI", "MOD-UI - Plugin Host", "Special", None, zynthian_engine_modui, True, "")]
-    #         # ["LS", ("LinuxSampler", "LinuxSampler - SFZ/GIG Player", "MIDI Synth", None, zynthian_engine_linuxsampler, True, "")],
-    #         # ["MX", ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, True, "Other")],
-    #         # ["ZY", ("ZynAddSubFX", "Synthesizer", "MIDI Synth", "Instrument", zynthian_engine_zynaddsubfx, True, "Other")],
-    #         # ["FS", ("FluidSynth", "SF2 Player", "MIDI Synth", "Instrument", zynthian_engine_fluidsynth, True, "Other")],
-    #         # ["SF", ("Sfizz", "SFZ Player", "MIDI Synth", "Instrument", zynthian_engine_sfizz, True, "Other")],
-    #         # ["BF", ("setBfree", "Hammond Emulator", "MIDI Synth", "Instrument", zynthian_engine_setbfree, True, "Other")],
-    #         # ["AE", ("Aeolus", "Pipe Organ Emulator", "MIDI Synth", "Instrument", zynthian_engine_aeolus, True, "Other")],
-    #     ])
-
     def __init__(self, parent = None):
         super(zynthian_gui_engine, self).__init__('Engine', parent)
+
         self.reset_index = True
         self.zyngine_counter = 0
         self.zyngines = OrderedDict()
+
+        # [<short name>, (<long name>, <description>, <plugin type>, <plugin category>, <plugin class>, <enabled>, <plugin format>, <plugin object>)]
+        engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other", None)}
+        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
+            try:
+                eng = ""
+
+                if plugin.engineType == "aeolus":
+                    eng = "AE"
+                elif plugin.engineType == "fluidsynth":
+                    eng = "FS"
+                elif plugin.engineType == "setbfree":
+                    eng = "BF"
+                elif plugin.engineType == "sfizz":
+                    eng = "SF"
+                elif plugin.engineType == "zynaddsubfx":
+                    eng = "ZY"
+                elif plugin.engineType == "jalv":
+                    eng = 'JV/{}'.format(plugin.name)
+
+                if eng != "":
+                    engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format, plugin)
+                else:
+                    logging.error(f"Unknown classname {plugin.engineType} found in plugin {plugin.name}")
+            except Exception as e:
+                logging.error(f"Error while trying to parse plugin details : {str(e)}")
+
+        # Sort the engine details by name (case insensitive)
+        self.engine_info = OrderedDict(sorted(engine_info.items(), key=lambda e: e[1][0].lower()))
 
         self.only_categories = False
         self.single_category = None
         # A variable to filter which type of plugin to list
         self.plugin_format = "LV2"
         self.set_engine_type("MIDI Synth")
-
-        engine_info = {"MX": ("Mixer", "ALSA Mixer", "MIXER", None, zynthian_engine_mixer, False, "Other")}
-        zynthian_engine_jalv.plugins_dict = {}
-        for plugin_id, plugin in self.zynqtgui.zynthbox_plugins_helper.plugins_by_id.items():
-            try:
-                if plugin.format.lower() == "lv2":
-                    eng = 'JV/{}'.format(plugin.name)
-                    engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format)
-                    zynthian_engine_jalv.plugins_dict[plugin.name] = {
-                        "TYPE": plugin.type,
-                        "URL": plugin.url
-                    }
-                elif plugin.format.lower() == "other":
-                    if plugin.engineType == "aeolus":
-                        eng = "AE"
-                    elif plugin.engineType == "fluidsynth":
-                        eng = "FS"
-                    elif plugin.engineType == "setbfree":
-                        eng = "BF"
-                    elif plugin.engineType == "sfizz":
-                        eng = "SF"
-                    elif plugin.engineType == "zynaddsubfx":
-                        eng = "ZY"
-                    else:
-                        eng = ""
-
-                    if eng != "":
-                        engine_info[eng] = (plugin.name, plugin.name, plugin.type, plugin.category, globals()[f"zynthian_engine_{plugin.engineType}"], True, plugin.format)
-                    else:
-                        logging.error(f"Unknown classname {plugin.engineType} found in plugin {plugin.name}")
-            except Exception as e:
-                logging.error(f"Error while trying to parse plugin details : {str(e)}")
-
-        # Sort the engine details by name (case insensitive)
-        self.engine_info = OrderedDict(sorted(engine_info.items(), key=lambda e: e[1][0].lower()))
 
     def set_midi_channel(self, chan):
         self.midi_chan = chan
@@ -155,108 +125,98 @@ class zynthian_gui_engine(zynthian_gui_selector):
         self.engine_type = "MIDI Tool"
         self.set_midi_channel(midi_chan)
         self.reset_index = True
-        # self.init_engine_info()
         self.engine_type_changed.emit()
 
     synth_engine_type = Property(str, get_engine_type, set_engine_type, notify = engine_type_changed)
 
     def filtered_engines_by_cat(self):
-        # TODO
-        # result = OrderedDict()
-        # for eng, info in self.engine_info.items():
-        #     eng_type = info[2]
-        #     cat = info[3]
-        #     enabled = info[5]
-        #     if enabled and (eng_type==self.engine_type or self.engine_type is None) and (eng not in self.single_layer_engines or eng not in self.zyngines) and (self.plugin_format == info[6]):
-        #         if cat not in result:
-        #             result[cat] = OrderedDict()
-        #         result[cat][eng] = info
-        # return result
-        pass
+        result = OrderedDict()
+        for eng, info in self.engine_info.items():
+            eng_type = info[2]
+            cat = info[3]
+            enabled = info[5]
+            if enabled and (eng_type==self.engine_type or self.engine_type is None) and eng not in self.zyngines and self.plugin_format == info[6]:
+                if cat not in result:
+                    result[cat] = OrderedDict()
+                result[cat][eng] = info
+        return result
 
 
     def fill_list(self):
-        # TODO
-        # self.init_engine_info()
-        # self.list_data=[]
-        # self.list_metadata = []
+        self.list_data=[]
+        self.list_metadata = []
 
+        if self.engine_type == "MIDI Synth":
+            for engine_short_name, engine_info in self.engine_info.items():
+                eng_type = engine_info[2]
+                enabled = engine_info[5]
+                plugin = engine_info[7]
+                if enabled and (eng_type == self.engine_type or self.engine_type is None) and engine_short_name not in self.zyngines:
+                    metadata = {}
+                    if plugin.description != "":
+                        metadata["description"] = plugin.description
+                    elif engine_info[1] is not None and engine_info[0] != engine_info[1]:
+                        # Do not set description text if the synth name and description text is the same
+                        metadata["description"] = engine_info[1]
+                    metadata["pluginFormat"] = engine_info[6]
 
-        # if self.engine_type == "MIDI Synth":
-        #     for engine_short_name, engine_info in self.engine_info.items():
-        #         eng_type = engine_info[2]
-        #         enabled = engine_info[5]
-        #         if enabled and (eng_type == self.engine_type or self.engine_type is None) and (engine_short_name not in self.single_layer_engines or engine_short_name not in self.zyngines):
-        #             metadata = {}
-        #             if engine_short_name in self.__engine_config__ and "description" in self.__engine_config__[engine_short_name]:
-        #                 metadata["description"] = self.__engine_config__[engine_short_name]["description"]
-        #             elif engine_info[1] is not None and not engine_info[0] == engine_info[1]:
-        #                 # Do not set description text if the synth name and description text is the same
-        #                 metadata["description"] = engine_info[1]
-        #             metadata["pluginFormat"] = engine_info[6]
+                    self.list_data.append((engine_short_name, len(self.list_data), engine_info[0]))
+                    self.list_metadata.append(metadata)
+        else:
+            # Sort category headings, but headings starting with "Zynthian" are shown first
 
-        #             self.list_data.append((engine_short_name, len(self.list_data), engine_info[0]))
-        #             self.list_metadata.append(metadata)
-        # else:
-        #     # Sort category headings, but headings starting with "Zynthian" are shown first
+            for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
+                # Add category header...
+                if self.single_category == None:
+                    if self.engine_type=="MIDI Synth":
+                        if self.only_categories:
+                            self.list_data.append((cat,len(self.list_data),"LV2 {}".format(cat)))
+                        else:
+                            self.list_data.append((None,len(self.list_data),"> LV2 {}".format(cat)))
+                    else:
+                        if self.only_categories:
+                            self.list_data.append((cat,len(self.list_data),format(cat)))
+                        else:
+                            self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
 
-        #     for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
-        #         # Add category header...
-        #         if self.single_category == None:
-        #             if self.engine_type=="MIDI Synth":
-        #                 if self.only_categories:
-        #                     self.list_data.append((cat,len(self.list_data),"LV2 {}".format(cat)))
-        #                 else:
-        #                     self.list_data.append((None,len(self.list_data),"> LV2 {}".format(cat)))
-        #             else:
-        #                 if self.only_categories:
-        #                     self.list_data.append((cat,len(self.list_data),format(cat)))
-        #                 else:
-        #                     self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
+                    self.list_metadata.append({})
 
-        #             self.list_metadata.append({})
+                cat_entries = []
+                # Metadata entries have to be a set of 3 items in the format (<metadata>, None, info[1])
+                # This is because the customSort method sorts the cat_entries by the value at index `2` and hence
+                # metadata_entries has to have the info[1] enter at index 2, so it sorts correctly along with cat_entries
+                metadata_entries = []
 
-        #         cat_entries = []
-        #         # Metadata entries have to be a set of 3 items in the format (<metadata>, None, info[1])
-        #         # This is because the customSort method sorts the cat_entries by the value at index `2` and hence
-        #         # metadata_entries has to have the info[1] enter at index 2, so it sorts correctly along with cat_entries
-        #         metadata_entries = []
+                if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
+                    # Add engines on this category...
+                    for eng, info in infos.items():
+                        metadata = {}
+                        plugin = info[7]
+                        cat_entries.append((eng,len(self.list_data),info[1],info[0]))
 
-        #         if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
-        #             # Add engines on this category...
-        #             for eng, info in infos.items():
-        #                 metadata = {}
-        #                 # For some engines, check if needed channels are free ...
-        #                 if eng not in self.check_channels_engines or all(chan in self.zynqtgui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
-        #                     cat_entries.append((eng,len(self.list_data),info[1],info[0]))
+                        if plugin.description != "":
+                            metadata["description"] = plugin.description
+                        elif info[1] is not None and not info[0] == info[1]:
+                            # Do not set description text if the synth name and description text is the same
+                            metadata["description"] = info[1]
+                        metadata["pluginFormat"] = info[6]
+                        metadata_entries.append((metadata, None, info[1]))
 
-        #                     if eng in self.__engine_config__ and "description" in self.__engine_config__[eng]:
-        #                         metadata["description"] = self.__engine_config__[eng]["description"]
-        #                     elif info[1] is not None and not info[0] == info[1]:
-        #                         # Do not set description text if the synth name and description text is the same
-        #                         metadata["description"] = info[1]
-        #                     metadata["pluginFormat"] = info[6]
-        #                 metadata_entries.append((metadata, None, info[1]))
+                cat_entries = sorted(cat_entries, key=cmp_to_key(customSort))
+                metadata_entries = sorted(metadata_entries, key=cmp_to_key(customSort))
 
-        #         cat_entries = sorted(cat_entries, key=cmp_to_key(customSort))
-        #         metadata_entries = sorted(metadata_entries, key=cmp_to_key(customSort))
+                self.list_data.extend(cat_entries)
+                # Append only the metadata after sorting metadata_entries
+                self.list_metadata.extend([x[0] for x in metadata_entries])
 
-        #         self.list_data.extend(cat_entries)
-        #         # Append only the metadata after sorting metadata_entries
-        #         self.list_metadata.extend([x[0] for x in metadata_entries])
-
-        #     # # Display help if no engines are enabled ...
-        #     # if len(self.list_data)==0:
-        #     #     self.list_data.append((None,len(self.list_data),"Enable LV2-plugins on webconf".format(os.uname().nodename)))
-
-        #     # Select the first element that is not a category heading
-        #     if self.reset_index:
-        #         self.index = 0
-        #         for i, val in enumerate(self.list_data):
-        #             if val[0] != None:
-        #                 self.index = i
-        #                 break
-        #         self.reset_index = False
+            # Select the first element that is not a category heading
+            if self.reset_index:
+                self.index = 0
+                for i, val in enumerate(self.list_data):
+                    if val[0] != None:
+                        self.index = i
+                        break
+                self.reset_index = False
 
         super().fill_list()
 
@@ -305,18 +265,18 @@ class zynthian_gui_engine(zynthian_gui_selector):
             zynthian_engine_class=info[4]
             if eng[0:3]=="JV/":
                 eng="JV/{}".format(self.zyngine_counter)
-                self.zyngines[eng]=zynthian_engine_class(info[0], info[2], self.zynqtgui)
-            elif eng[0:3]=="JY/":
-                eng="JY/{}".format(self.zyngine_counter)
-                self.zyngines[eng]=zynthian_engine_class(info[0], info[2], self.zynqtgui)
             else:
-                if eng=="SF":
-                    eng="SF/{}".format(self.zyngine_counter)
+                if eng=="AE":
+                    eng="AE/{}".format(self.zyngine_counter)
                 elif eng=="FS":
                     eng="FS/{}".format(self.zyngine_counter)
-                elif eng=="AE":
-                    eng="AE/{}".format(self.zyngine_counter)
-                self.zyngines[eng]=zynthian_engine_class(self.zynqtgui)
+                elif eng=="BF":
+                    eng="BF/{}".format(self.zyngine_counter)
+                elif eng=="SF":
+                    eng="SF/{}".format(self.zyngine_counter)
+                elif eng=="ZY":
+                    eng="ZY/{}".format(self.zyngine_counter)
+            self.zyngines[eng]=zynthian_engine_class(info[7], self.zynqtgui)
 
         self.zyngine_counter+=1
         return self.zyngines[eng]

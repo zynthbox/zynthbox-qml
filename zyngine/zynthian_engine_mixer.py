@@ -66,8 +66,8 @@ class zynthian_engine_mixer(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, zynqtgui=None):
-        super().__init__(zynqtgui)
+    def __init__(self, plugin_info, zynqtgui=None):
+        super().__init__(plugin_info, zynqtgui)
 
         self.type = "Mixer"
         self.name = "Audio Levels"

@@ -27,6 +27,7 @@ import logging
 import pexpect
 
 from . import zynthian_engine
+from zynqtgui.utils.zynthbox_plugins_helper import zynthbox_plugin
 
 #------------------------------------------------------------------------------
 # setBfree Engine Class
@@ -179,8 +180,8 @@ class zynthian_engine_setbfree(zynthian_engine):
     # Initialization
     #----------------------------------------------------------------------------
 
-    def __init__(self, zynqtgui=None):
-        super().__init__(zynqtgui)
+    def __init__(self, plugin_info: zynthbox_plugin, zynqtgui=None):
+        super().__init__(plugin_info, zynqtgui)
         self.name = "setBfree"
         self.nickname = "BF"
         self.jackname = "setBfree"

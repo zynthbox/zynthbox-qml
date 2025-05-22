@@ -51,6 +51,10 @@ class zynthbox_plugin(QObject):
         self.category = ""
         self.engineType = None
         self.substitution_map = {}
+        self.volumeControls = [] # List of strings
+        self.cutoffControl = ""
+        self.resonanceControl = ""
+        self.description = ""
 
         if "version" in plugin_details:
             self.version = plugin_details["version"]
@@ -66,6 +70,14 @@ class zynthbox_plugin(QObject):
             self.category = plugin_details["category"]
         if "engineType" in plugin_details:
             self.engineType = plugin_details["engineType"]
+        if "volumeControls" in plugin_details:
+            self.volumeControls = plugin_details["volumeControls"]
+        if "cutoffControl" in plugin_details:
+            self.cutoffControl = plugin_details["cutoffControl"]
+        if "resonanceControl" in plugin_details:
+            self.resonanceControl = plugin_details["resonanceControl"]
+        if "description" in plugin_details:
+            self.description = plugin_details["description"]
 
         for key in plugin_details:
             self.substitution_map[f"{self.id}_{key}"] = plugin_details[key]

@@ -171,21 +171,24 @@ class zynthbox_plugins_helper(QObject):
                 logging.info(f"Plugin name SF/{plugin_name} not found in plugin database. Plugin might be added by user. Handle user added plugins accordingly")
         elif snapshot["engine_nick"] == "FS":
             # Fluidsynth stores the plugin name in a few places
-            # 1. bank_name: `<plugin name>`
-            # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
-            # 3. bank_info[2]: `<plugin name>`
-            # 4. bank_info[4]: stem from plugin path
-            # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...`
-            # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2`
-            plugin_name = snapshot["bank_name"]
+            # 1. bank_name: `<plugin name>` : FIXME bank name is the display value which replaces `_` with ` ` and is not used anywhere other than displaying.
+            # 2. bank_info[0]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2` : FIXME Make it generic for handling sf3 files
+            # 3. bank_info[2]: `<plugin name>` : FIXME bank name is the display value which replaces `_` with ` ` and is not used anywhere other than displaying.
+            # 4. bank_info[4]: stem from plugin path : FIXME Make it generic for handling sf3 files
+            # 5. preset_info[0]: `<path to plugin as in bank_info[0]>/...` : FIXME Make it generic for handling sf3 files
+            # 6. preset_info[3]: path to plugin `/zynthian/zynthian-data/soundfonts/sf2/<plugin name>.sf2` : FIXME Make it generic for handling sf3 files
+            plugin_name = Path(snapshot["bank_info"][0]).stem
             if f"sf2/{plugin_name}" in self.plugins_by_name:
                 plugin = self.plugins_by_name[f"sf2/{plugin_name}"]
+            elif f"sf3/{plugin_name}" in self.plugins_by_name:
+                plugin = self.plugins_by_name[f"sf3/{plugin_name}"]
+            if plugin is not None:
                 logging.info(f"Found ZBP plugin id for plugin when generating snapshot. Translating plugin name {plugin_name} to {plugin.id}")
                 snapshot["plugin_id"] = plugin.id
-                snapshot["bank_name"] = "${{{0}_name}}".format(plugin.id)
+                # snapshot["bank_name"] = "${{{0}_name}}".format(plugin.id)
                 snapshot["bank_info"][0] = "${{{0}_path}}".format(plugin.id)
-                snapshot["bank_info"][2] = "${{{0}_name}}".format(plugin.id)
-                snapshot["bank_info"][4] = "${{{0}_name}}.sf2".format(plugin.id)
+                # snapshot["bank_info"][2] = "${{{0}_name}}".format(plugin.id)
+                # snapshot["bank_info"][4] = "${{{0}_name}}".format(plugin.id)
                 snapshot["preset_info"][0] = snapshot["preset_info"][0].replace(plugin.path, "${{{0}_path}}".format(plugin.id))
                 snapshot["preset_info"][3] = "${{{0}_path}}".format(plugin.id)
             else:

@@ -873,7 +873,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         self.set_clip_to_record(clip)
 
         if clip.isChannelSample:
-            Path(channel.bankDir).mkdir(parents=True, exist_ok=True)
+            Path(clip.clipChannel.bankDir).mkdir(parents=True, exist_ok=True)
         else:
             (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
@@ -893,7 +893,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
         count = 0
 
         if clip.isChannelSample:
-            base_recording_dir = channel.bankDir
+            base_recording_dir = clip.clipChannel.bankDir
         else:
             base_recording_dir = f"{clip.recording_basepath}/wav"
 
@@ -1022,13 +1022,14 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
 
     def load_recorded_file_to_clip(self):
         if self.recordingType == "audio":
-            logging.info(f"Loading recorded wav to ({self.clip_to_record_path}) clip({self.clip_to_record}) {self.clip_to_record.channel.id} {self.clip_to_record.id}")
+            logging.info(f"Loading recorded wav ({self.clip_to_record_path}) to clip({self.clip_to_record}) {self.clip_to_record.channel.id} {self.clip_to_record.id}")
             if not Path(self.clip_to_record_path).exists():
                 logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
             else:
                 # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
+                # Also, we do not want to copy the clip, as it will have been recorded into an appropriate location inside the sketchpad
                 self.zynqtgui.currentTaskMessage = "Loading recording to clip"
-                self.clip_to_record.set_path(self.clip_to_record_path, should_copy=True)
+                self.clip_to_record.set_path(self.clip_to_record_path, should_copy=False)
                 self.clip_to_record.enabled = True
                 # Set same recorded clip to other additional clips
                 for clip in self.clips_to_record:
@@ -1037,7 +1038,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.zynqtgui):
                     if clip != self.clip_to_record:
                         clip.enabled = True
                         # Since this is a new clip, it does not matter if we are loading autosave metadata or not, as it does not have any metadata yet
-                        clip.set_path(self.clip_to_record_path, should_copy=True)
+                        clip.set_path(self.clip_to_record_path, should_copy=False)
                     ### Save clip metadata
                     # When processing a sample, do not write sound metadata. It does not need to have sound metadata
                     # When processing a skit, do write sound metadata. Sound metadata is not saved unless explicitly asked for. It is a potentially heavy task as it needs to write a lot of data

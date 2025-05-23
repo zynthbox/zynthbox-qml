@@ -25,6 +25,8 @@
 import logging
 import re
 import Jucy
+import random
+import string
 from collections import OrderedDict
 from PySide2.QtCore import QTimer
 
@@ -77,7 +79,8 @@ class zynthian_engine_jucy(zynthian_engine):
         except:
             jname_count = 0
 
-        return "{}-{:02d}".format(jname, jname_count)
+        # Append a 4 letter random id to jackname to prevent name clashes
+        return "{}-{:02d}-{}".format(jname, jname_count, ''.join(random.choices(string.ascii_lowercase + string.digits, k=4)))
 
     def update_controllers(self):
         self.pluginhost_parameters_dict = {}

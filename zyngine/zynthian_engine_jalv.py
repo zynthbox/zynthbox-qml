@@ -24,11 +24,10 @@
 
 import os
 import re
-import json
 import shutil
 import logging
-import Zynthbox
-from os.path import isfile
+import random
+import string
 from collections import OrderedDict
 from subprocess import check_output, STDOUT
 
@@ -206,7 +205,8 @@ class zynthian_engine_jalv(zynthian_engine):
         except:
             jname_count = 0
 
-        return "{}-{:02d}".format(jname, jname_count)
+        # Append a 4 letter random id to jackname to prevent name clashes
+        return "{}-{:02d}-{}".format(jname, jname_count, ''.join(random.choices(string.ascii_lowercase + string.digits, k=4)))
 
     # ---------------------------------------------------------------------------
     # Layer Management

@@ -29,6 +29,9 @@ import liblo
 import logging
 import shlex
 import Zynthbox
+import re
+import random
+import string
 from os.path import isfile, isdir, join
 from string import Template
 from collections import OrderedDict
@@ -227,10 +230,11 @@ class zynthian_engine(zynthian_basic_engine):
             if sanitize:
                 jname = re.sub("[\_]{2,}","_",re.sub("[\'\*\(\)\[\]\s]","_",jname))
             jname_count = self.zynqtgui.screens['layer'].get_jackname_count(jname)
-        except Exception as e:
+        except:
             jname_count = 0
 
-        return "{}-{:02d}".format(jname, jname_count)
+        # Append a 4 letter random id to jackname to prevent name clashes
+        return "{}-{:02d}-{}".format(jname, jname_count, ''.join(random.choices(string.ascii_lowercase + string.digits, k=4)))
 
 
     # ---------------------------------------------------------------------------

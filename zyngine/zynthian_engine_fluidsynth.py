@@ -89,9 +89,7 @@ class zynthian_engine_fluidsynth(zynthian_engine):
 
         self.name = "FluidSynth"
         self.nickname = "FS"
-        # Fluidsynth cli do not have the functionality to get current jack client name and hence
-        # Append a 4 letter unique id to jackname to prevent name clashes
-        self.jackname = f"{self.get_next_jackname('fluidsynth')}-{''.join(random.choices(string.ascii_lowercase + string.digits, k=4))}"
+        self.jackname = self.get_next_jackname('fluidsynth')
 
         self.options['drop_pc']=True
 

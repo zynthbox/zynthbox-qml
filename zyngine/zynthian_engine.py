@@ -85,9 +85,13 @@ class zynthian_basic_engine(QObject):
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             self.is_running = True
 
+    """
+    Start the engine and return output if it is waiting for a prompt
+    """
     def start(self):
         command = shlex.split(self.command)[0]
         command_args = shlex.split(self.command)[1:]
+        output = ""
         if not self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:
             logging.info(f"Starting Engine {self.name}")
             logging.debug(f"Engine start command : {self.command}")
@@ -95,8 +99,10 @@ class zynthian_basic_engine(QObject):
             # logging.error(f"Waiting for start command to complete...")
             if self.command_prompt:
                 startTransaction.waitForState()
-                # logging.error(f"--- Engine Start Output BEGIN\n{startTransaction.standardOutput()}\n--- Engine Start Output END")
+                output = startTransaction.standardOutput()
+                # logging.error(f"--- Engine Start Output BEGIN\n{output}\n--- Engine Start Output END")
             startTransaction.release()
+        return output
 
     def stop(self):
         if self.proc.state() == Zynthbox.ProcessWrapper.ProcessState.RunningState:

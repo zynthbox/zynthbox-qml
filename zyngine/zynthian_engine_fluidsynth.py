@@ -98,8 +98,10 @@ class zynthian_engine_fluidsynth(zynthian_engine):
         self.proc.setCommandPrompt(self.command_prompt)
 
 
-        self.start()
+        output = self.start()
         self.reset()
+
+        logging.debug(f"Fluidsynth Startup output : {output}")
 
 
     def reset(self):

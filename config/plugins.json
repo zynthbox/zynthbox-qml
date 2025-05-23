@@ -9,7 +9,8 @@
       "engineType": "jalv",
       "zynthboxVersionAdded": "1",
       "volumeControls": ["master"],
-      "resonanceControl": "res"
+      "resonanceControl": "res",
+      "description": "Virtual analogue monophonic synthesizer"
     },
     "ZBP_1001": {
       "name": "Nekobi",
@@ -18,7 +19,8 @@
       "path": "/usr/lib/lv2/Nekobi.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Simple single-oscillator synth based on the Roland TB-303"
     },
     "ZBP_1002": {
       "name": "Raffo Synth",
@@ -27,7 +29,8 @@
       "path": "/zynthian/zynthian-plugins/lv2/raffo.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "4-oscillator subtractive synthesizer emulator of Minimoog"
     },
     "ZBP_1003": {
       "name": "String machine",
@@ -36,7 +39,8 @@
       "path": "/zynthian/zynthian-plugins/lv2/string-machine.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Virtual analog string ensemble synthesizer"
     },
     "ZBP_1004": {
       "name": "Noize Mak3r",
@@ -45,7 +49,8 @@
       "path": "/usr/lib/lv2/TAL-NoiseMaker.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Virtual analog synthesizer"
     },
     "ZBP_1005": {
       "name": "Red Zeppelin 5",
@@ -55,7 +60,8 @@
       "version": "",
       "engineType": "jalv",
       "zynthboxVersionAdded": "1",
-      "volumeControls": ["level"]
+      "volumeControls": ["level"],
+      "description": "Drumkits Percussion section of the AVL Drumkits series"
     },
     "ZBP_1006": {
       "name": "padthv1",
@@ -64,7 +70,8 @@
       "path": "/usr/lib/lv2/padthv1.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "An old-school polyphonic additive synthesizer with stereo fx"
     },
     "ZBP_1007": {
       "name": "Foo YC20 Organ",
@@ -73,7 +80,8 @@
       "path": "/usr/local/lib/lv2/foo-yc20.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Physical modelling implementation of the Yamaha YC-20 combo organ synthesizer"
     },
     "ZBP_1008": {
       "name": "synthv1",
@@ -95,7 +103,8 @@
       "path": "/usr/lib/lv2/Helm.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "A polyphonic synthesizer"
     },
     "ZBP_1010": {
       "name": "Fabla",
@@ -104,7 +113,8 @@
       "path": "/usr/lib/lv2/fabla.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "An open-source drum sampler plugin instrument"
     },
     "ZBP_1011": {
       "name": "ZynAddSubFX",
@@ -112,7 +122,8 @@
       "path": "/usr/bin/zynaddsubfx",
       "version": "",
       "engineType": "zynaddsubfx",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Polyphonic software synthesizer"
     },
     "ZBP_1012": {
       "name": "Obxd",
@@ -121,7 +132,8 @@
       "path": "/usr/lib/lv2/Obxd.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Oberheim OB-X Inspired Synth"
     },
     "ZBP_1013": {
       "name": "Surge",
@@ -130,7 +142,8 @@
       "path": "/usr/lib/lv2/Surge.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Open Source Digital Synthesizer"
     },
     "ZBP_1014": {
       "name": "Vex",
@@ -139,7 +152,8 @@
       "path": "/usr/lib/lv2/vex.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "A 3-oscillator wavesample/subtractive synthesizer"
     },
     "ZBP_1015": {
       "name": "DrumSynth",
@@ -148,7 +162,8 @@
       "path": "/usr/lib/lv2/drumsynth.lv2/",
       "version": "",
       "engineType": "jalv",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "A realtime 32/64-bit virtual drum synthesizer"
     },
     "ZBP_1016": {
       "name": "Aeolus",
@@ -156,7 +171,8 @@
       "path": "/usr/bin/aeolus",
       "version": "",
       "engineType": "aeolus",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Pipe organ synthesizer"
     },
     "ZBP_1017": {
       "name": "FluidSynth",
@@ -164,7 +180,8 @@
       "path": "/usr/bin/fluidsynth",
       "version": "",
       "engineType": "fluidsynth",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "SF2 Player"
     },
     "ZBP_1018": {
       "name": "setBfree",
@@ -172,7 +189,8 @@
       "path": "/usr/bin/setBfree",
       "version": "",
       "engineType": "setbfree",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "Hammond Emulator"
     },
     "ZBP_1019": {
       "name": "Sfizz",
@@ -180,7 +198,8 @@
       "path": "/usr/bin/sfizz_jack",
       "version": "",
       "engineType": "sfizz",
-      "zynthboxVersionAdded": "1"
+      "zynthboxVersionAdded": "1",
+      "description": "SFZ Player"
     }
   },
   "soundfont": {
